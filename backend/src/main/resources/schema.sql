@@ -1,0 +1,135 @@
+CREATE TABLE IF NOT EXISTS `user` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(50) NOT NULL,
+  `password` VARCHAR(100) NOT NULL,
+  `nickname` VARCHAR(50) DEFAULT NULL,
+  `avatar` VARCHAR(255) DEFAULT NULL,
+  `phone` VARCHAR(20) DEFAULT NULL,
+  `email` VARCHAR(100) DEFAULT NULL,
+  `role` VARCHAR(20) NOT NULL DEFAULT 'USER',
+  `status` TINYINT NOT NULL DEFAULT 1,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_username` (`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `address` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `receiver_name` VARCHAR(50) NOT NULL,
+  `receiver_phone` VARCHAR(20) NOT NULL,
+  `province` VARCHAR(50) NOT NULL,
+  `city` VARCHAR(50) NOT NULL,
+  `district` VARCHAR(50) DEFAULT NULL,
+  `detail` VARCHAR(255) NOT NULL,
+  `is_default` TINYINT NOT NULL DEFAULT 0,
+  `status` TINYINT NOT NULL DEFAULT 1,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_address_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `shop` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `owner_user_id` BIGINT NOT NULL,
+  `name` VARCHAR(80) NOT NULL,
+  `logo` VARCHAR(255) DEFAULT NULL,
+  `description` VARCHAR(255) DEFAULT NULL,
+  `status` TINYINT NOT NULL DEFAULT 1,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_shop_owner_user_id` (`owner_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `product` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `shop_id` BIGINT NOT NULL,
+  `name` VARCHAR(120) NOT NULL,
+  `cover` VARCHAR(255) DEFAULT NULL,
+  `description` TEXT,
+  `price` DECIMAL(10,2) NOT NULL,
+  `stock` INT NOT NULL DEFAULT 0,
+  `status` TINYINT NOT NULL DEFAULT 1,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_product_shop_id` (`shop_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `secondhand_product` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `seller_user_id` BIGINT NOT NULL,
+  `name` VARCHAR(120) NOT NULL,
+  `cover` VARCHAR(255) DEFAULT NULL,
+  `description` TEXT,
+  `origin_price` DECIMAL(10,2) DEFAULT NULL,
+  `sale_price` DECIMAL(10,2) NOT NULL,
+  `condition_level` VARCHAR(30) DEFAULT NULL,
+  `status` TINYINT NOT NULL DEFAULT 1,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_secondhand_seller` (`seller_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `order_info` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `order_no` VARCHAR(64) NOT NULL,
+  `buyer_user_id` BIGINT NOT NULL,
+  `total_amount` DECIMAL(10,2) NOT NULL DEFAULT 0,
+  `pay_status` TINYINT NOT NULL DEFAULT 0,
+  `order_status` TINYINT NOT NULL DEFAULT 0,
+  `remark` VARCHAR(255) DEFAULT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_order_info_order_no` (`order_no`),
+  KEY `idx_order_info_buyer_user_id` (`buyer_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `order_item` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `order_id` BIGINT NOT NULL,
+  `product_type` VARCHAR(20) NOT NULL DEFAULT 'NEW',
+  `product_id` BIGINT NOT NULL,
+  `product_name` VARCHAR(120) NOT NULL,
+  `price` DECIMAL(10,2) NOT NULL,
+  `quantity` INT NOT NULL DEFAULT 1,
+  `status` TINYINT NOT NULL DEFAULT 1,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_order_item_order_id` (`order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `review` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `order_id` BIGINT NOT NULL,
+  `product_type` VARCHAR(20) NOT NULL DEFAULT 'NEW',
+  `product_id` BIGINT NOT NULL,
+  `user_id` BIGINT NOT NULL,
+  `score` TINYINT NOT NULL,
+  `content` VARCHAR(500) DEFAULT NULL,
+  `status` TINYINT NOT NULL DEFAULT 1,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_review_product` (`product_id`),
+  KEY `idx_review_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `report` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `reporter_user_id` BIGINT NOT NULL,
+  `target_type` VARCHAR(30) NOT NULL,
+  `target_id` BIGINT NOT NULL,
+  `reason` VARCHAR(255) NOT NULL,
+  `status` TINYINT NOT NULL DEFAULT 0,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_report_reporter` (`reporter_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
