@@ -2,9 +2,9 @@
   <div class="page-card">
     <h2 class="page-title">首页</h2>
     <el-descriptions title="当前登录用户" :column="1" border>
-      <el-descriptions-item label="账号">{{ authStore.user?.username || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="昵称">{{ authStore.user?.nickname || '-' }}</el-descriptions-item>
-      <el-descriptions-item label="角色">{{ authStore.user?.role || '-' }}</el-descriptions-item>
+      <el-descriptions-item label="账号">{{ userStore.userInfo?.username || '-' }}</el-descriptions-item>
+      <el-descriptions-item label="昵称">{{ userStore.userInfo?.nickname || '-' }}</el-descriptions-item>
+      <el-descriptions-item label="角色">{{ userStore.userInfo?.role || '-' }}</el-descriptions-item>
     </el-descriptions>
 
     <h3 style="margin-top: 24px">推荐商品</h3>
@@ -20,13 +20,13 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { getProductListApi } from '@/api/product';
-import { useAuthStore } from '@/stores/auth';
+import { useUserStore } from '@/stores/user';
 
-const authStore = useAuthStore();
+const userStore = useUserStore();
 const products = ref([]);
 
 onMounted(async () => {
-  await authStore.fetchMe();
+  await userStore.fetchProfile();
   const result = await getProductListApi();
   products.value = result.data || [];
 });

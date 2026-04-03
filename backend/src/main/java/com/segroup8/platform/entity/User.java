@@ -18,9 +18,12 @@ public class User {
     private String phone;
     private String email;
     private String role;
-    private Integer status;
+    private String status;
+    private Integer creditScore;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+
+    // TODO: 关联商品/订单/评价数统计 的逻辑接口
 
     public Long getId() {
         return id;
@@ -86,12 +89,20 @@ public class User {
         this.role = role;
     }
 
-    public Integer getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Integer getCreditScore() {
+        return creditScore;
+    }
+
+    public void setCreditScore(Integer creditScore) {
+        this.creditScore = creditScore;
     }
 
     public LocalDateTime getCreateTime() {

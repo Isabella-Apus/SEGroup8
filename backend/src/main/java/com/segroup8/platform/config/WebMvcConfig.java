@@ -20,12 +20,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(jwtAuthInterceptor)
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(
+                        "/api/auth/register",
                         "/api/auth/login",
                         "/api/product/list",
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
-                        "/swagger-ui.html"
-                );
+                        "/swagger-ui.html");
     }
 
     @Override
