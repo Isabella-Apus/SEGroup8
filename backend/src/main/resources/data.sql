@@ -1,12 +1,12 @@
-INSERT IGNORE INTO `user` (`id`, `username`, `password`, `nickname`, `avatar`, `phone`, `email`, `role`, `status`)
+INSERT IGNORE INTO `user` (`id`, `username`, `password`, `nickname`, `avatar`, `phone`, `email`, `role`, `status`, `credit_score`)
 VALUES
-(1, 'admin', 'admin123', 'PlatformAdmin', '', '13800000000', 'admin@demo.com', 'ADMIN', 1),
-(2, 'seller', 'seller123', 'DemoSeller', '', '13800000001', 'seller@demo.com', 'SELLER', 1),
-(3, 'user', 'user123', 'DemoUser', '', '13800000002', 'user@demo.com', 'USER', 1);
+(1, 'admin', 'admin123', 'PlatformAdmin', '', '13800000000', 'admin@demo.com', 'ADMIN', 'NORMAL', 100),
+(2, 'seller', 'seller123', 'DemoSeller', '', '13800000001', 'seller@demo.com', 'OFFICIAL_SELLER', 'NORMAL', 100),
+(3, 'user', 'user123', 'DemoUser', '', '13800000002', 'user@demo.com', 'USER', 'NORMAL', 100);
 
-INSERT IGNORE INTO `address` (`id`, `user_id`, `receiver_name`, `receiver_phone`, `province`, `city`, `district`, `detail`, `is_default`, `status`)
+INSERT IGNORE INTO `address` (`id`, `user_id`, `receiver_name`, `receiver_phone`, `province`, `city`, `detail_address`, `is_default`)
 VALUES
-(1, 3, 'Zhang San', '13800000002', 'Beijing', 'Beijing', 'Haidian', 'Software Park Building 1', 1, 1);
+(1, 3, 'Zhang San', '13800000002', 'Beijing', 'Beijing', 'Software Park Building 1', 1);
 
 INSERT IGNORE INTO `shop` (`id`, `owner_user_id`, `name`, `logo`, `description`, `status`)
 VALUES

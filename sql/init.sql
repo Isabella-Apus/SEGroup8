@@ -21,7 +21,8 @@ CREATE TABLE `user` (
   `phone` VARCHAR(20) DEFAULT NULL,
   `email` VARCHAR(100) DEFAULT NULL,
   `role` VARCHAR(20) NOT NULL DEFAULT 'USER',
-  `status` TINYINT NOT NULL DEFAULT 1,
+  `status` VARCHAR(20) NOT NULL DEFAULT 'NORMAL',
+  `credit_score` INT NOT NULL DEFAULT 100,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -35,14 +36,59 @@ CREATE TABLE `address` (
   `receiver_phone` VARCHAR(20) NOT NULL,
   `province` VARCHAR(50) NOT NULL,
   `city` VARCHAR(50) NOT NULL,
-  `district` VARCHAR(50) DEFAULT NULL,
-  `detail` VARCHAR(255) NOT NULL,
+  `detail_address` VARCHAR(255) NOT NULL,
   `is_default` TINYINT NOT NULL DEFAULT 0,
-  `status` TINYINT NOT NULL DEFAULT 1,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_address_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `merchant_application` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `store_name` VARCHAR(80) NOT NULL,
+  `category_id` INT NOT NULL,
+  `id_card_no` VARCHAR(30) NOT NULL,
+  `bank_card_no` VARCHAR(50) NOT NULL,
+  `license_img` VARCHAR(255) NOT NULL,
+  `warehouse_addr` VARCHAR(255) NOT NULL,
+  `warehouse_province` VARCHAR(50) NOT NULL DEFAULT '',
+  `warehouse_city` VARCHAR(50) NOT NULL DEFAULT '',
+  `warehouse_detail` VARCHAR(255) NOT NULL DEFAULT '',
+  `contact_name` VARCHAR(50) NOT NULL,
+  `contact_phone` VARCHAR(20) NOT NULL,
+  `status` TINYINT NOT NULL DEFAULT 0,
+  `reject_reason` VARCHAR(255) DEFAULT NULL,
+  `apply_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_merchant_application_user_id` (`user_id`),
+  KEY `idx_merchant_application_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `notification` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `title` VARCHAR(100) NOT NULL,
+  `content` VARCHAR(500) NOT NULL,
+  `is_read` TINYINT NOT NULL DEFAULT 0,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_notification_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `admin_audit_log` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `admin_user_id` BIGINT DEFAULT NULL,
+  `admin_username` VARCHAR(50) NOT NULL,
+  `action` VARCHAR(80) NOT NULL,
+  `target_type` VARCHAR(50) NOT NULL,
+  `target_id` BIGINT DEFAULT NULL,
+  `detail` VARCHAR(500) DEFAULT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_admin_audit_log_admin_user_id` (`admin_user_id`),
+  KEY `idx_admin_audit_log_create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `shop` (

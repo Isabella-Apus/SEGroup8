@@ -4,7 +4,7 @@
       <strong>购物与二手交易平台</strong>
       <div>
         <el-space>
-          <span>{{ authStore.user?.nickname || authStore.user?.username || '游客' }}</span>
+          <span>{{ userStore.userInfo?.nickname || userStore.userInfo?.username || '游客' }}</span>
           <el-button size="small" @click="goProfile">个人中心</el-button>
           <el-button size="small" type="danger" @click="handleLogout">退出</el-button>
         </el-space>
@@ -19,6 +19,10 @@
           <el-menu-item index="/order">我的订单</el-menu-item>
           <el-menu-item index="/secondhand">二手</el-menu-item>
           <el-menu-item index="/secondhand/publish">发布二手</el-menu-item>
+          <el-menu-item index="/profile">个人资料</el-menu-item>
+          <el-menu-item index="/addresses">地址管理</el-menu-item>
+          <el-menu-item v-if="userStore.currentRole === 'OFFICIAL_SELLER'" index="/merchant">进入卖家工作台</el-menu-item>
+          <el-menu-item v-else index="/merchant-apply">申请成为卖家</el-menu-item>
         </el-menu>
       </el-aside>
       <el-main>
@@ -30,17 +34,17 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '@/stores/auth';
+import { useUserStore } from '@/stores/user';
 
 const router = useRouter();
-const authStore = useAuthStore();
+const userStore = useUserStore();
 
 function handleLogout() {
-  authStore.logout();
+  userStore.logout();
   router.push('/login');
 }
 
 function goProfile() {
-  router.push('/');
+  router.push('/profile');
 }
 </script>
