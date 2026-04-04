@@ -27,7 +27,7 @@ const products = ref([]);
 
 onMounted(async () => {
   await userStore.fetchProfile();
-  const result = await getProductListApi();
-  products.value = result.data || [];
+  const result = await getProductListApi({ pageNum: 1, pageSize: 5 });
+  products.value = result.data?.records || [];
 });
 </script>

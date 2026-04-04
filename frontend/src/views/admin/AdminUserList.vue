@@ -20,18 +20,8 @@
       <el-table-column prop="creditScore" label="信用分" width="100" />
       <el-table-column label="操作" width="180">
         <template #default="{ row }">
-          <el-button
-            v-if="row.status !== 'BANNED'"
-            link
-            type="danger"
-            @click="changeStatus(row, 'ban')"
-          >封禁</el-button>
-          <el-button
-            v-else
-            link
-            type="success"
-            @click="changeStatus(row, 'unban')"
-          >解封</el-button>
+          <el-button v-if="row.status !== 'BANNED'" link type="danger" @click="changeStatus(row, 'ban')">封禁</el-button>
+          <el-button v-else link type="success" @click="changeStatus(row, 'unban')">解封</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -65,9 +55,14 @@ const query = reactive({
 onMounted(loadUsers);
 
 async function loadUsers() {
-  const result = await pageUsersApi(query);
-  records.value = result.data.records || [];
-  total.value = result.data.total || 0;
+  try {
+    const result = await pageUsersApi(query);
+    records.value = result.data.records || [];
+    total.value = result.data.total || 0;
+  } catch (error) {
+    records.value = [];
+    total.value = 0;
+  }
 }
 
 async function changeStatus(row, action) {

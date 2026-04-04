@@ -2,19 +2,19 @@
     <div class="auth-wrap">
         <div class="auth-card page-card">
             <h2 class="page-title">账号登录</h2>
-            <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
-                <el-form-item label="账号" prop="username">
+            <el-form :model="form" label-width="80px" @submit.prevent>
+                <el-form-item label="账号">
                     <el-input v-model="form.username" placeholder="请输入账号" />
                 </el-form-item>
-                <el-form-item label="密码" prop="password">
+                <el-form-item label="密码">
                     <el-input v-model="form.password" type="password" show-password placeholder="请输入密码" />
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" :loading="loading" @click="handleLogin">登录</el-button>
-                    <el-button @click="router.push('/register')">注册</el-button>
                 </el-form-item>
             </el-form>
-        </div>
+            <p class="empty-tip">测试账号：admin/admin123 或 user/user123</p>
+    </div>
     </div>
 </template>
 
@@ -26,24 +26,20 @@ import { useUserStore } from '@/stores/user';
 
 const router = useRouter();
 const userStore = useUserStore();
-const formRef = ref();
 const loading = ref(false);
 const form = reactive({
     username: 'user',
     password: 'user123'
 });
 
-const rules = {
-    username: [{ required: true, message: '请输入账号', trigger: 'blur' }],
-    password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
-};
-
 async function handleLogin() {
-    await formRef.value.validate();
+    if (!form.username || !form.password) {
+        ElMessage.warning('请填写完整账号密码');
+        return;
+    }
     loading.value = true;
     try {
         const userInfo = await userStore.login(form);
-        await userStore.fetchProfile();
         ElMessage.success('登录成功');
         if (userInfo.role === 'ADMIN') {
             router.push('/admin');

@@ -4,8 +4,12 @@ export function submitMerchantApplicationApi(payload) {
     return http.post("/user/merchant-application", payload);
 }
 
-export function getMyMerchantApplicationApi() {
-    return http.get("/user/merchant-application/me");
+export async function getMyMerchantApplicationApi() {
+    try {
+        return await http.get("/user/merchant-application/me");
+    } catch (error) {
+        return http.get("/user/merchant-application/me.");
+    }
 }
 
 export function pageMerchantApplicationsApi(params) {
