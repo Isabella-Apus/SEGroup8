@@ -1,7 +1,11 @@
 import http from "./http";
 
-export function getProfileApi() {
-    return http.get("/user/profile");
+export async function getProfileApi() {
+    try {
+        return await http.get("/user/me");
+    } catch (error) {
+        return http.get("/user/profile");
+    }
 }
 
 export function updateProfileApi(payload) {

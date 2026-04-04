@@ -47,7 +47,7 @@ SEGroup8/
 
 官网下载：
 
-- https://nodejs.org/
+- <https://nodejs.org/>
 
 安装完成后，在命令行输入：
 
@@ -82,7 +82,7 @@ java -version
 
 Maven 官网：
 
-- https://maven.apache.org/download.cgi
+- <https://maven.apache.org/download.cgi>
 
 建议下载：
 
@@ -97,7 +97,7 @@ Maven 官网：
 C:\Users\你的用户名\tools\apache-maven-3.9.11
 ```
 
-3. 配置环境变量：
+1. 配置环境变量：
 
 - 新建用户变量或系统变量：`MAVEN_HOME`
 - 值填写 Maven 解压目录，例如：
@@ -112,7 +112,7 @@ C:\Users\你的用户名\tools\apache-maven-3.9.11
 %MAVEN_HOME%\bin
 ```
 
-4. 关闭当前终端，重新打开一个新的终端窗口
+1. 关闭当前终端，重新打开一个新的终端窗口
 
 #### 验证 Maven
 
@@ -188,26 +188,53 @@ Maven 会根据 [pom.xml](/c:/Users/34267/Desktop/code/SEGroup8/backend/pom.xml)
 
 ## 5. 数据库账号和密码在哪里填写
 
-数据库配置文件在：
+公共配置文件在：
 
-[application.yml](/c:/Users/34267/Desktop/code/SEGroup8/backend/src/main/resources/application.yml)
+- `backend/src/main/resources/application.yml`
 
-请修改下面这几项：
+请不要在公共配置里填写个人数据库密码。
+
+### 5.1 本地私有配置（推荐）
+
+在下面路径创建本地文件（该文件已被 `.gitignore` 忽略）：
+
+- `backend/src/main/resources/application-local.yml`
+
+可选：复制示例文件作为模板（示例仅用于参考）：
+
+- `backend/src/main/resources/application-local.example.yml`
+
+示例内容：
 
 ```yml
 spring:
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/segroup8_platform?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    password: hollowknight045
+    password: 你的MySQL密码
 ```
 
-你需要根据自己电脑里的 MySQL 账号密码修改：
+如果你的账号不是 `root`，请改成你自己的账号。
 
-- `username`
-- `password`
+### 5.2 自动创建（脚本启动）
 
-如果你的 MySQL 账号不是 `root`，或者密码不是 `hollowknight045`，就改成你自己的。
+如果你使用下面脚本启动后端：
+
+- `backend/start.bat`
+- `backend/start.ps1`
+
+当 `application-local.yml` 不存在时，脚本会自动从 `application-local.example.yml` 复制并创建本地文件。
+
+你只需要修改新生成文件里的这两项：
+
+- `spring.datasource.username`
+- `spring.datasource.password`
+
+注意：如果你直接使用 `mvn spring-boot:run`，脚本不会执行，需先手动创建 `application-local.yml`。
+
+注意：
+
+- `application-local.yml` 是本机私有配置，不会提交到仓库。
+- `application-local.example.yml` 只保留占位符，不能填写真实密码后提交。
 
 ## 6. SQL 初始化怎么做
 
@@ -221,7 +248,7 @@ spring:
 也就是说，只要：
 
 - MySQL 能正常连接
-- `application.yml` 里的用户名和密码写对
+- `application.yml` + `application-local.yml` 的用户名和密码写对
 
 后端第一次启动时会自动：
 
@@ -351,7 +378,7 @@ mvn spring-boot:run
 Access denied for user 'root'@'localhost'
 ```
 
-说明 [application.yml](/c:/Users/34267/Desktop/code/SEGroup8/backend/src/main/resources/application.yml) 里的数据库账号或密码不对。
+说明 `application.yml` 或 `application-local.yml` 里的数据库账号或密码不对。
 
 请修改：
 

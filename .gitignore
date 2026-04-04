@@ -4,6 +4,7 @@ frontend/dist/
 
 # backend
 backend/target/
+backend/src/main/resources/application-local.yml
 
 # uploads
 backend/uploads/
