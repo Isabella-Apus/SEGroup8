@@ -215,6 +215,22 @@ spring:
 
 如果你的账号不是 `root`，请改成你自己的账号。
 
+### 5.2 自动创建（脚本启动）
+
+如果你使用下面脚本启动后端：
+
+- `backend/start.bat`
+- `backend/start.ps1`
+
+当 `application-local.yml` 不存在时，脚本会自动从 `application-local.example.yml` 复制并创建本地文件。
+
+你只需要修改新生成文件里的这两项：
+
+- `spring.datasource.username`
+- `spring.datasource.password`
+
+注意：如果你直接使用 `mvn spring-boot:run`，脚本不会执行，需先手动创建 `application-local.yml`。
+
 注意：
 
 - `application-local.yml` 是本机私有配置，不会提交到仓库。
