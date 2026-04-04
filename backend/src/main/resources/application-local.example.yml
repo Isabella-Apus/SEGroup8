@@ -1,39 +1,4 @@
-server:
-  port: 8080
-
 spring:
-  application:
-    name: segroup8-platform
-  config:
-    import: optional:classpath:application-local.yml
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/segroup8_platform?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    password: root
-  sql:
-    init:
-      mode: always
-      encoding: UTF-8
-  servlet:
-    multipart:
-      max-file-size: 5MB
-      max-request-size: 20MB
-
-mybatis-plus:
-  configuration:
-    map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
-app:
-  jwt:
-    secret: SEGROUP8_DEMO_SECRET_KEY_CHANGE_ME_2026
-    expire-hours: 24
-  upload:
-    dir: uploads
-
-springdoc:
-  api-docs:
-    enabled: true
-  swagger-ui:
-    path: /swagger-ui.html
+    password: your_mysql_password
