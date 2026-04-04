@@ -199,7 +199,7 @@ spring:
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/segroup8_platform?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    password: hollowknight045
+    password: 
 ```
 
 你需要根据自己电脑里的 MySQL 账号密码修改：
@@ -207,7 +207,7 @@ spring:
 - `username`
 - `password`
 
-如果你的 MySQL 账号不是 `root`，或者密码不是 `hollowknight045`，就改成你自己的。
+
 
 ## 6. SQL 初始化怎么做
 
