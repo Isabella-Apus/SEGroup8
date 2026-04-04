@@ -39,7 +39,7 @@ import { ElMessage } from 'element-plus';
 import { useRoute, useRouter } from 'vue-router';
 import { getProductDetailApi } from '@/api/product';
 import { createOrderApi } from '@/api/order';
-import { addToCart } from '@/utils/cart';
+import { addToCart, removeFromCart } from '@/utils/cart';
 
 const route = useRoute();
 const router = useRouter();
@@ -95,6 +95,7 @@ async function handleBuyNow() {
   await createOrderApi({
     items: [{ productId: product.value.id, quantity: Number(quantity.value) }]
   });
+  removeFromCart(product.value.id);
   ElMessage.success('下单成功');
   router.push('/order');
 }

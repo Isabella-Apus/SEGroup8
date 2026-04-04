@@ -46,6 +46,7 @@ import { computed, onMounted, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { createOrderApi } from '@/api/order';
+import { getProductDetailApi } from '@/api/product';
 import { clearCart, getCartItems, removeFromCart, saveCartItems } from '@/utils/cart';
 
 const router = useRouter();
@@ -57,9 +58,19 @@ const totalAmount = computed(() => {
     .toFixed(2);
 });
 
-onMounted(() => {
-  items.value = getCartItems();
+onMounted(async () => {
+  await refreshCartItems();
 });
+
+async function refreshCartItems() {
+  const rawItems = getCartItems();
+  const checks = await Promise.allSettled(
+    rawItems.map((item) => getProductDetailApi(item.productId))
+  );
+  const validItems = rawItems.filter((_, index) => checks[index].status === 'fulfilled');
+  items.value = validItems;
+  saveCartItems(validItems);
+}
 
 function handleQtyChange() {
   saveCartItems(items.value);
@@ -75,8 +86,9 @@ function clear() {
 }
 
 async function checkout() {
+  await refreshCartItems();
   if (!items.value.length) {
-    ElMessage.warning('购物车为空');
+    ElMessage.warning('购物车为空或商品已下架');
     return;
   }
   await createOrderApi({

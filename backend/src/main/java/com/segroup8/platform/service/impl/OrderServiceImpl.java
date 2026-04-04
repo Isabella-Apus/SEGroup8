@@ -77,6 +77,13 @@ public class OrderServiceImpl implements OrderService {
                 throw new BusinessException(400, "库存不足: " + product.getName());
             }
 
+            Product latestProduct = productMapper.selectById(productId);
+            if (latestProduct != null && latestProduct.getStock() != null && latestProduct.getStock() <= 0
+                    && ProductStatusEnum.ON_SHELF.equals(ProductStatusEnum.of(latestProduct.getStatus()))) {
+                latestProduct.setStatus(ProductStatusEnum.OFF_SHELF.getCode());
+                productMapper.updateById(latestProduct);
+            }
+
             BigDecimal itemAmount = product.getPrice().multiply(BigDecimal.valueOf(quantity));
             totalAmount = totalAmount.add(itemAmount);
 
