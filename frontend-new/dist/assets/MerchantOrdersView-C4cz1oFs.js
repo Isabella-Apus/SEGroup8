@@ -1,0 +1,1 @@
+import{_ as t,c as a,a as s,o as c}from"./index-Bacd5VNc.js";const r={},o={class:"page-card"};function n(p,e){return c(),a("div",o,[...e[0]||(e[0]=[s("h2",{class:"page-title"},"订单管理",-1),s("p",{class:"empty-tip"},"订单管理模块占位页，可继续扩展发货与售后处理。",-1)])])}const d=t(r,[["render",n]]);export{d as default};

@@ -1,15 +1,15 @@
 <template>
-  <article class="product-card" @click="goDetail">
+  <article class="product-card" :class="{ clickable }" @click="goDetail">
     <div class="cover-wrap">
       <img class="cover" :src="coverUrl" :alt="product.name" loading="lazy" />
-      <span class="badge">{{ product.statusName || '在售' }}</span>
+      <span class="badge">{{ badgeText }}</span>
     </div>
     <div class="content">
       <h3 class="title">{{ product.name }}</h3>
-      <p class="desc">{{ product.description || '品质好物，支持快速发货' }}</p>
+      <p class="desc">{{ descriptionText }}</p>
       <div class="meta">
-        <strong class="price">¥{{ formatPrice(product.price) }}</strong>
-        <span class="stock">库存 {{ product.stock ?? 0 }}</span>
+        <strong class="price">¥{{ formatPrice(mainPrice) }}</strong>
+        <span class="sub">{{ subText }}</span>
       </div>
     </div>
   </article>
@@ -23,10 +23,46 @@ const props = defineProps({
   product: {
     type: Object,
     required: true
+  },
+  mode: {
+    type: String,
+    default: 'product'
+  },
+  clickable: {
+    type: Boolean,
+    default: true
+  },
+  routeBase: {
+    type: String,
+    default: '/product'
   }
 });
 
 const router = useRouter();
+
+const isSecondhand = computed(() => props.mode === 'secondhand');
+
+const badgeText = computed(() => {
+  if (isSecondhand.value) {
+    return props.product.conditionLevel || props.product.condition || '二手';
+  }
+  return props.product.statusName || '在售';
+});
+
+const descriptionText = computed(() => {
+  return props.product.description || '品质好物，支持快速发货';
+});
+
+const mainPrice = computed(() => {
+  return isSecondhand.value ? props.product.salePrice : props.product.price;
+});
+
+const subText = computed(() => {
+  if (isSecondhand.value) {
+    return `原价 ¥${formatPrice(props.product.originPrice)}`;
+  }
+  return `库存 ${props.product.stock ?? 0}`;
+});
 
 const coverUrl = computed(() => {
   const cover = props.product.cover || '';
@@ -40,7 +76,10 @@ const coverUrl = computed(() => {
 });
 
 function goDetail() {
-  router.push(`/product/${props.product.id}`);
+  if (!props.clickable) {
+    return;
+  }
+  router.push(`${props.routeBase}/${props.product.id}`);
 }
 
 function formatPrice(value) {
@@ -55,11 +94,14 @@ function formatPrice(value) {
   border: 1px solid var(--line-soft);
   border-radius: 18px;
   overflow: hidden;
-  cursor: pointer;
   transition: transform .2s ease, box-shadow .2s ease;
 }
 
-.product-card:hover {
+.product-card.clickable {
+  cursor: pointer;
+}
+
+.product-card.clickable:hover {
   transform: translateY(-2px);
   box-shadow: 0 16px 30px rgba(0, 0, 0, .08);
 }
@@ -118,7 +160,7 @@ function formatPrice(value) {
   font-size: 22px;
 }
 
-.stock {
+.sub {
   color: #8c8c8c;
   font-size: 12px;
 }

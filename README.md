@@ -7,7 +7,9 @@
 ```text
 SEGroup8/
   backend/                 # Spring Boot 后端
-  frontend/                # Vue 3 + Vite 前端
+  frontend/                # 旧版前端（保留）
+  frontend-new/            # 重构版前端（当前推荐）
+    src/mock-data/         # 统一测试数据生成与接口模拟
   sql/
     init.sql               # 手动初始化数据库脚本
 ```
@@ -148,7 +150,7 @@ mvn -version
 进入前端目录后执行：
 
 ```powershell
-cd C:\Users\34267\Desktop\code\SEGroup8\frontend
+cd frontend
 npm install
 ```
 
@@ -166,7 +168,7 @@ npm install
 进入后端目录后执行：
 
 ```powershell
-cd C:\Users\34267\Desktop\code\SEGroup8\backend
+cd backend
 mvn clean install
 ```
 
@@ -177,6 +179,7 @@ mvn spring-boot:run
 ```
 
 Maven 会根据 [pom.xml](/c:/Users/34267/Desktop/code/SEGroup8/backend/pom.xml) 自动下载后端依赖，包括：
+Maven 会根据 `backend/pom.xml` 自动下载后端依赖，包括：
 
 - spring-boot-starter-web
 - spring-boot-starter-validation
@@ -278,21 +281,21 @@ spring:
 ### 方式一：使用 Maven 启动
 
 ```powershell
-cd C:\Users\34267\Desktop\code\SEGroup8\backend
+cd backend
 mvn spring-boot:run
 ```
 
 ### 方式二：使用脚本启动
 
 ```bat
-cd C:\Users\34267\Desktop\code\SEGroup8\backend
+cd backend
 start.bat
 ```
 
 ### 方式三：运行打包好的 jar
 
 ```powershell
-cd C:\Users\34267\Desktop\code\SEGroup8\backend
+cd backend
 java -jar target\platform-backend-0.0.1-SNAPSHOT.jar
 ```
 
@@ -310,19 +313,52 @@ Started PlatformApplication
 - 接口地址：`http://localhost:8080`
 - Swagger 地址：`http://localhost:8080/swagger-ui.html`
 
-## 9. 怎么启动前端
+## 9. 怎么启动前端（推荐 frontend-new）
+
+### 9.1 启动旧版 frontend
 
 前端必须在 `frontend` 目录下启动。
 
 ```powershell
-cd C:\Users\34267\Desktop\code\SEGroup8\frontend
+cd frontend
 npm install
 npm run dev
 ```
 
-前端启动成功后，默认访问地址：
+旧版前端默认地址：
 
 - `http://localhost:5173`
+
+### 9.2 启动重构版 frontend-new（推荐）
+
+前端必须在 `frontend-new` 目录下启动。
+
+```powershell
+cd frontend-new
+npm install
+```
+
+使用测试数据源（mock）启动：
+
+```powershell
+npm run dev:mock
+```
+
+使用真实后端数据源（real）启动：
+
+```powershell
+npm run dev:real
+```
+
+重构版前端默认地址：
+
+- `http://localhost:5174`
+
+说明：
+
+- `dev:mock` / `dev:real` 已在 `frontend-new/package.json` 配置。
+- 数据源统一入口在 `frontend-new/src/api/http.js`。
+- 测试数据统一放在 `frontend-new/src/mock-data/`。
 
 ## 10. 推荐启动顺序
 
@@ -355,11 +391,20 @@ mvn -version
 正确方式：
 
 ```powershell
-cd C:\Users\34267\Desktop\code\SEGroup8\backend
+cd backend
 mvn spring-boot:run
 ```
 
 不要在 `frontend` 目录执行 `mvn spring-boot:run`。
+
+### 11.6 二手模块报 `No static resource api/secondhand/list`
+
+原因通常是：当前使用 `real` 数据源，但后端尚未提供二手接口。
+
+处理方法：
+
+1. 临时切到 mock：在 `frontend-new` 下执行 `npm run dev:mock`
+2. 或补齐后端二手接口后再使用 `npm run dev:real`
 
 ### 11.3 前端报 `AxiosError: Network Error`
 

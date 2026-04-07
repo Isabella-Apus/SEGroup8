@@ -1,1 +1,0 @@
-import{_ as s,c as a,a as t,o as c}from"./index-Cv7N0xVE.js";const o={},r={class:"page-card"};function n(p,e){return c(),a("div",r,[...e[0]||(e[0]=[t("h2",{class:"page-title"},"店铺设置",-1),t("p",{class:"empty-tip"},"店铺设置模块占位页，可继续扩展店铺信息与运费模板配置。",-1)])])}const _=s(o,[["render",n]]);export{_ as default};
