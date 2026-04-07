@@ -11,6 +11,7 @@
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" :loading="loading" @click="handleLogin">登录</el-button>
+                    <el-button text @click="goRegister">没有账号？去注册</el-button>
                 </el-form-item>
             </el-form>
             <p class="empty-tip">测试账号：admin/admin123 或 user/user123</p>
@@ -53,6 +54,10 @@ async function handleLogin() {
     } finally {
         loading.value = false;
     }
+}
+
+function goRegister() {
+    router.push('/register');
 }
 </script>
 

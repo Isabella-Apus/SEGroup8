@@ -116,7 +116,7 @@ class ProductServiceImplTest {
         inserted.setStatus(ProductStatusEnum.ON_SHELF.getCode());
 
         ArgumentCaptor<Product> insertCaptor = ArgumentCaptor.forClass(Product.class);
-        when(productMapper.selectById(1L)).thenReturn(inserted);
+        when(productMapper.selectById(any())).thenReturn(inserted);
 
         productService.createSellerProduct(request);
 
