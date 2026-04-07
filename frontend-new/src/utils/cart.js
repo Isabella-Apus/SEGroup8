@@ -25,27 +25,35 @@ export function saveCartItems(items) {
     writeRaw(items);
 }
 
-export function addToCart(product, quantity) {
+export function addToCart(product, quantity, options = {}) {
+    const itemType = options.itemType || 'PRODUCT';
+    const unitPrice = options.unitPrice ?? (itemType === 'SECONDHAND' ? product.salePrice : product.price);
+    const stock = options.stock ?? product.stock;
     const items = readRaw();
-    const index = items.findIndex((item) => item.productId === product.id);
+    const index = items.findIndex(
+        (item) => item.productId === product.id && (item.itemType || 'PRODUCT') === itemType
+    );
     if (index >= 0) {
         items[index].quantity += quantity;
     } else {
         items.push({
             productId: product.id,
+            itemType,
             name: product.name,
             cover: product.cover,
-            price: product.price,
+            price: unitPrice,
             quantity,
-            stock: product.stock
+            stock
         });
     }
     writeRaw(items);
     return items;
 }
 
-export function removeFromCart(productId) {
-    const items = readRaw().filter((item) => item.productId !== productId);
+export function removeFromCart(productId, itemType = 'PRODUCT') {
+    const items = readRaw().filter(
+        (item) => !(item.productId === productId && (item.itemType || 'PRODUCT') === itemType)
+    );
     writeRaw(items);
     return items;
 }

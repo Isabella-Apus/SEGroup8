@@ -15,6 +15,13 @@
 
         <el-table :data="order.items || []" border style="margin-top: 10px">
           <el-table-column prop="productName" label="商品名" min-width="220" />
+          <el-table-column label="类型" width="100">
+            <template #default="scope">
+              <el-tag :type="scope.row.itemType === 'SECONDHAND' ? 'warning' : 'info'" size="small">
+                {{ scope.row.itemType === 'SECONDHAND' ? '二手' : '普通' }}
+              </el-tag>
+            </template>
+          </el-table-column>
           <el-table-column prop="price" label="单价" width="120">
             <template #default="scope">￥{{ Number(scope.row.price || 0).toFixed(2) }}</template>
           </el-table-column>

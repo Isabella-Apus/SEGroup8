@@ -43,7 +43,7 @@
         :key="item.id"
         :product="item"
         mode="secondhand"
-        :clickable="false"
+        route-base="/secondhand"
       />
     </div>
 

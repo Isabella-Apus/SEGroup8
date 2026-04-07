@@ -276,6 +276,14 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
         return ok(paginate(records, params?.pageNum, params?.pageSize));
     }
 
+    const secondhandDetailMatch = p.match(/^\/secondhand\/(\d+)$/);
+    if (m === "get" && secondhandDetailMatch) {
+        const id = Number(secondhandDetailMatch[1]);
+        const item = mockStore.secondhandProducts.find((x) => Number(x.id) === id && x.status === 1);
+        if (!item) fail(404, "二手商品不存在");
+        return ok(item);
+    }
+
     if (m === "post" && p === "/secondhand/publish") {
         const user = requireLogin(headers);
         const id = mockStore.next.secondhandId++;
@@ -299,14 +307,24 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
     if (m === "post" && p === "/order/create") {
         const user = requireLogin(headers);
         const items = (data?.items || []).map((it) => {
-            const product = mockStore.products.find((x) => x.id === Number(it.productId));
+            const itemType = asText(it.itemType || "PRODUCT");
+            let product;
+            if (itemType === "SECONDHAND") {
+                product = mockStore.secondhandProducts.find(
+                    (x) => x.id === Number(it.productId) && x.status === 1
+                );
+            } else {
+                product = mockStore.products.find((x) => x.id === Number(it.productId));
+            }
             if (!product) {
                 fail(404, `商品不存在: ${it.productId}`);
             }
+            const price = itemType === "SECONDHAND" ? product.salePrice : product.price;
             return {
                 productId: product.id,
                 productName: product.name,
-                price: product.price,
+                itemType,
+                price,
                 quantity: Number(it.quantity || 1),
             };
         });

@@ -7,6 +7,13 @@
     <template v-else>
       <el-table :data="items" border>
         <el-table-column prop="name" label="商品名" min-width="220" />
+        <el-table-column label="类型" width="100">
+          <template #default="scope">
+            <el-tag :type="(scope.row.itemType || 'PRODUCT') === 'SECONDHAND' ? 'warning' : 'info'" size="small">
+              {{ (scope.row.itemType || 'PRODUCT') === 'SECONDHAND' ? '二手' : '普通' }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="price" label="单价" width="120">
           <template #default="scope">￥{{ Number(scope.row.price || 0).toFixed(2) }}</template>
         </el-table-column>
@@ -25,7 +32,7 @@
         </el-table-column>
         <el-table-column label="操作" width="120">
           <template #default="scope">
-            <el-button link type="danger" @click="remove(scope.row.productId)">移除</el-button>
+            <el-button link type="danger" @click="remove(scope.row)">移除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -47,6 +54,7 @@ import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { createOrderApi } from '@/api/order';
 import { getProductDetailApi } from '@/api/product';
+import { getSecondhandDetailApi } from '@/api/secondhand';
 import { clearCart, getCartItems, removeFromCart, saveCartItems } from '@/utils/cart';
 
 const router = useRouter();
@@ -65,7 +73,12 @@ onMounted(async () => {
 async function refreshCartItems() {
   const rawItems = getCartItems();
   const checks = await Promise.allSettled(
-    rawItems.map((item) => getProductDetailApi(item.productId))
+    rawItems.map((item) => {
+      if ((item.itemType || 'PRODUCT') === 'SECONDHAND') {
+        return getSecondhandDetailApi(item.productId);
+      }
+      return getProductDetailApi(item.productId);
+    })
   );
   const validItems = rawItems.filter((_, index) => checks[index].status === 'fulfilled');
   items.value = validItems;
@@ -76,8 +89,9 @@ function handleQtyChange() {
   saveCartItems(items.value);
 }
 
-function remove(productId) {
-  items.value = removeFromCart(productId);
+function remove(row) {
+  const itemType = row?.itemType || 'PRODUCT';
+  items.value = removeFromCart(row.productId, itemType);
 }
 
 function clear() {
@@ -94,6 +108,7 @@ async function checkout() {
   await createOrderApi({
     items: items.value.map((item) => ({
       productId: item.productId,
+      itemType: item.itemType || 'PRODUCT',
       quantity: Number(item.quantity || 0)
     }))
   });

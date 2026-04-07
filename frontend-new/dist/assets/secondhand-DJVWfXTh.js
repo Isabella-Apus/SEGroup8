@@ -1,0 +1,1 @@
+import{x as t}from"./index-B4GedX1Q.js";function o(n={}){return t.get("/secondhand/list",{params:n})}function a(n){return t.get(`/secondhand/${n}`)}function d(n){return t.post("/secondhand/publish",n)}export{o as a,a as g,d as p};

@@ -58,6 +58,12 @@ const routes = [
                     import("@/views/secondhand/SecondhandPublishView.vue"),
             },
             {
+                path: "secondhand/:id",
+                name: "secondhandDetail",
+                component: () =>
+                    import("@/views/secondhand/SecondhandDetailView.vue"),
+            },
+            {
                 path: "profile",
                 name: "profile",
                 component: () => import("@/views/user/Profile.vue"),
