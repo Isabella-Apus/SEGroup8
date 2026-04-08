@@ -1,7 +1,10 @@
 package com.segroup8.platform.config;
 
 import com.segroup8.platform.interceptor.JwtAuthInterceptor;
+import com.segroup8.platform.interceptor.IdempotencyInterceptor;
+import com.segroup8.platform.interceptor.TraceIdInterceptor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -9,14 +12,21 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private final JwtAuthInterceptor jwtAuthInterceptor;
+    private final @NonNull JwtAuthInterceptor jwtAuthInterceptor;
+    private final @NonNull TraceIdInterceptor traceIdInterceptor;
+    private final @NonNull IdempotencyInterceptor idempotencyInterceptor;
 
-    public WebMvcConfig(JwtAuthInterceptor jwtAuthInterceptor) {
+    public WebMvcConfig(@NonNull JwtAuthInterceptor jwtAuthInterceptor, @NonNull TraceIdInterceptor traceIdInterceptor, @NonNull IdempotencyInterceptor idempotencyInterceptor) {
         this.jwtAuthInterceptor = jwtAuthInterceptor;
+        this.traceIdInterceptor = traceIdInterceptor;
+        this.idempotencyInterceptor = idempotencyInterceptor;
     }
 
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
+    public void addInterceptors(@NonNull InterceptorRegistry registry) {
+        registry.addInterceptor(traceIdInterceptor)
+                .addPathPatterns("/api/**");
+
         registry.addInterceptor(jwtAuthInterceptor)
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(
@@ -29,10 +39,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html");
+
+        registry.addInterceptor(idempotencyInterceptor)
+                .addPathPatterns("/api/order/**", "/api/admin/orders/**");
     }
 
     @Override
-    public void addCorsMappings(CorsRegistry registry) {
+    public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOriginPatterns("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")

@@ -165,12 +165,342 @@ CREATE TABLE IF NOT EXISTS `order_info` (
   `total_amount` DECIMAL(10,2) NOT NULL DEFAULT 0,
   `pay_status` TINYINT NOT NULL DEFAULT 0,
   `order_status` TINYINT NOT NULL DEFAULT 0,
+  `refund_status` TINYINT NOT NULL DEFAULT 0,
+  `refund_reason` VARCHAR(255) DEFAULT NULL,
+  `refund_proof_urls` TEXT,
+  `paid_time` DATETIME DEFAULT NULL,
+  `shipped_time` DATETIME DEFAULT NULL,
+  `received_time` DATETIME DEFAULT NULL,
+  `completed_time` DATETIME DEFAULT NULL,
+  `closed_time` DATETIME DEFAULT NULL,
+  `refund_apply_time` DATETIME DEFAULT NULL,
+  `refund_decision_time` DATETIME DEFAULT NULL,
+  `refund_decision_user_id` BIGINT DEFAULT NULL,
+  `refund_decision_remark` VARCHAR(255) DEFAULT NULL,
+  `refund_decision_source` VARCHAR(20) DEFAULT NULL,
+  `version` INT NOT NULL DEFAULT 0,
+  `receiver_name` VARCHAR(50) DEFAULT NULL,
+  `receiver_phone` VARCHAR(20) DEFAULT NULL,
+  `receiver_province` VARCHAR(50) DEFAULT NULL,
+  `receiver_city` VARCHAR(50) DEFAULT NULL,
+  `receiver_detail_address` VARCHAR(255) DEFAULT NULL,
+  `pay_method` VARCHAR(30) DEFAULT NULL,
+  `delivery_no` VARCHAR(60) DEFAULT NULL,
   `remark` VARCHAR(255) DEFAULT NULL,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_order_info_order_no` (`order_no`),
-  KEY `idx_order_info_buyer_user_id` (`buyer_user_id`)
+  KEY `idx_order_info_buyer_user_id` (`buyer_user_id`),
+  KEY `idx_order_info_status_refund_create` (`order_status`, `refund_status`, `create_time`),
+  KEY `idx_order_info_refund_create` (`refund_status`, `create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @order_refund_status_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'refund_status'
+);
+SET @order_refund_status_add_sql = IF(
+  @order_refund_status_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `refund_status` TINYINT NOT NULL DEFAULT 0',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_refund_status FROM @order_refund_status_add_sql;
+EXECUTE stmt_order_add_refund_status;
+DEALLOCATE PREPARE stmt_order_add_refund_status;
+
+SET @order_refund_reason_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'refund_reason'
+);
+SET @order_refund_reason_add_sql = IF(
+  @order_refund_reason_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `refund_reason` VARCHAR(255) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_refund_reason FROM @order_refund_reason_add_sql;
+EXECUTE stmt_order_add_refund_reason;
+DEALLOCATE PREPARE stmt_order_add_refund_reason;
+
+SET @order_refund_proof_urls_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'refund_proof_urls'
+);
+SET @order_refund_proof_urls_add_sql = IF(
+  @order_refund_proof_urls_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `refund_proof_urls` TEXT',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_refund_proof_urls FROM @order_refund_proof_urls_add_sql;
+EXECUTE stmt_order_add_refund_proof_urls;
+DEALLOCATE PREPARE stmt_order_add_refund_proof_urls;
+
+SET @order_receiver_name_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'receiver_name'
+);
+SET @order_add_receiver_name_sql = IF(
+  @order_receiver_name_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `receiver_name` VARCHAR(50) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_receiver_name FROM @order_add_receiver_name_sql;
+EXECUTE stmt_order_add_receiver_name;
+DEALLOCATE PREPARE stmt_order_add_receiver_name;
+
+SET @order_receiver_phone_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'receiver_phone'
+);
+SET @order_add_receiver_phone_sql = IF(
+  @order_receiver_phone_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `receiver_phone` VARCHAR(20) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_receiver_phone FROM @order_add_receiver_phone_sql;
+EXECUTE stmt_order_add_receiver_phone;
+DEALLOCATE PREPARE stmt_order_add_receiver_phone;
+
+SET @order_receiver_province_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'receiver_province'
+);
+SET @order_add_receiver_province_sql = IF(
+  @order_receiver_province_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `receiver_province` VARCHAR(50) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_receiver_province FROM @order_add_receiver_province_sql;
+EXECUTE stmt_order_add_receiver_province;
+DEALLOCATE PREPARE stmt_order_add_receiver_province;
+
+SET @order_receiver_city_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'receiver_city'
+);
+SET @order_add_receiver_city_sql = IF(
+  @order_receiver_city_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `receiver_city` VARCHAR(50) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_receiver_city FROM @order_add_receiver_city_sql;
+EXECUTE stmt_order_add_receiver_city;
+DEALLOCATE PREPARE stmt_order_add_receiver_city;
+
+SET @order_receiver_detail_address_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'receiver_detail_address'
+);
+SET @order_add_receiver_detail_address_sql = IF(
+  @order_receiver_detail_address_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `receiver_detail_address` VARCHAR(255) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_receiver_detail_address FROM @order_add_receiver_detail_address_sql;
+EXECUTE stmt_order_add_receiver_detail_address;
+DEALLOCATE PREPARE stmt_order_add_receiver_detail_address;
+
+SET @order_pay_method_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'pay_method'
+);
+SET @order_add_pay_method_sql = IF(
+  @order_pay_method_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `pay_method` VARCHAR(30) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_pay_method FROM @order_add_pay_method_sql;
+EXECUTE stmt_order_add_pay_method;
+DEALLOCATE PREPARE stmt_order_add_pay_method;
+
+SET @order_delivery_no_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'delivery_no'
+);
+SET @order_add_delivery_no_sql = IF(
+  @order_delivery_no_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `delivery_no` VARCHAR(60) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_delivery_no FROM @order_add_delivery_no_sql;
+EXECUTE stmt_order_add_delivery_no;
+DEALLOCATE PREPARE stmt_order_add_delivery_no;
+
+SET @order_paid_time_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'paid_time'
+);
+SET @order_paid_time_add_sql = IF(
+  @order_paid_time_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `paid_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_paid_time FROM @order_paid_time_add_sql;
+EXECUTE stmt_order_add_paid_time;
+DEALLOCATE PREPARE stmt_order_add_paid_time;
+
+SET @order_shipped_time_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'shipped_time'
+);
+SET @order_shipped_time_add_sql = IF(
+  @order_shipped_time_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `shipped_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_shipped_time FROM @order_shipped_time_add_sql;
+EXECUTE stmt_order_add_shipped_time;
+DEALLOCATE PREPARE stmt_order_add_shipped_time;
+
+SET @order_received_time_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'received_time'
+);
+SET @order_received_time_add_sql = IF(
+  @order_received_time_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `received_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_received_time FROM @order_received_time_add_sql;
+EXECUTE stmt_order_add_received_time;
+DEALLOCATE PREPARE stmt_order_add_received_time;
+
+SET @order_completed_time_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'completed_time'
+);
+SET @order_completed_time_add_sql = IF(
+  @order_completed_time_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `completed_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_completed_time FROM @order_completed_time_add_sql;
+EXECUTE stmt_order_add_completed_time;
+DEALLOCATE PREPARE stmt_order_add_completed_time;
+
+SET @order_closed_time_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'closed_time'
+);
+SET @order_closed_time_add_sql = IF(
+  @order_closed_time_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `closed_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_closed_time FROM @order_closed_time_add_sql;
+EXECUTE stmt_order_add_closed_time;
+DEALLOCATE PREPARE stmt_order_add_closed_time;
+
+SET @order_refund_apply_time_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'refund_apply_time'
+);
+SET @order_refund_apply_time_add_sql = IF(
+  @order_refund_apply_time_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `refund_apply_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_refund_apply_time FROM @order_refund_apply_time_add_sql;
+EXECUTE stmt_order_add_refund_apply_time;
+DEALLOCATE PREPARE stmt_order_add_refund_apply_time;
+
+SET @order_refund_decision_time_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'refund_decision_time'
+);
+SET @order_refund_decision_time_add_sql = IF(
+  @order_refund_decision_time_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `refund_decision_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_refund_decision_time FROM @order_refund_decision_time_add_sql;
+EXECUTE stmt_order_add_refund_decision_time;
+DEALLOCATE PREPARE stmt_order_add_refund_decision_time;
+
+SET @order_refund_decision_user_id_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'refund_decision_user_id'
+);
+SET @order_refund_decision_user_id_add_sql = IF(
+  @order_refund_decision_user_id_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `refund_decision_user_id` BIGINT DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_refund_decision_user_id FROM @order_refund_decision_user_id_add_sql;
+EXECUTE stmt_order_add_refund_decision_user_id;
+DEALLOCATE PREPARE stmt_order_add_refund_decision_user_id;
+
+SET @order_refund_decision_remark_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'refund_decision_remark'
+);
+SET @order_refund_decision_remark_add_sql = IF(
+  @order_refund_decision_remark_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `refund_decision_remark` VARCHAR(255) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_refund_decision_remark FROM @order_refund_decision_remark_add_sql;
+EXECUTE stmt_order_add_refund_decision_remark;
+DEALLOCATE PREPARE stmt_order_add_refund_decision_remark;
+
+SET @order_refund_decision_source_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'refund_decision_source'
+);
+SET @order_refund_decision_source_add_sql = IF(
+  @order_refund_decision_source_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `refund_decision_source` VARCHAR(20) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_refund_decision_source FROM @order_refund_decision_source_add_sql;
+EXECUTE stmt_order_add_refund_decision_source;
+DEALLOCATE PREPARE stmt_order_add_refund_decision_source;
+
+SET @order_version_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'version'
+);
+SET @order_version_add_sql = IF(
+  @order_version_col_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `version` INT NOT NULL DEFAULT 0',
+  'SELECT 1'
+);
+PREPARE stmt_order_add_version FROM @order_version_add_sql;
+EXECUTE stmt_order_add_version;
+DEALLOCATE PREPARE stmt_order_add_version;
+
+CREATE TABLE IF NOT EXISTS `order_after_sale_log` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `order_id` BIGINT NOT NULL,
+  `action` VARCHAR(30) NOT NULL,
+  `operator_user_id` BIGINT DEFAULT NULL,
+  `operator_role` VARCHAR(30) DEFAULT NULL,
+  `remark` VARCHAR(255) DEFAULT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_order_after_sale_log_order_id` (`order_id`),
+  KEY `idx_order_after_sale_log_create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `order_item` (
@@ -196,6 +526,9 @@ CREATE TABLE IF NOT EXISTS `review` (
   `user_id` BIGINT NOT NULL,
   `score` TINYINT NOT NULL,
   `content` VARCHAR(500) DEFAULT NULL,
+  `review_type` VARCHAR(20) NOT NULL DEFAULT 'ORIGINAL',
+  `seller_reply` VARCHAR(500) DEFAULT NULL,
+  `seller_reply_time` DATETIME DEFAULT NULL,
   `status` TINYINT NOT NULL DEFAULT 1,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -203,6 +536,48 @@ CREATE TABLE IF NOT EXISTS `review` (
   KEY `idx_review_product` (`product_id`),
   KEY `idx_review_user` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @review_type_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'review' AND COLUMN_NAME = 'review_type'
+);
+SET @review_type_add_sql = IF(
+  @review_type_col_exists = 0,
+  'ALTER TABLE `review` ADD COLUMN `review_type` VARCHAR(20) NOT NULL DEFAULT ''ORIGINAL''',
+  'SELECT 1'
+);
+PREPARE stmt_review_type_add FROM @review_type_add_sql;
+EXECUTE stmt_review_type_add;
+DEALLOCATE PREPARE stmt_review_type_add;
+
+SET @review_seller_reply_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'review' AND COLUMN_NAME = 'seller_reply'
+);
+SET @review_seller_reply_add_sql = IF(
+  @review_seller_reply_col_exists = 0,
+  'ALTER TABLE `review` ADD COLUMN `seller_reply` VARCHAR(500) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_review_seller_reply_add FROM @review_seller_reply_add_sql;
+EXECUTE stmt_review_seller_reply_add;
+DEALLOCATE PREPARE stmt_review_seller_reply_add;
+
+SET @review_seller_reply_time_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'review' AND COLUMN_NAME = 'seller_reply_time'
+);
+SET @review_seller_reply_time_add_sql = IF(
+  @review_seller_reply_time_col_exists = 0,
+  'ALTER TABLE `review` ADD COLUMN `seller_reply_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_review_seller_reply_time_add FROM @review_seller_reply_time_add_sql;
+EXECUTE stmt_review_seller_reply_time_add;
+DEALLOCATE PREPARE stmt_review_seller_reply_time_add;
 
 CREATE TABLE IF NOT EXISTS `report` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -311,6 +686,79 @@ CREATE TABLE IF NOT EXISTS `admin_audit_log` (
   KEY `idx_admin_audit_log_admin_user_id` (`admin_user_id`),
   KEY `idx_admin_audit_log_create_time` (`create_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `idempotency_record` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT DEFAULT NULL,
+  `request_method` VARCHAR(10) NOT NULL,
+  `request_path` VARCHAR(255) NOT NULL,
+  `idempotency_key` VARCHAR(128) NOT NULL,
+  `status` TINYINT NOT NULL DEFAULT 0,
+  `http_status` INT DEFAULT NULL,
+  `response_body` TEXT,
+  `expire_time` DATETIME NOT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_idempotency_record` (`user_id`, `request_method`, `request_path`, `idempotency_key`),
+  KEY `idx_idempotency_expire_time` (`expire_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @idem_status_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'idempotency_record' AND COLUMN_NAME = 'status'
+);
+SET @idem_status_add_sql = IF(
+  @idem_status_col_exists = 0,
+  'ALTER TABLE `idempotency_record` ADD COLUMN `status` TINYINT NOT NULL DEFAULT 0',
+  'SELECT 1'
+);
+PREPARE stmt_idem_add_status FROM @idem_status_add_sql;
+EXECUTE stmt_idem_add_status;
+DEALLOCATE PREPARE stmt_idem_add_status;
+
+SET @idem_http_status_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'idempotency_record' AND COLUMN_NAME = 'http_status'
+);
+SET @idem_http_status_add_sql = IF(
+  @idem_http_status_col_exists = 0,
+  'ALTER TABLE `idempotency_record` ADD COLUMN `http_status` INT DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_idem_add_http_status FROM @idem_http_status_add_sql;
+EXECUTE stmt_idem_add_http_status;
+DEALLOCATE PREPARE stmt_idem_add_http_status;
+
+SET @idem_response_body_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'idempotency_record' AND COLUMN_NAME = 'response_body'
+);
+SET @idem_response_body_add_sql = IF(
+  @idem_response_body_col_exists = 0,
+  'ALTER TABLE `idempotency_record` ADD COLUMN `response_body` TEXT',
+  'SELECT 1'
+);
+PREPARE stmt_idem_add_response_body FROM @idem_response_body_add_sql;
+EXECUTE stmt_idem_add_response_body;
+DEALLOCATE PREPARE stmt_idem_add_response_body;
+
+SET @idem_update_time_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'idempotency_record' AND COLUMN_NAME = 'update_time'
+);
+SET @idem_update_time_add_sql = IF(
+  @idem_update_time_col_exists = 0,
+  'ALTER TABLE `idempotency_record` ADD COLUMN `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+  'SELECT 1'
+);
+PREPARE stmt_idem_add_update_time FROM @idem_update_time_add_sql;
+EXECUTE stmt_idem_add_update_time;
+DEALLOCATE PREPARE stmt_idem_add_update_time;
 
 UPDATE `user`
 SET `role` = 'OFFICIAL_SELLER'

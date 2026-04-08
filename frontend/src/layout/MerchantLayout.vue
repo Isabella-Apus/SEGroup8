@@ -9,6 +9,7 @@
                 <el-menu :default-active="$route.path" router>
                     <el-menu-item index="/merchant">商品管理</el-menu-item>
                     <el-menu-item index="/merchant/orders">订单管理</el-menu-item>
+                    <el-menu-item index="/merchant/reviews">评价管理</el-menu-item>
                     <el-menu-item index="/merchant/shop">店铺设置</el-menu-item>
                 </el-menu>
             </el-aside>
