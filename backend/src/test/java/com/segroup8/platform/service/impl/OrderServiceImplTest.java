@@ -1,0 +1,175 @@
+package com.segroup8.platform.service.impl;
+
+import com.segroup8.platform.common.BusinessException;
+import com.segroup8.platform.context.UserContext;
+import com.segroup8.platform.entity.OrderInfo;
+import com.segroup8.platform.entity.OrderItem;
+import com.segroup8.platform.entity.Product;
+import com.segroup8.platform.entity.SecondhandProduct;
+import com.segroup8.platform.entity.Shop;
+import com.segroup8.platform.entity.OrderAfterSaleLog;
+import com.segroup8.platform.mapper.AddressMapper;
+import com.segroup8.platform.mapper.NotificationMapper;
+import com.segroup8.platform.mapper.OrderAfterSaleLogMapper;
+import com.segroup8.platform.mapper.OrderInfoMapper;
+import com.segroup8.platform.mapper.OrderItemMapper;
+import com.segroup8.platform.mapper.ProductMapper;
+import com.segroup8.platform.mapper.ReviewMapper;
+import com.segroup8.platform.mapper.SecondhandProductMapper;
+import com.segroup8.platform.mapper.ShopMapper;
+import com.segroup8.platform.vo.OrderVO;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class OrderServiceImplTest {
+
+    @Mock
+    private OrderInfoMapper orderInfoMapper;
+    @Mock
+    private OrderItemMapper orderItemMapper;
+    @Mock
+    private ProductMapper productMapper;
+    @Mock
+    private ReviewMapper reviewMapper;
+    @Mock
+    private SecondhandProductMapper secondhandProductMapper;
+    @Mock
+    private ShopMapper shopMapper;
+    @Mock
+    private AddressMapper addressMapper;
+    @Mock
+    private NotificationMapper notificationMapper;
+    @Mock
+    private OrderAfterSaleLogMapper orderAfterSaleLogMapper;
+
+    private OrderServiceImpl orderService;
+
+    @BeforeEach
+    void setUp() {
+        orderService = new OrderServiceImpl(
+                orderInfoMapper,
+                orderItemMapper,
+                productMapper,
+                reviewMapper,
+                secondhandProductMapper,
+                shopMapper,
+                addressMapper,
+                notificationMapper,
+                orderAfterSaleLogMapper
+        );
+    }
+
+    @AfterEach
+    void tearDown() {
+        UserContext.clear();
+    }
+
+    @Test
+    void approveRefundBySeller_shouldPersistDecisionUserAndRemark() {
+        Long sellerUserId = 200L;
+        Long orderId = 10L;
+        UserContext.setUserId(sellerUserId);
+
+        OrderInfo order = new OrderInfo();
+        order.setId(orderId);
+        order.setBuyerUserId(999L);
+        order.setRefundStatus(1);
+
+        when(orderInfoMapper.selectById(orderId)).thenReturn(order);
+
+        OrderItem item = new OrderItem();
+        item.setId(1L);
+        item.setOrderId(orderId);
+        item.setProductType("NEW");
+        item.setProductId(88L);
+        item.setProductName("Test");
+        when(orderItemMapper.selectList(any())).thenReturn(List.of(item));
+
+        Product product = new Product();
+        product.setId(88L);
+        product.setShopId(66L);
+        when(productMapper.selectById(88L)).thenReturn(product);
+
+        Shop shop = new Shop();
+        shop.setId(66L);
+        shop.setOwnerUserId(sellerUserId);
+        when(shopMapper.selectById(66L)).thenReturn(shop);
+
+        when(orderInfoMapper.update(any(), any())).thenReturn(1);
+
+        OrderVO vo = orderService.approveRefundBySeller(orderId);
+
+        assertEquals(sellerUserId, vo.getRefundDecisionUserId());
+        assertEquals("卖家同意退货", vo.getRefundDecisionRemark());
+        assertEquals("SELLER", vo.getRefundDecisionSource());
+
+        verify(orderAfterSaleLogMapper).insert(any(OrderAfterSaleLog.class));
+    }
+
+    @Test
+    void getMyOrderDetail_shouldReturnRefundDecisionFieldsWhenPresent() {
+        Long buyerUserId = 100L;
+        Long orderId = 11L;
+        UserContext.setUserId(buyerUserId);
+
+        OrderInfo order = new OrderInfo();
+        order.setId(orderId);
+        order.setBuyerUserId(buyerUserId);
+        order.setRefundStatus(3);
+        order.setRefundDecisionUserId(999L);
+        order.setRefundDecisionRemark("平台审核：不符合退货条件");
+        order.setRefundDecisionTime(LocalDateTime.now());
+
+        when(orderInfoMapper.selectById(orderId)).thenReturn(order);
+
+        OrderItem item = new OrderItem();
+        item.setId(2L);
+        item.setOrderId(orderId);
+        item.setProductType("SECONDHAND");
+        item.setProductId(123L);
+        item.setProductName("Secondhand");
+        when(orderItemMapper.selectList(any())).thenReturn(List.of(item));
+
+        SecondhandProduct secondhand = new SecondhandProduct();
+        secondhand.setId(123L);
+        secondhand.setConditionLevel("95新");
+        when(secondhandProductMapper.selectById(123L)).thenReturn(secondhand);
+
+        OrderVO vo = orderService.getMyOrderDetail(orderId);
+        assertEquals(999L, vo.getRefundDecisionUserId());
+        assertEquals("平台审核：不符合退货条件", vo.getRefundDecisionRemark());
+        assertNotNull(vo.getRefundDecisionTime());
+    }
+
+    @Test
+    void getMyOrderDetail_shouldThrowWhenNotOwner() {
+        Long buyerUserId = 100L;
+        Long orderId = 12L;
+        UserContext.setUserId(buyerUserId);
+
+        OrderInfo order = new OrderInfo();
+        order.setId(orderId);
+        order.setBuyerUserId(999L);
+        when(orderInfoMapper.selectById(anyLong())).thenReturn(order);
+
+        BusinessException ex = assertThrows(BusinessException.class, () -> orderService.getMyOrderDetail(orderId));
+        assertEquals(403, ex.getCode());
+    }
+}
+

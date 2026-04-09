@@ -7,6 +7,8 @@ public class OrderItemVO {
     private Long id;
     private Long productId;
     private String productName;
+    private String productType;
+    private String conditionLevel;
     private BigDecimal price;
     private Integer quantity;
 
@@ -32,6 +34,22 @@ public class OrderItemVO {
 
     public void setProductName(String productName) {
         this.productName = productName;
+    }
+
+    public String getProductType() {
+        return productType;
+    }
+
+    public void setProductType(String productType) {
+        this.productType = productType;
+    }
+
+    public String getConditionLevel() {
+        return conditionLevel;
+    }
+
+    public void setConditionLevel(String conditionLevel) {
+        this.conditionLevel = conditionLevel;
     }
 
     public BigDecimal getPrice() {
