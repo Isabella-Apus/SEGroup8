@@ -1,0 +1,146 @@
+package com.segroup8.platform.service.impl;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.segroup8.platform.common.BusinessException;
+import com.segroup8.platform.context.UserContext;
+import com.segroup8.platform.dto.SecondhandOrderCreateRequest;
+import com.segroup8.platform.dto.SecondhandProductPageQueryRequest;
+import com.segroup8.platform.dto.SecondhandProductSaveRequest;
+import com.segroup8.platform.entity.OrderInfo;
+import com.segroup8.platform.entity.SecondhandProduct;
+import com.segroup8.platform.mapper.OrderInfoMapper;
+import com.segroup8.platform.mapper.OrderItemMapper;
+import com.segroup8.platform.mapper.SecondhandProductMapper;
+import com.segroup8.platform.vo.OrderVO;
+import com.segroup8.platform.vo.PageVO;
+import com.segroup8.platform.vo.SecondhandProductVO;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class SecondhandProductServiceImplTest {
+
+    @Mock
+    private SecondhandProductMapper secondhandProductMapper;
+
+    @Mock
+    private OrderInfoMapper orderInfoMapper;
+
+    @Mock
+    private OrderItemMapper orderItemMapper;
+
+    private SecondhandProductServiceImpl secondhandProductService;
+
+    @BeforeEach
+    void setUp() {
+        secondhandProductService = new SecondhandProductServiceImpl(secondhandProductMapper, orderInfoMapper,
+                orderItemMapper);
+    }
+
+    @AfterEach
+    void tearDown() {
+        UserContext.clear();
+    }
+
+    @Test
+    void pagePublicProducts_shouldThrowWhenPriceRangeInvalid() {
+        SecondhandProductPageQueryRequest request = new SecondhandProductPageQueryRequest();
+        request.setMinPrice(new BigDecimal("500"));
+        request.setMaxPrice(new BigDecimal("100"));
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> secondhandProductService.pagePublicProducts(request));
+        assertEquals(400, ex.getCode());
+    }
+
+    @Test
+    void createSellerProduct_shouldThrowWhenOriginPriceLowerThanSalePrice() {
+        UserContext.setUserId(3L);
+        SecondhandProductSaveRequest request = new SecondhandProductSaveRequest();
+        request.setName("test");
+        request.setOriginPrice(new BigDecimal("100"));
+        request.setSalePrice(new BigDecimal("150"));
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> secondhandProductService.createSellerProduct(request));
+        assertEquals(400, ex.getCode());
+        verify(secondhandProductMapper, never()).insert(any(SecondhandProduct.class));
+    }
+
+    @Test
+    void pageSellerProducts_shouldFilterByCurrentUser() {
+        UserContext.setUserId(3L);
+        SecondhandProductPageQueryRequest request = new SecondhandProductPageQueryRequest();
+        request.setPageNum(1L);
+        request.setPageSize(10L);
+
+        SecondhandProduct product = new SecondhandProduct();
+        product.setId(1L);
+        product.setSellerUserId(3L);
+        product.setName("Used Bicycle");
+        product.setSalePrice(new BigDecimal("650"));
+        product.setStatus(1);
+
+        Page<SecondhandProduct> page = new Page<>(1, 10);
+        page.setRecords(List.of(product));
+        page.setTotal(1);
+        when(secondhandProductMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class))).thenReturn(page);
+
+        PageVO<SecondhandProductVO> vo = secondhandProductService.pageSellerProducts(request);
+
+        assertEquals(1, vo.getTotal());
+        assertEquals("Used Bicycle", vo.getRecords().get(0).getName());
+    }
+
+    @Test
+    void buySecondhandProduct_shouldThrowWhenBuyerIsSeller() {
+        UserContext.setUserId(3L);
+        SecondhandProduct product = new SecondhandProduct();
+        product.setId(1L);
+        product.setSellerUserId(3L);
+        product.setStatus(1);
+        when(secondhandProductMapper.selectById(1L)).thenReturn(product);
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> secondhandProductService.buySecondhandProduct(1L, new SecondhandOrderCreateRequest()));
+        assertEquals(400, ex.getCode());
+    }
+
+    @Test
+    void buySecondhandProduct_shouldCreateOrderWhenSuccess() {
+        UserContext.setUserId(5L);
+        SecondhandProduct product = new SecondhandProduct();
+        product.setId(2L);
+        product.setSellerUserId(3L);
+        product.setName("Spare Headphones");
+        product.setSalePrice(new BigDecimal("180"));
+        product.setStatus(1);
+        when(secondhandProductMapper.selectById(2L)).thenReturn(product);
+        when(secondhandProductMapper.update(any(), any(UpdateWrapper.class))).thenReturn(1);
+
+        OrderVO vo = secondhandProductService.buySecondhandProduct(2L, new SecondhandOrderCreateRequest());
+
+        ArgumentCaptor<OrderInfo> orderCaptor = ArgumentCaptor.forClass(OrderInfo.class);
+        verify(orderInfoMapper).insert(orderCaptor.capture());
+        assertEquals(5L, orderCaptor.getValue().getBuyerUserId());
+        assertEquals(new BigDecimal("180"), vo.getTotalAmount());
+    }
+}
+

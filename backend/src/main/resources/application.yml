@@ -29,6 +29,10 @@ app:
   jwt:
     secret: SEGROUP8_DEMO_SECRET_KEY_CHANGE_ME_2026
     expire-hours: 24
+  realtime:
+    allowed-origin-patterns: http://127.0.0.1:5173,http://localhost:5173
+  idempotency:
+    cleanup-fixed-delay-ms: 60000
   upload:
     dir: uploads
 
