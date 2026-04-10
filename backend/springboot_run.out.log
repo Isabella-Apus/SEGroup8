@@ -1,0 +1,112 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< com.segroup8:platform-backend >--------------------
+[INFO] Building platform-backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.3.4:run (default-cli) > test-compile @ platform-backend >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ platform-backend ---
+[INFO] Copying 3 resources from src\main\resources to target\classes
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ platform-backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ platform-backend ---
+[INFO] Not copying test resources
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ platform-backend ---
+[INFO] Not compiling test sources
+[INFO] 
+[INFO] <<< spring-boot:3.3.4:run (default-cli) < test-compile @ platform-backend <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:3.3.4:run (default-cli) @ platform-backend ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-04-09T23:37:14.524+08:00  INFO 22504 --- [segroup8-platform] [           main] c.segroup8.platform.PlatformApplication  : Starting PlatformApplication using Java 25 with PID 22504 (D:\softwhere_homework2026\SEGroup8\backend\target\classes started by 27872 in D:\softwhere_homework2026\SEGroup8\backend)
+2026-04-09T23:37:14.525+08:00  INFO 22504 --- [segroup8-platform] [           main] c.segroup8.platform.PlatformApplication  : The following 1 profile is active: "local"
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by org.apache.tomcat.jni.Library in an unnamed module (file:/C:/Users/27872/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.30/tomcat-embed-core-10.1.30.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+2026-04-09T23:37:15.163+08:00  INFO 22504 --- [segroup8-platform] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-04-09T23:37:15.171+08:00  INFO 22504 --- [segroup8-platform] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-09T23:37:15.171+08:00  INFO 22504 --- [segroup8-platform] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+2026-04-09T23:37:15.211+08:00  INFO 22504 --- [segroup8-platform] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-04-09T23:37:15.211+08:00  INFO 22504 --- [segroup8-platform] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 658 ms
+Logging initialized using 'class org.apache.ibatis.logging.stdout.StdOutImpl' adapter.
+Get /10.192.165.222 network interface 
+Get network interface info: name:wireless_32768 (Intel(R) Wi-Fi 6E AX211 160MHz)
+Initialization Sequence datacenterId:14 workerId:22
+ _ _   |_  _ _|_. ___ _ |    _ 
+| | |\/|_)(_| | |_\  |_)||_|_\ 
+     /               |         
+                        3.5.7 
+2026-04-09T23:37:15.308+08:00  INFO 22504 --- [segroup8-platform] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-04-09T23:37:15.386+08:00  INFO 22504 --- [segroup8-platform] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@2e7af36e
+2026-04-09T23:37:15.388+08:00  INFO 22504 --- [segroup8-platform] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-04-09T23:37:15.991+08:00  WARN 22504 --- [segroup8-platform] [           main] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-04-09T23:37:15.992+08:00  INFO 22504 --- [segroup8-platform] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-04-09T23:37:15.996+08:00  INFO 22504 --- [segroup8-platform] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-04-09T23:37:16.003+08:00  INFO 22504 --- [segroup8-platform] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-04-09T23:37:16.011+08:00 ERROR 22504 --- [segroup8-platform] [           main] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  3.217 s
+[INFO] Finished at: 2026-04-09T23:37:16+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.springframework.boot:spring-boot-maven-plugin:3.3.4:run (default-cli) on project platform-backend: Process terminated with exit code: 1 -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solCreating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@c456818] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@2008352571 wrapping com.mysql.cj.jdbc.ConnectionImpl@d54d0f5] will not be managed by Spring
+==>  Preparing: DELETE FROM idempotency_record WHERE (expire_time < ?)
+==> Parameters: 2026-04-09T23:37:38.704872400(LocalDateTime)
+<==    Updates: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@c456818]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@71e96aa3] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1456195886 wrapping com.mysql.cj.jdbc.ConnectionImpl@d54d0f5] will not be managed by Spring
+==>  Preparing: DELETE FROM idempotency_record WHERE (expire_time < ?)
+==> Parameters: 2026-04-09T23:38:38.720386(LocalDateTime)
+<==    Updates: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@71e96aa3]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@13e414b8] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@694343701 wrapping com.mysql.cj.jdbc.ConnectionImpl@d54d0f5] will not be managed by Spring
+==>  Preparing: DELETE FROM idempotency_record WHERE (expire_time < ?)
+==> Parameters: 2026-04-09T23:39:38.731315200(LocalDateTime)
+<==    Updates: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@13e414b8]
