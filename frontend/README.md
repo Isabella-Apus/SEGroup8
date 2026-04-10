@@ -1,6 +1,6 @@
-# frontend-new
+# frontend
 
-这是在不改动现有 frontend 目录的前提下，新建的重构版前端。
+这是当前使用的前端工程。
 
 ## 目标
 
@@ -11,7 +11,7 @@
 ## 运行
 
 ```bash
-cd frontend-new
+cd frontend
 npm install
 npm run dev
 ```

@@ -45,12 +45,22 @@
       <el-tab-pane label="已关闭" name="CLOSED" />
     </el-tabs>
 
-    <el-empty v-if="!listLoading && records.length === 0" description="暂无订单" />
+    <div v-if="listLoading && records.length === 0" class="skeleton-panel">
+      <el-skeleton animated :rows="6" />
+    </div>
 
-    <div v-loading="listLoading" class="order-list">
+    <el-empty v-else-if="!listLoading && records.length === 0" description="暂无订单" />
+
+    <div v-else v-loading="listLoading" class="order-list">
       <el-card v-for="order in records" :key="order.id" shadow="hover" class="order-card" @click="goDetail(order.id)">
         <div class="order-card__header">
-          <OrderStatusTag :status="order.orderStatus" :status-name="order.orderStatusName" :refund-status="order.refundStatus" :refund-status-name="order.refundStatusName" size="default" />
+          <OrderStatusTag
+            :status="order.orderStatus"
+            :status-name="order.orderStatusName"
+            :refund-status="order.refundStatus"
+            :refund-status-name="order.refundStatusName"
+            size="default"
+          />
           <div class="meta">
             <span class="no">订单号：{{ order.orderNo }}</span>
             <span class="time">{{ formatTime(order.createTime) }}</span>
@@ -103,6 +113,19 @@
       </el-card>
     </div>
 
+    <div class="pager-wrap">
+      <el-pagination
+        background
+        layout="total, prev, pager, next, sizes"
+        :total="total"
+        :page-size="query.pageSize"
+        :current-page="query.pageNum"
+        :page-sizes="[10, 20, 50]"
+        @current-change="handlePageChange"
+        @size-change="handleSizeChange"
+      />
+    </div>
+
     <el-dialog v-model="logisticsDialogVisible" title="物流信息" width="420px">
       <el-descriptions :column="1" border>
         <el-descriptions-item label="物流单号">{{ logisticsOrder?.deliveryNo || '暂无（演示占位）' }}</el-descriptions-item>
@@ -147,19 +170,6 @@
         <el-button type="danger" :loading="refundSubmitting" @click="submitRefund">提交申请</el-button>
       </template>
     </el-dialog>
-
-    <div class="pager-wrap">
-      <el-pagination
-        background
-        layout="total, prev, pager, next, sizes"
-        :total="total"
-        :page-size="query.pageSize"
-        :current-page="query.pageNum"
-        :page-sizes="[10, 20, 50]"
-        @current-change="handlePageChange"
-        @size-change="handleSizeChange"
-      />
-    </div>
   </div>
 </template>
 
@@ -169,9 +179,9 @@ import { Plus } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { cancelOrderApi, confirmReceiveOrderApi, getOrderListApi, payOrderApi, refundOrderApi, remindShipOrderApi } from '@/api/order';
 import { uploadImageApi } from '@/api/upload';
-import { confirmOrderAction, showOrderActionError, showOrderActionSuccess } from "@/utils/orderUi";
-import OrderStatusTag from "@/components/order/OrderStatusTag.vue";
-import { onRealtimeEvent } from "@/realtime/realtimeClient";
+import { confirmOrderAction, showOrderActionError, showOrderActionSuccess } from '@/utils/orderUi';
+import OrderStatusTag from '@/components/order/OrderStatusTag.vue';
+import { onRealtimeEvent } from '@/realtime/realtimeClient';
 
 const query = reactive({
   pageNum: 1,
@@ -211,15 +221,17 @@ const refundForm = reactive({
   proofUrls: []
 });
 
+let unsubscribeRealtime = null;
+
 onMounted(() => {
   syncQueryFromTab();
   fetchOrders();
   unsubscribeRealtime = onRealtimeEvent(handleRealtimeEvent);
 });
+
 onBeforeUnmount(() => {
   if (unsubscribeRealtime) unsubscribeRealtime();
 });
-let unsubscribeRealtime = null;
 
 async function fetchOrders() {
   listLoading.value = true;
@@ -291,9 +303,7 @@ function handleSizeChange(pageSize) {
 }
 
 function formatTime(value) {
-  if (!value) {
-    return '-';
-  }
+  if (!value) return '-';
   return String(value).replace('T', ' ');
 }
 
@@ -304,48 +314,48 @@ function goDetail(id) {
 async function pay(orderId) {
   try {
     await confirmOrderAction({
-      title: "确认付款",
-      message: "确认立即付款？付款后订单将进入待发货。",
-      confirmButtonText: "确认付款"
+      title: '确认付款',
+      message: '确认立即付款？付款后订单将进入待发货。',
+      confirmButtonText: '确认付款'
     });
     await payOrderApi(orderId);
-    showOrderActionSuccess("支付成功");
+    showOrderActionSuccess('支付成功');
     fetchOrders();
   } catch (error) {
-    if (String(error?.message || "").includes("cancel")) return;
-    showOrderActionError(error, "支付失败");
+    if (String(error?.message || '').includes('cancel')) return;
+    showOrderActionError(error, '支付失败');
   }
 }
 
 async function cancel(orderId) {
   try {
     await confirmOrderAction({
-      title: "确认取消订单",
-      message: "取消后将无法继续付款，是否继续？",
-      confirmButtonText: "确认取消"
+      title: '确认取消订单',
+      message: '取消后将无法继续付款，是否继续？',
+      confirmButtonText: '确认取消'
     });
     await cancelOrderApi(orderId);
-    showOrderActionSuccess("已取消订单");
+    showOrderActionSuccess('已取消订单');
     fetchOrders();
   } catch (error) {
-    if (String(error?.message || "").includes("cancel")) return;
-    showOrderActionError(error, "取消订单失败");
+    if (String(error?.message || '').includes('cancel')) return;
+    showOrderActionError(error, '取消订单失败');
   }
 }
 
 async function confirmReceive(orderId) {
   try {
     await confirmOrderAction({
-      title: "确认收货",
-      message: "确认已收到货物？确认后订单将进入待评价。",
-      confirmButtonText: "确认收货"
+      title: '确认收货',
+      message: '确认已收到货物？确认后订单将进入待评价。',
+      confirmButtonText: '确认收货'
     });
     await confirmReceiveOrderApi(orderId);
-    showOrderActionSuccess("已确认收货");
+    showOrderActionSuccess('已确认收货');
     fetchOrders();
   } catch (error) {
-    if (String(error?.message || "").includes("cancel")) return;
-    showOrderActionError(error, "确认收货失败");
+    if (String(error?.message || '').includes('cancel')) return;
+    showOrderActionError(error, '确认收货失败');
   }
 }
 
@@ -384,7 +394,7 @@ function handleProofRemove(file) {
 async function submitRefund() {
   if (!refundTargetId.value) return;
   if (!refundForm.reason) {
-    showOrderActionError({ message: "请选择退货原因" }, "提交退货申请失败");
+    showOrderActionError({ message: '请选择退货原因' }, '提交退货申请失败');
     return;
   }
   refundSubmitting.value = true;
@@ -396,10 +406,10 @@ async function submitRefund() {
       proofUrls: refundForm.proofUrls
     });
     refundDialogVisible.value = false;
-    showOrderActionSuccess("已提交退货申请");
+    showOrderActionSuccess('已提交退货申请');
     await fetchOrders();
   } catch (error) {
-    showOrderActionError(error, "提交退货申请失败");
+    showOrderActionError(error, '提交退货申请失败');
   } finally {
     refundSubmitting.value = false;
   }
@@ -408,9 +418,9 @@ async function submitRefund() {
 async function remindShip(orderId) {
   try {
     await remindShipOrderApi(orderId);
-    showOrderActionSuccess("已提醒卖家发货");
+    showOrderActionSuccess('已提醒卖家发货');
   } catch (error) {
-    showOrderActionError(error, "提醒发货失败");
+    showOrderActionError(error, '提醒发货失败');
   }
 }
 
@@ -421,7 +431,7 @@ function viewLogistics(order) {
 
 function handleRealtimeEvent(event) {
   const type = event?.detail?.eventType;
-  if (type === "ORDER_STATUS_UPDATED" || type === "AFTER_SALE_UPDATED" || type === "LOGISTICS_UPDATED" || type === "ORDER_REMIND_SHIP") {
+  if (type === 'ORDER_STATUS_UPDATED' || type === 'AFTER_SALE_UPDATED' || type === 'LOGISTICS_UPDATED' || type === 'ORDER_REMIND_SHIP') {
     fetchOrders();
   }
 }
@@ -465,7 +475,6 @@ function handleRealtimeEvent(event) {
   color: #6b7280;
   font-size: 12px;
 }
-
 
 .order-item {
   display: flex;
