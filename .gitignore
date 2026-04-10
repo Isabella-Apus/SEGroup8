@@ -18,3 +18,18 @@ uploads/
 # OS
 .DS_Store
 Thumbs.db
+
+# frontend-new
+frontend-new/node_modules/
+frontend-new/dist/
+
+# local env overrides
+frontend-new/.env.local
+frontend-new/.env.*.local
+
+# runtime logs
+backend/*.log
+backend/springboot_run.out.log
+backend/springboot_run.err.log
+backend-out.log
+backend-err.log
