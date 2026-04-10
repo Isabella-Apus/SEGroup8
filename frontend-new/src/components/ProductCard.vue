@@ -92,9 +92,9 @@ function formatPrice(value) {
 .product-card {
   background: var(--card-bg);
   border: 1px solid var(--line-soft);
-  border-radius: 18px;
+  border-radius: 20px;
   overflow: hidden;
-  transition: transform .2s ease, box-shadow .2s ease;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
 }
 
 .product-card.clickable {
@@ -102,14 +102,15 @@ function formatPrice(value) {
 }
 
 .product-card.clickable:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 30px rgba(0, 0, 0, .08);
+  transform: translateY(-4px);
+  border-color: #d6e5f6;
+  box-shadow: 0 16px 34px rgba(20, 38, 69, .16);
 }
 
 .cover-wrap {
   position: relative;
   aspect-ratio: 4 / 3;
-  background: #f7f7f7;
+  background: linear-gradient(145deg, #f4f7fc, #eef3f9);
 }
 
 .cover {
@@ -123,29 +124,31 @@ function formatPrice(value) {
   position: absolute;
   right: 10px;
   top: 10px;
-  background: rgba(17, 17, 17, .82);
+  background: rgba(23, 34, 52, .84);
   color: #fff;
   border-radius: 999px;
-  padding: 4px 10px;
+  padding: 5px 11px;
   font-size: 12px;
+  letter-spacing: .2px;
 }
 
 .content {
-  padding: 12px;
+  padding: 14px;
 }
 
 .title {
   margin: 0;
-  font-size: 16px;
+  font-size: 17px;
+  font-weight: 700;
   line-height: 1.3;
   color: #1f2329;
 }
 
 .desc {
   margin: 8px 0;
-  color: #666;
+  color: #68748a;
   font-size: 13px;
-  line-height: 1.35;
+  line-height: 1.45;
   min-height: 34px;
 }
 
@@ -156,12 +159,13 @@ function formatPrice(value) {
 }
 
 .price {
-  color: var(--brand-orange);
-  font-size: 22px;
+  color: #e06c1d;
+  font-size: 23px;
+  letter-spacing: .2px;
 }
 
 .sub {
-  color: #8c8c8c;
+  color: #7f8b9f;
   font-size: 12px;
 }
 </style>
