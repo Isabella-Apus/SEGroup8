@@ -16,7 +16,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final @NonNull TraceIdInterceptor traceIdInterceptor;
     private final @NonNull IdempotencyInterceptor idempotencyInterceptor;
 
-    public WebMvcConfig(@NonNull JwtAuthInterceptor jwtAuthInterceptor, @NonNull TraceIdInterceptor traceIdInterceptor, @NonNull IdempotencyInterceptor idempotencyInterceptor) {
+    public WebMvcConfig(@NonNull JwtAuthInterceptor jwtAuthInterceptor, @NonNull TraceIdInterceptor traceIdInterceptor,
+            @NonNull IdempotencyInterceptor idempotencyInterceptor) {
         this.jwtAuthInterceptor = jwtAuthInterceptor;
         this.traceIdInterceptor = traceIdInterceptor;
         this.idempotencyInterceptor = idempotencyInterceptor;

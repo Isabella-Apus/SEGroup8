@@ -9,6 +9,7 @@ import com.segroup8.platform.mapper.OrderAfterSaleLogMapper;
 import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.OrderItemMapper;
 import com.segroup8.platform.mapper.UserMapper;
+import com.segroup8.platform.realtime.RealtimePushService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,13 +48,20 @@ class AdminOrderControllerWebMvcTest {
     private UserMapper userMapper;
     @Mock
     private OrderAfterSaleLogMapper orderAfterSaleLogMapper;
+    @Mock
+    private RealtimePushService realtimePushService;
 
     @BeforeEach
     void setUp() {
         LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
         validator.afterPropertiesSet();
 
-        AdminOrderController controller = new AdminOrderController(orderInfoMapper, orderItemMapper, userMapper, orderAfterSaleLogMapper);
+        AdminOrderController controller = new AdminOrderController(
+                orderInfoMapper,
+                orderItemMapper,
+                userMapper,
+                orderAfterSaleLogMapper,
+                realtimePushService);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .setMessageConverters(new MappingJackson2HttpMessageConverter())
@@ -74,8 +82,8 @@ class AdminOrderControllerWebMvcTest {
         String tooLong = "a".repeat(256);
 
         mockMvc.perform(post("/api/admin/orders/1/refund/approve")
-                        .contentType("application/json")
-                        .content("{\"remark\":\"" + tooLong + "\"}"))
+                .contentType("application/json")
+                .content("{\"remark\":\"" + tooLong + "\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.message").value("审核意见最多255字"));
@@ -105,7 +113,7 @@ class AdminOrderControllerWebMvcTest {
         when(orderAfterSaleLogMapper.selectList(any())).thenReturn(List.of(log));
 
         mockMvc.perform(get("/api/admin/orders/99/after-sale-logs")
-                        .accept(MediaType.APPLICATION_JSON))
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
                 .andExpect(jsonPath("$.data[0].orderId").value(99))
@@ -116,4 +124,3 @@ class AdminOrderControllerWebMvcTest {
         verify(userMapper).selectById(eq(adminId));
     }
 }
-
