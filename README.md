@@ -7,8 +7,7 @@
 ```text
 SEGroup8/
   backend/                 # Spring Boot 后端
-  frontend/                # 旧版前端（保留）
-  frontend-new/            # 重构版前端（当前推荐）
+  frontend/                # 当前前端
     src/mock-data/         # 统一测试数据生成与接口模拟
   sql/
     init.sql               # 手动初始化数据库脚本
@@ -313,9 +312,7 @@ Started PlatformApplication
 - 接口地址：`http://localhost:8080`
 - Swagger 地址：`http://localhost:8080/swagger-ui.html`
 
-## 9. 怎么启动前端（推荐 frontend-new）
-
-### 9.1 启动旧版 frontend
+## 9. 怎么启动前端
 
 前端必须在 `frontend` 目录下启动。
 
@@ -325,40 +322,15 @@ npm install
 npm run dev
 ```
 
-旧版前端默认地址：
-
-- `http://localhost:5173`
-
-### 9.2 启动重构版 frontend-new（推荐）
-
-前端必须在 `frontend-new` 目录下启动。
-
-```powershell
-cd frontend-new
-npm install
-```
-
-使用测试数据源（mock）启动：
-
-```powershell
-npm run dev:mock
-```
-
-使用真实后端数据源（real）启动：
-
-```powershell
-npm run dev:real
-```
-
-重构版前端默认地址：
+前端默认地址：
 
 - `http://localhost:5174`
 
 说明：
 
-- `dev:mock` / `dev:real` 已在 `frontend-new/package.json` 配置。
-- 数据源统一入口在 `frontend-new/src/api/http.js`。
-- 测试数据统一放在 `frontend-new/src/mock-data/`。
+- `dev:mock` / `dev:real` 已在 `frontend/package.json` 配置。
+- 数据源统一入口在 `frontend/src/api/http.js`。
+- 测试数据统一放在 `frontend/src/mock-data/`。
 
 ## 10. 推荐启动顺序
 
@@ -403,7 +375,7 @@ mvn spring-boot:run
 
 处理方法：
 
-1. 临时切到 mock：在 `frontend-new` 下执行 `npm run dev:mock`
+1. 临时切到 mock：在 `frontend` 下执行 `npm run dev:mock`
 2. 或补齐后端二手接口后再使用 `npm run dev:real`
 
 ### 11.3 前端报 `AxiosError: Network Error`

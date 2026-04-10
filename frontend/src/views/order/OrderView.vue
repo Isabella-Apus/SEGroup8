@@ -1,16 +1,28 @@
 <template>
-  <div class="page-card">
+  <div class="page-card fade-in-up">
     <h2 class="page-title">我的订单</h2>
 
-    <el-empty v-if="records.length === 0" description="暂无订单" />
+    <div v-if="loading" class="skeleton-panel">
+      <el-skeleton animated :rows="6" />
+    </div>
+
+    <el-empty v-else-if="records.length === 0" description="暂无订单" />
 
     <el-collapse v-else>
       <el-collapse-item v-for="order in records" :key="order.id" :title="`订单号：${order.orderNo}`" :name="order.id">
         <el-descriptions :column="2" border>
           <el-descriptions-item label="下单时间">{{ formatTime(order.createTime) }}</el-descriptions-item>
           <el-descriptions-item label="订单金额">￥{{ Number(order.totalAmount || 0).toFixed(2) }}</el-descriptions-item>
-          <el-descriptions-item label="支付状态">{{ order.payStatus === 1 ? '已支付' : '待支付' }}</el-descriptions-item>
-          <el-descriptions-item label="订单状态">{{ order.orderStatusName || order.orderStatus }}</el-descriptions-item>
+          <el-descriptions-item label="支付状态">
+            <el-tag class="status-tag" :class="payStatusClass(order)" size="small" effect="plain">
+              {{ order.payStatus === 1 ? '已支付' : '待支付' }}
+            </el-tag>
+          </el-descriptions-item>
+          <el-descriptions-item label="订单状态">
+            <el-tag class="status-tag" :class="orderStatusClass(order)" size="small" effect="plain">
+              {{ order.orderStatusName || order.orderStatus }}
+            </el-tag>
+          </el-descriptions-item>
         </el-descriptions>
 
         <div class="action-row">
@@ -24,23 +36,25 @@
           </el-space>
         </div>
 
-        <el-table :data="order.items || []" border style="margin-top: 10px">
-          <el-table-column prop="productName" label="商品名" min-width="220" />
-          <el-table-column label="类型" width="100">
-            <template #default="scope">
-              <el-tag :type="scope.row.itemType === 'SECONDHAND' ? 'warning' : 'info'" size="small">
-                {{ scope.row.itemType === 'SECONDHAND' ? '二手' : '普通' }}
-              </el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column prop="price" label="单价" width="120">
-            <template #default="scope">￥{{ Number(scope.row.price || 0).toFixed(2) }}</template>
-          </el-table-column>
-          <el-table-column prop="quantity" label="数量" width="100" />
-          <el-table-column label="小计" width="120">
-            <template #default="scope">￥{{ (Number(scope.row.price || 0) * Number(scope.row.quantity || 0)).toFixed(2) }}</template>
-          </el-table-column>
-        </el-table>
+        <div class="table-mobile-wrap">
+          <el-table :data="order.items || []" border style="margin-top: 10px">
+            <el-table-column prop="productName" label="商品名" min-width="220" />
+            <el-table-column label="类型" width="100">
+              <template #default="scope">
+                <el-tag :type="scope.row.itemType === 'SECONDHAND' ? 'warning' : 'info'" size="small">
+                  {{ scope.row.itemType === 'SECONDHAND' ? '二手' : '普通' }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="price" label="单价" width="120">
+              <template #default="scope">￥{{ Number(scope.row.price || 0).toFixed(2) }}</template>
+            </el-table-column>
+            <el-table-column prop="quantity" label="数量" width="100" />
+            <el-table-column label="小计" width="120">
+              <template #default="scope">￥{{ (Number(scope.row.price || 0) * Number(scope.row.quantity || 0)).toFixed(2) }}</template>
+            </el-table-column>
+          </el-table>
+        </div>
       </el-collapse-item>
     </el-collapse>
 
@@ -76,6 +90,7 @@ const query = reactive({
   pageNum: 1,
   pageSize: 10
 });
+const loading = ref(false);
 const total = ref(0);
 const records = ref([]);
 
@@ -84,9 +99,14 @@ onMounted(() => {
 });
 
 async function fetchOrders() {
-  const result = await getOrderListApi(query);
-  records.value = result.data?.records || [];
-  total.value = result.data?.total || 0;
+  loading.value = true;
+  try {
+    const result = await getOrderListApi(query);
+    records.value = result.data?.records || [];
+    total.value = result.data?.total || 0;
+  } finally {
+    loading.value = false;
+  }
 }
 
 function handlePageChange(pageNum) {
@@ -131,6 +151,24 @@ function canRefund(order) {
   return Number(order?.payStatus) === 1 && [1, 2, 3].includes(Number(order?.orderStatus));
 }
 
+function payStatusClass(order) {
+  return Number(order?.payStatus) === 1 ? 'status-success' : 'status-pending';
+}
+
+function orderStatusClass(order) {
+  const status = Number(order?.orderStatus);
+  if ([4, 5].includes(status)) {
+    return 'status-success';
+  }
+  if (status === 6) {
+    return 'status-danger';
+  }
+  if ([1, 2, 3].includes(status)) {
+    return 'status-progress';
+  }
+  return 'status-pending';
+}
+
 async function pay(order) {
   await payOrderApi(order.id);
   ElMessage.success('支付成功');
@@ -138,6 +176,7 @@ async function pay(order) {
 }
 
 async function cancel(order) {
+  await ElMessageBox.confirm('确认取消该订单吗？', '提示', { type: 'warning' });
   await cancelOrderApi(order.id);
   ElMessage.success('已取消订单');
   await fetchOrders();
@@ -155,6 +194,7 @@ async function confirmReceive(order) {
 }
 
 async function complete(order) {
+  await ElMessageBox.confirm('确认将订单标记为完成吗？', '提示', { type: 'warning' });
   await completeOrderApi(order.id);
   ElMessage.success('订单已完成');
   await fetchOrders();
