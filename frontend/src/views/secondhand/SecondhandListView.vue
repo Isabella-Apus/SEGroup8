@@ -3,7 +3,6 @@
     <div class="hero">
       <div>
         <h1>二手捡漏</h1>
-        <p>和商品页一致的沉浸式卡片流，持续滚动发现好价</p>
       </div>
       <div class="hero-dot"></div>
     </div>

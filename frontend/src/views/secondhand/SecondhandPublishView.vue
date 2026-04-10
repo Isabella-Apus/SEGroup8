@@ -3,7 +3,6 @@
     <div class="hero">
       <div>
         <h1>发布二手商品</h1>
-        <p>沿用商品页视觉语言，让发布体验统一且直观</p>
       </div>
       <div class="hero-dot"></div>
     </div>

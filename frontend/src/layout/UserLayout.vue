@@ -17,11 +17,12 @@
           <el-menu-item index="/product">商品</el-menu-item>
           <el-menu-item index="/cart">购物车</el-menu-item>
           <el-menu-item index="/order">我的订单</el-menu-item>
-          <el-menu-item index="/reviews">我的评价</el-menu-item>
           <el-menu-item index="/secondhand">二手</el-menu-item>
           <el-menu-item index="/secondhand/publish">发布二手</el-menu-item>
           <el-menu-item index="/profile">个人资料</el-menu-item>
           <el-menu-item index="/addresses">地址管理</el-menu-item>
+          <el-menu-item index="/my-reviews">我的评价</el-menu-item>
+          <el-menu-item index="/after-sale">退款/售后</el-menu-item>
           <el-menu-item v-if="userStore.currentRole === 'OFFICIAL_SELLER'" index="/merchant">进入卖家工作台</el-menu-item>
           <el-menu-item v-else index="/merchant-apply">申请成为卖家</el-menu-item>
         </el-menu>

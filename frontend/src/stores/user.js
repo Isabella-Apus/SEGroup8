@@ -9,6 +9,7 @@ import {
     setToken,
     setUser,
 } from "@/utils/storage";
+import { startRealtimeClient, stopRealtimeClient } from "@/realtime/realtimeClient";
 
 export const useUserStore = defineStore("user", {
     state: () => ({
@@ -35,6 +36,7 @@ export const useUserStore = defineStore("user", {
             this.isLoggedIn = true;
             setToken(this.token);
             setUser(this.userInfo);
+            startRealtimeClient();
             return this.userInfo;
         },
         async register(registerForm) {
@@ -58,6 +60,7 @@ export const useUserStore = defineStore("user", {
             this.isLoggedIn = false;
             clearToken();
             clearUser();
+            stopRealtimeClient();
         },
     },
 });

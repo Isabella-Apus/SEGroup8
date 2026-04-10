@@ -419,7 +419,12 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
 
     if (m === "get" && p === "/order/list") {
         const user = requireLogin(headers);
-        const records = mockStore.orders.filter((o) => o.buyerUserId === user.id);
+        let records = mockStore.orders.filter((o) => o.buyerUserId === user.id);
+        const rawStatus = params?.orderStatus;
+        if (rawStatus !== undefined && rawStatus !== null && rawStatus !== "") {
+            const st = Number(rawStatus);
+            records = records.filter((o) => Number(o.orderStatus) === st);
+        }
         return ok(paginate(records, params?.pageNum, params?.pageSize));
     }
 

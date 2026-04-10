@@ -3,7 +3,11 @@ import { ElMessage } from "element-plus";
 import { useUserStore } from "@/stores/user";
 import { mockRequest } from "@/mock-data";
 
-const DATA_SOURCE = (import.meta.env.VITE_DATA_SOURCE || "mock").toLowerCase();
+// 开发环境默认连真实后端；生产构建未配置时仍可用 mock。也可用 .env.development 显式设置 VITE_DATA_SOURCE。
+const DATA_SOURCE = (
+    import.meta.env.VITE_DATA_SOURCE ||
+    (import.meta.env.DEV ? "real" : "mock")
+).toLowerCase();
 
 const realHttp = axios.create({
     baseURL: "http://localhost:8080/api",

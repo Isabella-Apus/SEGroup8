@@ -1,192 +1,169 @@
 <template>
-    <div class="page-card">
-        <h2 class="page-title">订单管理</h2>
+  <div class="page-card">
+    <h2 class="page-title">卖家订单管理</h2>
 
-        <el-form :inline="true" :model="query" class="query-form">
-            <el-form-item label="关键字">
-                <el-input v-model="query.keyword" placeholder="订单号/商品名" clearable style="width: 220px" />
-            </el-form-item>
-            <el-form-item label="订单状态">
-                <el-input-number v-model="query.orderStatus" :min="0" :max="10" :step="1" style="width: 120px" />
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="search">查询</el-button>
-                <el-button @click="reset">重置</el-button>
-            </el-form-item>
-        </el-form>
-
-        <el-table v-loading="loading" :data="records" border>
-            <el-table-column prop="orderNo" label="订单号" min-width="200" />
-            <el-table-column prop="buyerUserId" label="买家ID" width="90" />
-            <el-table-column label="金额" width="120">
-                <template #default="scope">￥{{ Number(scope.row.totalAmount || 0).toFixed(2) }}</template>
-            </el-table-column>
-            <el-table-column prop="orderStatusName" label="订单状态" width="130" />
-            <el-table-column prop="refundStatusName" label="售后状态" width="130" />
-            <el-table-column prop="createTime" label="下单时间" min-width="180" />
-            <el-table-column label="操作" min-width="280">
-                <template #default="scope">
-                    <el-button link type="primary" @click="openDetail(scope.row)">详情</el-button>
-                    <el-button v-if="canShip(scope.row)" link type="success" @click="ship(scope.row)">发货</el-button>
-                    <el-button v-if="canApproveRefund(scope.row)" link type="success" @click="approveRefund(scope.row)">同意退货</el-button>
-                    <el-button v-if="canRejectRefund(scope.row)" link type="danger" @click="rejectRefund(scope.row)">拒绝退货</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-
-        <div class="pager-wrap">
-            <el-pagination
-                background
-                layout="total, prev, pager, next, sizes"
-                :total="total"
-                :page-size="query.pageSize"
-                :current-page="query.pageNum"
-                :page-sizes="[10, 20, 50]"
-                @current-change="handlePageChange"
-                @size-change="handleSizeChange"
-            />
-        </div>
-
-        <el-dialog v-model="detailVisible" title="订单详情" width="860px">
-            <el-descriptions v-if="detail" :column="2" border>
-                <el-descriptions-item label="订单号">{{ detail.orderNo }}</el-descriptions-item>
-                <el-descriptions-item label="买家ID">{{ detail.buyerUserId }}</el-descriptions-item>
-                <el-descriptions-item label="订单状态">{{ detail.orderStatusName }}</el-descriptions-item>
-                <el-descriptions-item label="售后状态">{{ detail.refundStatusName }}</el-descriptions-item>
-                <el-descriptions-item label="收货人">{{ detail.receiverName || '-' }}</el-descriptions-item>
-                <el-descriptions-item label="联系电话">{{ detail.receiverPhone || '-' }}</el-descriptions-item>
-                <el-descriptions-item label="收货地址">{{ fullAddress(detail) }}</el-descriptions-item>
-                <el-descriptions-item label="备注">{{ detail.remark || '-' }}</el-descriptions-item>
-            </el-descriptions>
-            <el-table v-if="detail" :data="detail.items || []" border style="margin-top: 12px">
-                <el-table-column prop="productName" label="商品名" min-width="220" />
-                <el-table-column prop="productType" label="类型" width="120" />
-                <el-table-column prop="price" label="单价" width="120">
-                    <template #default="scope">￥{{ Number(scope.row.price || 0).toFixed(2) }}</template>
-                </el-table-column>
-                <el-table-column prop="quantity" label="数量" width="100" />
-            </el-table>
-        </el-dialog>
+    <div class="toolbar">
+      <el-input v-model="query.keyword" placeholder="订单号/商品名" clearable style="max-width: 340px" />
+      <el-select v-model="query.orderStatus" placeholder="订单状态" clearable style="width: 160px">
+        <el-option label="待付款" :value="0" />
+        <el-option label="待发货" :value="1" />
+        <el-option label="待收货" :value="2" />
+        <el-option label="待评价" :value="3" />
+        <el-option label="已完成" :value="4" />
+        <el-option label="已关闭" :value="9" />
+      </el-select>
+      <el-button type="primary" @click="handleSearch">查询</el-button>
+      <el-button @click="handleReset">重置</el-button>
     </div>
+
+    <el-empty v-if="records.length === 0" description="暂无卖家相关订单" />
+
+    <div v-else class="order-list">
+      <el-card v-for="order in records" :key="order.id" shadow="hover" class="order-card">
+        <div class="order-card__header">
+          <el-space>
+            <el-tag size="small" :type="order.orderStatus === 1 ? 'warning' : 'info'">{{ order.orderStatusName || '-' }}</el-tag>
+            <el-tag v-if="order.refundStatus > 0" type="danger" size="small">{{ order.refundStatusName }}</el-tag>
+          </el-space>
+          <div class="meta">
+            <span>订单号：{{ order.orderNo }}</span>
+            <span>{{ formatTime(order.createTime) }}</span>
+          </div>
+        </div>
+        <div v-for="item in order.items || []" :key="item.id" class="order-item">
+          <div>
+            {{ item.productName }}
+            <el-tag size="small" style="margin-left: 8px" :type="item.productType === 'SECONDHAND' ? 'warning' : 'info'">
+              {{ item.productType === 'SECONDHAND' ? '二手' : '新品' }}
+            </el-tag>
+            <el-tag v-if="item.conditionLevel" size="small" type="success" style="margin-left: 6px">
+              {{ item.conditionLevel }}
+            </el-tag>
+          </div>
+          <div>￥{{ Number(item.price || 0).toFixed(2) }} × {{ item.quantity }}</div>
+        </div>
+        <div class="order-card__footer">
+          <div>总金额：<strong>￥{{ Number(order.totalAmount || 0).toFixed(2) }}</strong></div>
+          <el-space>
+            <el-button v-if="order.orderStatus === 1" size="small" type="primary" @click="ship(order.id)">去发货</el-button>
+            <el-button v-if="order.refundStatus === 1" size="small" type="success" @click="approveRefund(order.id)">同意退货</el-button>
+            <el-button v-if="order.refundStatus === 1" size="small" type="danger" plain @click="rejectRefund(order.id)">拒绝退货</el-button>
+            <el-button size="small" @click="goDetail(order.id)">查看详情</el-button>
+          </el-space>
+        </div>
+      </el-card>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue';
-import { ElMessage } from 'element-plus';
-import {
-    approveSellerRefundApi,
-    getSellerOrderDetailApi,
-    getSellerOrderListApi,
-    rejectSellerRefundApi,
-    shipSellerOrderApi,
-} from '@/api/order';
-
-const loading = ref(false);
-const total = ref(0);
-const records = ref([]);
-const detailVisible = ref(false);
-const detail = ref(null);
+import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
+import { approveRefundOrderApi, getSellerOrderListApi, rejectRefundOrderApi, shipOrderApi } from "@/api/order";
+import { onRealtimeEvent } from "@/realtime/realtimeClient";
 
 const query = reactive({
-    pageNum: 1,
-    pageSize: 10,
-    keyword: '',
-    orderStatus: undefined,
+  pageNum: 1,
+  pageSize: 20,
+  orderStatus: undefined,
+  keyword: ""
 });
+const records = ref([]);
+const router = useRouter();
 
 onMounted(() => {
-    fetchOrders();
+  fetchList();
+  unsubscribeRealtime = onRealtimeEvent(handleRealtimeEvent);
 });
+onBeforeUnmount(() => {
+  if (unsubscribeRealtime) unsubscribeRealtime();
+});
+let unsubscribeRealtime = null;
 
-async function fetchOrders() {
-    loading.value = true;
-    try {
-        const result = await getSellerOrderListApi(query);
-        records.value = result.data?.records || [];
-        total.value = result.data?.total || 0;
-    } finally {
-        loading.value = false;
-    }
+async function fetchList() {
+  const result = await getSellerOrderListApi(query);
+  records.value = result.data?.records || [];
 }
 
-function search() {
-    query.pageNum = 1;
-    fetchOrders();
+function handleSearch() {
+  query.pageNum = 1;
+  fetchList();
 }
 
-function reset() {
-    query.pageNum = 1;
-    query.pageSize = 10;
-    query.keyword = '';
-    query.orderStatus = undefined;
-    fetchOrders();
+function handleReset() {
+  query.pageNum = 1;
+  query.keyword = "";
+  query.orderStatus = undefined;
+  fetchList();
 }
 
-function handlePageChange(pageNum) {
-    query.pageNum = pageNum;
-    fetchOrders();
+function formatTime(value) {
+  if (!value) return "-";
+  return String(value).replace("T", " ");
 }
 
-function handleSizeChange(pageSize) {
-    query.pageSize = pageSize;
-    query.pageNum = 1;
-    fetchOrders();
+async function ship(orderId) {
+  await shipOrderApi(orderId);
+  ElMessage.success("发货成功");
+  fetchList();
 }
 
-function canShip(order) {
-    return Number(order?.orderStatus) === 1;
+async function approveRefund(orderId) {
+  await approveRefundOrderApi(orderId);
+  ElMessage.success("已同意退货");
+  fetchList();
 }
 
-function canApproveRefund(order) {
-    return Number(order?.refundStatus) === 1;
+async function rejectRefund(orderId) {
+  await rejectRefundOrderApi(orderId);
+  ElMessage.success("已拒绝退货");
+  fetchList();
 }
 
-function canRejectRefund(order) {
-    return Number(order?.refundStatus) === 1;
+function goDetail(orderId) {
+  router.push({ path: `/order/${orderId}`, query: { from: "seller" } });
 }
 
-async function ship(order) {
-    await shipSellerOrderApi(order.id);
-    ElMessage.success('发货成功');
-    await fetchOrders();
-}
-
-async function approveRefund(order) {
-    await approveSellerRefundApi(order.id);
-    ElMessage.success('已同意退货');
-    await fetchOrders();
-}
-
-async function rejectRefund(order) {
-    await rejectSellerRefundApi(order.id);
-    ElMessage.success('已拒绝退货');
-    await fetchOrders();
-}
-
-async function openDetail(order) {
-    const result = await getSellerOrderDetailApi(order.id);
-    detail.value = result.data || null;
-    detailVisible.value = true;
-}
-
-function fullAddress(order) {
-    if (!order) {
-        return '-';
-    }
-    const parts = [order.receiverProvince, order.receiverCity, order.receiverDetailAddress]
-        .filter(Boolean);
-    return parts.length ? parts.join(' ') : '-';
+function handleRealtimeEvent(event) {
+  const type = event?.detail?.eventType;
+  if (type === "ORDER_STATUS_UPDATED" || type === "AFTER_SALE_UPDATED" || type === "LOGISTICS_UPDATED" || type === "ORDER_REMIND_SHIP") {
+    fetchList();
+  }
 }
 </script>
 
 <style scoped>
-.query-form {
-    margin-bottom: 12px;
+.toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
 }
-
-.pager-wrap {
-    margin-top: 16px;
-    display: flex;
-    justify-content: flex-end;
+.order-list {
+  display: grid;
+  gap: 12px;
+}
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-top: 1px dashed #e5e7eb;
+}
+.order-card__header,
+.order-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.meta {
+  color: #6b7280;
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+}
+.order-card__footer strong {
+  color: #ef4444;
 }
 </style>
