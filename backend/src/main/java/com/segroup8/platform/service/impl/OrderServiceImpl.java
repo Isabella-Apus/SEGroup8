@@ -12,8 +12,10 @@ import com.segroup8.platform.common.OrderStatusEnum;
 import com.segroup8.platform.common.ProductStatusEnum;
 import com.segroup8.platform.common.RefundDecisionSourceEnum;
 import com.segroup8.platform.common.RefundStatusEnum;
+import com.segroup8.platform.common.TransactionTradeTypeEnum;
 import com.segroup8.platform.dto.CreateOrderItemRequest;
 import com.segroup8.platform.dto.CreateOrderRequest;
+import com.segroup8.platform.dto.PayOrderRequest;
 import com.segroup8.platform.dto.OrderPageQueryRequest;
 import com.segroup8.platform.dto.OrderItemReviewBatchSubmitRequest;
 import com.segroup8.platform.dto.OrderItemReviewSubmitRequest;
@@ -39,6 +41,8 @@ import com.segroup8.platform.mapper.AddressMapper;
 import com.segroup8.platform.mapper.NotificationMapper;
 import com.segroup8.platform.realtime.RealtimePushService;
 import com.segroup8.platform.service.OrderService;
+import com.segroup8.platform.service.LogisticsService;
+import com.segroup8.platform.service.settlement.EscrowSettlementService;
 import com.segroup8.platform.vo.OrderItemVO;
 import com.segroup8.platform.vo.OrderVO;
 import com.segroup8.platform.vo.PageVO;
@@ -74,11 +78,16 @@ public class OrderServiceImpl implements OrderService {
     private final NotificationMapper notificationMapper;
     private final OrderAfterSaleLogMapper orderAfterSaleLogMapper;
     private final RealtimePushService realtimePushService;
+    private final LogisticsService logisticsService;
+    private final EscrowSettlementService escrowSettlementService;
 
     public OrderServiceImpl(OrderInfoMapper orderInfoMapper, OrderItemMapper orderItemMapper,
-            ProductMapper productMapper, ReviewMapper reviewMapper, SecondhandProductMapper secondhandProductMapper, ShopMapper shopMapper,
-            AddressMapper addressMapper, NotificationMapper notificationMapper, OrderAfterSaleLogMapper orderAfterSaleLogMapper,
-            RealtimePushService realtimePushService) {
+            ProductMapper productMapper, ReviewMapper reviewMapper, SecondhandProductMapper secondhandProductMapper,
+            ShopMapper shopMapper,
+            AddressMapper addressMapper, NotificationMapper notificationMapper,
+            OrderAfterSaleLogMapper orderAfterSaleLogMapper,
+            RealtimePushService realtimePushService, LogisticsService logisticsService,
+            EscrowSettlementService escrowSettlementService) {
         this.orderInfoMapper = orderInfoMapper;
         this.orderItemMapper = orderItemMapper;
         this.productMapper = productMapper;
@@ -89,6 +98,8 @@ public class OrderServiceImpl implements OrderService {
         this.notificationMapper = notificationMapper;
         this.orderAfterSaleLogMapper = orderAfterSaleLogMapper;
         this.realtimePushService = realtimePushService;
+        this.logisticsService = logisticsService;
+        this.escrowSettlementService = escrowSettlementService;
     }
 
     @Override
@@ -142,6 +153,9 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalAmount(totalAmount);
         order.setPayStatus(0);
         order.setOrderStatus(OrderStatusEnum.PENDING_PAY.getCode());
+        order.setCanRefund(1);
+        order.setLogisticsStatus("PENDING");
+        order.setLogisticsCurrentIndex(0);
         order.setPayMethod("余额支付");
         order.setRemark(request.getRemark());
         order.setCreateTime(LocalDateTime.now());
@@ -178,11 +192,13 @@ public class OrderServiceImpl implements OrderService {
                 .orderByDesc(OrderInfo::getCreateTime);
 
         if (request.getStartTime() != null) {
-            LocalDateTime start = LocalDateTime.ofInstant(Instant.ofEpochMilli(request.getStartTime()), ZoneId.of("Asia/Shanghai"));
+            LocalDateTime start = LocalDateTime.ofInstant(Instant.ofEpochMilli(request.getStartTime()),
+                    ZoneId.of("Asia/Shanghai"));
             wrapper.ge(OrderInfo::getCreateTime, start);
         }
         if (request.getEndTime() != null) {
-            LocalDateTime end = LocalDateTime.ofInstant(Instant.ofEpochMilli(request.getEndTime()), ZoneId.of("Asia/Shanghai"));
+            LocalDateTime end = LocalDateTime.ofInstant(Instant.ofEpochMilli(request.getEndTime()),
+                    ZoneId.of("Asia/Shanghai"));
             wrapper.le(OrderInfo::getCreateTime, end);
         }
         if (request.getMinAmount() != null) {
@@ -192,7 +208,8 @@ public class OrderServiceImpl implements OrderService {
             wrapper.le(OrderInfo::getTotalAmount, BigDecimal.valueOf(request.getMaxAmount()));
         }
 
-        Page<OrderInfo> page = orderInfoMapper.selectPage(Page.of(request.getPageNum(), request.getPageSize()), wrapper);
+        Page<OrderInfo> page = orderInfoMapper.selectPage(Page.of(request.getPageNum(), request.getPageSize()),
+                wrapper);
 
         List<OrderVO> records = page.getRecords().stream().map(order -> {
             List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
@@ -201,7 +218,8 @@ public class OrderServiceImpl implements OrderService {
             if (StringUtils.hasText(request.getKeyword())) {
                 String kw = request.getKeyword().trim();
                 boolean hitOrderNo = order.getOrderNo() != null && order.getOrderNo().contains(kw);
-                boolean hitProduct = items.stream().anyMatch(i -> i.getProductName() != null && i.getProductName().contains(kw));
+                boolean hitProduct = items.stream()
+                        .anyMatch(i -> i.getProductName() != null && i.getProductName().contains(kw));
                 if (!hitOrderNo && !hitProduct) {
                     return null;
                 }
@@ -230,16 +248,35 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public OrderVO payMyOrder(Long orderId) {
+    public OrderVO payMyOrder(Long orderId, PayOrderRequest request) {
         Long userId = requireUserId();
         OrderInfo order = orderInfoMapper.selectById(orderId);
         AccessControl.requireOrderOwnedByBuyer(order, "无权操作该订单");
         OrderStateMachine.assertOrderActionAllowed(order, OrderStateMachine.OrderAction.PAY, "当前状态不可支付");
         LocalDateTime now = LocalDateTime.now();
+        String payMode = request != null && StringUtils.hasText(request.getPayMode())
+                ? request.getPayMode().trim().toUpperCase()
+                : "THIRD_PARTY";
+        String payChannel = request != null && StringUtils.hasText(request.getPayChannel())
+                ? request.getPayChannel().trim().toUpperCase()
+                : "WECHAT";
+        String payMethod;
+        if ("COIN".equals(payMode)) {
+            escrowSettlementService.changePersonalBalance(userId,
+                    order.getTotalAmount().negate(),
+                    orderId,
+                    "COIN_PAY",
+                    TransactionTradeTypeEnum.EXPENSE_PURCHASE,
+                    "商城币支付订单");
+            payMethod = "商城币支付";
+        } else {
+            payMethod = "ALIPAY".equals(payChannel) ? "支付宝支付" : "微信支付";
+        }
         Integer version = normalizeVersion(order);
         int updated = orderInfoMapper.update(null, new UpdateWrapper<OrderInfo>()
                 .set("pay_status", 1)
                 .set("paid_time", now)
+                .set("pay_method", payMethod)
                 .set("order_status", OrderStatusEnum.PENDING_SHIP.getCode())
                 .setSql("version = version + 1")
                 .eq("id", orderId)
@@ -301,8 +338,105 @@ public class OrderServiceImpl implements OrderService {
         if (updated == 0) {
             throw new BusinessException(400, "仅待收货订单可确认收货");
         }
+        finalizeReceipt(orderId, order, now);
         pushOrderRealtime(orderId, userId, resolveSellerUserIds(orderId), "ORDER_STATUS_UPDATED", "买家已确认收货");
         return getMyOrderDetail(orderId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void autoConfirmReceiveForSystem(Long orderId) {
+        OrderInfo order = orderInfoMapper.selectById(orderId);
+        if (order == null) {
+            return;
+        }
+        if (!Integer.valueOf(OrderStatusEnum.SHIPPED.getCode()).equals(order.getOrderStatus())) {
+            return;
+        }
+        if (!"ARRIVED".equalsIgnoreCase(order.getLogisticsStatus())) {
+            return;
+        }
+        LocalDateTime now = LocalDateTime.now();
+        if (order.getAutoConfirmDeadline() == null || now.isBefore(order.getAutoConfirmDeadline())) {
+            return;
+        }
+        Integer version = normalizeVersion(order);
+        int updated = orderInfoMapper.update(null, new UpdateWrapper<OrderInfo>()
+                .set("order_status", OrderStatusEnum.RECEIVED.getCode())
+                .set("received_time", now)
+                .setSql("version = version + 1")
+                .eq("id", orderId)
+                .eq("order_status", OrderStatusEnum.SHIPPED.getCode())
+                .eq("version", version));
+        if (updated == 0) {
+            return;
+        }
+        finalizeReceipt(orderId, order, now);
+        pushOrderRealtime(orderId, order.getBuyerUserId(), resolveSellerUserIds(orderId), "ORDER_STATUS_UPDATED",
+                "系统已自动确认收货");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void autoApproveRefundForSystem(Long orderId) {
+        OrderInfo order = orderInfoMapper.selectById(orderId);
+        if (order == null) {
+            return;
+        }
+        if (!Integer.valueOf(RefundStatusEnum.PROCESSING.getCode()).equals(order.getRefundStatus())) {
+            return;
+        }
+        if (order.getRefundApplyTime() == null
+                || LocalDateTime.now().isBefore(order.getRefundApplyTime().plusDays(7))) {
+            return;
+        }
+        String refundMode = StringUtils.hasText(order.getRefundMode()) ? order.getRefundMode().trim().toUpperCase()
+                : "RETURN_REFUND";
+        if (!"RETURN_REFUND".equals(refundMode)) {
+            return;
+        }
+        Integer version = normalizeVersion(order);
+        LocalDateTime now = LocalDateTime.now();
+        String decisionRemark = "卖家超时 7 天未处理，系统自动退款";
+        int updated = orderInfoMapper.update(null, new UpdateWrapper<OrderInfo>()
+                .set("refund_status", RefundStatusEnum.APPROVED.getCode())
+                .set("order_status", OrderStatusEnum.CLOSED.getCode())
+                .set("refund_decision_time", now)
+                .set("refund_decision_user_id", 0L)
+                .set("refund_decision_remark", decisionRemark)
+                .set("refund_decision_source", RefundDecisionSourceEnum.SYSTEM.name())
+                .set("closed_time", now)
+                .set("can_refund", 0)
+                .setSql("version = version + 1")
+                .eq("id", orderId)
+                .eq("refund_status", RefundStatusEnum.PROCESSING.getCode())
+                .eq("version", version));
+        if (updated == 0) {
+            return;
+        }
+        escrowSettlementService.changePersonalBalance(
+                order.getBuyerUserId(),
+                order.getTotalAmount(),
+                orderId,
+                "REFUND_TIMEOUT_AUTO",
+                TransactionTradeTypeEnum.REFUND_BACKFLOW,
+                decisionRemark);
+        insertAfterSaleLog(orderId, AfterSaleActionEnum.APPROVE, 0L, OperatorRoleEnum.ADMIN, decisionRemark);
+        pushOrderRealtime(orderId, order.getBuyerUserId(), resolveSellerUserIds(orderId), "AFTER_SALE_UPDATED",
+                "系统已自动退款");
+    }
+
+    private void finalizeReceipt(Long orderId, OrderInfo order, LocalDateTime now) {
+        List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
+                .eq(OrderItem::getOrderId, orderId)
+                .orderByAsc(OrderItem::getId));
+        escrowSettlementService.releaseEscrow(order, items);
+        boolean hasNewProduct = items.stream().anyMatch(i -> "NEW".equalsIgnoreCase(i.getProductType()));
+        LocalDateTime afterSalesDeadline = hasNewProduct ? now.plusDays(7) : null;
+        orderInfoMapper.update(null, new UpdateWrapper<OrderInfo>()
+                .set("can_refund", hasNewProduct ? 1 : 0)
+                .set("after_sales_deadline", afterSalesDeadline)
+                .eq("id", orderId));
     }
 
     @Override
@@ -391,8 +525,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         for (OrderItemReviewSubmitRequest r : request.getItems()) {
-            boolean exists = orderItems.stream().anyMatch(i ->
-                    i.getProductId().equals(r.getProductId()) && i.getProductType().equalsIgnoreCase(r.getProductType()));
+            boolean exists = orderItems.stream().anyMatch(i -> i.getProductId().equals(r.getProductId())
+                    && i.getProductType().equalsIgnoreCase(r.getProductType()));
             if (!exists) {
                 throw new BusinessException(400, "评价商品不属于该订单");
             }
@@ -435,7 +569,14 @@ public class OrderServiceImpl implements OrderService {
         OrderInfo order = orderInfoMapper.selectById(orderId);
         AccessControl.requireOrderOwnedByBuyer(order, "无权操作该订单");
         OrderStateMachine.assertRefundApplyOrderStatusAllowed(order, "当前状态不可退货");
+        if (Integer.valueOf(0).equals(order.getCanRefund())) {
+            throw new BusinessException(400, "该订单已确认收货，不可申请退款");
+        }
         OrderStateMachine.assertRefundActionAllowed(order, OrderStateMachine.RefundAction.APPLY, "当前状态不可重复申请退货");
+        String refundMode = (request != null && StringUtils.hasText(request.getRefundMode()))
+                ? request.getRefundMode().trim().toUpperCase()
+                : "RETURN_REFUND";
+        validateRefundMode(order, refundMode);
         LocalDateTime now = LocalDateTime.now();
         Integer version = normalizeVersion(order);
         String reason = (request != null && StringUtils.hasText(request.getReason()))
@@ -448,6 +589,7 @@ public class OrderServiceImpl implements OrderService {
         int updated = orderInfoMapper.update(null, new UpdateWrapper<OrderInfo>()
                 .set("refund_status", RefundStatusEnum.PROCESSING.getCode())
                 .set("refund_apply_time", now)
+                .set("refund_mode", refundMode)
                 .set("refund_reason", reason)
                 .set(proofUrls != null, "refund_proof_urls", proofUrls)
                 .setSql("version = version + 1")
@@ -459,6 +601,19 @@ public class OrderServiceImpl implements OrderService {
                 .eq("version", version));
         if (updated == 0) {
             throw new BusinessException(400, "当前状态不可重复申请退货");
+        }
+        if ("ONLY_REFUND".equals(refundMode)) {
+            // 仅退款：待发货时直接回流买家个人账户并关闭订单
+            escrowSettlementService.changePersonalBalance(order.getBuyerUserId(), order.getTotalAmount(), orderId,
+                    "REFUND_ONLY", TransactionTradeTypeEnum.REFUND_BACKFLOW, "仅退款回流");
+            orderInfoMapper.update(null, new UpdateWrapper<OrderInfo>()
+                    .set("refund_status", RefundStatusEnum.APPROVED.getCode())
+                    .set("order_status", OrderStatusEnum.CLOSED.getCode())
+                    .set("closed_time", now)
+                    .set("can_refund", 0)
+                    .eq("id", orderId));
+            pushOrderRealtime(orderId, userId, resolveSellerUserIds(orderId), "AFTER_SALE_UPDATED", "仅退款已自动完成");
+            return getMyOrderDetail(orderId);
         }
         insertAfterSaleLog(orderId, AfterSaleActionEnum.APPLY, userId, OperatorRoleEnum.BUYER, reason);
         pushOrderRealtime(orderId, userId, resolveSellerUserIds(orderId), "AFTER_SALE_UPDATED", "买家发起了退货申请");
@@ -476,11 +631,14 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
                 .eq(OrderItem::getOrderId, order.getId())
                 .orderByAsc(OrderItem::getId));
-        AccessControl.requireSellerOwnership(() -> items.stream().anyMatch(item -> isItemOwnedBySeller(item, sellerUserId)), "无权操作该订单");
+        AccessControl.requireSellerOwnership(
+                () -> items.stream().anyMatch(item -> isItemOwnedBySeller(item, sellerUserId)), "无权操作该订单");
         OrderStateMachine.assertRefundActionAllowed(order, OrderStateMachine.RefundAction.APPROVE, "当前无可处理退货申请");
         LocalDateTime now = LocalDateTime.now();
         Integer version = normalizeVersion(order);
-        String decisionRemark = StringUtils.hasText(order.getRefundDecisionRemark()) ? order.getRefundDecisionRemark().trim() : "卖家同意退货";
+        String decisionRemark = StringUtils.hasText(order.getRefundDecisionRemark())
+                ? order.getRefundDecisionRemark().trim()
+                : "卖家同意退货";
         int updated = orderInfoMapper.update(null, new UpdateWrapper<OrderInfo>()
                 .set("refund_status", RefundStatusEnum.APPROVED.getCode())
                 .set("order_status", OrderStatusEnum.CLOSED.getCode())
@@ -496,6 +654,8 @@ public class OrderServiceImpl implements OrderService {
         if (updated == 0) {
             throw new BusinessException(400, "当前无可处理退货申请");
         }
+        escrowSettlementService.changePersonalBalance(order.getBuyerUserId(), order.getTotalAmount(), orderId,
+                "REFUND_RETURN", TransactionTradeTypeEnum.REFUND_BACKFLOW, "退货退款回流");
         // 条件更新不会回写内存对象，这里同步补齐返回 VO 需要的字段
         order.setRefundStatus(RefundStatusEnum.APPROVED.getCode());
         order.setOrderStatus(OrderStatusEnum.CLOSED.getCode());
@@ -504,6 +664,7 @@ public class OrderServiceImpl implements OrderService {
         order.setRefundDecisionRemark(decisionRemark);
         order.setRefundDecisionSource(RefundDecisionSourceEnum.SELLER.name());
         order.setClosedTime(now);
+        order.setCanRefund(0);
         insertAfterSaleLog(orderId, AfterSaleActionEnum.APPROVE, sellerUserId, OperatorRoleEnum.SELLER, decisionRemark);
         pushOrderRealtime(orderId, order.getBuyerUserId(), List.of(sellerUserId), "AFTER_SALE_UPDATED", "卖家已同意退货并退款");
         return buildOrderVO(order, items);
@@ -520,11 +681,14 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
                 .eq(OrderItem::getOrderId, order.getId())
                 .orderByAsc(OrderItem::getId));
-        AccessControl.requireSellerOwnership(() -> items.stream().anyMatch(item -> isItemOwnedBySeller(item, sellerUserId)), "无权操作该订单");
+        AccessControl.requireSellerOwnership(
+                () -> items.stream().anyMatch(item -> isItemOwnedBySeller(item, sellerUserId)), "无权操作该订单");
         OrderStateMachine.assertRefundActionAllowed(order, OrderStateMachine.RefundAction.REJECT, "当前无可处理退货申请");
         LocalDateTime now = LocalDateTime.now();
         Integer version = normalizeVersion(order);
-        String decisionRemark = StringUtils.hasText(order.getRefundDecisionRemark()) ? order.getRefundDecisionRemark().trim() : "卖家拒绝退货";
+        String decisionRemark = StringUtils.hasText(order.getRefundDecisionRemark())
+                ? order.getRefundDecisionRemark().trim()
+                : "卖家拒绝退货";
         int updated = orderInfoMapper.update(null, new UpdateWrapper<OrderInfo>()
                 .set("refund_status", RefundStatusEnum.REJECTED.getCode())
                 .set("refund_decision_time", now)
@@ -570,7 +734,8 @@ public class OrderServiceImpl implements OrderService {
             if (StringUtils.hasText(request.getKeyword())) {
                 String kw = request.getKeyword().trim();
                 boolean hitOrderNo = order.getOrderNo() != null && order.getOrderNo().contains(kw);
-                boolean hitProduct = items.stream().anyMatch(i -> i.getProductName() != null && i.getProductName().contains(kw));
+                boolean hitProduct = items.stream()
+                        .anyMatch(i -> i.getProductName() != null && i.getProductName().contains(kw));
                 if (!hitOrderNo && !hitProduct) {
                     return null;
                 }
@@ -599,7 +764,8 @@ public class OrderServiceImpl implements OrderService {
         if (items.isEmpty()) {
             throw new BusinessException(404, "订单不存在");
         }
-        AccessControl.requireSellerOwnership(() -> items.stream().anyMatch(item -> isItemOwnedBySeller(item, sellerUserId)), "无权查看该订单");
+        AccessControl.requireSellerOwnership(
+                () -> items.stream().anyMatch(item -> isItemOwnedBySeller(item, sellerUserId)), "无权查看该订单");
         return buildOrderVO(order, items);
     }
 
@@ -617,13 +783,21 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
                 .eq(OrderItem::getOrderId, order.getId())
                 .orderByAsc(OrderItem::getId));
-        AccessControl.requireSellerOwnership(() -> items.stream().anyMatch(item -> isItemOwnedBySeller(item, sellerUserId)), "无权操作该订单");
+        AccessControl.requireSellerOwnership(
+                () -> items.stream().anyMatch(item -> isItemOwnedBySeller(item, sellerUserId)), "无权操作该订单");
         order.setOrderStatus(OrderStatusEnum.SHIPPED.getCode());
         LocalDateTime now = LocalDateTime.now();
         order.setShippedTime(now);
+        order.setDeliveryTime(now);
+        order.setLogisticsStatus("IN_TRANSIT");
+        if (order.getLogisticsCurrentIndex() == null) {
+            order.setLogisticsCurrentIndex(0);
+        }
         orderInfoMapper.updateById(order);
+        logisticsService.initializeWhenShipped(orderId);
         pushOrderRealtime(orderId, order.getBuyerUserId(), List.of(sellerUserId), "ORDER_STATUS_UPDATED", "卖家已发货");
-        pushOrderRealtime(orderId, order.getBuyerUserId(), List.of(sellerUserId), "LOGISTICS_UPDATED", "物流状态更新：包裹已揽收，开始运输");
+        pushOrderRealtime(orderId, order.getBuyerUserId(), List.of(sellerUserId), "LOGISTICS_UPDATED",
+                "物流状态更新：包裹已揽收，开始运输");
         return buildOrderVO(order, items);
     }
 
@@ -725,6 +899,9 @@ public class OrderServiceImpl implements OrderService {
         vo.setCreateTime(order.getCreateTime());
         vo.setPaidTime(order.getPaidTime());
         vo.setShippedTime(order.getShippedTime());
+        vo.setDeliveryTime(order.getDeliveryTime());
+        vo.setArrivalTime(order.getArrivalTime());
+        vo.setAutoConfirmDeadline(order.getAutoConfirmDeadline());
         vo.setReceivedTime(order.getReceivedTime());
         vo.setCompletedTime(order.getCompletedTime());
         vo.setClosedTime(order.getClosedTime());
@@ -733,11 +910,47 @@ public class OrderServiceImpl implements OrderService {
         vo.setRefundDecisionUserId(order.getRefundDecisionUserId());
         vo.setRefundDecisionRemark(order.getRefundDecisionRemark());
         vo.setRefundDecisionSource(order.getRefundDecisionSource());
+        vo.setLogisticsTemplateId(order.getLogisticsTemplateId());
+        String normalizedLogisticsStatus = order.getLogisticsStatus();
+        if (!StringUtils.hasText(normalizedLogisticsStatus)
+                || "PENDING".equalsIgnoreCase(normalizedLogisticsStatus)) {
+            if (Integer.valueOf(OrderStatusEnum.SHIPPED.getCode()).equals(order.getOrderStatus())
+                    || Integer.valueOf(OrderStatusEnum.RECEIVED.getCode()).equals(order.getOrderStatus())
+                    || Integer.valueOf(OrderStatusEnum.COMPLETED.getCode()).equals(order.getOrderStatus())) {
+                normalizedLogisticsStatus = "IN_TRANSIT";
+            }
+        }
+        vo.setLogisticsStatus(normalizedLogisticsStatus);
+        vo.setLogisticsCurrentIndex(order.getLogisticsCurrentIndex());
+        vo.setCanRefund(order.getCanRefund() == null ? 1 : order.getCanRefund());
+        vo.setAfterSalesDeadline(order.getAfterSalesDeadline());
+        vo.setRefundMode(order.getRefundMode());
         vo.setItems(items.stream().map(this::toItemVO).toList());
         return vo;
     }
 
-    private void insertAfterSaleLog(Long orderId, AfterSaleActionEnum action, Long operatorUserId, OperatorRoleEnum operatorRole, String remark) {
+    private void validateRefundMode(OrderInfo order, String refundMode) {
+        if ("ONLY_REFUND".equals(refundMode)) {
+            if (!Integer.valueOf(OrderStatusEnum.PENDING_SHIP.getCode()).equals(order.getOrderStatus())) {
+                throw new BusinessException(400, "仅退款仅支持待发货订单");
+            }
+            return;
+        }
+        if ("RETURN_REFUND".equals(refundMode)) {
+            boolean shippedOrArrived = Integer.valueOf(OrderStatusEnum.SHIPPED.getCode()).equals(order.getOrderStatus())
+                    || "ARRIVED".equalsIgnoreCase(order.getLogisticsStatus());
+            boolean inAfterSale = order.getAfterSalesDeadline() != null
+                    && LocalDateTime.now().isBefore(order.getAfterSalesDeadline());
+            if (!shippedOrArrived && !inAfterSale) {
+                throw new BusinessException(400, "退货退款仅支持已发货/已送达或售后保护期内订单");
+            }
+            return;
+        }
+        throw new BusinessException(400, "退款模式不支持");
+    }
+
+    private void insertAfterSaleLog(Long orderId, AfterSaleActionEnum action, Long operatorUserId,
+            OperatorRoleEnum operatorRole, String remark) {
         if (orderAfterSaleLogMapper == null || orderId == null) {
             return;
         }
@@ -749,7 +962,8 @@ public class OrderServiceImpl implements OrderService {
                 .eq(OrderAfterSaleLog::getOperatorRole, operatorRole.name())
                 .orderByDesc(OrderAfterSaleLog::getId)
                 .last("limit 1"));
-        if (latest != null && normalizedRemark.equals(StringUtils.hasText(latest.getRemark()) ? latest.getRemark().trim() : "")) {
+        if (latest != null
+                && normalizedRemark.equals(StringUtils.hasText(latest.getRemark()) ? latest.getRemark().trim() : "")) {
             return;
         }
         OrderAfterSaleLog log = new OrderAfterSaleLog();
@@ -828,7 +1042,8 @@ public class OrderServiceImpl implements OrderService {
         return new ArrayList<>(sellerIds);
     }
 
-    private void pushOrderRealtime(Long orderId, Long buyerUserId, List<Long> sellerUserIds, String eventType, String message) {
+    private void pushOrderRealtime(Long orderId, Long buyerUserId, List<Long> sellerUserIds, String eventType,
+            String message) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("orderId", orderId);
         payload.put("message", message);

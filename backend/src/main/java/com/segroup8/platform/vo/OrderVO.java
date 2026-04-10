@@ -38,6 +38,15 @@ public class OrderVO {
     private String refundDecisionUserName;
     private String refundDecisionRemark;
     private String refundDecisionSource;
+    private Long logisticsTemplateId;
+    private String logisticsStatus;
+    private Integer logisticsCurrentIndex;
+    private Integer canRefund;
+    private LocalDateTime afterSalesDeadline;
+    private LocalDateTime deliveryTime;
+    private LocalDateTime arrivalTime;
+    private LocalDateTime autoConfirmDeadline;
+    private String refundMode;
     private List<OrderItemVO> items;
 
     public Long getId() {
@@ -294,6 +303,78 @@ public class OrderVO {
 
     public void setRefundDecisionSource(String refundDecisionSource) {
         this.refundDecisionSource = refundDecisionSource;
+    }
+
+    public Long getLogisticsTemplateId() {
+        return logisticsTemplateId;
+    }
+
+    public void setLogisticsTemplateId(Long logisticsTemplateId) {
+        this.logisticsTemplateId = logisticsTemplateId;
+    }
+
+    public String getLogisticsStatus() {
+        return logisticsStatus;
+    }
+
+    public void setLogisticsStatus(String logisticsStatus) {
+        this.logisticsStatus = logisticsStatus;
+    }
+
+    public Integer getLogisticsCurrentIndex() {
+        return logisticsCurrentIndex;
+    }
+
+    public void setLogisticsCurrentIndex(Integer logisticsCurrentIndex) {
+        this.logisticsCurrentIndex = logisticsCurrentIndex;
+    }
+
+    public Integer getCanRefund() {
+        return canRefund;
+    }
+
+    public void setCanRefund(Integer canRefund) {
+        this.canRefund = canRefund;
+    }
+
+    public LocalDateTime getAfterSalesDeadline() {
+        return afterSalesDeadline;
+    }
+
+    public void setAfterSalesDeadline(LocalDateTime afterSalesDeadline) {
+        this.afterSalesDeadline = afterSalesDeadline;
+    }
+
+    public LocalDateTime getDeliveryTime() {
+        return deliveryTime;
+    }
+
+    public void setDeliveryTime(LocalDateTime deliveryTime) {
+        this.deliveryTime = deliveryTime;
+    }
+
+    public LocalDateTime getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public void setArrivalTime(LocalDateTime arrivalTime) {
+        this.arrivalTime = arrivalTime;
+    }
+
+    public LocalDateTime getAutoConfirmDeadline() {
+        return autoConfirmDeadline;
+    }
+
+    public void setAutoConfirmDeadline(LocalDateTime autoConfirmDeadline) {
+        this.autoConfirmDeadline = autoConfirmDeadline;
+    }
+
+    public String getRefundMode() {
+        return refundMode;
+    }
+
+    public void setRefundMode(String refundMode) {
+        this.refundMode = refundMode;
     }
 
     public List<OrderItemVO> getItems() {

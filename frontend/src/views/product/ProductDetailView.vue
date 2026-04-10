@@ -92,11 +92,16 @@ async function handleBuyNow() {
     ElMessage.warning('购买数量超过库存');
     return;
   }
-  await createOrderApi({
+  const result = await createOrderApi({
     items: [{ productId: product.value.id, quantity: Number(quantity.value) }]
   });
   removeFromCart(product.value.id);
   ElMessage.success('下单成功');
+  const orderId = result?.data?.id;
+  if (orderId) {
+    router.push({ path: `/order/${orderId}`, query: { action: 'pay' } });
+    return;
+  }
   router.push('/order');
 }
 

@@ -49,12 +49,19 @@ const routes = [
                 path: "order/:id",
                 name: "orderDetail",
                 component: () => import("@/views/order/OrderDetailView.vue"),
+                meta: { detailMode: "buyer" },
             },
             {
                 path: "secondhand",
                 name: "secondhandList",
                 component: () =>
                     import("@/views/secondhand/SecondhandListView.vue"),
+            },
+            {
+                path: "secondhand/:id",
+                name: "secondhandDetail",
+                component: () =>
+                    import("@/views/secondhand/SecondhandDetailView.vue"),
             },
             {
                 path: "secondhand/publish",
@@ -107,6 +114,18 @@ const routes = [
                     import("@/views/merchant/MerchantOrdersView.vue"),
             },
             {
+                path: "orders/:id",
+                name: "merchantOrderDetail",
+                component: () => import("@/views/order/OrderDetailView.vue"),
+                meta: { detailMode: "seller" },
+            },
+            {
+                path: "finance",
+                name: "merchantFinance",
+                component: () =>
+                    import("@/views/merchant/MerchantFinanceView.vue"),
+            },
+            {
                 path: "reviews",
                 name: "merchantReviews",
                 component: () =>
@@ -149,7 +168,8 @@ const routes = [
             {
                 path: "orders",
                 name: "adminOrders",
-                component: () => import("@/views/admin/AdminOrderManageView.vue"),
+                component: () =>
+                    import("@/views/admin/AdminOrderManageView.vue"),
             },
         ],
     },

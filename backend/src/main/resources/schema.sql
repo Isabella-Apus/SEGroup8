@@ -763,3 +763,190 @@ DEALLOCATE PREPARE stmt_idem_add_update_time;
 UPDATE `user`
 SET `role` = 'OFFICIAL_SELLER'
 WHERE `role` = 'SELLER';
+
+CREATE TABLE IF NOT EXISTS `balance` (
+  `user_id` BIGINT NOT NULL,
+  `personal_balance` DECIMAL(12,2) NOT NULL DEFAULT 0,
+  `business_balance` DECIMAL(12,2) NOT NULL DEFAULT 0,
+  `version` INT NOT NULL DEFAULT 0,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `transaction_record` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `order_id` BIGINT DEFAULT NULL,
+  `user_id` BIGINT NOT NULL,
+  `account_type` VARCHAR(20) NOT NULL,
+  `change_type` VARCHAR(60) NOT NULL,
+  `amount` DECIMAL(12,2) NOT NULL,
+  `balance_after` DECIMAL(12,2) NOT NULL,
+  `remark` VARCHAR(255) DEFAULT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_transaction_record_user_id` (`user_id`),
+  KEY `idx_transaction_record_order_id` (`order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `logistics_path_template` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `origin_region` VARCHAR(20) NOT NULL,
+  `dest_region` VARCHAR(20) NOT NULL,
+  `path_nodes` JSON NOT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_logistics_template_region` (`origin_region`, `dest_region`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `logistics_trace` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `order_id` BIGINT NOT NULL,
+  `node_name` VARCHAR(80) NOT NULL,
+  `status_desc` VARCHAR(120) NOT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_logistics_trace_order_id` (`order_id`),
+  KEY `idx_logistics_trace_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @order_logistics_template_id_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'logistics_template_id'
+);
+SET @order_logistics_template_id_sql = IF(
+  @order_logistics_template_id_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `logistics_template_id` BIGINT DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_logistics_template_id FROM @order_logistics_template_id_sql;
+EXECUTE stmt_order_logistics_template_id;
+DEALLOCATE PREPARE stmt_order_logistics_template_id;
+
+SET @order_logistics_status_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'logistics_status'
+);
+SET @order_logistics_status_sql = IF(
+  @order_logistics_status_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `logistics_status` VARCHAR(20) NOT NULL DEFAULT ''PENDING''',
+  'SELECT 1'
+);
+PREPARE stmt_order_logistics_status FROM @order_logistics_status_sql;
+EXECUTE stmt_order_logistics_status;
+DEALLOCATE PREPARE stmt_order_logistics_status;
+
+SET @order_logistics_current_index_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'logistics_current_index'
+);
+SET @order_logistics_current_index_sql = IF(
+  @order_logistics_current_index_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `logistics_current_index` INT NOT NULL DEFAULT 0',
+  'SELECT 1'
+);
+PREPARE stmt_order_logistics_current_index FROM @order_logistics_current_index_sql;
+EXECUTE stmt_order_logistics_current_index;
+DEALLOCATE PREPARE stmt_order_logistics_current_index;
+
+SET @order_can_refund_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'can_refund'
+);
+SET @order_can_refund_sql = IF(
+  @order_can_refund_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `can_refund` TINYINT NOT NULL DEFAULT 1',
+  'SELECT 1'
+);
+PREPARE stmt_order_can_refund FROM @order_can_refund_sql;
+EXECUTE stmt_order_can_refund;
+DEALLOCATE PREPARE stmt_order_can_refund;
+
+SET @order_after_sales_deadline_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'after_sales_deadline'
+);
+SET @order_after_sales_deadline_sql = IF(
+  @order_after_sales_deadline_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `after_sales_deadline` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_after_sales_deadline FROM @order_after_sales_deadline_sql;
+EXECUTE stmt_order_after_sales_deadline;
+DEALLOCATE PREPARE stmt_order_after_sales_deadline;
+
+SET @order_delivery_time_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'delivery_time'
+);
+SET @order_delivery_time_sql = IF(
+  @order_delivery_time_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `delivery_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_delivery_time FROM @order_delivery_time_sql;
+EXECUTE stmt_order_delivery_time;
+DEALLOCATE PREPARE stmt_order_delivery_time;
+
+SET @order_arrival_time_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'arrival_time'
+);
+SET @order_arrival_time_sql = IF(
+  @order_arrival_time_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `arrival_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_arrival_time FROM @order_arrival_time_sql;
+EXECUTE stmt_order_arrival_time;
+DEALLOCATE PREPARE stmt_order_arrival_time;
+
+SET @order_auto_confirm_deadline_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'auto_confirm_deadline'
+);
+SET @order_auto_confirm_deadline_sql = IF(
+  @order_auto_confirm_deadline_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `auto_confirm_deadline` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_auto_confirm_deadline FROM @order_auto_confirm_deadline_sql;
+EXECUTE stmt_order_auto_confirm_deadline;
+DEALLOCATE PREPARE stmt_order_auto_confirm_deadline;
+
+SET @order_refund_mode_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'refund_mode'
+);
+SET @order_refund_mode_sql = IF(
+  @order_refund_mode_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `refund_mode` VARCHAR(20) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_refund_mode FROM @order_refund_mode_sql;
+EXECUTE stmt_order_refund_mode;
+DEALLOCATE PREPARE stmt_order_refund_mode;
+
+SET @tr_trade_type_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'transaction_record' AND COLUMN_NAME = 'trade_type'
+);
+SET @tr_trade_type_sql = IF(
+  @tr_trade_type_exists = 0,
+  'ALTER TABLE `transaction_record` ADD COLUMN `trade_type` VARCHAR(60) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_tr_trade_type FROM @tr_trade_type_sql;
+EXECUTE stmt_tr_trade_type;
+DEALLOCATE PREPARE stmt_tr_trade_type;

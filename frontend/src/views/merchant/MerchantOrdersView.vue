@@ -45,6 +45,7 @@
             <el-button link type="primary" @click="goDetail(scope.row.id)">详情页</el-button>
             <el-button link type="primary" @click="openDetail(scope.row)">弹窗详情</el-button>
             <el-button v-if="canShip(scope.row)" link type="success" @click="ship(scope.row)">发货</el-button>
+            <el-button v-if="canPushLogistics(scope.row)" link type="primary" @click="pushLogistics(scope.row)">更新进度</el-button>
             <el-button v-if="canApproveRefund(scope.row)" link type="success" @click="approveRefund(scope.row)">同意退货</el-button>
             <el-button v-if="canRejectRefund(scope.row)" link class="danger-action" @click="rejectRefund(scope.row)">拒绝退货</el-button>
           </template>
@@ -102,6 +103,7 @@ import {
   rejectRefundOrderApi,
   shipOrderApi
 } from '@/api/order';
+import { pushNextLogisticsApi } from '@/api/logistics';
 import { onRealtimeEvent } from '@/realtime/realtimeClient';
 
 const loading = ref(false);
@@ -176,6 +178,10 @@ function canApproveRefund(order) {
   return Number(order?.refundStatus) === 1;
 }
 
+function canPushLogistics(order) {
+  return Number(order?.orderStatus) === 2;
+}
+
 function canRejectRefund(order) {
   return Number(order?.refundStatus) === 1;
 }
@@ -217,8 +223,18 @@ async function rejectRefund(order) {
   await fetchList();
 }
 
+async function pushLogistics(order) {
+  const result = await pushNextLogisticsApi(order.id);
+  const detailRes = await getSellerOrderDetailApi(order.id);
+  const targetIndex = records.value.findIndex((it) => String(it.id) === String(order.id));
+  if (targetIndex >= 0) {
+    records.value[targetIndex] = detailRes.data;
+  }
+  ElMessage.success(`物流已更新：${result.data?.nodeName || '下一节点'}`);
+}
+
 function goDetail(orderId) {
-  router.push({ path: `/order/${orderId}`, query: { from: 'seller' } });
+  router.push(`/merchant/orders/${orderId}`);
 }
 
 async function openDetail(order) {

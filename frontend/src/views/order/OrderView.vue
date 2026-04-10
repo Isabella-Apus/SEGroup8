@@ -126,17 +126,6 @@
       />
     </div>
 
-    <el-dialog v-model="logisticsDialogVisible" title="物流信息" width="420px">
-      <el-descriptions :column="1" border>
-        <el-descriptions-item label="物流单号">{{ logisticsOrder?.deliveryNo || '暂无（演示占位）' }}</el-descriptions-item>
-        <el-descriptions-item label="状态">运输中（演示占位）</el-descriptions-item>
-        <el-descriptions-item label="最新轨迹">包裹已揽收，正在发往下一站（演示占位）</el-descriptions-item>
-      </el-descriptions>
-      <template #footer>
-        <el-button type="primary" @click="logisticsDialogVisible = false">知道了</el-button>
-      </template>
-    </el-dialog>
-
     <el-dialog v-model="refundDialogVisible" title="申请退货/退款" width="520px">
       <el-form label-width="90px">
         <el-form-item label="退货原因">
@@ -168,6 +157,35 @@
       <template #footer>
         <el-button @click="refundDialogVisible = false">取消</el-button>
         <el-button type="danger" :loading="refundSubmitting" @click="submitRefund">提交申请</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="payDialogVisible" title="确认支付" width="520px">
+      <el-form label-width="90px">
+        <el-form-item label="支付方式">
+          <el-radio-group v-model="payForm.payMode">
+            <el-radio-button label="THIRD_PARTY">微信/支付宝</el-radio-button>
+            <el-radio-button label="COIN">商城币</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item v-if="payForm.payMode === 'THIRD_PARTY'" label="渠道">
+          <el-radio-group v-model="payForm.payChannel">
+            <el-radio-button label="WECHAT">微信</el-radio-button>
+            <el-radio-button label="ALIPAY">支付宝</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <div v-if="payForm.payMode === 'THIRD_PARTY'" class="pay-qr-placeholder">第三方支付二维码占位（模拟）</div>
+        <el-alert
+          v-else
+          type="info"
+          show-icon
+          :closable="false"
+          title="确认后将直接扣减商城币余额。"
+        />
+      </el-form>
+      <template #footer>
+        <el-button @click="payDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="paySubmitting" @click="confirmPay">{{ payForm.payMode === 'THIRD_PARTY' ? '我已支付' : '确认支付' }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -209,16 +227,21 @@ const tabLabelMap = {
 };
 const tabLabel = computed(() => tabLabelMap[activeTab.value] || '全部');
 const router = useRouter();
-const logisticsDialogVisible = ref(false);
-const logisticsOrder = ref(null);
 
 const refundDialogVisible = ref(false);
 const refundSubmitting = ref(false);
 const refundTargetId = ref(null);
+const payDialogVisible = ref(false);
+const paySubmitting = ref(false);
+const payTargetId = ref(null);
 const refundForm = reactive({
   reason: '',
   remark: '',
   proofUrls: []
+});
+const payForm = reactive({
+  payMode: 'THIRD_PARTY',
+  payChannel: 'WECHAT'
 });
 
 let unsubscribeRealtime = null;
@@ -312,18 +335,27 @@ function goDetail(id) {
 }
 
 async function pay(orderId) {
+  payTargetId.value = orderId;
+  payForm.payMode = 'THIRD_PARTY';
+  payForm.payChannel = 'WECHAT';
+  payDialogVisible.value = true;
+}
+
+async function confirmPay() {
+  if (!payTargetId.value) return;
+  paySubmitting.value = true;
   try {
-    await confirmOrderAction({
-      title: '确认付款',
-      message: '确认立即付款？付款后订单将进入待发货。',
-      confirmButtonText: '确认付款'
+    await payOrderApi(payTargetId.value, {
+      payMode: payForm.payMode,
+      payChannel: payForm.payChannel
     });
-    await payOrderApi(orderId);
+    payDialogVisible.value = false;
     showOrderActionSuccess('支付成功');
     fetchOrders();
   } catch (error) {
-    if (String(error?.message || '').includes('cancel')) return;
     showOrderActionError(error, '支付失败');
+  } finally {
+    paySubmitting.value = false;
   }
 }
 
@@ -425,8 +457,10 @@ async function remindShip(orderId) {
 }
 
 function viewLogistics(order) {
-  logisticsOrder.value = order;
-  logisticsDialogVisible.value = true;
+  router.push({
+    path: `/order/${order.id}`,
+    query: { tab: 'logistics' }
+  });
 }
 
 function handleRealtimeEvent(event) {
@@ -548,5 +582,16 @@ function handleRealtimeEvent(event) {
   color: #6b7280;
   font-size: 12px;
   margin-top: 6px;
+}
+
+.pay-qr-placeholder {
+  margin: 8px 0;
+  height: 180px;
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
 }
 </style>
