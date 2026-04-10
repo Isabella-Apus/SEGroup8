@@ -232,7 +232,6 @@ function fullAddress(order) {
         .filter(Boolean);
     return parts.length ? parts.join(' ') : '-';
 }
-</script>
 
 <style scoped>
 .query-form {
