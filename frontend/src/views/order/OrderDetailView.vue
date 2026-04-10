@@ -1,7 +1,7 @@
 <template>
   <div class="page-card">
     <div class="header">
-      <el-button text @click="router.back()">返回</el-button>
+      <el-button text @click="goBack">返回</el-button>
       <h2 class="page-title" style="margin: 0">订单详情</h2>
       <div style="width: 60px" />
     </div>
@@ -39,6 +39,36 @@
         <el-descriptions-item label="下单时间">{{ formatTime(order.createTime) }}</el-descriptions-item>
         <el-descriptions-item label="实付金额">￥{{ Number(order.totalAmount || 0).toFixed(2) }}</el-descriptions-item>
       </el-descriptions>
+
+      <el-alert
+        v-if="autoConfirmTip"
+        :title="autoConfirmTip"
+        type="warning"
+        show-icon
+        :closable="false"
+        class="auto-confirm-alert"
+      />
+
+      <el-card ref="logisticsCardRef" class="logistics-card" shadow="never">
+        <template #header>
+          <div class="logistics-head">
+            <span>物流轨迹</span>
+            <el-tag size="small" type="info">{{ order.logisticsStatus || 'PENDING' }}</el-tag>
+          </div>
+        </template>
+        <el-empty v-if="logisticsTraces.length === 0" description="暂无物流轨迹" />
+        <el-timeline v-else>
+          <el-timeline-item
+            v-for="trace in logisticsTraces"
+            :key="trace.id"
+            :timestamp="formatTime(trace.createTime)"
+            placement="top"
+          >
+            <div class="trace-node">{{ trace.nodeName }}</div>
+            <div class="trace-desc">{{ trace.statusDesc }}</div>
+          </el-timeline-item>
+        </el-timeline>
+      </el-card>
 
       <OrderTimeline title="订单进度" :steps="orderTimeline" :expanded="timelineExpanded" :default-count="3" @toggle="timelineExpanded = !timelineExpanded" />
       <template v-if="order.refundStatus > 0">
@@ -106,6 +136,12 @@
 
     <el-dialog v-if="!isSellerView" v-model="refundDialogVisible" title="申请退货/退款" width="520px">
       <el-form label-width="90px">
+        <el-form-item label="退款方式">
+          <el-radio-group v-model="refundForm.mode">
+            <el-radio-button label="ONLY_REFUND" :disabled="!canOnlyRefund">仅退款</el-radio-button>
+            <el-radio-button label="RETURN_REFUND">退货退款</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="退货原因">
           <el-select v-model="refundForm.reason" placeholder="请选择" style="width: 100%">
             <el-option label="不想要了/拍错了" value="不想要了/拍错了" />
@@ -144,11 +180,40 @@
         <el-button type="primary" @click="proofPreviewVisible = false">知道了</el-button>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="payDialogVisible" title="确认支付" width="520px">
+      <el-form label-width="90px">
+        <el-form-item label="支付方式">
+          <el-radio-group v-model="payForm.payMode">
+            <el-radio-button label="THIRD_PARTY">微信/支付宝</el-radio-button>
+            <el-radio-button label="COIN">商城币</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item v-if="payForm.payMode === 'THIRD_PARTY'" label="渠道">
+          <el-radio-group v-model="payForm.payChannel">
+            <el-radio-button label="WECHAT">微信</el-radio-button>
+            <el-radio-button label="ALIPAY">支付宝</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <div v-if="payForm.payMode === 'THIRD_PARTY'" class="pay-qr-placeholder">第三方支付二维码占位（模拟）</div>
+        <el-alert
+          v-else
+          type="info"
+          show-icon
+          :closable="false"
+          title="确认后将直接扣减商城币余额。"
+        />
+      </el-form>
+      <template #footer>
+        <el-button @click="payDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="paySubmitting" @click="confirmPay">{{ payForm.payMode === 'THIRD_PARTY' ? '我已支付' : '确认支付' }}</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { Plus } from "@element-plus/icons-vue";
 import { useRoute, useRouter } from "vue-router";
 import {
@@ -163,9 +228,9 @@ import {
   shipOrderApi,
   submitOrderItemReviewsApi
 } from "@/api/order";
+import { getLogisticsTraceApi } from "@/api/logistics";
 import { uploadImageApi } from "@/api/upload";
 import { confirmOrderAction, showOrderActionError, showOrderActionSuccess } from "@/utils/orderUi";
-import { useUserStore } from "@/stores/user";
 import OrderStatusTag from "@/components/order/OrderStatusTag.vue";
 import OrderSummaryCard from "@/components/order/OrderSummaryCard.vue";
 import OrderTimeline from "@/components/order/OrderTimeline.vue";
@@ -173,17 +238,25 @@ import { onRealtimeEvent } from "@/realtime/realtimeClient";
 
 const route = useRoute();
 const router = useRouter();
-const userStore = useUserStore();
 const loading = ref(false);
 const order = ref(null);
 const reviewDialogVisible = ref(false);
 const refundDialogVisible = ref(false);
 const refundSubmitting = ref(false);
+const payDialogVisible = ref(false);
+const paySubmitting = ref(false);
 const reviewItems = ref([]);
+const logisticsTraces = ref([]);
+const logisticsCardRef = ref(null);
 const refundForm = reactive({
+  mode: "RETURN_REFUND",
   reason: "",
   remark: "",
   proofUrls: []
+});
+const payForm = reactive({
+  payMode: "THIRD_PARTY",
+  payChannel: "WECHAT"
 });
 
 const proofList = computed(() => {
@@ -198,8 +271,26 @@ const proofList = computed(() => {
 const proofPreviewVisible = ref(false);
 const proofPreviewUrl = ref("");
 const timelineExpanded = ref(false);
-const isSellerRole = computed(() => userStore.currentRole === "OFFICIAL_SELLER");
-const isSellerView = computed(() => isSellerRole.value || route.query.from === "seller");
+const isSellerView = computed(() => route.meta?.detailMode === "seller" || route.query.from === "seller");
+const canOnlyRefund = computed(() => Number(order.value?.orderStatus) === 1);
+
+const autoConfirmTip = computed(() => {
+  const o = order.value;
+  if (!o || String(o.logisticsStatus || "").toUpperCase() !== "ARRIVED" || !o.autoConfirmDeadline) {
+    return "";
+  }
+  const now = Date.now();
+  const deadline = new Date(o.autoConfirmDeadline).getTime();
+  if (!deadline || deadline <= now) {
+    return "订单已达到自动确认收货时间，系统将尽快处理。";
+  }
+  const diffMs = deadline - now;
+  const dayMs = 24 * 60 * 60 * 1000;
+  const hourMs = 60 * 60 * 1000;
+  const days = Math.floor(diffMs / dayMs);
+  const hours = Math.floor((diffMs % dayMs) / hourMs);
+  return `系统将于 ${days} 天 ${hours} 小时后自动确认收货`;
+});
 
 function openProofPreview(url) {
   proofPreviewUrl.value = url;
@@ -208,6 +299,8 @@ function openProofPreview(url) {
 
 onMounted(async () => {
   await fetchDetail();
+  await maybeFocusLogistics();
+  maybeOpenPayDialog();
   unsubscribeRealtime = onRealtimeEvent(handleRealtimeEvent);
   if (!isSellerView.value && route.query.action === "review") {
     openReviewDialog();
@@ -225,6 +318,7 @@ async function fetchDetail() {
       try {
         const sellerResult = await getSellerOrderDetailApi(route.params.id);
         order.value = sellerResult.data;
+        await fetchLogisticsTrace();
         return;
       } catch (_) {
         // 兜底：历史链接可能未带 seller 标记，尝试买家详情避免页面空白。
@@ -232,8 +326,66 @@ async function fetchDetail() {
     }
     const result = await getOrderDetailApi(route.params.id);
     order.value = result.data;
+    await fetchLogisticsTrace();
   } finally {
     loading.value = false;
+  }
+}
+
+async function maybeFocusLogistics() {
+  if (route.query.tab !== "logistics") {
+    return;
+  }
+  await nextTick();
+  const cardEl = logisticsCardRef.value?.$el || logisticsCardRef.value;
+  if (cardEl?.scrollIntoView) {
+    cardEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+function goBack() {
+  if (isSellerView.value) {
+    router.push("/merchant/orders");
+    return;
+  }
+  router.push("/order");
+}
+
+function maybeOpenPayDialog() {
+  if (isSellerView.value) {
+    return;
+  }
+  if (route.query.action !== "pay") {
+    return;
+  }
+  if (Number(order.value?.orderStatus) !== 0) {
+    return;
+  }
+  payForm.payMode = "THIRD_PARTY";
+  payForm.payChannel = "WECHAT";
+  payDialogVisible.value = true;
+}
+
+async function fetchLogisticsTrace() {
+  if (!route.params.id) {
+    logisticsTraces.value = [];
+    return;
+  }
+  try {
+    const result = await getLogisticsTraceApi(route.params.id);
+    const traces = result.data || [];
+    logisticsTraces.value = [...traces].sort((a, b) => {
+      const at = new Date(a.createTime || 0).getTime();
+      const bt = new Date(b.createTime || 0).getTime();
+      return bt - at;
+    });
+    if (order.value && logisticsTraces.value.length > 0) {
+      const latest = logisticsTraces.value[0];
+      const desc = String(latest?.statusDesc || "");
+      order.value.logisticsStatus = /送达|签收/.test(desc) ? "ARRIVED" : "IN_TRANSIT";
+    }
+  } catch (_) {
+    logisticsTraces.value = [];
   }
 }
 
@@ -250,18 +402,25 @@ function toFullImageUrl(url) {
 }
 
 async function pay() {
+  payForm.payMode = "THIRD_PARTY";
+  payForm.payChannel = "WECHAT";
+  payDialogVisible.value = true;
+}
+
+async function confirmPay() {
+  paySubmitting.value = true;
   try {
-    await confirmOrderAction({
-      title: "确认付款",
-      message: "确认立即付款？付款后订单将进入待发货。",
-      confirmButtonText: "确认付款"
+    await payOrderApi(order.value.id, {
+      payMode: payForm.payMode,
+      payChannel: payForm.payChannel
     });
-    await payOrderApi(order.value.id);
+    payDialogVisible.value = false;
     showOrderActionSuccess("支付成功");
     await fetchDetail();
   } catch (error) {
-    if (String(error?.message || "").includes("cancel")) return;
     showOrderActionError(error, "支付失败");
+  } finally {
+    paySubmitting.value = false;
   }
 }
 
@@ -341,10 +500,11 @@ async function submitReview() {
 
 function canRefund(status, refundStatus) {
   if (refundStatus === 1 || refundStatus === 2) return false;
-  return status === 1 || status === 2 || status === 3 || status === 4;
+  return order.value?.canRefund !== 0 && (status === 1 || status === 2 || status === 3 || status === 4);
 }
 
 function openRefundDialog() {
+  refundForm.mode = canOnlyRefund.value ? "ONLY_REFUND" : "RETURN_REFUND";
   refundForm.reason = "";
   refundForm.remark = "";
   refundForm.proofUrls = [];
@@ -377,6 +537,7 @@ async function submitRefund() {
       ? `${refundForm.reason}（${refundForm.remark.trim()}）`
       : refundForm.reason;
     await refundOrderApi(order.value.id, {
+      refundMode: refundForm.mode,
       reason,
       proofUrls: refundForm.proofUrls
     });
@@ -599,6 +760,42 @@ const orderNextActionSummary = computed(() => {
   margin-top: 12px;
   display: flex;
   justify-content: flex-end;
+}
+
+.auto-confirm-alert {
+  margin-bottom: 12px;
+}
+
+.logistics-card {
+  margin-bottom: 12px;
+}
+
+.logistics-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.trace-node {
+  font-weight: 600;
+  color: #111827;
+}
+
+.trace-desc {
+  margin-top: 2px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.pay-qr-placeholder {
+  margin: 8px 0;
+  height: 180px;
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
 }
 
 

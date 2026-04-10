@@ -114,7 +114,7 @@ async function checkout() {
     await refreshCartItems();
     return;
   }
-  await createOrderApi({
+  const result = await createOrderApi({
     items: validCheckoutItems.map((item) => ({
       productId: item.productId,
       quantity: Number(item.quantity || 0)
@@ -126,6 +126,11 @@ async function checkout() {
   items.value = remain;
   selectedItems.value = [];
   ElMessage.success('下单成功');
+  const orderId = result?.data?.id;
+  if (orderId) {
+    router.push({ path: `/order/${orderId}`, query: { action: 'pay' } });
+    return;
+  }
   router.push('/order');
 }
 </script>

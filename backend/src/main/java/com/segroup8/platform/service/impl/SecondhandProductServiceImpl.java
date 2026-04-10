@@ -40,7 +40,8 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
     private final OrderInfoMapper orderInfoMapper;
     private final OrderItemMapper orderItemMapper;
 
-    public SecondhandProductServiceImpl(SecondhandProductMapper secondhandProductMapper, OrderInfoMapper orderInfoMapper,
+    public SecondhandProductServiceImpl(SecondhandProductMapper secondhandProductMapper,
+            OrderInfoMapper orderInfoMapper,
             OrderItemMapper orderItemMapper) {
         this.secondhandProductMapper = secondhandProductMapper;
         this.orderInfoMapper = orderInfoMapper;
@@ -166,6 +167,9 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         order.setTotalAmount(product.getSalePrice());
         order.setPayStatus(1);
         order.setOrderStatus(1);
+        order.setCanRefund(1);
+        order.setLogisticsStatus("PENDING");
+        order.setLogisticsCurrentIndex(0);
         order.setRemark(request == null ? null : request.getRemark());
         order.setCreateTime(LocalDateTime.now());
         orderInfoMapper.insert(order);
@@ -289,4 +293,3 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         return vo;
     }
 }
-

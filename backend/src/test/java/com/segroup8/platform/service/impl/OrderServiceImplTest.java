@@ -18,6 +18,8 @@ import com.segroup8.platform.mapper.ReviewMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.realtime.RealtimePushService;
+import com.segroup8.platform.service.LogisticsService;
+import com.segroup8.platform.service.settlement.EscrowSettlementService;
 import com.segroup8.platform.vo.OrderVO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,6 +62,10 @@ class OrderServiceImplTest {
     private OrderAfterSaleLogMapper orderAfterSaleLogMapper;
     @Mock
     private RealtimePushService realtimePushService;
+    @Mock
+    private LogisticsService logisticsService;
+    @Mock
+    private EscrowSettlementService escrowSettlementService;
 
     private OrderServiceImpl orderService;
 
@@ -75,7 +81,9 @@ class OrderServiceImplTest {
                 addressMapper,
                 notificationMapper,
                 orderAfterSaleLogMapper,
-                realtimePushService);
+                realtimePushService,
+                logisticsService,
+                escrowSettlementService);
     }
 
     @AfterEach
