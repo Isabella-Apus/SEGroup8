@@ -17,6 +17,7 @@ import com.segroup8.platform.mapper.ProductMapper;
 import com.segroup8.platform.mapper.ReviewMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
+import com.segroup8.platform.realtime.RealtimePushService;
 import com.segroup8.platform.vo.OrderVO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,6 +58,8 @@ class OrderServiceImplTest {
     private NotificationMapper notificationMapper;
     @Mock
     private OrderAfterSaleLogMapper orderAfterSaleLogMapper;
+    @Mock
+    private RealtimePushService realtimePushService;
 
     private OrderServiceImpl orderService;
 
@@ -71,8 +74,8 @@ class OrderServiceImplTest {
                 shopMapper,
                 addressMapper,
                 notificationMapper,
-                orderAfterSaleLogMapper
-        );
+                orderAfterSaleLogMapper,
+                realtimePushService);
     }
 
     @AfterEach
@@ -172,4 +175,3 @@ class OrderServiceImplTest {
         assertEquals(403, ex.getCode());
     }
 }
-

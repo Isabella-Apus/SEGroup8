@@ -5,7 +5,7 @@ export function getSecondhandListApi(params = {}) {
 }
 
 export function getSecondhandDetailApi(id) {
-    return http.get(`/secondhand/${id}`);
+    return http.get(`/secondhand/detail/${id}`);
 }
 
 export function publishSecondhandApi(payload) {
