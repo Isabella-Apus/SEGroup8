@@ -46,6 +46,11 @@ const routes = [
                 component: () => import("@/views/order/OrderView.vue"),
             },
             {
+                path: "reviews",
+                name: "myReviews",
+                component: () => import("@/views/user/MyReviewView.vue"),
+            },
+            {
                 path: "secondhand",
                 name: "secondhandList",
                 component: () =>
@@ -98,6 +103,12 @@ const routes = [
                     import("@/views/merchant/MerchantOrdersView.vue"),
             },
             {
+                path: "reviews",
+                name: "merchantReviews",
+                component: () =>
+                    import("@/views/merchant/MerchantReviewView.vue"),
+            },
+            {
                 path: "shop",
                 name: "merchantShopSetting",
                 component: () =>
@@ -125,6 +136,11 @@ const routes = [
                 name: "adminMerchantReview",
                 component: () =>
                     import("@/views/admin/AdminMerchantReviewView.vue"),
+            },
+            {
+                path: "orders",
+                name: "adminOrderList",
+                component: () => import("@/views/admin/AdminOrderView.vue"),
             },
             {
                 path: "audit-logs",

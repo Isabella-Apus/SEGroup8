@@ -17,14 +17,10 @@
         <p>状态：{{ item.statusName || '在售' }}</p>
         <p class="desc">{{ item.description || '暂无商品描述' }}</p>
 
-        <div class="actions">
-          <span>购买数量：</span>
-          <el-input-number v-model="quantity" :min="1" :max="maxQuantity" />
-        </div>
+        <p class="desc">二手商品仅支持单件购买，提交后将自动下单。</p>
 
         <el-space>
-          <el-button type="primary" @click="handleAddToCart" :disabled="maxQuantity <= 0">加入购物车</el-button>
-          <el-button @click="handleBuyNow" :disabled="maxQuantity <= 0">立即下单</el-button>
+          <el-button type="primary" @click="handleBuyNow" :disabled="!canBuy">立即购买</el-button>
           <el-button type="primary" plain @click="router.push('/secondhand/publish')">我也要发布</el-button>
           <el-button text @click="router.push('/secondhand')">返回列表</el-button>
         </el-space>
@@ -39,24 +35,15 @@
 import { computed, onMounted, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { useRoute, useRouter } from 'vue-router';
-import { getSecondhandDetailApi } from '@/api/secondhand';
-import { createOrderApi } from '@/api/order';
-import { addToCart, removeFromCart } from '@/utils/cart';
+import { buySecondhandApi, getSecondhandDetailApi } from '@/api/secondhand';
 
 const route = useRoute();
 const router = useRouter();
 
 const loading = ref(false);
 const item = ref(null);
-const quantity = ref(1);
 
-const maxQuantity = computed(() => {
-  if (!item.value) {
-    return 0;
-  }
-  const stock = Number(item.value.stock || 1);
-  return stock > 0 ? stock : 0;
-});
+const canBuy = computed(() => !!item.value && Number(item.value.status || 1) === 1);
 
 onMounted(async () => {
   await fetchDetail();
@@ -67,47 +54,18 @@ async function fetchDetail() {
   try {
     const result = await getSecondhandDetailApi(route.params.id);
     item.value = result.data;
-    if (maxQuantity.value > 0) {
-      quantity.value = 1;
-    }
   } finally {
     loading.value = false;
   }
 }
 
-function handleAddToCart() {
-  if (!item.value) {
-    return;
-  }
-  if (quantity.value > maxQuantity.value) {
-    ElMessage.warning('购买数量超过库存');
-    return;
-  }
-  addToCart(item.value, Number(quantity.value), {
-    itemType: 'SECONDHAND',
-    unitPrice: item.value.salePrice,
-    stock: maxQuantity.value
-  });
-  ElMessage.success('已加入购物车');
-}
-
 async function handleBuyNow() {
-  if (!item.value) {
+  if (!canBuy.value) {
+    ElMessage.warning('当前商品不可购买');
     return;
   }
-  if (quantity.value > maxQuantity.value) {
-    ElMessage.warning('购买数量超过库存');
-    return;
-  }
-  await createOrderApi({
-    items: [{
-      productId: item.value.id,
-      itemType: 'SECONDHAND',
-      quantity: Number(quantity.value)
-    }]
-  });
-  removeFromCart(item.value.id, 'SECONDHAND');
-  ElMessage.success('下单成功');
+  await buySecondhandApi(item.value.id, {});
+  ElMessage.success('购买成功');
   router.push('/order');
 }
 

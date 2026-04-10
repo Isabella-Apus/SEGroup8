@@ -10,8 +10,19 @@
           <el-descriptions-item label="下单时间">{{ formatTime(order.createTime) }}</el-descriptions-item>
           <el-descriptions-item label="订单金额">￥{{ Number(order.totalAmount || 0).toFixed(2) }}</el-descriptions-item>
           <el-descriptions-item label="支付状态">{{ order.payStatus === 1 ? '已支付' : '待支付' }}</el-descriptions-item>
-          <el-descriptions-item label="订单状态">{{ order.orderStatus === 1 ? '已创建' : order.orderStatus }}</el-descriptions-item>
+          <el-descriptions-item label="订单状态">{{ order.orderStatusName || order.orderStatus }}</el-descriptions-item>
         </el-descriptions>
+
+        <div class="action-row">
+          <el-space>
+            <el-button v-if="canPay(order)" type="primary" @click="pay(order)">支付</el-button>
+            <el-button v-if="canCancel(order)" @click="cancel(order)">取消订单</el-button>
+            <el-button v-if="canRemind(order)" @click="remind(order)">提醒发货</el-button>
+            <el-button v-if="canConfirm(order)" type="success" @click="confirmReceive(order)">确认收货</el-button>
+            <el-button v-if="canComplete(order)" type="success" plain @click="complete(order)">完成订单</el-button>
+            <el-button v-if="canRefund(order)" type="warning" @click="refund(order)">申请退货</el-button>
+          </el-space>
+        </div>
 
         <el-table :data="order.items || []" border style="margin-top: 10px">
           <el-table-column prop="productName" label="商品名" min-width="220" />
@@ -50,7 +61,16 @@
 
 <script setup>
 import { onMounted, reactive, ref } from 'vue';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { getOrderListApi } from '@/api/order';
+import {
+  cancelOrderApi,
+  completeOrderApi,
+  confirmReceiveOrderApi,
+  payOrderApi,
+  refundOrderApi,
+  remindShipApi,
+} from '@/api/order';
 
 const query = reactive({
   pageNum: 1,
@@ -86,9 +106,81 @@ function formatTime(value) {
   }
   return String(value).replace('T', ' ');
 }
+
+function canPay(order) {
+  return Number(order?.orderStatus) === 0;
+}
+
+function canCancel(order) {
+  return [0, 1, 2, 3].includes(Number(order?.orderStatus));
+}
+
+function canRemind(order) {
+  return Number(order?.orderStatus) === 1;
+}
+
+function canConfirm(order) {
+  return Number(order?.orderStatus) === 2;
+}
+
+function canComplete(order) {
+  return Number(order?.orderStatus) === 3;
+}
+
+function canRefund(order) {
+  return Number(order?.payStatus) === 1 && [1, 2, 3].includes(Number(order?.orderStatus));
+}
+
+async function pay(order) {
+  await payOrderApi(order.id);
+  ElMessage.success('支付成功');
+  await fetchOrders();
+}
+
+async function cancel(order) {
+  await cancelOrderApi(order.id);
+  ElMessage.success('已取消订单');
+  await fetchOrders();
+}
+
+async function remind(order) {
+  await remindShipApi(order.id);
+  ElMessage.success('已提醒卖家发货');
+}
+
+async function confirmReceive(order) {
+  await confirmReceiveOrderApi(order.id);
+  ElMessage.success('确认收货成功');
+  await fetchOrders();
+}
+
+async function complete(order) {
+  await completeOrderApi(order.id);
+  ElMessage.success('订单已完成');
+  await fetchOrders();
+}
+
+async function refund(order) {
+  const { value } = await ElMessageBox.prompt('请输入退货原因（选填）', '申请退货', {
+    confirmButtonText: '提交',
+    cancelButtonText: '取消',
+    inputPlaceholder: '例如：商品破损',
+    inputValue: '',
+  }).catch(() => ({ value: null }));
+  if (value === null) {
+    return;
+  }
+  await refundOrderApi(order.id, { reason: value || '', proofUrls: [] });
+  ElMessage.success('已提交退货申请');
+  await fetchOrders();
+}
 </script>
 
 <style scoped>
+.action-row {
+  margin-top: 12px;
+}
+
 .pager-wrap {
   margin-top: 16px;
   display: flex;

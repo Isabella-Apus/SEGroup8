@@ -276,7 +276,7 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
         return ok(paginate(records, params?.pageNum, params?.pageSize));
     }
 
-    const secondhandDetailMatch = p.match(/^\/secondhand\/(\d+)$/);
+    const secondhandDetailMatch = p.match(/^\/secondhand\/detail\/(\d+)$/);
     if (m === "get" && secondhandDetailMatch) {
         const id = Number(secondhandDetailMatch[1]);
         const item = mockStore.secondhandProducts.find((x) => Number(x.id) === id && x.status === 1);
@@ -284,7 +284,7 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
         return ok(item);
     }
 
-    if (m === "post" && p === "/secondhand/publish") {
+    if (m === "post" && p === "/secondhand/seller") {
         const user = requireLogin(headers);
         const id = mockStore.next.secondhandId++;
         const item = {
@@ -304,27 +304,100 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
         return ok(item);
     }
 
+    if (m === "get" && p === "/secondhand/seller/list") {
+        const user = requireLogin(headers);
+        const records = mockStore.secondhandProducts
+            .filter((x) => Number(x.sellerUserId) === Number(user.id))
+            .sort((a, b) => Number(b.id) - Number(a.id));
+        return ok(paginate(records, params?.pageNum, params?.pageSize));
+    }
+
+    const secondhandSellerUpdateMatch = p.match(/^\/secondhand\/seller\/(\d+)$/);
+    if (m === "put" && secondhandSellerUpdateMatch) {
+        const user = requireLogin(headers);
+        const id = Number(secondhandSellerUpdateMatch[1]);
+        const item = mockStore.secondhandProducts.find((x) => Number(x.id) === id);
+        if (!item) fail(404, "二手商品不存在");
+        if (Number(item.sellerUserId) !== Number(user.id)) fail(403, "无权操作该二手商品");
+        Object.assign(item, {
+            name: asText(data?.name || item.name),
+            cover: asText(data?.cover || item.cover),
+            description: asText(data?.description || item.description),
+            originPrice: Number(data?.originPrice ?? item.originPrice ?? 0),
+            salePrice: Number(data?.salePrice ?? item.salePrice ?? 0),
+            conditionLevel: asText(data?.conditionLevel || data?.condition || item.conditionLevel),
+            status: data?.status == null ? item.status : Number(data.status),
+        });
+        return ok(item);
+    }
+
+    const secondhandSellerDeleteMatch = p.match(/^\/secondhand\/seller\/(\d+)$/);
+    if (m === "delete" && secondhandSellerDeleteMatch) {
+        const user = requireLogin(headers);
+        const id = Number(secondhandSellerDeleteMatch[1]);
+        const index = mockStore.secondhandProducts.findIndex((x) => Number(x.id) === id);
+        if (index < 0) fail(404, "二手商品不存在");
+        if (Number(mockStore.secondhandProducts[index].sellerUserId) !== Number(user.id)) fail(403, "无权操作该二手商品");
+        mockStore.secondhandProducts.splice(index, 1);
+        return ok(null);
+    }
+
+    const secondhandSellerStatusMatch = p.match(/^\/secondhand\/seller\/(\d+)\/status$/);
+    if (m === "post" && secondhandSellerStatusMatch) {
+        const user = requireLogin(headers);
+        const id = Number(secondhandSellerStatusMatch[1]);
+        const item = mockStore.secondhandProducts.find((x) => Number(x.id) === id);
+        if (!item) fail(404, "二手商品不存在");
+        if (Number(item.sellerUserId) !== Number(user.id)) fail(403, "无权操作该二手商品");
+        item.status = Number(data?.status ?? item.status);
+        item.statusName = item.status === 1 ? "在售" : "下架";
+        return ok(item);
+    }
+
+    const secondhandBuyMatch = p.match(/^\/secondhand\/(\d+)\/buy$/);
+    if (m === "post" && secondhandBuyMatch) {
+        const user = requireLogin(headers);
+        const id = Number(secondhandBuyMatch[1]);
+        const item = mockStore.secondhandProducts.find((x) => Number(x.id) === id && x.status === 1);
+        if (!item) fail(404, "二手商品不存在");
+        if (Number(item.sellerUserId) === Number(user.id)) fail(400, "不能购买自己发布的二手商品");
+        item.status = 0;
+        item.statusName = "已售出";
+        const orderId = mockStore.next.orderId++;
+        const order = {
+            id: orderId,
+            orderNo: `ORDMOCK${String(orderId).padStart(6, "0")}`,
+            buyerUserId: user.id,
+            totalAmount: Number(item.salePrice || 0),
+            payStatus: 1,
+            orderStatus: 1,
+            createTime: new Date().toISOString(),
+            items: [
+                {
+                    productId: item.id,
+                    productName: item.name,
+                    itemType: "SECONDHAND",
+                    price: Number(item.salePrice || 0),
+                    quantity: 1,
+                },
+            ],
+        };
+        mockStore.orders.unshift(order);
+        return ok(order);
+    }
+
     if (m === "post" && p === "/order/create") {
         const user = requireLogin(headers);
         const items = (data?.items || []).map((it) => {
-            const itemType = asText(it.itemType || "PRODUCT");
-            let product;
-            if (itemType === "SECONDHAND") {
-                product = mockStore.secondhandProducts.find(
-                    (x) => x.id === Number(it.productId) && x.status === 1
-                );
-            } else {
-                product = mockStore.products.find((x) => x.id === Number(it.productId));
-            }
+            const product = mockStore.products.find((x) => x.id === Number(it.productId));
             if (!product) {
                 fail(404, `商品不存在: ${it.productId}`);
             }
-            const price = itemType === "SECONDHAND" ? product.salePrice : product.price;
             return {
                 productId: product.id,
                 productName: product.name,
-                itemType,
-                price,
+                itemType: "NEW",
+                price: Number(product.price || 0),
                 quantity: Number(it.quantity || 1),
             };
         });
@@ -348,6 +421,233 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
         const user = requireLogin(headers);
         const records = mockStore.orders.filter((o) => o.buyerUserId === user.id);
         return ok(paginate(records, params?.pageNum, params?.pageSize));
+    }
+
+    const orderDetailMatch = p.match(/^\/order\/detail\/(\d+)$/);
+    if (m === "get" && orderDetailMatch) {
+        const user = requireLogin(headers);
+        const id = Number(orderDetailMatch[1]);
+        const order = mockStore.orders.find((o) => o.id === id && o.buyerUserId === user.id);
+        if (!order) fail(404, "订单不存在");
+        return ok(order);
+    }
+
+    const orderActionMatch = p.match(/^\/order\/(\d+)\/(pay|cancel|confirm-receive|complete|refund|ship|remind-ship)$/);
+    if (m === "post" && orderActionMatch) {
+        const user = requireLogin(headers);
+        const id = Number(orderActionMatch[1]);
+        const action = orderActionMatch[2];
+        const order = mockStore.orders.find((o) => o.id === id);
+        if (!order) fail(404, "订单不存在");
+
+        if (action === "pay") {
+            if (order.buyerUserId !== user.id) fail(403, "无权操作该订单");
+            order.payStatus = 1;
+            order.orderStatus = 1;
+            order.orderStatusName = "待发货";
+            return ok(order);
+        }
+        if (action === "cancel") {
+            if (order.buyerUserId !== user.id) fail(403, "无权操作该订单");
+            order.orderStatus = 5;
+            order.orderStatusName = "已关闭";
+            return ok(order);
+        }
+        if (action === "confirm-receive") {
+            if (order.buyerUserId !== user.id) fail(403, "无权操作该订单");
+            order.orderStatus = 3;
+            order.orderStatusName = "待评价";
+            return ok(order);
+        }
+        if (action === "complete") {
+            if (order.buyerUserId !== user.id) fail(403, "无权操作该订单");
+            order.orderStatus = 4;
+            order.orderStatusName = "已完成";
+            return ok(order);
+        }
+        if (action === "refund") {
+            if (order.buyerUserId !== user.id) fail(403, "无权操作该订单");
+            order.refundStatus = 1;
+            order.refundStatusName = "待处理";
+            order.refundReason = asText(data?.reason);
+            return ok(order);
+        }
+        if (action === "ship") {
+            const ownNew = (order.items || []).some((item) => {
+                if (item.itemType !== "NEW") return false;
+                const product = mockStore.products.find((p2) => p2.id === Number(item.productId));
+                return product && Number(product.shopId) === Number(user.id);
+            });
+            if (!ownNew) fail(403, "无权操作该订单");
+            order.orderStatus = 2;
+            order.orderStatusName = "待收货";
+            return ok(order);
+        }
+        if (action === "remind-ship") {
+            if (order.buyerUserId !== user.id) fail(403, "无权操作该订单");
+            return ok(null);
+        }
+    }
+
+    const orderRefundActionMatch = p.match(/^\/order\/(\d+)\/refund\/(approve|reject)$/);
+    if (m === "post" && orderRefundActionMatch) {
+        const user = requireLogin(headers);
+        const id = Number(orderRefundActionMatch[1]);
+        const action = orderRefundActionMatch[2];
+        const order = mockStore.orders.find((o) => o.id === id);
+        if (!order) fail(404, "订单不存在");
+        const ownNew = (order.items || []).some((item) => {
+            if (item.itemType !== "NEW") return false;
+            const product = mockStore.products.find((p2) => p2.id === Number(item.productId));
+            return product && Number(product.shopId) === Number(user.id);
+        });
+        if (!ownNew) fail(403, "无权操作该订单");
+        order.refundStatus = action === "approve" ? 2 : 3;
+        order.refundStatusName = action === "approve" ? "已通过" : "已拒绝";
+        order.orderStatus = 5;
+        order.orderStatusName = "已关闭";
+        return ok(order);
+    }
+
+    const orderReviewMatch = p.match(/^\/order\/(\d+)\/review(\/items)?$/);
+    if (m === "post" && orderReviewMatch) {
+        const user = requireLogin(headers);
+        const id = Number(orderReviewMatch[1]);
+        const order = mockStore.orders.find((o) => o.id === id && o.buyerUserId === user.id);
+        if (!order) fail(404, "订单不存在");
+        order.orderStatus = 4;
+        order.orderStatusName = "已完成";
+        return ok(order);
+    }
+
+    if (m === "get" && p === "/review/my") {
+        requireLogin(headers);
+        return ok(paginate([], params?.pageNum, params?.pageSize));
+    }
+
+    if (m === "get" && p === "/review/seller/list") {
+        requireLogin(headers);
+        return ok(paginate([], params?.pageNum, params?.pageSize));
+    }
+
+    const reviewReplyMatch = p.match(/^\/review\/(\d+)\/reply$/);
+    if (m === "post" && reviewReplyMatch) {
+        requireLogin(headers);
+        return ok(null);
+    }
+
+    if (m === "post" && p === "/review/followup") {
+        requireLogin(headers);
+        return ok(null);
+    }
+
+    if (m === "get" && p === "/order/seller/list") {
+        const user = requireLogin(headers);
+        const records = mockStore.orders.filter((order) => {
+            return (order.items || []).some((item) => {
+                if (item.itemType === "SECONDHAND") {
+                    const secondhand = mockStore.secondhandProducts.find((x) => x.id === Number(item.productId));
+                    return secondhand && Number(secondhand.sellerUserId) === Number(user.id);
+                }
+                const product = mockStore.products.find((x) => x.id === Number(item.productId));
+                return product && Number(product.shopId) === Number(user.id);
+            });
+        });
+        return ok(paginate(records, params?.pageNum, params?.pageSize));
+    }
+
+    const sellerOrderDetailMatch = p.match(/^\/order\/seller\/detail\/(\d+)$/);
+    if (m === "get" && sellerOrderDetailMatch) {
+        const user = requireLogin(headers);
+        const id = Number(sellerOrderDetailMatch[1]);
+        const order = mockStore.orders.find((o) => o.id === id);
+        if (!order) fail(404, "订单不存在");
+        const canView = (order.items || []).some((item) => {
+            if (item.itemType === "SECONDHAND") {
+                const secondhand = mockStore.secondhandProducts.find((x) => x.id === Number(item.productId));
+                return secondhand && Number(secondhand.sellerUserId) === Number(user.id);
+            }
+            const product = mockStore.products.find((x) => x.id === Number(item.productId));
+            return product && Number(product.shopId) === Number(user.id);
+        });
+        if (!canView) fail(403, "无权查看该订单");
+        return ok(order);
+    }
+
+    if (m === "get" && p === "/admin/orders/list") {
+        const user = requireLogin(headers);
+        requireAdmin(user);
+        const keyword = asText(params?.keyword);
+        const records = mockStore.orders.filter((o) => {
+            if (!keyword) return true;
+            const hitOrderNo = String(o.orderNo || "").includes(keyword);
+            const hitProduct = (o.items || []).some((i) => String(i.productName || "").includes(keyword));
+            return hitOrderNo || hitProduct;
+        });
+        return ok(paginate(records, params?.pageNum, params?.pageSize));
+    }
+
+    const adminOrderDetailMatch = p.match(/^\/admin\/orders\/detail\/(\d+)$/);
+    if (m === "get" && adminOrderDetailMatch) {
+        const user = requireLogin(headers);
+        requireAdmin(user);
+        const id = Number(adminOrderDetailMatch[1]);
+        const order = mockStore.orders.find((o) => o.id === id);
+        if (!order) fail(404, "订单不存在");
+        return ok(order);
+    }
+
+    if (m === "post" && p === "/admin/orders/batch-close") {
+        const user = requireLogin(headers);
+        requireAdmin(user);
+        const ids = Array.isArray(data?.orderIds) ? data.orderIds.map((x) => Number(x)) : [];
+        const successIds = [];
+        const failedItems = [];
+        ids.forEach((id) => {
+            const order = mockStore.orders.find((o) => o.id === id);
+            if (!order) {
+                failedItems.push({ orderId: id, reason: "订单不存在" });
+                return;
+            }
+            order.orderStatus = 5;
+            order.orderStatusName = "已关闭";
+            successIds.push(id);
+        });
+        return ok({ successIds, failedItems });
+    }
+
+    const adminRefundMatch = p.match(/^\/admin\/orders\/(\d+)\/refund\/(approve|reject)$/);
+    if (m === "post" && adminRefundMatch) {
+        const user = requireLogin(headers);
+        requireAdmin(user);
+        const id = Number(adminRefundMatch[1]);
+        const action = adminRefundMatch[2];
+        const order = mockStore.orders.find((o) => o.id === id);
+        if (!order) fail(404, "订单不存在");
+        order.refundStatus = action === "approve" ? 2 : 3;
+        order.refundStatusName = action === "approve" ? "已通过" : "已拒绝";
+        order.orderStatus = 5;
+        order.orderStatusName = "已关闭";
+        order.refundDecisionRemark = asText(data?.remark);
+        return ok(order);
+    }
+
+    const adminAfterSaleLogMatch = p.match(/^\/admin\/orders\/(\d+)\/after-sale-logs$/);
+    if (m === "get" && adminAfterSaleLogMatch) {
+        const user = requireLogin(headers);
+        requireAdmin(user);
+        const orderId = Number(adminAfterSaleLogMatch[1]);
+        return ok([
+            {
+                id: 1,
+                orderId,
+                action: "APPLY",
+                operatorRole: "BUYER",
+                operatorUserId: 0,
+                remark: "买家提交售后申请",
+                createTime: new Date().toISOString(),
+            },
+        ]);
     }
 
     if (m === "get" && p === "/admin/users") {
