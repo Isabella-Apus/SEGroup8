@@ -1,26 +1,25 @@
-import http from "./http";
+import http from './http';
 
-export function getAdminOrderListApi(params = {}) {
-  return http.get("/admin/orders/list", { params });
+export function pageAdminOrdersApi(params = {}) {
+    return http.get('/admin/orders/list', { params });
 }
 
 export function getAdminOrderDetailApi(orderId) {
-  return http.get(`/admin/orders/detail/${orderId}`);
+    return http.get(`/admin/orders/detail/${orderId}`);
 }
 
-export function getAdminOrderAfterSaleLogsApi(orderId) {
-  return http.get(`/admin/orders/${orderId}/after-sale-logs`);
+export function batchCloseAdminOrdersApi(orderIds) {
+    return http.post('/admin/orders/batch-close', { orderIds });
 }
 
-export function batchCloseAdminOrderApi(orderIds = []) {
-  return http.post("/admin/orders/batch-close", { orderIds });
+export function approveAdminRefundApi(orderId, payload = {}) {
+    return http.post(`/admin/orders/${orderId}/refund/approve`, payload);
 }
 
-export function approveAdminRefundOrderApi(orderId, payload = {}) {
-  return http.post(`/admin/orders/${orderId}/refund/approve`, payload);
+export function rejectAdminRefundApi(orderId, payload = {}) {
+    return http.post(`/admin/orders/${orderId}/refund/reject`, payload);
 }
 
-export function rejectAdminRefundOrderApi(orderId, payload = {}) {
-  return http.post(`/admin/orders/${orderId}/refund/reject`, payload);
+export function getAdminAfterSaleLogsApi(orderId) {
+    return http.get(`/admin/orders/${orderId}/after-sale-logs`);
 }
-

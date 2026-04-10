@@ -27,7 +27,7 @@ const routes = [
             {
                 path: "product",
                 name: "productList",
-                component: () => import("@/views/product/ProductListView.vue"),
+                component: () => import("@/views/ProductFeedView.vue"),
             },
             {
                 path: "product/:id",
@@ -46,9 +46,9 @@ const routes = [
                 component: () => import("@/views/order/OrderView.vue"),
             },
             {
-                path: "order/:id",
-                name: "orderDetail",
-                component: () => import("@/views/order/OrderDetailView.vue"),
+                path: "reviews",
+                name: "myReviews",
+                component: () => import("@/views/user/MyReviewView.vue"),
             },
             {
                 path: "secondhand",
@@ -63,6 +63,12 @@ const routes = [
                     import("@/views/secondhand/SecondhandPublishView.vue"),
             },
             {
+                path: "secondhand/:id",
+                name: "secondhandDetail",
+                component: () =>
+                    import("@/views/secondhand/SecondhandDetailView.vue"),
+            },
+            {
                 path: "profile",
                 name: "profile",
                 component: () => import("@/views/user/Profile.vue"),
@@ -71,16 +77,6 @@ const routes = [
                 path: "addresses",
                 name: "addressManager",
                 component: () => import("@/views/user/AddressManager.vue"),
-            },
-            {
-                path: "my-reviews",
-                name: "myReviews",
-                component: () => import("@/views/user/MyReviewsView.vue"),
-            },
-            {
-                path: "after-sale",
-                name: "afterSale",
-                component: () => import("@/views/order/AfterSaleView.vue"),
             },
             {
                 path: "merchant-apply",
@@ -110,7 +106,7 @@ const routes = [
                 path: "reviews",
                 name: "merchantReviews",
                 component: () =>
-                    import("@/views/merchant/MerchantReviewsView.vue"),
+                    import("@/views/merchant/MerchantReviewView.vue"),
             },
             {
                 path: "shop",
@@ -142,14 +138,14 @@ const routes = [
                     import("@/views/admin/AdminMerchantReviewView.vue"),
             },
             {
+                path: "orders",
+                name: "adminOrderList",
+                component: () => import("@/views/admin/AdminOrderView.vue"),
+            },
+            {
                 path: "audit-logs",
                 name: "adminAuditLogs",
                 component: () => import("@/views/admin/AdminAuditLogView.vue"),
-            },
-            {
-                path: "orders",
-                name: "adminOrders",
-                component: () => import("@/views/admin/AdminOrderManageView.vue"),
             },
         ],
     },
@@ -160,19 +156,8 @@ const router = createRouter({
     routes,
 });
 
-const FIRST_VISIT_GUARD_KEY = "segroup8_force_login_checked";
-
 router.beforeEach(async (to, from, next) => {
     const userStore = useUserStore();
-    // Force the app to start from login once per browser session.
-    if (!sessionStorage.getItem(FIRST_VISIT_GUARD_KEY)) {
-        sessionStorage.setItem(FIRST_VISIT_GUARD_KEY, "1");
-        if (to.path !== "/login") {
-            userStore.logout();
-            next("/login");
-            return;
-        }
-    }
     if (to.meta.public) {
         next();
         return;

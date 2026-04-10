@@ -6,13 +6,12 @@
 
     <template v-else>
       <el-table
-        ref="tableRef"
         :data="items"
-        row-key="productId"
         border
+        row-key="productId"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="55" />
+        <el-table-column type="selection" width="56" reserve-selection />
         <el-table-column prop="name" label="商品名" min-width="220" />
         <el-table-column prop="price" label="单价" width="120">
           <template #default="scope">￥{{ Number(scope.row.price || 0).toFixed(2) }}</template>
@@ -32,22 +31,16 @@
         </el-table-column>
         <el-table-column label="操作" width="120">
           <template #default="scope">
-            <el-button link type="primary" @click="checkoutSingle(scope.row)">下单</el-button>
-            <el-button link type="danger" @click="remove(scope.row.productId)">移除</el-button>
+            <el-button link type="danger" @click="remove(scope.row)">移除</el-button>
           </template>
         </el-table-column>
       </el-table>
 
       <div class="cart-footer">
-        <div class="total">
-          已选 {{ selectedItems.length }} 件，合计：<strong>￥{{ selectedTotalAmount }}</strong>
-        </div>
+        <div class="total">已选合计：<strong>￥{{ selectedTotalAmount }}</strong></div>
         <el-space>
-          <el-button @click="toggleAllSelection(true)">全选</el-button>
-          <el-button @click="toggleAllSelection(false)">取消全选</el-button>
-          <el-button type="danger" plain @click="removeSelected">批量删除</el-button>
           <el-button @click="clear">清空购物车</el-button>
-          <el-button type="primary" @click="checkoutSelected">批量下单</el-button>
+          <el-button type="primary" :disabled="selectedItems.length === 0" @click="checkout">结算选中商品</el-button>
         </el-space>
       </div>
     </template>
@@ -65,7 +58,6 @@ import { clearCart, getCartItems, removeFromCart, saveCartItems } from '@/utils/
 const router = useRouter();
 const items = ref([]);
 const selectedItems = ref([]);
-const tableRef = ref(null);
 
 const selectedTotalAmount = computed(() => {
   return selectedItems.value
@@ -84,6 +76,7 @@ async function refreshCartItems() {
   );
   const validItems = rawItems.filter((_, index) => checks[index].status === 'fulfilled');
   items.value = validItems;
+  selectedItems.value = [];
   saveCartItems(validItems);
 }
 
@@ -91,9 +84,13 @@ function handleQtyChange() {
   saveCartItems(items.value);
 }
 
-function remove(productId) {
-  items.value = removeFromCart(productId);
-  selectedItems.value = selectedItems.value.filter((item) => item.productId !== productId);
+function handleSelectionChange(selection) {
+  selectedItems.value = selection;
+}
+
+function remove(row) {
+  items.value = removeFromCart(row.productId);
+  selectedItems.value = selectedItems.value.filter((item) => item.productId !== row.productId);
 }
 
 function clear() {
@@ -102,77 +99,34 @@ function clear() {
   selectedItems.value = [];
 }
 
-function handleSelectionChange(selection) {
-  selectedItems.value = selection;
-}
-
-function toggleAllSelection(selected) {
-  if (!tableRef.value) {
+async function checkout() {
+  const toCheckout = [...selectedItems.value];
+  if (!toCheckout.length) {
+    ElMessage.warning('请先选择要结算的商品');
     return;
   }
-  if (selected) {
-    items.value.forEach((item) => {
-      tableRef.value.toggleRowSelection(item, true);
-    });
+  const checks = await Promise.allSettled(
+    toCheckout.map((item) => getProductDetailApi(item.productId))
+  );
+  const validCheckoutItems = toCheckout.filter((_, index) => checks[index].status === 'fulfilled');
+  if (!validCheckoutItems.length) {
+    ElMessage.warning('选中商品已失效，请重新选择');
+    await refreshCartItems();
     return;
   }
-  tableRef.value.clearSelection();
-}
-
-async function submitOrder(targetItems) {
-  if (!targetItems.length) {
-    ElMessage.warning('请先选择要下单的商品');
-    return;
-  }
-
   await createOrderApi({
-    items: targetItems.map((item) => ({
+    items: validCheckoutItems.map((item) => ({
       productId: item.productId,
       quantity: Number(item.quantity || 0)
     }))
   });
-
-  const orderedIds = new Set(targetItems.map((item) => item.productId));
-  const remain = items.value.filter((item) => !orderedIds.has(item.productId));
+  const checkoutIds = new Set(validCheckoutItems.map((item) => item.productId));
+  const remain = items.value.filter((item) => !checkoutIds.has(item.productId));
   saveCartItems(remain);
   items.value = remain;
   selectedItems.value = [];
   ElMessage.success('下单成功');
   router.push('/order');
-}
-
-async function checkoutSelected() {
-  await refreshCartItems();
-  if (!items.value.length) {
-    ElMessage.warning('购物车为空或商品已下架');
-    return;
-  }
-  const selectedIds = new Set(selectedItems.value.map((item) => item.productId));
-  const targets = items.value.filter((item) => selectedIds.has(item.productId));
-  await submitOrder(targets);
-}
-
-async function checkoutSingle(row) {
-  await refreshCartItems();
-  const target = items.value.find((item) => item.productId === row.productId);
-  if (!target) {
-    ElMessage.warning('商品不存在或已下架');
-    return;
-  }
-  await submitOrder([target]);
-}
-
-function removeSelected() {
-  if (!selectedItems.value.length) {
-    ElMessage.warning('请先选择要删除的商品');
-    return;
-  }
-  const selectedIds = new Set(selectedItems.value.map((item) => item.productId));
-  const remain = items.value.filter((item) => !selectedIds.has(item.productId));
-  saveCartItems(remain);
-  items.value = remain;
-  selectedItems.value = [];
-  ElMessage.success('已删除选中商品');
 }
 </script>
 

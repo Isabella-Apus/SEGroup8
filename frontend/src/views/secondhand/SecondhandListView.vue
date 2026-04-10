@@ -1,127 +1,267 @@
 <template>
-  <div class="page-card">
-    <h2 class="page-title">二手商品</h2>
-    <el-form :inline="true" :model="query" class="query-form">
-      <el-form-item label="关键字">
-        <el-input v-model="query.keyword" placeholder="输入二手商品名" clearable style="width: 200px" />
-      </el-form-item>
-      <el-form-item label="最低价">
-        <el-input-number v-model="query.minPrice" :min="0" :precision="2" :step="10" style="width: 140px" />
-      </el-form-item>
-      <el-form-item label="最高价">
-        <el-input-number v-model="query.maxPrice" :min="0" :precision="2" :step="10" style="width: 140px" />
+  <section class="feed-page">
+    <div class="hero">
+      <div>
+        <h1>二手捡漏</h1>
+        <p>和商品页一致的沉浸式卡片流，持续滚动发现好价</p>
+      </div>
+      <div class="hero-dot"></div>
+    </div>
+
+    <el-form :inline="true" class="query" @submit.prevent>
+      <el-form-item>
+        <el-input
+          v-model="query.keyword"
+          placeholder="搜二手商品名，例如：自行车"
+          clearable
+          style="width: 240px"
+          @keyup.enter="onSearch"
+        />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="handleSearch">查询</el-button>
-        <el-button @click="handleReset">重置</el-button>
+        <el-button type="primary" @click="onSearch">搜索</el-button>
+        <el-button @click="onReset">重置</el-button>
+        <el-button type="success" @click="$router.push('/secondhand/publish')">去发布</el-button>
       </el-form-item>
     </el-form>
 
-    <el-table v-loading="loading" :data="list" border>
-      <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column prop="name" label="商品名" />
-      <el-table-column prop="conditionLevel" label="成色" width="120" />
-      <el-table-column prop="salePrice" label="售价" width="120" />
-      <el-table-column prop="statusName" label="状态" width="100" />
-      <el-table-column label="操作" width="180">
-        <template #default="scope">
-          <el-button link type="primary" @click="handleBuy(scope.row)">购买</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <div class="chips">
+      <button
+        v-for="chip in chips"
+        :key="chip.label"
+        class="chip"
+        type="button"
+        @click="applyChip(chip)"
+      >
+        {{ chip.label }}
+      </button>
+    </div>
 
-    <div class="pager-wrap">
-      <el-pagination
-        background
-        layout="total, prev, pager, next, sizes"
-        :total="total"
-        :page-size="query.pageSize"
-        :current-page="query.pageNum"
-        :page-sizes="[10, 20, 50]"
-        @current-change="handlePageChange"
-        @size-change="handleSizeChange"
+    <div class="grid">
+      <ProductCard
+        v-for="item in visibleItems"
+        :key="item.id"
+        :product="item"
+        mode="secondhand"
+        route-base="/secondhand"
       />
     </div>
-  </div>
+
+    <div ref="sentinel" class="sentinel">
+      <span v-if="loading">加载中...</span>
+      <span v-else-if="!hasMore && visibleItems.length">已经到底了</span>
+      <span v-else-if="!visibleItems.length">暂无二手商品</span>
+    </div>
+  </section>
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
-import { buySecondhandApi, getSecondhandListApi } from "@/api/secondhand";
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import ProductCard from '@/components/ProductCard.vue';
+import { getSecondhandListApi } from '@/api/secondhand';
 
-const list = ref([]);
-const total = ref(0);
+const pageSize = 16;
 const loading = ref(false);
+const sentinel = ref(null);
+const queryPageNum = ref(1);
+let observer = null;
+const items = ref([]);
+const total = ref(0);
 
-const query = ref({
-  pageNum: 1,
-  pageSize: 10,
-  keyword: "",
-  minPrice: undefined,
-  maxPrice: undefined
+const query = reactive({
+  keyword: '',
+  condition: 'all'
 });
+
+const chips = [
+  { label: '全部', condition: 'all' },
+  { label: '95新以上', condition: '95%' },
+  { label: '9成新', condition: '90%' },
+  { label: '8成新', condition: '80%' }
+];
+
+const allItems = computed(() => {
+  return items.value.filter((item) => {
+    const hitKeyword = !query.keyword || item.name.includes(query.keyword.trim());
+    const hitCondition = query.condition === 'all'
+      || item.condition === query.condition
+      || item.conditionLevel === query.condition;
+    return hitKeyword && hitCondition;
+  });
+});
+
+const visibleItems = computed(() => allItems.value);
+const hasMore = computed(() => items.value.length < total.value);
 
 onMounted(async () => {
-  await fetchList();
+  await fetchPage(true);
+  initObserver();
 });
 
-async function fetchList() {
+onBeforeUnmount(() => {
+  if (observer) {
+    observer.disconnect();
+  }
+});
+
+function onSearch() {
+  fetchPage(true);
+}
+
+function onReset() {
+  query.keyword = '';
+  query.condition = 'all';
+  fetchPage(true);
+}
+
+function applyChip(chip) {
+  query.condition = chip.condition;
+  fetchPage(true);
+}
+
+async function fetchPage(reset = false) {
+  if (loading.value) {
+    return;
+  }
+  if (!reset && !hasMore.value) {
+    return;
+  }
   loading.value = true;
   try {
-    const result = await getSecondhandListApi(query.value);
-    list.value = result.data?.records || [];
-    total.value = result.data?.total || 0;
+    if (reset) {
+      queryPageNum.value = 1;
+    }
+    const res = await getSecondhandListApi({
+      pageNum: queryPageNum.value,
+      pageSize,
+      keyword: query.keyword || undefined,
+    });
+    const records = (res.data?.records || []).map((item) => ({
+      ...item,
+      condition: item.conditionLevel || item.condition,
+      originPrice: item.originPrice ?? item.salePrice,
+      salePrice: item.salePrice ?? item.price,
+    }));
+    total.value = Number(res.data?.total || 0);
+    if (reset) {
+      items.value = records;
+    } else {
+      items.value = items.value.concat(records);
+    }
+    queryPageNum.value += 1;
   } finally {
     loading.value = false;
   }
 }
 
-function handleSearch() {
-  query.value.pageNum = 1;
-  fetchList();
+function initObserver() {
+  observer = new IntersectionObserver(
+    (entries) => {
+      const [entry] = entries;
+      if (entry.isIntersecting) {
+        fetchPage(false);
+      }
+    },
+    { root: null, rootMargin: '280px 0px', threshold: 0 }
+  );
+  if (sentinel.value) {
+    observer.observe(sentinel.value);
+  }
 }
 
-function handleReset() {
-  query.value = {
-    pageNum: 1,
-    pageSize: 10,
-    keyword: "",
-    minPrice: undefined,
-    maxPrice: undefined
-  };
-  fetchList();
-}
-
-function handlePageChange(pageNum) {
-  query.value.pageNum = pageNum;
-  fetchList();
-}
-
-function handleSizeChange(pageSize) {
-  query.value.pageSize = pageSize;
-  query.value.pageNum = 1;
-  fetchList();
-}
-
-async function handleBuy(row) {
-  await ElMessageBox.confirm(`确认购买二手商品「${row.name}」吗？`, "提示", {
-    type: "warning"
-  });
-  await buySecondhandApi(row.id, {});
-  ElMessage.success("购买成功，订单已创建");
-  await fetchList();
-}
 </script>
 
 <style scoped>
-.query-form {
-  margin-bottom: 12px;
+.feed-page {
+  padding: 8px 10px 20px;
 }
 
-.pager-wrap {
-  margin-top: 16px;
+.hero {
+  border-radius: 22px;
+  padding: 20px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+  margin-bottom: 14px;
+  background: linear-gradient(120deg, #ff6f2f, #ff9822);
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: 30px;
+}
+
+.hero p {
+  margin: 8px 0 0;
+  opacity: .92;
+}
+
+.hero-dot {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 25% 25%, #fff5, #fff1 60%, transparent 70%);
+}
+
+.query {
+  background: #fff;
+  border: 1px solid var(--line-soft);
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.chips {
+  margin: 10px 0 14px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  border: 1px solid #ffd6b9;
+  border-radius: 999px;
+  background: #fff8f2;
+  color: #7f4f2f;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sentinel {
+  text-align: center;
+  padding: 24px 8px;
+  color: #80848d;
+}
+
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .feed-page {
+    padding: 6px;
+  }
+
+  .hero {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .hero h1 {
+    font-size: 24px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
 }
 </style>

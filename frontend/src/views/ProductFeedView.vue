@@ -2,8 +2,8 @@
   <section class="feed-page">
     <div class="hero">
       <div>
-        <h1>二手捡漏</h1>
-        <p>和商品页一致的沉浸式卡片流，持续滚动发现好价</p>
+        <h1>猜你喜欢</h1>
+        <p>发现每日上新，沉浸式浏览无限滚动商品流</p>
       </div>
       <div class="hero-dot"></div>
     </div>
@@ -12,16 +12,21 @@
       <el-form-item>
         <el-input
           v-model="query.keyword"
-          placeholder="搜二手商品名，例如：自行车"
+          placeholder="搜商品名，例如：无线耳机"
           clearable
           style="width: 240px"
           @keyup.enter="onSearch"
         />
       </el-form-item>
       <el-form-item>
+        <el-input-number v-model="query.minPrice" :min="0" :precision="2" :step="10" placeholder="最低价" />
+      </el-form-item>
+      <el-form-item>
+        <el-input-number v-model="query.maxPrice" :min="0" :precision="2" :step="10" placeholder="最高价" />
+      </el-form-item>
+      <el-form-item>
         <el-button type="primary" @click="onSearch">搜索</el-button>
         <el-button @click="onReset">重置</el-button>
-        <el-button type="success" @click="$router.push('/secondhand/publish')">去发布</el-button>
       </el-form-item>
     </el-form>
 
@@ -38,19 +43,13 @@
     </div>
 
     <div class="grid">
-      <ProductCard
-        v-for="item in visibleItems"
-        :key="item.id"
-        :product="item"
-        mode="secondhand"
-        route-base="/secondhand"
-      />
+      <ProductCard v-for="item in items" :key="item.id" :product="item" />
     </div>
 
     <div ref="sentinel" class="sentinel">
       <span v-if="loading">加载中...</span>
-      <span v-else-if="!hasMore && visibleItems.length">已经到底了</span>
-      <span v-else-if="!visibleItems.length">暂无二手商品</span>
+      <span v-else-if="!hasMore && items.length">已经到底了</span>
+      <span v-else-if="!items.length">暂无商品</span>
     </div>
   </section>
 </template>
@@ -58,40 +57,31 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import ProductCard from '@/components/ProductCard.vue';
-import { getSecondhandListApi } from '@/api/secondhand';
+import { getProductListApi } from '@/api/product';
 
-const pageSize = 16;
+const pageSize = 20;
 const loading = ref(false);
-const sentinel = ref(null);
-const queryPageNum = ref(1);
-let observer = null;
 const items = ref([]);
 const total = ref(0);
+const sentinel = ref(null);
+let observer = null;
 
 const query = reactive({
+  pageNum: 1,
+  pageSize,
   keyword: '',
-  condition: 'all'
+  minPrice: undefined,
+  maxPrice: undefined
 });
 
 const chips = [
-  { label: '全部', condition: 'all' },
-  { label: '95新以上', condition: '95%' },
-  { label: '9成新', condition: '90%' },
-  { label: '8成新', condition: '80%' }
+  { label: '全部', minPrice: undefined, maxPrice: undefined },
+  { label: '百元好物', minPrice: 0, maxPrice: 100 },
+  { label: '200-500', minPrice: 200, maxPrice: 500 },
+  { label: '千元以上', minPrice: 1000, maxPrice: undefined }
 ];
 
-const allItems = computed(() => {
-  return items.value.filter((item) => {
-    const hitKeyword = !query.keyword || item.name.includes(query.keyword.trim());
-    const hitCondition = query.condition === 'all'
-      || item.condition === query.condition
-      || item.conditionLevel === query.condition;
-    return hitKeyword && hitCondition;
-  });
-});
-
-const visibleItems = computed(() => allItems.value);
-const hasMore = computed(() => items.value.length < total.value);
+const hasMore = computed(() => items.value.length < total.value || total.value === 0);
 
 onMounted(async () => {
   await fetchPage(true);
@@ -104,21 +94,6 @@ onBeforeUnmount(() => {
   }
 });
 
-function onSearch() {
-  fetchPage(true);
-}
-
-function onReset() {
-  query.keyword = '';
-  query.condition = 'all';
-  fetchPage(true);
-}
-
-function applyChip(chip) {
-  query.condition = chip.condition;
-  fetchPage(true);
-}
-
 async function fetchPage(reset = false) {
   if (loading.value) {
     return;
@@ -129,29 +104,37 @@ async function fetchPage(reset = false) {
   loading.value = true;
   try {
     if (reset) {
-      queryPageNum.value = 1;
+      query.pageNum = 1;
     }
-    const res = await getSecondhandListApi({
-      pageNum: queryPageNum.value,
-      pageSize,
-      keyword: query.keyword || undefined,
-    });
-    const records = (res.data?.records || []).map((item) => ({
-      ...item,
-      condition: item.conditionLevel || item.condition,
-      originPrice: item.originPrice ?? item.salePrice,
-      salePrice: item.salePrice ?? item.price,
-    }));
-    total.value = Number(res.data?.total || 0);
+    const result = await getProductListApi(query);
+    const records = result.data?.records || [];
+    total.value = Number(result.data?.total || 0);
     if (reset) {
       items.value = records;
     } else {
       items.value = items.value.concat(records);
     }
-    queryPageNum.value += 1;
+    query.pageNum += 1;
   } finally {
     loading.value = false;
   }
+}
+
+function onSearch() {
+  fetchPage(true);
+}
+
+function onReset() {
+  query.keyword = '';
+  query.minPrice = undefined;
+  query.maxPrice = undefined;
+  fetchPage(true);
+}
+
+function applyChip(chip) {
+  query.minPrice = chip.minPrice;
+  query.maxPrice = chip.maxPrice;
+  fetchPage(true);
 }
 
 function initObserver() {
@@ -162,13 +145,16 @@ function initObserver() {
         fetchPage(false);
       }
     },
-    { root: null, rootMargin: '280px 0px', threshold: 0 }
+    {
+      root: null,
+      rootMargin: '280px 0px',
+      threshold: 0
+    }
   );
   if (sentinel.value) {
     observer.observe(sentinel.value);
   }
 }
-
 </script>
 
 <style scoped>
@@ -185,6 +171,7 @@ function initObserver() {
   color: #fff;
   margin-bottom: 14px;
   background: linear-gradient(120deg, #ff6f2f, #ff9822);
+  animation: fadeSlide .6s ease;
 }
 
 .hero h1 {
@@ -237,6 +224,17 @@ function initObserver() {
   text-align: center;
   padding: 24px 8px;
   color: #80848d;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 1100px) {

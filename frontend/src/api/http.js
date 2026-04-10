@@ -1,13 +1,16 @@
 import axios from "axios";
 import { ElMessage } from "element-plus";
 import { useUserStore } from "@/stores/user";
+import { mockRequest } from "@/mock-data";
 
-const http = axios.create({
+const DATA_SOURCE = (import.meta.env.VITE_DATA_SOURCE || "mock").toLowerCase();
+
+const realHttp = axios.create({
     baseURL: "http://localhost:8080/api",
     timeout: 10000,
 });
 
-http.interceptors.request.use(
+realHttp.interceptors.request.use(
     (config) => {
         const userStore = useUserStore();
         if (userStore.token) {
@@ -18,7 +21,7 @@ http.interceptors.request.use(
     (error) => Promise.reject(error),
 );
 
-http.interceptors.response.use(
+realHttp.interceptors.response.use(
     (response) => {
         const { data } = response;
         if (data && data.code !== 0) {
@@ -40,5 +43,55 @@ http.interceptors.response.use(
         return Promise.reject(error);
     },
 );
+
+async function mockAdapter(method, url, data, config) {
+    try {
+        const userStore = useUserStore();
+        const headers = {
+            ...(config?.headers || {}),
+        };
+        if (userStore.token) {
+            headers.Authorization = `Bearer ${userStore.token}`;
+        }
+        return await mockRequest({
+            method,
+            url,
+            params: config?.params,
+            data,
+            headers,
+        });
+    } catch (error) {
+        const message = error?.message || "Mock request failed";
+        ElMessage.error(message);
+        return Promise.reject(error);
+    }
+}
+
+const http = {
+    get(url, config = {}) {
+        if (DATA_SOURCE === "mock") {
+            return mockAdapter("get", url, undefined, config);
+        }
+        return realHttp.get(url, config);
+    },
+    post(url, data = {}, config = {}) {
+        if (DATA_SOURCE === "mock") {
+            return mockAdapter("post", url, data, config);
+        }
+        return realHttp.post(url, data, config);
+    },
+    put(url, data = {}, config = {}) {
+        if (DATA_SOURCE === "mock") {
+            return mockAdapter("put", url, data, config);
+        }
+        return realHttp.put(url, data, config);
+    },
+    delete(url, config = {}) {
+        if (DATA_SOURCE === "mock") {
+            return mockAdapter("delete", url, undefined, config);
+        }
+        return realHttp.delete(url, config);
+    },
+};
 
 export default http;

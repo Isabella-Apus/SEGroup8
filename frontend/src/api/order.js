@@ -12,10 +12,6 @@ export function getOrderDetailApi(orderId) {
     return http.get(`/order/detail/${orderId}`);
 }
 
-export function getSellerOrderDetailApi(orderId) {
-    return http.get(`/order/seller/detail/${orderId}`);
-}
-
 export function payOrderApi(orderId) {
     return http.post(`/order/${orderId}/pay`);
 }
@@ -32,27 +28,19 @@ export function completeOrderApi(orderId) {
     return http.post(`/order/${orderId}/complete`);
 }
 
-export function submitOrderReviewApi(orderId, payload) {
+export function reviewOrderApi(orderId, payload) {
     return http.post(`/order/${orderId}/review`, payload);
 }
 
-export function submitOrderItemReviewsApi(orderId, payload) {
+export function reviewOrderItemsApi(orderId, payload) {
     return http.post(`/order/${orderId}/review/items`, payload);
 }
 
-export function refundOrderApi(orderId, payload) {
+export function refundOrderApi(orderId, payload = {}) {
     return http.post(`/order/${orderId}/refund`, payload);
 }
 
-export function approveRefundOrderApi(orderId) {
-    return http.post(`/order/${orderId}/refund/approve`);
-}
-
-export function rejectRefundOrderApi(orderId) {
-    return http.post(`/order/${orderId}/refund/reject`);
-}
-
-export function remindShipOrderApi(orderId) {
+export function remindShipApi(orderId) {
     return http.post(`/order/${orderId}/remind-ship`);
 }
 
@@ -60,6 +48,18 @@ export function getSellerOrderListApi(params = {}) {
     return http.get('/order/seller/list', { params });
 }
 
-export function shipOrderApi(orderId) {
+export function getSellerOrderDetailApi(orderId) {
+    return http.get(`/order/seller/detail/${orderId}`);
+}
+
+export function shipSellerOrderApi(orderId) {
     return http.post(`/order/${orderId}/ship`);
+}
+
+export function approveSellerRefundApi(orderId) {
+    return http.post(`/order/${orderId}/refund/approve`);
+}
+
+export function rejectSellerRefundApi(orderId) {
+    return http.post(`/order/${orderId}/refund/reject`);
 }
