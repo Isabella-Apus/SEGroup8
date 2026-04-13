@@ -58,6 +58,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import ProductCard from '@/components/ProductCard.vue';
 import { getSecondhandListApi } from '@/api/secondhand';
+import { searchList } from '@/utils/search';
 
 const pageSize = 16;
 const loading = ref(false);
@@ -80,12 +81,19 @@ const chips = [
 ];
 
 const allItems = computed(() => {
-  return items.value.filter((item) => {
-    const hitKeyword = !query.keyword || item.name.includes(query.keyword.trim());
+  const keywordTrimmed = query.keyword.trim();
+  const source = keywordTrimmed
+    ? searchList({
+      items: items.value,
+      keyword: keywordTrimmed,
+      keys: ['name', 'description'],
+    })
+    : items.value;
+  return source.filter((item) => {
     const hitCondition = query.condition === 'all'
       || item.condition === query.condition
       || item.conditionLevel === query.condition;
-    return hitKeyword && hitCondition;
+    return hitCondition;
   });
 });
 
@@ -103,19 +111,23 @@ onBeforeUnmount(() => {
   }
 });
 
-function onSearch() {
-  fetchPage(true);
+async function onSearch() {
+  await fetchPage(true);
+  await ensureAllItemsLoaded();
 }
 
-function onReset() {
+async function onReset() {
   query.keyword = '';
   query.condition = 'all';
-  fetchPage(true);
+  await fetchPage(true);
 }
 
-function applyChip(chip) {
+async function applyChip(chip) {
   query.condition = chip.condition;
-  fetchPage(true);
+  await fetchPage(true);
+  if (query.keyword.trim()) {
+    await ensureAllItemsLoaded();
+  }
 }
 
 async function fetchPage(reset = false) {
@@ -133,7 +145,7 @@ async function fetchPage(reset = false) {
     const res = await getSecondhandListApi({
       pageNum: queryPageNum.value,
       pageSize,
-      keyword: query.keyword || undefined,
+      keyword: undefined,
     });
     const records = (res.data?.records || []).map((item) => ({
       ...item,
@@ -150,6 +162,12 @@ async function fetchPage(reset = false) {
     queryPageNum.value += 1;
   } finally {
     loading.value = false;
+  }
+}
+
+async function ensureAllItemsLoaded() {
+  while (hasMore.value) {
+    await fetchPage(false);
   }
 }
 

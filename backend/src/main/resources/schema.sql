@@ -142,6 +142,65 @@ CREATE TABLE IF NOT EXISTS `product` (
   KEY `idx_product_shop_id` (`shop_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+CREATE TABLE IF NOT EXISTS `browse_history` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `product_type` VARCHAR(20) NOT NULL DEFAULT 'NEW',
+  `product_id` BIGINT NOT NULL,
+  `browse_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_browse_history_user_product_type_product` (`user_id`, `product_type`, `product_id`),
+  KEY `idx_browse_history_user_browse_time` (`user_id`, `browse_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- 兼容已存在库：补齐浏览记录类型字段和唯一索引（按 user + type + product 维度去重）
+SET @browse_history_product_type_add_sql = IF (
+  EXISTS (
+    SELECT 1
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'browse_history'
+      AND COLUMN_NAME = 'product_type'
+  ),
+  'SELECT 1',
+  'ALTER TABLE `browse_history` ADD COLUMN `product_type` VARCHAR(20) NOT NULL DEFAULT ''NEW'' AFTER `user_id`'
+);
+PREPARE stmt_browse_history_add_product_type FROM @browse_history_product_type_add_sql;
+EXECUTE stmt_browse_history_add_product_type;
+DEALLOCATE PREPARE stmt_browse_history_add_product_type;
+
+SET @browse_history_drop_old_uk_sql = IF (
+  EXISTS (
+    SELECT 1
+    FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'browse_history'
+      AND INDEX_NAME = 'uk_browse_history_user_product'
+  ),
+  'ALTER TABLE `browse_history` DROP INDEX `uk_browse_history_user_product`',
+  'SELECT 1'
+);
+PREPARE stmt_browse_history_drop_old_uk FROM @browse_history_drop_old_uk_sql;
+EXECUTE stmt_browse_history_drop_old_uk;
+DEALLOCATE PREPARE stmt_browse_history_drop_old_uk;
+
+SET @browse_history_add_new_uk_sql = IF (
+  EXISTS (
+    SELECT 1
+    FROM INFORMATION_SCHEMA.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'browse_history'
+      AND INDEX_NAME = 'uk_browse_history_user_product_type_product'
+  ),
+  'SELECT 1',
+  'ALTER TABLE `browse_history` ADD UNIQUE KEY `uk_browse_history_user_product_type_product` (`user_id`, `product_type`, `product_id`)'
+);
+PREPARE stmt_browse_history_add_new_uk FROM @browse_history_add_new_uk_sql;
+EXECUTE stmt_browse_history_add_new_uk;
+DEALLOCATE PREPARE stmt_browse_history_add_new_uk;
+
 CREATE TABLE IF NOT EXISTS `secondhand_product` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `seller_user_id` BIGINT NOT NULL,

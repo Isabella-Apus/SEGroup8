@@ -24,7 +24,7 @@
         <el-space>
           <el-button type="primary" @click="handleAddToCart" :disabled="maxQuantity <= 0">加入购物车</el-button>
           <el-button @click="handleBuyNow" :disabled="maxQuantity <= 0">立即下单</el-button>
-          <el-button text @click="router.push('/product')">返回列表</el-button>
+          <el-button text @click="goBack">返回列表</el-button>
         </el-space>
       </div>
     </div>
@@ -114,6 +114,14 @@ function toFullImageUrl(url) {
   }
   const normalized = url.startsWith('/') ? url : `/${url}`;
   return `http://localhost:8080${normalized}`;
+}
+
+function goBack() {
+  if (route.query.from === 'browse-history') {
+    router.push('/browse-history');
+    return;
+  }
+  router.push('/product');
 }
 </script>
 

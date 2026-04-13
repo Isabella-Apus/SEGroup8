@@ -27,3 +27,19 @@ export function updateAddressApi(addressId, payload) {
 export function deleteAddressApi(addressId) {
     return http.delete(`/user/addresses/${addressId}`);
 }
+
+export function getBrowseHistoryApi() {
+    return http.get("/user/browse-history");
+}
+
+export function deleteBrowseHistoryApi(historyId) {
+    return http.delete(`/user/browse-history/${historyId}`);
+}
+
+export function deleteBrowseHistoryBatchApi(historyIds) {
+    return http.post("/user/browse-history/delete-batch", historyIds);
+}
+
+export function clearBrowseHistoryApi() {
+    return http.delete("/user/browse-history/all");
+}
