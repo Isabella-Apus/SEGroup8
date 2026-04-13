@@ -2,7 +2,7 @@
   <div class="page-card">
     <h2 class="page-title">
       我的订单
-      <span v-if="!listLoading" class="page-title-sub">（{{ tabLabel }} · 共 {{ total }} 条）</span>
+      <span v-if="!listLoading" class="page-title-sub">（{{ tabLabel }} · 共 {{ filteredRecords.length }} 条）</span>
     </h2>
 
     <div class="toolbar">
@@ -49,10 +49,10 @@
       <el-skeleton animated :rows="6" />
     </div>
 
-    <el-empty v-else-if="!listLoading && records.length === 0" description="暂无订单" />
+    <el-empty v-else-if="!listLoading && filteredRecords.length === 0" description="暂无订单" />
 
     <div v-else v-loading="listLoading" class="order-list">
-      <el-card v-for="order in records" :key="order.id" shadow="hover" class="order-card" @click="goDetail(order.id)">
+      <el-card v-for="order in filteredRecords" :key="order.id" shadow="hover" class="order-card" @click="goDetail(order.id)">
         <div class="order-card__header">
           <OrderStatusTag
             :status="order.orderStatus"
@@ -199,6 +199,7 @@ import { cancelOrderApi, confirmReceiveOrderApi, getOrderListApi, payOrderApi, r
 import { uploadImageApi } from '@/api/upload';
 import { confirmOrderAction, showOrderActionError, showOrderActionSuccess } from '@/utils/orderUi';
 import OrderStatusTag from '@/components/order/OrderStatusTag.vue';
+import { fuzzySearchItems } from '@/utils/search';
 import { onRealtimeEvent } from '@/realtime/realtimeClient';
 
 const query = reactive({
@@ -215,6 +216,23 @@ const total = ref(0);
 const records = ref([]);
 const activeTab = ref('ALL');
 const listLoading = ref(false);
+
+const filteredRecords = computed(() => {
+  const keyword = String(query.keyword || '').trim();
+  if (!keyword) {
+    return records.value;
+  }
+  return fuzzySearchItems(records.value, keyword, {
+    keys: [
+      'orderNo',
+      {
+        name: 'itemNames',
+        getFn: (order) => (order.items || []).map((item) => item.productName || '').join(' '),
+      },
+    ],
+    threshold: 0.4,
+  });
+});
 
 const tabLabelMap = {
   ALL: '全部',

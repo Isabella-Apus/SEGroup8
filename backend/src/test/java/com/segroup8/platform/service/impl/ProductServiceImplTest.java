@@ -15,6 +15,7 @@ import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.ProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
+import com.segroup8.platform.service.BrowseHistoryService;
 import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.vo.ProductVO;
 import org.junit.jupiter.api.AfterEach;
@@ -48,11 +49,14 @@ class ProductServiceImplTest {
     @Mock
     private UserMapper userMapper;
 
+    @Mock
+    private BrowseHistoryService browseHistoryService;
+
     private ProductServiceImpl productService;
 
     @BeforeEach
     void setUp() {
-        productService = new ProductServiceImpl(productMapper, shopMapper, userMapper);
+        productService = new ProductServiceImpl(productMapper, shopMapper, userMapper, browseHistoryService);
     }
 
     @AfterEach
