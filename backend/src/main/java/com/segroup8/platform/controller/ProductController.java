@@ -5,11 +5,14 @@ import com.segroup8.platform.dto.ProductPageQueryRequest;
 import com.segroup8.platform.dto.ProductSaveRequest;
 import com.segroup8.platform.dto.ProductStatusUpdateRequest;
 import com.segroup8.platform.dto.ProductStockAdjustRequest;
+import com.segroup8.platform.entity.Product;
 import com.segroup8.platform.service.ProductService;
+import com.segroup8.platform.service.SearchService;
 import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.vo.ProductVO;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
@@ -25,9 +29,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 public class ProductController {
 
     private final ProductService productService;
+    private final SearchService searchService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, SearchService searchService) {
         this.productService = productService;
+        this.searchService = searchService;
     }
 
     @Operation(summary = "分页查询在售商品")
@@ -40,6 +46,13 @@ public class ProductController {
     @GetMapping("/detail/{productId}")
     public Result<ProductVO> detail(@PathVariable Long productId) {
         return Result.success(productService.getPublicProductDetail(productId));
+    }
+
+    @Operation(summary = "商品搜索")
+    @GetMapping("/search")
+    public List<Product> search(String keyword,
+            @RequestParam(defaultValue = "0.3") Double threshold) {
+        return searchService.search(keyword, threshold);
     }
 
     @Operation(summary = "卖家分页查询商品")

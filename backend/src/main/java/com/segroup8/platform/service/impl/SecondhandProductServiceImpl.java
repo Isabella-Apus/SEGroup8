@@ -14,6 +14,7 @@ import com.segroup8.platform.entity.SecondhandProduct;
 import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.OrderItemMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
+import com.segroup8.platform.service.BrowseHistoryService;
 import com.segroup8.platform.service.SecondhandProductService;
 import com.segroup8.platform.vo.OrderItemVO;
 import com.segroup8.platform.vo.OrderVO;
@@ -39,13 +40,16 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
     private final SecondhandProductMapper secondhandProductMapper;
     private final OrderInfoMapper orderInfoMapper;
     private final OrderItemMapper orderItemMapper;
+    private final BrowseHistoryService browseHistoryService;
 
     public SecondhandProductServiceImpl(SecondhandProductMapper secondhandProductMapper,
             OrderInfoMapper orderInfoMapper,
-            OrderItemMapper orderItemMapper) {
+            OrderItemMapper orderItemMapper,
+            BrowseHistoryService browseHistoryService) {
         this.secondhandProductMapper = secondhandProductMapper;
         this.orderInfoMapper = orderInfoMapper;
         this.orderItemMapper = orderItemMapper;
+        this.browseHistoryService = browseHistoryService;
     }
 
     @Override
@@ -70,6 +74,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         if (product == null) {
             throw new BusinessException(404, "二手商品不存在或已下架");
         }
+        browseHistoryService.saveBrowseHistory(productId, "SECONDHAND");
         return toVO(product);
     }
 
