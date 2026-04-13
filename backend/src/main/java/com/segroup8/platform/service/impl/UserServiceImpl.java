@@ -54,6 +54,15 @@ public class UserServiceImpl implements UserService {
         vo.setRole(user.getRole());
         vo.setStatus(user.getStatus());
         vo.setCreditScore(user.getCreditScore());
+        vo.setShopName(user.getShopName());
+        vo.setShopDesc(user.getShopDesc());
+        vo.setBannerUrl(user.getBannerUrl());
+        vo.setCategory(user.getCategory());
+        vo.setRegion(user.getRegion());
+        vo.setBusinessHours(user.getBusinessHours());
+        vo.setReturnPolicy(user.getReturnPolicy());
+        vo.setShippingPolicy(user.getShippingPolicy());
+        vo.setAnnouncement(user.getAnnouncement());
         return vo;
     }
 
@@ -65,6 +74,15 @@ public class UserServiceImpl implements UserService {
         update.setAvatar(request.getAvatar());
         update.setPhone(request.getPhone());
         update.setEmail(request.getEmail());
+        update.setShopName(request.getShopName());
+        update.setShopDesc(request.getShopDesc());
+        update.setBannerUrl(request.getBannerUrl());
+        update.setCategory(request.getCategory());
+        update.setRegion(request.getRegion());
+        update.setBusinessHours(request.getBusinessHours());
+        update.setReturnPolicy(request.getReturnPolicy());
+        update.setShippingPolicy(request.getShippingPolicy());
+        update.setAnnouncement(request.getAnnouncement());
         userMapper.updateById(update);
     }
 

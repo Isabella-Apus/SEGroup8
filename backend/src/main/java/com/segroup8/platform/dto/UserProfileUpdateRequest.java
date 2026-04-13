@@ -2,7 +2,9 @@ package com.segroup8.platform.dto;
 
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Pattern;
+import lombok.Data;
 
+@Data
 public class UserProfileUpdateRequest {
 
     @Size(max = 50, message = "昵称长度不能超过50")
@@ -17,35 +19,30 @@ public class UserProfileUpdateRequest {
     @Size(max = 100, message = "邮箱长度不能超过100")
     private String email;
 
-    public String getNickname() {
-        return nickname;
-    }
+    @Size(max = 100, message = "店铺名称不能超过100")
+    private String shopName;
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
+    @Size(max = 200, message = "店铺简介不能超过200")
+    private String shopDesc;
 
-    public String getAvatar() {
-        return avatar;
-    }
+    @Size(max = 255, message = "封面地址不能超过255")
+    private String bannerUrl;
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
+    @Size(max = 50, message = "类目不能超过50")
+    private String category;
 
-    public String getPhone() {
-        return phone;
-    }
+    @Size(max = 100, message = "地区不能超过100")
+    private String region;
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+    @Size(max = 100, message = "营业时间不能超过100")
+    private String businessHours;
 
-    public String getEmail() {
-        return email;
-    }
+    @Size(max = 500, message = "退换货政策不能超过500")
+    private String returnPolicy;
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    @Size(max = 300, message = "发货说明不能超过300")
+    private String shippingPolicy;
+
+    @Size(max = 300, message = "店铺公告不能超过300")
+    private String announcement;
 }
