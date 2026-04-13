@@ -3,15 +3,16 @@
     <!-- 顶部工具栏 -->
     <div class="editor-toolbar">
       <div class="toolbar-left">
-        <h2 class="toolbar-title">Shop Decoration</h2>
+        <h2 class="toolbar-title">🎨 店铺装修</h2>
         <el-radio-group v-model="previewMode" size="small">
-          <el-radio-button label="pc">💻 PC</el-radio-button>
-          <el-radio-button label="mobile">📱 Mobile</el-radio-button>
+          <el-radio-button label="pc">💻 电脑端</el-radio-button>
+          <el-radio-button label="mobile">📱 手机端</el-radio-button>
         </el-radio-group>
       </div>
       <div class="toolbar-right">
-        <el-button @click="handlePreview">预览</el-button>
-        <el-button type="primary" :loading="saving" @click="handleSave">保存发布</el-button>
+        <el-button @click="handlePreview">👁 预览</el-button>
+        <el-button @click="handleClear" plain>🗑 清空</el-button>
+        <el-button type="primary" :loading="saving" @click="handleSave">💾 保存发布</el-button>
       </div>
     </div>
 
@@ -45,7 +46,11 @@
                 v-for="c in themeColors"
                 :key="c"
                 class="color-dot"
-                :style="{ background: c, outline: globalSettings.themeColor === c ? `3px solid ${c}` : 'none', outlineOffset: '2px' }"
+                :style="{
+                  background: c,
+                  outline: globalSettings.themeColor === c ? `3px solid ${c}` : 'none',
+                  outlineOffset: '2px'
+                }"
                 @click="globalSettings.themeColor = c"
               />
               <el-color-picker v-model="globalSettings.themeColor" size="small" />
@@ -56,9 +61,14 @@
             <el-color-picker v-model="globalSettings.bgColor" />
           </div>
           <div class="prop-group">
-            <div class="prop-label">组件间距 (px)</div>
+            <div class="prop-label">组件间距（px）</div>
             <el-slider v-model="globalSettings.gap" :min="0" :max="32" />
           </div>
+        </div>
+
+        <!-- 已添加组件数 -->
+        <div class="panel-count" v-if="components.length > 0">
+          已添加 {{ components.length }} 个组件
         </div>
       </div>
 
@@ -69,13 +79,13 @@
           :class="previewMode"
           :style="{ background: globalSettings.bgColor }"
         >
-          <!-- 店铺头部（固定） -->
+          <!-- 店铺头部（固定展示） -->
           <div class="canvas-shop-header" :style="{ background: globalSettings.themeColor }">
             <el-avatar :src="shopInfo.avatarUrl" :size="50" style="flex-shrink:0">
-              {{ shopInfo.shopName?.[0] || 'S' }}
+              {{ shopInfo.shopName?.[0] || '店' }}
             </el-avatar>
             <div class="canvas-shop-info">
-              <div class="canvas-shop-name">{{ shopInfo.shopName || 'DemoSeller' }}</div>
+              <div class="canvas-shop-name">{{ shopInfo.shopName || '我的店铺' }}</div>
               <div class="canvas-shop-desc">{{ shopInfo.shopDesc || '暂无简介' }}</div>
             </div>
           </div>
@@ -111,7 +121,8 @@
           </draggable>
 
           <div v-if="components.length === 0" class="canvas-empty">
-            <div>点击左侧组件添加到页面</div>
+            <div style="font-size:32px;margin-bottom:8px">🎨</div>
+            <div>从左侧点击组件，添加到页面</div>
           </div>
         </div>
       </div>
@@ -125,24 +136,29 @@
           />
         </div>
         <div v-else class="props-empty">
-          点击画布中的组件进行编辑
+          <div style="font-size:24px;margin-bottom:8px">✏️</div>
+          <div>点击画布中的组件<br>进行属性编辑</div>
         </div>
       </div>
     </div>
 
     <!-- 预览弹窗 -->
-    <el-dialog v-model="previewVisible" title="店铺预览" width="420px">
+    <el-dialog v-model="previewVisible" title="📱 店铺预览" width="420px" align-center>
       <div class="preview-modal" :style="{ background: globalSettings.bgColor }">
         <div class="canvas-shop-header" :style="{ background: globalSettings.themeColor }">
           <el-avatar :src="shopInfo.avatarUrl" :size="40" style="flex-shrink:0">
-            {{ shopInfo.shopName?.[0] || 'S' }}
+            {{ shopInfo.shopName?.[0] || '店' }}
           </el-avatar>
           <div class="canvas-shop-info">
-            <div class="canvas-shop-name" style="font-size:14px">{{ shopInfo.shopName }}</div>
+            <div class="canvas-shop-name" style="font-size:14px">{{ shopInfo.shopName || '我的店铺' }}</div>
+            <div class="canvas-shop-desc" style="font-size:11px">{{ shopInfo.shopDesc }}</div>
           </div>
         </div>
         <div v-for="comp in components" :key="comp.id" style="padding: 8px 12px">
           <ComponentRenderer :component="comp" :theme-color="globalSettings.themeColor" />
+        </div>
+        <div v-if="components.length === 0" style="text-align:center;padding:40px;color:#999">
+          暂未添加任何组件
         </div>
       </div>
     </el-dialog>
@@ -151,7 +167,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Delete, Rank } from '@element-plus/icons-vue'
 import draggable from 'vuedraggable'
 import { useUserStore } from '@/stores/user'
@@ -191,12 +207,25 @@ function addComponent(type) {
   if (comp) {
     components.value.push(comp)
     selectedId.value = comp.id
+    ElMessage.success(`已添加「${COMPONENT_TEMPLATES.find(t => t.type === type)?.label}」`)
   }
 }
 
 function deleteComponent(id) {
   components.value = components.value.filter(c => c.id !== id)
   if (selectedId.value === id) selectedId.value = null
+}
+
+async function handleClear() {
+  if (components.value.length === 0) return ElMessage.info('画布已经是空的')
+  await ElMessageBox.confirm('确定清空所有组件吗？此操作不可撤销。', '清空画布', {
+    confirmButtonText: '确定清空',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+  components.value = []
+  selectedId.value = null
+  ElMessage.success('已清空画布')
 }
 
 function handlePreview() {
@@ -211,29 +240,38 @@ async function handleSave() {
       components: components.value
     }
     localStorage.setItem('shop_decoration_v2', JSON.stringify(decoration))
-    await updateShopProfile({ announcement: '' })
-    ElMessage.success('保存发布成功！')
-  } catch (e) {
-    ElMessage.error('保存失败')
+    // 同步保存一个标记到后端（可选）
+    await updateShopProfile({ announcement: userStore.userInfo?.announcement || '' })
+    ElMessage.success('店铺装修已保存发布！')
+  } catch {
+    ElMessage.error('保存失败，请稍后重试')
   } finally {
     saving.value = false
   }
 }
 
 async function loadData() {
-  await userStore.fetchProfile()
-  const info = userStore.userInfo || {}
-  shopInfo.shopName = info.shopName || info.nickname || ''
-  shopInfo.shopDesc = info.shopDesc || ''
-  shopInfo.avatarUrl = info.avatar
-    ? (info.avatar.startsWith('http') ? info.avatar : 'http://localhost:8080' + info.avatar)
-    : ''
+  try {
+    await userStore.fetchProfile()
+    const info = userStore.userInfo || {}
+    shopInfo.shopName = info.shopName || info.nickname || ''
+    shopInfo.shopDesc = info.shopDesc || ''
+    shopInfo.avatarUrl = info.avatar
+      ? (info.avatar.startsWith('http') ? info.avatar : 'http://localhost:8080' + info.avatar)
+      : ''
 
-  const saved = localStorage.getItem('shop_decoration_v2')
-  if (saved) {
-    const parsed = JSON.parse(saved)
-    Object.assign(globalSettings, parsed.globalSettings || {})
-    components.value = parsed.components || []
+    const saved = localStorage.getItem('shop_decoration_v2')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        Object.assign(globalSettings, parsed.globalSettings || {})
+        components.value = parsed.components || []
+      } catch {
+        // 本地数据损坏，忽略
+      }
+    }
+  } catch {
+    ElMessage.error('加载店铺信息失败')
   }
 }
 
@@ -258,12 +296,10 @@ onMounted(loadData)
 }
 .toolbar-left { display: flex; align-items: center; gap: 16px; }
 .toolbar-right { display: flex; gap: 8px; }
-.toolbar-title { margin: 0; font-size: 18px; }
-.editor-body {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-}
+.toolbar-title { margin: 0; font-size: 18px; font-weight: 600; }
+
+.editor-body { display: flex; flex: 1; overflow: hidden; }
+
 .editor-panel {
   width: 240px;
   flex-shrink: 0;
@@ -273,12 +309,21 @@ onMounted(loadData)
   padding: 12px;
 }
 .panel-title {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   color: #9ca3af;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 8px;
+}
+.panel-count {
+  text-align: center;
+  font-size: 12px;
+  color: #1d9e75;
+  margin-top: 12px;
+  padding: 6px;
+  background: #f0fdf4;
+  border-radius: 6px;
 }
 .component-list { display: flex; flex-direction: column; gap: 6px; }
 .component-item {
@@ -297,18 +342,19 @@ onMounted(loadData)
 .component-name { font-size: 13px; font-weight: 500; color: #111827; }
 .component-desc { font-size: 11px; color: #9ca3af; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .add-icon { color: #9ca3af; flex-shrink: 0; }
+
 .global-settings { padding: 4px 0; }
 .prop-group { margin-bottom: 12px; }
 .prop-label { font-size: 12px; color: #555; margin-bottom: 6px; }
 .color-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .color-dot {
-  width: 24px;
-  height: 24px;
+  width: 24px; height: 24px;
   border-radius: 50%;
   cursor: pointer;
   transition: transform 0.2s;
 }
 .color-dot:hover { transform: scale(1.2); }
+
 .editor-canvas-wrap {
   flex: 1;
   overflow-y: auto;
@@ -324,10 +370,10 @@ onMounted(loadData)
   min-height: 100%;
   border-radius: 8px;
   overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
-.editor-canvas.mobile {
-  max-width: 390px;
-}
+.editor-canvas.mobile { max-width: 390px; }
+
 .canvas-shop-header {
   display: flex;
   align-items: center;
@@ -337,6 +383,7 @@ onMounted(loadData)
 }
 .canvas-shop-name { font-size: 16px; font-weight: 600; }
 .canvas-shop-desc { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+
 .canvas-component {
   border: 2px solid transparent;
   border-radius: 4px;
@@ -369,8 +416,10 @@ onMounted(loadData)
 .delete-btn { cursor: pointer; margin-left: 8px; }
 .delete-btn:hover { color: #fca5a5; }
 .component-type-label { font-size: 11px; }
+
 .canvas-empty {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 300px;
@@ -378,6 +427,7 @@ onMounted(loadData)
   font-size: 14px;
 }
 .drag-ghost { opacity: 0.4; background: #e0f2fe; }
+
 .editor-props {
   width: 280px;
   flex-shrink: 0;
@@ -391,6 +441,13 @@ onMounted(loadData)
   color: #9ca3af;
   font-size: 13px;
   margin-top: 40px;
+  line-height: 1.8;
 }
-.preview-modal { border-radius: 8px; overflow: hidden; max-height: 70vh; overflow-y: auto; }
+
+.preview-modal {
+  border-radius: 8px;
+  overflow: hidden;
+  max-height: 70vh;
+  overflow-y: auto;
+}
 </style>

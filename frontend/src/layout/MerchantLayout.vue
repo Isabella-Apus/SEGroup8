@@ -46,8 +46,8 @@
             <template #title>
               <span class="menu-group-title">📊 数据</span>
             </template>
-            <el-menu-item index="/merchant/seller-dashboard">Business Insights</el-menu-item>
-            <el-menu-item index="/merchant/account-health">Account Health</el-menu-item>
+            <el-menu-item index="/merchant/seller-dashboard">数据看板</el-menu-item>
+            <el-menu-item index="/merchant/account-health">账户信誉</el-menu-item>
           </el-sub-menu>
 
           <!-- Customer Service -->
@@ -63,8 +63,8 @@
             <template #title>
               <span class="menu-group-title">🏪 店铺</span>
             </template>
-            <el-menu-item index="/merchant/seller-shop">Shop Information</el-menu-item>
-            <el-menu-item index="/merchant/shop-decoration">Shop Decoration</el-menu-item>
+            <el-menu-item index="/merchant/seller-shop">店铺信息</el-menu-item>
+            <el-menu-item index="/merchant/shop-decoration">店铺修饰</el-menu-item>
           </el-sub-menu>
 
         </el-menu>
