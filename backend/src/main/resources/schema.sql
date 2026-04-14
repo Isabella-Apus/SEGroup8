@@ -1009,3 +1009,109 @@ SET @tr_trade_type_sql = IF(
 PREPARE stmt_tr_trade_type FROM @tr_trade_type_sql;
 EXECUTE stmt_tr_trade_type;
 DEALLOCATE PREPARE stmt_tr_trade_type;
+
+-- ============================================================
+-- 补充 user 表的店铺相关字段（SellerShopSetting 功能需要）
+-- 使用 IF NOT EXISTS 模式，已有字段不重复添加
+-- ============================================================
+
+SET @user_shop_name_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user' AND COLUMN_NAME = 'shop_name'
+);
+SET @sql = IF(@user_shop_name_exists = 0,
+  'ALTER TABLE `user` ADD COLUMN `shop_name` VARCHAR(80) DEFAULT NULL',
+  'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @user_shop_desc_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user' AND COLUMN_NAME = 'shop_desc'
+);
+SET @sql = IF(@user_shop_desc_exists = 0,
+  'ALTER TABLE `user` ADD COLUMN `shop_desc` VARCHAR(255) DEFAULT NULL',
+  'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @user_banner_url_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user' AND COLUMN_NAME = 'banner_url'
+);
+SET @sql = IF(@user_banner_url_exists = 0,
+  'ALTER TABLE `user` ADD COLUMN `banner_url` VARCHAR(255) DEFAULT NULL',
+  'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @user_category_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user' AND COLUMN_NAME = 'category'
+);
+SET @sql = IF(@user_category_exists = 0,
+  'ALTER TABLE `user` ADD COLUMN `category` VARCHAR(50) DEFAULT NULL',
+  'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @user_region_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user' AND COLUMN_NAME = 'region'
+);
+SET @sql = IF(@user_region_exists = 0,
+  'ALTER TABLE `user` ADD COLUMN `region` VARCHAR(100) DEFAULT NULL',
+  'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @user_business_hours_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user' AND COLUMN_NAME = 'business_hours'
+);
+SET @sql = IF(@user_business_hours_exists = 0,
+  'ALTER TABLE `user` ADD COLUMN `business_hours` VARCHAR(100) DEFAULT NULL',
+  'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @user_return_policy_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user' AND COLUMN_NAME = 'return_policy'
+);
+SET @sql = IF(@user_return_policy_exists = 0,
+  'ALTER TABLE `user` ADD COLUMN `return_policy` VARCHAR(500) DEFAULT NULL',
+  'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @user_shipping_policy_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user' AND COLUMN_NAME = 'shipping_policy'
+);
+SET @sql = IF(@user_shipping_policy_exists = 0,
+  'ALTER TABLE `user` ADD COLUMN `shipping_policy` VARCHAR(300) DEFAULT NULL',
+  'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @user_announcement_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user' AND COLUMN_NAME = 'announcement'
+);
+SET @sql = IF(@user_announcement_exists = 0,
+  'ALTER TABLE `user` ADD COLUMN `announcement` VARCHAR(300) DEFAULT NULL',
+  'SELECT 1');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- voucher 表（优惠券功能）
+CREATE TABLE IF NOT EXISTS `voucher` (
+  `id`              BIGINT NOT NULL AUTO_INCREMENT,
+  `shop_id`         BIGINT NOT NULL,
+  `name`            VARCHAR(100) NOT NULL,
+  `type`            TINYINT NOT NULL DEFAULT 1,
+  `discount_amount` DECIMAL(10,2) DEFAULT NULL,
+  `discount_rate`   DECIMAL(4,2)  DEFAULT NULL,
+  `min_amount`      DECIMAL(10,2) NOT NULL DEFAULT 0,
+  `total_count`     INT NOT NULL DEFAULT 0,
+  `used_count`      INT NOT NULL DEFAULT 0,
+  `start_time`      DATETIME NOT NULL,
+  `end_time`        DATETIME NOT NULL,
+  `status`          TINYINT NOT NULL DEFAULT 1,
+  `create_time`     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time`     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_voucher_shop_id` (`shop_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

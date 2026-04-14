@@ -108,3 +108,64 @@ VALUES
 INSERT IGNORE INTO `report` (`id`, `reporter_user_id`, `target_type`, `target_id`, `reason`, `status`)
 VALUES
 (1, 3, 'SECONDHAND_PRODUCT', 2, 'Description does not fully match the item', 0);
+
+SET @seller_id = 2;
+
+INSERT INTO `voucher`
+  (shop_id, name, type, discount_amount, discount_rate, min_amount, total_count, used_count, start_time, end_time, status, create_time, update_time)
+VALUES
+-- 满减券（进行中）
+(@seller_id, '新用户专享满100减20', 1, 20.00, NULL, 100.00, 200, 45, NOW() - INTERVAL 5 DAY, NOW() + INTERVAL 25 DAY, 1, NOW(), NOW()),
+(@seller_id, '店铺周年庆满200减50', 1, 50.00, NULL, 200.00, 500, 123, NOW() - INTERVAL 3 DAY, NOW() + INTERVAL 7 DAY, 1, NOW(), NOW()),
+(@seller_id, '满50减8元优惠券',     1, 8.00,  NULL, 50.00,  300, 88,  NOW() - INTERVAL 10 DAY, NOW() + INTERVAL 20 DAY, 1, NOW(), NOW()),
+-- 折扣券（进行中）
+(@seller_id, '全场九折优惠券',      2, NULL,  0.90, 0.00,   100, 32,  NOW() - INTERVAL 2 DAY, NOW() + INTERVAL 13 DAY, 1, NOW(), NOW()),
+(@seller_id, '电子数码专区八五折',  2, NULL,  0.85, 100.00, 150, 67,  NOW() - INTERVAL 7 DAY, NOW() + INTERVAL 3 DAY,  1, NOW(), NOW()),
+-- 已结束的券
+(@seller_id, '双十一大促满300减80', 1, 80.00, NULL, 300.00, 1000, 998, NOW() - INTERVAL 60 DAY, NOW() - INTERVAL 30 DAY, 2, NOW() - INTERVAL 60 DAY, NOW()),
+(@seller_id, '春节特惠七五折',      2, NULL,  0.75, 50.00,  200, 196,  NOW() - INTERVAL 90 DAY, NOW() - INTERVAL 60 DAY, 2, NOW() - INTERVAL 90 DAY, NOW()),
+-- 未开始的券
+(@seller_id, '618预热满150减30',    1, 30.00, NULL, 150.00, 300, 0,   NOW() + INTERVAL 5 DAY,  NOW() + INTERVAL 15 DAY, 0, NOW(), NOW());
+
+INSERT INTO `balance` (user_id, personal_balance, business_balance, version, create_time, update_time)
+VALUES (@seller_id, 1280.50, 15680.00, 0, NOW(), NOW())
+ON DUPLICATE KEY UPDATE
+  personal_balance = 1280.50,
+  business_balance = 15680.00,
+  update_time = NOW();
+
+INSERT INTO `transaction_record`
+  (order_id, user_id, account_type, change_type, amount, balance_after, remark, trade_type, create_time)
+VALUES
+-- 近期订单收款（经营账户）
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 299.00,  15680.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 1 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 158.00,  15381.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 2 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 520.00,  15223.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 3 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 88.00,   14703.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 4 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 1280.00, 14615.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 5 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 366.00,  13335.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 6 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 99.00,   12969.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 7 DAY),
+-- 退款扣除
+(NULL, @seller_id, 'BUSINESS', 'REFUND_ONLY',            -128.00, 12870.00, '仅退款回流',   'REFUND_BACKFLOW', NOW() - INTERVAL 3 DAY),
+(NULL, @seller_id, 'BUSINESS', 'REFUND_RETURN',          -299.00, 12998.00, '退货退款回流', 'REFUND_BACKFLOW', NOW() - INTERVAL 8 DAY),
+-- 更早的收款记录（上月）
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 688.00,  13297.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 12 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 450.00,  12609.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 15 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 1580.00, 12159.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 18 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 320.00,  10579.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 22 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 199.00,  10259.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 25 DAY),
+-- 个人账户充值记录
+(NULL, @seller_id, 'PERSONAL', 'RECHARGE',                500.00,  1280.50, '钱包充值',     'RECHARGE',        NOW() - INTERVAL 5 DAY),
+(NULL, @seller_id, 'PERSONAL', 'RECHARGE',                1000.00, 780.50,  '钱包充值',     'RECHARGE',        NOW() - INTERVAL 20 DAY);
+
+SELECT '=== 优惠券 ===' AS info;
+SELECT id, name, type, discount_amount, discount_rate, min_amount, total_count, used_count, status FROM voucher WHERE shop_id = @seller_id;
+ 
+SELECT '=== 账户余额 ===' AS info;
+SELECT * FROM balance WHERE user_id = @seller_id;
+ 
+SELECT '=== 流水记录（最近10条）===' AS info;
+SELECT id, account_type, change_type, amount, balance_after, remark, trade_type, create_time
+FROM transaction_record WHERE user_id = @seller_id ORDER BY create_time DESC LIMIT 10;
+
+

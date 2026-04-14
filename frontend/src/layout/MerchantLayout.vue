@@ -8,7 +8,7 @@
       <el-aside width="220px" class="layout-aside">
         <el-menu :default-active="$route.path" router class="layout-menu" :default-openeds="openeds">
 
-          <!-- Order -->
+          <!-- 订单 -->
           <el-sub-menu index="order">
             <template #title>
               <span class="menu-group-title">📦 订单</span>
@@ -16,7 +16,7 @@
             <el-menu-item index="/merchant/orders">订单管理</el-menu-item>
           </el-sub-menu>
 
-          <!-- Product -->
+          <!-- 商品 -->
           <el-sub-menu index="product">
             <template #title>
               <span class="menu-group-title">🛍️ 商品</span>
@@ -25,7 +25,7 @@
             <el-menu-item index="/merchant/seller-products/edit">发布新商品</el-menu-item>
           </el-sub-menu>
 
-          <!-- Marketing -->
+          <!-- 营销 -->
           <el-sub-menu index="marketing">
             <template #title>
               <span class="menu-group-title">🎯 营销</span>
@@ -33,7 +33,7 @@
             <el-menu-item index="/merchant/vouchers">优惠券</el-menu-item>
           </el-sub-menu>
 
-          <!-- Finance -->
+          <!-- 财务 -->
           <el-sub-menu index="finance">
             <template #title>
               <span class="menu-group-title">💰 财务</span>
@@ -41,7 +41,7 @@
             <el-menu-item index="/merchant/finance">财务看板</el-menu-item>
           </el-sub-menu>
 
-          <!-- Data -->
+          <!-- 数据 -->
           <el-sub-menu index="data">
             <template #title>
               <span class="menu-group-title">📊 数据</span>
@@ -50,7 +50,7 @@
             <el-menu-item index="/merchant/account-health">账户信誉</el-menu-item>
           </el-sub-menu>
 
-          <!-- Customer Service -->
+          <!-- 客服 -->
           <el-sub-menu index="service">
             <template #title>
               <span class="menu-group-title">💬 客服</span>
@@ -58,13 +58,13 @@
             <el-menu-item index="/merchant/reviews">评价管理</el-menu-item>
           </el-sub-menu>
 
-          <!-- Shop -->
+          <!-- 店铺 -->
           <el-sub-menu index="shop">
             <template #title>
               <span class="menu-group-title">🏪 店铺</span>
             </template>
             <el-menu-item index="/merchant/seller-shop">店铺信息</el-menu-item>
-            <el-menu-item index="/merchant/shop-decoration">店铺修饰</el-menu-item>
+            <el-menu-item index="/merchant/shop-decoration">店铺装修</el-menu-item>
           </el-sub-menu>
 
         </el-menu>
