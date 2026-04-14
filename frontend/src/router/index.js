@@ -110,7 +110,7 @@ const routes = [
                 path: "",
                 name: "merchantWorkbench",
                 component: () =>
-                    import("@/views/merchant/MerchantWorkbenchView.vue"),
+                    import("@/views/seller/SellerProductList.vue"),
             },
             {
                 path: "orders",
@@ -142,6 +142,42 @@ const routes = [
                 component: () =>
                     import("@/views/merchant/MerchantShopSettingView.vue"),
             },
+            {
+                path: "seller-products",
+                name: "sellerProducts",
+                component: () => import("@/views/seller/SellerProductList.vue"),
+            },
+            {
+                path: "seller-products/edit/:id?",
+                name: "sellerProductEdit",
+                component: () => import("@/views/seller/SellerProductEdit.vue"),
+            },
+            {
+                path: "seller-dashboard",
+                name: "sellerDashboard",
+                component: () => import("@/views/seller/SellerDashboard.vue"),
+            },
+            {
+                path: "seller-shop",
+                name: "sellerShop",
+                component: () => import("@/views/seller/SellerShopSetting.vue"),
+            },
+            {
+                path: "vouchers",
+                name: "sellerVouchers",
+                component: () => import("@/views/seller/SellerVoucher.vue"),
+            },
+            {
+                path: "account-health",
+                name: "sellerAccountHealth",
+                component: () => import("@/views/seller/SellerAccountHealth.vue"),
+            },
+            {
+                path: "shop-decoration",
+                name: "sellerShopDecoration",
+                component: () => import("@/views/seller/SellerShopDecoration.vue"),
+            },
+            
         ],
     },
     {
