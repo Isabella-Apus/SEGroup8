@@ -49,10 +49,11 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { useRouter } from 'vue-router';
 import { createOrderApi } from '@/api/order';
 import { getProductDetailApi } from '@/api/product';
+import { listAddressesApi } from '@/api/user';
 import { clearCart, getCartItems, removeFromCart, saveCartItems } from '@/utils/cart';
 
 const router = useRouter();
@@ -114,7 +115,13 @@ async function checkout() {
     await refreshCartItems();
     return;
   }
+  const selectedAddressId = await confirmAddressAndPickId();
+  if (!selectedAddressId) {
+    return;
+  }
+
   const result = await createOrderApi({
+    addressId: selectedAddressId,
     items: validCheckoutItems.map((item) => ({
       productId: item.productId,
       quantity: Number(item.quantity || 0)
@@ -132,6 +139,30 @@ async function checkout() {
     return;
   }
   router.push('/order');
+}
+
+async function confirmAddressAndPickId() {
+  const result = await listAddressesApi();
+  const addresses = result?.data || [];
+  if (!addresses.length) {
+    ElMessage.warning('请先新增收货地址后再下单');
+    router.push({ name: 'addressManager' });
+    return null;
+  }
+  const preferred = addresses.find((a) => Number(a.isDefault) === 1) || addresses[0];
+  const summary = `${preferred.receiverName} ${preferred.receiverPhone}\n${preferred.province}${preferred.city}${preferred.detailAddress}`;
+  const confirmed = await ElMessageBox.confirm(`请确认本次收货地址：\n${summary}`, '确认收货地址', {
+    confirmButtonText: '确认下单',
+    cancelButtonText: '去改地址',
+    type: 'warning'
+  }).then(() => true).catch(() => {
+    router.push({ name: 'addressManager' });
+    return false;
+  });
+  if (!confirmed) {
+    return null;
+  }
+  return preferred.id;
 }
 </script>
 

@@ -16,7 +16,7 @@
       </div>
       <div class="comp-products" :style="{ gridTemplateColumns: `repeat(${component.props.columns}, 1fr)` }">
         <div v-for="p in component.props.products" :key="p.id" class="comp-product-card">
-          <el-image v-if="p.cover" :src="'http://localhost:8080' + p.cover" fit="cover" class="comp-product-img" />
+          <el-image v-if="p.cover" :src="toFullImageUrl(p.cover)" fit="cover" class="comp-product-img" />
           <div v-else class="comp-product-img-placeholder">📦</div>
           <div class="comp-product-name">{{ p.name }}</div>
           <div class="comp-product-price" :style="{ color: themeColor }">¥{{ p.price }}</div>
@@ -92,6 +92,13 @@ const props = defineProps({
 
 const countdown = ref({ hours: '00', minutes: '00', seconds: '00' })
 let timer = null
+
+function toFullImageUrl(url) {
+  if (!url) {
+    return ''
+  }
+  return url.startsWith('http') ? url : `http://localhost:8080${url}`
+}
 
 function updateCountdown() {
   if (props.component.type !== 'countdown' || !props.component.props.endTime) return

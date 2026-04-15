@@ -134,7 +134,7 @@ async function loadProducts() {
     })
     products.value = (res.data.records || []).map(item => ({
         ...item,
-        imageUrl: item.cover ? 'http://localhost:8080' + item.cover : ''
+        imageUrl: toFullImageUrl(item.cover)
     }))
     total.value = res.data.total || 0
   } catch (e) {
@@ -183,6 +183,13 @@ function statusTagType(status) {
 function statusLabel(status) {
   const map = { 1: '在售', 0: '已下架', 2: '审核中' }
   return map[status] ?? status
+}
+
+function toFullImageUrl(url) {
+  if (!url) {
+    return ''
+  }
+  return url.startsWith('http') ? url : `http://localhost:8080${url}`
 }
 
 onMounted(loadProducts)

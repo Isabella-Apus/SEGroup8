@@ -126,7 +126,13 @@
       />
     </div>
 
-    <el-dialog v-model="refundDialogVisible" title="申请退货/退款" width="520px">
+    <el-dialog
+      v-model="refundDialogVisible"
+      title="申请退货/退款"
+      width="520px"
+      align-center
+      append-to-body
+    >
       <el-form label-width="90px">
         <el-form-item label="退货原因">
           <el-select v-model="refundForm.reason" placeholder="请选择" style="width: 100%">

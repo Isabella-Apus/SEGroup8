@@ -14,8 +14,11 @@
       <el-table-column prop="username" label="申请用户" width="120" />
       <el-table-column prop="storeName" label="店名" min-width="150" />
       <el-table-column prop="categoryId" label="类目ID" width="90" />
+      <el-table-column prop="warehouseProvince" label="仓库省份" width="120" />
+      <el-table-column prop="warehouseCity" label="仓库城市" width="120" />
       <el-table-column prop="contactName" label="负责人" width="120" />
       <el-table-column prop="contactPhone" label="电话" width="140" />
+      <el-table-column prop="idCardNo" label="身份证(脱敏)" width="160" />
       <el-table-column prop="status" label="状态" width="100">
         <template #default="{ row }">{{ statusText(row.status) }}</template>
       </el-table-column>

@@ -20,6 +20,10 @@ public class UserVO {
     private String returnPolicy;
     private String shippingPolicy;
     private String announcement;
+    private String shopContactName;
+    private String shopContactPhone;
+    private String warehouseAddr;
+    private String idCardNoMasked;
 
     public Long getId() {
         return id;
@@ -118,4 +122,36 @@ public class UserVO {
 
     public String getAnnouncement() { return announcement; }
     public void setAnnouncement(String announcement) { this.announcement = announcement; }
+
+    public String getShopContactName() {
+        return shopContactName;
+    }
+
+    public void setShopContactName(String shopContactName) {
+        this.shopContactName = shopContactName;
+    }
+
+    public String getShopContactPhone() {
+        return shopContactPhone;
+    }
+
+    public void setShopContactPhone(String shopContactPhone) {
+        this.shopContactPhone = shopContactPhone;
+    }
+
+    public String getWarehouseAddr() {
+        return warehouseAddr;
+    }
+
+    public void setWarehouseAddr(String warehouseAddr) {
+        this.warehouseAddr = warehouseAddr;
+    }
+
+    public String getIdCardNoMasked() {
+        return idCardNoMasked;
+    }
+
+    public void setIdCardNoMasked(String idCardNoMasked) {
+        this.idCardNoMasked = idCardNoMasked;
+    }
 }

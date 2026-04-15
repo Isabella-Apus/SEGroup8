@@ -77,7 +77,7 @@
             >
               <div v-if="form.imageUrl" class="preview-wrap">
                 <el-image
-                  :src="form.imageUrl"
+                  :src="toFullImageUrl(form.imageUrl)"
                   fit="cover"
                   style="width: 120px; height: 120px; border-radius: 6px"
                 />
@@ -160,13 +160,19 @@ async function loadDetail() {
     form.description = d.description
     form.price = d.price
     form.stock = d.stock
-    form.category = d.category
-    form.imageUrl = d.imageUrl
+    form.imageUrl = d.cover || ''
   } catch (e) {
     ElMessage.error('加载商品信息失败')
   } finally {
     loading.value = false
   }
+}
+
+function toFullImageUrl(url) {
+  if (!url) {
+    return ''
+  }
+  return url.startsWith('http') ? url : `http://localhost:8080${url}`
 }
 
 // 上传前校验
@@ -201,11 +207,19 @@ async function handleSubmit() {
     if (!valid) return
     submitting.value = true
     try {
+      const payload = {
+        name: form.name,
+        description: form.description,
+        price: form.price,
+        stock: form.stock,
+        cover: form.imageUrl,
+        status: 1
+      }
       if (isEdit.value) {
-        await updateProduct(route.params.id, form)
+        await updateProduct(route.params.id, payload)
         ElMessage.success('修改成功')
       } else {
-        await createProduct(form)
+        await createProduct(payload)
         ElMessage.success('发布成功')
       }
       router.push('/merchant')

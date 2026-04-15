@@ -6,21 +6,14 @@
 
     <!-- 余额卡片 -->
     <el-row :gutter="16" v-loading="loading" style="margin-bottom: 16px">
-      <el-col :span="8">
+      <el-col :span="12">
         <el-card class="balance-card business">
           <div class="balance-label">经营账户余额</div>
           <div class="balance-value">¥{{ Number(finance.businessBalance || 0).toFixed(2) }}</div>
           <div class="balance-desc">官方商品经营相关收入</div>
         </el-card>
       </el-col>
-      <el-col :span="8">
-        <el-card class="balance-card personal">
-          <div class="balance-label">个人钱包余额</div>
-          <div class="balance-value">¥{{ Number(finance.personalBalance || 0).toFixed(2) }}</div>
-          <div class="balance-desc">个人充值及消费余额</div>
-        </el-card>
-      </el-col>
-      <el-col :span="8">
+      <el-col :span="12">
         <el-card class="balance-card income">
           <div class="balance-label">累计收入</div>
           <div class="balance-value income-text">¥{{ totalIncome }}</div>
@@ -88,7 +81,6 @@ import { resolveTradeTypeLabel } from '@/utils/finance'
 const loading = ref(false)
 const filterType = ref('')
 const finance = reactive({
-  personalBalance: 0,
   businessBalance: 0
 })
 const businessRecords = ref([])
@@ -124,7 +116,6 @@ onMounted(async () => {
   try {
     const result = await getFinanceDashboardApi()
     finance.businessBalance = result.data?.businessBalance || 0
-    finance.personalBalance = result.data?.personalBalance || 0
     const business = await getBusinessRecordsApi()
     businessRecords.value = business.data || []
   } finally {
@@ -143,7 +134,6 @@ onMounted(async () => {
 .page-title { margin: 0; font-size: 20px; }
 .balance-card { text-align: center; padding: 8px 0; }
 .balance-card.business { border-top: 3px solid #1d9e75; }
-.balance-card.personal { border-top: 3px solid #409eff; }
 .balance-card.income { border-top: 3px solid #e4393c; }
 .balance-label { font-size: 13px; color: #999; }
 .balance-value { font-size: 28px; font-weight: 700; color: #303133; margin: 8px 0; }

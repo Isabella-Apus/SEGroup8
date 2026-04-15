@@ -160,18 +160,27 @@ public class OrderServiceImpl implements OrderService {
         order.setRemark(request.getRemark());
         order.setCreateTime(LocalDateTime.now());
 
-        Address addr = addressMapper.selectOne(new LambdaQueryWrapper<Address>()
-                .eq(Address::getUserId, userId)
-                .orderByDesc(Address::getIsDefault)
-                .orderByDesc(Address::getId)
-                .last("limit 1"));
-        if (addr != null) {
-            order.setReceiverName(addr.getReceiverName());
-            order.setReceiverPhone(addr.getReceiverPhone());
-            order.setReceiverProvince(addr.getProvince());
-            order.setReceiverCity(addr.getCity());
-            order.setReceiverDetailAddress(addr.getDetailAddress());
+        Address addr;
+        if (request.getAddressId() != null) {
+            addr = addressMapper.selectById(request.getAddressId());
+            if (addr == null || !Objects.equals(addr.getUserId(), userId)) {
+                throw new BusinessException(400, "收货地址不存在或不属于当前用户");
+            }
+        } else {
+            addr = addressMapper.selectOne(new LambdaQueryWrapper<Address>()
+                    .eq(Address::getUserId, userId)
+                    .orderByDesc(Address::getIsDefault)
+                    .orderByDesc(Address::getId)
+                    .last("limit 1"));
         }
+        if (addr == null) {
+            throw new BusinessException(400, "请先选择收货地址");
+        }
+        order.setReceiverName(addr.getReceiverName());
+        order.setReceiverPhone(addr.getReceiverPhone());
+        order.setReceiverProvince(addr.getProvince());
+        order.setReceiverCity(addr.getCity());
+        order.setReceiverDetailAddress(addr.getDetailAddress());
         orderInfoMapper.insert(order);
 
         for (OrderItem item : orderItems) {
@@ -313,6 +322,10 @@ public class OrderServiceImpl implements OrderService {
                 .eq("version", version));
         if (updated == 0) {
             throw new BusinessException(400, "当前状态不可取消");
+        }
+        boolean isUnpaid = order.getPayStatus() == null || Integer.valueOf(0).equals(order.getPayStatus());
+        if (isUnpaid) {
+            restoreStockForNewItems(orderId);
         }
         pushOrderRealtime(orderId, userId, resolveSellerUserIds(orderId), "ORDER_STATUS_UPDATED", "订单已取消");
         return getMyOrderDetail(orderId);
@@ -1049,5 +1062,28 @@ public class OrderServiceImpl implements OrderService {
         payload.put("message", message);
         realtimePushService.pushToUser(buyerUserId, eventType, payload);
         realtimePushService.pushToUsers(sellerUserIds, eventType, payload);
+    }
+
+    private void restoreStockForNewItems(Long orderId) {
+        List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
+                .eq(OrderItem::getOrderId, orderId));
+        for (OrderItem item : items) {
+            String productType = item.getProductType();
+            if (StringUtils.hasText(productType) && !"NEW".equalsIgnoreCase(productType.trim())) {
+                continue;
+            }
+            Product product = productMapper.selectById(item.getProductId());
+            if (product == null) {
+                continue;
+            }
+            int currentStock = product.getStock() == null ? 0 : product.getStock();
+            int restoreQty = item.getQuantity() == null ? 0 : item.getQuantity();
+            int nextStock = currentStock + restoreQty;
+            product.setStock(nextStock);
+            if (nextStock > 0 && Integer.valueOf(ProductStatusEnum.OFF_SHELF.getCode()).equals(product.getStatus())) {
+                product.setStatus(ProductStatusEnum.ON_SHELF.getCode());
+            }
+            productMapper.updateById(product);
+        }
     }
 }

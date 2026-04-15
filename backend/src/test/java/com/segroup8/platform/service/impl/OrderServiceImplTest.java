@@ -1,6 +1,8 @@
 package com.segroup8.platform.service.impl;
 
 import com.segroup8.platform.common.BusinessException;
+import com.segroup8.platform.common.OrderStatusEnum;
+import com.segroup8.platform.common.ProductStatusEnum;
 import com.segroup8.platform.context.UserContext;
 import com.segroup8.platform.entity.OrderInfo;
 import com.segroup8.platform.entity.OrderItem;
@@ -35,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -181,5 +184,52 @@ class OrderServiceImplTest {
 
         BusinessException ex = assertThrows(BusinessException.class, () -> orderService.getMyOrderDetail(orderId));
         assertEquals(403, ex.getCode());
+    }
+
+    @Test
+    void cancelMyOrder_shouldRestoreStockWhenUnpaidEvenIfOrderStatusNotPendingPay() {
+        Long buyerUserId = 100L;
+        Long orderId = 13L;
+        Long productId = 88L;
+        Long shopId = 66L;
+        UserContext.setUserId(buyerUserId);
+
+        OrderInfo order = new OrderInfo();
+        order.setId(orderId);
+        order.setBuyerUserId(buyerUserId);
+        // 模拟脏数据：状态已变更但仍未支付，取消时仍应回补库存
+        order.setOrderStatus(OrderStatusEnum.PENDING_SHIP.getCode());
+        order.setPayStatus(0);
+        order.setVersion(1);
+        when(orderInfoMapper.selectById(orderId)).thenReturn(order);
+        when(orderInfoMapper.update(any(), any())).thenReturn(1);
+
+        OrderItem item = new OrderItem();
+        item.setId(1L);
+        item.setOrderId(orderId);
+        item.setProductType("NEW");
+        item.setProductId(productId);
+        item.setProductName("Test");
+        item.setQuantity(2);
+        when(orderItemMapper.selectList(any())).thenReturn(List.of(item));
+
+        Product product = new Product();
+        product.setId(productId);
+        product.setShopId(shopId);
+        product.setStock(5);
+        product.setStatus(ProductStatusEnum.OFF_SHELF.getCode());
+        when(productMapper.selectById(productId)).thenReturn(product);
+
+        Shop shop = new Shop();
+        shop.setId(shopId);
+        shop.setOwnerUserId(200L);
+        when(shopMapper.selectById(shopId)).thenReturn(shop);
+
+        orderService.cancelMyOrder(orderId);
+
+        verify(productMapper).updateById(argThat((Product p) -> p != null
+                && productId.equals(p.getId())
+                && Integer.valueOf(7).equals(p.getStock())
+            && Integer.valueOf(ProductStatusEnum.ON_SHELF.getCode()).equals(p.getStatus())));
     }
 }

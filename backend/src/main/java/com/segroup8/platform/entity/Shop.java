@@ -11,6 +11,11 @@ public class Shop {
     private Long id;
     private Long ownerUserId;
     private String name;
+    private String region;
+    private String contactName;
+    private String contactPhone;
+    private String idCardNoMasked;
+    private String warehouseAddr;
     private Integer status;
 
     public Long getId() {
@@ -35,6 +40,46 @@ public class Shop {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    public String getContactName() {
+        return contactName;
+    }
+
+    public void setContactName(String contactName) {
+        this.contactName = contactName;
+    }
+
+    public String getContactPhone() {
+        return contactPhone;
+    }
+
+    public void setContactPhone(String contactPhone) {
+        this.contactPhone = contactPhone;
+    }
+
+    public String getIdCardNoMasked() {
+        return idCardNoMasked;
+    }
+
+    public void setIdCardNoMasked(String idCardNoMasked) {
+        this.idCardNoMasked = idCardNoMasked;
+    }
+
+    public String getWarehouseAddr() {
+        return warehouseAddr;
+    }
+
+    public void setWarehouseAddr(String warehouseAddr) {
+        this.warehouseAddr = warehouseAddr;
     }
 
     public Integer getStatus() {

@@ -52,12 +52,9 @@ export function replyReview(reviewId, content) {
 export async function uploadImage(file) {
     const formData = new FormData()
     formData.append('file', file)
-    const res = await http.post('/upload/image', formData, {
+    return http.post('/upload/image', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
     })
-    // 拼上后端地址
-    res.data.url = 'http://localhost:8080' + res.data.url
-    return res
 }
 
 // ===== 优惠券管理 =====
