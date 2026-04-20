@@ -45,4 +45,13 @@ public class UserProfileUpdateRequest {
 
     @Size(max = 300, message = "店铺公告不能超过300")
     private String announcement;
+
+    @Size(max = 50, message = "店铺负责人姓名不能超过50")
+    private String shopContactName;
+
+    @Pattern(regexp = "^$|^1\\d{10}$", message = "店铺负责人手机号需为11位")
+    private String shopContactPhone;
+
+    @Size(max = 255, message = "仓库地址不能超过255")
+    private String warehouseAddr;
 }

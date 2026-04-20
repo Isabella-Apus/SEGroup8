@@ -41,7 +41,7 @@
             style="max-width: 620px; margin-top: 16px"
           >
             <el-form-item label="店铺名称" prop="shopName">
-              <el-input v-model="form.shopName" maxlength="50" show-word-limit placeholder="请输入店铺名称" />
+              <el-input v-model="form.shopName" disabled placeholder="来自入驻申请，审核后自动回填" />
             </el-form-item>
             <el-form-item label="店铺简介" prop="shopDesc">
               <el-input
@@ -54,23 +54,34 @@
               />
             </el-form-item>
             <el-form-item label="主营类目" prop="category">
-              <el-select v-model="form.category" placeholder="请选择主营类目" style="width: 100%">
-                <el-option label="电子数码" value="电子数码" />
-                <el-option label="服装鞋帽" value="服装鞋帽" />
-                <el-option label="食品饮料" value="食品饮料" />
-                <el-option label="家居用品" value="家居用品" />
-                <el-option label="运动户外" value="运动户外" />
-                <el-option label="图书文具" value="图书文具" />
-                <el-option label="美妆护肤" value="美妆护肤" />
-                <el-option label="母婴用品" value="母婴用品" />
-                <el-option label="其他" value="其他" />
-              </el-select>
+              <el-input v-model="form.category" disabled placeholder="来自入驻申请，审核后自动回填" />
             </el-form-item>
             <el-form-item label="联系电话" prop="phone">
               <el-input v-model="form.phone" placeholder="13800000000" style="width: 240px" />
             </el-form-item>
+            <el-form-item label="负责人姓名" prop="shopContactName">
+              <el-input v-model="form.shopContactName" disabled placeholder="来自入驻申请，审核后自动回填" style="width: 240px" />
+            </el-form-item>
+            <el-form-item label="负责人电话" prop="shopContactPhone">
+              <el-input v-model="form.shopContactPhone" disabled placeholder="来自入驻申请，审核后自动回填" style="width: 240px" />
+            </el-form-item>
             <el-form-item label="所在地区" prop="region">
-              <el-input v-model="form.region" placeholder="例如：广东省广州市" style="width: 240px" />
+              <el-input v-model="form.region" disabled placeholder="来自入驻申请，审核后自动回填" style="width: 240px" />
+            </el-form-item>
+            <el-form-item label="仓库地址" prop="warehouseAddr">
+              <el-input
+                v-model="form.warehouseAddr"
+                disabled
+                type="textarea"
+                :rows="2"
+                maxlength="255"
+                show-word-limit
+                placeholder="来自入驻申请，审核后自动回填"
+                style="width: 360px"
+              />
+            </el-form-item>
+            <el-form-item label="身份证(脱敏)">
+              <el-input v-model="form.idCardNoMasked" disabled style="width: 240px" />
             </el-form-item>
             <el-form-item label="营业时间">
               <el-input
@@ -199,6 +210,10 @@ const form = reactive({
   category: '',
   phone: '',
   region: '',
+  shopContactName: '',
+  shopContactPhone: '',
+  warehouseAddr: '',
+  idCardNoMasked: '',
   businessHours: '',
   avatarUrl: '',
   bannerUrl: '',
@@ -216,10 +231,6 @@ const bannerStyle = computed(() => ({
 }))
 
 const rules = {
-  shopName: [
-    { required: true, message: '请输入店铺名称', trigger: 'blur' },
-    { min: 2, max: 50, message: '长度在 2 到 50 个字符', trigger: 'blur' }
-  ],
   phone: [{
     pattern: /^1[3-9]\d{9}$/,
     message: '请输入正确的手机号格式',
@@ -244,6 +255,10 @@ async function loadShopInfo() {
     form.category = info.category || ''
     form.phone = info.phone || ''
     form.region = info.region || ''
+    form.shopContactName = info.shopContactName || ''
+    form.shopContactPhone = info.shopContactPhone || ''
+    form.warehouseAddr = info.warehouseAddr || ''
+    form.idCardNoMasked = info.idCardNoMasked || ''
     form.businessHours = info.businessHours || ''
     form.avatarUrl = toFullUrl(info.avatar)
     form.bannerUrl = toFullUrl(info.bannerUrl)
@@ -284,13 +299,9 @@ async function handleSubmit() {
   submitting.value = true
   try {
     await updateShopProfile({
-      nickname: form.shopName,
-      shopName: form.shopName,
       shopDesc: form.shopDesc,
       bannerUrl: form.bannerUrl,
-      category: form.category,
       phone: form.phone,
-      region: form.region,
       businessHours: form.businessHours,
       avatar: form.avatarUrl,
       returnPolicy: form.returnPolicy,

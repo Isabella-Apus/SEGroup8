@@ -120,12 +120,82 @@ CREATE TABLE IF NOT EXISTS `shop` (
   `name` VARCHAR(80) NOT NULL,
   `logo` VARCHAR(255) DEFAULT NULL,
   `description` VARCHAR(255) DEFAULT NULL,
+  `region` VARCHAR(100) DEFAULT NULL,
+  `contact_name` VARCHAR(50) DEFAULT NULL,
+  `contact_phone` VARCHAR(20) DEFAULT NULL,
+  `id_card_no_masked` VARCHAR(50) DEFAULT NULL,
+  `warehouse_addr` VARCHAR(255) DEFAULT NULL,
   `status` TINYINT NOT NULL DEFAULT 1,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_shop_owner_user_id` (`owner_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @shop_region_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'shop' AND COLUMN_NAME = 'region'
+);
+SET @sql = IF(@shop_region_exists = 0,
+  'ALTER TABLE `shop` ADD COLUMN `region` VARCHAR(100) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @shop_contact_name_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'shop' AND COLUMN_NAME = 'contact_name'
+);
+SET @sql = IF(@shop_contact_name_exists = 0,
+  'ALTER TABLE `shop` ADD COLUMN `contact_name` VARCHAR(50) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @shop_contact_phone_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'shop' AND COLUMN_NAME = 'contact_phone'
+);
+SET @sql = IF(@shop_contact_phone_exists = 0,
+  'ALTER TABLE `shop` ADD COLUMN `contact_phone` VARCHAR(20) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @shop_id_card_no_masked_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'shop' AND COLUMN_NAME = 'id_card_no_masked'
+);
+SET @sql = IF(@shop_id_card_no_masked_exists = 0,
+  'ALTER TABLE `shop` ADD COLUMN `id_card_no_masked` VARCHAR(50) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @shop_warehouse_addr_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'shop' AND COLUMN_NAME = 'warehouse_addr'
+);
+SET @sql = IF(@shop_warehouse_addr_exists = 0,
+  'ALTER TABLE `shop` ADD COLUMN `warehouse_addr` VARCHAR(255) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 CREATE TABLE IF NOT EXISTS `product` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,

@@ -10,13 +10,16 @@ import com.segroup8.platform.dto.MerchantApplicationRejectRequest;
 import com.segroup8.platform.dto.MerchantApplicationSubmitRequest;
 import com.segroup8.platform.entity.MerchantApplication;
 import com.segroup8.platform.entity.Notification;
+import com.segroup8.platform.entity.Shop;
 import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.MerchantApplicationMapper;
 import com.segroup8.platform.mapper.NotificationMapper;
+import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.MerchantApplicationService;
 import com.segroup8.platform.vo.MerchantApplicationVO;
 import com.segroup8.platform.vo.PageVO;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -30,13 +33,16 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
     private final MerchantApplicationMapper merchantApplicationMapper;
     private final UserMapper userMapper;
     private final NotificationMapper notificationMapper;
+    private final ShopMapper shopMapper;
 
     public MerchantApplicationServiceImpl(MerchantApplicationMapper merchantApplicationMapper,
             UserMapper userMapper,
-            NotificationMapper notificationMapper) {
+            NotificationMapper notificationMapper,
+            ShopMapper shopMapper) {
         this.merchantApplicationMapper = merchantApplicationMapper;
         this.userMapper = userMapper;
         this.notificationMapper = notificationMapper;
+        this.shopMapper = shopMapper;
     }
 
     @Override
@@ -85,7 +91,7 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
             return null;
         }
         User user = userMapper.selectById(application.getUserId());
-        return toVO(application, user);
+        return toVO(application, user, false);
     }
 
     @Override
@@ -99,7 +105,7 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
         Page<MerchantApplication> page = merchantApplicationMapper
                 .selectPage(Page.of(request.getPageNum(), request.getPageSize()), wrapper);
         List<MerchantApplicationVO> records = page.getRecords().stream()
-                .map(app -> toVO(app, userMapper.selectById(app.getUserId()))).toList();
+            .map(app -> toVO(app, userMapper.selectById(app.getUserId()), true)).toList();
 
         PageVO<MerchantApplicationVO> result = new PageVO<>();
         result.setTotal(page.getTotal());
@@ -109,6 +115,7 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
         return result;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void approve(Long applicationId) {
         assertAdmin();
@@ -128,7 +135,12 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
             throw new BusinessException(404, "申请用户不存在");
         }
         user.setRole(RoleEnum.OFFICIAL_SELLER.name());
+        user.setShopName(app.getStoreName());
+        user.setCategory(app.getCategoryId() == null ? null : String.valueOf(app.getCategoryId()));
+        user.setRegion(buildRegion(app.getWarehouseProvince(), app.getWarehouseCity()));
         userMapper.updateById(user);
+
+        upsertShopByApplication(app);
 
         Notification notification = new Notification();
         notification.setUserId(user.getId());
@@ -159,15 +171,15 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
         notificationMapper.insert(notification);
     }
 
-    private MerchantApplicationVO toVO(MerchantApplication app, User user) {
+    private MerchantApplicationVO toVO(MerchantApplication app, User user, boolean includeSensitive) {
         MerchantApplicationVO vo = new MerchantApplicationVO();
         vo.setId(app.getId());
         vo.setUserId(app.getUserId());
         vo.setUsername(user != null ? user.getUsername() : "");
         vo.setStoreName(app.getStoreName());
         vo.setCategoryId(app.getCategoryId());
-        vo.setIdCardNo(maskMiddle(app.getIdCardNo()));
-        vo.setBankCardNo(maskMiddle(app.getBankCardNo()));
+        vo.setIdCardNo(includeSensitive ? maskMiddle(app.getIdCardNo()) : null);
+        vo.setBankCardNo(includeSensitive ? maskMiddle(app.getBankCardNo()) : null);
         vo.setLicenseImg(app.getLicenseImg());
         vo.setWarehouseAddr(app.getWarehouseAddr());
         String[] warehouseParts = parseWarehouseParts(app);
@@ -180,6 +192,37 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
         vo.setRejectReason(app.getRejectReason());
         vo.setApplyTime(app.getApplyTime());
         return vo;
+    }
+
+    private void upsertShopByApplication(MerchantApplication app) {
+        Shop shop = shopMapper.selectOne(new LambdaQueryWrapper<Shop>()
+                .eq(Shop::getOwnerUserId, app.getUserId())
+                .orderByDesc(Shop::getId)
+                .last("limit 1"));
+        if (shop == null) {
+            shop = new Shop();
+            shop.setOwnerUserId(app.getUserId());
+            shop.setStatus(1);
+            applyShopBackfillFromApplication(shop, app);
+            shopMapper.insert(shop);
+            return;
+        }
+        shop.setStatus(1);
+        applyShopBackfillFromApplication(shop, app);
+        shopMapper.updateById(shop);
+    }
+
+    private void applyShopBackfillFromApplication(Shop shop, MerchantApplication app) {
+        shop.setName(app.getStoreName());
+        shop.setRegion(buildRegion(app.getWarehouseProvince(), app.getWarehouseCity()));
+        shop.setContactName(app.getContactName());
+        shop.setContactPhone(app.getContactPhone());
+        shop.setIdCardNoMasked(maskMiddle(app.getIdCardNo()));
+        shop.setWarehouseAddr(buildWarehouseAddr(
+                app.getWarehouseProvince(),
+                app.getWarehouseCity(),
+                app.getWarehouseDetail(),
+                app.getWarehouseAddr()));
     }
 
     private Long requireUserId() {
@@ -234,5 +277,12 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
             return new String[] { tokens[0], tokens[1], "" };
         }
         return new String[] { tokens[0], tokens[1], tokens[2] };
+    }
+
+    private String buildRegion(String province, String city) {
+        if (StringUtils.hasText(province) && StringUtils.hasText(city)) {
+            return province + " " + city;
+        }
+        return StringUtils.hasText(province) ? province : city;
     }
 }

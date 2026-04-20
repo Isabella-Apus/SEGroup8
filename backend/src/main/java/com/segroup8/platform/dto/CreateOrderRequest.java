@@ -12,6 +12,8 @@ public class CreateOrderRequest {
     @Valid
     private List<CreateOrderItemRequest> items;
 
+    private Long addressId;
+
     @Size(max = 255, message = "备注长度不能超过255")
     private String remark;
 
@@ -29,5 +31,13 @@ public class CreateOrderRequest {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public Long getAddressId() {
+        return addressId;
+    }
+
+    public void setAddressId(Long addressId) {
+        this.addressId = addressId;
     }
 }

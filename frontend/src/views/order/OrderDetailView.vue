@@ -134,7 +134,14 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-if="!isSellerView" v-model="refundDialogVisible" title="申请退货/退款" width="520px">
+    <el-dialog
+      v-if="!isSellerView"
+      v-model="refundDialogVisible"
+      title="申请退货/退款"
+      width="520px"
+      align-center
+      append-to-body
+    >
       <el-form label-width="90px">
         <el-form-item label="退款方式">
           <el-radio-group v-model="refundForm.mode">

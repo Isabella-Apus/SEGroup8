@@ -7,8 +7,12 @@ import com.segroup8.platform.dto.AddressSaveRequest;
 import com.segroup8.platform.dto.MerchantApplicationSubmitRequest;
 import com.segroup8.platform.dto.UserProfileUpdateRequest;
 import com.segroup8.platform.entity.Address;
+import com.segroup8.platform.entity.MerchantApplication;
+import com.segroup8.platform.entity.Shop;
 import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.AddressMapper;
+import com.segroup8.platform.mapper.MerchantApplicationMapper;
+import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.MerchantApplicationService;
 import com.segroup8.platform.service.UserService;
@@ -16,6 +20,7 @@ import com.segroup8.platform.vo.AddressVO;
 import com.segroup8.platform.vo.MerchantApplicationVO;
 import com.segroup8.platform.vo.UserVO;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -25,13 +30,19 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final AddressMapper addressMapper;
     private final MerchantApplicationService merchantApplicationService;
+    private final ShopMapper shopMapper;
+    private final MerchantApplicationMapper merchantApplicationMapper;
 
     public UserServiceImpl(UserMapper userMapper,
             AddressMapper addressMapper,
-            MerchantApplicationService merchantApplicationService) {
+            MerchantApplicationService merchantApplicationService,
+            ShopMapper shopMapper,
+            MerchantApplicationMapper merchantApplicationMapper) {
         this.userMapper = userMapper;
         this.addressMapper = addressMapper;
         this.merchantApplicationService = merchantApplicationService;
+        this.shopMapper = shopMapper;
+        this.merchantApplicationMapper = merchantApplicationMapper;
     }
 
     @Override
@@ -63,6 +74,38 @@ public class UserServiceImpl implements UserService {
         vo.setReturnPolicy(user.getReturnPolicy());
         vo.setShippingPolicy(user.getShippingPolicy());
         vo.setAnnouncement(user.getAnnouncement());
+
+        Shop shop = findLatestShopByOwner(userId);
+        MerchantApplication approvedApp = findLatestApprovedApplication(userId);
+        if (shop == null && approvedApp != null) {
+            shop = new Shop();
+            shop.setOwnerUserId(userId);
+            shop.setStatus(1);
+            applyShopBackfill(shop, approvedApp);
+            shopMapper.insert(shop);
+        } else if (shop != null && approvedApp != null) {
+            boolean changed = applyShopBackfillIfBlank(shop, approvedApp);
+            if (changed) {
+                shopMapper.updateById(shop);
+            }
+        }
+
+        if (shop != null) {
+            if (StringUtils.hasText(shop.getName())) {
+                vo.setShopName(shop.getName());
+            }
+            if (StringUtils.hasText(shop.getRegion())) {
+                vo.setRegion(shop.getRegion());
+            }
+            vo.setShopContactName(shop.getContactName());
+            vo.setShopContactPhone(shop.getContactPhone());
+            vo.setWarehouseAddr(shop.getWarehouseAddr());
+            vo.setIdCardNoMasked(shop.getIdCardNoMasked());
+        }
+
+        if (!StringUtils.hasText(vo.getCategory()) && approvedApp != null) {
+            vo.setCategory(mapCategoryLabel(approvedApp.getCategoryId()));
+        }
         return vo;
     }
 
@@ -74,11 +117,8 @@ public class UserServiceImpl implements UserService {
         update.setAvatar(request.getAvatar());
         update.setPhone(request.getPhone());
         update.setEmail(request.getEmail());
-        update.setShopName(request.getShopName());
         update.setShopDesc(request.getShopDesc());
         update.setBannerUrl(request.getBannerUrl());
-        update.setCategory(request.getCategory());
-        update.setRegion(request.getRegion());
         update.setBusinessHours(request.getBusinessHours());
         update.setReturnPolicy(request.getReturnPolicy());
         update.setShippingPolicy(request.getShippingPolicy());
@@ -181,5 +221,104 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(401, "未登录");
         }
         return userId;
+    }
+
+    private Shop findLatestShopByOwner(Long userId) {
+        return shopMapper.selectOne(new LambdaQueryWrapper<Shop>()
+                .eq(Shop::getOwnerUserId, userId)
+                .orderByDesc(Shop::getId)
+                .last("limit 1"));
+    }
+
+    private MerchantApplication findLatestApprovedApplication(Long userId) {
+        return merchantApplicationMapper.selectOne(new LambdaQueryWrapper<MerchantApplication>()
+                .eq(MerchantApplication::getUserId, userId)
+                .eq(MerchantApplication::getStatus, 1)
+                .orderByDesc(MerchantApplication::getId)
+                .last("limit 1"));
+    }
+
+    private void applyShopBackfill(Shop shop, MerchantApplication app) {
+        shop.setName(app.getStoreName());
+        shop.setRegion(buildRegion(app.getWarehouseProvince(), app.getWarehouseCity()));
+        shop.setContactName(app.getContactName());
+        shop.setContactPhone(app.getContactPhone());
+        shop.setIdCardNoMasked(maskMiddle(app.getIdCardNo()));
+        shop.setWarehouseAddr(buildWarehouseAddr(
+                app.getWarehouseProvince(),
+                app.getWarehouseCity(),
+                app.getWarehouseDetail(),
+                app.getWarehouseAddr()));
+    }
+
+    private boolean applyShopBackfillIfBlank(Shop shop, MerchantApplication app) {
+        boolean changed = false;
+        if (!StringUtils.hasText(shop.getName()) && StringUtils.hasText(app.getStoreName())) {
+            shop.setName(app.getStoreName());
+            changed = true;
+        }
+        String region = buildRegion(app.getWarehouseProvince(), app.getWarehouseCity());
+        if (!StringUtils.hasText(shop.getRegion()) && StringUtils.hasText(region)) {
+            shop.setRegion(region);
+            changed = true;
+        }
+        if (!StringUtils.hasText(shop.getContactName()) && StringUtils.hasText(app.getContactName())) {
+            shop.setContactName(app.getContactName());
+            changed = true;
+        }
+        if (!StringUtils.hasText(shop.getContactPhone()) && StringUtils.hasText(app.getContactPhone())) {
+            shop.setContactPhone(app.getContactPhone());
+            changed = true;
+        }
+        String maskedIdCard = maskMiddle(app.getIdCardNo());
+        if (!StringUtils.hasText(shop.getIdCardNoMasked()) && StringUtils.hasText(maskedIdCard)) {
+            shop.setIdCardNoMasked(maskedIdCard);
+            changed = true;
+        }
+        String warehouseAddr = buildWarehouseAddr(
+                app.getWarehouseProvince(),
+                app.getWarehouseCity(),
+                app.getWarehouseDetail(),
+                app.getWarehouseAddr());
+        if (!StringUtils.hasText(shop.getWarehouseAddr()) && StringUtils.hasText(warehouseAddr)) {
+            shop.setWarehouseAddr(warehouseAddr);
+            changed = true;
+        }
+        return changed;
+    }
+
+    private String buildRegion(String province, String city) {
+        if (StringUtils.hasText(province) && StringUtils.hasText(city)) {
+            return province + " " + city;
+        }
+        return StringUtils.hasText(province) ? province : city;
+    }
+
+    private String buildWarehouseAddr(String province, String city, String detail, String fallback) {
+        if (StringUtils.hasText(province) && StringUtils.hasText(city) && StringUtils.hasText(detail)) {
+            return province + " " + city + " " + detail;
+        }
+        return fallback;
+    }
+
+    private String maskMiddle(String val) {
+        if (!StringUtils.hasText(val) || val.length() <= 6) {
+            return val;
+        }
+        return val.substring(0, 3) + "****" + val.substring(val.length() - 3);
+    }
+
+    private String mapCategoryLabel(Integer categoryId) {
+        if (categoryId == null) {
+            return null;
+        }
+        return switch (categoryId) {
+            case 1 -> "食品";
+            case 2 -> "3C";
+            case 3 -> "美妆";
+            case 4 -> "服装";
+            case 5 -> "运动";
+            default -> String.valueOf(categoryId);
+        };
     }
 }
