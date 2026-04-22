@@ -7,66 +7,59 @@
     <el-container>
       <el-aside width="220px" class="layout-aside">
         <el-menu :default-active="$route.path" router class="layout-menu" :default-openeds="openeds">
-
-          <!-- 订单 -->
           <el-sub-menu index="order">
             <template #title>
-              <span class="menu-group-title">📦 订单</span>
+              <span class="menu-group-title">订单</span>
             </template>
             <el-menu-item index="/merchant/orders">订单管理</el-menu-item>
           </el-sub-menu>
 
-          <!-- 商品 -->
           <el-sub-menu index="product">
             <template #title>
-              <span class="menu-group-title">🛍️ 商品</span>
+              <span class="menu-group-title">商品</span>
             </template>
             <el-menu-item index="/merchant">我的商品</el-menu-item>
-            <el-menu-item index="/merchant/seller-products/edit">发布新商品</el-menu-item>
+            <el-menu-item index="/merchant/seller-products/edit">发布商品</el-menu-item>
           </el-sub-menu>
 
-          <!-- 营销 -->
           <el-sub-menu index="marketing">
             <template #title>
-              <span class="menu-group-title">🎯 营销</span>
+              <span class="menu-group-title">营销</span>
             </template>
             <el-menu-item index="/merchant/vouchers">优惠券</el-menu-item>
           </el-sub-menu>
 
-          <!-- 财务 -->
           <el-sub-menu index="finance">
             <template #title>
-              <span class="menu-group-title">💰 财务</span>
+              <span class="menu-group-title">财务</span>
             </template>
             <el-menu-item index="/merchant/finance">财务看板</el-menu-item>
           </el-sub-menu>
 
-          <!-- 数据 -->
           <el-sub-menu index="data">
             <template #title>
-              <span class="menu-group-title">📊 数据</span>
+              <span class="menu-group-title">数据</span>
             </template>
-            <el-menu-item index="/merchant/seller-dashboard">数据看板</el-menu-item>
-            <el-menu-item index="/merchant/account-health">账户信誉</el-menu-item>
+            <el-menu-item index="/merchant/seller-dashboard">数据分析</el-menu-item>
+            <el-menu-item index="/merchant/account-health">账户健康</el-menu-item>
           </el-sub-menu>
 
-          <!-- 客服 -->
           <el-sub-menu index="service">
             <template #title>
-              <span class="menu-group-title">💬 客服</span>
+              <span class="menu-group-title">客服</span>
             </template>
             <el-menu-item index="/merchant/reviews">评价管理</el-menu-item>
+            <el-menu-item index="/merchant/messages">买家消息</el-menu-item>
+            <el-menu-item index="/merchant/notifications">通知</el-menu-item>
           </el-sub-menu>
 
-          <!-- 店铺 -->
           <el-sub-menu index="shop">
             <template #title>
-              <span class="menu-group-title">🏪 店铺</span>
+              <span class="menu-group-title">店铺</span>
             </template>
-            <el-menu-item index="/merchant/seller-shop">店铺信息</el-menu-item>
+            <el-menu-item index="/merchant/seller-shop">店铺资料</el-menu-item>
             <el-menu-item index="/merchant/shop-decoration">店铺装修</el-menu-item>
           </el-sub-menu>
-
         </el-menu>
       </el-aside>
       <el-main class="layout-main fade-in-up">
@@ -77,9 +70,10 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router'
-const router = useRouter()
-const openeds = ['order', 'product', 'marketing', 'finance', 'data', 'service', 'shop']
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+const openeds = ["order", "product", "marketing", "finance", "data", "service", "shop"];
 </script>
 
 <style scoped>

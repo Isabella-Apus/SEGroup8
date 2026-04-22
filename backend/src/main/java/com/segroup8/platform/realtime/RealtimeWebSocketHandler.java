@@ -1,6 +1,10 @@
 package com.segroup8.platform.realtime;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.segroup8.platform.common.BusinessException;
+import com.segroup8.platform.service.ChatService;
+import com.segroup8.platform.vo.ChatMessageVO;
 import com.segroup8.platform.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
 import org.springframework.lang.NonNull;
@@ -13,16 +17,26 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 @Component
 public class RealtimeWebSocketHandler extends TextWebSocketHandler {
 
+    private static final String USER_ID_ATTR = "uid";
+
     private final JwtUtils jwtUtils;
     private final RealtimePushService realtimePushService;
+    private final ChatService chatService;
+    private final ObjectMapper objectMapper;
 
-    public RealtimeWebSocketHandler(JwtUtils jwtUtils, RealtimePushService realtimePushService) {
+    public RealtimeWebSocketHandler(JwtUtils jwtUtils,
+            RealtimePushService realtimePushService,
+            ChatService chatService,
+            ObjectMapper objectMapper) {
         this.jwtUtils = jwtUtils;
         this.realtimePushService = realtimePushService;
+        this.chatService = chatService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -55,7 +69,42 @@ public class RealtimeWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(@NonNull WebSocketSession session, @NonNull TextMessage message) {
-        // heartbeat passthrough
+        Object uidObj = session.getAttributes().get(USER_ID_ATTR);
+        Long userId = uidObj == null ? null : Long.valueOf(String.valueOf(uidObj));
+        if (userId == null) {
+            return;
+        }
+        try {
+            JsonNode root = objectMapper.readTree(message.getPayload());
+            String eventType = root.path("eventType").asText("");
+            if ("PING".equalsIgnoreCase(eventType)) {
+                session.sendMessage(new TextMessage("{\"eventType\":\"PONG\"}"));
+                return;
+            }
+            if (!"CHAT_SEND".equalsIgnoreCase(eventType)) {
+                return;
+            }
+            JsonNode payload = root.path("payload");
+            Long conversationId = payload.path("conversationId").isNumber()
+                    ? payload.path("conversationId").asLong()
+                    : null;
+            String content = payload.path("content").asText("");
+            ChatMessageVO chatMessage = chatService.sendMessage(userId, conversationId, content);
+            realtimePushService.pushToUsers(
+                    java.util.List.of(chatMessage.getSenderUserId(), chatMessage.getReceiverUserId()),
+                    "CHAT_MESSAGE",
+                    chatMessage);
+        } catch (BusinessException ex) {
+            try {
+                session.sendMessage(new TextMessage(objectMapper.writeValueAsString(Map.of(
+                        "eventType", "CHAT_ERROR",
+                        "payload", Map.of("message", ex.getMessage())))));
+            } catch (Exception ignored) {
+                // ignore secondary send failure
+            }
+        } catch (Exception ignored) {
+            // ignore malformed payload
+        }
     }
 
     private String getToken(URI uri) {

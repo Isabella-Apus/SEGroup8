@@ -108,6 +108,7 @@
             <el-button v-if="order.orderStatus === 3" size="small" type="primary" @click="goReview(order.id)">去评价</el-button>
             <el-button v-if="canRefund(order.orderStatus, order.refundStatus)" size="small" type="danger" plain @click="openRefundDialog(order.id)">申请退货</el-button>
             <el-button size="small" @click="goDetail(order.id)">查看详情</el-button>
+            <el-button v-if="getOrderPrimarySeller(order)?.sellerUserId" size="small" type="success" plain @click="contactSeller(order)">联系卖家</el-button>
           </el-space>
         </div>
       </el-card>
@@ -356,6 +357,25 @@ function formatTime(value) {
 
 function goDetail(id) {
   router.push(`/order/${id}`);
+}
+
+function getOrderPrimarySeller(order) {
+  const items = order?.items || [];
+  return items.find((item) => item?.sellerUserId) || null;
+}
+
+function contactSeller(order) {
+  const seller = getOrderPrimarySeller(order);
+  if (!seller?.sellerUserId) {
+    showOrderActionError({ message: '未找到卖家信息' }, '联系卖家失败');
+    return;
+  }
+  router.push({
+    path: '/messages',
+    query: {
+      participantId: seller.sellerUserId
+    }
+  });
 }
 
 async function pay(orderId) {

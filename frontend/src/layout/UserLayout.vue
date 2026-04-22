@@ -4,9 +4,9 @@
       <strong class="brand">购物与二手交易平台</strong>
       <div class="header-actions">
         <el-space>
-          <span class="nickname">{{ userStore.userInfo?.nickname || userStore.userInfo?.username || '游客' }}</span>
+          <span class="nickname">{{ userStore.userInfo?.nickname || userStore.userInfo?.username || "游客" }}</span>
           <el-button size="small" @click="goProfile">个人中心</el-button>
-          <el-button size="small" type="danger" @click="handleLogout">退出</el-button>
+          <el-button size="small" type="danger" @click="handleLogout">退出登录</el-button>
         </el-space>
       </div>
     </el-header>
@@ -17,8 +17,10 @@
           <el-menu-item index="/product">商品</el-menu-item>
           <el-menu-item index="/cart">购物车</el-menu-item>
           <el-menu-item index="/order">我的订单</el-menu-item>
-          <el-menu-item index="/secondhand">二手</el-menu-item>
+          <el-menu-item index="/secondhand">二手商品</el-menu-item>
           <el-menu-item index="/secondhand/publish">发布二手</el-menu-item>
+          <el-menu-item index="/messages">站内消息</el-menu-item>
+          <el-menu-item index="/notifications">通知</el-menu-item>
           <el-menu-item index="/profile">个人资料</el-menu-item>
           <el-menu-item index="/addresses">地址管理</el-menu-item>
           <el-menu-item index="/my-reviews">我的评价</el-menu-item>
@@ -36,19 +38,19 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/user';
+import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/user";
 
 const router = useRouter();
 const userStore = useUserStore();
 
 function handleLogout() {
   userStore.logout();
-  router.push('/login');
+  router.push("/login");
 }
 
 function goProfile() {
-  router.push('/profile');
+  router.push("/profile");
 }
 </script>
 

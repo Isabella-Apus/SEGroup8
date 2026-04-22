@@ -27,9 +27,10 @@ import com.segroup8.platform.entity.Product;
 import com.segroup8.platform.entity.Review;
 import com.segroup8.platform.entity.SecondhandProduct;
 import com.segroup8.platform.entity.Shop;
+import com.segroup8.platform.entity.User;
 import com.segroup8.platform.entity.Address;
-import com.segroup8.platform.entity.OrderAfterSaleLog;
 import com.segroup8.platform.entity.Notification;
+import com.segroup8.platform.entity.OrderAfterSaleLog;
 import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.OrderItemMapper;
 import com.segroup8.platform.mapper.ProductMapper;
@@ -38,10 +39,11 @@ import com.segroup8.platform.mapper.ReviewMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.AddressMapper;
-import com.segroup8.platform.mapper.NotificationMapper;
+import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.realtime.RealtimePushService;
 import com.segroup8.platform.service.OrderService;
 import com.segroup8.platform.service.LogisticsService;
+import com.segroup8.platform.service.NotificationService;
 import com.segroup8.platform.service.settlement.EscrowSettlementService;
 import com.segroup8.platform.vo.OrderItemVO;
 import com.segroup8.platform.vo.OrderVO;
@@ -74,8 +76,9 @@ public class OrderServiceImpl implements OrderService {
     private final ReviewMapper reviewMapper;
     private final SecondhandProductMapper secondhandProductMapper;
     private final ShopMapper shopMapper;
+    private final UserMapper userMapper;
     private final AddressMapper addressMapper;
-    private final NotificationMapper notificationMapper;
+    private final NotificationService notificationService;
     private final OrderAfterSaleLogMapper orderAfterSaleLogMapper;
     private final RealtimePushService realtimePushService;
     private final LogisticsService logisticsService;
@@ -84,7 +87,8 @@ public class OrderServiceImpl implements OrderService {
     public OrderServiceImpl(OrderInfoMapper orderInfoMapper, OrderItemMapper orderItemMapper,
             ProductMapper productMapper, ReviewMapper reviewMapper, SecondhandProductMapper secondhandProductMapper,
             ShopMapper shopMapper,
-            AddressMapper addressMapper, NotificationMapper notificationMapper,
+            UserMapper userMapper,
+            AddressMapper addressMapper, NotificationService notificationService,
             OrderAfterSaleLogMapper orderAfterSaleLogMapper,
             RealtimePushService realtimePushService, LogisticsService logisticsService,
             EscrowSettlementService escrowSettlementService) {
@@ -94,8 +98,9 @@ public class OrderServiceImpl implements OrderService {
         this.reviewMapper = reviewMapper;
         this.secondhandProductMapper = secondhandProductMapper;
         this.shopMapper = shopMapper;
+        this.userMapper = userMapper;
         this.addressMapper = addressMapper;
-        this.notificationMapper = notificationMapper;
+        this.notificationService = notificationService;
         this.orderAfterSaleLogMapper = orderAfterSaleLogMapper;
         this.realtimePushService = realtimePushService;
         this.logisticsService = logisticsService;
@@ -858,7 +863,7 @@ public class OrderServiceImpl implements OrderService {
         n.setTitle("买家提醒发货");
         n.setContent("订单号：" + order.getOrderNo() + "，请尽快发货。");
         n.setIsRead(0);
-        notificationMapper.insert(n);
+        notificationService.createNotification(sellerUserId, n.getTitle(), n.getContent());
         pushOrderRealtime(orderId, order.getBuyerUserId(), List.of(sellerUserId), "ORDER_REMIND_SHIP", "买家已发起提醒发货");
     }
 
@@ -1003,6 +1008,25 @@ public class OrderServiceImpl implements OrderService {
             SecondhandProduct secondhand = secondhandProductMapper.selectById(item.getProductId());
             if (secondhand != null) {
                 vo.setConditionLevel(secondhand.getConditionLevel());
+                vo.setSellerUserId(secondhand.getSellerUserId());
+                User seller = secondhand.getSellerUserId() == null ? null : userMapper.selectById(secondhand.getSellerUserId());
+                if (seller != null) {
+                    vo.setSellerName(StringUtils.hasText(seller.getNickname()) ? seller.getNickname() : seller.getUsername());
+                }
+            }
+        } else {
+            Product product = productMapper.selectById(item.getProductId());
+            if (product != null) {
+                Shop shop = shopMapper.selectById(product.getShopId());
+                if (shop != null) {
+                    vo.setSellerUserId(shop.getOwnerUserId());
+                    User seller = shop.getOwnerUserId() == null ? null : userMapper.selectById(shop.getOwnerUserId());
+                    if (seller != null) {
+                        vo.setSellerName(StringUtils.hasText(seller.getNickname()) ? seller.getNickname() : seller.getUsername());
+                    } else {
+                        vo.setSellerName(shop.getName());
+                    }
+                }
             }
         }
         return vo;
@@ -1060,8 +1084,43 @@ public class OrderServiceImpl implements OrderService {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("orderId", orderId);
         payload.put("message", message);
+        createOrderNotification(buyerUserId, buildBuyerNotificationTitle(eventType), orderId, message);
+        for (Long sellerUserId : sellerUserIds) {
+            createOrderNotification(sellerUserId, buildSellerNotificationTitle(eventType), orderId, message);
+        }
         realtimePushService.pushToUser(buyerUserId, eventType, payload);
         realtimePushService.pushToUsers(sellerUserIds, eventType, payload);
+    }
+
+    private void createOrderNotification(Long userId, String title, Long orderId, String message) {
+        if (userId == null || !StringUtils.hasText(title) || !StringUtils.hasText(message)) {
+            return;
+        }
+        Notification notification = new Notification();
+        notification.setUserId(userId);
+        notification.setTitle(title);
+        notification.setContent("订单#" + orderId + "：" + message.trim());
+        notification.setIsRead(0);
+        notification.setCreateTime(LocalDateTime.now());
+        notificationService.createNotification(userId, title, notification.getContent());
+    }
+
+    private String buildBuyerNotificationTitle(String eventType) {
+        return switch (String.valueOf(eventType).toUpperCase()) {
+            case "LOGISTICS_UPDATED" -> "物流通知";
+            case "AFTER_SALE_UPDATED" -> "售后通知";
+            case "ORDER_REMIND_SHIP" -> "订单通知";
+            default -> "订单通知";
+        };
+    }
+
+    private String buildSellerNotificationTitle(String eventType) {
+        return switch (String.valueOf(eventType).toUpperCase()) {
+            case "AFTER_SALE_UPDATED" -> "售后提醒";
+            case "ORDER_REMIND_SHIP" -> "催发货提醒";
+            case "LOGISTICS_UPDATED" -> "物流同步";
+            default -> "店铺订单提醒";
+        };
     }
 
     private void restoreStockForNewItems(Long orderId) {

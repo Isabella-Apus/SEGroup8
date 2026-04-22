@@ -11,9 +11,11 @@ import com.segroup8.platform.dto.SecondhandProductSaveRequest;
 import com.segroup8.platform.entity.OrderInfo;
 import com.segroup8.platform.entity.OrderItem;
 import com.segroup8.platform.entity.SecondhandProduct;
+import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.OrderItemMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
+import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
 import com.segroup8.platform.service.SecondhandProductService;
 import com.segroup8.platform.vo.OrderItemVO;
@@ -40,15 +42,18 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
     private final SecondhandProductMapper secondhandProductMapper;
     private final OrderInfoMapper orderInfoMapper;
     private final OrderItemMapper orderItemMapper;
+    private final UserMapper userMapper;
     private final BrowseHistoryService browseHistoryService;
 
     public SecondhandProductServiceImpl(SecondhandProductMapper secondhandProductMapper,
             OrderInfoMapper orderInfoMapper,
             OrderItemMapper orderItemMapper,
+            UserMapper userMapper,
             BrowseHistoryService browseHistoryService) {
         this.secondhandProductMapper = secondhandProductMapper;
         this.orderInfoMapper = orderInfoMapper;
         this.orderItemMapper = orderItemMapper;
+        this.userMapper = userMapper;
         this.browseHistoryService = browseHistoryService;
     }
 
@@ -261,6 +266,10 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         SecondhandProductVO vo = new SecondhandProductVO();
         vo.setId(product.getId());
         vo.setSellerUserId(product.getSellerUserId());
+        User seller = product.getSellerUserId() == null ? null : userMapper.selectById(product.getSellerUserId());
+        if (seller != null) {
+            vo.setSellerName(StringUtils.hasText(seller.getNickname()) ? seller.getNickname() : seller.getUsername());
+        }
         vo.setName(product.getName());
         vo.setCover(product.getCover());
         vo.setDescription(product.getDescription());

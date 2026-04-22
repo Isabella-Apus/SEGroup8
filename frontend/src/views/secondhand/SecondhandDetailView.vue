@@ -13,29 +13,32 @@
         <h3>{{ item.name }}</h3>
         <p class="price">￥{{ Number(item.salePrice || 0).toFixed(2) }}</p>
         <p class="origin">原价：￥{{ Number(item.originPrice || item.salePrice || 0).toFixed(2) }}</p>
-        <p>成色：{{ item.conditionLevel || item.condition || '未标注' }}</p>
-        <p>状态：{{ item.statusName || '在售' }}</p>
-        <p class="desc">{{ item.description || '暂无商品描述' }}</p>
+        <p>成色：{{ item.conditionLevel || item.condition || "未知" }}</p>
+        <p>状态：{{ item.statusName || "在售" }}</p>
+        <p v-if="item.sellerName">卖家：{{ item.sellerName }}</p>
+        <p class="desc">{{ item.description || "暂无商品描述" }}</p>
 
-        <p class="desc">二手商品仅支持单件购买，提交后将自动下单。</p>
+        <p class="desc">二手商品仅支持单件下单购买。</p>
 
         <el-space>
           <el-button type="primary" @click="handleBuyNow" :disabled="!canBuy">立即购买</el-button>
+          <el-button v-if="canChatWithSeller" type="success" plain @click="handleContactSeller">联系卖家</el-button>
           <el-button type="primary" plain @click="router.push('/secondhand/publish')">我也要发布</el-button>
-          <el-button text @click="router.push('/secondhand')">返回列表</el-button>
+          <el-button text @click="router.push('/secondhand')">返回</el-button>
         </el-space>
       </div>
     </div>
 
-    <p v-else class="empty-tip">二手商品不存在或已下架</p>
+    <p v-else class="empty-tip">二手商品不存在</p>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
-import { ElMessage } from 'element-plus';
-import { useRoute, useRouter } from 'vue-router';
-import { buySecondhandApi, getSecondhandDetailApi } from '@/api/secondhand';
+import { computed, onMounted, ref } from "vue";
+import { ElMessage } from "element-plus";
+import { useRoute, useRouter } from "vue-router";
+import { buySecondhandApi, getSecondhandDetailApi } from "@/api/secondhand";
+import { getUser } from "@/utils/storage";
 
 const route = useRoute();
 const router = useRouter();
@@ -44,6 +47,12 @@ const loading = ref(false);
 const item = ref(null);
 
 const canBuy = computed(() => !!item.value && Number(item.value.status || 1) === 1);
+const canChatWithSeller = computed(() => {
+  if (!item.value?.sellerUserId) {
+    return false;
+  }
+  return Number(item.value.sellerUserId) !== Number(getUser()?.id);
+});
 
 onMounted(async () => {
   await fetchDetail();
@@ -61,22 +70,37 @@ async function fetchDetail() {
 
 async function handleBuyNow() {
   if (!canBuy.value) {
-    ElMessage.warning('当前商品不可购买');
+    ElMessage.warning("当前商品暂不可购买");
     return;
   }
   await buySecondhandApi(item.value.id, {});
-  ElMessage.success('购买成功');
-  router.push('/order');
+  ElMessage.success("购买成功");
+  router.push("/order");
+}
+
+function handleContactSeller() {
+  if (!item.value?.sellerUserId) {
+    ElMessage.warning("当前无法联系卖家");
+    return;
+  }
+  router.push({
+    path: "/messages",
+    query: {
+      participantId: item.value.sellerUserId,
+      sourceType: "SECONDHAND",
+      sourceId: item.value.id,
+    },
+  });
 }
 
 function toFullImageUrl(url) {
   if (!url) {
-    return '';
+    return "";
   }
-  if (url.startsWith('http://') || url.startsWith('https://')) {
+  if (url.startsWith("http://") || url.startsWith("https://")) {
     return url;
   }
-  const normalized = url.startsWith('/') ? url : `/${url}`;
+  const normalized = url.startsWith("/") ? url : `/${url}`;
   return `http://localhost:8080${normalized}`;
 }
 </script>

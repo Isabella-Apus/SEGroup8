@@ -95,6 +95,16 @@ const routes = [
                 component: () => import("@/views/order/AfterSaleView.vue"),
             },
             {
+                path: "messages",
+                name: "messages",
+                component: () => import("@/views/chat/ChatView.vue"),
+            },
+            {
+                path: "notifications",
+                name: "notifications",
+                component: () => import("@/views/notification/NotificationView.vue"),
+            },
+            {
                 path: "merchant-apply",
                 name: "merchantApply",
                 component: () => import("@/views/user/MerchantApplyView.vue"),
@@ -135,6 +145,16 @@ const routes = [
                 name: "merchantReviews",
                 component: () =>
                     import("@/views/merchant/MerchantReviewsView.vue"),
+            },
+            {
+                path: "messages",
+                name: "merchantMessages",
+                component: () => import("@/views/chat/ChatView.vue"),
+            },
+            {
+                path: "notifications",
+                name: "merchantNotifications",
+                component: () => import("@/views/notification/NotificationView.vue"),
             },
             {
                 path: "shop",

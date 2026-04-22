@@ -91,6 +91,11 @@
           <template #default="scope">￥{{ Number(scope.row.price || 0).toFixed(2) }}</template>
         </el-table-column>
         <el-table-column prop="quantity" label="数量" width="100" />
+        <el-table-column v-if="!isSellerView" label="鎿嶄綔" width="140">
+          <template #default="scope">
+            <el-button v-if="scope.row.sellerUserId" size="small" type="success" plain @click="contactSellerByItem(scope.row)">联系卖家</el-button>
+          </template>
+        </el-table-column>
       </el-table>
 
       <div v-if="!isSellerView" class="actions">
@@ -356,6 +361,19 @@ function goBack() {
     return;
   }
   router.push("/order");
+}
+
+function contactSellerByItem(item) {
+  if (!item?.sellerUserId) {
+    showOrderActionError({ message: "未找到卖家信息" }, "联系卖家失败");
+    return;
+  }
+  router.push({
+    path: "/messages",
+    query: {
+      participantId: item.sellerUserId
+    }
+  });
 }
 
 function maybeOpenPayDialog() {
