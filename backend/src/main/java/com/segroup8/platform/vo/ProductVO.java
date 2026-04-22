@@ -7,6 +7,8 @@ public class ProductVO {
 
     private Long id;
     private Long shopId;
+    private Long sellerUserId;
+    private String sellerName;
     private String name;
     private String cover;
     private String description;
@@ -30,6 +32,22 @@ public class ProductVO {
 
     public void setShopId(Long shopId) {
         this.shopId = shopId;
+    }
+
+    public Long getSellerUserId() {
+        return sellerUserId;
+    }
+
+    public void setSellerUserId(Long sellerUserId) {
+        this.sellerUserId = sellerUserId;
+    }
+
+    public String getSellerName() {
+        return sellerName;
+    }
+
+    public void setSellerName(String sellerName) {
+        this.sellerName = sellerName;
     }
 
     public String getName() {

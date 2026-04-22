@@ -14,7 +14,8 @@
         <p class="price">￥{{ Number(product.price || 0).toFixed(2) }}</p>
         <p>库存：{{ product.stock }}</p>
         <p>状态：{{ product.statusName }}</p>
-        <p class="desc">{{ product.description || '暂无商品描述' }}</p>
+        <p v-if="product.sellerName">卖家：{{ product.sellerName }}</p>
+        <p class="desc">{{ product.description || "暂无商品描述" }}</p>
 
         <div class="actions">
           <span>购买数量：</span>
@@ -22,25 +23,27 @@
         </div>
 
         <el-space>
-          <el-button type="primary" @click="handleAddToCart" :disabled="maxQuantity <= 0">加入购物车</el-button>
-          <el-button @click="handleBuyNow" :disabled="maxQuantity <= 0">立即下单</el-button>
-          <el-button text @click="goBack">返回列表</el-button>
+          <el-button type="primary" :disabled="maxQuantity <= 0" @click="handleAddToCart">加入购物车</el-button>
+          <el-button :disabled="maxQuantity <= 0" @click="handleBuyNow">立即购买</el-button>
+          <el-button v-if="canChatWithSeller" type="success" plain @click="handleContactSeller">联系卖家</el-button>
+          <el-button text @click="goBack">返回</el-button>
         </el-space>
       </div>
     </div>
 
-    <p v-else class="empty-tip">商品不存在或已下架</p>
+    <p v-else class="empty-tip">商品不存在</p>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
-import { useRoute, useRouter } from 'vue-router';
-import { getProductDetailApi } from '@/api/product';
-import { createOrderApi } from '@/api/order';
-import { listAddressesApi } from '@/api/user';
-import { addToCart, removeFromCart } from '@/utils/cart';
+import { computed, onMounted, ref } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { useRoute, useRouter } from "vue-router";
+import { getProductDetailApi } from "@/api/product";
+import { createOrderApi } from "@/api/order";
+import { listAddressesApi } from "@/api/user";
+import { addToCart, removeFromCart } from "@/utils/cart";
+import { getUser } from "@/utils/storage";
 
 const route = useRoute();
 const router = useRouter();
@@ -49,11 +52,12 @@ const loading = ref(false);
 const product = ref(null);
 const quantity = ref(1);
 
-const maxQuantity = computed(() => {
-  if (!product.value) {
-    return 0;
+const maxQuantity = computed(() => Number(product.value?.stock || 0));
+const canChatWithSeller = computed(() => {
+  if (!product.value?.sellerUserId) {
+    return false;
   }
-  return Number(product.value.stock || 0);
+  return Number(product.value.sellerUserId) !== Number(getUser()?.id);
 });
 
 onMounted(async () => {
@@ -78,11 +82,11 @@ function handleAddToCart() {
     return;
   }
   if (quantity.value > maxQuantity.value) {
-    ElMessage.warning('购买数量超过库存');
+    ElMessage.warning("购买数量超过库存");
     return;
   }
   addToCart(product.value, Number(quantity.value));
-  ElMessage.success('已加入购物车');
+  ElMessage.success("已加入购物车");
 }
 
 async function handleBuyNow() {
@@ -90,7 +94,7 @@ async function handleBuyNow() {
     return;
   }
   if (quantity.value > maxQuantity.value) {
-    ElMessage.warning('购买数量超过库存');
+    ElMessage.warning("购买数量超过库存");
     return;
   }
   const selectedAddressId = await confirmAddressAndPickId();
@@ -99,34 +103,49 @@ async function handleBuyNow() {
   }
   const result = await createOrderApi({
     addressId: selectedAddressId,
-    items: [{ productId: product.value.id, quantity: Number(quantity.value) }]
+    items: [{ productId: product.value.id, quantity: Number(quantity.value) }],
   });
   removeFromCart(product.value.id);
-  ElMessage.success('下单成功');
+  ElMessage.success("下单成功");
   const orderId = result?.data?.id;
   if (orderId) {
-    router.push({ path: `/order/${orderId}`, query: { action: 'pay' } });
+    router.push({ path: `/order/${orderId}`, query: { action: "pay" } });
     return;
   }
-  router.push('/order');
+  router.push("/order");
+}
+
+function handleContactSeller() {
+  if (!product.value?.sellerUserId) {
+    ElMessage.warning("当前无法联系卖家");
+    return;
+  }
+  router.push({
+    path: "/messages",
+    query: {
+      participantId: product.value.sellerUserId,
+      sourceType: "PRODUCT",
+      sourceId: product.value.id,
+    },
+  });
 }
 
 async function confirmAddressAndPickId() {
   const result = await listAddressesApi();
   const addresses = result?.data || [];
   if (!addresses.length) {
-    ElMessage.warning('请先新增收货地址后再下单');
-    router.push({ name: 'addressManager' });
+    ElMessage.warning("请先新增收货地址");
+    router.push({ name: "addressManager" });
     return null;
   }
-  const preferred = addresses.find((a) => Number(a.isDefault) === 1) || addresses[0];
+  const preferred = addresses.find((item) => Number(item.isDefault) === 1) || addresses[0];
   const summary = `${preferred.receiverName} ${preferred.receiverPhone}\n${preferred.province}${preferred.city}${preferred.detailAddress}`;
-  const confirmed = await ElMessageBox.confirm(`请确认本次收货地址：\n${summary}`, '确认收货地址', {
-    confirmButtonText: '确认下单',
-    cancelButtonText: '去改地址',
-    type: 'warning'
+  const confirmed = await ElMessageBox.confirm(`请确认收货地址：\n${summary}`, "收货地址确认", {
+    confirmButtonText: "提交订单",
+    cancelButtonText: "修改地址",
+    type: "warning",
   }).then(() => true).catch(() => {
-    router.push({ name: 'addressManager' });
+    router.push({ name: "addressManager" });
     return false;
   });
   if (!confirmed) {
@@ -137,21 +156,21 @@ async function confirmAddressAndPickId() {
 
 function toFullImageUrl(url) {
   if (!url) {
-    return '';
+    return "";
   }
-  if (url.startsWith('http://') || url.startsWith('https://')) {
+  if (url.startsWith("http://") || url.startsWith("https://")) {
     return url;
   }
-  const normalized = url.startsWith('/') ? url : `/${url}`;
+  const normalized = url.startsWith("/") ? url : `/${url}`;
   return `http://localhost:8080${normalized}`;
 }
 
 function goBack() {
-  if (route.query.from === 'browse-history') {
-    router.push('/browse-history');
+  if (route.query.from === "browse-history") {
+    router.push("/browse-history");
     return;
   }
-  router.push('/product');
+  router.push("/product");
 }
 </script>
 

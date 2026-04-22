@@ -13,6 +13,7 @@ import com.segroup8.platform.entity.SecondhandProduct;
 import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.OrderItemMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
+import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
 import com.segroup8.platform.vo.OrderVO;
 import com.segroup8.platform.vo.PageVO;
@@ -50,12 +51,15 @@ class SecondhandProductServiceImplTest {
     @Mock
     private BrowseHistoryService browseHistoryService;
 
+    @Mock
+    private UserMapper userMapper;
+
     private SecondhandProductServiceImpl secondhandProductService;
 
     @BeforeEach
     void setUp() {
         secondhandProductService = new SecondhandProductServiceImpl(secondhandProductMapper, orderInfoMapper,
-                orderItemMapper, browseHistoryService);
+                orderItemMapper, userMapper, browseHistoryService);
     }
 
     @AfterEach

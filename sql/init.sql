@@ -77,6 +77,37 @@ CREATE TABLE `notification` (
   KEY `idx_notification_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+CREATE TABLE `chat_conversation` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `buyer_user_id` BIGINT NOT NULL,
+  `seller_user_id` BIGINT NOT NULL,
+  `source_type` VARCHAR(20) NOT NULL DEFAULT 'DIRECT',
+  `source_id` BIGINT NOT NULL DEFAULT 0,
+  `source_title` VARCHAR(120) DEFAULT NULL,
+  `last_message_content` VARCHAR(1000) DEFAULT NULL,
+  `last_message_time` DATETIME DEFAULT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_chat_conversation_pair` (`buyer_user_id`, `seller_user_id`, `source_type`, `source_id`),
+  KEY `idx_chat_conversation_buyer` (`buyer_user_id`),
+  KEY `idx_chat_conversation_seller` (`seller_user_id`),
+  KEY `idx_chat_conversation_last_message_time` (`last_message_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `chat_message` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `conversation_id` BIGINT NOT NULL,
+  `sender_user_id` BIGINT NOT NULL,
+  `receiver_user_id` BIGINT NOT NULL,
+  `content` VARCHAR(1000) NOT NULL,
+  `is_read` TINYINT NOT NULL DEFAULT 0,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_chat_message_conversation` (`conversation_id`, `create_time`),
+  KEY `idx_chat_message_receiver` (`receiver_user_id`, `is_read`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 CREATE TABLE `admin_audit_log` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `admin_user_id` BIGINT DEFAULT NULL,

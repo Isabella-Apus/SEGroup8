@@ -3,12 +3,11 @@ package com.segroup8.platform.service.impl;
 import com.segroup8.platform.common.RoleEnum;
 import com.segroup8.platform.context.UserContext;
 import com.segroup8.platform.entity.MerchantApplication;
-import com.segroup8.platform.entity.Notification;
 import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.MerchantApplicationMapper;
-import com.segroup8.platform.mapper.NotificationMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
+import com.segroup8.platform.service.NotificationService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,7 @@ class MerchantApplicationServiceImplTest {
     private UserMapper userMapper;
 
     @Mock
-    private NotificationMapper notificationMapper;
+    private NotificationService notificationService;
 
     @Mock
     private ShopMapper shopMapper;
@@ -43,8 +42,8 @@ class MerchantApplicationServiceImplTest {
         merchantApplicationService = new MerchantApplicationServiceImpl(
                 merchantApplicationMapper,
                 userMapper,
-            notificationMapper,
-            shopMapper);
+                notificationService,
+                shopMapper);
     }
 
     @AfterEach
@@ -53,7 +52,7 @@ class MerchantApplicationServiceImplTest {
     }
 
     @Test
-    void approve_shouldUpgradeRoleAndInsertNotification() {
+    void approve_shouldUpgradeRoleAndPushNotification() {
         UserContext.setUserId(1L);
 
         User admin = new User();
@@ -83,6 +82,6 @@ class MerchantApplicationServiceImplTest {
         verify(userMapper).updateById(userCaptor.capture());
         assertEquals(RoleEnum.OFFICIAL_SELLER.name(), userCaptor.getValue().getRole());
 
-        verify(notificationMapper).insert(org.mockito.ArgumentMatchers.any(Notification.class));
+        verify(notificationService).createNotification(3L, "入驻审核结果", "恭喜，您的入驻申请已通过，现可进入卖家工作台。");
     }
 }

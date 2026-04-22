@@ -221,6 +221,16 @@ public class ProductServiceImpl implements ProductService {
         ProductVO vo = new ProductVO();
         vo.setId(product.getId());
         vo.setShopId(product.getShopId());
+        Shop shop = product.getShopId() == null ? null : shopMapper.selectById(product.getShopId());
+        if (shop != null) {
+            vo.setSellerUserId(shop.getOwnerUserId());
+            User seller = shop.getOwnerUserId() == null ? null : userMapper.selectById(shop.getOwnerUserId());
+            if (seller != null) {
+                vo.setSellerName(StringUtils.hasText(seller.getNickname()) ? seller.getNickname() : seller.getUsername());
+            } else {
+                vo.setSellerName(shop.getName());
+            }
+        }
         vo.setName(product.getName());
         vo.setCover(product.getCover());
         vo.setDescription(product.getDescription());
