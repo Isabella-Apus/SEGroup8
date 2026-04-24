@@ -23,6 +23,7 @@ CREATE TABLE `user` (
   `role` VARCHAR(20) NOT NULL DEFAULT 'USER',
   `status` VARCHAR(20) NOT NULL DEFAULT 'NORMAL',
   `credit_score` INT NOT NULL DEFAULT 100,
+  `seller_credit_score` INT NOT NULL DEFAULT 100,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -202,6 +203,7 @@ CREATE TABLE `review` (
   `product_type` VARCHAR(20) NOT NULL DEFAULT 'NEW',
   `product_id` BIGINT NOT NULL,
   `user_id` BIGINT NOT NULL,
+  `review_type` VARCHAR(30) NOT NULL DEFAULT 'BUYER_TO_SELLER',
   `score` TINYINT NOT NULL,
   `content` VARCHAR(500) DEFAULT NULL,
   `status` TINYINT NOT NULL DEFAULT 1,
@@ -210,6 +212,52 @@ CREATE TABLE `review` (
   PRIMARY KEY (`id`),
   KEY `idx_review_product` (`product_id`),
   KEY `idx_review_user` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `credit_score_log` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `role` VARCHAR(10) NOT NULL COMMENT 'BUYER or SELLER',
+  `delta` INT NOT NULL,
+  `reason_code` VARCHAR(50) NOT NULL,
+  `reason_desc` VARCHAR(255) DEFAULT NULL,
+  `ref_id` BIGINT DEFAULT NULL,
+  `operator_id` BIGINT DEFAULT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_credit_log_user` (`user_id`, `role`),
+  KEY `idx_credit_log_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `user_report` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `reporter_id` BIGINT NOT NULL,
+  `reported_id` BIGINT NOT NULL,
+  `reporter_role` VARCHAR(10) NOT NULL COMMENT 'BUYER or SELLER',
+  `reason_type` VARCHAR(30) NOT NULL,
+  `reason_desc` VARCHAR(500) DEFAULT NULL,
+  `evidence_urls` VARCHAR(1000) DEFAULT NULL,
+  `status` TINYINT NOT NULL DEFAULT 0 COMMENT '0=待审核 1=成立 2=驳回',
+  `admin_id` BIGINT DEFAULT NULL,
+  `admin_remark` VARCHAR(255) DEFAULT NULL,
+  `audit_time` DATETIME DEFAULT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_report_reporter` (`reporter_id`),
+  KEY `idx_user_report_reported` (`reported_id`),
+  KEY `idx_user_report_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `user_block` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `blocker_id` BIGINT NOT NULL,
+  `blocked_id` BIGINT NOT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_user_block` (`blocker_id`, `blocked_id`),
+  KEY `idx_user_block_blocker` (`blocker_id`),
+  KEY `idx_user_block_blocked` (`blocked_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `report` (

@@ -99,12 +99,17 @@
       </el-table>
 
       <div v-if="!isSellerView" class="actions">
-        <el-space>
+        <el-space wrap>
           <el-button v-if="order.orderStatus === 0" type="primary" @click="pay">立即付款</el-button>
           <el-button v-if="order.orderStatus === 0" @click="cancel">取消订单</el-button>
           <el-button v-if="order.orderStatus === 2" type="primary" @click="confirmReceive">确认收货</el-button>
           <el-button v-if="order.orderStatus === 3" type="primary" @click="openReviewDialog">去评价</el-button>
           <el-button v-if="canRefund(order.orderStatus, order.refundStatus)" type="danger" plain @click="openRefundDialog">申请退货</el-button>
+          <!-- 付款后即可举报/拉黑卖家 -->
+          <template v-if="order.orderStatus >= 1 && orderSellerUserId">
+            <el-button type="warning" plain size="small" @click="openOrderReportDialog">举报卖家</el-button>
+            <el-button type="danger"  plain size="small" @click="handleOrderBlock">拉黑卖家</el-button>
+          </template>
         </el-space>
       </div>
       <div v-else class="actions">
@@ -221,6 +226,29 @@
         <el-button type="primary" :loading="paySubmitting" @click="confirmPay">{{ payForm.payMode === 'THIRD_PARTY' ? '我已支付' : '确认支付' }}</el-button>
       </template>
     </el-dialog>
+
+    <!-- ===== 举报卖家弹窗（订单内） ===== -->
+    <el-dialog v-model="orderReportDialogVisible" title="举报卖家" width="480px">
+      <el-form :model="orderReportForm" label-width="90px">
+        <el-form-item label="举报类型" required>
+          <el-select v-model="orderReportForm.reasonType" style="width:100%">
+            <el-option label="诈骗/虚假交易" value="FRAUD" />
+            <el-option label="商品与描述不符" value="FAKE_ITEM" />
+            <el-option label="态度恶劣/骚扰" value="BAD_ATTITUDE" />
+            <el-option label="恶意退款" value="REFUND_ABUSE" />
+            <el-option label="刷单/广告骚扰" value="SPAM" />
+            <el-option label="其他" value="OTHER" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="补充说明">
+          <el-input v-model="orderReportForm.reasonDesc" type="textarea" :rows="3" maxlength="500" show-word-limit />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="orderReportDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="orderReportSubmitting" @click="handleOrderReportSubmit">提交举报</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -247,6 +275,7 @@ import OrderStatusTag from "@/components/order/OrderStatusTag.vue";
 import OrderSummaryCard from "@/components/order/OrderSummaryCard.vue";
 import OrderTimeline from "@/components/order/OrderTimeline.vue";
 import { onRealtimeEvent } from "@/realtime/realtimeClient";
+import { submitReportApi, blockUserApi } from "@/api/credit";
 
 const route = useRoute();
 const router = useRouter();
@@ -285,6 +314,58 @@ const proofPreviewUrl = ref("");
 const timelineExpanded = ref(false);
 const isSellerView = computed(() => route.meta?.detailMode === "seller" || route.query.from === "seller");
 const canOnlyRefund = computed(() => Number(order.value?.orderStatus) === 1);
+
+// 取订单中第一个有卖家ID的商品的卖家ID
+const orderSellerUserId = computed(() => {
+  const items = order.value?.items || [];
+  return items.find(i => i.sellerUserId)?.sellerUserId || null;
+});
+
+// 举报弹窗（订单内）
+const orderReportDialogVisible = ref(false);
+const orderReportSubmitting = ref(false);
+const orderReportForm = ref({ reasonType: "", reasonDesc: "" });
+
+function openOrderReportDialog() {
+  orderReportForm.value = { reasonType: "", reasonDesc: "" };
+  orderReportDialogVisible.value = true;
+}
+
+async function handleOrderReportSubmit() {
+  if (!orderReportForm.value.reasonType) {
+    showOrderActionError({ message: "请选择举报类型" }, "举报失败");
+    return;
+  }
+  orderReportSubmitting.value = true;
+  try {
+    await submitReportApi({
+      reportedId: orderSellerUserId.value,
+      reasonType: orderReportForm.value.reasonType,
+      reasonDesc: orderReportForm.value.reasonDesc,
+    });
+    orderReportDialogVisible.value = false;
+    showOrderActionSuccess("举报已提交，等待管理员审核");
+  } catch (e) {
+    showOrderActionError(e, "举报提交失败");
+  } finally {
+    orderReportSubmitting.value = false;
+  }
+}
+
+async function handleOrderBlock() {
+  try {
+    await confirmOrderAction({
+      title: "拉黑卖家",
+      message: "确认拉黑该订单的卖家？拉黑后对方无法与你发起会话。",
+      confirmButtonText: "确认拉黑"
+    });
+    await blockUserApi(orderSellerUserId.value);
+    showOrderActionSuccess("已拉黑该卖家");
+  } catch (e) {
+    if (String(e?.message || "").includes("cancel")) return;
+    showOrderActionError(e, "操作失败");
+  }
+}
 
 const autoConfirmTip = computed(() => {
   const o = order.value;
@@ -844,4 +925,3 @@ const orderNextActionSummary = computed(() => {
   max-height: 560px;
 }
 </style>
-

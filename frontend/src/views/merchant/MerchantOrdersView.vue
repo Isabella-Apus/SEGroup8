@@ -48,6 +48,8 @@
             <el-button v-if="canPushLogistics(scope.row)" link type="primary" @click="pushLogistics(scope.row)">更新进度</el-button>
             <el-button v-if="canApproveRefund(scope.row)" link type="success" @click="approveRefund(scope.row)">同意退货</el-button>
             <el-button v-if="canRejectRefund(scope.row)" link class="danger-action" @click="rejectRefund(scope.row)">拒绝退货</el-button>
+            <el-button link type="warning" @click="openReportBuyerDialog(scope.row)">举报买家</el-button>
+            <el-button link class="danger-action" @click="handleBlockBuyer(scope.row)">拉黑买家</el-button>
           </template>
         </el-table-column>
         <template #empty>
@@ -89,6 +91,28 @@
         <el-table-column prop="quantity" label="数量" width="100" />
       </el-table>
     </el-dialog>
+
+    <!-- ===== 举报买家弹窗 ===== -->
+    <el-dialog v-model="reportBuyerDialogVisible" title="举报买家" width="480px">
+      <el-form :model="reportBuyerForm" label-width="90px">
+        <el-form-item label="举报类型" required>
+          <el-select v-model="reportBuyerForm.reasonType" style="width:100%">
+            <el-option label="恶意退款" value="REFUND_ABUSE" />
+            <el-option label="诈骗/虚假交易" value="FRAUD" />
+            <el-option label="态度恶劣/骚扰" value="BAD_ATTITUDE" />
+            <el-option label="刷单/广告骚扰" value="SPAM" />
+            <el-option label="其他" value="OTHER" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="补充说明">
+          <el-input v-model="reportBuyerForm.reasonDesc" type="textarea" :rows="3" maxlength="500" show-word-limit />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="reportBuyerDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="reportBuyerSubmitting" @click="handleReportBuyerSubmit">提交举报</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -105,6 +129,7 @@ import {
 } from '@/api/order';
 import { pushNextLogisticsApi } from '@/api/logistics';
 import { onRealtimeEvent } from '@/realtime/realtimeClient';
+import { submitReportApi, blockUserApi } from '@/api/credit';
 
 const loading = ref(false);
 const total = ref(0);
@@ -252,6 +277,55 @@ function handleRealtimeEvent(event) {
   const type = event?.detail?.eventType;
   if (type === 'ORDER_STATUS_UPDATED' || type === 'AFTER_SALE_UPDATED' || type === 'LOGISTICS_UPDATED' || type === 'ORDER_REMIND_SHIP') {
     fetchList();
+  }
+}
+
+// ===== 举报买家 =====
+const reportBuyerDialogVisible = ref(false);
+const reportBuyerSubmitting = ref(false);
+const reportBuyerForm = ref({ reasonType: '', reasonDesc: '' });
+let reportTargetBuyerId = null;
+
+function openReportBuyerDialog(order) {
+  reportTargetBuyerId = order.buyerUserId;
+  reportBuyerForm.value = { reasonType: '', reasonDesc: '' };
+  reportBuyerDialogVisible.value = true;
+}
+
+async function handleReportBuyerSubmit() {
+  if (!reportBuyerForm.value.reasonType) {
+    ElMessage.warning('请选择举报类型');
+    return;
+  }
+  reportBuyerSubmitting.value = true;
+  try {
+    await submitReportApi({
+      reportedId: reportTargetBuyerId,
+      reasonType: reportBuyerForm.value.reasonType,
+      reasonDesc: reportBuyerForm.value.reasonDesc,
+    });
+    ElMessage.success('举报已提交，等待管理员审核');
+    reportBuyerDialogVisible.value = false;
+  } catch (e) {
+    ElMessage.error(e?.response?.data?.message || '举报提交失败');
+  } finally {
+    reportBuyerSubmitting.value = false;
+  }
+}
+
+// ===== 拉黑买家 =====
+async function handleBlockBuyer(order) {
+  try {
+    await ElMessageBox.confirm(
+      `确认拉黑买家（ID: ${order.buyerUserId}）？拉黑后对方的二手商品不会出现在你的列表中。`,
+      '拉黑确认',
+      { type: 'warning', confirmButtonText: '确认拉黑', cancelButtonText: '取消' }
+    );
+    await blockUserApi(order.buyerUserId);
+    ElMessage.success('已拉黑该买家');
+  } catch (e) {
+    if (e === 'cancel' || e?.toString?.().includes('cancel')) return;
+    ElMessage.error(e?.response?.data?.message || '操作失败');
   }
 }
 </script>

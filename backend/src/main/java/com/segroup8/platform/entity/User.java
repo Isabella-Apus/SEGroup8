@@ -114,6 +114,11 @@ public class User {
         this.creditScore = creditScore;
     }
 
+    private Integer sellerCreditScore;
+
+    public Integer getSellerCreditScore() { return sellerCreditScore; }
+    public void setSellerCreditScore(Integer sellerCreditScore) { this.sellerCreditScore = sellerCreditScore; }
+
     public LocalDateTime getCreateTime() {
         return createTime;
     }
