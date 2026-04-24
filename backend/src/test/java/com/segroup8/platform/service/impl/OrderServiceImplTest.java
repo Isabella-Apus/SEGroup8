@@ -19,6 +19,8 @@ import com.segroup8.platform.mapper.ReviewMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
+import com.segroup8.platform.mapper.VoucherMapper;
+import com.segroup8.platform.mapper.UserVoucherMapper;
 import com.segroup8.platform.realtime.RealtimePushService;
 import com.segroup8.platform.service.LogisticsService;
 import com.segroup8.platform.service.NotificationService;
@@ -63,6 +65,10 @@ class OrderServiceImplTest {
     @Mock
     private AddressMapper addressMapper;
     @Mock
+    private VoucherMapper voucherMapper;
+    @Mock
+    private UserVoucherMapper userVoucherMapper;
+    @Mock
     private NotificationService notificationService;
     @Mock
     private OrderAfterSaleLogMapper orderAfterSaleLogMapper;
@@ -86,6 +92,8 @@ class OrderServiceImplTest {
                 shopMapper,
                 userMapper,
                 addressMapper,
+                voucherMapper,
+                userVoucherMapper,
                 notificationService,
                 orderAfterSaleLogMapper,
                 realtimePushService,

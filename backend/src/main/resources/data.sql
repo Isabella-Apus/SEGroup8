@@ -111,28 +111,15 @@ VALUES
 
 SET @seller_id = 2;
 
-INSERT INTO `voucher`
-  (shop_id, name, type, discount_amount, discount_rate, min_amount, total_count, used_count, start_time, end_time, status, create_time, update_time)
-VALUES
--- 满减券（进行中）
-(@seller_id, '新用户专享满100减20', 1, 20.00, NULL, 100.00, 200, 45, NOW() - INTERVAL 5 DAY, NOW() + INTERVAL 25 DAY, 1, NOW(), NOW()),
-(@seller_id, '店铺周年庆满200减50', 1, 50.00, NULL, 200.00, 500, 123, NOW() - INTERVAL 3 DAY, NOW() + INTERVAL 7 DAY, 1, NOW(), NOW()),
-(@seller_id, '满50减8元优惠券',     1, 8.00,  NULL, 50.00,  300, 88,  NOW() - INTERVAL 10 DAY, NOW() + INTERVAL 20 DAY, 1, NOW(), NOW()),
--- 折扣券（进行中）
-(@seller_id, '全场九折优惠券',      2, NULL,  0.90, 0.00,   100, 32,  NOW() - INTERVAL 2 DAY, NOW() + INTERVAL 13 DAY, 1, NOW(), NOW()),
-(@seller_id, '电子数码专区八五折',  2, NULL,  0.85, 100.00, 150, 67,  NOW() - INTERVAL 7 DAY, NOW() + INTERVAL 3 DAY,  1, NOW(), NOW()),
--- 已结束的券
-(@seller_id, '双十一大促满300减80', 1, 80.00, NULL, 300.00, 1000, 998, NOW() - INTERVAL 60 DAY, NOW() - INTERVAL 30 DAY, 2, NOW() - INTERVAL 60 DAY, NOW()),
-(@seller_id, '春节特惠七五折',      2, NULL,  0.75, 50.00,  200, 196,  NOW() - INTERVAL 90 DAY, NOW() - INTERVAL 60 DAY, 2, NOW() - INTERVAL 90 DAY, NOW()),
--- 未开始的券
-(@seller_id, '618预热满150减30',    1, 30.00, NULL, 150.00, 300, 0,   NOW() + INTERVAL 5 DAY,  NOW() + INTERVAL 15 DAY, 0, NOW(), NOW());
-
 INSERT INTO `balance` (user_id, personal_balance, business_balance, version, create_time, update_time)
 VALUES (@seller_id, 1280.50, 15680.00, 0, NOW(), NOW())
 ON DUPLICATE KEY UPDATE
   personal_balance = 1280.50,
   business_balance = 15680.00,
   update_time = NOW();
+
+DELETE FROM `user_voucher`;
+DELETE FROM `voucher`;
 
 INSERT INTO `transaction_record`
   (order_id, user_id, account_type, change_type, amount, balance_after, remark, trade_type, create_time)
@@ -160,7 +147,7 @@ VALUES
 
 SELECT '=== 优惠券 ===' AS info;
 SELECT id, name, type, discount_amount, discount_rate, min_amount, total_count, used_count, status FROM voucher WHERE shop_id = @seller_id;
- 
+
 SELECT '=== 账户余额 ===' AS info;
 SELECT * FROM balance WHERE user_id = @seller_id;
  
