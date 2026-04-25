@@ -32,13 +32,13 @@ public interface UserReportMapper extends BaseMapper<UserReport> {
     );
 
     /**
-     * 查询某人对另一人是否已经有待审核或成立的举报
-     * 防止重复举报
+     * 查询某人对另一人是否已经有待审核的举报
+     * 只阻止重复提交待审核的举报，已处理的举报不影响新举报
      */
     @Select("SELECT COUNT(*) FROM user_report " +
             "WHERE reporter_id = #{reporterId} " +
             "  AND reported_id = #{reportedId} " +
-            "  AND status IN (0, 1)")
+            "  AND status = 0")
     int countActiveReport(
             @Param("reporterId") Long reporterId,
             @Param("reportedId") Long reportedId

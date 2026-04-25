@@ -31,7 +31,8 @@
         <el-divider v-if="canChatWithSeller" />
         <el-space v-if="canChatWithSeller" wrap>
           <el-button type="warning" plain size="small" @click="openReportDialog">举报卖家</el-button>
-          <el-button type="danger"  plain size="small" @click="handleBlock">拉黑卖家</el-button>
+          <el-button v-if="!isSellerBlocked" type="danger" plain size="small" @click="handleBlock">拉黑卖家</el-button>
+          <el-button v-else type="info" plain size="small" @click="handleUnblock">取消拉黑</el-button>
         </el-space>
       </div>
     </div>
@@ -67,7 +68,7 @@ import { computed, onMounted, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRoute, useRouter } from "vue-router";
 import { buySecondhandApi, getSecondhandDetailApi } from "@/api/secondhand";
-import { submitReportApi, blockUserApi, isBlockingApi, isBlockedByApi } from "@/api/credit";
+import { submitReportApi, blockUserApi, unblockUserApi, isBlockingApi, isBlockedByApi } from "@/api/credit";
 import { getUser } from "@/utils/storage";
 
 const route = useRoute();
@@ -80,6 +81,9 @@ const item = ref(null);
 const reportDialogVisible = ref(false);
 const reportSubmitting = ref(false);
 const reportForm = ref({ reasonType: "", reasonDesc: "" });
+
+// 拉黑状态
+const isSellerBlocked = ref(false);
 
 const canBuy = computed(() => !!item.value && Number(item.value.status || 1) === 1);
 const canChatWithSeller = computed(() => {
@@ -110,6 +114,8 @@ async function fetchDetail() {
         router.replace("/secondhand");
         return;
       }
+      // 记录当前是否已拉黑该卖家（用于按钮切换）
+      isSellerBlocked.value = iBlocked.data === true;
     }
   } finally {
     loading.value = false;
@@ -175,7 +181,24 @@ async function handleBlock() {
       { type: "warning", confirmButtonText: "确认拉黑", cancelButtonText: "取消" }
     );
     await blockUserApi(item.value.sellerUserId);
+    isSellerBlocked.value = true;
     ElMessage.success("已拉黑该卖家");
+  } catch (e) {
+    if (e === "cancel" || e?.toString?.().includes("cancel")) return;
+    ElMessage.error(e?.response?.data?.message || "操作失败");
+  }
+}
+
+async function handleUnblock() {
+  try {
+    await ElMessageBox.confirm(
+      `确认取消拉黑卖家「${item.value.sellerName || item.value.sellerUserId}」？`,
+      "取消拉黑",
+      { type: "warning", confirmButtonText: "确认取消", cancelButtonText: "取消" }
+    );
+    await unblockUserApi(item.value.sellerUserId);
+    isSellerBlocked.value = false;
+    ElMessage.success("已取消拉黑");
   } catch (e) {
     if (e === "cancel" || e?.toString?.().includes("cancel")) return;
     ElMessage.error(e?.response?.data?.message || "操作失败");

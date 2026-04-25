@@ -83,7 +83,7 @@
     </div>
 
     <!-- 审核弹窗 -->
-    <el-dialog v-model="auditVisible" title="审核举报" width="480px">
+    <el-dialog v-model="auditVisible" title="审核举报" width="480px" append-to-body draggable>
       <el-descriptions :column="1" border size="small" style="margin-bottom:16px">
         <el-descriptions-item label="举报人ID">{{ auditRow.reporterId }}</el-descriptions-item>
         <el-descriptions-item label="被举报ID">{{ auditRow.reportedId }}</el-descriptions-item>
@@ -91,7 +91,7 @@
         <el-descriptions-item label="说明">{{ auditRow.reasonDesc || '-' }}</el-descriptions-item>
       </el-descriptions>
 
-      <el-form :model="auditForm" label-width="110px">
+      <el-form :model="auditForm" label-width="110px" @submit.prevent>
         <el-form-item label="审核结果" required>
           <el-radio-group v-model="auditForm.decision">
             <el-radio :label="1">成立（扣分）</el-radio>

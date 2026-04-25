@@ -49,7 +49,18 @@
             <el-button v-if="canApproveRefund(scope.row)" link type="success" @click="approveRefund(scope.row)">同意退货</el-button>
             <el-button v-if="canRejectRefund(scope.row)" link class="danger-action" @click="rejectRefund(scope.row)">拒绝退货</el-button>
             <el-button link type="warning" @click="openReportBuyerDialog(scope.row)">举报买家</el-button>
-            <el-button link class="danger-action" @click="handleBlockBuyer(scope.row)">拉黑买家</el-button>
+            <el-button
+              v-if="!blockedBuyerIds.has(scope.row.buyerUserId)"
+              link
+              class="danger-action"
+              @click="handleBlockBuyer(scope.row)"
+            >拉黑买家</el-button>
+            <el-button
+              v-else
+              link
+              type="info"
+              @click="handleUnblockBuyer(scope.row)"
+            >取消拉黑</el-button>
           </template>
         </el-table-column>
         <template #empty>
@@ -129,7 +140,7 @@ import {
 } from '@/api/order';
 import { pushNextLogisticsApi } from '@/api/logistics';
 import { onRealtimeEvent } from '@/realtime/realtimeClient';
-import { submitReportApi, blockUserApi } from '@/api/credit';
+import { submitReportApi, blockUserApi, unblockUserApi, isBlockingApi } from '@/api/credit';
 
 const loading = ref(false);
 const total = ref(0);
@@ -137,6 +148,8 @@ const records = ref([]);
 const detailVisible = ref(false);
 const detail = ref(null);
 const router = useRouter();
+// 记录已被拉黑的买家ID集合
+const blockedBuyerIds = ref(new Set());
 
 const query = reactive({
   pageNum: 1,
@@ -162,9 +175,25 @@ async function fetchList() {
     const result = await getSellerOrderListApi(query);
     records.value = result.data?.records || [];
     total.value = result.data?.total || 0;
+    // 检查每个买家的拉黑状态
+    await refreshBlockedStatus();
   } finally {
     loading.value = false;
   }
+}
+
+async function refreshBlockedStatus() {
+  const uniqueBuyerIds = [...new Set(records.value.map(r => r.buyerUserId).filter(Boolean))];
+  const newBlockedSet = new Set();
+  await Promise.allSettled(
+    uniqueBuyerIds.map(async (id) => {
+      try {
+        const res = await isBlockingApi(id);
+        if (res.data === true) newBlockedSet.add(id);
+      } catch {}
+    })
+  );
+  blockedBuyerIds.value = newBlockedSet;
 }
 
 function handleSearch() {
@@ -322,7 +351,26 @@ async function handleBlockBuyer(order) {
       { type: 'warning', confirmButtonText: '确认拉黑', cancelButtonText: '取消' }
     );
     await blockUserApi(order.buyerUserId);
+    blockedBuyerIds.value = new Set([...blockedBuyerIds.value, order.buyerUserId]);
     ElMessage.success('已拉黑该买家');
+  } catch (e) {
+    if (e === 'cancel' || e?.toString?.().includes('cancel')) return;
+    ElMessage.error(e?.response?.data?.message || '操作失败');
+  }
+}
+
+async function handleUnblockBuyer(order) {
+  try {
+    await ElMessageBox.confirm(
+      `确认取消拉黑买家（ID: ${order.buyerUserId}）？`,
+      '取消拉黑',
+      { type: 'warning', confirmButtonText: '确认取消', cancelButtonText: '取消' }
+    );
+    await unblockUserApi(order.buyerUserId);
+    const newSet = new Set(blockedBuyerIds.value);
+    newSet.delete(order.buyerUserId);
+    blockedBuyerIds.value = newSet;
+    ElMessage.success('已取消拉黑');
   } catch (e) {
     if (e === 'cancel' || e?.toString?.().includes('cancel')) return;
     ElMessage.error(e?.response?.data?.message || '操作失败');
