@@ -2,108 +2,89 @@
   <div class="page-card">
     <h2 class="page-title">我的信用</h2>
 
-    <el-skeleton v-if="loading" :rows="8" animated />
+    <el-skeleton v-if="loading" :rows="10" animated />
 
     <template v-else-if="credit">
 
-      <!-- ========== 商家：账户健康 ========== -->
-      <template v-if="isSeller">
-        <div class="credit-section">
-          <h3 class="section-title">账户健康</h3>
-          <div class="score-bar-wrap">
-            <div class="score-bar">
-              <div
-                v-for="lv in levels"
-                :key="lv"
-                class="bar-segment"
-                :class="{ active: credit.sellerLevel === lv }"
-              >{{ lv }}</div>
-            </div>
-            <div class="score-num">{{ credit.sellerScore }} 分</div>
+      <!-- ========== 买家信用 ========== -->
+      <div class="credit-section">
+        <h3 class="section-title">买家信用</h3>
+        <p class="section-tip">作为买家在交易中积累的信用评分</p>
+        <div class="score-bar-wrap">
+          <div class="score-bar buyer">
+            <div
+              v-for="lv in levels"
+              :key="'buyer-' + lv"
+              class="bar-segment"
+              :class="{ active: credit.buyerLevel === lv }"
+            >{{ lv }}</div>
           </div>
-
-          <el-descriptions :column="2" border class="credit-desc">
-            <el-descriptions-item label="健康等级">
-              <el-tag :type="levelTagType(credit.sellerLevel)">{{ credit.sellerLevel }}</el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="好评率">
-              {{ credit.sellerGoodRate }}%
-            </el-descriptions-item>
-            <el-descriptions-item label="累计售出">
-              {{ credit.sellerSoldCount }} 单
-            </el-descriptions-item>
-            <el-descriptions-item label="好评数">
-              {{ credit.sellerGoodReviewCount }} 条
-            </el-descriptions-item>
-            <el-descriptions-item label="近2年纠纷">
-              {{ credit.sellerDisputeCount }} 次
-            </el-descriptions-item>
-          </el-descriptions>
-
-          <div class="log-title">近期变动记录</div>
-          <el-table :data="credit.sellerLogs" border size="small" style="margin-top:6px">
-            <el-table-column prop="createTime" label="时间" min-width="160" />
-            <el-table-column prop="reasonDesc" label="原因" min-width="200" />
-            <el-table-column label="变动" width="90">
-              <template #default="{ row }">
-                <span :class="row.delta >= 0 ? 'delta-plus' : 'delta-minus'">
-                  {{ row.delta >= 0 ? '+' + row.delta : row.delta }}
-                </span>
-              </template>
-            </el-table-column>
-          </el-table>
+          <div class="score-num">{{ credit.buyerScore ?? 100 }} 分</div>
         </div>
-      </template>
+        <div class="level-tag-row">
+          <span class="level-label">信用等级：</span>
+          <el-tag :type="levelTagType(credit.buyerLevel)">{{ credit.buyerLevel ?? '极好' }}</el-tag>
+        </div>
 
-      <!-- ========== 普通用户：个人信用 ========== -->
-      <template v-else>
-        <div class="credit-section">
-          <h3 class="section-title">个人信用</h3>
-          <p class="section-tip">您的信用分由与您交易的买家和卖家共同影响</p>
-          <div class="score-bar-wrap">
-            <div class="score-bar buyer">
-              <div
-                v-for="lv in levels"
-                :key="lv"
-                class="bar-segment"
-                :class="{ active: credit.buyerLevel === lv }"
-              >{{ lv }}</div>
-            </div>
-            <div class="score-num">{{ credit.buyerScore }} 分</div>
+        <div class="log-title">近期变动记录</div>
+        <el-table
+          :data="credit.buyerLogs || []"
+          border size="small"
+          style="margin-top:6px"
+          :empty-text="'暂无变动记录'"
+        >
+          <el-table-column prop="createTime" label="时间" min-width="160" />
+          <el-table-column prop="reasonDesc" label="原因" min-width="200" />
+          <el-table-column label="变动" width="90">
+            <template #default="{ row }">
+              <span :class="row.delta >= 0 ? 'delta-plus' : 'delta-minus'">
+                {{ row.delta >= 0 ? '+' + row.delta : row.delta }}
+              </span>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+
+      <el-divider />
+
+      <!-- ========== 二手卖家信用 ========== -->
+      <div class="credit-section">
+        <h3 class="section-title">二手卖家信用</h3>
+        <p class="section-tip">作为二手卖家在交易中积累的信用评分</p>
+        <div class="score-bar-wrap">
+          <div class="score-bar sh-seller">
+            <div
+              v-for="lv in levels"
+              :key="'shs-' + lv"
+              class="bar-segment"
+              :class="{ active: credit.shSellerLevel === lv }"
+            >{{ lv }}</div>
           </div>
-
-          <el-descriptions :column="2" border class="credit-desc">
-            <el-descriptions-item label="信用等级">
-              <el-tag :type="levelTagType(credit.buyerLevel)">{{ credit.buyerLevel }}</el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="好评率">
-              {{ credit.buyerGoodRate }}%
-            </el-descriptions-item>
-            <el-descriptions-item label="累计交易">
-              {{ credit.buyerOrderCount }} 单
-            </el-descriptions-item>
-            <el-descriptions-item label="好评数">
-              {{ credit.buyerGoodReviewCount }} 条
-            </el-descriptions-item>
-            <el-descriptions-item label="近2年纠纷">
-              {{ credit.buyerDisputeCount }} 次
-            </el-descriptions-item>
-          </el-descriptions>
-
-          <div class="log-title">近期变动记录</div>
-          <el-table :data="credit.buyerLogs" border size="small" style="margin-top:6px">
-            <el-table-column prop="createTime" label="时间" min-width="160" />
-            <el-table-column prop="reasonDesc" label="原因" min-width="200" />
-            <el-table-column label="变动" width="90">
-              <template #default="{ row }">
-                <span :class="row.delta >= 0 ? 'delta-plus' : 'delta-minus'">
-                  {{ row.delta >= 0 ? '+' + row.delta : row.delta }}
-                </span>
-              </template>
-            </el-table-column>
-          </el-table>
+          <div class="score-num">{{ credit.shSellerScore ?? 100 }} 分</div>
         </div>
-      </template>
+        <div class="level-tag-row">
+          <span class="level-label">信用等级：</span>
+          <el-tag :type="levelTagType(credit.shSellerLevel)">{{ credit.shSellerLevel ?? '极好' }}</el-tag>
+        </div>
+
+        <div class="log-title">近期变动记录</div>
+        <el-table
+          :data="credit.shSellerLogs || []"
+          border size="small"
+          style="margin-top:6px"
+          :empty-text="'暂无变动记录'"
+        >
+          <el-table-column prop="createTime" label="时间" min-width="160" />
+          <el-table-column prop="reasonDesc" label="原因" min-width="200" />
+          <el-table-column label="变动" width="90">
+            <template #default="{ row }">
+              <span :class="row.delta >= 0 ? 'delta-plus' : 'delta-minus'">
+                {{ row.delta >= 0 ? '+' + row.delta : row.delta }}
+              </span>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
 
       <el-divider />
 
@@ -116,12 +97,15 @@
           </el-button>
         </div>
 
-        <el-table :data="myReports" border size="small" style="margin-top:10px">
+        <el-table :data="myReports" border size="small" style="margin-top:10px" :empty-text="'暂无举报记录'">
           <el-table-column prop="reportedId" label="被举报用户ID" width="130" />
+          <el-table-column label="举报对象" width="140">
+            <template #default="{ row }">{{ tradeContextLabel(row.tradeContext) }}</template>
+          </el-table-column>
           <el-table-column prop="reasonType" label="举报类型" min-width="130">
             <template #default="{ row }">{{ reasonTypeLabel(row.reasonType) }}</template>
           </el-table-column>
-          <el-table-column prop="reasonDesc" label="说明" min-width="180" show-overflow-tooltip />
+          <el-table-column prop="reasonDesc" label="说明" min-width="160" show-overflow-tooltip />
           <el-table-column label="状态" width="90">
             <template #default="{ row }">
               <el-tag :type="reportStatusType(row.status)" size="small">
@@ -157,13 +141,20 @@
 
     <!-- ========== 举报弹窗 ========== -->
     <el-dialog v-model="reportDialogVisible" title="发起举报" width="500px">
-      <el-form :model="reportForm" label-width="100px">
+      <el-form :model="reportForm" label-width="110px">
         <el-form-item label="被举报用户ID" required>
           <el-input-number
             v-model="reportForm.reportedId"
             :min="1" style="width:200px"
             placeholder="请输入用户ID"
           />
+        </el-form-item>
+        <el-form-item label="举报对象" required>
+          <el-select v-model="reportForm.tradeContext" style="width:240px">
+            <el-option label="举报店铺卖家（全新商品）" value="SHOP" />
+            <el-option label="举报二手卖家（我是买家）" value="SH_BUYER" />
+            <el-option label="举报买家（我是二手卖家）" value="SH_SELLER" />
+          </el-select>
         </el-form-item>
         <el-form-item label="举报类型" required>
           <el-select v-model="reportForm.reasonType" style="width:200px">
@@ -201,9 +192,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { useUserStore } from "@/stores/user";
 import {
   getMyCreditApi,
   getMyReportsApi,
@@ -211,14 +201,6 @@ import {
   submitReportApi,
   unblockUserApi,
 } from "@/api/credit";
-
-const userStore = useUserStore();
-
-// 判断是否是商家角色
-const isSeller = computed(() => {
-  const role = userStore.currentRole;
-  return role === "SELLER" || role === "OFFICIAL_SELLER";
-});
 
 const loading = ref(false);
 const credit = ref(null);
@@ -232,6 +214,7 @@ const reportDialogVisible = ref(false);
 const reportSubmitting = ref(false);
 const reportForm = ref({
   reportedId: null,
+  tradeContext: "SH_BUYER",
   reasonType: "",
   reasonDesc: "",
   evidenceUrls: "",
@@ -264,6 +247,10 @@ async function handleSubmitReport() {
     ElMessage.warning("请填写被举报用户ID");
     return;
   }
+  if (!reportForm.value.tradeContext) {
+    ElMessage.warning("请选择举报对象");
+    return;
+  }
   if (!reportForm.value.reasonType) {
     ElMessage.warning("请选择举报类型");
     return;
@@ -273,7 +260,7 @@ async function handleSubmitReport() {
     await submitReportApi(reportForm.value);
     ElMessage.success("举报已提交，等待管理员审核");
     reportDialogVisible.value = false;
-    reportForm.value = { reportedId: null, reasonType: "", reasonDesc: "", evidenceUrls: "" };
+    reportForm.value = { reportedId: null, tradeContext: "SH_BUYER", reasonType: "", reasonDesc: "", evidenceUrls: "" };
     loadAll();
   } catch (e) {
     ElMessage.error(e?.response?.data?.message || "举报提交失败");
@@ -317,6 +304,15 @@ function reasonTypeLabel(type) {
   };
   return map[type] || type;
 }
+
+function tradeContextLabel(ctx) {
+  const map = {
+    SHOP: "举报店铺卖家",
+    SH_BUYER: "举报二手卖家",
+    SH_SELLER: "举报买家",
+  };
+  return map[ctx] || ctx || "-";
+}
 </script>
 
 <style scoped>
@@ -340,17 +336,27 @@ function reasonTypeLabel(type) {
   justify-content: space-between;
   margin-bottom: 12px;
 }
+.level-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.level-label {
+  font-size: 13px;
+  color: #606266;
+}
 .score-bar-wrap {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 .score-bar {
   display: flex;
   border-radius: 20px;
   overflow: hidden;
-  background: #e8f4ff;
+  background: #f0f2f5;
   height: 36px;
 }
 .bar-segment {
@@ -364,23 +370,25 @@ function reasonTypeLabel(type) {
   padding: 0 12px;
   transition: background 0.2s;
 }
-.score-bar .bar-segment.active {
-  background: #409eff;
+/* 买家信用 — 橙色系 */
+.score-bar.buyer .bar-segment.active {
+  background: #e6a23c;
   color: #fff;
   font-weight: 600;
   border-radius: 20px;
 }
-.score-bar.buyer .bar-segment.active {
-  background: #e6a23c;
+/* 二手卖家 — 蓝色系 */
+.score-bar.sh-seller .bar-segment.active {
+  background: #409eff;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 20px;
 }
 .score-num {
   font-size: 22px;
   font-weight: 700;
   color: #303133;
   min-width: 70px;
-}
-.credit-desc {
-  margin-bottom: 12px;
 }
 .log-title {
   font-size: 13px;

@@ -35,6 +35,18 @@ public class UserReportRequest {
     private String evidenceUrls;
 
     /**
+     * 交易场景，决定扣哪种信用分：
+     * SHOP      = 从全新商品店铺购买，买家举报卖家 → 扣卖家店铺账户健康（seller_credit_score）
+     * SH_BUYER  = 二手交易，买家举报卖家 → 扣被举报人的二手卖家分（buyer_credit_score）
+     * SH_SELLER = 二手交易，卖家举报买家 → 扣被举报人的买家信用分（credit_score）
+     * 不传时默认 SHOP
+     */
+    private String tradeContext = "SHOP";
+
+    public String getTradeContext() { return tradeContext; }
+    public void setTradeContext(String tradeContext) { this.tradeContext = tradeContext; }
+
+    /**
      * 举报人当时的身份，由后端根据登录用户角色自动判断，
      * 前端无需传入，此字段仅供内部流转使用
      */

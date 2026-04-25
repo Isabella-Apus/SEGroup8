@@ -1244,6 +1244,8 @@ CREATE TABLE IF NOT EXISTS `user_report` (
   `reporter_id`   BIGINT NOT NULL COMMENT '举报人ID',
   `reported_id`   BIGINT NOT NULL COMMENT '被举报人ID',
   `reporter_role` VARCHAR(20) NOT NULL COMMENT '举报人当时身份：BUYER/SELLER',
+  `trade_context` VARCHAR(20) NOT NULL DEFAULT 'SHOP'
+                  COMMENT '交易场景：SHOP=店铺 SH_BUYER=二手买家举报卖家 SH_SELLER=二手卖家举报买家',
   `reason_type`   VARCHAR(50) NOT NULL COMMENT '举报类型',
   `reason_desc`   VARCHAR(500) DEFAULT NULL COMMENT '补充说明',
   `evidence_urls` VARCHAR(1000) DEFAULT NULL COMMENT '证据图片URL，逗号分隔',
@@ -1296,6 +1298,17 @@ SET @sql2 = IF(@col_buyer = 0,
   'SELECT 1');
 PREPARE s2 FROM @sql2; EXECUTE s2; DEALLOCATE PREPARE s2;
 
+-- 为 user_report 表追加 trade_context 列（幂等，已存在则跳过）
+SET @col_tc = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_report'
+    AND COLUMN_NAME = 'trade_context'
+);
+SET @sql_tc = IF(@col_tc = 0,
+  'ALTER TABLE `user_report` ADD COLUMN `trade_context` VARCHAR(20) NOT NULL DEFAULT ''SHOP'' COMMENT ''交易场景：SHOP/SH_BUYER/SH_SELLER'' AFTER `reporter_role`',
+  'SELECT 1');
+PREPARE stc FROM @sql_tc; EXECUTE stc; DEALLOCATE PREPARE stc;
+
 -- =====================================================
 -- 信用评分、举报、拉黑 相关新表
 -- =====================================================
@@ -1319,6 +1332,7 @@ CREATE TABLE IF NOT EXISTS `user_report` (
   `reporter_id`   BIGINT NOT NULL,
   `reported_id`   BIGINT NOT NULL,
   `reporter_role` VARCHAR(20) NOT NULL,
+  `trade_context` VARCHAR(20) NOT NULL DEFAULT 'SHOP',
   `reason_type`   VARCHAR(50) NOT NULL,
   `reason_desc`   VARCHAR(500) DEFAULT NULL,
   `evidence_urls` VARCHAR(1000) DEFAULT NULL,

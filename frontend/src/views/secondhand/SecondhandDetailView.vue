@@ -161,6 +161,7 @@ async function handleSubmitReport() {
   try {
     await submitReportApi({
       reportedId: item.value.sellerUserId,
+      tradeContext: "SH_BUYER",
       reasonType: reportForm.value.reasonType,
       reasonDesc: reportForm.value.reasonDesc,
     });

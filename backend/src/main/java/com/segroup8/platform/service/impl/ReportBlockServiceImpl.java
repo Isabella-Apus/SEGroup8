@@ -64,14 +64,30 @@ public class ReportBlockServiceImpl implements ReportBlockService {
             throw new BusinessException(400, "您已对该用户提交过举报，请等待审核结果");
         }
 
-        // 判断举报人身份：OFFICIAL_SELLER/SELLER 以卖家身份举报，其余以买家身份举报
-        User reporter = userMapper.selectById(reporterId);
-        String reporterRole = isSellerRole(reporter) ? "SELLER" : "BUYER";
+        /*
+         * 举报人身份（reporterRole）由后端根据 tradeContext 自动判断，前端无需传入：
+         *   SH_BUYER  → 举报人以买家身份举报（买家举报二手卖家）
+         *   SH_SELLER → 举报人以卖家身份举报（卖家举报二手买家）
+         *   SHOP      → 举报人以买家身份举报店铺卖家
+         *
+         * reporterRole 仅用于记录，扣分逻辑以 tradeContext 为准。
+         */
+        String tradeContext = request.getTradeContext();
+        if (tradeContext == null ||
+            (!tradeContext.equals("SHOP") &&
+             !tradeContext.equals("SH_BUYER") &&
+             !tradeContext.equals("SH_SELLER"))) {
+            tradeContext = "SHOP"; // 默认全新商品场景
+        }
+
+        // reporterRole：SH_SELLER 是卖家举报买家，SHOP 和 SH_BUYER 都是买家举报卖家
+        String reporterRole = "SH_SELLER".equals(tradeContext) ? "SELLER" : "BUYER";
 
         UserReport report = new UserReport();
         report.setReporterId(reporterId);
         report.setReportedId(request.getReportedId());
         report.setReporterRole(reporterRole);
+        report.setTradeContext(tradeContext);
         report.setReasonType(request.getReasonType());
         report.setReasonDesc(request.getReasonDesc());
         report.setEvidenceUrls(request.getEvidenceUrls());
@@ -116,14 +132,12 @@ public class ReportBlockServiceImpl implements ReportBlockService {
         report.setAuditTime(LocalDateTime.now());
         userReportMapper.updateById(report);
 
-        // 举报成立 → 扣被举报人信用分
+        // 举报成立 → 扣被举报人信用分（由 CreditService 根据 tradeContext 决定扣哪个分）
         if (request.getDecision() == 1) {
-            // 被举报人的身份取反：举报人是BUYER说明被举报人是SELLER，反之亦然
-            String reportedRole = "BUYER".equals(report.getReporterRole()) ? "SELLER" : "BUYER";
             creditService.onReportUpheld(
                     report.getId(),
                     report.getReportedId(),
-                    reportedRole,
+                    report.getTradeContext(),
                     report.getReasonType(),
                     request.getCustomDelta()
             );
@@ -137,18 +151,15 @@ public class ReportBlockServiceImpl implements ReportBlockService {
     public void blockUser(UserBlockRequest request) {
         Long blockerId = AccessControl.requireUserId();
 
-        // 不能拉黑自己
         if (blockerId.equals(request.getTargetUserId())) {
             throw new BusinessException(400, "不能拉黑自己");
         }
 
-        // 目标用户必须存在
         User target = userMapper.selectById(request.getTargetUserId());
         if (target == null) {
             throw new BusinessException(404, "目标用户不存在");
         }
 
-        // 已拉黑则提示
         int exists = userBlockMapper.isBlocked(blockerId, request.getTargetUserId());
         if (exists > 0) {
             throw new BusinessException(400, "已拉黑该用户");
@@ -186,13 +197,5 @@ public class ReportBlockServiceImpl implements ReportBlockService {
     public boolean isBlocking(Long targetUserId) {
         Long myId = AccessControl.requireUserId();
         return userBlockMapper.isBlocked(myId, targetUserId) > 0;
-    }
-
-    // ==================== 私有辅助 ====================
-
-    private boolean isSellerRole(User user) {
-        if (user == null || user.getRole() == null) return false;
-        return "OFFICIAL_SELLER".equals(user.getRole())
-                || "SELLER".equals(user.getRole());
     }
 }

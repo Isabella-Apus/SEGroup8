@@ -61,21 +61,20 @@ public class CreditServiceImpl implements CreditService {
     @Override
     @Transactional
     public void onOrderComplete(Long orderId, Long buyerUserId, Long sellerUserId) {
-        // 幂等：同一订单已处理过则跳过
+        // 幂等：同一订单买家已处理过则跳过
         if (creditScoreLogMapper.countByReasonAndRef(
                 buyerUserId, "BUYER", "ORDER_COMPLETE", orderId) > 0) {
             return;
         }
 
-        // -------- 买家加分 --------
-        // 判断是否首单
+        // -------- 买家加分（credit_score） --------
         long buyerHistory = creditScoreLogMapper.selectCount(
                 new LambdaQueryWrapper<CreditScoreLog>()
                         .eq(CreditScoreLog::getUserId, buyerUserId)
                         .eq(CreditScoreLog::getRole, "BUYER")
                         .eq(CreditScoreLog::getReasonCode, "ORDER_COMPLETE"));
         if (buyerHistory == 0) {
-            // 首单：基础+2 + 首单奖励+3，写两条日志方便用户查看
+            // 首单：基础+2 + 首单奖励+3
             applyScore(buyerUserId, "BUYER", 2, "ORDER_COMPLETE",
                     "完成交易加分", orderId, null);
             applyScore(buyerUserId, "BUYER", 3, "FIRST_TRADE",
@@ -86,13 +85,17 @@ public class CreditServiceImpl implements CreditService {
         }
 
         // -------- 卖家加分 --------
+        // 判断卖家身份：OFFICIAL_SELLER 加店铺健康分，普通用户加二手卖家分
+        User seller = userMapper.selectById(sellerUserId);
+        String sellerRole = isOfficialSeller(seller) ? "SELLER" : "SH_SELLER";
+
         int sellerDelta = 2; // 基础分
 
         // 该订单是否有5星好评（买家给卖家的评价）
         boolean hasFiveStar = reviewMapper.selectCount(
                 new LambdaQueryWrapper<Review>()
                         .eq(Review::getOrderId, orderId)
-                        .eq(Review::getUserId, buyerUserId)   // 买家写的
+                        .eq(Review::getUserId, buyerUserId)
                         .eq(Review::getScore, 5)) > 0;
         if (hasFiveStar) sellerDelta += 1;
 
@@ -101,7 +104,7 @@ public class CreditServiceImpl implements CreditService {
         double goodRate = calcSellerGoodRate(sellerUserId, soldCount);
         if (soldCount >= 10 && goodRate >= 95.0) sellerDelta += 1;
 
-        applyScore(sellerUserId, "SELLER", sellerDelta, "ORDER_COMPLETE",
+        applyScore(sellerUserId, sellerRole, sellerDelta, "ORDER_COMPLETE",
                 "完成交易加分", orderId, null);
     }
 
@@ -118,6 +121,7 @@ public class CreditServiceImpl implements CreditService {
             default:
                 delta = -5;  desc = "订单纠纷判定买家责任扣分"; break;
         }
+        // 买家纠纷扣买家信用分（credit_score）
         applyScore(buyerUserId, "BUYER", delta, reasonCode, desc, orderId, null);
     }
 
@@ -132,12 +136,15 @@ public class CreditServiceImpl implements CreditService {
             default:
                 delta = -5; desc = "订单纠纷判定卖家责任扣分"; break;
         }
-        applyScore(sellerUserId, "SELLER", delta, reasonCode, desc, orderId, null);
+        // 判断卖家类型：OFFICIAL_SELLER 扣店铺健康分，普通用户扣二手卖家分
+        User seller = userMapper.selectById(sellerUserId);
+        String sellerRole = isOfficialSeller(seller) ? "SELLER" : "SH_SELLER";
+        applyScore(sellerUserId, sellerRole, delta, reasonCode, desc, orderId, null);
     }
 
     @Override
     @Transactional
-    public void onReportUpheld(Long reportId, Long reportedId, String reportedRole,
+    public void onReportUpheld(Long reportId, Long reportedId, String tradeContext,
                                 String reasonType, Integer customDelta) {
         int delta = (customDelta != null) ? -Math.abs(customDelta) : calcReportPenalty(reasonType);
 
@@ -145,7 +152,24 @@ public class CreditServiceImpl implements CreditService {
         int upheldCount = userReportMapper.countUpheldReportsIn2Years(reportedId);
         if (upheldCount >= 3) delta -= 5;
 
-        applyScore(reportedId, reportedRole, delta, "REPORT_UPHELD",
+        /*
+         * 根据 tradeContext 决定扣被举报人哪个信用分：
+         *
+         * SHOP      = 买家举报店铺卖家  → 扣被举报人的店铺健康分 (SELLER)
+         * SH_BUYER  = 买家举报二手卖家  → 扣被举报人的二手卖家分 (SH_SELLER)
+         * SH_SELLER = 卖家举报买家      → 扣被举报人的买家信用分 (BUYER)
+         */
+        String scoreRole;
+        if ("SH_SELLER".equals(tradeContext)) {
+            scoreRole = "BUYER";
+        } else if ("SH_BUYER".equals(tradeContext)) {
+            scoreRole = "SH_SELLER";
+        } else {
+            // SHOP：买家举报店铺卖家，扣店铺健康分
+            scoreRole = "SELLER";
+        }
+
+        applyScore(reportedId, scoreRole, delta, "REPORT_UPHELD",
                 "举报成立扣分：" + reasonType, reportId, null);
     }
 
@@ -167,8 +191,11 @@ public class CreditServiceImpl implements CreditService {
 
     /**
      * 核心：更新user表分数 + 写日志（带上下限0~100保护）
-     * 你们User表只有一个creditScore，我们用BUYER身份更新它，
-     * SELLER身份更新seller_credit_score（schema.sql里已追加的列）
+     *
+     * role 取值：
+     *   BUYER     → credit_score（买家信用分，所有用户都有）
+     *   SH_SELLER → buyer_credit_score（二手卖家信用分，所有用户都有；DB 列复用 buyer_credit_score）
+     *   SELLER    → seller_credit_score（店铺账户健康分，仅 OFFICIAL_SELLER 有意义）
      */
     private void applyScore(Long userId, String role, int delta,
                              String reasonCode, String reasonDesc,
@@ -177,22 +204,32 @@ public class CreditServiceImpl implements CreditService {
         if (user == null) return;
 
         int current;
-        if ("BUYER".equals(role)) {
-            // 买家信用分 = 原有的 creditScore 字段
-            current = user.getCreditScore() == null ? 100 : user.getCreditScore();
-        } else {
-            // 卖家信用分 = 新增的 seller_credit_score 字段
-            current = user.getSellerCreditScore() == null ? 100 : user.getSellerCreditScore();
+        switch (role) {
+            case "SELLER":
+                current = user.getSellerCreditScore() == null ? 100 : user.getSellerCreditScore();
+                break;
+            case "SH_SELLER":
+                current = user.getShSellerCreditScore() == null ? 100 : user.getShSellerCreditScore();
+                break;
+            default: // BUYER
+                current = user.getCreditScore() == null ? 100 : user.getCreditScore();
+                break;
         }
 
         int newScore = Math.min(100, Math.max(0, current + delta));
         int actualDelta = newScore - current;
         if (actualDelta == 0) return; // 边界无变化
 
-        if ("BUYER".equals(role)) {
-            user.setCreditScore(newScore);
-        } else {
-            user.setSellerCreditScore(newScore);
+        switch (role) {
+            case "SELLER":
+                user.setSellerCreditScore(newScore);
+                break;
+            case "SH_SELLER":
+                user.setShSellerCreditScore(newScore);
+                break;
+            default:
+                user.setCreditScore(newScore);
+                break;
         }
         userMapper.updateById(user);
 
@@ -222,33 +259,54 @@ public class CreditServiceImpl implements CreditService {
     private CreditScoreVO buildVO(User user) {
         CreditScoreVO vo = new CreditScoreVO();
         Long uid = user.getId();
+        boolean officialSeller = isOfficialSeller(user);
 
-        // 买家
+        // -------- 买家信用分（所有用户） --------
         int buyerScore = user.getCreditScore() == null ? 100 : user.getCreditScore();
         vo.setBuyerScore(buyerScore);
         vo.setBuyerLevel(calcLevel(buyerScore));
         int buyerOrderCount = countBuyerOrders(uid);
         vo.setBuyerOrderCount(buyerOrderCount);
-        int buyerGoodReview = countBuyerGoodReviews(uid);
-        vo.setBuyerGoodReviewCount(buyerGoodReview);
         vo.setBuyerDisputeCount(userReportMapper.countUpheldReportsIn2Years(uid));
-        vo.setBuyerGoodRate(buyerOrderCount == 0 ? 100.0
-                : Math.round(buyerGoodReview * 1000.0 / buyerOrderCount) / 10.0);
-
-        // 卖家
-        int sellerScore = user.getSellerCreditScore() == null ? 100 : user.getSellerCreditScore();
-        vo.setSellerScore(sellerScore);
-        vo.setSellerLevel(calcLevel(sellerScore));
-        int soldCount = countSellerSoldOrders(uid);
-        vo.setSellerSoldCount(soldCount);
-        int sellerGoodReview = countSellerGoodReviews(uid);
-        vo.setSellerGoodReviewCount(sellerGoodReview);
-        vo.setSellerDisputeCount(userReportMapper.countUpheldReportsIn2Years(uid));
-        vo.setSellerGoodRate(calcSellerGoodRate(uid, soldCount));
-
-        // 最近10条日志
         vo.setBuyerLogs(buildLogVOs(uid, "BUYER"));
-        vo.setSellerLogs(buildLogVOs(uid, "SELLER"));
+
+        // -------- 二手卖家信用分（所有用户） --------
+        int shSellerScore = user.getShSellerCreditScore() == null ? 100 : user.getShSellerCreditScore();
+        vo.setShSellerScore(shSellerScore);
+        vo.setShSellerLevel(calcLevel(shSellerScore));
+        int shSellerSoldCount = countShSellerSoldOrders(uid);
+        vo.setShSellerSoldCount(shSellerSoldCount);
+        int shSellerGoodReview = countShSellerGoodReviews(uid);
+        vo.setShSellerGoodReviewCount(shSellerGoodReview);
+        vo.setShSellerDisputeCount(userReportMapper.countUpheldReportsIn2Years(uid));
+        vo.setShSellerGoodRate(shSellerSoldCount == 0 ? 100.0
+                : Math.round(shSellerGoodReview * 1000.0 / shSellerSoldCount) / 10.0);
+        vo.setShSellerLogs(buildLogVOs(uid, "SH_SELLER"));
+
+        // -------- 店铺账户健康分（仅 OFFICIAL_SELLER） --------
+        vo.setIsOfficialSeller(officialSeller);
+        if (officialSeller) {
+            int shopScore = user.getSellerCreditScore() == null ? 100 : user.getSellerCreditScore();
+            vo.setShopScore(shopScore);
+            vo.setShopLevel(calcLevel(shopScore));
+            int shopSoldCount = countShopSoldOrders(uid);
+            vo.setShopSoldCount(shopSoldCount);
+            int shopGoodReview = countShopGoodReviews(uid);
+            vo.setShopGoodRate(shopSoldCount == 0 ? 100.0
+                    : Math.round(shopGoodReview * 1000.0 / shopSoldCount) / 10.0);
+            vo.setShopLogs(buildLogVOs(uid, "SELLER"));
+
+            // 综合评分（官方卖家）：买家30% + 二手卖家30% + 店铺40%
+            int shopScore2 = user.getSellerCreditScore() == null ? 100 : user.getSellerCreditScore();
+            int overall = (int) Math.round(buyerScore * 0.3 + shSellerScore * 0.3 + shopScore2 * 0.4);
+            vo.setOverallScore(overall);
+            vo.setOverallLevel(calcLevel(overall));
+        } else {
+            // 综合评分（普通用户）：买家50% + 二手卖家50%
+            int overall = (int) Math.round((buyerScore + shSellerScore) / 2.0);
+            vo.setOverallScore(overall);
+            vo.setOverallLevel(calcLevel(overall));
+        }
 
         return vo;
     }
@@ -281,6 +339,13 @@ public class CreditServiceImpl implements CreditService {
         }
     }
 
+    // -------- 角色判断 --------
+
+    private boolean isOfficialSeller(User user) {
+        if (user == null || user.getRole() == null) return false;
+        return "OFFICIAL_SELLER".equals(user.getRole());
+    }
+
     // -------- 统计辅助 --------
 
     private int countBuyerOrders(Long userId) {
@@ -290,23 +355,15 @@ public class CreditServiceImpl implements CreditService {
                         .eq("order_status", OrderStatusEnum.COMPLETED.getCode())).intValue();
     }
 
-    private int countBuyerGoodReviews(Long userId) {
-        // Review.userId = 评价人，reviewType=BUYER_TO_SELLER 是买家写的
-        return reviewMapper.selectCount(
-                new QueryWrapper<Review>()
-                        .eq("user_id", userId)
-                        .eq("review_type", "BUYER_TO_SELLER")
-                        .ge("score", 4)).intValue();
-    }
-
-    private int countSellerSoldOrders(Long sellerUserId) {
-        // OrderInfo没有seller字段，通过OrderItem找卖家商品对应的订单
+    /**
+     * 统计用户作为二手卖家的售出订单（secondhand_product 来源）
+     */
+    private int countShSellerSoldOrders(Long sellerUserId) {
         List<Long> orderIds = orderItemMapper.selectList(
                         new QueryWrapper<OrderItem>()
                                 .select("order_id")
                                 .inSql("product_id",
-                                        "SELECT id FROM product WHERE shop_id IN (SELECT id FROM shop WHERE owner_user_id=" + sellerUserId + ")"
-                                        + " UNION SELECT id FROM secondhand_product WHERE seller_user_id=" + sellerUserId))
+                                        "SELECT id FROM secondhand_product WHERE seller_user_id=" + sellerUserId))
                 .stream()
                 .map(OrderItem::getOrderId)
                 .distinct()
@@ -318,14 +375,36 @@ public class CreditServiceImpl implements CreditService {
                         .eq("order_status", OrderStatusEnum.COMPLETED.getCode())).intValue();
     }
 
-    private int countSellerGoodReviews(Long sellerUserId) {
-        // 找卖家的所有订单，再找这些订单里买家给的好评
+    /**
+     * 统计用户作为店铺卖家的售出订单（product 来源，仅 OFFICIAL_SELLER）
+     */
+    private int countShopSoldOrders(Long sellerUserId) {
         List<Long> orderIds = orderItemMapper.selectList(
                         new QueryWrapper<OrderItem>()
                                 .select("order_id")
                                 .inSql("product_id",
-                                        "SELECT id FROM product WHERE shop_id IN (SELECT id FROM shop WHERE owner_user_id=" + sellerUserId + ")"
-                                        + " UNION SELECT id FROM secondhand_product WHERE seller_user_id=" + sellerUserId))
+                                        "SELECT id FROM product WHERE shop_id IN " +
+                                        "(SELECT id FROM shop WHERE owner_user_id=" + sellerUserId + ")"))
+                .stream()
+                .map(OrderItem::getOrderId)
+                .distinct()
+                .collect(Collectors.toList());
+        if (orderIds.isEmpty()) return 0;
+        return orderInfoMapper.selectCount(
+                new QueryWrapper<OrderInfo>()
+                        .in("id", orderIds)
+                        .eq("order_status", OrderStatusEnum.COMPLETED.getCode())).intValue();
+    }
+
+    /**
+     * 统计卖家在二手交易中收到的好评（score >= 4）
+     */
+    private int countShSellerGoodReviews(Long sellerUserId) {
+        List<Long> orderIds = orderItemMapper.selectList(
+                        new QueryWrapper<OrderItem>()
+                                .select("order_id")
+                                .inSql("product_id",
+                                        "SELECT id FROM secondhand_product WHERE seller_user_id=" + sellerUserId))
                 .stream()
                 .map(OrderItem::getOrderId)
                 .distinct()
@@ -338,25 +417,36 @@ public class CreditServiceImpl implements CreditService {
                         .ge("score", 4)).intValue();
     }
 
+    /**
+     * 统计店铺卖家在店铺交易中收到的好评（仅 OFFICIAL_SELLER）
+     */
+    private int countShopGoodReviews(Long sellerUserId) {
+        List<Long> orderIds = orderItemMapper.selectList(
+                        new QueryWrapper<OrderItem>()
+                                .select("order_id")
+                                .inSql("product_id",
+                                        "SELECT id FROM product WHERE shop_id IN " +
+                                        "(SELECT id FROM shop WHERE owner_user_id=" + sellerUserId + ")"))
+                .stream()
+                .map(OrderItem::getOrderId)
+                .distinct()
+                .collect(Collectors.toList());
+        if (orderIds.isEmpty()) return 0;
+        return reviewMapper.selectCount(
+                new QueryWrapper<Review>()
+                        .in("order_id", orderIds)
+                        .eq("review_type", "BUYER_TO_SELLER")
+                        .ge("score", 4)).intValue();
+    }
+
+    private int countSellerSoldOrders(Long sellerUserId) {
+        // 兼容旧调用：返回二手+店铺合计售出数（用于好评率加分判断）
+        return countShSellerSoldOrders(sellerUserId) + countShopSoldOrders(sellerUserId);
+    }
+
     private double calcSellerGoodRate(Long sellerUserId, int soldCount) {
         if (soldCount == 0) return 100.0;
-        int good = countSellerGoodReviews(sellerUserId);
+        int good = countShSellerGoodReviews(sellerUserId) + countShopGoodReviews(sellerUserId);
         return Math.round(good * 1000.0 / soldCount) / 10.0;
     }
-
-    private List<Long> getSellerProductIds(Long sellerUserId) {
-        return orderItemMapper.selectList(
-                        new QueryWrapper<OrderItem>()
-                                .select("distinct product_id")
-                                .inSql("product_id",
-                                        "SELECT id FROM product WHERE shop_id IN (SELECT id FROM shop WHERE owner_user_id=" + sellerUserId + ")"
-                                        + " UNION SELECT id FROM secondhand_product WHERE seller_user_id=" + sellerUserId))
-                .stream()
-                .map(OrderItem::getProductId)
-                .collect(Collectors.toList());
-    }
-
-
-
-
 }

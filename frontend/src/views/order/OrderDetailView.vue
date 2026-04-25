@@ -427,6 +427,7 @@ async function handleOrderReportSubmit() {
   try {
     await submitReportApi({
       reportedId: orderSellerUserId.value,
+      tradeContext: "SHOP",
       reasonType: orderReportForm.value.reasonType,
       reasonDesc: orderReportForm.value.reasonDesc,
     });
@@ -486,6 +487,7 @@ async function handleSellerReportSubmit() {
   try {
     await submitReportApi({
       reportedId: orderBuyerUserId.value,
+      tradeContext: "SH_SELLER",
       reasonType: sellerReportForm.value.reasonType,
       reasonDesc: sellerReportForm.value.reasonDesc,
     });

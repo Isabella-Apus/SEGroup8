@@ -1,6 +1,7 @@
 package com.segroup8.platform.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -19,14 +20,30 @@ public class UserReport {
     private Long reportedId;
 
     /**
-     * 举报人当时的身份
-     * BUYER = 买家举报卖家
-     * SELLER = 卖家举报买家
+     * 举报人当时的身份（由后端自动判断，前端无需传）：
+     * BUYER  = 买家举报（SHOP 或 SH_BUYER 场景）
+     * SELLER = 卖家举报（SH_SELLER 场景，即卖家举报买家）
      */
     private String reporterRole;
 
     /**
-     * 举报类型枚举值：
+     * 交易场景（决定扣被举报人哪个信用分）：
+     *
+     * SHOP      = 买家举报店铺卖家
+     *             → 被举报人是 OFFICIAL_SELLER 时扣 seller_credit_score（店铺账户健康分）
+     *             → 被举报人非 OFFICIAL_SELLER 时扣 buyer_credit_score（二手卖家分）
+     *
+     * SH_BUYER  = 买家举报二手卖家
+     *             → 扣被举报人 buyer_credit_score（二手卖家信用分）
+     *
+     * SH_SELLER = 卖家举报二手买家
+     *             → 扣被举报人 credit_score（买家信用分）
+     */
+    @TableField("trade_context")
+    private String tradeContext;
+
+    /**
+     * 举报类型：
      * FRAUD          诈骗/虚假交易
      * FAKE_ITEM      商品与描述不符
      * BAD_ATTITUDE   态度恶劣/骚扰
@@ -73,6 +90,9 @@ public class UserReport {
 
     public String getReporterRole() { return reporterRole; }
     public void setReporterRole(String reporterRole) { this.reporterRole = reporterRole; }
+
+    public String getTradeContext() { return tradeContext; }
+    public void setTradeContext(String tradeContext) { this.tradeContext = tradeContext; }
 
     public String getReasonType() { return reasonType; }
     public void setReasonType(String reasonType) { this.reasonType = reasonType; }
