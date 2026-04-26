@@ -99,12 +99,30 @@
       </el-table>
 
       <div v-if="!isSellerView" class="actions">
-        <el-space>
+        <el-space wrap>
           <el-button v-if="order.orderStatus === 0" type="primary" @click="pay">立即付款</el-button>
           <el-button v-if="order.orderStatus === 0" @click="cancel">取消订单</el-button>
           <el-button v-if="order.orderStatus === 2" type="primary" @click="confirmReceive">确认收货</el-button>
           <el-button v-if="order.orderStatus === 3" type="primary" @click="openReviewDialog">去评价</el-button>
           <el-button v-if="canRefund(order.orderStatus, order.refundStatus)" type="danger" plain @click="openRefundDialog">申请退货</el-button>
+          <!-- 付款后即可举报/拉黑卖家 -->
+          <template v-if="order.orderStatus >= 1 && orderSellerUserId">
+            <el-button type="warning" plain size="small" @click="openOrderReportDialog">举报卖家</el-button>
+            <el-button
+              v-if="!isSellerBlocked"
+              type="danger"
+              plain
+              size="small"
+              @click="handleOrderBlock"
+            >拉黑卖家</el-button>
+            <el-button
+              v-else
+              type="info"
+              plain
+              size="small"
+              @click="handleOrderUnblock"
+            >取消拉黑</el-button>
+          </template>
         </el-space>
       </div>
       <div v-else class="actions">
@@ -112,6 +130,24 @@
           <el-button v-if="order.orderStatus === 1" type="primary" @click="shipBySeller">去发货</el-button>
           <el-button v-if="order.refundStatus === 1" type="success" @click="approveRefundBySeller">同意退货</el-button>
           <el-button v-if="order.refundStatus === 1" type="danger" plain @click="rejectRefundBySeller">拒绝退货</el-button>
+          <!-- 卖家可举报/拉黑买家 -->
+          <template v-if="orderBuyerUserId">
+            <el-button type="warning" plain size="small" @click="openSellerReportDialog">举报买家</el-button>
+            <el-button
+              v-if="!isBuyerBlocked"
+              type="danger"
+              plain
+              size="small"
+              @click="handleSellerBlock"
+            >拉黑买家</el-button>
+            <el-button
+              v-else
+              type="info"
+              plain
+              size="small"
+              @click="handleSellerUnblock"
+            >取消拉黑</el-button>
+          </template>
         </el-space>
       </div>
     </template>
@@ -221,6 +257,51 @@
         <el-button type="primary" :loading="paySubmitting" @click="confirmPay">{{ payForm.payMode === 'THIRD_PARTY' ? '我已支付' : '确认支付' }}</el-button>
       </template>
     </el-dialog>
+
+    <!-- ===== 举报卖家弹窗（订单内） ===== -->
+    <el-dialog v-model="orderReportDialogVisible" title="举报卖家" width="480px" append-to-body>
+      <el-form :model="orderReportForm" label-width="90px" @submit.prevent>
+        <el-form-item label="举报类型" required>
+          <el-select v-model="orderReportForm.reasonType" style="width:100%">
+            <el-option label="诈骗/虚假交易" value="FRAUD" />
+            <el-option label="商品与描述不符" value="FAKE_ITEM" />
+            <el-option label="态度恶劣/骚扰" value="BAD_ATTITUDE" />
+            <el-option label="恶意退款" value="REFUND_ABUSE" />
+            <el-option label="刷单/广告骚扰" value="SPAM" />
+            <el-option label="其他" value="OTHER" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="补充说明">
+          <el-input v-model="orderReportForm.reasonDesc" type="textarea" :rows="3" maxlength="500" show-word-limit />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="orderReportDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="orderReportSubmitting" @click="handleOrderReportSubmit">提交举报</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- ===== 举报买家弹窗（卖家视图） ===== -->
+    <el-dialog v-model="sellerReportDialogVisible" title="举报买家" width="480px" append-to-body>
+      <el-form :model="sellerReportForm" label-width="90px" @submit.prevent>
+        <el-form-item label="举报类型" required>
+          <el-select v-model="sellerReportForm.reasonType" style="width:100%">
+            <el-option label="恶意退款" value="REFUND_ABUSE" />
+            <el-option label="诈骗/虚假交易" value="FRAUD" />
+            <el-option label="态度恶劣/骚扰" value="BAD_ATTITUDE" />
+            <el-option label="刷单/广告骚扰" value="SPAM" />
+            <el-option label="其他" value="OTHER" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="补充说明">
+          <el-input v-model="sellerReportForm.reasonDesc" type="textarea" :rows="3" maxlength="500" show-word-limit />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="sellerReportDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="sellerReportSubmitting" @click="handleSellerReportSubmit">提交举报</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -247,6 +328,7 @@ import OrderStatusTag from "@/components/order/OrderStatusTag.vue";
 import OrderSummaryCard from "@/components/order/OrderSummaryCard.vue";
 import OrderTimeline from "@/components/order/OrderTimeline.vue";
 import { onRealtimeEvent } from "@/realtime/realtimeClient";
+import { submitReportApi, blockUserApi, unblockUserApi, isBlockingApi } from "@/api/credit";
 
 const route = useRoute();
 const router = useRouter();
@@ -286,6 +368,171 @@ const timelineExpanded = ref(false);
 const isSellerView = computed(() => route.meta?.detailMode === "seller" || route.query.from === "seller");
 const canOnlyRefund = computed(() => Number(order.value?.orderStatus) === 1);
 
+// 取订单中第一个有卖家ID的商品的卖家ID
+const orderSellerUserId = computed(() => {
+  const items = order.value?.items || [];
+  return items.find(i => i.sellerUserId)?.sellerUserId || null;
+});
+
+// 取买家ID（卖家视图使用）
+const orderBuyerUserId = computed(() => order.value?.buyerUserId || null);
+
+// 举报弹窗（订单内，买家举报卖家）
+const orderReportDialogVisible = ref(false);
+const orderReportSubmitting = ref(false);
+const orderReportForm = ref({ reasonType: "", reasonDesc: "" });
+
+// 拉黑状态（买家对卖家）
+const isSellerBlocked = ref(false);
+
+// 举报弹窗（卖家举报买家）
+const sellerReportDialogVisible = ref(false);
+const sellerReportSubmitting = ref(false);
+const sellerReportForm = ref({ reasonType: "", reasonDesc: "" });
+
+// 拉黑状态（卖家对买家）
+const isBuyerBlocked = ref(false);
+
+async function checkBlockStatus() {
+  if (!orderSellerUserId.value) return;
+  try {
+    const res = await isBlockingApi(orderSellerUserId.value);
+    isSellerBlocked.value = res.data === true;
+  } catch {
+    isSellerBlocked.value = false;
+  }
+}
+
+async function checkBuyerBlockStatus() {
+  if (!orderBuyerUserId.value) return;
+  try {
+    const res = await isBlockingApi(orderBuyerUserId.value);
+    isBuyerBlocked.value = res.data === true;
+  } catch {
+    isBuyerBlocked.value = false;
+  }
+}
+
+function openOrderReportDialog() {
+  orderReportForm.value = { reasonType: "", reasonDesc: "" };
+  orderReportDialogVisible.value = true;
+}
+
+async function handleOrderReportSubmit() {
+  if (!orderReportForm.value.reasonType) {
+    showOrderActionError({ message: "请选择举报类型" }, "举报失败");
+    return;
+  }
+  orderReportSubmitting.value = true;
+  try {
+    await submitReportApi({
+      reportedId: orderSellerUserId.value,
+      tradeContext: "SHOP",
+      reasonType: orderReportForm.value.reasonType,
+      reasonDesc: orderReportForm.value.reasonDesc,
+    });
+    orderReportDialogVisible.value = false;
+    showOrderActionSuccess("举报已提交，等待管理员审核");
+  } catch (e) {
+    showOrderActionError(e, "举报提交失败");
+  } finally {
+    orderReportSubmitting.value = false;
+  }
+}
+
+async function handleOrderBlock() {
+  try {
+    await confirmOrderAction({
+      title: "拉黑卖家",
+      message: "确认拉黑该订单的卖家？拉黑后对方无法与你发起会话。",
+      confirmButtonText: "确认拉黑"
+    });
+    await blockUserApi(orderSellerUserId.value);
+    isSellerBlocked.value = true;
+    showOrderActionSuccess("已拉黑该卖家");
+  } catch (e) {
+    if (String(e?.message || "").includes("cancel")) return;
+    showOrderActionError(e, "操作失败");
+  }
+}
+
+async function handleOrderUnblock() {
+  try {
+    await confirmOrderAction({
+      title: "取消拉黑",
+      message: "确认取消对该卖家的拉黑？",
+      confirmButtonText: "确认取消"
+    });
+    await unblockUserApi(orderSellerUserId.value);
+    isSellerBlocked.value = false;
+    showOrderActionSuccess("已取消拉黑");
+  } catch (e) {
+    if (String(e?.message || "").includes("cancel")) return;
+    showOrderActionError(e, "操作失败");
+  }
+}
+
+// ===== 卖家举报买家 =====
+function openSellerReportDialog() {
+  sellerReportForm.value = { reasonType: "", reasonDesc: "" };
+  sellerReportDialogVisible.value = true;
+}
+
+async function handleSellerReportSubmit() {
+  if (!sellerReportForm.value.reasonType) {
+    showOrderActionError({ message: "请选择举报类型" }, "举报失败");
+    return;
+  }
+  sellerReportSubmitting.value = true;
+  try {
+    await submitReportApi({
+      reportedId: orderBuyerUserId.value,
+      tradeContext: "SH_SELLER",
+      reasonType: sellerReportForm.value.reasonType,
+      reasonDesc: sellerReportForm.value.reasonDesc,
+    });
+    sellerReportDialogVisible.value = false;
+    showOrderActionSuccess("举报已提交，等待管理员审核");
+  } catch (e) {
+    showOrderActionError(e, "举报提交失败");
+  } finally {
+    sellerReportSubmitting.value = false;
+  }
+}
+
+// ===== 卖家拉黑买家 =====
+async function handleSellerBlock() {
+  try {
+    await confirmOrderAction({
+      title: "拉黑买家",
+      message: "确认拉黑该订单的买家？拉黑后对方无法与你发起会话。",
+      confirmButtonText: "确认拉黑"
+    });
+    await blockUserApi(orderBuyerUserId.value);
+    isBuyerBlocked.value = true;
+    showOrderActionSuccess("已拉黑该买家");
+  } catch (e) {
+    if (String(e?.message || "").includes("cancel")) return;
+    showOrderActionError(e, "操作失败");
+  }
+}
+
+async function handleSellerUnblock() {
+  try {
+    await confirmOrderAction({
+      title: "取消拉黑",
+      message: "确认取消对该买家的拉黑？",
+      confirmButtonText: "确认取消"
+    });
+    await unblockUserApi(orderBuyerUserId.value);
+    isBuyerBlocked.value = false;
+    showOrderActionSuccess("已取消拉黑");
+  } catch (e) {
+    if (String(e?.message || "").includes("cancel")) return;
+    showOrderActionError(e, "操作失败");
+  }
+}
+
 const autoConfirmTip = computed(() => {
   const o = order.value;
   if (!o || String(o.logisticsStatus || "").toUpperCase() !== "ARRIVED" || !o.autoConfirmDeadline) {
@@ -316,6 +563,13 @@ onMounted(async () => {
   unsubscribeRealtime = onRealtimeEvent(handleRealtimeEvent);
   if (!isSellerView.value && route.query.action === "review") {
     openReviewDialog();
+  }
+  // 检查是否已拉黑卖家
+  if (!isSellerView.value) {
+    await checkBlockStatus();
+  } else {
+    // 卖家视图：检查是否已拉黑买家
+    await checkBuyerBlockStatus();
   }
 });
 onBeforeUnmount(() => {
@@ -844,4 +1098,3 @@ const orderNextActionSummary = computed(() => {
   max-height: 560px;
 }
 </style>
-

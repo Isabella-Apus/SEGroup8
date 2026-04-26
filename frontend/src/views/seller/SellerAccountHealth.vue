@@ -7,11 +7,55 @@
       </el-tag>
     </div>
 
+    <!-- 店铺信用分（来自后端） -->
+    <el-card class="credit-score-card" v-loading="loading">
+      <template #header>
+        <span>🏅 店铺信用分</span>
+      </template>
+      <div class="shop-credit-wrap">
+        <div class="score-bar-wrap">
+          <div class="score-bar shop-seller">
+            <div
+              v-for="lv in levels"
+              :key="lv"
+              class="bar-segment"
+              :class="{ active: sellerCreditLevel === lv }"
+            >{{ lv }}</div>
+          </div>
+          <div class="score-num" :style="{ color: sellerCreditColor }">
+            {{ sellerCreditScore }} 分
+          </div>
+        </div>
+        <div class="credit-meta">
+          <el-tag :type="levelTagType(sellerCreditLevel)" size="large">{{ sellerCreditLevel }}</el-tag>
+          <span class="credit-tip">店铺信用分由买家举报、订单纠纷等因素影响</span>
+        </div>
+
+        <div class="log-title">近期信用变动记录</div>
+        <el-table
+          :data="sellerCreditLogs"
+          border size="small"
+          style="margin-top:6px"
+          :empty-text="'暂无变动记录'"
+        >
+          <el-table-column prop="createTime" label="时间" min-width="160" />
+          <el-table-column prop="reasonDesc" label="原因" min-width="200" />
+          <el-table-column label="变动" width="90">
+            <template #default="{ row }">
+              <span :class="row.delta >= 0 ? 'delta-plus' : 'delta-minus'">
+                {{ row.delta >= 0 ? '+' + row.delta : row.delta }}
+              </span>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+    </el-card>
+
     <!-- 综合评分 -->
-    <el-card class="score-card" v-loading="loading">
+    <el-card class="score-card" v-loading="loading" style="margin-top:16px">
       <div class="score-main">
         <div class="score-circle" :style="{ borderColor: scoreColor }">
-          <div class="score-num" :style="{ color: scoreColor }">{{ overallScore }}</div>
+          <div class="score-num-big" :style="{ color: scoreColor }">{{ overallScore }}</div>
           <div class="score-sub">综合评分</div>
         </div>
         <div class="score-desc">
@@ -21,7 +65,6 @@
           <p>综合评分基于好评率、按时发货率、退款率等指标加权计算得出。</p>
           <p>保持良好的店铺表现有助于提升搜索曝光度和买家信任度。</p>
         </div>
-        <!-- 评分环形进度 -->
         <div class="score-ring-wrap">
           <el-progress
             type="circle"
@@ -107,20 +150,38 @@
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { getMyOrders, getMyReviews } from '@/api/seller'
+import { getMyCreditApi } from '@/api/credit'
 
 const loading = ref(false)
 const orders = ref([])
 const reviews = ref([])
+const creditData = ref(null)
+
+const levels = ['较差', '良好', '优秀', '极好']
+
+// 店铺信用分（来自后端 API）
+const sellerCreditScore = computed(() => creditData.value?.shopScore ?? 100)
+const sellerCreditLevel = computed(() => creditData.value?.shopLevel ?? '极好')
+const sellerCreditLogs = computed(() => creditData.value?.shopLogs || [])
+const sellerCreditColor = computed(() => {
+  const score = sellerCreditScore.value
+  if (score >= 90) return '#1d9e75'
+  if (score >= 70) return '#409eff'
+  if (score >= 50) return '#e6a23c'
+  return '#f56c6c'
+})
 
 async function loadData() {
   loading.value = true
   try {
-    const [ordersRes, reviewsRes] = await Promise.all([
+    const [ordersRes, reviewsRes, creditRes] = await Promise.all([
       getMyOrders({ page: 1, pageSize: 100 }),
-      getMyReviews({ page: 1, pageSize: 100, keyword: '' })
+      getMyReviews({ page: 1, pageSize: 100, keyword: '' }),
+      getMyCreditApi()
     ])
     orders.value = ordersRes.data?.records || []
     reviews.value = reviewsRes.data?.records || []
+    creditData.value = creditRes.data
   } catch {
     ElMessage.error('加载数据失败，请刷新重试')
   } finally {
@@ -237,6 +298,8 @@ const orderStats = computed(() => [
 
 const suggestions = computed(() => {
   const list = []
+  if (sellerCreditScore.value < 70)
+    list.push({ level: '警告', type: 'danger', text: `店铺信用分 ${sellerCreditScore.value} 分，低于70分，请注意减少纠纷和举报` })
   if (positiveRate.value < 90)
     list.push({ level: '建议', type: 'warning', text: `好评率 ${positiveRate.value}%，低于90%目标，建议提升商品质量和售后服务` })
   if (refundRate.value > 5)
@@ -247,6 +310,11 @@ const suggestions = computed(() => {
     list.push({ level: '提示', type: 'info', text: `订单完成率 ${completionRate.value}%，低于80%目标，建议关注买家收货状态` })
   return list
 })
+
+function levelTagType(level) {
+  const map = { 较差: 'danger', 良好: 'warning', 优秀: '', 极好: 'success' }
+  return map[level] || ''
+}
 
 onMounted(loadData)
 </script>
@@ -259,6 +327,61 @@ onMounted(loadData)
   margin-bottom: 16px;
 }
 .page-title { margin: 0; font-size: 20px; font-weight: 600; }
+
+.credit-score-card { margin-bottom: 4px; }
+.shop-credit-wrap { padding: 4px 0; }
+.score-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+.score-bar {
+  display: flex;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #f0f2f5;
+  height: 36px;
+}
+.bar-segment {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #909399;
+  cursor: default;
+  padding: 0 12px;
+  transition: background 0.2s;
+}
+.score-bar.shop-seller .bar-segment.active {
+  background: #1d9e75;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 20px;
+}
+.score-num {
+  font-size: 22px;
+  font-weight: 700;
+  min-width: 70px;
+}
+.credit-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.credit-tip {
+  font-size: 13px;
+  color: #909399;
+}
+.log-title {
+  font-size: 13px;
+  color: #606266;
+  margin-top: 10px;
+}
+.delta-plus { color: #67c23a; font-weight: 600; }
+.delta-minus { color: #f56c6c; font-weight: 600; }
 
 .score-card { margin-bottom: 4px; }
 .score-main {
@@ -279,7 +402,7 @@ onMounted(loadData)
   flex-shrink: 0;
   transition: border-color 0.3s;
 }
-.score-num { font-size: 36px; font-weight: 700; line-height: 1; }
+.score-num-big { font-size: 36px; font-weight: 700; line-height: 1; }
 .score-sub { font-size: 12px; color: #999; margin-top: 4px; }
 .score-grade { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
 .score-desc { color: #666; font-size: 14px; line-height: 1.8; flex: 1; }

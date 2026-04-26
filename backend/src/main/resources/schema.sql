@@ -1216,3 +1216,143 @@ CREATE TABLE IF NOT EXISTS `chat_message` (
   KEY `idx_chat_message_conversation` (`conversation_id`, `create_time`),
   KEY `idx_chat_message_receiver` (`receiver_user_id`, `is_read`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- =====================================================
+-- 信用评分、举报、拉黑 相关表（追加到schema.sql末尾）
+-- =====================================================
+
+-- 信用分变动日志
+CREATE TABLE IF NOT EXISTS `credit_score_log` (
+  `id`          BIGINT NOT NULL AUTO_INCREMENT,
+  `user_id`     BIGINT NOT NULL COMMENT '目标用户',
+  `role`        VARCHAR(20) NOT NULL COMMENT '变动时身份：BUYER / SELLER',
+  `delta`       INT NOT NULL COMMENT '分数变化，正为加分负为扣分',
+  `reason_code` VARCHAR(50) NOT NULL COMMENT '原因码',
+  `reason_desc` VARCHAR(255) DEFAULT NULL COMMENT '详细说明',
+  `ref_id`      BIGINT DEFAULT NULL COMMENT '关联业务ID（订单/举报等）',
+  `operator_id` BIGINT DEFAULT NULL COMMENT '触发操作者ID，系统自动则NULL',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_csl_user_id` (`user_id`),
+  KEY `idx_csl_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+  COMMENT='信用分变动日志';
+
+-- 举报记录
+CREATE TABLE IF NOT EXISTS `user_report` (
+  `id`            BIGINT NOT NULL AUTO_INCREMENT,
+  `reporter_id`   BIGINT NOT NULL COMMENT '举报人ID',
+  `reported_id`   BIGINT NOT NULL COMMENT '被举报人ID',
+  `reporter_role` VARCHAR(20) NOT NULL COMMENT '举报人当时身份：BUYER/SELLER',
+  `trade_context` VARCHAR(20) NOT NULL DEFAULT 'SHOP'
+                  COMMENT '交易场景：SHOP=店铺 SH_BUYER=二手买家举报卖家 SH_SELLER=二手卖家举报买家',
+  `reason_type`   VARCHAR(50) NOT NULL COMMENT '举报类型',
+  `reason_desc`   VARCHAR(500) DEFAULT NULL COMMENT '补充说明',
+  `evidence_urls` VARCHAR(1000) DEFAULT NULL COMMENT '证据图片URL，逗号分隔',
+  `status`        TINYINT NOT NULL DEFAULT 0
+                  COMMENT '0=待审核 1=成立扣分 2=不成立驳回',
+  `admin_id`      BIGINT DEFAULT NULL COMMENT '处理管理员ID',
+  `admin_remark`  VARCHAR(500) DEFAULT NULL COMMENT '管理员备注',
+  `audit_time`    DATETIME DEFAULT NULL,
+  `create_time`   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time`   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_ur_reporter` (`reporter_id`),
+  KEY `idx_ur_reported` (`reported_id`),
+  KEY `idx_ur_status`   (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+  COMMENT='用户举报记录';
+
+-- 拉黑关系
+CREATE TABLE IF NOT EXISTS `user_block` (
+  `id`          BIGINT NOT NULL AUTO_INCREMENT,
+  `blocker_id`  BIGINT NOT NULL COMMENT '拉黑操作者',
+  `blocked_id`  BIGINT NOT NULL COMMENT '被拉黑用户',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_block` (`blocker_id`, `blocked_id`),
+  KEY `idx_ub_blocker` (`blocker_id`),
+  KEY `idx_ub_blocked` (`blocked_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+  COMMENT='用户拉黑关系';
+
+-- 为 user 表追加卖家信用分列（幂等，已存在则跳过）
+SET @col_seller = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user'
+    AND COLUMN_NAME = 'seller_credit_score'
+);
+SET @sql1 = IF(@col_seller = 0,
+  'ALTER TABLE `user` ADD COLUMN `seller_credit_score` INT NOT NULL DEFAULT 100 COMMENT ''卖家信用分''',
+  'SELECT 1');
+PREPARE s1 FROM @sql1; EXECUTE s1; DEALLOCATE PREPARE s1;
+
+-- 为 user 表追加买家信用分列（幂等，已存在则跳过）
+SET @col_buyer = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user'
+    AND COLUMN_NAME = 'buyer_credit_score'
+);
+SET @sql2 = IF(@col_buyer = 0,
+  'ALTER TABLE `user` ADD COLUMN `buyer_credit_score` INT NOT NULL DEFAULT 100 COMMENT ''买家信用分''',
+  'SELECT 1');
+PREPARE s2 FROM @sql2; EXECUTE s2; DEALLOCATE PREPARE s2;
+
+-- 为 user_report 表追加 trade_context 列（幂等，已存在则跳过）
+SET @col_tc = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_report'
+    AND COLUMN_NAME = 'trade_context'
+);
+SET @sql_tc = IF(@col_tc = 0,
+  'ALTER TABLE `user_report` ADD COLUMN `trade_context` VARCHAR(20) NOT NULL DEFAULT ''SHOP'' COMMENT ''交易场景：SHOP/SH_BUYER/SH_SELLER'' AFTER `reporter_role`',
+  'SELECT 1');
+PREPARE stc FROM @sql_tc; EXECUTE stc; DEALLOCATE PREPARE stc;
+
+-- =====================================================
+-- 信用评分、举报、拉黑 相关新表
+-- =====================================================
+
+CREATE TABLE IF NOT EXISTS `credit_score_log` (
+  `id`          BIGINT NOT NULL AUTO_INCREMENT,
+  `user_id`     BIGINT NOT NULL,
+  `role`        VARCHAR(20) NOT NULL,
+  `delta`       INT NOT NULL,
+  `reason_code` VARCHAR(50) NOT NULL,
+  `reason_desc` VARCHAR(255) DEFAULT NULL,
+  `ref_id`      BIGINT DEFAULT NULL,
+  `operator_id` BIGINT DEFAULT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_csl_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `user_report` (
+  `id`            BIGINT NOT NULL AUTO_INCREMENT,
+  `reporter_id`   BIGINT NOT NULL,
+  `reported_id`   BIGINT NOT NULL,
+  `reporter_role` VARCHAR(20) NOT NULL,
+  `trade_context` VARCHAR(20) NOT NULL DEFAULT 'SHOP',
+  `reason_type`   VARCHAR(50) NOT NULL,
+  `reason_desc`   VARCHAR(500) DEFAULT NULL,
+  `evidence_urls` VARCHAR(1000) DEFAULT NULL,
+  `status`        TINYINT NOT NULL DEFAULT 0,
+  `admin_id`      BIGINT DEFAULT NULL,
+  `admin_remark`  VARCHAR(500) DEFAULT NULL,
+  `audit_time`    DATETIME DEFAULT NULL,
+  `create_time`   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time`   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_ur_reporter` (`reporter_id`),
+  KEY `idx_ur_reported` (`reported_id`),
+  KEY `idx_ur_status`   (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `user_block` (
+  `id`          BIGINT NOT NULL AUTO_INCREMENT,
+  `blocker_id`  BIGINT NOT NULL,
+  `blocked_id`  BIGINT NOT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_block` (`blocker_id`, `blocked_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
