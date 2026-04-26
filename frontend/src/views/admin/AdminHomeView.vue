@@ -22,9 +22,9 @@
         </el-card>
       </el-col>
       <el-col :span="6">
-        <el-card shadow="hover" class="entry-card" @click="router.push('/admin/audit-logs')">
-          <h3>审计日志</h3>
-          <p class="empty-tip">查看管理员关键操作记录</p>
+        <el-card shadow="hover" class="entry-card" @click="router.push('/admin/vouchers')">
+          <h3>优惠券管理</h3>
+          <p class="empty-tip">创建、编辑、关闭和删除平台优惠券</p>
         </el-card>
       </el-col>
     </el-row>

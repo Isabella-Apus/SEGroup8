@@ -98,7 +98,11 @@
         </div>
 
         <div class="order-card__footer" @click.stop>
-          <div class="amount">实付：<strong>￥{{ Number(order.totalAmount || 0).toFixed(2) }}</strong></div>
+          <div class="amount-wrap">
+            <div class="amount">原价：<strong>￥{{ Number(order.totalAmount || 0).toFixed(2) }}</strong></div>
+            <div v-if="Number(order.voucherDiscountAmount || 0) > 0" class="amount discount">优惠券：-￥{{ Number(order.voucherDiscountAmount || 0).toFixed(2) }}</div>
+            <div class="amount payable">实付：<strong>￥{{ Number(order.payableAmount ?? (order.totalAmount || 0)).toFixed(2) }}</strong></div>
+          </div>
           <el-space>
             <el-button v-if="order.orderStatus === 0" size="small" @click="cancel(order.id)">取消订单</el-button>
             <el-button v-if="order.orderStatus === 0" size="small" type="primary" @click="pay(order.id)">立即付款</el-button>
@@ -610,6 +614,24 @@ function handleRealtimeEvent(event) {
   height: 12px;
   background: #e5e7eb;
   margin: 0 6px;
+}
+
+.amount-wrap {
+  display: grid;
+  gap: 2px;
+}
+
+.amount {
+  font-size: 13px;
+  color: #374151;
+}
+
+.amount.discount {
+  color: #16a34a;
+}
+
+.amount.payable {
+  font-size: 14px;
 }
 
 .amount strong {

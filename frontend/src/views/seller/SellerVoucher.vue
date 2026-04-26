@@ -116,10 +116,17 @@
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item label="最低消费" prop="minAmount">
+        <el-form-item label="门槛类型" prop="noThreshold">
+          <el-radio-group v-model="form.noThreshold">
+            <el-radio :label="false">有门槛</el-radio>
+            <el-radio :label="true">无门槛</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item v-if="!form.noThreshold" label="最低消费" prop="minAmount">
           <el-input-number
             v-model="form.minAmount"
-            :min="0"
+            :min="0.01"
             :precision="2"
             style="width: 180px"
           />
@@ -158,13 +165,26 @@
           <span style="margin-left: 8px">张</span>
         </el-form-item>
 
-        <el-form-item label="有效期" prop="timeRange">
+        <el-form-item label="抢券时间" prop="grabTimeRange">
+          <el-date-picker
+            v-model="form.grabTimeRange"
+            type="datetimerange"
+            range-separator="至"
+            start-placeholder="抢券开始"
+            end-placeholder="抢券结束"
+            format="YYYY-MM-DD HH:mm"
+            value-format="YYYY-MM-DDTHH:mm:ss"
+            style="width: 100%"
+          />
+        </el-form-item>
+
+        <el-form-item label="使用有效期" prop="timeRange">
           <el-date-picker
             v-model="form.timeRange"
             type="datetimerange"
             range-separator="至"
-            start-placeholder="开始时间"
-            end-placeholder="结束时间"
+            start-placeholder="使用开始"
+            end-placeholder="使用结束"
             format="YYYY-MM-DD HH:mm"
             value-format="YYYY-MM-DDTHH:mm:ss"
             style="width: 100%"
@@ -206,19 +226,50 @@ const formRef = ref(null)
 const form = reactive({
   name: '',
   type: 1,
+  noThreshold: false,
   minAmount: 0,
   discountAmount: null,
   discountRate: null,
   totalCount: 100,
+  grabTimeRange: null,
   timeRange: null
 })
 
 const rules = {
   name: [{ required: true, message: '请输入优惠券名称', trigger: 'blur' }],
   type: [{ required: true, message: '请选择类型', trigger: 'change' }],
-  minAmount: [{ required: true, message: '请输入最低消费', trigger: 'blur' }],
+  minAmount: [{
+    validator: (_, value, callback) => {
+      if (form.noThreshold) return callback()
+      if (value == null || Number(value) <= 0) return callback(new Error('请输入最低消费'))
+      callback()
+    },
+    trigger: 'change'
+  }],
+  discountAmount: [{
+    validator: (_, value, callback) => {
+      if (form.type !== 1) return callback()
+      if (value == null || Number(value) <= 0) return callback(new Error('请输入优惠金额'))
+      if (!form.noThreshold && Number(form.minAmount) > 0 && Number(value) > Number(form.minAmount)) {
+        return callback(new Error('优惠金额不能大于最低消费'))
+      }
+      callback()
+    },
+    trigger: 'change'
+  }],
+  discountRate: [{
+    validator: (_, value, callback) => {
+      if (form.type !== 2) return callback()
+      if (value == null || Number(value) <= 0 || Number(value) >= 1) {
+        return callback(new Error('折扣率需在0到1之间'))
+      }
+      callback()
+    },
+    trigger: 'change'
+  }],
   totalCount: [{ required: true, message: '请输入发放总量', trigger: 'blur' }],
-  timeRange: [{ required: true, message: '请选择有效期', trigger: 'change' }]
+  grabTimeRange: [{ required: true, message: '请选择抢券时间', trigger: 'change' }],
+  timeRange: [{ required: true, message: '请选择使用有效期', trigger: 'change' }]
 }
 
 async function loadVouchers() {
@@ -239,18 +290,22 @@ function openDialog(row = null) {
   if (row) {
     form.name = row.name
     form.type = row.type
+    form.noThreshold = (row.minAmount ?? 0) <= 0
     form.minAmount = row.minAmount
     form.discountAmount = row.discountAmount
     form.discountRate = row.discountRate
     form.totalCount = row.totalCount
+    form.grabTimeRange = [row.grabStartTime, row.grabEndTime]
     form.timeRange = [row.startTime, row.endTime]
   } else {
     form.name = ''
     form.type = 1
+    form.noThreshold = false
     form.minAmount = 0
     form.discountAmount = null
     form.discountRate = null
     form.totalCount = 100
+    form.grabTimeRange = null
     form.timeRange = null
   }
   dialogVisible.value = true
@@ -264,10 +319,13 @@ async function handleSubmit() {
       const payload = {
         name: form.name,
         type: form.type,
-        minAmount: form.minAmount,
+        minAmount: form.noThreshold ? 0 : form.minAmount,
+        noThreshold: form.noThreshold,
         discountAmount: form.type === 1 ? form.discountAmount : null,
         discountRate: form.type === 2 ? form.discountRate : null,
         totalCount: form.totalCount,
+        grabStartTime: form.grabTimeRange[0],
+        grabEndTime: form.grabTimeRange[1],
         startTime: form.timeRange[0],
         endTime: form.timeRange[1]
       }

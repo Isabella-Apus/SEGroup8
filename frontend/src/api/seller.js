@@ -73,6 +73,15 @@ export function closeVoucher(id) {
 export function deleteVoucher(id) {
     return http.delete(`/voucher/seller/${id}`)
 }
+export function getMyVouchersForClaim(params) {
+    return http.get('/voucher/list', { params })
+}
+export function claimVoucher(id) {
+    return http.post(`/voucher/${id}/claim`)
+}
+export function getMyClaimedVouchers(params) {
+    return http.get('/voucher/my', { params })
+}
 // ===== 店铺设置 =====
 export function updateShopProfile(data) {
     return http.put('/user/profile', data)
