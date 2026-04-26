@@ -61,7 +61,7 @@ class AdminOrderControllerWebMvcTest {
                 orderItemMapper,
                 userMapper,
                 orderAfterSaleLogMapper,
-                realtimePushService);
+                realtimePushService, null);
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .setMessageConverters(new MappingJackson2HttpMessageConverter())

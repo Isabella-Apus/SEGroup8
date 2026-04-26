@@ -110,7 +110,7 @@
             <el-button v-if="order.orderStatus === 2" size="small" @click="viewLogistics(order)">查看物流</el-button>
             <el-button v-if="order.orderStatus === 2" size="small" type="primary" @click="confirmReceive(order.id)">确认收货</el-button>
             <el-button v-if="order.orderStatus === 3" size="small" type="primary" @click="goReview(order.id)">去评价</el-button>
-            <el-button v-if="canRefund(order.orderStatus, order.refundStatus)" size="small" type="danger" plain @click="openRefundDialog(order.id)">申请退货</el-button>
+            <el-button v-if="canRefund(order.orderStatus, order.refundStatus)" size="small" type="danger" plain @click="openRefundDialog(order)">申请退货</el-button>
             <el-button size="small" @click="goDetail(order.id)">查看详情</el-button>
             <el-button v-if="getOrderPrimarySeller(order)?.sellerUserId" size="small" type="success" plain @click="contactSeller(order)">联系卖家</el-button>
           </el-space>
@@ -139,6 +139,12 @@
       append-to-body
     >
       <el-form label-width="90px">
+        <el-form-item label="退款方式">
+          <el-radio-group v-model="refundForm.mode">
+            <el-radio-button label="ONLY_REFUND" :disabled="!canOnlyRefund">仅退款</el-radio-button>
+            <el-radio-button label="RETURN_REFUND">退货退款</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="退货原因">
           <el-select v-model="refundForm.reason" placeholder="请选择" style="width: 100%">
             <el-option label="不想要了/拍错了" value="不想要了/拍错了" />
@@ -260,14 +266,17 @@ const router = useRouter();
 const refundDialogVisible = ref(false);
 const refundSubmitting = ref(false);
 const refundTargetId = ref(null);
+const refundTargetOrderStatus = ref(null);
 const payDialogVisible = ref(false);
 const paySubmitting = ref(false);
 const payTargetId = ref(null);
 const refundForm = reactive({
+  mode: 'RETURN_REFUND',
   reason: '',
   remark: '',
   proofUrls: []
 });
+const canOnlyRefund = computed(() => Number(refundTargetOrderStatus.value) === 1);
 const payForm = reactive({
   payMode: 'THIRD_PARTY',
   payChannel: 'WECHAT'
@@ -448,8 +457,10 @@ function canRefund(status, refundStatus) {
   return status === 1 || status === 2 || status === 3 || status === 4;
 }
 
-function openRefundDialog(orderId) {
-  refundTargetId.value = orderId;
+function openRefundDialog(order) {
+  refundTargetId.value = order?.id ?? null;
+  refundTargetOrderStatus.value = Number(order?.orderStatus ?? -1);
+  refundForm.mode = canOnlyRefund.value ? 'ONLY_REFUND' : 'RETURN_REFUND';
   refundForm.reason = '';
   refundForm.remark = '';
   refundForm.proofUrls = [];
@@ -482,6 +493,7 @@ async function submitRefund() {
     const remark = refundForm.remark?.trim();
     const reason = remark ? `${refundForm.reason}（${remark}）` : refundForm.reason;
     await refundOrderApi(refundTargetId.value, {
+      refundMode: refundForm.mode,
       reason,
       proofUrls: refundForm.proofUrls
     });
