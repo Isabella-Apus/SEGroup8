@@ -20,24 +20,55 @@
 
         <p class="desc">二手商品仅支持单件下单购买。</p>
 
-        <el-space>
+        <el-space wrap>
           <el-button type="primary" @click="handleBuyNow" :disabled="!canBuy">立即购买</el-button>
           <el-button v-if="canChatWithSeller" type="success" plain @click="handleContactSeller">联系卖家</el-button>
           <el-button type="primary" plain @click="router.push('/secondhand/publish')">我也要发布</el-button>
           <el-button text @click="router.push('/secondhand')">返回</el-button>
         </el-space>
+
+        <!-- 举报 / 拉黑（非本人商品时显示） -->
+        <el-divider v-if="canChatWithSeller" />
+        <el-space v-if="canChatWithSeller" wrap>
+          <el-button type="warning" plain size="small" @click="openReportDialog">举报卖家</el-button>
+          <el-button v-if="!isSellerBlocked" type="danger" plain size="small" @click="handleBlock">拉黑卖家</el-button>
+          <el-button v-else type="info" plain size="small" @click="handleUnblock">取消拉黑</el-button>
+        </el-space>
       </div>
     </div>
 
     <p v-else class="empty-tip">二手商品不存在</p>
+
+    <!-- ===== 举报弹窗 ===== -->
+    <el-dialog v-model="reportDialogVisible" title="举报卖家" width="480px">
+      <el-form :model="reportForm" label-width="90px">
+        <el-form-item label="举报类型" required>
+          <el-select v-model="reportForm.reasonType" style="width:100%">
+            <el-option label="诈骗/虚假交易" value="FRAUD" />
+            <el-option label="商品与描述不符" value="FAKE_ITEM" />
+            <el-option label="态度恶劣/骚扰" value="BAD_ATTITUDE" />
+            <el-option label="刷单/广告骚扰" value="SPAM" />
+            <el-option label="其他" value="OTHER" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="补充说明">
+          <el-input v-model="reportForm.reasonDesc" type="textarea" :rows="3" maxlength="500" show-word-limit />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="reportDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="reportSubmitting" @click="handleSubmitReport">提交举报</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, ref } from "vue";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { useRoute, useRouter } from "vue-router";
 import { buySecondhandApi, getSecondhandDetailApi } from "@/api/secondhand";
+import { submitReportApi, blockUserApi, unblockUserApi, isBlockingApi, isBlockedByApi } from "@/api/credit";
 import { getUser } from "@/utils/storage";
 
 const route = useRoute();
@@ -46,11 +77,17 @@ const router = useRouter();
 const loading = ref(false);
 const item = ref(null);
 
+// 举报弹窗
+const reportDialogVisible = ref(false);
+const reportSubmitting = ref(false);
+const reportForm = ref({ reasonType: "", reasonDesc: "" });
+
+// 拉黑状态
+const isSellerBlocked = ref(false);
+
 const canBuy = computed(() => !!item.value && Number(item.value.status || 1) === 1);
 const canChatWithSeller = computed(() => {
-  if (!item.value?.sellerUserId) {
-    return false;
-  }
+  if (!item.value?.sellerUserId) return false;
   return Number(item.value.sellerUserId) !== Number(getUser()?.id);
 });
 
@@ -63,6 +100,23 @@ async function fetchDetail() {
   try {
     const result = await getSecondhandDetailApi(route.params.id);
     item.value = result.data;
+
+    // 拉黑检查：任意一方拉黑对方，直接跳回列表
+    const sellerUserId = item.value?.sellerUserId;
+    const currentUserId = getUser()?.id;
+    if (sellerUserId && currentUserId && Number(sellerUserId) !== Number(currentUserId)) {
+      const [iBlocked, blockedMe] = await Promise.all([
+        isBlockingApi(sellerUserId),
+        isBlockedByApi(sellerUserId),
+      ]);
+      if (iBlocked.data || blockedMe.data) {
+        ElMessage.warning("该商品不可访问");
+        router.replace("/secondhand");
+        return;
+      }
+      // 记录当前是否已拉黑该卖家（用于按钮切换）
+      isSellerBlocked.value = iBlocked.data === true;
+    }
   } finally {
     loading.value = false;
   }
@@ -93,13 +147,68 @@ function handleContactSeller() {
   });
 }
 
+function openReportDialog() {
+  reportForm.value = { reasonType: "", reasonDesc: "" };
+  reportDialogVisible.value = true;
+}
+
+async function handleSubmitReport() {
+  if (!reportForm.value.reasonType) {
+    ElMessage.warning("请选择举报类型");
+    return;
+  }
+  reportSubmitting.value = true;
+  try {
+    await submitReportApi({
+      reportedId: item.value.sellerUserId,
+      tradeContext: "SH_BUYER",
+      reasonType: reportForm.value.reasonType,
+      reasonDesc: reportForm.value.reasonDesc,
+    });
+    ElMessage.success("举报已提交，等待管理员审核");
+    reportDialogVisible.value = false;
+  } catch (e) {
+    ElMessage.error(e?.response?.data?.message || "举报提交失败");
+  } finally {
+    reportSubmitting.value = false;
+  }
+}
+
+async function handleBlock() {
+  try {
+    await ElMessageBox.confirm(
+      `确认拉黑卖家「${item.value.sellerName || item.value.sellerUserId}」？拉黑后对方无法与你发起会话。`,
+      "拉黑确认",
+      { type: "warning", confirmButtonText: "确认拉黑", cancelButtonText: "取消" }
+    );
+    await blockUserApi(item.value.sellerUserId);
+    isSellerBlocked.value = true;
+    ElMessage.success("已拉黑该卖家");
+  } catch (e) {
+    if (e === "cancel" || e?.toString?.().includes("cancel")) return;
+    ElMessage.error(e?.response?.data?.message || "操作失败");
+  }
+}
+
+async function handleUnblock() {
+  try {
+    await ElMessageBox.confirm(
+      `确认取消拉黑卖家「${item.value.sellerName || item.value.sellerUserId}」？`,
+      "取消拉黑",
+      { type: "warning", confirmButtonText: "确认取消", cancelButtonText: "取消" }
+    );
+    await unblockUserApi(item.value.sellerUserId);
+    isSellerBlocked.value = false;
+    ElMessage.success("已取消拉黑");
+  } catch (e) {
+    if (e === "cancel" || e?.toString?.().includes("cancel")) return;
+    ElMessage.error(e?.response?.data?.message || "操作失败");
+  }
+}
+
 function toFullImageUrl(url) {
-  if (!url) {
-    return "";
-  }
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    return url;
-  }
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
   const normalized = url.startsWith("/") ? url : `/${url}`;
   return `http://localhost:8080${normalized}`;
 }

@@ -1,6 +1,7 @@
 package com.segroup8.platform.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -19,6 +20,10 @@ public class User {
     private String email;
     private String role;
     private String status;
+    /**
+     * 买家信用分（所有用户都有）
+     * 对应 DB 列：credit_score
+     */
     private Integer creditScore;
     private String shopName;
     private String shopDesc;
@@ -113,6 +118,29 @@ public class User {
     public void setCreditScore(Integer creditScore) {
         this.creditScore = creditScore;
     }
+
+    /**
+     * 店铺账户健康分（仅 OFFICIAL_SELLER 有意义）
+     * 对应 DB 列：seller_credit_score
+     */
+    @TableField("seller_credit_score")
+    private Integer sellerCreditScore;
+
+    public Integer getSellerCreditScore() { return sellerCreditScore; }
+    public void setSellerCreditScore(Integer sellerCreditScore) { this.sellerCreditScore = sellerCreditScore; }
+
+    /**
+     * 二手卖家信用分（所有用户都有，用于二手交易卖家侧评价）
+     * 对应 DB 列：buyer_credit_score
+     *
+     * 注意：该列由 schema 的 ALTER TABLE 添加，复用 buyer_credit_score 存储二手卖家分。
+     * 买家信用统一使用 credit_score（creditScore 字段）。
+     */
+    @TableField("buyer_credit_score")
+    private Integer shSellerCreditScore;
+
+    public Integer getShSellerCreditScore() { return shSellerCreditScore; }
+    public void setShSellerCreditScore(Integer shSellerCreditScore) { this.shSellerCreditScore = shSellerCreditScore; }
 
     public LocalDateTime getCreateTime() {
         return createTime;

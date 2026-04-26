@@ -26,9 +26,6 @@
             <el-form-item label="角色">
                 <el-input v-model="form.role" disabled />
             </el-form-item>
-            <el-form-item label="信用分">
-                <el-input :model-value="String(form.creditScore || '-')" disabled />
-            </el-form-item>
             <el-form-item>
                 <el-button type="primary" :loading="loading" @click="saveProfile">保存</el-button>
             </el-form-item>
@@ -108,7 +105,6 @@ const form = reactive({
     phone: '',
     email: '',
     role: '',
-    creditScore: 100
 });
 
 const rules = {

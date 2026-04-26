@@ -15,6 +15,7 @@ import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.OrderItemMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
+import com.segroup8.platform.mapper.UserBlockMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
 import com.segroup8.platform.service.SecondhandProductService;
@@ -44,17 +45,20 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
     private final OrderItemMapper orderItemMapper;
     private final UserMapper userMapper;
     private final BrowseHistoryService browseHistoryService;
+    private final UserBlockMapper userBlockMapper;
 
     public SecondhandProductServiceImpl(SecondhandProductMapper secondhandProductMapper,
             OrderInfoMapper orderInfoMapper,
             OrderItemMapper orderItemMapper,
             UserMapper userMapper,
-            BrowseHistoryService browseHistoryService) {
+            BrowseHistoryService browseHistoryService,
+            UserBlockMapper userBlockMapper) {
         this.secondhandProductMapper = secondhandProductMapper;
         this.orderInfoMapper = orderInfoMapper;
         this.orderItemMapper = orderItemMapper;
         this.userMapper = userMapper;
         this.browseHistoryService = browseHistoryService;
+        this.userBlockMapper = userBlockMapper;
     }
 
     @Override
@@ -64,6 +68,20 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
                 .eq(SecondhandProduct::getStatus, ON_SHELF)
                 .orderByDesc(SecondhandProduct::getCreateTime);
         appendCommonFilters(wrapper, request);
+
+        // 拉黑屏蔽：双向过滤（我拉黑的人 + 拉黑我的人 的商品都不显示）
+        Long currentUserId = UserContext.getUserId();
+        if (currentUserId != null) {
+            List<Long> blockedByMe = userBlockMapper.listBlockedIds(currentUserId);
+            List<Long> blockedMe   = userBlockMapper.listBlockerIds(currentUserId);
+            java.util.Set<Long> hiddenSellerIds = new java.util.HashSet<>();
+            hiddenSellerIds.addAll(blockedByMe);
+            hiddenSellerIds.addAll(blockedMe);
+            if (!hiddenSellerIds.isEmpty()) {
+                wrapper.notIn(SecondhandProduct::getSellerUserId, hiddenSellerIds);
+            }
+        }
+
         Page<SecondhandProduct> page = secondhandProductMapper.selectPage(
                 Page.of(request.getPageNum(), request.getPageSize()),
                 wrapper);
@@ -161,6 +179,14 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         }
         if (!Objects.equals(product.getStatus(), ON_SHELF)) {
             throw new BusinessException(400, "二手商品已下架或已售出");
+        }
+        // 拉黑拦截：任意一方拉黑对方都不能交易
+        Long sellerUserId = product.getSellerUserId();
+        if (userBlockMapper.isBlocked(buyerUserId, sellerUserId) > 0) {
+            throw new BusinessException(403, "您已拉黑该卖家，无法购买其商品");
+        }
+        if (userBlockMapper.isBlocked(sellerUserId, buyerUserId) > 0) {
+            throw new BusinessException(403, "该卖家已拉黑您，无法购买其商品");
         }
 
         int updated = secondhandProductMapper.update(null, new UpdateWrapper<SecondhandProduct>()

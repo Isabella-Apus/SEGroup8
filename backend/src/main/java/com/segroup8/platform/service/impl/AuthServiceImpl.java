@@ -48,6 +48,7 @@ public class AuthServiceImpl implements AuthService {
         user.setRole(RoleEnum.USER.name());
         user.setStatus(UserStatusEnum.NORMAL.name());
         user.setCreditScore(100);
+        user.setSellerCreditScore(100);
         userMapper.insert(user);
     }
 

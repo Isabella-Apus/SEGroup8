@@ -27,6 +27,7 @@
           <el-menu-item index="/browse-history">浏览记录</el-menu-item>
           <el-menu-item index="/vouchers">优惠券中心</el-menu-item>
           <el-menu-item index="/after-sale">退款/售后</el-menu-item>
+          <el-menu-item index="/credit">我的信用</el-menu-item>
           <el-menu-item v-if="userStore.currentRole === 'OFFICIAL_SELLER'" index="/merchant">进入卖家工作台</el-menu-item>
           <el-menu-item v-else index="/merchant-apply">申请成为卖家</el-menu-item>
         </el-menu>

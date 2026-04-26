@@ -105,6 +105,11 @@ const routes = [
                 component: () => import("@/views/order/AfterSaleView.vue"),
             },
             {
+                path: "credit",
+                name: "credit",
+                component: () => import("@/views/user/CreditView.vue"),
+            },
+            {
                 path: "messages",
                 name: "messages",
                 component: () => import("@/views/chat/ChatView.vue"),
@@ -246,6 +251,11 @@ const routes = [
                 path: "vouchers",
                 name: "adminVouchers",
                 component: () => import("@/views/admin/AdminVoucherView.vue"),
+            },
+            {
+                path: "reports",
+                name: "adminReports",
+                component: () => import("@/views/admin/AdminReportView.vue"),
             },
         ],
     },

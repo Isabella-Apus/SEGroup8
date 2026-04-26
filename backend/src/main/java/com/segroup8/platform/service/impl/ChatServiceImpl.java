@@ -15,6 +15,7 @@ import com.segroup8.platform.mapper.ChatMessageMapper;
 import com.segroup8.platform.mapper.ProductMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
+import com.segroup8.platform.mapper.UserBlockMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.ChatService;
 import com.segroup8.platform.vo.ChatConversationVO;
@@ -42,19 +43,22 @@ public class ChatServiceImpl implements ChatService {
     private final ProductMapper productMapper;
     private final ShopMapper shopMapper;
     private final SecondhandProductMapper secondhandProductMapper;
+    private final UserBlockMapper userBlockMapper;
 
     public ChatServiceImpl(ChatConversationMapper chatConversationMapper,
             ChatMessageMapper chatMessageMapper,
             UserMapper userMapper,
             ProductMapper productMapper,
             ShopMapper shopMapper,
-            SecondhandProductMapper secondhandProductMapper) {
+            SecondhandProductMapper secondhandProductMapper,
+            UserBlockMapper userBlockMapper) {
         this.chatConversationMapper = chatConversationMapper;
         this.chatMessageMapper = chatMessageMapper;
         this.userMapper = userMapper;
         this.productMapper = productMapper;
         this.shopMapper = shopMapper;
         this.secondhandProductMapper = secondhandProductMapper;
+        this.userBlockMapper = userBlockMapper;
     }
 
     @Override
@@ -142,6 +146,15 @@ public class ChatServiceImpl implements ChatService {
         Long receiverUserId = Objects.equals(conversation.getBuyerUserId(), senderUserId)
                 ? conversation.getSellerUserId()
                 : conversation.getBuyerUserId();
+
+        // 拉黑检查：若接收方已将发送方拉黑，则消息发送失败
+        if (userBlockMapper.isBlocked(receiverUserId, senderUserId) > 0) {
+            throw new BusinessException(403, "对方已将您拉黑，无法发送消息");
+        }
+        // 若发送方已将接收方拉黑，也不允许发消息（主动拉黑后不应再联系对方）
+        if (userBlockMapper.isBlocked(senderUserId, receiverUserId) > 0) {
+            throw new BusinessException(403, "您已拉黑对方，无法发送消息");
+        }
 
         ChatMessage message = new ChatMessage();
         message.setConversationId(conversationId);
