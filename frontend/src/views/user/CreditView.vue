@@ -140,7 +140,14 @@
     </template>
 
     <!-- ========== 举报弹窗 ========== -->
-    <el-dialog v-model="reportDialogVisible" title="发起举报" width="500px">
+    <el-dialog
+      v-model="reportDialogVisible"
+      title="发起举报"
+      width="500px"
+      align-center
+      append-to-body
+      modal-class="report-dialog-overlay"
+    >
       <el-form :model="reportForm" label-width="110px">
         <el-form-item label="被举报用户ID" required>
           <el-input-number
@@ -402,5 +409,24 @@ function tradeContextLabel(ctx) {
 .delta-minus {
   color: #f56c6c;
   font-weight: 600;
+}
+
+:deep(.report-dialog-overlay .el-dialog) {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin: 0 !important;
+  transform: translate(-50%, -50%);
+}
+
+:deep(.report-dialog-overlay .el-dialog__body) {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 600px) {
+  :deep(.report-dialog-overlay .el-dialog) {
+    width: calc(100vw - 32px) !important;
+  }
 }
 </style>
