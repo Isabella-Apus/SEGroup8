@@ -22,9 +22,11 @@ if (!(Test-Path $localConfigPath) -and (Test-Path $localExamplePath)) {
 }
 
 $mvn = Get-Command mvn -ErrorAction SilentlyContinue
+$pomPath = Join-Path $PSScriptRoot "pom.xml"
 if ($mvn) {
     Write-Host "Using Maven to start backend with reset-all profile..."
-    mvn spring-boot:run "-Dspring-boot.run.profiles=reset-all"
+    $env:SPRING_PROFILES_ACTIVE = "reset-all"
+    mvn -f $pomPath spring-boot:run
     exit $LASTEXITCODE
 }
 
