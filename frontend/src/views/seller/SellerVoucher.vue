@@ -32,9 +32,9 @@
         </el-table-column>
         <el-table-column label="数量" width="120">
           <template #default="{ row }">
-            <span>{{ row.usedCount }}/{{ row.totalCount }}</span>
+            <span>{{ row.receivedCount || 0 }}/{{ row.totalCount }}</span>
             <el-progress
-              :percentage="Math.round(row.usedCount / row.totalCount * 100)"
+              :percentage="Math.round(((row.receivedCount || 0) / row.totalCount) * 100)"
               :show-text="false"
               style="margin-top: 4px"
             />
