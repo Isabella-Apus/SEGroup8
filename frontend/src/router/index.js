@@ -90,6 +90,16 @@ const routes = [
                 component: () => import("@/views/user/BrowseHistoryView.vue"),
             },
             {
+                path: "vouchers",
+                name: "voucherCenter",
+                component: () => import("@/views/voucher/MyVoucherView.vue"),
+            },
+            {
+                path: "vouchers/claim",
+                name: "voucherClaim",
+                component: () => import("@/views/voucher/VoucherClaimView.vue"),
+            },
+            {
                 path: "after-sale",
                 name: "afterSale",
                 component: () => import("@/views/order/AfterSaleView.vue"),
@@ -236,6 +246,11 @@ const routes = [
                 name: "adminOrders",
                 component: () =>
                     import("@/views/admin/AdminOrderManageView.vue"),
+            },
+            {
+                path: "vouchers",
+                name: "adminVouchers",
+                component: () => import("@/views/admin/AdminVoucherView.vue"),
             },
             {
                 path: "reports",

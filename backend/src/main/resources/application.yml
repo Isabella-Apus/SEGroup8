@@ -20,7 +20,7 @@ spring:
       connection-init-sql: SET NAMES utf8mb4 COLLATE utf8mb4_general_ci
   sql:
     init:
-      mode: always
+      mode: never
       encoding: UTF-8
   servlet:
     multipart:

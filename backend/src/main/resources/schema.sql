@@ -1168,23 +1168,208 @@ PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 -- voucher 表（优惠券功能）
 CREATE TABLE IF NOT EXISTS `voucher` (
-  `id`              BIGINT NOT NULL AUTO_INCREMENT,
-  `shop_id`         BIGINT NOT NULL,
-  `name`            VARCHAR(100) NOT NULL,
-  `type`            TINYINT NOT NULL DEFAULT 1,
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `issuer_type` TINYINT NOT NULL DEFAULT 1,
+  `voucher_type` TINYINT NOT NULL DEFAULT 1,
+  `issuer_user_id` BIGINT DEFAULT NULL,
+  `scope_type` TINYINT NOT NULL DEFAULT 1,
+  `shop_id` BIGINT DEFAULT NULL,
+  `product_id` BIGINT DEFAULT NULL,
+  `can_stack` TINYINT(1) NOT NULL DEFAULT 0,
+  `name` VARCHAR(100) NOT NULL,
+  `type` TINYINT NOT NULL DEFAULT 1,
   `discount_amount` DECIMAL(10,2) DEFAULT NULL,
-  `discount_rate`   DECIMAL(4,2)  DEFAULT NULL,
-  `min_amount`      DECIMAL(10,2) NOT NULL DEFAULT 0,
-  `total_count`     INT NOT NULL DEFAULT 0,
-  `used_count`      INT NOT NULL DEFAULT 0,
-  `start_time`      DATETIME NOT NULL,
-  `end_time`        DATETIME NOT NULL,
-  `status`          TINYINT NOT NULL DEFAULT 1,
-  `create_time`     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time`     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `discount_rate` DECIMAL(4,2) DEFAULT NULL,
+  `min_amount` DECIMAL(10,2) NOT NULL DEFAULT 0,
+  `total_count` INT NOT NULL DEFAULT 0,
+  `received_count` INT NOT NULL DEFAULT 0,
+  `used_count` INT NOT NULL DEFAULT 0,
+  `grab_start_time` DATETIME DEFAULT NULL,
+  `grab_end_time` DATETIME DEFAULT NULL,
+  `start_time` DATETIME DEFAULT NULL,
+  `end_time` DATETIME DEFAULT NULL,
+  `status` TINYINT NOT NULL DEFAULT 1,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_voucher_shop_id` (`shop_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @voucher_issuer_type_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'issuer_type'
+);
+SET @voucher_issuer_type_sql = IF(
+  @voucher_issuer_type_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `issuer_type` TINYINT NOT NULL DEFAULT 1',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_issuer_type FROM @voucher_issuer_type_sql;
+EXECUTE stmt_voucher_issuer_type;
+DEALLOCATE PREPARE stmt_voucher_issuer_type;
+
+SET @voucher_type_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'voucher_type'
+);
+SET @voucher_type_sql = IF(
+  @voucher_type_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `voucher_type` TINYINT NOT NULL DEFAULT 1',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_type FROM @voucher_type_sql;
+EXECUTE stmt_voucher_type;
+DEALLOCATE PREPARE stmt_voucher_type;
+
+SET @voucher_issuer_user_id_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'issuer_user_id'
+);
+SET @voucher_issuer_user_id_sql = IF(
+  @voucher_issuer_user_id_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `issuer_user_id` BIGINT DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_issuer_user_id FROM @voucher_issuer_user_id_sql;
+EXECUTE stmt_voucher_issuer_user_id;
+DEALLOCATE PREPARE stmt_voucher_issuer_user_id;
+
+SET @voucher_scope_type_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'scope_type'
+);
+SET @voucher_scope_type_sql = IF(
+  @voucher_scope_type_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `scope_type` TINYINT NOT NULL DEFAULT 1',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_scope_type FROM @voucher_scope_type_sql;
+EXECUTE stmt_voucher_scope_type;
+DEALLOCATE PREPARE stmt_voucher_scope_type;
+
+SET @voucher_product_id_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'product_id'
+);
+SET @voucher_product_id_sql = IF(
+  @voucher_product_id_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `product_id` BIGINT DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_product_id FROM @voucher_product_id_sql;
+EXECUTE stmt_voucher_product_id;
+DEALLOCATE PREPARE stmt_voucher_product_id;
+
+SET @voucher_can_stack_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'can_stack'
+);
+SET @voucher_can_stack_sql = IF(
+  @voucher_can_stack_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `can_stack` TINYINT(1) NOT NULL DEFAULT 0',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_can_stack FROM @voucher_can_stack_sql;
+EXECUTE stmt_voucher_can_stack;
+DEALLOCATE PREPARE stmt_voucher_can_stack;
+
+SET @voucher_received_count_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'received_count'
+);
+SET @voucher_received_count_sql = IF(
+  @voucher_received_count_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `received_count` INT NOT NULL DEFAULT 0',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_received_count FROM @voucher_received_count_sql;
+EXECUTE stmt_voucher_received_count;
+DEALLOCATE PREPARE stmt_voucher_received_count;
+
+SET @voucher_grab_start_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'grab_start_time'
+);
+SET @voucher_grab_start_sql = IF(
+  @voucher_grab_start_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `grab_start_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_grab_start FROM @voucher_grab_start_sql;
+EXECUTE stmt_voucher_grab_start;
+DEALLOCATE PREPARE stmt_voucher_grab_start;
+
+SET @voucher_grab_end_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'grab_end_time'
+);
+SET @voucher_grab_end_sql = IF(
+  @voucher_grab_end_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `grab_end_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_grab_end FROM @voucher_grab_end_sql;
+EXECUTE stmt_voucher_grab_end;
+DEALLOCATE PREPARE stmt_voucher_grab_end;
+ALTER TABLE `voucher` MODIFY COLUMN `shop_id` BIGINT DEFAULT NULL;
+ALTER TABLE `voucher` MODIFY COLUMN `start_time` DATETIME DEFAULT NULL;
+ALTER TABLE `voucher` MODIFY COLUMN `end_time` DATETIME DEFAULT NULL;
+
+CREATE TABLE IF NOT EXISTS `user_voucher` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `voucher_id` BIGINT NOT NULL,
+  `status` TINYINT NOT NULL DEFAULT 1,
+  `received_time` DATETIME DEFAULT NULL,
+  `used_order_id` BIGINT DEFAULT NULL,
+  `used_time` DATETIME DEFAULT NULL,
+  `expire_time` DATETIME DEFAULT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_voucher_user_id` (`user_id`),
+  KEY `idx_user_voucher_voucher_id` (`voucher_id`),
+  KEY `idx_user_voucher_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @user_voucher_used_order_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_voucher' AND COLUMN_NAME = 'used_order_id'
+);
+SET @user_voucher_used_order_sql = IF(
+  @user_voucher_used_order_exists = 0,
+  'ALTER TABLE `user_voucher` ADD COLUMN `used_order_id` BIGINT DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_user_voucher_used_order FROM @user_voucher_used_order_sql;
+EXECUTE stmt_user_voucher_used_order;
+DEALLOCATE PREPARE stmt_user_voucher_used_order;
+
+SET @user_voucher_used_time_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_voucher' AND COLUMN_NAME = 'used_time'
+);
+SET @user_voucher_used_time_sql = IF(
+  @user_voucher_used_time_exists = 0,
+  'ALTER TABLE `user_voucher` ADD COLUMN `used_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_user_voucher_used_time FROM @user_voucher_used_time_sql;
+EXECUTE stmt_user_voucher_used_time;
+DEALLOCATE PREPARE stmt_user_voucher_used_time;
+
+SET @user_voucher_expire_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_voucher' AND COLUMN_NAME = 'expire_time'
+);
+SET @user_voucher_expire_sql = IF(
+  @user_voucher_expire_exists = 0,
+  'ALTER TABLE `user_voucher` ADD COLUMN `expire_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_user_voucher_expire FROM @user_voucher_expire_sql;
+EXECUTE stmt_user_voucher_expire;
+DEALLOCATE PREPARE stmt_user_voucher_expire;
 
 CREATE TABLE IF NOT EXISTS `chat_conversation` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,

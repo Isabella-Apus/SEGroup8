@@ -1,0 +1,46 @@
+# Default: normalize text files and keep LF in repository
+* text=auto eol=lf
+
+# Source code
+*.java text eol=lf
+*.kt text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.vue text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.html text eol=lf
+*.xml text eol=lf
+*.sql text eol=lf
+*.sh text eol=lf
+*.ps1 text eol=crlf
+
+# Config / docs
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.properties text eol=lf
+
+# Windows scripts / cmd files
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files (no line-ending conversion)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.jar binary
+*.zip binary
+*.gz binary
+*.7z binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary

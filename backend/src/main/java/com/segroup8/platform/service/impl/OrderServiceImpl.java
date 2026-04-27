@@ -31,11 +31,15 @@ import com.segroup8.platform.entity.User;
 import com.segroup8.platform.entity.Address;
 import com.segroup8.platform.entity.Notification;
 import com.segroup8.platform.entity.OrderAfterSaleLog;
+import com.segroup8.platform.entity.UserVoucher;
+import com.segroup8.platform.entity.Voucher;
 import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.OrderItemMapper;
 import com.segroup8.platform.mapper.ProductMapper;
 import com.segroup8.platform.mapper.OrderAfterSaleLogMapper;
 import com.segroup8.platform.mapper.ReviewMapper;
+import com.segroup8.platform.mapper.UserVoucherMapper;
+import com.segroup8.platform.mapper.VoucherMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.AddressMapper;
@@ -78,6 +82,8 @@ public class OrderServiceImpl implements OrderService {
     private final ShopMapper shopMapper;
     private final UserMapper userMapper;
     private final AddressMapper addressMapper;
+    private final VoucherMapper voucherMapper;
+    private final UserVoucherMapper userVoucherMapper;
     private final NotificationService notificationService;
     private final OrderAfterSaleLogMapper orderAfterSaleLogMapper;
     private final RealtimePushService realtimePushService;
@@ -88,7 +94,10 @@ public class OrderServiceImpl implements OrderService {
             ProductMapper productMapper, ReviewMapper reviewMapper, SecondhandProductMapper secondhandProductMapper,
             ShopMapper shopMapper,
             UserMapper userMapper,
-            AddressMapper addressMapper, NotificationService notificationService,
+            AddressMapper addressMapper,
+            VoucherMapper voucherMapper,
+            UserVoucherMapper userVoucherMapper,
+            NotificationService notificationService,
             OrderAfterSaleLogMapper orderAfterSaleLogMapper,
             RealtimePushService realtimePushService, LogisticsService logisticsService,
             EscrowSettlementService escrowSettlementService) {
@@ -100,6 +109,8 @@ public class OrderServiceImpl implements OrderService {
         this.shopMapper = shopMapper;
         this.userMapper = userMapper;
         this.addressMapper = addressMapper;
+        this.voucherMapper = voucherMapper;
+        this.userVoucherMapper = userVoucherMapper;
         this.notificationService = notificationService;
         this.orderAfterSaleLogMapper = orderAfterSaleLogMapper;
         this.realtimePushService = realtimePushService;
@@ -163,6 +174,8 @@ public class OrderServiceImpl implements OrderService {
         order.setLogisticsCurrentIndex(0);
         order.setPayMethod("余额支付");
         order.setRemark(request.getRemark());
+        order.setVoucherId(request.getVoucherId());
+        applyVoucherIfNeeded(order, userId, totalAmount, request.getVoucherId());
         order.setCreateTime(LocalDateTime.now());
 
         Address addr;
@@ -187,6 +200,7 @@ public class OrderServiceImpl implements OrderService {
         order.setReceiverCity(addr.getCity());
         order.setReceiverDetailAddress(addr.getDetailAddress());
         orderInfoMapper.insert(order);
+        bindVoucherToOrderIfNeeded(order.getId(), userId, request.getVoucherId());
 
         for (OrderItem item : orderItems) {
             item.setOrderId(order.getId());
@@ -275,9 +289,10 @@ public class OrderServiceImpl implements OrderService {
                 ? request.getPayChannel().trim().toUpperCase()
                 : "WECHAT";
         String payMethod;
+        BigDecimal payAmount = order.getPayableAmount() == null ? order.getTotalAmount() : order.getPayableAmount();
         if ("COIN".equals(payMode)) {
             escrowSettlementService.changePersonalBalance(userId,
-                    order.getTotalAmount().negate(),
+                    payAmount.negate(),
                     orderId,
                     "COIN_PAY",
                     TransactionTradeTypeEnum.EXPENSE_PURCHASE,
@@ -300,6 +315,7 @@ public class OrderServiceImpl implements OrderService {
         if (updated == 0) {
             throw new BusinessException(400, "当前状态不可支付");
         }
+        consumeVoucherOnPayIfNeeded(orderId, userId);
         pushOrderRealtime(orderId, userId, resolveSellerUserIds(orderId), "ORDER_STATUS_UPDATED", "订单已支付，等待卖家发货");
         return getMyOrderDetail(orderId);
     }
@@ -331,6 +347,7 @@ public class OrderServiceImpl implements OrderService {
         boolean isUnpaid = order.getPayStatus() == null || Integer.valueOf(0).equals(order.getPayStatus());
         if (isUnpaid) {
             restoreStockForNewItems(orderId);
+            rollbackVoucherIfNeeded(orderId, userId);
         }
         pushOrderRealtime(orderId, userId, resolveSellerUserIds(orderId), "ORDER_STATUS_UPDATED", "订单已取消");
         return getMyOrderDetail(orderId);
@@ -434,11 +451,12 @@ public class OrderServiceImpl implements OrderService {
         }
         escrowSettlementService.changePersonalBalance(
                 order.getBuyerUserId(),
-                order.getTotalAmount(),
+            resolveRefundAmount(order),
                 orderId,
                 "REFUND_TIMEOUT_AUTO",
                 TransactionTradeTypeEnum.REFUND_BACKFLOW,
                 decisionRemark);
+        restoreConsumedVoucherOnRefundIfNeeded(order);
         insertAfterSaleLog(orderId, AfterSaleActionEnum.APPROVE, 0L, OperatorRoleEnum.ADMIN, decisionRemark);
         pushOrderRealtime(orderId, order.getBuyerUserId(), resolveSellerUserIds(orderId), "AFTER_SALE_UPDATED",
                 "系统已自动退款");
@@ -449,6 +467,7 @@ public class OrderServiceImpl implements OrderService {
                 .eq(OrderItem::getOrderId, orderId)
                 .orderByAsc(OrderItem::getId));
         escrowSettlementService.releaseEscrow(order, items);
+        distributeVoucherCostBeforeSettlement(order, items);
         boolean hasNewProduct = items.stream().anyMatch(i -> "NEW".equalsIgnoreCase(i.getProductType()));
         LocalDateTime afterSalesDeadline = hasNewProduct ? now.plusDays(7) : null;
         orderInfoMapper.update(null, new UpdateWrapper<OrderInfo>()
@@ -622,7 +641,7 @@ public class OrderServiceImpl implements OrderService {
         }
         if ("ONLY_REFUND".equals(refundMode)) {
             // 仅退款：待发货时直接回流买家个人账户并关闭订单
-            escrowSettlementService.changePersonalBalance(order.getBuyerUserId(), order.getTotalAmount(), orderId,
+            escrowSettlementService.changePersonalBalance(order.getBuyerUserId(), resolveRefundAmount(order), orderId,
                     "REFUND_ONLY", TransactionTradeTypeEnum.REFUND_BACKFLOW, "仅退款回流");
             orderInfoMapper.update(null, new UpdateWrapper<OrderInfo>()
                     .set("refund_status", RefundStatusEnum.APPROVED.getCode())
@@ -630,6 +649,7 @@ public class OrderServiceImpl implements OrderService {
                     .set("closed_time", now)
                     .set("can_refund", 0)
                     .eq("id", orderId));
+            restoreConsumedVoucherOnRefundIfNeeded(order);
             pushOrderRealtime(orderId, userId, resolveSellerUserIds(orderId), "AFTER_SALE_UPDATED", "仅退款已自动完成");
             return getMyOrderDetail(orderId);
         }
@@ -665,6 +685,7 @@ public class OrderServiceImpl implements OrderService {
                 .set("refund_decision_remark", decisionRemark)
                 .set("refund_decision_source", RefundDecisionSourceEnum.SELLER.name())
                 .set("closed_time", now)
+            .set("can_refund", 0)
                 .setSql("version = version + 1")
                 .eq("id", orderId)
                 .eq("refund_status", RefundStatusEnum.PROCESSING.getCode())
@@ -672,8 +693,9 @@ public class OrderServiceImpl implements OrderService {
         if (updated == 0) {
             throw new BusinessException(400, "当前无可处理退货申请");
         }
-        escrowSettlementService.changePersonalBalance(order.getBuyerUserId(), order.getTotalAmount(), orderId,
+        escrowSettlementService.changePersonalBalance(order.getBuyerUserId(), resolveRefundAmount(order), orderId,
                 "REFUND_RETURN", TransactionTradeTypeEnum.REFUND_BACKFLOW, "退货退款回流");
+        restoreConsumedVoucherOnRefundIfNeeded(order);
         // 条件更新不会回写内存对象，这里同步补齐返回 VO 需要的字段
         order.setRefundStatus(RefundStatusEnum.APPROVED.getCode());
         order.setOrderStatus(OrderStatusEnum.CLOSED.getCode());
@@ -685,6 +707,57 @@ public class OrderServiceImpl implements OrderService {
         order.setCanRefund(0);
         insertAfterSaleLog(orderId, AfterSaleActionEnum.APPROVE, sellerUserId, OperatorRoleEnum.SELLER, decisionRemark);
         pushOrderRealtime(orderId, order.getBuyerUserId(), List.of(sellerUserId), "AFTER_SALE_UPDATED", "卖家已同意退货并退款");
+        return buildOrderVO(order, items);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public OrderVO approveRefundByAdmin(Long orderId, Long adminUserId, String remark) {
+        OrderInfo order = orderInfoMapper.selectById(orderId);
+        if (order == null) {
+            throw new BusinessException(404, "订单不存在");
+        }
+        OrderStateMachine.assertRefundActionAllowed(order, OrderStateMachine.RefundAction.APPROVE, "当前无可处理的退款申请");
+
+        LocalDateTime now = LocalDateTime.now();
+        Integer version = normalizeVersion(order);
+        String decisionRemark = StringUtils.hasText(remark) ? remark.trim() : "同意退货";
+        int updated = orderInfoMapper.update(null, new UpdateWrapper<OrderInfo>()
+                .set("refund_status", RefundStatusEnum.APPROVED.getCode())
+                .set("order_status", OrderStatusEnum.CLOSED.getCode())
+                .set("refund_decision_time", now)
+                .set("refund_decision_user_id", adminUserId)
+                .set("refund_decision_remark", decisionRemark)
+                .set("refund_decision_source", RefundDecisionSourceEnum.ADMIN.name())
+                .set("closed_time", now)
+                .set("can_refund", 0)
+                .setSql("version = version + 1")
+                .eq("id", orderId)
+                .eq("refund_status", RefundStatusEnum.PROCESSING.getCode())
+                .eq("version", version));
+        if (updated == 0) {
+            throw new BusinessException(400, "当前无可处理的退款申请");
+        }
+
+        escrowSettlementService.changePersonalBalance(order.getBuyerUserId(), resolveRefundAmount(order), orderId,
+                "REFUND_RETURN", TransactionTradeTypeEnum.REFUND_BACKFLOW, decisionRemark);
+        restoreConsumedVoucherOnRefundIfNeeded(order);
+
+        order.setRefundStatus(RefundStatusEnum.APPROVED.getCode());
+        order.setOrderStatus(OrderStatusEnum.CLOSED.getCode());
+        order.setRefundDecisionTime(now);
+        order.setRefundDecisionUserId(adminUserId);
+        order.setRefundDecisionRemark(decisionRemark);
+        order.setRefundDecisionSource(RefundDecisionSourceEnum.ADMIN.name());
+        order.setClosedTime(now);
+        order.setCanRefund(0);
+
+        insertAfterSaleLog(orderId, AfterSaleActionEnum.APPROVE, adminUserId, OperatorRoleEnum.ADMIN, decisionRemark);
+        pushOrderRealtime(orderId, order.getBuyerUserId(), resolveSellerUserIds(orderId), "AFTER_SALE_UPDATED", "管理员已同意退货并退款");
+
+        List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
+                .eq(OrderItem::getOrderId, order.getId())
+                .orderByAsc(OrderItem::getId));
         return buildOrderVO(order, items);
     }
 
@@ -943,6 +1016,11 @@ public class OrderServiceImpl implements OrderService {
         vo.setCanRefund(order.getCanRefund() == null ? 1 : order.getCanRefund());
         vo.setAfterSalesDeadline(order.getAfterSalesDeadline());
         vo.setRefundMode(order.getRefundMode());
+        vo.setVoucherId(order.getVoucherId());
+        vo.setVoucherDiscountAmount(order.getVoucherDiscountAmount());
+        vo.setSellerBearAmount(order.getSellerBearAmount());
+        vo.setPlatformBearAmount(order.getPlatformBearAmount());
+        vo.setPayableAmount(order.getPayableAmount());
         vo.setItems(items.stream().map(this::toItemVO).toList());
         return vo;
     }
@@ -1121,6 +1199,245 @@ public class OrderServiceImpl implements OrderService {
             case "LOGISTICS_UPDATED" -> "物流同步";
             default -> "店铺订单提醒";
         };
+    }
+
+    private void distributeVoucherCostBeforeSettlement(OrderInfo order, List<OrderItem> items) {
+        BigDecimal sellerBear = order.getSellerBearAmount() == null ? BigDecimal.ZERO : order.getSellerBearAmount();
+        if (sellerBear.compareTo(BigDecimal.ZERO) <= 0 || items == null || items.isEmpty()) {
+            return;
+        }
+
+        Long issuerUserId = null;
+        if (order.getVoucherId() != null) {
+            Voucher voucher = voucherMapper.selectById(order.getVoucherId());
+            if (voucher != null) {
+                issuerUserId = voucher.getIssuerUserId();
+            }
+        }
+        if (issuerUserId == null) {
+            return;
+        }
+        final Long finalIssuerUserId = issuerUserId;
+
+        boolean issuerInOrder = items.stream().anyMatch(item -> finalIssuerUserId.equals(resolveItemSellerUserId(item)));
+        if (!issuerInOrder) {
+            return;
+        }
+
+        escrowSettlementService.changeBusinessBalance(
+                issuerUserId,
+                sellerBear.negate(),
+                order.getId(),
+                "VOUCHER_SUBSIDY",
+                TransactionTradeTypeEnum.EXPENSE_PURCHASE,
+                "卖家券补贴扣减");
+    }
+
+    private Long resolveItemSellerUserId(OrderItem item) {
+        if (item == null || item.getProductType() == null || item.getProductId() == null) {
+            return null;
+        }
+        if ("NEW".equalsIgnoreCase(item.getProductType())) {
+            Product product = productMapper.selectById(item.getProductId());
+            if (product == null) {
+                return null;
+            }
+            Shop shop = shopMapper.selectById(product.getShopId());
+            return shop == null ? null : shop.getOwnerUserId();
+        }
+        if ("SECONDHAND".equalsIgnoreCase(item.getProductType())) {
+            SecondhandProduct secondhand = secondhandProductMapper.selectById(item.getProductId());
+            return secondhand == null ? null : secondhand.getSellerUserId();
+        }
+        return null;
+    }
+
+    private void applyVoucherIfNeeded(OrderInfo order, Long userId, BigDecimal totalAmount, Long voucherId) {
+        order.setVoucherDiscountAmount(BigDecimal.ZERO);
+        order.setSellerBearAmount(BigDecimal.ZERO);
+        order.setPlatformBearAmount(BigDecimal.ZERO);
+        order.setPayableAmount(totalAmount);
+
+        if (voucherId == null) {
+            return;
+        }
+
+        Voucher voucher = voucherMapper.selectById(voucherId);
+        if (voucher == null) {
+            throw new BusinessException(400, "优惠券不存在");
+        }
+        if (voucher.getStatus() == null || voucher.getStatus() != 1) {
+            throw new BusinessException(400, "优惠券当前不可用");
+        }
+        LocalDateTime now = LocalDateTime.now();
+        if (voucher.getStartTime() != null && now.isBefore(voucher.getStartTime())) {
+            throw new BusinessException(400, "优惠券未到生效时间");
+        }
+        if (voucher.getEndTime() != null && now.isAfter(voucher.getEndTime())) {
+            throw new BusinessException(400, "优惠券已过期");
+        }
+
+        UserVoucher userVoucher = userVoucherMapper.selectOne(new LambdaQueryWrapper<UserVoucher>()
+                .eq(UserVoucher::getUserId, userId)
+                .eq(UserVoucher::getVoucherId, voucherId)
+                .eq(UserVoucher::getStatus, 1)
+                .last("limit 1"));
+        if (userVoucher == null) {
+            throw new BusinessException(400, "您未持有该优惠券或已使用");
+        }
+
+        BigDecimal minAmount = voucher.getMinAmount() == null ? BigDecimal.ZERO : voucher.getMinAmount();
+        if (totalAmount.compareTo(minAmount) < 0) {
+            throw new BusinessException(400, "未达到优惠券使用门槛");
+        }
+
+        BigDecimal discount = BigDecimal.ZERO;
+        if (Integer.valueOf(1).equals(voucher.getType())) {
+            discount = voucher.getDiscountAmount() == null ? BigDecimal.ZERO : voucher.getDiscountAmount();
+        } else if (Integer.valueOf(2).equals(voucher.getType())) {
+            BigDecimal rate = voucher.getDiscountRate() == null ? BigDecimal.ONE : voucher.getDiscountRate();
+            discount = totalAmount.multiply(BigDecimal.ONE.subtract(rate));
+        }
+        if (discount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException(400, "优惠券金额无效");
+        }
+        BigDecimal maxDiscount = totalAmount.subtract(new BigDecimal("0.01"));
+        if (discount.compareTo(maxDiscount) > 0) {
+            discount = maxDiscount;
+        }
+        if (discount.compareTo(BigDecimal.ZERO) < 0) {
+            discount = BigDecimal.ZERO;
+        }
+
+        order.setVoucherDiscountAmount(discount);
+        order.setPayableAmount(totalAmount.subtract(discount));
+
+        boolean adminVoucher = Integer.valueOf(2).equals(voucher.getIssuerType()) || Integer.valueOf(2).equals(voucher.getVoucherType());
+        if (adminVoucher) {
+            order.setSellerBearAmount(BigDecimal.ZERO);
+            order.setPlatformBearAmount(discount);
+        } else {
+            order.setSellerBearAmount(discount);
+            order.setPlatformBearAmount(BigDecimal.ZERO);
+        }
+
+        // 下单时仅做可用性校验，不修改 user_voucher 状态。
+        // 订单创建成功后会绑定 usedOrderId，支付成功后再核销为 USED。
+    }
+
+    private void bindVoucherToOrderIfNeeded(Long orderId, Long userId, Long voucherId) {
+        if (orderId == null || userId == null || voucherId == null) {
+            return;
+        }
+        UserVoucher userVoucher = userVoucherMapper.selectOne(new LambdaQueryWrapper<UserVoucher>()
+                .eq(UserVoucher::getUserId, userId)
+                .eq(UserVoucher::getVoucherId, voucherId)
+                .eq(UserVoucher::getStatus, 1)
+                .isNull(UserVoucher::getUsedOrderId)
+                .orderByAsc(UserVoucher::getId)
+                .last("limit 1"));
+        if (userVoucher == null) {
+            throw new BusinessException(400, "您未持有该优惠券或已使用");
+        }
+        userVoucher.setUsedOrderId(orderId);
+        userVoucherMapper.updateById(userVoucher);
+    }
+
+    private void consumeVoucherOnPayIfNeeded(Long orderId, Long userId) {
+        OrderInfo latest = orderInfoMapper.selectById(orderId);
+        if (latest == null || latest.getVoucherId() == null) {
+            return;
+        }
+
+        UserVoucher userVoucher = userVoucherMapper.selectOne(new LambdaQueryWrapper<UserVoucher>()
+                .eq(UserVoucher::getUserId, userId)
+                .eq(UserVoucher::getVoucherId, latest.getVoucherId())
+                .eq(UserVoucher::getStatus, 1)
+                .eq(UserVoucher::getUsedOrderId, orderId)
+                .orderByDesc(UserVoucher::getId)
+                .last("limit 1"));
+        if (userVoucher == null) {
+            throw new BusinessException(400, "优惠券状态异常，请刷新后重试");
+        }
+        userVoucher.setStatus(2);
+        userVoucher.setUsedTime(LocalDateTime.now());
+        userVoucherMapper.updateById(userVoucher);
+
+        Voucher voucher = voucherMapper.selectById(latest.getVoucherId());
+        if (voucher != null) {
+            voucher.setUsedCount((voucher.getUsedCount() == null ? 0 : voucher.getUsedCount()) + 1);
+            voucherMapper.updateById(voucher);
+        }
+    }
+
+    private void rollbackVoucherIfNeeded(Long orderId, Long userId) {
+        OrderInfo latest = orderInfoMapper.selectById(orderId);
+        if (latest == null || latest.getVoucherId() == null) {
+            return;
+        }
+
+        UserVoucher userVoucher = userVoucherMapper.selectOne(new LambdaQueryWrapper<UserVoucher>()
+                .eq(UserVoucher::getUserId, userId)
+                .eq(UserVoucher::getVoucherId, latest.getVoucherId())
+                .eq(UserVoucher::getStatus, 1)
+                .eq(UserVoucher::getUsedOrderId, orderId)
+                .orderByDesc(UserVoucher::getId)
+                .last("limit 1"));
+        if (userVoucher != null) {
+            userVoucher.setUsedOrderId(null);
+            userVoucherMapper.updateById(userVoucher);
+        }
+    }
+
+    private BigDecimal resolveRefundAmount(OrderInfo order) {
+        if (order == null) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal refundAmount = order.getPayableAmount();
+        if (refundAmount == null) {
+            BigDecimal total = order.getTotalAmount() == null ? BigDecimal.ZERO : order.getTotalAmount();
+            BigDecimal discount = order.getVoucherDiscountAmount() == null ? BigDecimal.ZERO : order.getVoucherDiscountAmount();
+            refundAmount = total.subtract(discount);
+        }
+        if (refundAmount.compareTo(BigDecimal.ZERO) < 0) {
+            return BigDecimal.ZERO;
+        }
+        return refundAmount;
+    }
+
+    private void restoreConsumedVoucherOnRefundIfNeeded(OrderInfo order) {
+        if (order == null || order.getVoucherId() == null || order.getBuyerUserId() == null) {
+            return;
+        }
+        UserVoucher usedVoucher = userVoucherMapper.selectOne(new LambdaQueryWrapper<UserVoucher>()
+                .eq(UserVoucher::getUserId, order.getBuyerUserId())
+                .eq(UserVoucher::getVoucherId, order.getVoucherId())
+                .eq(UserVoucher::getStatus, 2)
+                .eq(UserVoucher::getUsedOrderId, order.getId())
+                .orderByDesc(UserVoucher::getId)
+                .last("limit 1"));
+        if (usedVoucher == null) {
+            return;
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        Voucher voucher = voucherMapper.selectById(order.getVoucherId());
+        LocalDateTime voucherEndTime = voucher == null ? null : voucher.getEndTime();
+        boolean expired = (voucherEndTime != null && now.isAfter(voucherEndTime))
+                || (usedVoucher.getExpireTime() != null && now.isAfter(usedVoucher.getExpireTime()));
+
+        usedVoucher.setStatus(expired ? 3 : 1);
+        usedVoucher.setUsedOrderId(null);
+        usedVoucher.setUsedTime(null);
+        if (usedVoucher.getExpireTime() == null && voucherEndTime != null) {
+            usedVoucher.setExpireTime(voucherEndTime);
+        }
+        userVoucherMapper.updateById(usedVoucher);
+
+        if (voucher != null && voucher.getUsedCount() != null && voucher.getUsedCount() > 0) {
+            voucher.setUsedCount(voucher.getUsedCount() - 1);
+            voucherMapper.updateById(voucher);
+        }
     }
 
     private void restoreStockForNewItems(Long orderId) {

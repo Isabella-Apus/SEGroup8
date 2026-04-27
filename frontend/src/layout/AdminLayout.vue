@@ -8,6 +8,7 @@
         <el-button link type="primary" @click="router.push('/admin/merchant-review')">入驻审核</el-button>
         <el-button link type="primary" @click="router.push('/admin/audit-logs')">审计日志</el-button>
         <el-button link type="primary" @click="router.push('/admin/orders')">订单管理</el-button>
+        <el-button link type="primary" @click="router.push('/admin/vouchers')">优惠券管理</el-button>
         <el-button link type="primary" @click="router.push('/admin/reports')">举报审核</el-button>
         <el-button link type="danger" @click="logout">退出</el-button>
       </el-space>

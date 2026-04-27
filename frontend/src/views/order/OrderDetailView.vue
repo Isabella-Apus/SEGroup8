@@ -37,7 +37,12 @@
           </el-space>
         </el-descriptions-item>
         <el-descriptions-item label="下单时间">{{ formatTime(order.createTime) }}</el-descriptions-item>
-        <el-descriptions-item label="实付金额">￥{{ Number(order.totalAmount || 0).toFixed(2) }}</el-descriptions-item>
+        <el-descriptions-item label="订单原价">￥{{ Number(order.totalAmount || 0).toFixed(2) }}</el-descriptions-item>
+        <el-descriptions-item label="优惠券优惠">
+          <span v-if="Number(order.voucherDiscountAmount || 0) > 0">-￥{{ Number(order.voucherDiscountAmount || 0).toFixed(2) }}</span>
+          <span v-else>无</span>
+        </el-descriptions-item>
+        <el-descriptions-item label="实付金额">￥{{ Number(order.payableAmount ?? (order.totalAmount || 0)).toFixed(2) }}</el-descriptions-item>
       </el-descriptions>
 
       <el-alert
