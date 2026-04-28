@@ -26,8 +26,17 @@ public class SecondhandProductSaveRequest {
     @DecimalMin(value = "0.01", message = "售价必须大于0")
     private BigDecimal salePrice;
 
+    @NotNull(message = "一级分类不能为空")
+    private Integer categoryId;
+
+    @NotNull(message = "二级分类不能为空")
+    private Integer subCategoryId;
+
     @Size(max = 30, message = "成色长度不能超过30")
     private String conditionLevel;
+
+    @NotNull(message = "是否可议价不能为空")
+    private Integer isNegotiable;
 
     private Integer status;
 
@@ -71,12 +80,36 @@ public class SecondhandProductSaveRequest {
         this.salePrice = salePrice;
     }
 
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Integer getSubCategoryId() {
+        return subCategoryId;
+    }
+
+    public void setSubCategoryId(Integer subCategoryId) {
+        this.subCategoryId = subCategoryId;
+    }
+
     public String getConditionLevel() {
         return conditionLevel;
     }
 
     public void setConditionLevel(String conditionLevel) {
         this.conditionLevel = conditionLevel;
+    }
+
+    public Integer getIsNegotiable() {
+        return isNegotiable;
+    }
+
+    public void setIsNegotiable(Integer isNegotiable) {
+        this.isNegotiable = isNegotiable;
     }
 
     public Integer getStatus() {

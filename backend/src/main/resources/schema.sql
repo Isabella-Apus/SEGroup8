@@ -132,6 +132,32 @@ CREATE TABLE IF NOT EXISTS `shop` (
   KEY `idx_shop_owner_user_id` (`owner_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+CREATE TABLE IF NOT EXISTS `category` (
+  `id` INT NOT NULL,
+  `name` VARCHAR(50) NOT NULL,
+  `parent_id` INT DEFAULT NULL,
+  `sort_order` INT NOT NULL DEFAULT 0,
+  `status` TINYINT NOT NULL DEFAULT 1,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_category_parent_id` (`parent_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @category_parent_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'category' AND COLUMN_NAME = 'parent_id'
+);
+SET @category_parent_sql = IF(
+  @category_parent_col_exists = 0,
+  'ALTER TABLE `category` ADD COLUMN `parent_id` INT DEFAULT NULL AFTER `name`',
+  'SELECT 1'
+);
+PREPARE stmt_category_parent FROM @category_parent_sql;
+EXECUTE stmt_category_parent;
+DEALLOCATE PREPARE stmt_category_parent;
+
 SET @shop_region_exists = (
   SELECT COUNT(*)
   FROM information_schema.COLUMNS
@@ -204,13 +230,58 @@ CREATE TABLE IF NOT EXISTS `product` (
   `cover` VARCHAR(255) DEFAULT NULL,
   `description` TEXT,
   `price` DECIMAL(10,2) NOT NULL,
+  `category_id` INT NOT NULL DEFAULT 8,
+  `sub_category_id` INT NOT NULL DEFAULT 801,
   `stock` INT NOT NULL DEFAULT 0,
   `status` TINYINT NOT NULL DEFAULT 1,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_product_shop_id` (`shop_id`)
+  KEY `idx_product_shop_id` (`shop_id`),
+  KEY `idx_product_sub_category_id` (`sub_category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @product_category_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'product' AND COLUMN_NAME = 'category_id'
+);
+SET @product_category_sql = IF(
+  @product_category_col_exists = 0,
+  'ALTER TABLE `product` ADD COLUMN `category_id` INT NOT NULL DEFAULT 8 AFTER `price`',
+  'SELECT 1'
+);
+PREPARE stmt_product_category FROM @product_category_sql;
+EXECUTE stmt_product_category;
+DEALLOCATE PREPARE stmt_product_category;
+
+SET @product_sub_category_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'product' AND COLUMN_NAME = 'sub_category_id'
+);
+SET @product_sub_category_sql = IF(
+  @product_sub_category_col_exists = 0,
+  'ALTER TABLE `product` ADD COLUMN `sub_category_id` INT NOT NULL DEFAULT 801 AFTER `category_id`',
+  'SELECT 1'
+);
+PREPARE stmt_product_sub_category FROM @product_sub_category_sql;
+EXECUTE stmt_product_sub_category;
+DEALLOCATE PREPARE stmt_product_sub_category;
+
+SET @product_sub_category_idx_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.STATISTICS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'product' AND INDEX_NAME = 'idx_product_sub_category_id'
+);
+SET @product_sub_category_idx_sql = IF(
+  @product_sub_category_idx_exists = 0,
+  'ALTER TABLE `product` ADD KEY `idx_product_sub_category_id` (`sub_category_id`)',
+  'SELECT 1'
+);
+PREPARE stmt_product_sub_category_idx FROM @product_sub_category_idx_sql;
+EXECUTE stmt_product_sub_category_idx;
+DEALLOCATE PREPARE stmt_product_sub_category_idx;
 
 CREATE TABLE IF NOT EXISTS `browse_history` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -279,12 +350,192 @@ CREATE TABLE IF NOT EXISTS `secondhand_product` (
   `description` TEXT,
   `origin_price` DECIMAL(10,2) DEFAULT NULL,
   `sale_price` DECIMAL(10,2) NOT NULL,
+  `category_id` INT NOT NULL DEFAULT 8,
+  `sub_category_id` INT NOT NULL DEFAULT 801,
   `condition_level` VARCHAR(30) DEFAULT NULL,
+  `is_negotiable` TINYINT NOT NULL DEFAULT 0,
   `status` TINYINT NOT NULL DEFAULT 1,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_secondhand_seller` (`seller_user_id`)
+  KEY `idx_secondhand_seller` (`seller_user_id`),
+  KEY `idx_secondhand_sub_category_id` (`sub_category_id`),
+  KEY `idx_secondhand_is_negotiable` (`is_negotiable`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @secondhand_category_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'secondhand_product' AND COLUMN_NAME = 'category_id'
+);
+SET @secondhand_category_sql = IF(
+  @secondhand_category_col_exists = 0,
+  'ALTER TABLE `secondhand_product` ADD COLUMN `category_id` INT NOT NULL DEFAULT 8 AFTER `sale_price`',
+  'SELECT 1'
+);
+PREPARE stmt_secondhand_category FROM @secondhand_category_sql;
+EXECUTE stmt_secondhand_category;
+DEALLOCATE PREPARE stmt_secondhand_category;
+
+SET @secondhand_sub_category_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'secondhand_product' AND COLUMN_NAME = 'sub_category_id'
+);
+SET @secondhand_sub_category_sql = IF(
+  @secondhand_sub_category_col_exists = 0,
+  'ALTER TABLE `secondhand_product` ADD COLUMN `sub_category_id` INT NOT NULL DEFAULT 801 AFTER `category_id`',
+  'SELECT 1'
+);
+PREPARE stmt_secondhand_sub_category FROM @secondhand_sub_category_sql;
+EXECUTE stmt_secondhand_sub_category;
+DEALLOCATE PREPARE stmt_secondhand_sub_category;
+
+SET @secondhand_negotiable_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'secondhand_product' AND COLUMN_NAME = 'is_negotiable'
+);
+SET @secondhand_negotiable_sql = IF(
+  @secondhand_negotiable_col_exists = 0,
+  'ALTER TABLE `secondhand_product` ADD COLUMN `is_negotiable` TINYINT NOT NULL DEFAULT 0 AFTER `condition_level`',
+  'SELECT 1'
+);
+PREPARE stmt_secondhand_negotiable FROM @secondhand_negotiable_sql;
+EXECUTE stmt_secondhand_negotiable;
+DEALLOCATE PREPARE stmt_secondhand_negotiable;
+
+SET @secondhand_sub_category_idx_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.STATISTICS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'secondhand_product' AND INDEX_NAME = 'idx_secondhand_sub_category_id'
+);
+SET @secondhand_sub_category_idx_sql = IF(
+  @secondhand_sub_category_idx_exists = 0,
+  'ALTER TABLE `secondhand_product` ADD KEY `idx_secondhand_sub_category_id` (`sub_category_id`)',
+  'SELECT 1'
+);
+PREPARE stmt_secondhand_sub_category_idx FROM @secondhand_sub_category_idx_sql;
+EXECUTE stmt_secondhand_sub_category_idx;
+DEALLOCATE PREPARE stmt_secondhand_sub_category_idx;
+
+SET @secondhand_negotiable_idx_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.STATISTICS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'secondhand_product' AND INDEX_NAME = 'idx_secondhand_is_negotiable'
+);
+SET @secondhand_negotiable_idx_sql = IF(
+  @secondhand_negotiable_idx_exists = 0,
+  'ALTER TABLE `secondhand_product` ADD KEY `idx_secondhand_is_negotiable` (`is_negotiable`)',
+  'SELECT 1'
+);
+PREPARE stmt_secondhand_negotiable_idx FROM @secondhand_negotiable_idx_sql;
+EXECUTE stmt_secondhand_negotiable_idx;
+DEALLOCATE PREPARE stmt_secondhand_negotiable_idx;
+
+CREATE TABLE IF NOT EXISTS `product_negotiation` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `product_id` BIGINT NOT NULL,
+  `buyer_user_id` BIGINT NOT NULL,
+  `seller_user_id` BIGINT NOT NULL,
+  `conversation_id` BIGINT DEFAULT NULL,
+  `proposed_price` DECIMAL(10,2) NOT NULL,
+  `confirmed_price` DECIMAL(10,2) DEFAULT NULL,
+  `status` VARCHAR(20) NOT NULL DEFAULT 'APPLIED',
+  `effective_from` DATETIME DEFAULT NULL,
+  `effective_until` DATETIME DEFAULT NULL,
+  `used_order_id` BIGINT DEFAULT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_negotiation_product_buyer_status` (`product_id`, `buyer_user_id`, `status`),
+  KEY `idx_negotiation_seller_status` (`seller_user_id`, `status`),
+  KEY `idx_negotiation_effective_until` (`effective_until`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @negotiation_used_order_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'product_negotiation' AND COLUMN_NAME = 'used_order_id'
+);
+SET @negotiation_used_order_sql = IF(
+  @negotiation_used_order_col_exists = 0,
+  'ALTER TABLE `product_negotiation` ADD COLUMN `used_order_id` BIGINT DEFAULT NULL AFTER `effective_until`',
+  'SELECT 1'
+);
+PREPARE stmt_negotiation_used_order FROM @negotiation_used_order_sql;
+EXECUTE stmt_negotiation_used_order;
+DEALLOCATE PREPARE stmt_negotiation_used_order;
+
+CREATE TABLE IF NOT EXISTS `product_auction` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `product_id` BIGINT NOT NULL,
+  `seller_user_id` BIGINT NOT NULL,
+  `start_price` DECIMAL(10,2) NOT NULL,
+  `increment_amount` DECIMAL(10,2) NOT NULL,
+  `current_price` DECIMAL(10,2) DEFAULT NULL,
+  `current_bidder_user_id` BIGINT DEFAULT NULL,
+  `start_time` DATETIME NOT NULL,
+  `end_time` DATETIME NOT NULL,
+  `status` VARCHAR(20) NOT NULL DEFAULT 'ONGOING',
+  `settled_order_id` BIGINT DEFAULT NULL,
+  `version` INT NOT NULL DEFAULT 0,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_product_auction_product` (`product_id`),
+  KEY `idx_product_auction_status_end_time` (`status`, `end_time`),
+  KEY `idx_product_auction_bidder_status` (`current_bidder_user_id`, `status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @auction_version_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'product_auction' AND COLUMN_NAME = 'version'
+);
+SET @auction_version_sql = IF(
+  @auction_version_col_exists = 0,
+  'ALTER TABLE `product_auction` ADD COLUMN `version` INT NOT NULL DEFAULT 0 AFTER `settled_order_id`',
+  'SELECT 1'
+);
+PREPARE stmt_auction_version FROM @auction_version_sql;
+EXECUTE stmt_auction_version;
+DEALLOCATE PREPARE stmt_auction_version;
+
+CREATE TABLE IF NOT EXISTS `auction_log` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `auction_id` BIGINT NOT NULL,
+  `product_id` BIGINT NOT NULL,
+  `bidder_user_id` BIGINT NOT NULL,
+  `bid_amount` DECIMAL(10,2) NOT NULL,
+  `status` VARCHAR(20) NOT NULL DEFAULT 'ACCEPTED',
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_auction_log_auction_time` (`auction_id`, `create_time`),
+  KEY `idx_auction_log_bidder_time` (`bidder_user_id`, `create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `user_search_history` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `keyword` VARCHAR(100) NOT NULL,
+  `search_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_search_history_user_time` (`user_id`, `search_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `search_keyword_stat` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `keyword` VARCHAR(100) NOT NULL,
+  `stat_date` DATE NOT NULL,
+  `search_count` INT NOT NULL DEFAULT 0,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_search_keyword_stat_keyword_date` (`keyword`, `stat_date`),
+  KEY `idx_search_keyword_stat_date` (`stat_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `order_info` (

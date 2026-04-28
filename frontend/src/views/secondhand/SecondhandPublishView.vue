@@ -21,12 +21,33 @@
         <el-form-item label="售价">
           <el-input-number v-model="form.salePrice" :min="1" :precision="2" :step="10" />
         </el-form-item>
+        <el-form-item label="商品分类">
+          <el-cascader
+            v-model="form.categoryPath"
+            :options="SECONDHAND_CATEGORY_TREE"
+            :props="cascaderProps"
+            clearable
+            filterable
+            placeholder="先选一级，再选二级"
+            style="width: 320px"
+          />
+        </el-form-item>
         <el-form-item label="成色">
           <el-select v-model="form.condition" style="width: 180px">
-            <el-option label="95新" value="95%" />
-            <el-option label="9成新" value="90%" />
-            <el-option label="8成新" value="80%" />
+            <el-option label="全新" value="全新" />
+            <el-option label="99新" value="99新" />
+            <el-option label="9成新" value="9成新" />
+            <el-option label="8成新及以下" value="8成新及以下" />
           </el-select>
+        </el-form-item>
+        <el-form-item label="议价">
+          <el-switch
+            v-model="form.isNegotiable"
+            :active-value="1"
+            :inactive-value="0"
+            active-text="可议价"
+            inactive-text="不可议价"
+          />
         </el-form-item>
         <el-form-item label="商品描述">
           <el-input v-model="form.description" type="textarea" :rows="4" />
@@ -45,14 +66,25 @@
 import { reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { publishSecondhandApi } from '@/api/secondhand';
+import { SECONDHAND_CATEGORY_TREE } from '@/constants/categories';
+
+const cascaderProps = {
+  emitPath: true,
+  checkStrictly: false,
+  value: 'value',
+  label: 'label',
+  children: 'children',
+};
 
 const form = reactive({
   name: '',
   cover: '',
   originPrice: 100,
   salePrice: 80,
-  condition: '90%',
-  description: ''
+  categoryPath: [],
+  condition: '9成新',
+  isNegotiable: 1,
+  description: '',
 });
 
 const submitting = ref(false);
@@ -60,13 +92,21 @@ const submitting = ref(false);
 async function submit() {
   submitting.value = true;
   try {
+    const [categoryId, subCategoryId] = form.categoryPath || [];
+    if (!categoryId || !subCategoryId) {
+      ElMessage.warning('请先选择一级与二级分类');
+      return;
+    }
     await publishSecondhandApi({
       name: form.name,
       cover: form.cover,
       description: form.description,
       originPrice: form.originPrice,
       salePrice: form.salePrice,
+      categoryId,
+      subCategoryId,
       conditionLevel: form.condition,
+      isNegotiable: form.isNegotiable,
     });
     ElMessage.success('二手商品发布成功');
     reset();
@@ -80,7 +120,9 @@ function reset() {
   form.cover = '';
   form.originPrice = 100;
   form.salePrice = 80;
-  form.condition = '90%';
+  form.categoryPath = [];
+  form.condition = '9成新';
+  form.isNegotiable = 1;
   form.description = '';
 }
 </script>

@@ -58,7 +58,26 @@
           >
             <div class="message-bubble">
               <div class="message-author">{{ message.sender?.nickname || "用户" }}</div>
-              <div class="message-content">{{ message.content }}</div>
+              <div v-if="parseTradeCard(message.content)?.type === 'BARGAIN_APPLY'" class="trade-card">
+                <div class="trade-card-title">议价申请</div>
+                <div class="trade-card-line">商品：{{ parseTradeCard(message.content)?.productName || "二手商品" }}</div>
+                <div class="trade-card-line">买家出价：￥{{ parseTradeCard(message.content)?.proposedPrice }}</div>
+                <el-button
+                  v-if="canConfirmBargain(message)"
+                  type="warning"
+                  size="small"
+                  @click="handleConfirmBargainFromCard(parseTradeCard(message.content))"
+                >
+                  确认小刀价
+                </el-button>
+              </div>
+              <div v-else-if="parseTradeCard(message.content)?.type === 'BARGAIN_CONFIRM'" class="trade-card trade-card-confirmed">
+                <div class="trade-card-title">议价已确认</div>
+                <div class="trade-card-line">商品：{{ parseTradeCard(message.content)?.productName || "二手商品" }}</div>
+                <div class="trade-card-line">成交小刀价：￥{{ parseTradeCard(message.content)?.confirmedPrice }}</div>
+                <div class="trade-card-line">有效期至：{{ formatTime(parseTradeCard(message.content)?.effectiveUntil, true) }}</div>
+              </div>
+              <div v-else class="message-content">{{ message.content }}</div>
               <div class="message-time">{{ formatTime(message.createTime, true) }}</div>
             </div>
           </div>
@@ -95,12 +114,20 @@ import {
   listChatMessagesApi,
   sendChatMessageApi,
 } from "@/api/chat";
+import { confirmBargainApi } from "@/api/secondhand";
 import {
   onRealtimeEvent,
   sendRealtimeMessage,
   startRealtimeClient,
 } from "@/realtime/realtimeClient";
 import { useUserStore } from "@/stores/user";
+import {
+  MSG_TYPE_AUCTION_BID_ACCEPTED,
+  MSG_TYPE_AUCTION_OUTBID,
+  MSG_TYPE_AUCTION_SETTLED,
+  MSG_TYPE_BARGAIN_APPLY,
+  MSG_TYPE_BARGAIN_CONFIRM,
+} from "@/realtime/messageTypes";
 
 const route = useRoute();
 const router = useRouter();
@@ -282,6 +309,76 @@ function handleRealtimeEvent(event) {
   }
   if (detail.eventType === "CHAT_ERROR") {
     ElMessage.error(detail.payload?.message || "消息发送失败");
+    return;
+  }
+  if (detail.eventType === MSG_TYPE_BARGAIN_APPLY) {
+    ElMessage.info("收到新的议价申请");
+    return;
+  }
+  if (detail.eventType === MSG_TYPE_BARGAIN_CONFIRM) {
+    ElMessage.success("卖家已确认小刀价");
+    return;
+  }
+  if (detail.eventType === MSG_TYPE_AUCTION_BID_ACCEPTED) {
+    ElMessage.success("拍卖出价成功");
+    return;
+  }
+  if (detail.eventType === MSG_TYPE_AUCTION_OUTBID) {
+    ElMessage.warning("您已被他人超价，预扣金额已退回");
+    return;
+  }
+  if (detail.eventType === MSG_TYPE_AUCTION_SETTLED) {
+    ElMessage.info("拍卖已完成结算");
+  }
+}
+
+function parseTradeCard(content) {
+  if (!content || typeof content !== "string") {
+    return null;
+  }
+  if (content.startsWith("[BARGAIN_APPLY]")) {
+    return parseCardPayload("BARGAIN_APPLY", content.slice("[BARGAIN_APPLY]".length));
+  }
+  if (content.startsWith("[BARGAIN_CONFIRM]")) {
+    return parseCardPayload("BARGAIN_CONFIRM", content.slice("[BARGAIN_CONFIRM]".length));
+  }
+  return null;
+}
+
+function parseCardPayload(type, text) {
+  try {
+    const data = JSON.parse(text || "{}");
+    return { type, ...data };
+  } catch {
+    return null;
+  }
+}
+
+function canConfirmBargain(message) {
+  const card = parseTradeCard(message?.content);
+  if (!card || card.type !== "BARGAIN_APPLY") {
+    return false;
+  }
+  return Number(message?.senderUserId) !== Number(currentUserId.value);
+}
+
+async function handleConfirmBargainFromCard(card) {
+  if (!card?.negotiationId) {
+    return;
+  }
+  const defaultPrice = Number(card.proposedPrice || 0);
+  const finalPrice = Number.isFinite(defaultPrice) && defaultPrice > 0 ? defaultPrice : 0.01;
+  try {
+    await confirmBargainApi({
+      negotiationId: Number(card.negotiationId),
+      confirmedPrice: finalPrice.toFixed(2),
+    });
+    ElMessage.success("已确认小刀价");
+    if (activeConversationId.value) {
+      await loadMessages(activeConversationId.value);
+    }
+  } catch (e) {
+    ElMessage.error(e?.response?.data?.message || "确认议价失败");
   }
 }
 
@@ -510,6 +607,30 @@ async function scrollToBottom() {
   line-height: 1.7;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.trade-card {
+  border: 1px solid #f5d08a;
+  background: #fffbeb;
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.trade-card-confirmed {
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.trade-card-title {
+  font-weight: 700;
+  color: #92400e;
+  margin-bottom: 6px;
+}
+
+.trade-card-line {
+  color: #3f3f46;
+  font-size: 13px;
+  margin-bottom: 4px;
 }
 
 .message-time {

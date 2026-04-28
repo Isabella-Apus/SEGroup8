@@ -31,3 +31,27 @@ export function deleteSellerSecondhandApi(id) {
 export function changeSellerSecondhandStatusApi(id, status) {
     return http.post(`/secondhand/seller/${id}/status`, { status });
 }
+
+export function applyBargainApi(payload) {
+    return http.post("/secondhand/trade/bargain/apply", payload);
+}
+
+export function confirmBargainApi(payload) {
+    return http.post("/secondhand/trade/bargain/confirm", payload);
+}
+
+export function getMyEffectiveBargainApi(productId) {
+    return http.get("/secondhand/trade/bargain/effective", { params: { productId } });
+}
+
+export function createAuctionApi(payload) {
+    return http.post("/secondhand/trade/auction", payload);
+}
+
+export function getAuctionByProductIdApi(productId) {
+    return http.get(`/secondhand/trade/auction/product/${productId}`);
+}
+
+export function placeAuctionBidApi(auctionId, payload) {
+    return http.post(`/secondhand/trade/auction/${auctionId}/bid`, payload);
+}

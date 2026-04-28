@@ -18,7 +18,9 @@ import com.segroup8.platform.mapper.SecondhandProductMapper;
 import com.segroup8.platform.mapper.UserBlockMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
+import com.segroup8.platform.service.CategoryService;
 import com.segroup8.platform.service.SecondhandProductService;
+import com.segroup8.platform.service.SecondhandTradeService;
 import com.segroup8.platform.vo.OrderItemVO;
 import com.segroup8.platform.vo.OrderVO;
 import com.segroup8.platform.vo.PageVO;
@@ -32,6 +34,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Service
 public class SecondhandProductServiceImpl implements SecondhandProductService {
@@ -46,28 +49,34 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
     private final UserMapper userMapper;
     private final BrowseHistoryService browseHistoryService;
     private final UserBlockMapper userBlockMapper;
+    private final CategoryService categoryService;
+    private final SecondhandTradeService secondhandTradeService;
 
     public SecondhandProductServiceImpl(SecondhandProductMapper secondhandProductMapper,
             OrderInfoMapper orderInfoMapper,
             OrderItemMapper orderItemMapper,
             UserMapper userMapper,
             BrowseHistoryService browseHistoryService,
-            UserBlockMapper userBlockMapper) {
+            UserBlockMapper userBlockMapper,
+            CategoryService categoryService,
+            SecondhandTradeService secondhandTradeService) {
         this.secondhandProductMapper = secondhandProductMapper;
         this.orderInfoMapper = orderInfoMapper;
         this.orderItemMapper = orderItemMapper;
         this.userMapper = userMapper;
         this.browseHistoryService = browseHistoryService;
         this.userBlockMapper = userBlockMapper;
+        this.categoryService = categoryService;
+        this.secondhandTradeService = secondhandTradeService;
     }
 
     @Override
     public PageVO<SecondhandProductVO> pagePublicProducts(SecondhandProductPageQueryRequest request) {
         validatePriceRange(request.getMinPrice(), request.getMaxPrice());
         LambdaQueryWrapper<SecondhandProduct> wrapper = new LambdaQueryWrapper<SecondhandProduct>()
-                .eq(SecondhandProduct::getStatus, ON_SHELF)
-                .orderByDesc(SecondhandProduct::getCreateTime);
+            .eq(SecondhandProduct::getStatus, ON_SHELF);
         appendCommonFilters(wrapper, request);
+        applySort(wrapper, request.getSortBy());
 
         // 拉黑屏蔽：双向过滤（我拉黑的人 + 拉黑我的人 的商品都不显示）
         Long currentUserId = UserContext.getUserId();
@@ -106,12 +115,12 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         validatePriceRange(request.getMinPrice(), request.getMaxPrice());
         Long sellerUserId = requireUserId();
         LambdaQueryWrapper<SecondhandProduct> wrapper = new LambdaQueryWrapper<SecondhandProduct>()
-                .eq(SecondhandProduct::getSellerUserId, sellerUserId)
-                .orderByDesc(SecondhandProduct::getCreateTime);
+            .eq(SecondhandProduct::getSellerUserId, sellerUserId);
         appendCommonFilters(wrapper, request);
         if (request.getStatus() != null) {
             wrapper.eq(SecondhandProduct::getStatus, request.getStatus());
         }
+        applySort(wrapper, request.getSortBy());
         Page<SecondhandProduct> page = secondhandProductMapper.selectPage(
                 Page.of(request.getPageNum(), request.getPageSize()),
                 wrapper);
@@ -121,6 +130,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
     @Override
     public SecondhandProductVO createSellerProduct(SecondhandProductSaveRequest request) {
         validatePriceFields(request.getOriginPrice(), request.getSalePrice());
+        validateSecondhandCategory(request.getCategoryId(), request.getSubCategoryId());
         Long sellerUserId = requireUserId();
         SecondhandProduct product = new SecondhandProduct();
         product.setSellerUserId(sellerUserId);
@@ -129,7 +139,10 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         product.setDescription(request.getDescription());
         product.setOriginPrice(request.getOriginPrice());
         product.setSalePrice(request.getSalePrice());
+        product.setCategoryId(request.getCategoryId());
+        product.setSubCategoryId(request.getSubCategoryId());
         product.setConditionLevel(request.getConditionLevel());
+        product.setIsNegotiable(request.getIsNegotiable());
         product.setStatus(normalizeStatus(request.getStatus(), ON_SHELF));
         secondhandProductMapper.insert(product);
         return toVO(secondhandProductMapper.selectById(product.getId()));
@@ -138,13 +151,17 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
     @Override
     public SecondhandProductVO updateSellerProduct(Long productId, SecondhandProductSaveRequest request) {
         validatePriceFields(request.getOriginPrice(), request.getSalePrice());
+        validateSecondhandCategory(request.getCategoryId(), request.getSubCategoryId());
         SecondhandProduct product = getSellerOwnedProduct(productId);
         product.setName(request.getName().trim());
         product.setCover(request.getCover());
         product.setDescription(request.getDescription());
         product.setOriginPrice(request.getOriginPrice());
         product.setSalePrice(request.getSalePrice());
+        product.setCategoryId(request.getCategoryId());
+        product.setSubCategoryId(request.getSubCategoryId());
         product.setConditionLevel(request.getConditionLevel());
+        product.setIsNegotiable(request.getIsNegotiable());
         if (request.getStatus() != null) {
             product.setStatus(normalizeStatus(request.getStatus(), null));
         }
@@ -197,10 +214,13 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
             throw new BusinessException(400, "二手商品已售出");
         }
 
+        BigDecimal effectivePrice = secondhandTradeService.resolveEffectivePriceForBuyer(productId, buyerUserId);
+        BigDecimal dealPrice = effectivePrice == null ? product.getSalePrice() : effectivePrice;
+
         OrderInfo order = new OrderInfo();
         order.setOrderNo(generateOrderNo(buyerUserId));
         order.setBuyerUserId(buyerUserId);
-        order.setTotalAmount(product.getSalePrice());
+        order.setTotalAmount(dealPrice);
         order.setPayStatus(1);
         order.setOrderStatus(1);
         order.setCanRefund(1);
@@ -215,10 +235,12 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         orderItem.setProductType("SECONDHAND");
         orderItem.setProductId(product.getId());
         orderItem.setProductName(product.getName());
-        orderItem.setPrice(product.getSalePrice());
+        orderItem.setPrice(dealPrice);
         orderItem.setQuantity(1);
         orderItem.setStatus(1);
         orderItemMapper.insert(orderItem);
+
+        secondhandTradeService.markNegotiationUsed(productId, buyerUserId, order.getId());
 
         return toOrderVO(order, orderItem);
     }
@@ -242,8 +264,44 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         if (request.getMaxPrice() != null) {
             wrapper.le(SecondhandProduct::getSalePrice, request.getMaxPrice());
         }
+        if (request.getCategoryId() != null) {
+            Set<Integer> leafIds = categoryService.resolveLeafCategoryIds(request.getCategoryId());
+            if (leafIds.isEmpty()) {
+                wrapper.eq(SecondhandProduct::getSubCategoryId, -1);
+            } else {
+                wrapper.in(SecondhandProduct::getSubCategoryId, leafIds);
+            }
+        }
         if (StringUtils.hasText(request.getConditionLevel())) {
             wrapper.eq(SecondhandProduct::getConditionLevel, request.getConditionLevel().trim());
+        }
+        if (request.getIsNegotiable() != null) {
+            wrapper.eq(SecondhandProduct::getIsNegotiable, request.getIsNegotiable());
+        }
+    }
+
+    private void applySort(LambdaQueryWrapper<SecondhandProduct> wrapper, String sortBy) {
+        String rule = StringUtils.hasText(sortBy) ? sortBy.trim() : "time_desc";
+        switch (rule) {
+            case "price_asc" -> wrapper.orderByAsc(SecondhandProduct::getSalePrice)
+                    .orderByDesc(SecondhandProduct::getCreateTime);
+            case "price_desc" -> wrapper.orderByDesc(SecondhandProduct::getSalePrice)
+                    .orderByDesc(SecondhandProduct::getCreateTime);
+            case "sales_desc" -> wrapper.last(
+                    "ORDER BY (SELECT IFNULL(SUM(oi.quantity), 0) FROM order_item oi WHERE oi.product_type = 'SECONDHAND' AND oi.product_id = secondhand_product.id) DESC, create_time DESC");
+            default -> wrapper.orderByDesc(SecondhandProduct::getCreateTime);
+        }
+    }
+
+    private void validateSecondhandCategory(Integer categoryId, Integer subCategoryId) {
+        if (!categoryService.isMainCategory(categoryId)) {
+            throw new BusinessException(400, "一级分类非法");
+        }
+        if (Objects.equals(categoryId, CategoryService.FOOD_MAIN_CATEGORY_ID)) {
+            throw new BusinessException(400, "二手商品不支持食品类目");
+        }
+        if (!categoryService.isSubCategoryOf(categoryId, subCategoryId)) {
+            throw new BusinessException(400, "二级分类不属于所选一级分类");
         }
     }
 
@@ -301,7 +359,12 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         vo.setDescription(product.getDescription());
         vo.setOriginPrice(product.getOriginPrice());
         vo.setSalePrice(product.getSalePrice());
+        vo.setCategoryId(product.getCategoryId());
+        vo.setSubCategoryId(product.getSubCategoryId());
+        vo.setCategoryName(categoryService.getCategoryName(product.getCategoryId()));
+        vo.setSubCategoryName(categoryService.getCategoryName(product.getSubCategoryId()));
         vo.setConditionLevel(product.getConditionLevel());
+        vo.setIsNegotiable(product.getIsNegotiable());
         vo.setStatus(product.getStatus());
         vo.setStatusName(Objects.equals(product.getStatus(), ON_SHELF) ? "在售" : "下架");
         vo.setCreateTime(product.getCreateTime());

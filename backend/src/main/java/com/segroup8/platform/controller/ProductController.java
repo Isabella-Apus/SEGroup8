@@ -7,6 +7,7 @@ import com.segroup8.platform.dto.ProductStatusUpdateRequest;
 import com.segroup8.platform.dto.ProductStockAdjustRequest;
 import com.segroup8.platform.entity.Product;
 import com.segroup8.platform.service.ProductService;
+import com.segroup8.platform.service.SearchBehaviorService;
 import com.segroup8.platform.service.SearchService;
 import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.vo.ProductVO;
@@ -30,15 +31,20 @@ public class ProductController {
 
     private final ProductService productService;
     private final SearchService searchService;
+    private final SearchBehaviorService searchBehaviorService;
 
-    public ProductController(ProductService productService, SearchService searchService) {
+    public ProductController(ProductService productService,
+            SearchService searchService,
+            SearchBehaviorService searchBehaviorService) {
         this.productService = productService;
         this.searchService = searchService;
+        this.searchBehaviorService = searchBehaviorService;
     }
 
     @Operation(summary = "分页查询在售商品")
     @GetMapping("/list")
     public Result<PageVO<ProductVO>> list(@Valid @ModelAttribute ProductPageQueryRequest request) {
+        searchBehaviorService.recordKeyword(request.getKeyword());
         return Result.success(productService.pagePublicProducts(request));
     }
 

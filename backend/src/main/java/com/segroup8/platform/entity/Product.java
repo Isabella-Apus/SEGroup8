@@ -17,6 +17,8 @@ public class Product {
     private String cover;
     private String description;
     private BigDecimal price;
+    private Integer categoryId;
+    private Integer subCategoryId;
     private Integer stock;
     private Integer status;
     private LocalDateTime createTime;
@@ -68,6 +70,22 @@ public class Product {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Integer getSubCategoryId() {
+        return subCategoryId;
+    }
+
+    public void setSubCategoryId(Integer subCategoryId) {
+        this.subCategoryId = subCategoryId;
     }
 
     public Integer getStock() {

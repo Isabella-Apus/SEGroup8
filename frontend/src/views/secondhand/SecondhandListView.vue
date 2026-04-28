@@ -13,9 +13,42 @@
           v-model="query.keyword"
           placeholder="搜二手商品名，例如：自行车"
           clearable
-          style="width: 240px"
+          style="width: 260px"
           @keyup.enter="onSearch"
         />
+      </el-form-item>
+      <el-form-item>
+        <el-cascader
+          v-model="query.categoryPath"
+          :options="SECONDHAND_CATEGORY_TREE"
+          :props="cascaderProps"
+          clearable
+          filterable
+          collapse-tags
+          collapse-tags-tooltip
+          placeholder="分类筛选"
+          style="width: 240px"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-input-number v-model="query.minPrice" :min="0" :precision="2" :step="10" placeholder="最低价" />
+      </el-form-item>
+      <el-form-item>
+        <el-input-number v-model="query.maxPrice" :min="0" :precision="2" :step="10" placeholder="最高价" />
+      </el-form-item>
+      <el-form-item>
+        <el-select v-model="query.conditionLevel" placeholder="成色筛选" clearable style="width: 160px">
+          <el-option label="全新" value="全新" />
+          <el-option label="99新" value="99新" />
+          <el-option label="9成新" value="9成新" />
+          <el-option label="8成新及以下" value="8成新及以下" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-select v-model="query.isNegotiable" placeholder="议价筛选" clearable style="width: 140px">
+          <el-option label="可议价" :value="1" />
+          <el-option label="不可议价" :value="0" />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSearch">搜索</el-button>
@@ -23,6 +56,18 @@
         <el-button type="success" @click="$router.push('/secondhand/publish')">去发布</el-button>
       </el-form-item>
     </el-form>
+
+    <div class="sort-row">
+      <el-button
+        v-for="item in sortOptions"
+        :key="item.value"
+        :type="query.sortBy === item.value ? 'warning' : 'default'"
+        plain
+        @click="changeSort(item.value)"
+      >
+        {{ item.label }}
+      </el-button>
+    </div>
 
     <div class="chips">
       <button
@@ -43,6 +88,7 @@
         :product="item"
         mode="secondhand"
         route-base="/secondhand"
+        :highlight-keyword="query.keyword.trim()"
       />
     </div>
 
@@ -58,7 +104,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import ProductCard from '@/components/ProductCard.vue';
 import { getSecondhandListApi } from '@/api/secondhand';
-import { searchList } from '@/utils/search';
+import { SECONDHAND_CATEGORY_TREE } from '@/constants/categories';
 
 const pageSize = 16;
 const loading = ref(false);
@@ -70,34 +116,46 @@ const total = ref(0);
 
 const query = reactive({
   keyword: '',
-  condition: 'all'
+  categoryPath: [],
+  minPrice: undefined,
+  maxPrice: undefined,
+  conditionLevel: undefined,
+  isNegotiable: undefined,
+  sortBy: 'time_desc',
+  condition: 'all',
 });
+
+const cascaderProps = {
+  emitPath: true,
+  checkStrictly: false,
+  value: 'value',
+  label: 'label',
+  children: 'children',
+};
+
+const sortOptions = [
+  { label: '最新发布', value: 'time_desc' },
+  { label: '销量优先', value: 'sales_desc' },
+  { label: '价格升序', value: 'price_asc' },
+  { label: '价格降序', value: 'price_desc' },
+];
 
 const chips = [
   { label: '全部', condition: 'all' },
-  { label: '95新以上', condition: '95%' },
-  { label: '9成新', condition: '90%' },
-  { label: '8成新', condition: '80%' }
+  { label: '全新', condition: '全新' },
+  { label: '99新', condition: '99新' },
+  { label: '9成新', condition: '9成新' },
+  { label: '8成新及以下', condition: '8成新及以下' }
 ];
 
-const allItems = computed(() => {
-  const keywordTrimmed = query.keyword.trim();
-  const source = keywordTrimmed
-    ? searchList({
-      items: items.value,
-      keyword: keywordTrimmed,
-      keys: ['name', 'description'],
-    })
-    : items.value;
-  return source.filter((item) => {
-    const hitCondition = query.condition === 'all'
-      || item.condition === query.condition
-      || item.conditionLevel === query.condition;
-    return hitCondition;
-  });
+const selectedCategoryId = computed(() => {
+  if (!query.categoryPath.length) {
+    return undefined;
+  }
+  return query.categoryPath[1] || query.categoryPath[0];
 });
 
-const visibleItems = computed(() => allItems.value);
+const visibleItems = computed(() => items.value);
 const hasMore = computed(() => items.value.length < total.value);
 
 onMounted(async () => {
@@ -118,16 +176,20 @@ async function onSearch() {
 
 async function onReset() {
   query.keyword = '';
+  query.categoryPath = [];
+  query.minPrice = undefined;
+  query.maxPrice = undefined;
+  query.conditionLevel = undefined;
+  query.isNegotiable = undefined;
+  query.sortBy = 'time_desc';
   query.condition = 'all';
   await fetchPage(true);
 }
 
 async function applyChip(chip) {
   query.condition = chip.condition;
+  query.conditionLevel = chip.condition === 'all' ? undefined : chip.condition;
   await fetchPage(true);
-  if (query.keyword.trim()) {
-    await ensureAllItemsLoaded();
-  }
 }
 
 async function fetchPage(reset = false) {
@@ -145,7 +207,13 @@ async function fetchPage(reset = false) {
     const res = await getSecondhandListApi({
       pageNum: queryPageNum.value,
       pageSize,
-      keyword: undefined,
+      keyword: query.keyword.trim() || undefined,
+      categoryId: selectedCategoryId.value,
+      minPrice: query.minPrice,
+      maxPrice: query.maxPrice,
+      conditionLevel: query.conditionLevel,
+      isNegotiable: query.isNegotiable,
+      sortBy: query.sortBy,
     });
     const records = (res.data?.records || []).map((item) => ({
       ...item,
@@ -165,10 +233,9 @@ async function fetchPage(reset = false) {
   }
 }
 
-async function ensureAllItemsLoaded() {
-  while (hasMore.value) {
-    await fetchPage(false);
-  }
+function changeSort(value) {
+  query.sortBy = value;
+  fetchPage(true);
 }
 
 function initObserver() {
@@ -226,6 +293,13 @@ function initObserver() {
   border: 1px solid var(--line-soft);
   border-radius: 16px;
   padding: 12px;
+}
+
+.sort-row {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .chips {

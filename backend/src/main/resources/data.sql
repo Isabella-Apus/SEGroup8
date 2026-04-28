@@ -12,16 +12,66 @@ INSERT IGNORE INTO `shop` (`id`, `owner_user_id`, `name`, `logo`, `description`,
 VALUES
 (1, 2, 'Digital Store', '', 'Demo shop for new products', 1);
 
-INSERT IGNORE INTO `product` (`id`, `shop_id`, `name`, `cover`, `description`, `price`, `stock`, `status`)
+INSERT INTO `category` (`id`, `name`, `parent_id`, `sort_order`, `status`)
 VALUES
-(1, 1, 'Mechanical Keyboard K87', '', '87-key hot-swappable keyboard', 299.00, 80, 1),
-(2, 1, 'Wireless Mouse M2', '', 'Bluetooth dual-mode mouse', 89.00, 120, 1),
-(3, 1, '27-inch Monitor', '', '2K IPS monitor for demo', 1299.00, 30, 1);
+(1, '电子数码', NULL, 1, 1),
+(2, '服饰鞋包', NULL, 2, 1),
+(3, '居家生活', NULL, 3, 1),
+(4, '美妆个护', NULL, 4, 1),
+(5, '运动户外', NULL, 5, 1),
+(6, '图书音像', NULL, 6, 1),
+(7, '美食类', NULL, 7, 1),
+(8, '其他', NULL, 8, 1),
+(101, '手机', 1, 1, 1),
+(102, '电脑/平板', 1, 2, 1),
+(103, '摄影摄像', 1, 3, 1),
+(104, '影音娱乐', 1, 4, 1),
+(105, '智能穿戴', 1, 5, 1),
+(201, '潮流女装', 2, 1, 1),
+(202, '品质男装', 2, 2, 1),
+(203, '运动户外', 2, 3, 1),
+(204, '精选箱包', 2, 4, 1),
+(205, '时尚饰品', 2, 5, 1),
+(301, '家具家装', 3, 1, 1),
+(302, '厨房用具', 3, 2, 1),
+(303, '居家日用', 3, 3, 1),
+(304, '家用电器', 3, 4, 1),
+(305, '收纳整理', 3, 5, 1),
+(401, '面部护肤', 4, 1, 1),
+(402, '魅力彩妆', 4, 2, 1),
+(403, '个人护理', 4, 3, 1),
+(404, '香水香氛', 4, 4, 1),
+(405, '美容仪器', 4, 5, 1),
+(501, '健身器材', 5, 1, 1),
+(502, '户外装备', 5, 2, 1),
+(503, '体育用品', 5, 3, 1),
+(504, '骑行运动', 5, 4, 1),
+(601, '教材教辅', 6, 1, 1),
+(602, '小说文学', 6, 2, 1),
+(603, '艺术收藏', 6, 3, 1),
+(604, '办公用品', 6, 4, 1),
+(701, '休闲零食', 7, 1, 1),
+(702, '粮油调味', 7, 2, 1),
+(703, '生鲜果蔬', 7, 3, 1),
+(704, '冲调饮品', 7, 4, 1),
+(705, '地方特产', 7, 5, 1),
+(801, '未分类', 8, 1, 1)
+ON DUPLICATE KEY UPDATE
+  `name` = VALUES(`name`),
+  `parent_id` = VALUES(`parent_id`),
+  `sort_order` = VALUES(`sort_order`),
+  `status` = VALUES(`status`);
 
-INSERT IGNORE INTO `secondhand_product` (`id`, `seller_user_id`, `name`, `cover`, `description`, `origin_price`, `sale_price`, `condition_level`, `status`)
+INSERT IGNORE INTO `product` (`id`, `shop_id`, `name`, `cover`, `description`, `price`, `category_id`, `sub_category_id`, `stock`, `status`)
 VALUES
-(1, 3, 'Used Bicycle', '', 'Gently used and works well', 1200.00, 650.00, '90%', 1),
-(2, 3, 'Spare Headphones', '', 'Minor usage marks, fully functional', 399.00, 180.00, '80%', 1);
+(1, 1, 'Mechanical Keyboard K87', '', '87-key hot-swappable keyboard', 299.00, 1, 102, 80, 1),
+(2, 1, 'Wireless Mouse M2', '', 'Bluetooth dual-mode mouse', 89.00, 1, 105, 120, 1),
+(3, 1, '27-inch Monitor', '', '2K IPS monitor for demo', 1299.00, 1, 102, 30, 1);
+
+INSERT IGNORE INTO `secondhand_product` (`id`, `seller_user_id`, `name`, `cover`, `description`, `origin_price`, `sale_price`, `category_id`, `sub_category_id`, `condition_level`, `is_negotiable`, `status`)
+VALUES
+(1, 3, 'Used Bicycle', '', 'Gently used and works well', 1200.00, 650.00, 5, 504, '9成新', 1, 1),
+(2, 3, 'Spare Headphones', '', 'Minor usage marks, fully functional', 399.00, 180.00, 1, 104, '8成新及以下', 0, 1);
 
 INSERT INTO `order_info` (`id`, `order_no`, `buyer_user_id`, `total_amount`, `pay_status`, `order_status`, `refund_status`, `refund_reason`, `remark`, `create_time`, `paid_time`, `shipped_time`, `received_time`, `completed_time`, `closed_time`, `refund_apply_time`, `refund_decision_time`)
 VALUES

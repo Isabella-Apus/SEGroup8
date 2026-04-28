@@ -7,6 +7,7 @@ import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.MerchantApplicationMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
+import com.segroup8.platform.service.CategoryService;
 import com.segroup8.platform.service.NotificationService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,6 +36,9 @@ class MerchantApplicationServiceImplTest {
     @Mock
     private ShopMapper shopMapper;
 
+    @Mock
+    private CategoryService categoryService;
+
     private MerchantApplicationServiceImpl merchantApplicationService;
 
     @BeforeEach
@@ -43,7 +47,8 @@ class MerchantApplicationServiceImplTest {
                 merchantApplicationMapper,
                 userMapper,
                 notificationService,
-                shopMapper);
+            shopMapper,
+            categoryService);
     }
 
     @AfterEach

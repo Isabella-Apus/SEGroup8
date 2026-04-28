@@ -15,9 +15,12 @@ public class SecondhandProductPageQueryRequest {
     private Long pageSize = 10L;
 
     private String keyword;
+    private Integer categoryId;
+    private String sortBy;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
     private String conditionLevel;
+    private Integer isNegotiable;
     private Integer status;
 
     public Long getPageNum() {
@@ -44,6 +47,22 @@ public class SecondhandProductPageQueryRequest {
         this.keyword = keyword;
     }
 
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
+    }
+
     public BigDecimal getMinPrice() {
         return minPrice;
     }
@@ -66,6 +85,14 @@ public class SecondhandProductPageQueryRequest {
 
     public void setConditionLevel(String conditionLevel) {
         this.conditionLevel = conditionLevel;
+    }
+
+    public Integer getIsNegotiable() {
+        return isNegotiable;
+    }
+
+    public void setIsNegotiable(Integer isNegotiable) {
+        this.isNegotiable = isNegotiable;
     }
 
     public Integer getStatus() {

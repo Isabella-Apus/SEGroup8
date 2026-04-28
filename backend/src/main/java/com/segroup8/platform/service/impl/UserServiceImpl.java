@@ -14,6 +14,7 @@ import com.segroup8.platform.mapper.AddressMapper;
 import com.segroup8.platform.mapper.MerchantApplicationMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
+import com.segroup8.platform.service.CategoryService;
 import com.segroup8.platform.service.MerchantApplicationService;
 import com.segroup8.platform.service.UserService;
 import com.segroup8.platform.vo.AddressVO;
@@ -32,17 +33,20 @@ public class UserServiceImpl implements UserService {
     private final MerchantApplicationService merchantApplicationService;
     private final ShopMapper shopMapper;
     private final MerchantApplicationMapper merchantApplicationMapper;
+    private final CategoryService categoryService;
 
     public UserServiceImpl(UserMapper userMapper,
             AddressMapper addressMapper,
             MerchantApplicationService merchantApplicationService,
             ShopMapper shopMapper,
-            MerchantApplicationMapper merchantApplicationMapper) {
+            MerchantApplicationMapper merchantApplicationMapper,
+            CategoryService categoryService) {
         this.userMapper = userMapper;
         this.addressMapper = addressMapper;
         this.merchantApplicationService = merchantApplicationService;
         this.shopMapper = shopMapper;
         this.merchantApplicationMapper = merchantApplicationMapper;
+        this.categoryService = categoryService;
     }
 
     @Override
@@ -68,7 +72,7 @@ public class UserServiceImpl implements UserService {
         vo.setShopName(user.getShopName());
         vo.setShopDesc(user.getShopDesc());
         vo.setBannerUrl(user.getBannerUrl());
-        vo.setCategory(user.getCategory());
+        vo.setCategory(resolveCategoryLabel(user.getCategory()));
         vo.setRegion(user.getRegion());
         vo.setBusinessHours(user.getBusinessHours());
         vo.setReturnPolicy(user.getReturnPolicy());
@@ -309,16 +313,19 @@ public class UserServiceImpl implements UserService {
     }
 
     private String mapCategoryLabel(Integer categoryId) {
-        if (categoryId == null) {
-            return null;
+        return categoryService.getCategoryName(categoryId);
+    }
+
+    private String resolveCategoryLabel(String category) {
+        if (!StringUtils.hasText(category)) {
+            return category;
         }
-        return switch (categoryId) {
-            case 1 -> "食品";
-            case 2 -> "3C";
-            case 3 -> "美妆";
-            case 4 -> "服装";
-            case 5 -> "运动";
-            default -> String.valueOf(categoryId);
-        };
+        try {
+            Integer categoryId = Integer.parseInt(category.trim());
+            String name = categoryService.getCategoryName(categoryId);
+            return StringUtils.hasText(name) ? name : category;
+        } catch (NumberFormatException e) {
+            return category;
+        }
     }
 }
