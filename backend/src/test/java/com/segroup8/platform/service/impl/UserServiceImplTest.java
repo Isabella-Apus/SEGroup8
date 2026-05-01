@@ -9,7 +9,6 @@ import com.segroup8.platform.mapper.AddressMapper;
 import com.segroup8.platform.mapper.MerchantApplicationMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
-import com.segroup8.platform.service.CategoryService;
 import com.segroup8.platform.service.MerchantApplicationService;
 import com.segroup8.platform.vo.UserVO;
 import org.junit.jupiter.api.AfterEach;
@@ -44,9 +43,6 @@ class UserServiceImplTest {
     @Mock
     private MerchantApplicationMapper merchantApplicationMapper;
 
-    @Mock
-    private CategoryService categoryService;
-
     private UserServiceImpl userService;
 
     @BeforeEach
@@ -56,8 +52,7 @@ class UserServiceImplTest {
                 addressMapper,
                 merchantApplicationService,
                 shopMapper,
-            merchantApplicationMapper,
-            categoryService);
+                merchantApplicationMapper);
     }
 
     @AfterEach

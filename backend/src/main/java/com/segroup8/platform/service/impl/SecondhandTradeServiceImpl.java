@@ -31,6 +31,7 @@ import com.segroup8.platform.service.SecondhandTradeService;
 import com.segroup8.platform.service.settlement.EscrowSettlementService;
 import com.segroup8.platform.vo.AuctionLogVO;
 import com.segroup8.platform.vo.ChatConversationVO;
+import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.vo.ProductAuctionVO;
 import com.segroup8.platform.vo.ProductNegotiationVO;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,7 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
 
     private static final String NEGOTIATION_APPLIED = "APPLIED";
     private static final String NEGOTIATION_CONFIRMED = "CONFIRMED";
+    private static final String NEGOTIATION_REJECTED = "REJECTED";
     private static final String NEGOTIATION_USED = "USED";
 
     private static final String AUCTION_ONGOING = "ONGOING";
@@ -198,6 +200,44 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ProductNegotiationVO rejectBargain(Long negotiationId) {
+        Long sellerUserId = requireUserId();
+        if (negotiationId == null) {
+            throw new BusinessException(400, "议价记录ID不能为空");
+        }
+        ProductNegotiation negotiation = productNegotiationMapper.selectById(negotiationId);
+        if (negotiation == null) {
+            throw new BusinessException(404, "议价记录不存在");
+        }
+        if (!Objects.equals(negotiation.getSellerUserId(), sellerUserId)) {
+            throw new BusinessException(403, "无权驳回该议价");
+        }
+        if (!NEGOTIATION_APPLIED.equalsIgnoreCase(negotiation.getStatus())) {
+            throw new BusinessException(400, "当前议价状态不可驳回");
+        }
+
+        negotiation.setStatus(NEGOTIATION_REJECTED);
+        productNegotiationMapper.updateById(negotiation);
+
+        SecondhandProduct product = secondhandProductMapper.selectById(negotiation.getProductId());
+        if (negotiation.getConversationId() != null && product != null) {
+            chatService.sendMessage(
+                    sellerUserId,
+                    negotiation.getConversationId(),
+                    buildBargainRejectCardMessage(negotiation, product));
+        }
+
+        realtimePushService.pushToUser(negotiation.getBuyerUserId(), RealtimeEventTypes.MSG_TYPE_BARGAIN_CONFIRM, Map.of(
+                "negotiationId", negotiation.getId(),
+                "productId", negotiation.getProductId(),
+                "sellerUserId", sellerUserId,
+                "status", NEGOTIATION_REJECTED));
+
+        return toNegotiationVO(negotiation);
+    }
+
+    @Override
     public ProductNegotiationVO getMyEffectiveNegotiation(Long productId) {
         Long buyerUserId = requireUserId();
         ProductNegotiation negotiation = findEffectiveNegotiation(productId, buyerUserId);
@@ -285,6 +325,67 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                 .orderByDesc(ProductAuction::getId)
                 .last("limit 1"));
         return auction == null ? null : toAuctionVO(auction);
+    }
+
+    @Override
+    public PageVO<ProductAuctionVO> pageMyAuctions(Long pageNum, Long pageSize, String status) {
+        Long sellerUserId = requireUserId();
+        long safePageNum = pageNum == null || pageNum < 1 ? 1L : pageNum;
+        long safePageSize = pageSize == null || pageSize < 1 ? 10L : Math.min(pageSize, 50L);
+        LambdaQueryWrapper<ProductAuction> wrapper = new LambdaQueryWrapper<ProductAuction>()
+                .eq(ProductAuction::getSellerUserId, sellerUserId)
+                .orderByDesc(ProductAuction::getCreateTime);
+        if (status != null && !status.isBlank()) {
+            wrapper.eq(ProductAuction::getStatus, status.trim().toUpperCase(Locale.ROOT));
+        }
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ProductAuction> page = productAuctionMapper.selectPage(
+                com.baomidou.mybatisplus.extension.plugins.pagination.Page.of(safePageNum, safePageSize), wrapper);
+        if (page.getTotal() == 0 && !page.getRecords().isEmpty()) {
+            page.setTotal(productAuctionMapper.selectCount(wrapper));
+        }
+        PageVO<ProductAuctionVO> vo = new PageVO<>();
+        vo.setTotal(page.getTotal());
+        vo.setPageNum(page.getCurrent());
+        vo.setPageSize(page.getSize());
+        vo.setRecords(page.getRecords().stream().map(this::toAuctionVO).toList());
+        return vo;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ProductAuctionVO closeAuctionEarly(Long auctionId) {
+        ProductAuction auction = getOwnedOngoingAuction(auctionId);
+        productAuctionMapper.update(null, new UpdateWrapper<ProductAuction>()
+                .set("end_time", LocalDateTime.now())
+                .eq("id", auction.getId())
+                .eq("status", AUCTION_ONGOING));
+        settleOneAuction(auction.getId());
+        return getAuctionByProductId(auction.getProductId());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public ProductAuctionVO markAuctionFlow(Long auctionId) {
+        ProductAuction auction = getOwnedOngoingAuction(auctionId);
+        if (auction.getCurrentBidderUserId() != null) {
+            throw new BusinessException(400, "已有出价记录，不能直接标记为流拍");
+        }
+        int updated = productAuctionMapper.update(null, new UpdateWrapper<ProductAuction>()
+                .set("status", AUCTION_FLOW)
+                .eq("id", auction.getId())
+                .eq("status", AUCTION_ONGOING));
+        if (updated == 0) {
+            throw new BusinessException(409, "拍卖状态已变化，请刷新后重试");
+        }
+        secondhandProductMapper.update(null, new UpdateWrapper<SecondhandProduct>()
+                .set("status", SECONDHAND_OFF_SHELF)
+                .eq("id", auction.getProductId())
+                .eq("status", SECONDHAND_ON_SHELF));
+        realtimePushService.pushToUser(auction.getSellerUserId(), RealtimeEventTypes.MSG_TYPE_AUCTION_SETTLED, Map.of(
+                "auctionId", auction.getId(),
+                "productId", auction.getProductId(),
+                "settleResult", AUCTION_FLOW));
+        return getAuctionByProductId(auction.getProductId());
     }
 
     @Override
@@ -435,6 +536,10 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         order.setOrderNo(generateAuctionOrderNo(auction.getCurrentBidderUserId()));
         order.setBuyerUserId(auction.getCurrentBidderUserId());
         order.setTotalAmount(auction.getCurrentPrice());
+        order.setVoucherDiscountAmount(BigDecimal.ZERO);
+        order.setSellerBearAmount(BigDecimal.ZERO);
+        order.setPlatformBearAmount(BigDecimal.ZERO);
+        order.setPayableAmount(auction.getCurrentPrice());
         order.setPayStatus(1);
         order.setOrderStatus(OrderStatusEnum.PENDING_SHIP.getCode());
         order.setCanRefund(0);
@@ -518,6 +623,7 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         vo.setStartTime(auction.getStartTime());
         vo.setEndTime(auction.getEndTime());
         vo.setStatus(auction.getStatus());
+        vo.setSettledOrderId(auction.getSettledOrderId());
 
         if (auction.getCurrentBidderUserId() != null) {
             User user = userMapper.selectById(auction.getCurrentBidderUserId());
@@ -556,13 +662,18 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         if (auction.getCurrentPrice() == null) {
             return auction.getStartPrice();
         }
-        return auction.getCurrentPrice().add(auction.getIncrementAmount());
+        BigDecimal increment = auction.getIncrementAmount() == null || auction.getIncrementAmount().compareTo(BigDecimal.ZERO) <= 0
+                ? BigDecimal.ONE
+                : auction.getIncrementAmount();
+        return auction.getCurrentPrice().add(increment);
     }
 
     private String buildBargainApplyCardMessage(ProductNegotiation negotiation, SecondhandProduct product) {
         return "[BARGAIN_APPLY]{\"negotiationId\":" + negotiation.getId()
                 + ",\"productId\":" + negotiation.getProductId()
                 + ",\"productName\":\"" + safeJsonValue(product.getName()) + "\""
+                + ",\"buyerUserId\":" + negotiation.getBuyerUserId()
+                + ",\"sellerUserId\":" + negotiation.getSellerUserId()
                 + ",\"proposedPrice\":\"" + negotiation.getProposedPrice() + "\"}";
     }
 
@@ -570,8 +681,19 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         return "[BARGAIN_CONFIRM]{\"negotiationId\":" + negotiation.getId()
                 + ",\"productId\":" + negotiation.getProductId()
                 + ",\"productName\":\"" + safeJsonValue(product.getName()) + "\""
+                + ",\"buyerUserId\":" + negotiation.getBuyerUserId()
+                + ",\"sellerUserId\":" + negotiation.getSellerUserId()
                 + ",\"confirmedPrice\":\"" + negotiation.getConfirmedPrice() + "\""
                 + ",\"effectiveUntil\":\"" + negotiation.getEffectiveUntil() + "\"}";
+    }
+
+    private String buildBargainRejectCardMessage(ProductNegotiation negotiation, SecondhandProduct product) {
+        return "[BARGAIN_REJECT]{\"negotiationId\":" + negotiation.getId()
+                + ",\"productId\":" + negotiation.getProductId()
+                + ",\"productName\":\"" + safeJsonValue(product.getName()) + "\""
+                + ",\"buyerUserId\":" + negotiation.getBuyerUserId()
+                + ",\"sellerUserId\":" + negotiation.getSellerUserId()
+                + ",\"proposedPrice\":\"" + negotiation.getProposedPrice() + "\"}";
     }
 
     private String safeJsonValue(String value) {
@@ -598,6 +720,24 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
             throw new BusinessException(401, "未登录");
         }
         return userId;
+    }
+
+    private ProductAuction getOwnedOngoingAuction(Long auctionId) {
+        Long sellerUserId = requireUserId();
+        if (auctionId == null) {
+            throw new BusinessException(400, "拍卖ID不能为空");
+        }
+        ProductAuction auction = productAuctionMapper.selectById(auctionId);
+        if (auction == null) {
+            throw new BusinessException(404, "拍卖不存在");
+        }
+        if (!Objects.equals(auction.getSellerUserId(), sellerUserId)) {
+            throw new BusinessException(403, "无权操作该拍卖");
+        }
+        if (!AUCTION_ONGOING.equalsIgnoreCase(auction.getStatus())) {
+            throw new BusinessException(400, "当前拍卖状态不可操作");
+        }
+        return auction;
     }
 
     private String generateAuctionOrderNo(Long buyerUserId) {

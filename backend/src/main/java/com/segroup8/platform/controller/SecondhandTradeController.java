@@ -5,6 +5,7 @@ import com.segroup8.platform.dto.AuctionBidRequest;
 import com.segroup8.platform.dto.AuctionCreateRequest;
 import com.segroup8.platform.dto.BargainApplyRequest;
 import com.segroup8.platform.dto.BargainConfirmRequest;
+import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.service.SecondhandTradeService;
 import com.segroup8.platform.vo.ProductAuctionVO;
 import com.segroup8.platform.vo.ProductNegotiationVO;
@@ -40,6 +41,12 @@ public class SecondhandTradeController {
         return Result.success(secondhandTradeService.confirmBargain(request));
     }
 
+    @Operation(summary = "卖家驳回议价")
+    @PostMapping("/bargain/{negotiationId}/reject")
+    public Result<ProductNegotiationVO> rejectBargain(@PathVariable Long negotiationId) {
+        return Result.success(secondhandTradeService.rejectBargain(negotiationId));
+    }
+
     @Operation(summary = "查询我对某二手商品的有效议价")
     @GetMapping("/bargain/effective")
     public Result<ProductNegotiationVO> getMyEffectiveBargain(@RequestParam Long productId) {
@@ -56,6 +63,27 @@ public class SecondhandTradeController {
     @GetMapping("/auction/product/{productId}")
     public Result<ProductAuctionVO> getAuctionByProductId(@PathVariable Long productId) {
         return Result.success(secondhandTradeService.getAuctionByProductId(productId));
+    }
+
+    @Operation(summary = "分页查看我发起的拍卖")
+    @GetMapping("/auction/seller/list")
+    public Result<PageVO<ProductAuctionVO>> pageMyAuctions(
+            @RequestParam(defaultValue = "1") Long pageNum,
+            @RequestParam(defaultValue = "10") Long pageSize,
+            @RequestParam(required = false) String status) {
+        return Result.success(secondhandTradeService.pageMyAuctions(pageNum, pageSize, status));
+    }
+
+    @Operation(summary = "卖家提前结束拍卖")
+    @PostMapping("/auction/{auctionId}/close")
+    public Result<ProductAuctionVO> closeAuctionEarly(@PathVariable Long auctionId) {
+        return Result.success(secondhandTradeService.closeAuctionEarly(auctionId));
+    }
+
+    @Operation(summary = "卖家将拍卖标记为流拍")
+    @PostMapping("/auction/{auctionId}/flow")
+    public Result<ProductAuctionVO> markAuctionFlow(@PathVariable Long auctionId) {
+        return Result.success(secondhandTradeService.markAuctionFlow(auctionId));
     }
 
     @Operation(summary = "参与竞价")

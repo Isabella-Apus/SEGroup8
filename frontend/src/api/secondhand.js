@@ -40,6 +40,10 @@ export function confirmBargainApi(payload) {
     return http.post("/secondhand/trade/bargain/confirm", payload);
 }
 
+export function rejectBargainApi(negotiationId) {
+    return http.post(`/secondhand/trade/bargain/${negotiationId}/reject`);
+}
+
 export function getMyEffectiveBargainApi(productId) {
     return http.get("/secondhand/trade/bargain/effective", { params: { productId } });
 }
@@ -50,6 +54,18 @@ export function createAuctionApi(payload) {
 
 export function getAuctionByProductIdApi(productId) {
     return http.get(`/secondhand/trade/auction/product/${productId}`);
+}
+
+export function getMyAuctionListApi(params = {}) {
+    return http.get("/secondhand/trade/auction/seller/list", { params });
+}
+
+export function closeAuctionEarlyApi(auctionId) {
+    return http.post(`/secondhand/trade/auction/${auctionId}/close`);
+}
+
+export function markAuctionFlowApi(auctionId) {
+    return http.post(`/secondhand/trade/auction/${auctionId}/flow`);
 }
 
 export function placeAuctionBidApi(auctionId, payload) {

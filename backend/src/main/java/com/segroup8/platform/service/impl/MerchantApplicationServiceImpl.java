@@ -9,46 +9,40 @@ import com.segroup8.platform.dto.AdminMerchantApplicationQueryRequest;
 import com.segroup8.platform.dto.MerchantApplicationRejectRequest;
 import com.segroup8.platform.dto.MerchantApplicationSubmitRequest;
 import com.segroup8.platform.entity.MerchantApplication;
+import com.segroup8.platform.entity.Notification;
 import com.segroup8.platform.entity.Shop;
 import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.MerchantApplicationMapper;
+import com.segroup8.platform.mapper.NotificationMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.MerchantApplicationService;
-import com.segroup8.platform.service.NotificationService;
-import com.segroup8.platform.service.CategoryService;
 import com.segroup8.platform.vo.MerchantApplicationVO;
 import com.segroup8.platform.vo.PageVO;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Service
 public class MerchantApplicationServiceImpl implements MerchantApplicationService {
 
-    private static final Set<Integer> ALLOWED_MAIN_CATEGORY_IDS = Set.of(1, 2, 3, 4, 5, 6, 7);
-
     private final MerchantApplicationMapper merchantApplicationMapper;
     private final UserMapper userMapper;
-    private final NotificationService notificationService;
+    private final NotificationMapper notificationMapper;
     private final ShopMapper shopMapper;
-    private final CategoryService categoryService;
 
     public MerchantApplicationServiceImpl(MerchantApplicationMapper merchantApplicationMapper,
             UserMapper userMapper,
-            NotificationService notificationService,
-            ShopMapper shopMapper,
-            CategoryService categoryService) {
+            NotificationMapper notificationMapper,
+            ShopMapper shopMapper) {
         this.merchantApplicationMapper = merchantApplicationMapper;
         this.userMapper = userMapper;
-        this.notificationService = notificationService;
+        this.notificationMapper = notificationMapper;
         this.shopMapper = shopMapper;
-        this.categoryService = categoryService;
     }
 
     @Override
@@ -60,15 +54,6 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
                 .last("limit 1"));
         if (existing != null && (existing.getStatus() == 0 || existing.getStatus() == 1)) {
             throw new BusinessException(400, existing.getStatus() == 0 ? "已提交申请，请等待审核" : "您已是认证卖家");
-        }
-        if (request.getCategoryId() == null) {
-            throw new BusinessException(400, "请选择主营领域（一级分类）");
-        }
-        if (!ALLOWED_MAIN_CATEGORY_IDS.contains(request.getCategoryId())) {
-            throw new BusinessException(400, "主营领域仅支持七个一级分类");
-        }
-        if (!categoryService.isMainCategory(request.getCategoryId())) {
-            throw new BusinessException(400, "主营领域异常，请刷新后重新选择一级分类");
         }
 
         MerchantApplication application = new MerchantApplication();
@@ -97,10 +82,11 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
     @Override
     public MerchantApplicationVO getMyApplication() {
         Long userId = requireUserId();
-        MerchantApplication application = merchantApplicationMapper.selectOne(new LambdaQueryWrapper<MerchantApplication>()
-                .eq(MerchantApplication::getUserId, userId)
-                .orderByDesc(MerchantApplication::getId)
-                .last("limit 1"));
+        MerchantApplication application = merchantApplicationMapper
+                .selectOne(new LambdaQueryWrapper<MerchantApplication>()
+                        .eq(MerchantApplication::getUserId, userId)
+                        .orderByDesc(MerchantApplication::getId)
+                        .last("limit 1"));
         if (application == null) {
             return null;
         }
@@ -119,8 +105,7 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
         Page<MerchantApplication> page = merchantApplicationMapper
                 .selectPage(Page.of(request.getPageNum(), request.getPageSize()), wrapper);
         List<MerchantApplicationVO> records = page.getRecords().stream()
-                .map(app -> toVO(app, userMapper.selectById(app.getUserId()), true))
-                .toList();
+            .map(app -> toVO(app, userMapper.selectById(app.getUserId()), true)).toList();
 
         PageVO<MerchantApplicationVO> result = new PageVO<>();
         result.setTotal(page.getTotal());
@@ -156,10 +141,14 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
         userMapper.updateById(user);
 
         upsertShopByApplication(app);
-        notificationService.createNotification(
-                user.getId(),
-                "入驻审核结果",
-                "恭喜，您的入驻申请已通过，现可进入卖家工作台。");
+
+        Notification notification = new Notification();
+        notification.setUserId(user.getId());
+        notification.setTitle("入驻审核结果");
+        notification.setContent("恭喜，您的入驻申请已通过，现可进入卖家工作台。");
+        notification.setIsRead(0);
+        notification.setCreateTime(LocalDateTime.now());
+        notificationMapper.insert(notification);
     }
 
     @Override
@@ -173,10 +162,13 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
         app.setRejectReason(request.getRejectReason());
         merchantApplicationMapper.updateById(app);
 
-        notificationService.createNotification(
-                app.getUserId(),
-                "入驻审核结果",
-                "您的入驻申请被驳回，原因：" + request.getRejectReason());
+        Notification notification = new Notification();
+        notification.setUserId(app.getUserId());
+        notification.setTitle("入驻审核结果");
+        notification.setContent("您的入驻申请被驳回，原因：" + request.getRejectReason());
+        notification.setIsRead(0);
+        notification.setCreateTime(LocalDateTime.now());
+        notificationMapper.insert(notification);
     }
 
     private MerchantApplicationVO toVO(MerchantApplication app, User user, boolean includeSensitive) {

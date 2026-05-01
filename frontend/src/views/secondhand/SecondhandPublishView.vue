@@ -12,8 +12,13 @@
         <el-form-item label="商品名称">
           <el-input v-model="form.name" placeholder="例如：九成新办公椅" />
         </el-form-item>
-        <el-form-item label="封面链接">
-          <el-input v-model="form.cover" placeholder="请输入图片 URL" />
+        <el-form-item label="商品封面">
+          <el-space alignment="flex-start">
+            <el-upload :show-file-list="false" :http-request="uploadCover" accept="image/*">
+              <el-button :loading="coverUploading">上传图片</el-button>
+            </el-upload>
+            <el-image v-if="form.cover" :src="toFullImageUrl(form.cover)" fit="cover" class="cover-preview" />
+          </el-space>
         </el-form-item>
         <el-form-item label="原价">
           <el-input-number v-model="form.originPrice" :min="1" :precision="2" :step="10" />
@@ -66,6 +71,7 @@
 import { reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { publishSecondhandApi } from '@/api/secondhand';
+import { uploadImageApi } from '@/api/upload';
 import { SECONDHAND_CATEGORY_TREE } from '@/constants/categories';
 
 const cascaderProps = {
@@ -88,6 +94,7 @@ const form = reactive({
 });
 
 const submitting = ref(false);
+const coverUploading = ref(false);
 
 async function submit() {
   submitting.value = true;
@@ -115,6 +122,20 @@ async function submit() {
   }
 }
 
+async function uploadCover(option) {
+  coverUploading.value = true;
+  try {
+    const result = await uploadImageApi(option.file);
+    form.cover = result.data?.url || '';
+    option.onSuccess?.(result);
+  } catch (error) {
+    ElMessage.error(error?.response?.data?.message || '图片上传失败');
+    option.onError?.(error);
+  } finally {
+    coverUploading.value = false;
+  }
+}
+
 function reset() {
   form.name = '';
   form.cover = '';
@@ -124,6 +145,13 @@ function reset() {
   form.condition = '9成新';
   form.isNegotiable = 1;
   form.description = '';
+}
+
+function toFullImageUrl(url) {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const normalized = url.startsWith('/') ? url : `/${url}`;
+  return `http://localhost:8080${normalized}`;
 }
 </script>
 
@@ -165,6 +193,13 @@ function reset() {
   border: 1px solid var(--line-soft);
   border-radius: 16px;
   padding: 16px;
+}
+
+.cover-preview {
+  width: 96px;
+  height: 96px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
 }
 
 @media (max-width: 760px) {

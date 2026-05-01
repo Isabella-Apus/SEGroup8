@@ -10,6 +10,18 @@ public class CategoryTreeNodeVO {
     private Integer parentId;
     private List<CategoryTreeNodeVO> children = new ArrayList<>();
 
+    /**
+     * 兼容前端级联选择器常用字段命名（value/label）。
+     * 保留 id/name 作为后端更直观的字段。
+     */
+    public Integer getValue() {
+        return id;
+    }
+
+    public String getLabel() {
+        return name;
+    }
+
     public Integer getId() {
         return id;
     }

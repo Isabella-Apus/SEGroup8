@@ -197,7 +197,6 @@ import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { uploadImage, updateShopProfile } from '@/api/seller'
-import { findMainCategory } from '@/constants/categories'
 
 const userStore = useUserStore()
 const formRef = ref(null)
@@ -253,7 +252,7 @@ async function loadShopInfo() {
     const info = userStore.userInfo || {}
     form.shopName = info.shopName || info.nickname || ''
     form.shopDesc = info.shopDesc || ''
-    form.category = resolveMainCategoryLabel(info.category)
+    form.category = info.category || ''
     form.phone = info.phone || ''
     form.region = info.region || ''
     form.shopContactName = info.shopContactName || ''
@@ -272,18 +271,6 @@ async function loadShopInfo() {
   } finally {
     loading.value = false
   }
-}
-
-function resolveMainCategoryLabel(rawCategory) {
-  if (rawCategory == null || rawCategory === '') {
-    return ''
-  }
-  const numericCategoryId = Number(rawCategory)
-  if (!Number.isNaN(numericCategoryId)) {
-    const category = findMainCategory(numericCategoryId)
-    return category?.label || String(rawCategory)
-  }
-  return String(rawCategory)
 }
 
 function beforeUpload(file) {

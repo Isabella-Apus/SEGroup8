@@ -12,7 +12,9 @@ import com.segroup8.platform.entity.OrderInfo;
 import com.segroup8.platform.entity.SecondhandProduct;
 import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.OrderItemMapper;
+import com.segroup8.platform.mapper.ProductAuctionMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
+import com.segroup8.platform.mapper.AddressMapper;
 import com.segroup8.platform.mapper.UserBlockMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
@@ -52,6 +54,12 @@ class SecondhandProductServiceImplTest {
     private OrderItemMapper orderItemMapper;
 
     @Mock
+    private ProductAuctionMapper productAuctionMapper;
+
+    @Mock
+    private AddressMapper addressMapper;
+
+    @Mock
     private BrowseHistoryService browseHistoryService;
 
     @Mock
@@ -71,7 +79,7 @@ class SecondhandProductServiceImplTest {
     @BeforeEach
     void setUp() {
         secondhandProductService = new SecondhandProductServiceImpl(secondhandProductMapper, orderInfoMapper,
-                orderItemMapper, userMapper, browseHistoryService, userBlockMapper, categoryService,
+                orderItemMapper, productAuctionMapper, userMapper, addressMapper, browseHistoryService, userBlockMapper, categoryService,
                 secondhandTradeService);
     }
 
@@ -101,9 +109,6 @@ class SecondhandProductServiceImplTest {
         request.setCategoryId(1);
         request.setSubCategoryId(101);
         request.setIsNegotiable(1);
-
-        when(categoryService.isMainCategory(1)).thenReturn(true);
-        when(categoryService.isSubCategoryOf(1, 101)).thenReturn(true);
 
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> secondhandProductService.createSellerProduct(request));

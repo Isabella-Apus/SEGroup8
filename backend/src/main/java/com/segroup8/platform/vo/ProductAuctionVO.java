@@ -17,6 +17,7 @@ public class ProductAuctionVO {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String status;
+    private Long settledOrderId;
     private List<AuctionLogVO> logs;
 
     public Long getId() {
@@ -105,6 +106,14 @@ public class ProductAuctionVO {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Long getSettledOrderId() {
+        return settledOrderId;
+    }
+
+    public void setSettledOrderId(Long settledOrderId) {
+        this.settledOrderId = settledOrderId;
     }
 
     public List<AuctionLogVO> getLogs() {

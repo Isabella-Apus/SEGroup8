@@ -54,16 +54,16 @@
         </el-form-item>
 
         <!-- 商品分类 -->
-        <el-form-item label="商品分类" prop="categoryPath">
-          <el-cascader
-            v-model="form.categoryPath"
-            :options="allowedCategoryTree"
-            :props="cascaderProps"
-            clearable
-            filterable
-            placeholder="先选一级，再选二级"
-            style="width: 320px"
-          />
+        <el-form-item label="商品分类" prop="category">
+          <el-select v-model="form.category" placeholder="请选择分类" style="width: 200px">
+            <el-option label="电子数码" value="electronics" />
+            <el-option label="服装鞋帽" value="clothing" />
+            <el-option label="食品饮料" value="food" />
+            <el-option label="家居用品" value="home" />
+            <el-option label="运动户外" value="sports" />
+            <el-option label="图书文具" value="books" />
+            <el-option label="其他" value="other" />
+          </el-select>
         </el-form-item>
 
         <!-- 商品图片 -->
@@ -121,8 +121,6 @@ import {
   updateProduct,
   uploadImage
 } from '@/api/seller'
-import { getMyMerchantApplicationApi } from '@/api/merchantApplication';
-import { buildCategoryPath, cascaderForMainCategory } from '@/constants/categories';
 
 const route = useRoute()
 const router = useRouter()
@@ -138,27 +136,16 @@ const form = reactive({
   description: '',
   price: 0.01,
   stock: 0,
-  categoryPath: [],
+  category: '',
   imageUrl: ''
 })
-
-const allowedCategoryTree = ref([]);
-const sellerMainCategoryId = ref(null);
-
-const cascaderProps = {
-  emitPath: true,
-  checkStrictly: false,
-  value: 'value',
-  label: 'label',
-  children: 'children',
-};
 
 const rules = {
   name: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
   description: [{ required: true, message: '请输入商品描述', trigger: 'blur' }],
   price: [{ required: true, message: '请输入价格', trigger: 'blur' }],
   stock: [{ required: true, message: '请输入库存', trigger: 'blur' }],
-  categoryPath: [{ required: true, message: '请选择一级和二级分类', trigger: 'change' }],
+  category: [{ required: true, message: '请选择分类', trigger: 'change' }],
   imageUrl: [{ required: true, message: '请上传商品图片', trigger: 'change' }]
 }
 
@@ -174,27 +161,11 @@ async function loadDetail() {
     form.price = d.price
     form.stock = d.stock
     form.imageUrl = d.cover || ''
-    form.categoryPath = buildCategoryPath(d.categoryId, d.subCategoryId)
   } catch (e) {
     ElMessage.error('加载商品信息失败')
   } finally {
     loading.value = false
   }
-}
-
-async function loadMerchantCategoryConstraint() {
-  try {
-    const res = await getMyMerchantApplicationApi();
-    const categoryId = Number(res.data?.categoryId || 0);
-    if (categoryId > 0) {
-      sellerMainCategoryId.value = categoryId;
-      allowedCategoryTree.value = cascaderForMainCategory(categoryId);
-      return;
-    }
-  } catch (e) {
-    // ignore and fallback
-  }
-  allowedCategoryTree.value = [];
 }
 
 function toFullImageUrl(url) {
@@ -237,8 +208,6 @@ async function handleSubmit() {
     submitting.value = true
     try {
       const payload = {
-        categoryId: form.categoryPath?.[0],
-        subCategoryId: form.categoryPath?.[1],
         name: form.name,
         description: form.description,
         price: form.price,
@@ -262,10 +231,7 @@ async function handleSubmit() {
   })
 }
 
-onMounted(async () => {
-  await loadMerchantCategoryConstraint();
-  await loadDetail();
-})
+onMounted(loadDetail)
 </script>
 
 <style scoped>
