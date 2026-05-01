@@ -30,8 +30,7 @@
           show-icon
           :closable="false"
           title="该商品正在拍卖中：一口价购买已关闭，请参与拍卖出价。"
-        />
-        <p class="desc">{{ item.description || "暂无商品描述" }}</p>
+        />        <p class="desc">{{ item.description || "暂无商品描述" }}</p>
 
         <p class="desc">二手商品仅支持单件下单购买。</p>
 
@@ -45,8 +44,7 @@
           <el-button v-if="canChatWithSeller && auctionInfo && auctionInfo.status === 'ONGOING'" type="danger" plain @click="openBidDialog">
             参与拍卖
           </el-button>
-          <el-button type="primary" plain @click="router.push('/secondhand?tab=publish')">我也要发布</el-button>
-          <el-button text @click="router.push('/secondhand')">返回</el-button>
+          <el-button type="primary" plain @click="router.push('/secondhand?tab=publish')">我也要发布</el-button>          <el-button text @click="router.push('/secondhand')">返回</el-button>
         </el-space>
 
         <!-- 举报 / 拉黑（非本人商品时显示） -->
@@ -170,8 +168,7 @@
         <el-button @click="addressDialogVisible = false">取消</el-button>
         <el-button type="primary" :loading="buySubmitting" @click="confirmBuyWithAddress">确认下单</el-button>
       </template>
-    </el-dialog>
-  </div>
+    </el-dialog>  </div>
 </template>
 
 <script setup>
@@ -188,8 +185,7 @@ import {
   placeAuctionBidApi,
 } from "@/api/secondhand";
 import { submitReportApi, blockUserApi, unblockUserApi, isBlockingApi, isBlockedByApi } from "@/api/credit";
-import { listAddressesApi } from "@/api/user";
-import { getUser } from "@/utils/storage";
+import { listAddressesApi } from "@/api/user";import { getUser } from "@/utils/storage";
 
 const route = useRoute();
 const router = useRouter();
@@ -231,8 +227,7 @@ const canBuyOnePrice = computed(() => canBuy.value && !(auctionInfo.value && auc
 const isOwner = computed(() => {
   if (!item.value?.sellerUserId) return false;
   return Number(item.value.sellerUserId) === Number(getUser()?.id);
-});
-const canChatWithSeller = computed(() => {
+});const canChatWithSeller = computed(() => {
   if (!item.value?.sellerUserId) return false;
   return Number(item.value.sellerUserId) !== Number(getUser()?.id);
 });
@@ -247,7 +242,6 @@ const minBidPrice = computed(() => {
   if (!auctionInfo.value) return 0;
   return Number(auctionInfo.value?.currentPrice) > 0 ? current + increment : current;
 });
-
 onMounted(async () => {
   await fetchDetail();
 });
@@ -258,7 +252,6 @@ async function fetchDetail() {
     const result = await getSecondhandDetailApi(route.params.id);
     item.value = result.data;
     await loadTradeInfo();
-
     // 拉黑检查：任意一方拉黑对方，直接跳回列表
     const sellerUserId = item.value?.sellerUserId;
     const currentUserId = getUser()?.id;
@@ -431,8 +424,7 @@ async function handlePlaceBid() {
     ElMessage.error(getErrorMessage(e, "出价失败"));
   } finally {
     bidSubmitting.value = false;
-  }
-}
+  }}
 
 function handleContactSeller() {
   if (!item.value?.sellerUserId) {
@@ -470,8 +462,7 @@ async function handleSubmitReport() {
     ElMessage.success("举报已提交，等待管理员审核");
     reportDialogVisible.value = false;
   } catch (e) {
-    ElMessage.error(getErrorMessage(e, "举报提交失败"));
-  } finally {
+    ElMessage.error(getErrorMessage(e, "举报提交失败"));  } finally {
     reportSubmitting.value = false;
   }
 }
@@ -488,8 +479,7 @@ async function handleBlock() {
     ElMessage.success("已拉黑该卖家");
   } catch (e) {
     if (e === "cancel" || e?.toString?.().includes("cancel")) return;
-    ElMessage.error(getErrorMessage(e, "操作失败"));
-  }
+    ElMessage.error(getErrorMessage(e, "操作失败"));  }
 }
 
 async function handleUnblock() {
@@ -504,8 +494,7 @@ async function handleUnblock() {
     ElMessage.success("已取消拉黑");
   } catch (e) {
     if (e === "cancel" || e?.toString?.().includes("cancel")) return;
-    ElMessage.error(getErrorMessage(e, "操作失败"));
-  }
+    ElMessage.error(getErrorMessage(e, "操作失败"));  }
 }
 
 function toFullImageUrl(url) {

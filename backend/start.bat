@@ -11,14 +11,15 @@ if not exist "%~dp0src\main\resources\application-local.yml" (
 
 where mvn >nul 2>nul
 if %errorlevel%==0 (
-  echo Using Maven to start backend...
-  mvn spring-boot:run
+  echo Using Maven to start backend with schema auto-sync...
+  set "SPRING_PROFILES_ACTIVE=start-schema"
+  mvn -f "%~dp0pom.xml" spring-boot:run
   exit /b %errorlevel%
 )
 
 if exist "%~dp0target\platform-backend-0.0.1-SNAPSHOT.jar" (
-  echo Maven not found. Starting packaged jar instead...
-  java -jar "%~dp0target\platform-backend-0.0.1-SNAPSHOT.jar"
+  echo Maven not found. Starting packaged jar with schema auto-sync instead...
+  java -jar "%~dp0target\platform-backend-0.0.1-SNAPSHOT.jar" --spring.profiles.active=start-schema
   exit /b %errorlevel%
 )
 

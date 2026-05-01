@@ -217,7 +217,6 @@ import ProductCard from '@/components/ProductCard.vue';
 import { closeAuctionEarlyApi, getMyAuctionListApi, getSecondhandListApi, markAuctionFlowApi, publishSecondhandApi } from '@/api/secondhand';
 import { SECONDHAND_CATEGORY_TREE } from '@/constants/categories';
 import { getUser } from '@/utils/storage';
-
 const pageSize = 16;
 const loading = ref(false);
 const sentinel = ref(null);
@@ -275,8 +274,7 @@ const selectedCategoryId = computed(() => {
   if (!query.categoryPath.length) {
     return undefined;
   }
-  return query.categoryPath[1] || query.categoryPath[0];
-});
+  return query.categoryPath[1] || query.categoryPath[0];});
 
 const visibleItems = computed(() => items.value);
 const hasMore = computed(() => items.value.length < total.value);
@@ -311,8 +309,7 @@ async function onReset() {
 async function applyChip(chip) {
   query.condition = chip.condition;
   query.conditionLevel = chip.condition === 'all' ? undefined : chip.condition;
-  await fetchPage(true);
-}
+  await fetchPage(true);}
 
 async function fetchPage(reset = false) {
   if (loading.value) {
@@ -335,8 +332,7 @@ async function fetchPage(reset = false) {
       maxPrice: query.maxPrice,
       conditionLevel: query.conditionLevel,
       isNegotiable: query.isNegotiable,
-      sortBy: query.sortBy,
-    });
+      sortBy: query.sortBy,    });
     const records = (res.data?.records || []).map((item) => ({
       ...item,
       condition: item.conditionLevel || item.condition,
@@ -380,7 +376,6 @@ watch(
     activeTab.value = tab === 'publish' || tab === 'auctions' ? tab : 'browse';
   }
 );
-
 function initObserver() {
   observer = new IntersectionObserver(
     (entries) => {

@@ -108,3 +108,51 @@ VALUES
 INSERT IGNORE INTO `report` (`id`, `reporter_user_id`, `target_type`, `target_id`, `reason`, `status`)
 VALUES
 (1, 3, 'SECONDHAND_PRODUCT', 2, 'Description does not fully match the item', 0);
+
+SET @seller_id = 2;
+
+INSERT INTO `balance` (user_id, personal_balance, business_balance, version, create_time, update_time)
+VALUES (@seller_id, 1280.50, 15680.00, 0, NOW(), NOW())
+ON DUPLICATE KEY UPDATE
+  personal_balance = 1280.50,
+  business_balance = 15680.00,
+  update_time = NOW();
+
+DELETE FROM `user_voucher`;
+DELETE FROM `voucher`;
+
+INSERT INTO `transaction_record`
+  (order_id, user_id, account_type, change_type, amount, balance_after, remark, trade_type, create_time)
+VALUES
+-- 近期订单收款（经营账户）
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 299.00,  15680.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 1 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 158.00,  15381.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 2 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 520.00,  15223.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 3 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 88.00,   14703.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 4 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 1280.00, 14615.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 5 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 366.00,  13335.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 6 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 99.00,   12969.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 7 DAY),
+-- 退款扣除
+(NULL, @seller_id, 'BUSINESS', 'REFUND_ONLY',            -128.00, 12870.00, '仅退款回流',   'REFUND_BACKFLOW', NOW() - INTERVAL 3 DAY),
+(NULL, @seller_id, 'BUSINESS', 'REFUND_RETURN',          -299.00, 12998.00, '退货退款回流', 'REFUND_BACKFLOW', NOW() - INTERVAL 8 DAY),
+-- 更早的收款记录（上月）
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 688.00,  13297.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 12 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 450.00,  12609.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 15 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 1580.00, 12159.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 18 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 320.00,  10579.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 22 DAY),
+(NULL, @seller_id, 'BUSINESS', 'ESCROW_RELEASE_BUSINESS', 199.00,  10259.00, '订单结算入账', 'INCOME_BUSINESS', NOW() - INTERVAL 25 DAY),
+-- 个人账户充值记录
+(NULL, @seller_id, 'PERSONAL', 'RECHARGE',                500.00,  1280.50, '钱包充值',     'RECHARGE',        NOW() - INTERVAL 5 DAY),
+(NULL, @seller_id, 'PERSONAL', 'RECHARGE',                1000.00, 780.50,  '钱包充值',     'RECHARGE',        NOW() - INTERVAL 20 DAY);
+
+SELECT '=== 优惠券 ===' AS info;
+SELECT id, name, type, discount_amount, discount_rate, min_amount, total_count, used_count, status FROM voucher WHERE shop_id = @seller_id;
+
+SELECT '=== 账户余额 ===' AS info;
+SELECT * FROM balance WHERE user_id = @seller_id;
+ 
+SELECT '=== 流水记录（最近10条）===' AS info;
+SELECT id, account_type, change_type, amount, balance_after, remark, trade_type, create_time
+FROM transaction_record WHERE user_id = @seller_id ORDER BY create_time DESC LIMIT 10;
+
+

@@ -1,5 +1,5 @@
 <template>
-  <div class="page-card">
+  <div class="page-card fade-in-up">
     <h2 class="page-title">订单监管</h2>
 
     <el-form :inline="true" :model="query" class="query-form">
@@ -19,32 +19,49 @@
       </el-form-item>
     </el-form>
 
-    <el-table
-      v-loading="loading"
-      :data="records"
-      border
-      row-key="id"
-      @selection-change="handleSelectionChange"
-    >
-      <el-table-column type="selection" width="56" />
-      <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column prop="orderNo" label="订单号" min-width="200" />
-      <el-table-column prop="buyerUserId" label="买家ID" width="90" />
-      <el-table-column label="金额" width="120">
-        <template #default="scope">￥{{ Number(scope.row.totalAmount || 0).toFixed(2) }}</template>
-      </el-table-column>
-      <el-table-column prop="orderStatusName" label="订单状态" width="130" />
-      <el-table-column prop="refundStatusName" label="售后状态" width="130" />
-      <el-table-column prop="createTime" label="下单时间" min-width="180" />
-      <el-table-column label="操作" min-width="300">
-        <template #default="scope">
-          <el-button link type="primary" @click="openDetail(scope.row)">详情</el-button>
-          <el-button v-if="canDealRefund(scope.row)" link type="success" @click="approveRefund(scope.row)">同意退货</el-button>
-          <el-button v-if="canDealRefund(scope.row)" link type="danger" @click="rejectRefund(scope.row)">拒绝退货</el-button>
-          <el-button link @click="openAfterSaleLogs(scope.row)">售后日志</el-button>
+    <div class="table-mobile-wrap">
+      <el-table
+        v-loading="loading"
+        :data="records"
+        border
+        row-key="id"
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column type="selection" width="56" />
+        <el-table-column prop="id" label="ID" width="80" />
+        <el-table-column prop="orderNo" label="订单号" min-width="200" />
+        <el-table-column prop="buyerUserId" label="买家ID" width="90" />
+        <el-table-column label="金额" width="120">
+          <template #default="scope">￥{{ Number(scope.row.totalAmount || 0).toFixed(2) }}</template>
+        </el-table-column>
+        <el-table-column label="订单状态" width="130">
+          <template #default="scope">
+            <el-tag class="status-tag" :class="orderStatusClass(scope.row)" size="small" effect="plain">
+              {{ scope.row.orderStatusName || scope.row.orderStatus }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="售后状态" width="130">
+          <template #default="scope">
+            <el-tag class="status-tag" :class="refundStatusClass(scope.row)" size="small" effect="plain">
+              {{ scope.row.refundStatusName || '-' }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="下单时间" min-width="180" />
+        <el-table-column label="操作" min-width="300">
+          <template #default="scope">
+            <el-button link type="primary" @click="openDetail(scope.row)">详情</el-button>
+            <el-button v-if="canDealRefund(scope.row)" link type="success" @click="approveRefund(scope.row)">同意退货</el-button>
+            <el-button v-if="canDealRefund(scope.row)" link class="danger-action" @click="rejectRefund(scope.row)">拒绝退货</el-button>
+            <el-button link @click="openAfterSaleLogs(scope.row)">售后日志</el-button>
+          </template>
+        </el-table-column>
+        <template #empty>
+          <div class="empty-state">暂无订单数据</div>
         </template>
-      </el-table-column>
-    </el-table>
+      </el-table>
+    </div>
 
     <div class="pager-wrap">
       <el-pagination
@@ -68,25 +85,32 @@
         <el-descriptions-item label="审核人">{{ detail.refundDecisionUserName || '-' }}</el-descriptions-item>
         <el-descriptions-item label="审核意见">{{ detail.refundDecisionRemark || '-' }}</el-descriptions-item>
       </el-descriptions>
-      <el-table v-if="detail" :data="detail.items || []" border style="margin-top: 12px">
-        <el-table-column prop="productName" label="商品名" min-width="220" />
-        <el-table-column prop="productType" label="类型" width="120" />
-        <el-table-column prop="price" label="单价" width="120">
-          <template #default="scope">￥{{ Number(scope.row.price || 0).toFixed(2) }}</template>
-        </el-table-column>
-        <el-table-column prop="quantity" label="数量" width="100" />
-      </el-table>
+      <div class="table-mobile-wrap">
+        <el-table v-if="detail" :data="detail.items || []" border style="margin-top: 12px">
+          <el-table-column prop="productName" label="商品名" min-width="220" />
+          <el-table-column prop="productType" label="类型" width="120" />
+          <el-table-column prop="price" label="单价" width="120">
+            <template #default="scope">￥{{ Number(scope.row.price || 0).toFixed(2) }}</template>
+          </el-table-column>
+          <el-table-column prop="quantity" label="数量" width="100" />
+        </el-table>
+      </div>
     </el-dialog>
 
     <el-dialog v-model="logVisible" title="售后日志" width="820px">
-      <el-table :data="afterSaleLogs" border>
-        <el-table-column prop="id" label="ID" width="90" />
-        <el-table-column prop="action" label="操作" width="140" />
-        <el-table-column prop="operatorRole" label="角色" width="120" />
-        <el-table-column prop="operatorUserId" label="操作人ID" width="120" />
-        <el-table-column prop="remark" label="备注" min-width="180" />
-        <el-table-column prop="createTime" label="时间" min-width="180" />
-      </el-table>
+      <div class="table-mobile-wrap">
+        <el-table :data="afterSaleLogs" border>
+          <el-table-column prop="id" label="ID" width="90" />
+          <el-table-column prop="action" label="操作" width="140" />
+          <el-table-column prop="operatorRole" label="角色" width="120" />
+          <el-table-column prop="operatorUserId" label="操作人ID" width="120" />
+          <el-table-column prop="remark" label="备注" min-width="180" />
+          <el-table-column prop="createTime" label="时间" min-width="180" />
+          <template #empty>
+            <div class="empty-state">暂无售后日志</div>
+          </template>
+        </el-table>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -166,6 +190,34 @@ function handleSizeChange(pageSize) {
 
 function canDealRefund(order) {
   return Number(order?.refundStatus) === 1;
+}
+
+function orderStatusClass(order) {
+  const status = Number(order?.orderStatus);
+  if ([4, 5].includes(status)) {
+    return 'status-success';
+  }
+  if (status === 6) {
+    return 'status-danger';
+  }
+  if ([1, 2, 3].includes(status)) {
+    return 'status-progress';
+  }
+  return 'status-pending';
+}
+
+function refundStatusClass(order) {
+  const status = Number(order?.refundStatus);
+  if (status === 2) {
+    return 'status-success';
+  }
+  if (status === 3) {
+    return 'status-danger';
+  }
+  if (status === 1) {
+    return 'status-progress';
+  }
+  return 'status-pending';
 }
 
 async function batchClose() {

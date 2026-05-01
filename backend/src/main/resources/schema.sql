@@ -157,7 +157,6 @@ SET @category_parent_sql = IF(
 PREPARE stmt_category_parent FROM @category_parent_sql;
 EXECUTE stmt_category_parent;
 DEALLOCATE PREPARE stmt_category_parent;
-
 SET @shop_region_exists = (
   SELECT COUNT(*)
   FROM information_schema.COLUMNS
@@ -282,7 +281,6 @@ SET @product_sub_category_idx_sql = IF(
 PREPARE stmt_product_sub_category_idx FROM @product_sub_category_idx_sql;
 EXECUTE stmt_product_sub_category_idx;
 DEALLOCATE PREPARE stmt_product_sub_category_idx;
-
 CREATE TABLE IF NOT EXISTS `browse_history` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `user_id` BIGINT NOT NULL,
@@ -1386,7 +1384,6 @@ SET @order_payable_amount_sql = IF(
 PREPARE stmt_order_payable_amount FROM @order_payable_amount_sql;
 EXECUTE stmt_order_payable_amount;
 DEALLOCATE PREPARE stmt_order_payable_amount;
-
 SET @tr_trade_type_exists = (
   SELECT COUNT(*)
   FROM information_schema.COLUMNS

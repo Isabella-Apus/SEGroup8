@@ -187,8 +187,7 @@ const routes = [
                 component: () =>
                     import("@/views/merchant/MerchantSecondhandProductsView.vue"),
             },
-            {
-                path: "seller-products/edit/:id?",
+            {                path: "seller-products/edit/:id?",
                 name: "sellerProductEdit",
                 component: () => import("@/views/seller/SellerProductEdit.vue"),
             },

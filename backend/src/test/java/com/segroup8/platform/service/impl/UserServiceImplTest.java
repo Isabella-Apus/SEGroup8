@@ -6,6 +6,8 @@ import com.segroup8.platform.dto.AddressSaveRequest;
 import com.segroup8.platform.entity.Address;
 import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.AddressMapper;
+import com.segroup8.platform.mapper.MerchantApplicationMapper;
+import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.MerchantApplicationService;
 import com.segroup8.platform.vo.UserVO;
@@ -35,11 +37,22 @@ class UserServiceImplTest {
     @Mock
     private MerchantApplicationService merchantApplicationService;
 
+    @Mock
+    private ShopMapper shopMapper;
+
+    @Mock
+    private MerchantApplicationMapper merchantApplicationMapper;
+
     private UserServiceImpl userService;
 
     @BeforeEach
     void setUp() {
-        userService = new UserServiceImpl(userMapper, addressMapper, merchantApplicationService);
+        userService = new UserServiceImpl(
+                userMapper,
+                addressMapper,
+                merchantApplicationService,
+                shopMapper,
+                merchantApplicationMapper);
     }
 
     @AfterEach

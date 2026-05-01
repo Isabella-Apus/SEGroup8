@@ -9,18 +9,20 @@ if (!(Test-Path $localConfigPath) -and (Test-Path $localExamplePath)) {
 }
 
 $mvn = Get-Command mvn -ErrorAction SilentlyContinue
+$pomPath = Join-Path $PSScriptRoot "pom.xml"
 
 if ($mvn) {
-    Write-Host "Using Maven to start backend..."
-    mvn spring-boot:run
+    Write-Host "Using Maven to start backend with schema auto-sync..."
+    $env:SPRING_PROFILES_ACTIVE = "start-schema"
+    mvn -f $pomPath spring-boot:run
     exit $LASTEXITCODE
 }
 
 $jarPath = Join-Path $PSScriptRoot "target\\platform-backend-0.0.1-SNAPSHOT.jar"
 
 if (Test-Path $jarPath) {
-    Write-Host "Maven not found. Starting packaged jar instead..."
-    java -jar $jarPath
+    Write-Host "Maven not found. Starting packaged jar with schema auto-sync instead..."
+    java -jar $jarPath --spring.profiles.active=start-schema
     exit $LASTEXITCODE
 }
 

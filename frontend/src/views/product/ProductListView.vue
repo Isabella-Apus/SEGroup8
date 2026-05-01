@@ -57,6 +57,7 @@
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import ProductCard from '@/components/ProductCard.vue';
 import { getProductListApi } from '@/api/product';
+import { searchList } from '@/utils/search';
 
 const pageSize = 16;
 const loading = ref(false);
@@ -79,14 +80,21 @@ const chips = [
 ];
 
 const allItems = computed(() => {
-  return items.value.filter((item) => {
-    const hitKeyword = !query.keyword || item.name.includes(query.keyword.trim());
+  const keywordTrimmed = query.keyword.trim();
+  const source = keywordTrimmed
+    ? searchList({
+      items: items.value,
+      keyword: keywordTrimmed,
+      keys: ['name', 'description'],
+    })
+    : items.value;
+  return source.filter((item) => {
     const price = Number(item.price || 0);
     let hitPrice = true;
     if (query.priceRange === 'low') hitPrice = price < 100;
     if (query.priceRange === 'mid') hitPrice = price >= 100 && price <= 500;
     if (query.priceRange === 'high') hitPrice = price > 500;
-    return hitKeyword && hitPrice;
+    return hitPrice;
   });
 });
 
@@ -102,19 +110,23 @@ onBeforeUnmount(() => {
   if (observer) observer.disconnect();
 });
 
-function onSearch() {
-  fetchPage(true);
+async function onSearch() {
+  await fetchPage(true);
+  await ensureAllItemsLoaded();
 }
 
-function onReset() {
+async function onReset() {
   query.keyword = '';
   query.priceRange = 'all';
-  fetchPage(true);
+  await fetchPage(true);
 }
 
-function applyChip(chip) {
+async function applyChip(chip) {
   query.priceRange = chip.range;
-  fetchPage(true);
+  await fetchPage(true);
+  if (query.keyword.trim()) {
+    await ensureAllItemsLoaded();
+  }
 }
 
 async function fetchPage(reset = false) {
@@ -126,7 +138,7 @@ async function fetchPage(reset = false) {
     const params = {
       pageNum: queryPageNum.value,
       pageSize,
-      keyword: query.keyword || undefined
+      keyword: undefined
     };
     const res = await getProductListApi(params);
     const records = res.data?.records || [];
@@ -139,6 +151,12 @@ async function fetchPage(reset = false) {
     queryPageNum.value += 1;
   } finally {
     loading.value = false;
+  }
+}
+
+async function ensureAllItemsLoaded() {
+  while (hasMore.value) {
+    await fetchPage(false);
   }
 }
 

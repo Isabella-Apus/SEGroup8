@@ -8,6 +8,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -34,6 +35,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public Result<Void> handleBody(HttpMessageNotReadableException ex) {
         return Result.fail(400, "Request body format is invalid");
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public Result<Void> handleNoResource(NoResourceFoundException ex) {
+        String path = ex.getResourcePath();
+        if (path == null || path.isBlank()) {
+            path = "unknown";
+        }
+        return Result.fail(404, "接口不存在: " + path);
     }
 
     @ExceptionHandler(Exception.class)

@@ -1,5 +1,10 @@
 server:
   port: 8080
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 spring:
   application:
@@ -8,12 +13,14 @@ spring:
     import: optional:classpath:application-local.yml
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/segroup8_platform?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://127.0.0.1:3306/segroup8_platform?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
     username: root
     password: root
+    hikari:
+      connection-init-sql: SET NAMES utf8mb4 COLLATE utf8mb4_general_ci
   sql:
     init:
-      mode: always
+      mode: never
       encoding: UTF-8
   servlet:
     multipart:
@@ -30,7 +37,7 @@ app:
     secret: SEGROUP8_DEMO_SECRET_KEY_CHANGE_ME_2026
     expire-hours: 24
   realtime:
-    allowed-origin-patterns: http://127.0.0.1:5173,http://localhost:5173
+    allowed-origin-patterns: http://127.0.0.1:*,http://localhost:*,http://192.168.*:*,http://10.*:*,http://172.16.*:*,http://172.17.*:*,http://172.18.*:*,http://172.19.*:*,http://172.2*:*,http://172.30.*:*,http://172.31.*:*
   idempotency:
     cleanup-fixed-delay-ms: 60000
   upload:

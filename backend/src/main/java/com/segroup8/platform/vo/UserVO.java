@@ -11,6 +11,19 @@ public class UserVO {
     private String role;
     private String status;
     private Integer creditScore;
+    private String shopName;
+    private String shopDesc;
+    private String bannerUrl;
+    private String category;
+    private String region;
+    private String businessHours;
+    private String returnPolicy;
+    private String shippingPolicy;
+    private String announcement;
+    private String shopContactName;
+    private String shopContactPhone;
+    private String warehouseAddr;
+    private String idCardNoMasked;
 
     public Long getId() {
         return id;
@@ -82,5 +95,63 @@ public class UserVO {
 
     public void setCreditScore(Integer creditScore) {
         this.creditScore = creditScore;
+    }
+    public String getShopName() { return shopName; }
+    public void setShopName(String shopName) { this.shopName = shopName; }
+
+    public String getShopDesc() { return shopDesc; }
+    public void setShopDesc(String shopDesc) { this.shopDesc = shopDesc; }
+
+    public String getBannerUrl() { return bannerUrl; }
+    public void setBannerUrl(String bannerUrl) { this.bannerUrl = bannerUrl; }
+
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+
+    public String getRegion() { return region; }
+    public void setRegion(String region) { this.region = region; }
+
+    public String getBusinessHours() { return businessHours; }
+    public void setBusinessHours(String businessHours) { this.businessHours = businessHours; }
+
+    public String getReturnPolicy() { return returnPolicy; }
+    public void setReturnPolicy(String returnPolicy) { this.returnPolicy = returnPolicy; }
+
+    public String getShippingPolicy() { return shippingPolicy; }
+    public void setShippingPolicy(String shippingPolicy) { this.shippingPolicy = shippingPolicy; }
+
+    public String getAnnouncement() { return announcement; }
+    public void setAnnouncement(String announcement) { this.announcement = announcement; }
+
+    public String getShopContactName() {
+        return shopContactName;
+    }
+
+    public void setShopContactName(String shopContactName) {
+        this.shopContactName = shopContactName;
+    }
+
+    public String getShopContactPhone() {
+        return shopContactPhone;
+    }
+
+    public void setShopContactPhone(String shopContactPhone) {
+        this.shopContactPhone = shopContactPhone;
+    }
+
+    public String getWarehouseAddr() {
+        return warehouseAddr;
+    }
+
+    public void setWarehouseAddr(String warehouseAddr) {
+        this.warehouseAddr = warehouseAddr;
+    }
+
+    public String getIdCardNoMasked() {
+        return idCardNoMasked;
+    }
+
+    public void setIdCardNoMasked(String idCardNoMasked) {
+        this.idCardNoMasked = idCardNoMasked;
     }
 }

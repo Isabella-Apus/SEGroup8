@@ -14,16 +14,14 @@ import com.segroup8.platform.entity.SecondhandProduct;
 import com.segroup8.platform.entity.ProductAuction;
 import com.segroup8.platform.entity.Address;
 import com.segroup8.platform.entity.User;
-import com.segroup8.platform.mapper.AddressMapper;
-import com.segroup8.platform.mapper.OrderInfoMapper;
+import com.segroup8.platform.mapper.AddressMapper;import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.OrderItemMapper;
 import com.segroup8.platform.mapper.ProductAuctionMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
 import com.segroup8.platform.mapper.UserBlockMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
-import com.segroup8.platform.service.CategoryService;
-import com.segroup8.platform.service.SecondhandProductService;
+import com.segroup8.platform.service.CategoryService;import com.segroup8.platform.service.SecondhandProductService;
 import com.segroup8.platform.service.SecondhandTradeService;
 import com.segroup8.platform.vo.OrderItemVO;
 import com.segroup8.platform.vo.OrderVO;
@@ -59,7 +57,6 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
     private final UserBlockMapper userBlockMapper;
     private final CategoryService categoryService;
     private final SecondhandTradeService secondhandTradeService;
-
     public SecondhandProductServiceImpl(SecondhandProductMapper secondhandProductMapper,
             OrderInfoMapper orderInfoMapper,
             OrderItemMapper orderItemMapper,
@@ -79,8 +76,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         this.browseHistoryService = browseHistoryService;
         this.userBlockMapper = userBlockMapper;
         this.categoryService = categoryService;
-        this.secondhandTradeService = secondhandTradeService;
-    }
+        this.secondhandTradeService = secondhandTradeService;    }
 
     @Override
     public PageVO<SecondhandProductVO> pagePublicProducts(SecondhandProductPageQueryRequest request) {
@@ -89,7 +85,6 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
             .eq(SecondhandProduct::getStatus, ON_SHELF);
         appendCommonFilters(wrapper, request);
         applySort(wrapper, request.getSortBy());
-
         // 拉黑屏蔽：双向过滤（我拉黑的人 + 拉黑我的人 的商品都不显示）
         Long currentUserId = UserContext.getUserId();
         if (currentUserId != null) {
@@ -222,8 +217,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
                 .last("limit 1"));
         if (ongoingAuction != null) {
             throw new BusinessException(400, "该商品正在拍卖中，暂不支持一口价购买");
-        }
-        // 拉黑拦截：任意一方拉黑对方都不能交易
+        }        // 拉黑拦截：任意一方拉黑对方都不能交易
         Long sellerUserId = product.getSellerUserId();
         if (userBlockMapper.isBlocked(buyerUserId, sellerUserId) > 0) {
             throw new BusinessException(403, "您已拉黑该卖家，无法购买其商品");
@@ -249,8 +243,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         order.setTotalAmount(dealPrice);
         // 二手下单与普通商品一致，先进入待付款，再由买家主动支付推进状态。
         order.setPayStatus(0);
-        order.setOrderStatus(ORDER_PENDING_PAY);
-        order.setCanRefund(1);
+        order.setOrderStatus(ORDER_PENDING_PAY);        order.setCanRefund(1);
         order.setLogisticsStatus("PENDING");
         order.setLogisticsCurrentIndex(0);
         order.setRemark(request == null ? null : request.getRemark());

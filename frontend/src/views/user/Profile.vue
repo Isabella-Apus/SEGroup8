@@ -26,13 +26,54 @@
             <el-form-item label="角色">
                 <el-input v-model="form.role" disabled />
             </el-form-item>
-            <el-form-item label="信用分">
-                <el-input :model-value="String(form.creditScore || '-')" disabled />
-            </el-form-item>
             <el-form-item>
                 <el-button type="primary" :loading="loading" @click="saveProfile">保存</el-button>
             </el-form-item>
         </el-form>
+
+        <div class="wallet-panel">
+            <h3 class="wallet-title">我的钱包</h3>
+            <div class="wallet-balance">商城币余额：<strong>{{ Number(walletBalance || 0).toFixed(2) }}</strong></div>
+            <el-space>
+                <el-button type="primary" @click="openRechargeDialog">充值商城币</el-button>
+                <el-button @click="loadWalletData">刷新余额</el-button>
+            </el-space>
+            <el-table :data="walletRecords" border style="margin-top: 12px">
+                <el-table-column prop="orderId" label="订单ID" width="100" />
+                <el-table-column label="类型" min-width="180">
+                    <template #default="scope">{{ resolveTradeTypeLabel(scope.row) }}</template>
+                </el-table-column>
+                <el-table-column prop="amount" label="金额" width="120">
+                    <template #default="scope">
+                        <span :class="Number(scope.row.amount || 0) >= 0 ? 'amount-plus' : 'amount-minus'">
+                            {{ Number(scope.row.amount || 0).toFixed(2) }}
+                        </span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="remark" label="备注" min-width="220" />
+                <el-table-column prop="createTime" label="时间" min-width="180" />
+            </el-table>
+        </div>
+
+        <el-dialog v-model="rechargeDialogVisible" title="充值商城币（模拟）" width="520px">
+            <el-form label-width="90px">
+                <el-form-item label="充值金额">
+                    <el-input-number v-model="rechargeForm.amount" :min="0.01" :step="10" :precision="2" style="width: 220px" />
+                </el-form-item>
+                <el-form-item label="支付方式">
+                    <el-radio-group v-model="rechargeForm.channel">
+                        <el-radio-button label="WECHAT">微信</el-radio-button>
+                        <el-radio-button label="ALIPAY">支付宝</el-radio-button>
+                    </el-radio-group>
+                </el-form-item>
+                <div class="qr-placeholder">二维码占位（模拟）</div>
+                <div class="qr-tip">请在真实项目接入支付网关后替换为可扫码二维码。</div>
+            </el-form>
+            <template #footer>
+                <el-button @click="rechargeDialogVisible = false">取消</el-button>
+                <el-button type="primary" :loading="rechargeLoading" @click="confirmRechargePaid">我已支付，确认入账</el-button>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
@@ -41,12 +82,22 @@ import { onMounted, reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { getProfileApi, updateProfileApi } from '@/api/user';
 import { uploadImageApi } from '@/api/upload';
+import { getFinanceDashboardApi, getMyWalletRecordsApi, rechargeCoinApi } from '@/api/finance';
 import { useUserStore } from '@/stores/user';
+import { resolveTradeTypeLabel } from '@/utils/finance';
 
 const userStore = useUserStore();
 const formRef = ref();
 const loading = ref(false);
 const avatarUploading = ref(false);
+const walletBalance = ref(0);
+const walletRecords = ref([]);
+const rechargeDialogVisible = ref(false);
+const rechargeLoading = ref(false);
+const rechargeForm = reactive({
+    amount: 100,
+    channel: 'WECHAT'
+});
 const form = reactive({
     username: '',
     nickname: '',
@@ -54,7 +105,6 @@ const form = reactive({
     phone: '',
     email: '',
     role: '',
-    creditScore: 100
 });
 
 const rules = {
@@ -62,7 +112,10 @@ const rules = {
     phone: [{ pattern: /^$|^1\d{10}$/, message: '手机号需为11位', trigger: 'blur' }]
 };
 
-onMounted(loadProfile);
+onMounted(async () => {
+    await loadProfile();
+    await loadWalletData();
+});
 
 async function loadProfile() {
     const result = await getProfileApi();
@@ -118,6 +171,38 @@ async function saveProfile() {
         loading.value = false;
     }
 }
+
+async function loadWalletData() {
+    const dashboard = await getFinanceDashboardApi();
+    walletBalance.value = dashboard.data?.personalBalance || 0;
+    const records = await getMyWalletRecordsApi();
+    walletRecords.value = records.data || [];
+}
+
+function openRechargeDialog() {
+    rechargeForm.amount = 100;
+    rechargeForm.channel = 'WECHAT';
+    rechargeDialogVisible.value = true;
+}
+
+async function confirmRechargePaid() {
+    if (!rechargeForm.amount || Number(rechargeForm.amount) <= 0) {
+        ElMessage.warning('请输入有效充值金额');
+        return;
+    }
+    rechargeLoading.value = true;
+    try {
+        await rechargeCoinApi({
+            amount: Number(rechargeForm.amount),
+            channel: rechargeForm.channel
+        });
+        rechargeDialogVisible.value = false;
+        ElMessage.success('充值成功（模拟）');
+        await loadWalletData();
+    } finally {
+        rechargeLoading.value = false;
+    }
+}
 </script>
 
 <style scoped>
@@ -126,5 +211,46 @@ async function saveProfile() {
     align-items: center;
     gap: 16px;
     margin-bottom: 20px;
+}
+
+.wallet-panel {
+    margin-top: 24px;
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.wallet-title {
+    margin: 0 0 8px;
+    font-size: 18px;
+}
+
+.wallet-balance {
+    margin-bottom: 10px;
+}
+
+.amount-plus {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.amount-minus {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.qr-placeholder {
+    height: 180px;
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    margin: 6px 0;
+}
+
+.qr-tip {
+    color: #9ca3af;
+    font-size: 12px;
 }
 </style>

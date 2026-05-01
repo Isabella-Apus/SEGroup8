@@ -16,7 +16,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
     private final String[] allowedOriginPatterns;
 
     public WebSocketConfig(@NonNull RealtimeWebSocketHandler realtimeWebSocketHandler,
-                           @Value("${app.realtime.allowed-origin-patterns:http://127.0.0.1:5173,http://localhost:5173}") String allowedOrigins) {
+                           @Value("${app.realtime.allowed-origin-patterns:http://127.0.0.1:*,http://localhost:*,http://192.168.*:*,http://10.*:*,http://172.16.*:*,http://172.17.*:*,http://172.18.*:*,http://172.19.*:*,http://172.2*:*,http://172.30.*:*,http://172.31.*:*}") String allowedOrigins) {
         this.realtimeWebSocketHandler = realtimeWebSocketHandler;
         this.allowedOriginPatterns = allowedOrigins.split("\\s*,\\s*");
     }

@@ -20,8 +20,7 @@
             </template>
             <el-menu-item index="/merchant">我的商品</el-menu-item>
             <el-menu-item index="/merchant/seller-products/edit">发布商品</el-menu-item>
-            <el-menu-item index="/merchant/secondhand-products">二手商品管理</el-menu-item>
-          </el-sub-menu>
+            <el-menu-item index="/merchant/secondhand-products">二手商品管理</el-menu-item>          </el-sub-menu>
 
           <el-sub-menu index="marketing">
             <template #title>

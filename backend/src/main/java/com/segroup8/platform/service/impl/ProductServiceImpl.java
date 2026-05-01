@@ -15,6 +15,7 @@ import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.ProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
+import com.segroup8.platform.service.BrowseHistoryService;
 import com.segroup8.platform.service.ProductService;
 import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.vo.ProductVO;
@@ -29,11 +30,14 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final ShopMapper shopMapper;
     private final UserMapper userMapper;
+    private final BrowseHistoryService browseHistoryService;
 
-    public ProductServiceImpl(ProductMapper productMapper, ShopMapper shopMapper, UserMapper userMapper) {
+    public ProductServiceImpl(ProductMapper productMapper, ShopMapper shopMapper, UserMapper userMapper,
+            BrowseHistoryService browseHistoryService) {
         this.productMapper = productMapper;
         this.shopMapper = shopMapper;
         this.userMapper = userMapper;
+        this.browseHistoryService = browseHistoryService;
     }
 
     @Override
@@ -56,6 +60,7 @@ public class ProductServiceImpl implements ProductService {
         if (product == null) {
             throw new BusinessException(404, "商品不存在或已下架");
         }
+        browseHistoryService.saveBrowseHistory(productId, "NEW");
         return toVO(product);
     }
 
@@ -216,6 +221,16 @@ public class ProductServiceImpl implements ProductService {
         ProductVO vo = new ProductVO();
         vo.setId(product.getId());
         vo.setShopId(product.getShopId());
+        Shop shop = product.getShopId() == null ? null : shopMapper.selectById(product.getShopId());
+        if (shop != null) {
+            vo.setSellerUserId(shop.getOwnerUserId());
+            User seller = shop.getOwnerUserId() == null ? null : userMapper.selectById(shop.getOwnerUserId());
+            if (seller != null) {
+                vo.setSellerName(StringUtils.hasText(seller.getNickname()) ? seller.getNickname() : seller.getUsername());
+            } else {
+                vo.setSellerName(shop.getName());
+            }
+        }
         vo.setName(product.getName());
         vo.setCover(product.getCover());
         vo.setDescription(product.getDescription());

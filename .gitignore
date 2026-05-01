@@ -14,18 +14,21 @@ uploads/
 # IDE
 .idea/
 .vscode/
+.metals/
+.bloop/
+.scala-build/
 
 # OS
 .DS_Store
 Thumbs.db
 
-# frontend-new
-frontend-new/node_modules/
-frontend-new/dist/
+# frontend
+frontend/node_modules/
+frontend/dist/
 
 # local env overrides
-frontend-new/.env.local
-frontend-new/.env.*.local
+frontend/.env.local
+frontend/.env.*.local
 
 # runtime logs
 backend/*.log

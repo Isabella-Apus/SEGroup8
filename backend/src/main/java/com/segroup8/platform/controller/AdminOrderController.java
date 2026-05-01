@@ -23,6 +23,7 @@ import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.OrderItemMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.realtime.RealtimePushService;
+import com.segroup8.platform.service.OrderService;
 import com.segroup8.platform.vo.OrderItemVO;
 import com.segroup8.platform.vo.OrderVO;
 import com.segroup8.platform.vo.PageVO;
@@ -57,15 +58,18 @@ public class AdminOrderController {
     private final UserMapper userMapper;
     private final OrderAfterSaleLogMapper orderAfterSaleLogMapper;
     private final RealtimePushService realtimePushService;
+    private final OrderService orderService;
     private final Map<Long, String> adminNameCache = new ConcurrentHashMap<>();
 
     public AdminOrderController(OrderInfoMapper orderInfoMapper, OrderItemMapper orderItemMapper, UserMapper userMapper,
-                                OrderAfterSaleLogMapper orderAfterSaleLogMapper, RealtimePushService realtimePushService) {
+                                OrderAfterSaleLogMapper orderAfterSaleLogMapper, RealtimePushService realtimePushService,
+                                OrderService orderService) {
         this.orderInfoMapper = orderInfoMapper;
         this.orderItemMapper = orderItemMapper;
         this.userMapper = userMapper;
         this.orderAfterSaleLogMapper = orderAfterSaleLogMapper;
         this.realtimePushService = realtimePushService;
+        this.orderService = orderService;
     }
 
     @Operation(summary = "管理员分页查询订单")
@@ -160,34 +164,9 @@ public class AdminOrderController {
     @PostMapping("/{orderId}/refund/approve")
     public Result<OrderVO> approveRefund(@PathVariable Long orderId, @Valid @RequestBody(required = false) AdminRefundDecisionRequest request) {
         AccessControl.requireAdmin(userMapper);
-        OrderInfo order = orderInfoMapper.selectById(orderId);
-        if (order == null) {
-            throw new BusinessException(404, "订单不存在");
-        }
-        OrderStateMachine.assertRefundActionAllowed(order, OrderStateMachine.RefundAction.APPROVE, "当前无可处理的退款申请");
-        order.setRefundStatus(RefundStatusEnum.APPROVED.getCode());
-        order.setOrderStatus(OrderStatusEnum.CLOSED.getCode());
-        order.setRefundDecisionTime(LocalDateTime.now());
         Long operatorId = AccessControl.requireUserId();
-        order.setRefundDecisionUserId(operatorId);
-        if (request != null && StringUtils.hasText(request.getRemark())) {
-            order.setRefundDecisionRemark(request.getRemark().trim());
-        } else {
-            order.setRefundDecisionRemark("同意退货");
-        }
-        order.setRefundDecisionSource(RefundDecisionSourceEnum.ADMIN.name());
-        order.setClosedTime(LocalDateTime.now());
-        orderInfoMapper.updateById(order);
-        insertAfterSaleLog(orderId, AfterSaleActionEnum.APPROVE, operatorId, OperatorRoleEnum.ADMIN, order.getRefundDecisionRemark());
-        realtimePushService.pushToUser(order.getBuyerUserId(), "AFTER_SALE_UPDATED", Map.of(
-                "orderId", orderId,
-                "message", "管理员已同意退货并退款"
-        ));
-
-        List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
-                .eq(OrderItem::getOrderId, order.getId())
-                .orderByAsc(OrderItem::getId));
-        return Result.success(buildOrderVO(order, items));
+        String remark = request != null ? request.getRemark() : null;
+        return Result.success(orderService.approveRefundByAdmin(orderId, operatorId, remark));
     }
 
     @Operation(summary = "管理员拒绝退货（退款）")

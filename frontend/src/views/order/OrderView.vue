@@ -2,7 +2,7 @@
   <div class="page-card">
     <h2 class="page-title">
       我的订单
-      <span v-if="!listLoading" class="page-title-sub">（{{ tabLabel }} · 共 {{ total }} 条）</span>
+      <span v-if="!listLoading" class="page-title-sub">（{{ tabLabel }} · 共 {{ filteredRecords.length }} 条）</span>
     </h2>
 
     <div class="toolbar">
@@ -45,12 +45,22 @@
       <el-tab-pane label="已关闭" name="CLOSED" />
     </el-tabs>
 
-    <el-empty v-if="!listLoading && records.length === 0" description="暂无订单" />
+    <div v-if="listLoading && records.length === 0" class="skeleton-panel">
+      <el-skeleton animated :rows="6" />
+    </div>
 
-    <div v-loading="listLoading" class="order-list">
-      <el-card v-for="order in records" :key="order.id" shadow="hover" class="order-card" @click="goDetail(order.id)">
+    <el-empty v-else-if="!listLoading && filteredRecords.length === 0" description="暂无订单" />
+
+    <div v-else v-loading="listLoading" class="order-list">
+      <el-card v-for="order in filteredRecords" :key="order.id" shadow="hover" class="order-card" @click="goDetail(order.id)">
         <div class="order-card__header">
-          <OrderStatusTag :status="order.orderStatus" :status-name="order.orderStatusName" :refund-status="order.refundStatus" :refund-status-name="order.refundStatusName" size="default" />
+          <OrderStatusTag
+            :status="order.orderStatus"
+            :status-name="order.orderStatusName"
+            :refund-status="order.refundStatus"
+            :refund-status-name="order.refundStatusName"
+            size="default"
+          />
           <div class="meta">
             <span class="no">订单号：{{ order.orderNo }}</span>
             <span class="time">{{ formatTime(order.createTime) }}</span>
@@ -88,7 +98,11 @@
         </div>
 
         <div class="order-card__footer" @click.stop>
-          <div class="amount">实付：<strong>￥{{ Number(order.totalAmount || 0).toFixed(2) }}</strong></div>
+          <div class="amount-wrap">
+            <div class="amount">原价：<strong>￥{{ Number(order.totalAmount || 0).toFixed(2) }}</strong></div>
+            <div v-if="Number(order.voucherDiscountAmount || 0) > 0" class="amount discount">优惠券：-￥{{ Number(order.voucherDiscountAmount || 0).toFixed(2) }}</div>
+            <div class="amount payable">实付：<strong>￥{{ Number(order.payableAmount ?? (order.totalAmount || 0)).toFixed(2) }}</strong></div>
+          </div>
           <el-space>
             <el-button v-if="order.orderStatus === 0" size="small" @click="cancel(order.id)">取消订单</el-button>
             <el-button v-if="order.orderStatus === 0" size="small" type="primary" @click="pay(order.id)">立即付款</el-button>
@@ -96,26 +110,41 @@
             <el-button v-if="order.orderStatus === 2" size="small" @click="viewLogistics(order)">查看物流</el-button>
             <el-button v-if="order.orderStatus === 2" size="small" type="primary" @click="confirmReceive(order.id)">确认收货</el-button>
             <el-button v-if="order.orderStatus === 3" size="small" type="primary" @click="goReview(order.id)">去评价</el-button>
-            <el-button v-if="canRefund(order.orderStatus, order.refundStatus)" size="small" type="danger" plain @click="openRefundDialog(order.id)">申请退货</el-button>
+            <el-button v-if="canRefund(order.orderStatus, order.refundStatus)" size="small" type="danger" plain @click="openRefundDialog(order)">申请退货</el-button>
             <el-button size="small" @click="goDetail(order.id)">查看详情</el-button>
+            <el-button v-if="getOrderPrimarySeller(order)?.sellerUserId" size="small" type="success" plain @click="contactSeller(order)">联系卖家</el-button>
           </el-space>
         </div>
       </el-card>
     </div>
 
-    <el-dialog v-model="logisticsDialogVisible" title="物流信息" width="420px">
-      <el-descriptions :column="1" border>
-        <el-descriptions-item label="物流单号">{{ logisticsOrder?.deliveryNo || '暂无（演示占位）' }}</el-descriptions-item>
-        <el-descriptions-item label="状态">运输中（演示占位）</el-descriptions-item>
-        <el-descriptions-item label="最新轨迹">包裹已揽收，正在发往下一站（演示占位）</el-descriptions-item>
-      </el-descriptions>
-      <template #footer>
-        <el-button type="primary" @click="logisticsDialogVisible = false">知道了</el-button>
-      </template>
-    </el-dialog>
+    <div class="pager-wrap">
+      <el-pagination
+        background
+        layout="total, prev, pager, next, sizes"
+        :total="total"
+        :page-size="query.pageSize"
+        :current-page="query.pageNum"
+        :page-sizes="[10, 20, 50]"
+        @current-change="handlePageChange"
+        @size-change="handleSizeChange"
+      />
+    </div>
 
-    <el-dialog v-model="refundDialogVisible" title="申请退货/退款" width="520px">
+    <el-dialog
+      v-model="refundDialogVisible"
+      title="申请退货/退款"
+      width="520px"
+      align-center
+      append-to-body
+    >
       <el-form label-width="90px">
+        <el-form-item label="退款方式">
+          <el-radio-group v-model="refundForm.mode">
+            <el-radio-button label="ONLY_REFUND" :disabled="!canOnlyRefund">仅退款</el-radio-button>
+            <el-radio-button label="RETURN_REFUND">退货退款</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="退货原因">
           <el-select v-model="refundForm.reason" placeholder="请选择" style="width: 100%">
             <el-option label="不想要了/拍错了" value="不想要了/拍错了" />
@@ -148,18 +177,34 @@
       </template>
     </el-dialog>
 
-    <div class="pager-wrap">
-      <el-pagination
-        background
-        layout="total, prev, pager, next, sizes"
-        :total="total"
-        :page-size="query.pageSize"
-        :current-page="query.pageNum"
-        :page-sizes="[10, 20, 50]"
-        @current-change="handlePageChange"
-        @size-change="handleSizeChange"
-      />
-    </div>
+    <el-dialog v-model="payDialogVisible" title="确认支付" width="520px">
+      <el-form label-width="90px">
+        <el-form-item label="支付方式">
+          <el-radio-group v-model="payForm.payMode">
+            <el-radio-button label="THIRD_PARTY">微信/支付宝</el-radio-button>
+            <el-radio-button label="COIN">商城币</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item v-if="payForm.payMode === 'THIRD_PARTY'" label="渠道">
+          <el-radio-group v-model="payForm.payChannel">
+            <el-radio-button label="WECHAT">微信</el-radio-button>
+            <el-radio-button label="ALIPAY">支付宝</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <div v-if="payForm.payMode === 'THIRD_PARTY'" class="pay-qr-placeholder">第三方支付二维码占位（模拟）</div>
+        <el-alert
+          v-else
+          type="info"
+          show-icon
+          :closable="false"
+          title="确认后将直接扣减商城币余额。"
+        />
+      </el-form>
+      <template #footer>
+        <el-button @click="payDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="paySubmitting" @click="confirmPay">{{ payForm.payMode === 'THIRD_PARTY' ? '我已支付' : '确认支付' }}</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -169,9 +214,10 @@ import { Plus } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { cancelOrderApi, confirmReceiveOrderApi, getOrderListApi, payOrderApi, refundOrderApi, remindShipOrderApi } from '@/api/order';
 import { uploadImageApi } from '@/api/upload';
-import { confirmOrderAction, showOrderActionError, showOrderActionSuccess } from "@/utils/orderUi";
-import OrderStatusTag from "@/components/order/OrderStatusTag.vue";
-import { onRealtimeEvent } from "@/realtime/realtimeClient";
+import { confirmOrderAction, showOrderActionError, showOrderActionSuccess } from '@/utils/orderUi';
+import OrderStatusTag from '@/components/order/OrderStatusTag.vue';
+import { fuzzySearchItems } from '@/utils/search';
+import { onRealtimeEvent } from '@/realtime/realtimeClient';
 
 const query = reactive({
   pageNum: 1,
@@ -188,6 +234,23 @@ const records = ref([]);
 const activeTab = ref('ALL');
 const listLoading = ref(false);
 
+const filteredRecords = computed(() => {
+  const keyword = String(query.keyword || '').trim();
+  if (!keyword) {
+    return records.value;
+  }
+  return fuzzySearchItems(records.value, keyword, {
+    keys: [
+      'orderNo',
+      {
+        name: 'itemNames',
+        getFn: (order) => (order.items || []).map((item) => item.productName || '').join(' '),
+      },
+    ],
+    threshold: 0.4,
+  });
+});
+
 const tabLabelMap = {
   ALL: '全部',
   PENDING_PAY: '待付款',
@@ -199,27 +262,37 @@ const tabLabelMap = {
 };
 const tabLabel = computed(() => tabLabelMap[activeTab.value] || '全部');
 const router = useRouter();
-const logisticsDialogVisible = ref(false);
-const logisticsOrder = ref(null);
 
 const refundDialogVisible = ref(false);
 const refundSubmitting = ref(false);
 const refundTargetId = ref(null);
+const refundTargetOrderStatus = ref(null);
+const payDialogVisible = ref(false);
+const paySubmitting = ref(false);
+const payTargetId = ref(null);
 const refundForm = reactive({
+  mode: 'RETURN_REFUND',
   reason: '',
   remark: '',
   proofUrls: []
 });
+const canOnlyRefund = computed(() => Number(refundTargetOrderStatus.value) === 1);
+const payForm = reactive({
+  payMode: 'THIRD_PARTY',
+  payChannel: 'WECHAT'
+});
+
+let unsubscribeRealtime = null;
 
 onMounted(() => {
   syncQueryFromTab();
   fetchOrders();
   unsubscribeRealtime = onRealtimeEvent(handleRealtimeEvent);
 });
+
 onBeforeUnmount(() => {
   if (unsubscribeRealtime) unsubscribeRealtime();
 });
-let unsubscribeRealtime = null;
 
 async function fetchOrders() {
   listLoading.value = true;
@@ -291,9 +364,7 @@ function handleSizeChange(pageSize) {
 }
 
 function formatTime(value) {
-  if (!value) {
-    return '-';
-  }
+  if (!value) return '-';
   return String(value).replace('T', ' ');
 }
 
@@ -301,51 +372,79 @@ function goDetail(id) {
   router.push(`/order/${id}`);
 }
 
+function getOrderPrimarySeller(order) {
+  const items = order?.items || [];
+  return items.find((item) => item?.sellerUserId) || null;
+}
+
+function contactSeller(order) {
+  const seller = getOrderPrimarySeller(order);
+  if (!seller?.sellerUserId) {
+    showOrderActionError({ message: '未找到卖家信息' }, '联系卖家失败');
+    return;
+  }
+  router.push({
+    path: '/messages',
+    query: {
+      participantId: seller.sellerUserId
+    }
+  });
+}
+
 async function pay(orderId) {
+  payTargetId.value = orderId;
+  payForm.payMode = 'THIRD_PARTY';
+  payForm.payChannel = 'WECHAT';
+  payDialogVisible.value = true;
+}
+
+async function confirmPay() {
+  if (!payTargetId.value) return;
+  paySubmitting.value = true;
   try {
-    await confirmOrderAction({
-      title: "确认付款",
-      message: "确认立即付款？付款后订单将进入待发货。",
-      confirmButtonText: "确认付款"
+    await payOrderApi(payTargetId.value, {
+      payMode: payForm.payMode,
+      payChannel: payForm.payChannel
     });
-    await payOrderApi(orderId);
-    showOrderActionSuccess("支付成功");
+    payDialogVisible.value = false;
+    showOrderActionSuccess('支付成功');
     fetchOrders();
   } catch (error) {
-    if (String(error?.message || "").includes("cancel")) return;
-    showOrderActionError(error, "支付失败");
+    showOrderActionError(error, '支付失败');
+  } finally {
+    paySubmitting.value = false;
   }
 }
 
 async function cancel(orderId) {
   try {
     await confirmOrderAction({
-      title: "确认取消订单",
-      message: "取消后将无法继续付款，是否继续？",
-      confirmButtonText: "确认取消"
+      title: '确认取消订单',
+      message: '取消后将无法继续付款，是否继续？',
+      confirmButtonText: '确认取消'
     });
     await cancelOrderApi(orderId);
-    showOrderActionSuccess("已取消订单");
+    showOrderActionSuccess('已取消订单');
     fetchOrders();
   } catch (error) {
-    if (String(error?.message || "").includes("cancel")) return;
-    showOrderActionError(error, "取消订单失败");
+    if (String(error?.message || '').includes('cancel')) return;
+    showOrderActionError(error, '取消订单失败');
   }
 }
 
 async function confirmReceive(orderId) {
   try {
     await confirmOrderAction({
-      title: "确认收货",
-      message: "确认已收到货物？确认后订单将进入待评价。",
-      confirmButtonText: "确认收货"
+      title: '确认收货',
+      message: '确认已收到货物？确认后订单将进入待评价。',
+      confirmButtonText: '确认收货'
     });
     await confirmReceiveOrderApi(orderId);
-    showOrderActionSuccess("已确认收货");
+    showOrderActionSuccess('已确认收货');
     fetchOrders();
   } catch (error) {
-    if (String(error?.message || "").includes("cancel")) return;
-    showOrderActionError(error, "确认收货失败");
+    if (String(error?.message || '').includes('cancel')) return;
+    showOrderActionError(error, '确认收货失败');
   }
 }
 
@@ -358,8 +457,10 @@ function canRefund(status, refundStatus) {
   return status === 1 || status === 2 || status === 3 || status === 4;
 }
 
-function openRefundDialog(orderId) {
-  refundTargetId.value = orderId;
+function openRefundDialog(order) {
+  refundTargetId.value = order?.id ?? null;
+  refundTargetOrderStatus.value = Number(order?.orderStatus ?? -1);
+  refundForm.mode = canOnlyRefund.value ? 'ONLY_REFUND' : 'RETURN_REFUND';
   refundForm.reason = '';
   refundForm.remark = '';
   refundForm.proofUrls = [];
@@ -384,7 +485,7 @@ function handleProofRemove(file) {
 async function submitRefund() {
   if (!refundTargetId.value) return;
   if (!refundForm.reason) {
-    showOrderActionError({ message: "请选择退货原因" }, "提交退货申请失败");
+    showOrderActionError({ message: '请选择退货原因' }, '提交退货申请失败');
     return;
   }
   refundSubmitting.value = true;
@@ -392,14 +493,15 @@ async function submitRefund() {
     const remark = refundForm.remark?.trim();
     const reason = remark ? `${refundForm.reason}（${remark}）` : refundForm.reason;
     await refundOrderApi(refundTargetId.value, {
+      refundMode: refundForm.mode,
       reason,
       proofUrls: refundForm.proofUrls
     });
     refundDialogVisible.value = false;
-    showOrderActionSuccess("已提交退货申请");
+    showOrderActionSuccess('已提交退货申请');
     await fetchOrders();
   } catch (error) {
-    showOrderActionError(error, "提交退货申请失败");
+    showOrderActionError(error, '提交退货申请失败');
   } finally {
     refundSubmitting.value = false;
   }
@@ -408,20 +510,22 @@ async function submitRefund() {
 async function remindShip(orderId) {
   try {
     await remindShipOrderApi(orderId);
-    showOrderActionSuccess("已提醒卖家发货");
+    showOrderActionSuccess('已提醒卖家发货');
   } catch (error) {
-    showOrderActionError(error, "提醒发货失败");
+    showOrderActionError(error, '提醒发货失败');
   }
 }
 
 function viewLogistics(order) {
-  logisticsOrder.value = order;
-  logisticsDialogVisible.value = true;
+  router.push({
+    path: `/order/${order.id}`,
+    query: { tab: 'logistics' }
+  });
 }
 
 function handleRealtimeEvent(event) {
   const type = event?.detail?.eventType;
-  if (type === "ORDER_STATUS_UPDATED" || type === "AFTER_SALE_UPDATED" || type === "LOGISTICS_UPDATED" || type === "ORDER_REMIND_SHIP") {
+  if (type === 'ORDER_STATUS_UPDATED' || type === 'AFTER_SALE_UPDATED' || type === 'LOGISTICS_UPDATED' || type === 'ORDER_REMIND_SHIP') {
     fetchOrders();
   }
 }
@@ -465,7 +569,6 @@ function handleRealtimeEvent(event) {
   color: #6b7280;
   font-size: 12px;
 }
-
 
 .order-item {
   display: flex;
@@ -525,6 +628,24 @@ function handleRealtimeEvent(event) {
   margin: 0 6px;
 }
 
+.amount-wrap {
+  display: grid;
+  gap: 2px;
+}
+
+.amount {
+  font-size: 13px;
+  color: #374151;
+}
+
+.amount.discount {
+  color: #16a34a;
+}
+
+.amount.payable {
+  font-size: 14px;
+}
+
 .amount strong {
   color: #ef4444;
 }
@@ -539,5 +660,16 @@ function handleRealtimeEvent(event) {
   color: #6b7280;
   font-size: 12px;
   margin-top: 6px;
+}
+
+.pay-qr-placeholder {
+  margin: 8px 0;
+  height: 180px;
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
 }
 </style>
