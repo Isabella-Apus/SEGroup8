@@ -11,8 +11,7 @@
           <el-button size="small" @click="$router.push('/product')">商品</el-button>
           <el-button size="small" @click="$router.push('/cart')">购物车</el-button>
           <el-button size="small" @click="$router.push('/order')">我的订单</el-button>
-          <el-button size="small" @click="$router.push('/secondhand')">二手</el-button>
-          <el-button size="small" @click="$router.push('/secondhand/publish')">发布二手</el-button>
+          <el-button size="small" @click="$router.push('/secondhand')">二手交易</el-button>
           <el-button size="small" @click="$router.push('/profile')">个人资料</el-button>
           <el-button size="small" @click="$router.push('/addresses')">地址管理</el-button>
           <el-button size="small" @click="$router.push('/merchant-apply')">申请成为卖家</el-button>

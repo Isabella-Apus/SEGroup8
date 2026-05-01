@@ -2,6 +2,7 @@ package com.segroup8.platform.controller;
 
 import com.segroup8.platform.common.Result;
 import com.segroup8.platform.dto.CreateOrderRequest;
+import com.segroup8.platform.dto.PayOrderRequest;
 import com.segroup8.platform.dto.OrderItemReviewBatchSubmitRequest;
 import com.segroup8.platform.dto.OrderPageQueryRequest;
 import com.segroup8.platform.dto.OrderRefundApplyRequest;
@@ -49,8 +50,8 @@ public class OrderController {
 
     @Operation(summary = "支付订单")
     @PostMapping("/{orderId}/pay")
-    public Result<OrderVO> pay(@PathVariable Long orderId) {
-        return Result.success(orderService.payMyOrder(orderId));
+    public Result<OrderVO> pay(@PathVariable Long orderId, @RequestBody(required = false) PayOrderRequest request) {
+        return Result.success(orderService.payMyOrder(orderId, request));
     }
 
     @Operation(summary = "取消订单")
@@ -79,13 +80,15 @@ public class OrderController {
 
     @Operation(summary = "按商品逐条提交订单评价")
     @PostMapping("/{orderId}/review/items")
-    public Result<OrderVO> reviewItems(@PathVariable Long orderId, @Valid @RequestBody OrderItemReviewBatchSubmitRequest request) {
+    public Result<OrderVO> reviewItems(@PathVariable Long orderId,
+            @Valid @RequestBody OrderItemReviewBatchSubmitRequest request) {
         return Result.success(orderService.submitMyOrderItemReviews(orderId, request));
     }
 
     @Operation(summary = "申请退货")
     @PostMapping("/{orderId}/refund")
-    public Result<OrderVO> refund(@PathVariable Long orderId, @RequestBody(required = false) OrderRefundApplyRequest request) {
+    public Result<OrderVO> refund(@PathVariable Long orderId,
+            @RequestBody(required = false) OrderRefundApplyRequest request) {
         return Result.success(orderService.refundMyOrder(orderId, request));
     }
 
