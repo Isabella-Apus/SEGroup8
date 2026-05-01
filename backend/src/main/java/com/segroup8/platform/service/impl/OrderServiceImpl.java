@@ -1086,4 +1086,10 @@ public class OrderServiceImpl implements OrderService {
             productMapper.updateById(product);
         }
     }
+
+    @Override
+    public OrderVO approveRefundByAdmin(Long orderId, Long adminUserId, String remark) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'approveRefundByAdmin'");
+    }
 }
