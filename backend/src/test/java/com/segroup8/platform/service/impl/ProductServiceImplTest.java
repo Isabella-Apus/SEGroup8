@@ -16,6 +16,7 @@ import com.segroup8.platform.mapper.ProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
+import com.segroup8.platform.service.CategoryService;
 import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.vo.ProductVO;
 import org.junit.jupiter.api.AfterEach;
@@ -52,11 +53,14 @@ class ProductServiceImplTest {
     @Mock
     private BrowseHistoryService browseHistoryService;
 
+    @Mock
+    private CategoryService categoryService;
+
     private ProductServiceImpl productService;
 
     @BeforeEach
     void setUp() {
-        productService = new ProductServiceImpl(productMapper, shopMapper, userMapper, browseHistoryService);
+        productService = new ProductServiceImpl(productMapper, shopMapper, userMapper, browseHistoryService, categoryService);
     }
 
     @AfterEach
@@ -94,6 +98,7 @@ class ProductServiceImplTest {
         User user = new User();
         user.setId(userId);
         user.setRole(RoleEnum.SELLER.name());
+        user.setCategory("1");
         when(userMapper.selectById(userId)).thenReturn(user);
 
         Shop shop = new Shop();
@@ -107,7 +112,12 @@ class ProductServiceImplTest {
         request.setDescription("desc");
         request.setPrice(new BigDecimal("9.99"));
         request.setStock(5);
+        request.setCategoryId(1);
+        request.setSubCategoryId(101);
         request.setStatus(ProductStatusEnum.ON_SHELF.getCode());
+
+        when(categoryService.isMainCategory(1)).thenReturn(true);
+        when(categoryService.isSubCategoryOf(1, 101)).thenReturn(true);
 
         Product inserted = new Product();
         inserted.setId(1L);
@@ -130,6 +140,8 @@ class ProductServiceImplTest {
         assertEquals("Test Product", toInsert.getName());
         assertEquals(new BigDecimal("9.99"), toInsert.getPrice());
         assertEquals(5, toInsert.getStock());
+        assertEquals(1, toInsert.getCategoryId());
+        assertEquals(101, toInsert.getSubCategoryId());
     }
 
     @Test

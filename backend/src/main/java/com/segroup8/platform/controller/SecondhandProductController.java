@@ -5,6 +5,7 @@ import com.segroup8.platform.dto.SecondhandOrderCreateRequest;
 import com.segroup8.platform.dto.SecondhandProductPageQueryRequest;
 import com.segroup8.platform.dto.SecondhandProductSaveRequest;
 import com.segroup8.platform.dto.SecondhandProductStatusUpdateRequest;
+import com.segroup8.platform.service.SearchBehaviorService;
 import com.segroup8.platform.service.SecondhandProductService;
 import com.segroup8.platform.vo.OrderVO;
 import com.segroup8.platform.vo.PageVO;
@@ -26,14 +27,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class SecondhandProductController {
 
     private final SecondhandProductService secondhandProductService;
+    private final SearchBehaviorService searchBehaviorService;
 
-    public SecondhandProductController(SecondhandProductService secondhandProductService) {
+    public SecondhandProductController(SecondhandProductService secondhandProductService,
+            SearchBehaviorService searchBehaviorService) {
         this.secondhandProductService = secondhandProductService;
+        this.searchBehaviorService = searchBehaviorService;
     }
 
     @Operation(summary = "分页查询二手在售商品")
     @GetMapping("/list")
     public Result<PageVO<SecondhandProductVO>> list(@Valid @ModelAttribute SecondhandProductPageQueryRequest request) {
+        searchBehaviorService.recordKeyword(request.getKeyword());
         return Result.success(secondhandProductService.pagePublicProducts(request));
     }
 

@@ -15,6 +15,8 @@ public class ProductPageQueryRequest {
     private Long pageSize = 10L;
 
     private String keyword;
+    private Integer categoryId;
+    private String sortBy;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
     private Integer status;
@@ -41,6 +43,22 @@ public class ProductPageQueryRequest {
 
     public void setKeyword(String keyword) {
         this.keyword = keyword;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getSortBy() {
+        return sortBy;
+    }
+
+    public void setSortBy(String sortBy) {
+        this.sortBy = sortBy;
     }
 
     public BigDecimal getMinPrice() {

@@ -18,7 +18,10 @@ public class SecondhandProduct {
     private String description;
     private BigDecimal originPrice;
     private BigDecimal salePrice;
+    private Integer categoryId;
+    private Integer subCategoryId;
     private String conditionLevel;
+    private Integer isNegotiable;
     private Integer status;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
@@ -79,12 +82,36 @@ public class SecondhandProduct {
         this.salePrice = salePrice;
     }
 
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Integer getSubCategoryId() {
+        return subCategoryId;
+    }
+
+    public void setSubCategoryId(Integer subCategoryId) {
+        this.subCategoryId = subCategoryId;
+    }
+
     public String getConditionLevel() {
         return conditionLevel;
     }
 
     public void setConditionLevel(String conditionLevel) {
         this.conditionLevel = conditionLevel;
+    }
+
+    public Integer getIsNegotiable() {
+        return isNegotiable;
+    }
+
+    public void setIsNegotiable(Integer isNegotiable) {
+        this.isNegotiable = isNegotiable;
     }
 
     public Integer getStatus() {

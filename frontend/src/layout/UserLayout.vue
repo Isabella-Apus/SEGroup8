@@ -17,9 +17,7 @@
           <el-menu-item index="/product">商品</el-menu-item>
           <el-menu-item index="/cart">购物车</el-menu-item>
           <el-menu-item index="/order">我的订单</el-menu-item>
-          <el-menu-item index="/secondhand">二手商品</el-menu-item>
-          <el-menu-item index="/secondhand/publish">发布二手</el-menu-item>
-          <el-menu-item index="/messages">站内消息</el-menu-item>
+          <el-menu-item index="/secondhand">二手交易</el-menu-item>          <el-menu-item index="/messages">站内消息</el-menu-item>
           <el-menu-item index="/notifications">通知</el-menu-item>
           <el-menu-item index="/profile">个人资料</el-menu-item>
           <el-menu-item index="/addresses">地址管理</el-menu-item>
