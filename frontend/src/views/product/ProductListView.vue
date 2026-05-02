@@ -1,10 +1,11 @@
 <template>
   <section class="feed-page">
-    <div class="hero">
+    <div class="feed-head">
       <div>
+        <p>商品市场</p>
         <h1>新品优选</h1>
       </div>
-      <div class="hero-dot"></div>
+      <el-button type="warning" round @click="$router.push('/secondhand/publish')">发布闲置</el-button>
     </div>
 
     <el-form :inline="true" class="query" @submit.prevent>
@@ -13,13 +14,13 @@
           v-model="query.keyword"
           placeholder="搜商品名，例如：键盘"
           clearable
-          style="width: 240px"
+          style="width: 280px"
           @keyup.enter="onSearch"
         />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSearch">搜索</el-button>
-        <el-button @click="onReset">重置</el-button>
+        <el-button type="primary" round @click="onSearch">搜索</el-button>
+        <el-button round @click="onReset">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -28,6 +29,7 @@
         v-for="chip in chips"
         :key="chip.label"
         class="chip"
+        :class="{ active: query.priceRange === chip.range }"
         type="button"
         @click="applyChip(chip)"
       >
@@ -54,11 +56,13 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import ProductCard from '@/components/ProductCard.vue';
 import { getProductListApi } from '@/api/product';
 import { searchList } from '@/utils/search';
 
+const route = useRoute();
 const pageSize = 16;
 const loading = ref(false);
 const sentinel = ref(null);
@@ -74,7 +78,7 @@ const query = reactive({
 
 const chips = [
   { label: '全部', range: 'all' },
-  { label: '100 元以下', range: 'low' },
+  { label: '100 元以内', range: 'low' },
   { label: '100-500 元', range: 'mid' },
   { label: '500 元以上', range: 'high' }
 ];
@@ -101,8 +105,17 @@ const allItems = computed(() => {
 const visibleItems = computed(() => allItems.value);
 const hasMore = computed(() => items.value.length < total.value);
 
-onMounted(async () => {
-  await fetchPage(true);
+watch(
+  () => route.query.keyword,
+  async (value) => {
+    query.keyword = typeof value === 'string' ? value : '';
+    await fetchPage(true);
+    if (query.keyword.trim()) await ensureAllItemsLoaded();
+  },
+  { immediate: true }
+);
+
+onMounted(() => {
   initObserver();
 });
 
@@ -171,58 +184,61 @@ function initObserver() {
 
 <style scoped>
 .feed-page {
-  padding: 8px 10px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.hero {
-  border-radius: 22px;
-  padding: 20px;
+.feed-head,
+.query {
+  border: 1px solid #eeeeee;
+  border-radius: 20px;
+  background: #fff;
+}
+
+.feed-head {
+  min-height: 128px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #fff;
-  margin-bottom: 14px;
-  background: linear-gradient(120deg, #3b82f6, #6366f1);
+  padding: 22px 26px;
 }
 
-.hero h1 {
+.feed-head p {
+  margin: 0 0 4px;
+  color: #8a8a8a;
+}
+
+.feed-head h1 {
   margin: 0;
   font-size: 30px;
-}
-
-.hero p {
-  margin: 8px 0 0;
-  opacity: .92;
-}
-
-.hero-dot {
-  width: 86px;
-  height: 86px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 25% 25%, #fff5, #fff1 60%, transparent 70%);
+  letter-spacing: 0;
 }
 
 .query {
-  background: #fff;
-  border: 1px solid var(--line-soft);
-  border-radius: 16px;
-  padding: 12px;
+  padding: 14px 14px 0;
 }
 
 .chips {
-  margin: 10px 0 14px;
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
 }
 
 .chip {
-  border: 1px solid #c7d2fe;
+  border: 1px solid #eeeeee;
   border-radius: 999px;
-  background: #eef2ff;
-  color: #374151;
-  padding: 6px 12px;
+  background: #fff;
+  color: #444;
+  padding: 7px 13px;
   cursor: pointer;
+}
+
+.chip:hover,
+.chip.active {
+  border-color: #ffe100;
+  background: #fff7c2;
+  font-weight: 700;
 }
 
 .grid {
@@ -244,17 +260,24 @@ function initObserver() {
 }
 
 @media (max-width: 760px) {
-  .feed-page {
-    padding: 6px;
+  .feed-head {
+    min-height: auto;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
   }
 
-  .hero {
-    padding: 14px;
-    border-radius: 16px;
+  .feed-head h1 {
+    font-size: 23px;
   }
 
-  .hero h1 {
-    font-size: 24px;
+  .query :deep(.el-form-item) {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .query :deep(.el-input) {
+    width: 100% !important;
   }
 
   .grid {

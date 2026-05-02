@@ -1,10 +1,11 @@
 <template>
   <section class="feed-page">
-    <div class="hero">
+    <div class="feed-head secondhand">
       <div>
-        <h1>二手捡漏</h1>
+        <p>二手闲置</p>
+        <h1>淘同学手里的好物</h1>
       </div>
-      <div class="hero-dot"></div>
+      <el-button type="warning" round @click="$router.push('/secondhand/publish')">去发布</el-button>
     </div>
 
     <el-form :inline="true" class="query" @submit.prevent>
@@ -13,14 +14,13 @@
           v-model="query.keyword"
           placeholder="搜二手商品名，例如：自行车"
           clearable
-          style="width: 240px"
+          style="width: 280px"
           @keyup.enter="onSearch"
         />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSearch">搜索</el-button>
-        <el-button @click="onReset">重置</el-button>
-        <el-button type="success" @click="$router.push('/secondhand/publish')">去发布</el-button>
+        <el-button type="primary" round @click="onSearch">搜索</el-button>
+        <el-button round @click="onReset">重置</el-button>
       </el-form-item>
     </el-form>
 
@@ -29,6 +29,7 @@
         v-for="chip in chips"
         :key="chip.label"
         class="chip"
+        :class="{ active: query.condition === chip.condition }"
         type="button"
         @click="applyChip(chip)"
       >
@@ -75,9 +76,9 @@ const query = reactive({
 
 const chips = [
   { label: '全部', condition: 'all' },
-  { label: '95新以上', condition: '95%' },
-  { label: '9成新', condition: '90%' },
-  { label: '8成新', condition: '80%' }
+  { label: '95 新以上', condition: '95%' },
+  { label: '9 成新', condition: '90%' },
+  { label: '8 成新', condition: '80%' }
 ];
 
 const allItems = computed(() => {
@@ -185,63 +186,71 @@ function initObserver() {
     observer.observe(sentinel.value);
   }
 }
-
 </script>
 
 <style scoped>
 .feed-page {
-  padding: 8px 10px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.hero {
-  border-radius: 22px;
-  padding: 20px;
+.feed-head,
+.query {
+  border: 1px solid #eeeeee;
+  border-radius: 20px;
+  background: #fff;
+}
+
+.feed-head {
+  min-height: 128px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #fff;
-  margin-bottom: 14px;
-  background: linear-gradient(120deg, #ff6f2f, #ff9822);
+  padding: 22px 26px;
 }
 
-.hero h1 {
+.feed-head.secondhand {
+  background:
+    radial-gradient(circle at 88% 14%, rgba(255, 225, 0, 0.38), transparent 28%),
+    #fff;
+}
+
+.feed-head p {
+  margin: 0 0 4px;
+  color: #8a8a8a;
+}
+
+.feed-head h1 {
   margin: 0;
   font-size: 30px;
-}
-
-.hero p {
-  margin: 8px 0 0;
-  opacity: .92;
-}
-
-.hero-dot {
-  width: 86px;
-  height: 86px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 25% 25%, #fff5, #fff1 60%, transparent 70%);
+  letter-spacing: 0;
 }
 
 .query {
-  background: #fff;
-  border: 1px solid var(--line-soft);
-  border-radius: 16px;
-  padding: 12px;
+  padding: 14px 14px 0;
 }
 
 .chips {
-  margin: 10px 0 14px;
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
 }
 
 .chip {
-  border: 1px solid #ffd6b9;
+  border: 1px solid #eeeeee;
   border-radius: 999px;
-  background: #fff8f2;
-  color: #7f4f2f;
-  padding: 6px 12px;
+  background: #fff;
+  color: #444;
+  padding: 7px 13px;
   cursor: pointer;
+}
+
+.chip:hover,
+.chip.active {
+  border-color: #ffe100;
+  background: #fff7c2;
+  font-weight: 700;
 }
 
 .grid {
@@ -263,17 +272,24 @@ function initObserver() {
 }
 
 @media (max-width: 760px) {
-  .feed-page {
-    padding: 6px;
+  .feed-head {
+    min-height: auto;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
   }
 
-  .hero {
-    padding: 14px;
-    border-radius: 16px;
+  .feed-head h1 {
+    font-size: 23px;
   }
 
-  .hero h1 {
-    font-size: 24px;
+  .query :deep(.el-form-item) {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .query :deep(.el-input) {
+    width: 100% !important;
   }
 
   .grid {

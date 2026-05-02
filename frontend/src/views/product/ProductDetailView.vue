@@ -1,40 +1,118 @@
 <template>
-  <div class="page-card">
-    <h2 class="page-title">商品详情</h2>
-    <el-skeleton v-if="loading" :rows="6" animated />
+  <section class="detail-page">
+    <el-skeleton v-if="loading" :rows="10" animated />
 
-    <div v-else-if="product" class="detail-wrap">
-      <div class="cover-box">
-        <el-image v-if="product.cover" :src="toFullImageUrl(product.cover)" fit="cover" class="cover-image" />
-        <div v-else class="cover-placeholder">暂无图片</div>
-      </div>
+    <template v-else-if="product">
+      <section class="seller-bar">
+        <div class="seller-profile">
+          <span class="seller-avatar">{{ sellerInitial }}</span>
+          <div>
+            <div class="seller-name">
+              <strong>{{ product.sellerName || "校园卖家" }}</strong>
+              <em>官方认证</em>
+              <em class="soft">品质保障</em>
+            </div>
+            <p>校园店铺 · 最近上新 · 好评率 {{ praiseRate }}%</p>
+          </div>
+        </div>
+        <el-button round @click="goBack">返回列表</el-button>
+      </section>
 
-      <div class="info-box">
-        <h3>{{ product.name }}</h3>
-        <p class="price">￥{{ Number(product.price || 0).toFixed(2) }}</p>
-        <p>库存：{{ product.stock }}</p>
-        <p>状态：{{ product.statusName }}</p>
-        <p v-if="product.sellerName">卖家：{{ product.sellerName }}</p>
-        <p class="desc">{{ product.description || "暂无商品描述" }}</p>
+      <section class="detail-card">
+        <aside class="thumb-rail">
+          <button
+            v-for="(image, index) in galleryImages"
+            :key="`${image}-${index}`"
+            class="thumb"
+            :class="{ active: activeImage === image }"
+            type="button"
+            @click="activeImage = image"
+          >
+            <img v-if="image" :src="image" :alt="`${product.name}-${index + 1}`" />
+            <span v-else>暂无图片</span>
+          </button>
+        </aside>
 
-        <div class="actions">
-          <span>购买数量：</span>
-          <el-input-number v-model="quantity" :min="1" :max="maxQuantity" @change="recalcPreview" />
+        <div class="image-stage">
+          <div class="image-frame">
+            <img v-if="activeImage" :src="activeImage" :alt="product.name" />
+            <div v-else class="cover-placeholder">暂无图片</div>
+          </div>
+          <div class="image-footer">
+            <span>担保交易</span>
+            <button type="button">举报</button>
+          </div>
         </div>
 
-        <el-space>
-          <el-button type="primary" :disabled="maxQuantity <= 0" @click="handleAddToCart">加入购物车</el-button>
-          <el-button :disabled="maxQuantity <= 0" @click="openBuyNow">立即购买</el-button>
-          <el-button v-if="canChatWithSeller" type="success" plain @click="handleContactSeller">联系卖家</el-button>
-          <el-button text @click="goBack">返回</el-button>
-        </el-space>
-      </div>
-    </div>
+        <article class="info-panel">
+          <div class="price-row">
+            <div>
+              <span class="currency">￥</span>
+              <strong>{{ Number(product.price || 0).toFixed(2) }}</strong>
+              <em>包邮</em>
+            </div>
+            <p>{{ wantCount }}人想要｜{{ viewCount }}浏览</p>
+          </div>
+
+          <div class="service-strip">描述不符包邮退 · 7天无理由退货</div>
+
+          <h1>{{ product.name }}</h1>
+
+          <div class="detail-text">
+            <p>{{ product.description || "暂无商品描述，详情可联系卖家咨询。" }}</p>
+            <p>【库存】当前库存 {{ product.stock ?? 0 }} 件。</p>
+            <p>【状态】{{ product.statusName || "在售" }}。</p>
+            <p>【购买】选择数量后可以加入购物车，也可以直接购买并选择地址与优惠券。</p>
+            <p>【售后】请在下单前确认商品规格与收货信息，售后流程可在订单中心处理。</p>
+          </div>
+
+          <div class="quantity-row">
+            <span>购买数量</span>
+            <el-input-number v-model="quantity" :min="1" :max="maxQuantity" @change="recalcPreview" />
+          </div>
+
+          <div class="action-row">
+            <el-button class="chat-btn" round :disabled="!canChatWithSeller" @click="handleContactSeller">
+              聊一聊
+            </el-button>
+            <el-button class="buy-btn" round :disabled="maxQuantity <= 0" @click="openBuyNow">
+              立即购买
+            </el-button>
+            <el-button class="cart-btn" round :disabled="maxQuantity <= 0" @click="handleAddToCart">
+              加入购物车
+            </el-button>
+          </div>
+        </article>
+      </section>
+
+      <section class="recommend-panel">
+        <div class="section-head">
+          <h2>为你推荐</h2>
+          <el-button text @click="$router.push('/product')">查看更多</el-button>
+        </div>
+        <div v-if="recommendedItems.length" class="recommend-grid">
+          <ProductCard
+            v-for="item in recommendedItems"
+            :key="item.id"
+            :product="item"
+            mode="product"
+            route-base="/product"
+          />
+        </div>
+        <el-empty v-else description="暂无推荐商品" />
+      </section>
+    </template>
 
     <p v-else class="empty-tip">商品不存在</p>
 
     <el-dialog v-model="buyDialogVisible" title="立即购买" width="860px" destroy-on-close>
-      <el-alert type="info" :closable="false" show-icon title="请选择收货地址并可直接使用我的优惠券，选中后应付金额会实时更新。" style="margin-bottom: 12px" />
+      <el-alert
+        type="info"
+        :closable="false"
+        show-icon
+        title="请选择收货地址并可直接使用我的优惠券，选中后应付金额会实时更新。"
+        style="margin-bottom: 12px"
+      />
       <el-form label-width="100px">
         <el-form-item label="收货地址">
           <div v-if="selectedAddress" class="address-box">
@@ -45,7 +123,12 @@
         <el-form-item label="我的优惠券">
           <el-select v-model="selectedVoucherId" placeholder="不使用优惠券" clearable filterable style="width: 100%">
             <el-option :value="null" label="不使用优惠券" />
-            <el-option v-for="voucher in availableVouchers" :key="voucher.id" :value="voucher.id" :label="voucherOptionLabel(voucher)" />
+            <el-option
+              v-for="voucher in availableVouchers"
+              :key="voucher.id"
+              :value="voucher.id"
+              :label="voucherOptionLabel(voucher)"
+            />
           </el-select>
         </el-form-item>
       </el-form>
@@ -72,14 +155,15 @@
         <el-button type="primary" :loading="buySubmitting" @click="confirmBuyNow">提交订单</el-button>
       </template>
     </el-dialog>
-  </div>
+  </section>
 </template>
 
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRoute, useRouter } from "vue-router";
-import { getProductDetailApi } from "@/api/product";
+import ProductCard from "@/components/ProductCard.vue";
+import { getProductDetailApi, getProductListApi } from "@/api/product";
 import { createOrderApi } from "@/api/order";
 import { listAddressesApi } from "@/api/user";
 import { myAvailableVoucherApi } from "@/api/voucher";
@@ -92,6 +176,8 @@ const router = useRouter();
 const loading = ref(false);
 const product = ref(null);
 const quantity = ref(1);
+const activeImage = ref("");
+const recommendations = ref([]);
 const buyDialogVisible = ref(false);
 const buySubmitting = ref(false);
 const selectedAddress = ref(null);
@@ -100,6 +186,17 @@ const selectedVoucherId = ref(null);
 const previewItems = ref([]);
 
 const maxQuantity = computed(() => Number(product.value?.stock || 0));
+const sellerInitial = computed(() => (product.value?.sellerName || "店").slice(0, 1).toUpperCase());
+const praiseRate = computed(() => 90 + (Number(product.value?.id || 0) % 8));
+const wantCount = computed(() => 20 + (Number(product.value?.id || 0) % 31));
+const viewCount = computed(() => 300 + (Number(product.value?.id || 0) % 220));
+const galleryImages = computed(() => {
+  const cover = toFullImageUrl(product.value?.cover || "");
+  return [cover, cover, cover].filter(Boolean);
+});
+const recommendedItems = computed(() => {
+  return recommendations.value.filter((item) => Number(item.id) !== Number(product.value?.id)).slice(0, 4);
+});
 const canChatWithSeller = computed(() => {
   if (!product.value?.sellerUserId) return false;
   return Number(product.value.sellerUserId) !== Number(getUser()?.id);
@@ -111,6 +208,7 @@ const previewPayable = computed(() => Math.max(0.01, previewTotal.value - previe
 
 onMounted(async () => {
   await fetchDetail();
+  await fetchRecommendations();
 });
 
 watch(selectedVoucherId, () => {});
@@ -120,11 +218,19 @@ async function fetchDetail() {
   try {
     const result = await getProductDetailApi(route.params.id);
     product.value = result.data;
+    activeImage.value = toFullImageUrl(product.value?.cover || "");
     if (maxQuantity.value > 0) quantity.value = 1;
   } finally {
     loading.value = false;
   }
 }
+
+async function fetchRecommendations() {
+  const result = await getProductListApi({ pageNum: 1, pageSize: 8 });
+  recommendations.value = result.data?.records || [];
+}
+
+function recalcPreview() {}
 
 function handleAddToCart() {
   if (!product.value) return;
@@ -159,7 +265,7 @@ async function loadMyVouchers() {
   const result = await myAvailableVoucherApi({
     page: 1,
     pageSize: 100,
-    shopIds: shopIds.join(','),
+    shopIds: shopIds.join(","),
     totalAmount: Number(totalAmount.toFixed(2))
   });
   availableVouchers.value = result?.data?.records || [];
@@ -176,7 +282,7 @@ function voucherOptionLabel(voucher) {
   const rule = voucher.type === 1
     ? (voucher.minAmount > 0 ? `满${Number(voucher.minAmount).toFixed(2)}减${Number(voucher.discountAmount).toFixed(2)}` : `无门槛减${Number(voucher.discountAmount).toFixed(2)}`)
     : (voucher.minAmount > 0 ? `满${Number(voucher.minAmount).toFixed(2)}打${(Number(voucher.discountRate) * 10).toFixed(1)}折` : `无门槛打${(Number(voucher.discountRate) * 10).toFixed(1)}折`);
-  return `${voucher.name}｜${rule}`;
+  return `${voucher.name} - ${rule}`;
 }
 
 async function confirmAddressAndPick() {
@@ -252,15 +358,408 @@ function goBack() {
 </script>
 
 <style scoped>
-.detail-wrap { display: grid; grid-template-columns: 280px 1fr; gap: 24px; }
-.cover-box { width: 280px; height: 280px; border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
-.cover-image { width: 100%; height: 100%; }
-.cover-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #6b7280; background: #f9fafb; }
-.price { color: #ef4444; font-size: 22px; font-weight: 700; margin: 8px 0; }
-.desc { color: #4b5563; line-height: 1.8; }
-.actions { margin: 14px 0; }
-.address-box { padding: 10px 12px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fafafa; width: 100%; }
-.pay-summary { margin-top: 12px; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fafafa; display: grid; gap: 6px; font-size: 14px; }
-.payable { font-size: 18px; color: #ef4444; font-weight: 700; }
-@media (max-width: 900px) { .detail-wrap { grid-template-columns: 1fr; } .cover-box { width: 100%; max-width: 360px; margin: 0 auto; } }
+.detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.seller-bar,
+.detail-card,
+.recommend-panel {
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(30, 34, 40, 0.04);
+}
+
+.seller-bar {
+  min-height: 72px;
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.seller-profile {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.seller-avatar {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #20242d;
+  color: #ffe100;
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.seller-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.seller-name strong {
+  color: #20242d;
+  font-size: 17px;
+}
+
+.seller-name em {
+  border-radius: 999px;
+  padding: 2px 7px;
+  background: #00c8df;
+  color: #fff;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.seller-name em.soft {
+  background: #ffe100;
+  color: #20242d;
+}
+
+.seller-profile p {
+  margin: 5px 0 0;
+  color: #6f7682;
+  font-size: 13px;
+}
+
+.detail-card {
+  min-height: 620px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 112px minmax(360px, 1fr) minmax(360px, 540px);
+  gap: 18px;
+}
+
+.thumb-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.thumb {
+  width: 92px;
+  height: 92px;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  padding: 0;
+  overflow: hidden;
+  background: #f1f1f1;
+  color: #8a8f99;
+  cursor: pointer;
+}
+
+.thumb.active {
+  border-color: #20242d;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.image-stage {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  background: #f5f5f5;
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.image-frame {
+  min-height: 560px;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+}
+
+.image-frame img {
+  max-width: 100%;
+  max-height: 560px;
+  object-fit: contain;
+  display: block;
+}
+
+.cover-placeholder {
+  width: 100%;
+  height: 420px;
+  display: grid;
+  place-items: center;
+  color: #7c838f;
+}
+
+.image-footer {
+  height: 36px;
+  padding: 0 14px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  color: #6f7682;
+  font-size: 13px;
+}
+
+.image-footer span {
+  color: #1677ff;
+}
+
+.image-footer button {
+  border: 0;
+  background: transparent;
+  color: #6f7682;
+  cursor: pointer;
+}
+
+.info-panel {
+  min-width: 0;
+  padding: 4px 0 0 24px;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.price-row > div {
+  color: #ff4d00;
+}
+
+.currency {
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.price-row strong {
+  font-size: 34px;
+  line-height: 1;
+}
+
+.price-row em {
+  margin-left: 8px;
+  color: #20242d;
+  font-size: 13px;
+  font-style: normal;
+}
+
+.price-row p {
+  margin: 8px 0 0;
+  color: #9a9fa8;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.service-strip {
+  margin: 14px 0 20px;
+  border-radius: 14px;
+  padding: 13px 16px;
+  background: #f4f4f4;
+  color: #333842;
+  font-size: 14px;
+}
+
+.info-panel h1 {
+  margin: 0 0 24px;
+  color: #20242d;
+  font-size: 22px;
+  line-height: 1.45;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+
+.detail-text {
+  max-height: 290px;
+  overflow: auto;
+  color: #20242d;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.detail-text p {
+  margin: 0 0 8px;
+}
+
+.quantity-row {
+  margin-top: 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #333842;
+}
+
+.action-row {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: 1.1fr 1.2fr 1fr;
+  gap: 0;
+  overflow: hidden;
+  border-radius: 999px;
+}
+
+.action-row :deep(.el-button) {
+  height: 50px;
+  margin: 0;
+  border-radius: 0;
+  border: 0;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.chat-btn {
+  --el-button-bg-color: #ffe100;
+  --el-button-text-color: #20242d;
+  --el-button-hover-bg-color: #ffe83f;
+  --el-button-hover-text-color: #20242d;
+}
+
+.buy-btn {
+  --el-button-bg-color: #333333;
+  --el-button-text-color: #ffffff;
+  --el-button-hover-bg-color: #222222;
+  --el-button-hover-text-color: #ffffff;
+}
+
+.cart-btn {
+  --el-button-bg-color: #f4f4f4;
+  --el-button-text-color: #20242d;
+  --el-button-hover-bg-color: #eeeeee;
+  --el-button-hover-text-color: #20242d;
+}
+
+.recommend-panel {
+  padding: 20px;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.section-head h2 {
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: 0;
+}
+
+.recommend-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.address-box {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fafafa;
+}
+
+.pay-summary {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fafafa;
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.payable {
+  font-size: 18px;
+  color: #ef4444;
+  font-weight: 700;
+}
+
+@media (max-width: 1180px) {
+  .detail-card {
+    grid-template-columns: 92px minmax(0, 1fr);
+  }
+
+  .info-panel {
+    grid-column: 1 / -1;
+    padding: 8px 0 0;
+  }
+
+  .recommend-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .seller-bar {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .detail-card {
+    padding: 12px;
+    grid-template-columns: 1fr;
+  }
+
+  .thumb-rail {
+    order: 2;
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .image-stage {
+    order: 1;
+  }
+
+  .info-panel {
+    order: 3;
+  }
+
+  .image-frame {
+    min-height: 320px;
+  }
+
+  .image-frame img {
+    max-height: 320px;
+  }
+
+  .price-row {
+    display: block;
+  }
+
+  .detail-text {
+    max-height: none;
+    font-size: 15px;
+  }
+
+  .action-row {
+    grid-template-columns: 1fr;
+    border-radius: 16px;
+    gap: 8px;
+    overflow: visible;
+  }
+
+  .action-row :deep(.el-button) {
+    border-radius: 999px;
+  }
+
+  .recommend-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+}
 </style>

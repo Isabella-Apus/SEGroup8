@@ -1,12 +1,10 @@
 :root {
-    --bg-main: #f5f7fb;
-    --bg-grad: radial-gradient(circle at 15% 15%, #ffe9d5 0, transparent 35%),
-        radial-gradient(circle at 85% 0, #e8f6ff 0, transparent 32%),
-        linear-gradient(180deg, #fffaf4 0%, #f5f7fb 100%);
-    --brand-orange: #ff5a1f;
-    --brand-yellow: #ffb11b;
-    --text-main: #202329;
-    --line-soft: #eceef3;
+    --bg-main: #f2f4f6;
+    --bg-grad: #f2f4f6;
+    --brand-orange: #ff4d00;
+    --brand-yellow: #ffe100;
+    --text-main: #20242d;
+    --line-soft: #eeeeee;
     --card-bg: #ffffff;
 }
 
