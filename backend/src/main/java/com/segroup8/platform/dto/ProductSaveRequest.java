@@ -28,6 +28,12 @@ public class ProductSaveRequest {
     @Min(value = 0, message = "库存不能小于0")
     private Integer stock;
 
+    @NotNull(message = "一级分类不能为空")
+    private Integer categoryId;
+
+    @NotNull(message = "二级分类不能为空")
+    private Integer subCategoryId;
+
     private Integer status;
 
     public String getName() {
@@ -68,6 +74,22 @@ public class ProductSaveRequest {
 
     public void setStock(Integer stock) {
         this.stock = stock;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Integer getSubCategoryId() {
+        return subCategoryId;
+    }
+
+    public void setSubCategoryId(Integer subCategoryId) {
+        this.subCategoryId = subCategoryId;
     }
 
     public Integer getStatus() {

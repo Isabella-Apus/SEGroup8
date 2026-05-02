@@ -13,6 +13,10 @@ public class ProductVO {
     private String cover;
     private String description;
     private BigDecimal price;
+    private Integer categoryId;
+    private Integer subCategoryId;
+    private String categoryName;
+    private String subCategoryName;
     private Integer stock;
     private Integer status;
     private String statusName;
@@ -82,6 +86,39 @@ public class ProductVO {
         this.price = price;
     }
 
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Integer getSubCategoryId() {
+        return subCategoryId;
+    }
+
+    public void setSubCategoryId(Integer subCategoryId) {
+        this.subCategoryId = subCategoryId;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getSubCategoryName() {
+        return subCategoryName;
+    }
+
+    public void setSubCategoryName(String subCategoryName) {
+        this.subCategoryName = subCategoryName;
+    }
+
+>>>>>>> main
     public Integer getStock() {
         return stock;
     }

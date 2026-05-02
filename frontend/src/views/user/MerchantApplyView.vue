@@ -18,7 +18,7 @@
                     <el-input v-model="form.storeName" />
                 </el-form-item>
                 <el-form-item label="主营领域" prop="categoryId">
-                    <el-select v-model="form.categoryId" placeholder="请选择主营领域" style="width: 100%">
+                    <el-select v-model="form.categoryId" placeholder="请选择主营领域（一级分类）" style="width: 100%">
                         <el-option v-for="item in categoryOptions" :key="item.value" :label="item.label"
                             :value="item.value" />
                     </el-select>
@@ -80,6 +80,7 @@ import { useRouter } from "vue-router";
 import { getMyMerchantApplicationApi, submitMerchantApplicationApi } from "@/api/merchantApplication";
 import { uploadImageApi } from "@/api/upload";
 import { useUserStore } from "@/stores/user";
+import { MAIN_CATEGORY_OPTIONS } from '@/constants/categories';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -89,13 +90,7 @@ const uploading = ref(false);
 const myApplication = ref(null);
 const isOfficialSeller = ref(false);
 
-const categoryOptions = [
-    { label: "食品", value: 1 },
-    { label: "3C", value: 2 },
-    { label: "美妆", value: 3 },
-    { label: "服装", value: 4 },
-    { label: "运动", value: 5 }
-];
+const categoryOptions = MAIN_CATEGORY_OPTIONS;
 
 const provinceOptions = [
     "北京市", "天津市", "上海市", "重庆市",
@@ -110,7 +105,7 @@ const provinceOptions = [
 
 const form = reactive({
     storeName: "",
-    categoryId: 1,
+    categoryId: null,
     idCardNo: "",
     bankCardNo: "",
     licenseImg: "",
@@ -124,7 +119,7 @@ const form = reactive({
 
 const rules = {
     storeName: [{ required: true, message: "请输入店名", trigger: "blur" }],
-    categoryId: [{ required: true, message: "请选择主营领域", trigger: "change" }],
+    categoryId: [{ required: true, message: "请选择主营领域（一级分类）", trigger: "change" }],
     idCardNo: [{ required: true, message: "请输入身份证号", trigger: "blur" }],
     bankCardNo: [{ required: true, message: "请输入银行卡号", trigger: "blur" }],
     licenseImg: [{ required: true, message: "请上传营业执照图片", trigger: "change" }],
@@ -151,7 +146,7 @@ async function loadMyApplication() {
         if (result.data) {
             Object.assign(form, {
                 storeName: result.data.storeName || "",
-                categoryId: result.data.categoryId || 1,
+                categoryId: result.data.categoryId ?? null,
                 licenseImg: result.data.licenseImg || "",
                 warehouseAddr: result.data.warehouseAddr || "",
                 warehouseProvince: result.data.warehouseProvince || "",

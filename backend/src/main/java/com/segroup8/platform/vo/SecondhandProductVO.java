@@ -13,7 +13,12 @@ public class SecondhandProductVO {
     private String description;
     private BigDecimal originPrice;
     private BigDecimal salePrice;
+    private Integer categoryId;
+    private Integer subCategoryId;
+    private String categoryName;
+    private String subCategoryName;
     private String conditionLevel;
+    private Integer isNegotiable;
     private Integer status;
     private String statusName;
     private LocalDateTime createTime;
@@ -82,12 +87,52 @@ public class SecondhandProductVO {
         this.salePrice = salePrice;
     }
 
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Integer getSubCategoryId() {
+        return subCategoryId;
+    }
+
+    public void setSubCategoryId(Integer subCategoryId) {
+        this.subCategoryId = subCategoryId;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getSubCategoryName() {
+        return subCategoryName;
+    }
+
+    public void setSubCategoryName(String subCategoryName) {
+        this.subCategoryName = subCategoryName;
+    }
+
     public String getConditionLevel() {
         return conditionLevel;
     }
 
     public void setConditionLevel(String conditionLevel) {
         this.conditionLevel = conditionLevel;
+    }
+
+    public Integer getIsNegotiable() {
+        return isNegotiable;
+    }
+
+    public void setIsNegotiable(Integer isNegotiable) {
+        this.isNegotiable = isNegotiable;
     }
 
     public Integer getStatus() {

@@ -58,16 +58,34 @@ const routes = [
                     import("@/views/secondhand/SecondhandListView.vue"),
             },
             {
-                path: "secondhand/:id",
-                name: "secondhandDetail",
+                path: "secondhand/orders",
+                name: "secondhandOrders",
+                redirect: "/secondhand?tab=boughtOrders",
+            },
+            {
+                path: "secondhand/orders/:id",
+                name: "secondhandBuyerOrderDetail",
                 component: () =>
-                    import("@/views/secondhand/SecondhandDetailView.vue"),
+                    import("@/views/secondhand/SecondhandOrderDetailView.vue"),
+                meta: { detailMode: "buyer" },
+            },
+            {
+                path: "secondhand/sold-orders/:id",
+                name: "secondhandSellerOrderDetail",
+                component: () =>
+                    import("@/views/secondhand/SecondhandOrderDetailView.vue"),
+                meta: { detailMode: "seller" },
             },
             {
                 path: "secondhand/publish",
                 name: "secondhandPublish",
+                redirect: "/secondhand?tab=publish",
+            },
+            {
+                path: "secondhand/:id",
+                name: "secondhandDetail",
                 component: () =>
-                    import("@/views/secondhand/SecondhandPublishView.vue"),
+                    import("@/views/secondhand/SecondhandDetailView.vue"),
             },
             {
                 path: "profile",
@@ -183,7 +201,12 @@ const routes = [
                 component: () => import("@/views/seller/SellerProductList.vue"),
             },
             {
-                path: "seller-products/edit/:id?",
+                path: "secondhand-products",
+                name: "merchantSecondhandProducts",
+                component: () =>
+                    import("@/views/merchant/MerchantSecondhandProductsView.vue"),
+            },
+            {                path: "seller-products/edit/:id?",
                 name: "sellerProductEdit",
                 component: () => import("@/views/seller/SellerProductEdit.vue"),
             },

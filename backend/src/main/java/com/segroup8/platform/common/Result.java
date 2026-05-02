@@ -50,4 +50,5 @@ public class Result<T> {
     public static Result<Void> fail(Integer code, String message) {
         return new Result<>(code, message, null);
     }
+
 }

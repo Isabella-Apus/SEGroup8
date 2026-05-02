@@ -44,7 +44,6 @@
           </el-dropdown>
         </nav>
       </div>
-
       <div class="nav-strip">
         <button
           v-for="item in primaryNav"

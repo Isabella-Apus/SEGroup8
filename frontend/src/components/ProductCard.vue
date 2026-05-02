@@ -5,7 +5,7 @@
       <span class="badge">{{ badgeText }}</span>
     </div>
     <div class="content">
-      <h3 class="title">{{ product.name }}</h3>
+      <h3 class="title" v-html="highlightedTitle"></h3>
       <p class="desc">{{ descriptionText }}</p>
       <div class="meta">
         <strong class="price">￥{{ formatPrice(mainPrice) }}</strong>
@@ -35,6 +35,10 @@ const props = defineProps({
   routeBase: {
     type: String,
     default: '/product'
+  },
+  highlightKeyword: {
+    type: String,
+    default: ''
   }
 });
 
@@ -51,6 +55,18 @@ const badgeText = computed(() => {
 
 const descriptionText = computed(() => {
   return props.product.description || '品质好物，支持快速发货';
+});
+
+const highlightedTitle = computed(() => {
+  const source = String(props.product.name || '');
+  const escaped = escapeHtml(source);
+  const keyword = String(props.highlightKeyword || '').trim();
+  if (!keyword) {
+    return escaped;
+  }
+  const escapedKeyword = escapeRegExp(keyword);
+  const reg = new RegExp(`(${escapedKeyword})`, 'ig');
+  return escaped.replace(reg, '<span class="title-highlight">$1</span>');
 });
 
 const mainPrice = computed(() => {
@@ -85,6 +101,19 @@ function goDetail() {
 function formatPrice(value) {
   const num = Number(value || 0);
   return num.toFixed(2);
+}
+
+function escapeHtml(value) {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 </script>
 
@@ -153,6 +182,11 @@ function formatPrice(value) {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.title :deep(.title-highlight) {
+  color: #e6a23c;
+  font-weight: 700;
 }
 
 .desc {

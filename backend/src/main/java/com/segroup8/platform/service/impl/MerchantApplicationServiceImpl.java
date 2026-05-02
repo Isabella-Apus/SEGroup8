@@ -9,17 +9,18 @@ import com.segroup8.platform.dto.AdminMerchantApplicationQueryRequest;
 import com.segroup8.platform.dto.MerchantApplicationRejectRequest;
 import com.segroup8.platform.dto.MerchantApplicationSubmitRequest;
 import com.segroup8.platform.entity.MerchantApplication;
+import com.segroup8.platform.entity.Notification;
 import com.segroup8.platform.entity.Shop;
 import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.MerchantApplicationMapper;
+import com.segroup8.platform.mapper.NotificationMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.MerchantApplicationService;
-import com.segroup8.platform.service.NotificationService;
 import com.segroup8.platform.vo.MerchantApplicationVO;
 import com.segroup8.platform.vo.PageVO;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
@@ -31,16 +32,16 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
 
     private final MerchantApplicationMapper merchantApplicationMapper;
     private final UserMapper userMapper;
-    private final NotificationService notificationService;
+    private final NotificationMapper notificationMapper;
     private final ShopMapper shopMapper;
 
     public MerchantApplicationServiceImpl(MerchantApplicationMapper merchantApplicationMapper,
             UserMapper userMapper,
-            NotificationService notificationService,
+            NotificationMapper notificationMapper,
             ShopMapper shopMapper) {
         this.merchantApplicationMapper = merchantApplicationMapper;
         this.userMapper = userMapper;
-        this.notificationService = notificationService;
+        this.notificationMapper = notificationMapper;
         this.shopMapper = shopMapper;
     }
 
@@ -81,10 +82,11 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
     @Override
     public MerchantApplicationVO getMyApplication() {
         Long userId = requireUserId();
-        MerchantApplication application = merchantApplicationMapper.selectOne(new LambdaQueryWrapper<MerchantApplication>()
-                .eq(MerchantApplication::getUserId, userId)
-                .orderByDesc(MerchantApplication::getId)
-                .last("limit 1"));
+        MerchantApplication application = merchantApplicationMapper
+                .selectOne(new LambdaQueryWrapper<MerchantApplication>()
+                        .eq(MerchantApplication::getUserId, userId)
+                        .orderByDesc(MerchantApplication::getId)
+                        .last("limit 1"));
         if (application == null) {
             return null;
         }
@@ -103,8 +105,7 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
         Page<MerchantApplication> page = merchantApplicationMapper
                 .selectPage(Page.of(request.getPageNum(), request.getPageSize()), wrapper);
         List<MerchantApplicationVO> records = page.getRecords().stream()
-                .map(app -> toVO(app, userMapper.selectById(app.getUserId()), true))
-                .toList();
+            .map(app -> toVO(app, userMapper.selectById(app.getUserId()), true)).toList();
 
         PageVO<MerchantApplicationVO> result = new PageVO<>();
         result.setTotal(page.getTotal());
@@ -140,10 +141,14 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
         userMapper.updateById(user);
 
         upsertShopByApplication(app);
-        notificationService.createNotification(
-                user.getId(),
-                "入驻审核结果",
-                "恭喜，您的入驻申请已通过，现可进入卖家工作台。");
+
+        Notification notification = new Notification();
+        notification.setUserId(user.getId());
+        notification.setTitle("入驻审核结果");
+        notification.setContent("恭喜，您的入驻申请已通过，现可进入卖家工作台。");
+        notification.setIsRead(0);
+        notification.setCreateTime(LocalDateTime.now());
+        notificationMapper.insert(notification);
     }
 
     @Override
@@ -157,10 +162,13 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
         app.setRejectReason(request.getRejectReason());
         merchantApplicationMapper.updateById(app);
 
-        notificationService.createNotification(
-                app.getUserId(),
-                "入驻审核结果",
-                "您的入驻申请被驳回，原因：" + request.getRejectReason());
+        Notification notification = new Notification();
+        notification.setUserId(app.getUserId());
+        notification.setTitle("入驻审核结果");
+        notification.setContent("您的入驻申请被驳回，原因：" + request.getRejectReason());
+        notification.setIsRead(0);
+        notification.setCreateTime(LocalDateTime.now());
+        notificationMapper.insert(notification);
     }
 
     private MerchantApplicationVO toVO(MerchantApplication app, User user, boolean includeSensitive) {

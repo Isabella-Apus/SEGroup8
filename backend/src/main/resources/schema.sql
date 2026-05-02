@@ -1243,29 +1243,20 @@ PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 -- voucher 表（优惠券功能）
 CREATE TABLE IF NOT EXISTS `voucher` (
-  `id` BIGINT NOT NULL AUTO_INCREMENT,
-  `issuer_type` TINYINT NOT NULL DEFAULT 1,
-  `voucher_type` TINYINT NOT NULL DEFAULT 1,
-  `issuer_user_id` BIGINT DEFAULT NULL,
-  `scope_type` TINYINT NOT NULL DEFAULT 1,
-  `shop_id` BIGINT DEFAULT NULL,
-  `product_id` BIGINT DEFAULT NULL,
-  `can_stack` TINYINT(1) NOT NULL DEFAULT 0,
-  `name` VARCHAR(100) NOT NULL,
-  `type` TINYINT NOT NULL DEFAULT 1,
+  `id`              BIGINT NOT NULL AUTO_INCREMENT,
+  `shop_id`         BIGINT NOT NULL,
+  `name`            VARCHAR(100) NOT NULL,
+  `type`            TINYINT NOT NULL DEFAULT 1,
   `discount_amount` DECIMAL(10,2) DEFAULT NULL,
-  `discount_rate` DECIMAL(4,2) DEFAULT NULL,
-  `min_amount` DECIMAL(10,2) NOT NULL DEFAULT 0,
-  `total_count` INT NOT NULL DEFAULT 0,
-  `received_count` INT NOT NULL DEFAULT 0,
-  `used_count` INT NOT NULL DEFAULT 0,
-  `grab_start_time` DATETIME DEFAULT NULL,
-  `grab_end_time` DATETIME DEFAULT NULL,
-  `start_time` DATETIME DEFAULT NULL,
-  `end_time` DATETIME DEFAULT NULL,
-  `status` TINYINT NOT NULL DEFAULT 1,
-  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `discount_rate`   DECIMAL(4,2)  DEFAULT NULL,
+  `min_amount`      DECIMAL(10,2) NOT NULL DEFAULT 0,
+  `total_count`     INT NOT NULL DEFAULT 0,
+  `used_count`      INT NOT NULL DEFAULT 0,
+  `start_time`      DATETIME NOT NULL,
+  `end_time`        DATETIME NOT NULL,
+  `status`          TINYINT NOT NULL DEFAULT 1,
+  `create_time`     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time`     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_voucher_shop_id` (`shop_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -1615,4 +1606,4 @@ CREATE TABLE IF NOT EXISTS `user_block` (
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_block` (`blocker_id`, `blocked_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
