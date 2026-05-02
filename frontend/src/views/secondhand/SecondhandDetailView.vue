@@ -52,7 +52,7 @@
           <el-button v-if="canChatWithSeller && auctionInfo && auctionInfo.status === 'ONGOING'" type="danger" plain @click="openBidDialog">
             参与拍卖
           </el-button>
-          <el-button type="primary" plain @click="router.push('/secondhand?tab=publish')">我也要发布</el-button>
+          <el-button type="primary" plain @click="router.push('/secondhand/publish')">我也要发布</el-button>
           <el-button text @click="router.push('/secondhand')">返回</el-button>
         </el-space>
 

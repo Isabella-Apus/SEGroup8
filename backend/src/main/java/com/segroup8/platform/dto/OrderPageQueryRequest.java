@@ -99,5 +99,4 @@ public class OrderPageQueryRequest {
     public void setProductType(String productType) {
         this.productType = productType;
     }
->>>>>>> main
 }

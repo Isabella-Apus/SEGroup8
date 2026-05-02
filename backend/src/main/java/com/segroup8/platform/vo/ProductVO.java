@@ -118,7 +118,6 @@ public class ProductVO {
         this.subCategoryName = subCategoryName;
     }
 
->>>>>>> main
     public Integer getStock() {
         return stock;
     }

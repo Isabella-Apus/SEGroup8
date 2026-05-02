@@ -37,6 +37,8 @@ public class ProductController {
         this.productService = productService;
         this.searchService = searchService;
         this.searchBehaviorService = searchBehaviorService;
+    }
+
     @Operation(summary = "分页查询在售商品")
     @GetMapping("/list")
     public Result<PageVO<ProductVO>> list(@Valid @ModelAttribute ProductPageQueryRequest request) {
