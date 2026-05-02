@@ -3,10 +3,10 @@
     <header class="seller-topbar">
       <div class="topbar-inner">
         <button class="seller-brand" type="button" @click="router.push('/merchant')">
-          <span class="brand-mark">卖</span>
+          <span class="brand-mark">kg</span>
           <span>
             <strong>卖家中心</strong>
-            <em>校园闲置商家中心</em>
+            <em>kinda goods 商家中心</em>
           </span>
         </button>
 
@@ -111,7 +111,9 @@ function isActive(path) {
   place-items: center;
   border: 3px solid #20242d;
   border-radius: 14px;
-  font-size: 28px;
+  font-size: 18px;
+  letter-spacing: 0;
+  text-transform: lowercase;
   line-height: 1;
   font-weight: 900;
 }

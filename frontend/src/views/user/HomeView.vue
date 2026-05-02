@@ -2,7 +2,7 @@
   <section class="home-page">
     <section class="hero-panel">
       <div class="hero-copy">
-        <p>校园好物正在流转</p>
+        <p>kinda goods 正在流转</p>
         <h1>买新品、淘闲置、管订单，都在一个清爽首页里</h1>
         <div class="hero-actions">
           <el-button type="primary" round @click="$router.push('/product')">逛商品市场</el-button>
@@ -20,7 +20,7 @@
         >
           <img v-if="item.cover" :src="resolveCover(item.cover)" :alt="item.name" />
           <span v-else class="feature-placeholder"></span>
-          <strong>{{ item.name || '校园好物' }}</strong>
+          <strong>{{ item.name || 'kinda goods 好物' }}</strong>
           <em>￥{{ formatPrice(item.price) }}</em>
         </button>
 
@@ -72,7 +72,7 @@
       </div>
 
       <div v-else class="empty-recommend">
-        <div class="empty-mark">闲</div>
+        <div class="empty-mark">kg</div>
         <p>暂时没有推荐商品</p>
         <el-button type="warning" round @click="$router.push('/secondhand/publish')">先发布一个闲置</el-button>
       </div>

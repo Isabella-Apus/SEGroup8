@@ -303,7 +303,9 @@ a {
   place-items: center;
   border: 3px solid #20242d;
   border-radius: 14px;
-  font-size: 28px;
+  font-size: 18px;
+  letter-spacing: 0;
+  text-transform: lowercase;
   line-height: 1;
   font-weight: 900;
 }
@@ -735,7 +737,9 @@ a {
   border-radius: 14px;
   background: linear-gradient(135deg, #ffe100, #ff9d5c);
   font-weight: 900;
-  font-size: 24px;
+  font-size: 17px;
+  letter-spacing: 0;
+  text-transform: lowercase;
 }
 
 .minimal-brand strong {

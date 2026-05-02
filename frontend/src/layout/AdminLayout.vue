@@ -3,10 +3,10 @@
     <header class="admin-topbar">
       <div class="admin-topbar-inner">
         <button class="admin-brand" type="button" @click="router.push('/admin')">
-          <span class="brand-mark">管</span>
+          <span class="brand-mark">kg</span>
           <span>
             <strong>管理后台</strong>
-            <em>校园闲置平台控制台</em>
+            <em>kinda goods 控制台</em>
           </span>
         </button>
 
@@ -117,7 +117,9 @@ function logout() {
   place-items: center;
   border: 3px solid #20242d;
   border-radius: 14px;
-  font-size: 28px;
+  font-size: 18px;
+  letter-spacing: 0;
+  text-transform: lowercase;
   line-height: 1;
   font-weight: 900;
 }

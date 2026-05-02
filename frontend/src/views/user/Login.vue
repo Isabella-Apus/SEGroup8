@@ -13,8 +13,8 @@
         <main class="minimal-card">
             <div class="trace-ring" aria-hidden="true"></div>
             <button class="minimal-brand" type="button" @click="router.push('/')">
-                <span>闲</span>
-                <strong>校园闲置</strong>
+                <span>kg</span>
+                <strong>kinda goods</strong>
             </button>
 
             <section class="minimal-form">
@@ -179,7 +179,9 @@ async function handleLogin() {
     background: linear-gradient(135deg, #ffe100, #ff9d5c);
     border-radius: 14px;
     font-weight: 900;
-    font-size: 24px;
+    font-size: 17px;
+    letter-spacing: 0;
+    text-transform: lowercase;
 }
 
 .minimal-brand strong {

@@ -3,8 +3,8 @@
     <header class="market-header">
       <div class="header-inner">
         <button class="brand" type="button" @click="go('/')">
-          <span class="brand-mark">闲</span>
-          <span class="brand-name">校园闲置</span>
+          <span class="brand-mark">kg</span>
+          <span class="brand-name">kinda goods</span>
         </button>
 
         <form class="search-bar" @submit.prevent="submitSearch">
@@ -182,7 +182,9 @@ function handleUserCommand(command) {
   place-items: center;
   border: 3px solid #20242d;
   border-radius: 14px;
-  font-size: 28px;
+  font-size: 18px;
+  letter-spacing: 0;
+  text-transform: lowercase;
   line-height: 1;
 }
 

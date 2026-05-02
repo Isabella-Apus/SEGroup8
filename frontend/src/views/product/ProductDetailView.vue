@@ -8,11 +8,11 @@
           <span class="seller-avatar">{{ sellerInitial }}</span>
           <div>
             <div class="seller-name">
-              <strong>{{ product.sellerName || "校园卖家" }}</strong>
+              <strong>{{ product.sellerName || "kinda goods 卖家" }}</strong>
               <em>官方认证</em>
               <em class="soft">品质保障</em>
             </div>
-            <p>校园店铺 · 最近上新 · 好评率 {{ praiseRate }}%</p>
+            <p>kinda goods 店铺 · 最近上新 · 好评率 {{ praiseRate }}%</p>
           </div>
         </div>
         <el-button round @click="goBack">返回列表</el-button>
@@ -39,8 +39,8 @@
             <div v-else class="cover-placeholder">暂无图片</div>
           </div>
           <div class="image-footer">
-            <span>担保交易</span>
-            <button type="button">举报</button>
+            <button class="trust-link" type="button" @click="openGuaranteeInfo">担保交易</button>
+            <button type="button" @click="openReportDialog">举报</button>
           </div>
         </div>
 
@@ -105,6 +105,35 @@
 
     <p v-else class="empty-tip">商品不存在</p>
 
+    <el-dialog v-model="reportDialogVisible" title="举报卖家" width="480px" append-to-body>
+      <el-form :model="reportForm" label-width="90px" @submit.prevent>
+        <el-form-item label="举报类型" required>
+          <el-select v-model="reportForm.reasonType" placeholder="请选择举报类型" style="width: 100%">
+            <el-option label="诈骗/虚假交易" value="FRAUD" />
+            <el-option label="商品与描述不符" value="FAKE_ITEM" />
+            <el-option label="态度恶劣/骚扰" value="BAD_ATTITUDE" />
+            <el-option label="退款纠纷" value="REFUND_ABUSE" />
+            <el-option label="刷单/广告骚扰" value="SPAM" />
+            <el-option label="其他" value="OTHER" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="补充说明">
+          <el-input
+            v-model="reportForm.reasonDesc"
+            type="textarea"
+            :rows="4"
+            maxlength="500"
+            show-word-limit
+            placeholder="请描述你遇到的问题，便于管理员审核"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="reportDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="reportSubmitting" @click="handleSubmitReport">提交举报</el-button>
+      </template>
+    </el-dialog>
+
     <el-dialog v-model="buyDialogVisible" title="立即购买" width="860px" destroy-on-close>
       <el-alert
         type="info"
@@ -165,6 +194,7 @@ import { useRoute, useRouter } from "vue-router";
 import ProductCard from "@/components/ProductCard.vue";
 import { getProductDetailApi, getProductListApi } from "@/api/product";
 import { createOrderApi } from "@/api/order";
+import { submitReportApi } from "@/api/credit";
 import { listAddressesApi } from "@/api/user";
 import { myAvailableVoucherApi } from "@/api/voucher";
 import { addToCart, removeFromCart } from "@/utils/cart";
@@ -184,6 +214,9 @@ const selectedAddress = ref(null);
 const availableVouchers = ref([]);
 const selectedVoucherId = ref(null);
 const previewItems = ref([]);
+const reportDialogVisible = ref(false);
+const reportSubmitting = ref(false);
+const reportForm = ref({ reasonType: "", reasonDesc: "" });
 
 const maxQuantity = computed(() => Number(product.value?.stock || 0));
 const sellerInitial = computed(() => (product.value?.sellerName || "店").slice(0, 1).toUpperCase());
@@ -200,6 +233,11 @@ const recommendedItems = computed(() => {
 const canChatWithSeller = computed(() => {
   if (!product.value?.sellerUserId) return false;
   return Number(product.value.sellerUserId) !== Number(getUser()?.id);
+});
+const sellerUserId = computed(() => product.value?.sellerUserId || product.value?.sellerId || product.value?.merchantUserId || null);
+const canReportSeller = computed(() => {
+  if (!sellerUserId.value) return false;
+  return Number(sellerUserId.value) !== Number(getUser()?.id);
 });
 const previewTotal = computed(() => previewItems.value.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0), 0));
 const selectedVoucher = computed(() => availableVouchers.value.find((v) => v.id === selectedVoucherId.value) || null);
@@ -231,6 +269,57 @@ async function fetchRecommendations() {
 }
 
 function recalcPreview() {}
+
+function openGuaranteeInfo() {
+  ElMessageBox.alert(
+    "平台会在下单后先托管交易资金，买家确认收货后再结算给卖家。若商品存在描述不符、未发货等问题，可以在订单售后中发起处理。",
+    "担保交易说明",
+    {
+      confirmButtonText: "知道了",
+      type: "info",
+    }
+  );
+}
+
+function openReportDialog() {
+  if (!getUser()?.id) {
+    ElMessage.warning("请先登录后再举报");
+    router.push("/login");
+    return;
+  }
+  if (!sellerUserId.value) {
+    ElMessage.warning("当前商品缺少卖家信息，暂时无法举报");
+    return;
+  }
+  if (!canReportSeller.value) {
+    ElMessage.warning("不能举报自己发布的商品");
+    return;
+  }
+  reportForm.value = { reasonType: "", reasonDesc: "" };
+  reportDialogVisible.value = true;
+}
+
+async function handleSubmitReport() {
+  if (!reportForm.value.reasonType) {
+    ElMessage.warning("请选择举报类型");
+    return;
+  }
+  reportSubmitting.value = true;
+  try {
+    await submitReportApi({
+      reportedId: sellerUserId.value,
+      tradeContext: "SHOP",
+      reasonType: reportForm.value.reasonType,
+      reasonDesc: reportForm.value.reasonDesc,
+    });
+    ElMessage.success("举报已提交，等待管理员审核");
+    reportDialogVisible.value = false;
+  } catch (e) {
+    ElMessage.error(e?.response?.data?.message || "举报提交失败");
+  } finally {
+    reportSubmitting.value = false;
+  }
+}
 
 function handleAddToCart() {
   if (!product.value) return;
@@ -513,7 +602,7 @@ function goBack() {
   font-size: 13px;
 }
 
-.image-footer span {
+.image-footer .trust-link {
   color: #1677ff;
 }
 
@@ -522,6 +611,11 @@ function goBack() {
   background: transparent;
   color: #6f7682;
   cursor: pointer;
+}
+
+.image-footer button:disabled {
+  color: #b5bac2;
+  cursor: not-allowed;
 }
 
 .info-panel {
