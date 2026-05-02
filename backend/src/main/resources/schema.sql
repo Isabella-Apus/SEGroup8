@@ -316,6 +316,11 @@ CREATE TABLE IF NOT EXISTS `order_info` (
   `pay_method` VARCHAR(30) DEFAULT NULL,
   `delivery_no` VARCHAR(60) DEFAULT NULL,
   `remark` VARCHAR(255) DEFAULT NULL,
+  `voucher_id` BIGINT DEFAULT NULL,
+  `voucher_discount_amount` DECIMAL(10,2) NOT NULL DEFAULT 0,
+  `seller_bear_amount` DECIMAL(10,2) NOT NULL DEFAULT 0,
+  `platform_bear_amount` DECIMAL(10,2) NOT NULL DEFAULT 0,
+  `payable_amount` DECIMAL(10,2) DEFAULT NULL,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -618,6 +623,76 @@ SET @order_version_add_sql = IF(
 PREPARE stmt_order_add_version FROM @order_version_add_sql;
 EXECUTE stmt_order_add_version;
 DEALLOCATE PREPARE stmt_order_add_version;
+
+SET @order_voucher_id_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'voucher_id'
+);
+SET @order_voucher_id_sql = IF(
+  @order_voucher_id_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `voucher_id` BIGINT DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_voucher_id FROM @order_voucher_id_sql;
+EXECUTE stmt_order_voucher_id;
+DEALLOCATE PREPARE stmt_order_voucher_id;
+
+SET @order_voucher_discount_amount_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'voucher_discount_amount'
+);
+SET @order_voucher_discount_amount_sql = IF(
+  @order_voucher_discount_amount_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `voucher_discount_amount` DECIMAL(10,2) NOT NULL DEFAULT 0',
+  'SELECT 1'
+);
+PREPARE stmt_order_voucher_discount_amount FROM @order_voucher_discount_amount_sql;
+EXECUTE stmt_order_voucher_discount_amount;
+DEALLOCATE PREPARE stmt_order_voucher_discount_amount;
+
+SET @order_seller_bear_amount_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'seller_bear_amount'
+);
+SET @order_seller_bear_amount_sql = IF(
+  @order_seller_bear_amount_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `seller_bear_amount` DECIMAL(10,2) NOT NULL DEFAULT 0',
+  'SELECT 1'
+);
+PREPARE stmt_order_seller_bear_amount FROM @order_seller_bear_amount_sql;
+EXECUTE stmt_order_seller_bear_amount;
+DEALLOCATE PREPARE stmt_order_seller_bear_amount;
+
+SET @order_platform_bear_amount_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'platform_bear_amount'
+);
+SET @order_platform_bear_amount_sql = IF(
+  @order_platform_bear_amount_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `platform_bear_amount` DECIMAL(10,2) NOT NULL DEFAULT 0',
+  'SELECT 1'
+);
+PREPARE stmt_order_platform_bear_amount FROM @order_platform_bear_amount_sql;
+EXECUTE stmt_order_platform_bear_amount;
+DEALLOCATE PREPARE stmt_order_platform_bear_amount;
+
+SET @order_payable_amount_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'payable_amount'
+);
+SET @order_payable_amount_sql = IF(
+  @order_payable_amount_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `payable_amount` DECIMAL(10,2) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_payable_amount FROM @order_payable_amount_sql;
+EXECUTE stmt_order_payable_amount;
+DEALLOCATE PREPARE stmt_order_payable_amount;
 
 CREATE TABLE IF NOT EXISTS `order_after_sale_log` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
