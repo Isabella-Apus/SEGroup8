@@ -154,7 +154,7 @@ function goDetail(id, toAuction = false) {
 }
 
 function goPublish() {
-  router.push("/secondhand?tab=publish");
+  router.push("/secondhand/publish");
 }
 
 async function toggleStatus(row, status) {
@@ -259,4 +259,3 @@ function toFullImageUrl(url) {
   justify-content: flex-end;
 }
 </style>
-

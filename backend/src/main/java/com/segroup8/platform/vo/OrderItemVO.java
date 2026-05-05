@@ -8,7 +8,8 @@ public class OrderItemVO {
     private Long productId;
     private Long sellerUserId;
     private String sellerName;
-    private String productName;    private String productType;
+    private String productName;
+    private String productType;
     private String conditionLevel;
     private BigDecimal price;
     private Integer quantity;
@@ -46,7 +47,8 @@ public class OrderItemVO {
     }
 
     public String getProductName() {
-        return productName;    }
+        return productName;
+    }
 
     public void setProductName(String productName) {
         this.productName = productName;

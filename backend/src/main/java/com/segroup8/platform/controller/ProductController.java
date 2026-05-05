@@ -33,9 +33,7 @@ public class ProductController {
     private final SearchService searchService;
     private final SearchBehaviorService searchBehaviorService;
 
-    public ProductController(ProductService productService,
-            SearchService searchService,
-            SearchBehaviorService searchBehaviorService) {
+    public ProductController(ProductService productService, SearchService searchService, SearchBehaviorService searchBehaviorService) {
         this.productService = productService;
         this.searchService = searchService;
         this.searchBehaviorService = searchBehaviorService;

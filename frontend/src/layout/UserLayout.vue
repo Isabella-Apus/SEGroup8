@@ -1,104 +1,355 @@
 <template>
-  <el-container class="user-layout">
-    <el-header class="layout-header">
-      <strong class="brand">购物与二手交易平台</strong>
-      <div class="header-actions">
-        <el-space>
-          <span class="nickname">{{ userStore.userInfo?.nickname || userStore.userInfo?.username || "游客" }}</span>
-          <el-button size="small" @click="goProfile">个人中心</el-button>
-          <el-button size="small" type="danger" @click="handleLogout">退出登录</el-button>
-        </el-space>
+  <div class="market-shell">
+    <header class="market-header">
+      <div class="header-inner">
+        <button class="brand" type="button" @click="go('/')">
+          <span class="brand-mark">kg</span>
+          <span class="brand-name">kinda goods</span>
+        </button>
+
+        <form class="search-bar" @submit.prevent="submitSearch">
+          <input
+            v-model="keyword"
+            type="search"
+            placeholder="搜索商品、闲置、教材、数码好物"
+            aria-label="搜索商品"
+          />
+          <button type="submit">搜索</button>
+        </form>
+
+        <nav class="header-actions" aria-label="顶部快捷入口">
+          <button type="button" @click="go('/cart')">购物车</button>
+          <button type="button" @click="go('/order')">订单</button>
+          <button v-if="!userStore.isLoggedIn" class="user-entry" type="button" @click="go('/login')">
+            <span class="avatar">{{ avatarText }}</span>
+            <span>{{ displayName }}</span>
+          </button>
+          <el-dropdown v-else trigger="click" placement="bottom-end" @command="handleUserCommand">
+            <button class="user-entry" type="button">
+              <span class="avatar">{{ avatarText }}</span>
+              <span>{{ displayName }}</span>
+            </button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  v-for="item in profileItems"
+                  :key="item.path"
+                  :command="item.path"
+                >
+                  {{ item.label }}
+                </el-dropdown-item>
+                <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </nav>
       </div>
-    </el-header>
-    <el-container>
-      <el-aside width="230px" class="layout-aside">
-        <el-menu :default-active="$route.path" router class="layout-menu">
-          <el-menu-item index="/">首页</el-menu-item>
-          <el-menu-item index="/product">商品</el-menu-item>
-          <el-menu-item index="/cart">购物车</el-menu-item>
-          <el-menu-item index="/order">我的订单</el-menu-item>
-          <el-menu-item index="/secondhand">二手交易</el-menu-item>          <el-menu-item index="/messages">站内消息</el-menu-item>
-          <el-menu-item index="/notifications">通知</el-menu-item>
-          <el-menu-item index="/profile">个人资料</el-menu-item>
-          <el-menu-item index="/addresses">地址管理</el-menu-item>
-          <el-menu-item index="/my-reviews">我的评价</el-menu-item>
-          <el-menu-item index="/browse-history">浏览记录</el-menu-item>
-          <el-menu-item index="/vouchers">优惠券中心</el-menu-item>
-          <el-menu-item index="/after-sale">退款/售后</el-menu-item>
-          <el-menu-item index="/credit">我的信用</el-menu-item>
-          <el-menu-item v-if="userStore.currentRole === 'OFFICIAL_SELLER'" index="/merchant">进入卖家工作台</el-menu-item>
-          <el-menu-item v-else index="/merchant-apply">申请成为卖家</el-menu-item>
-        </el-menu>
-      </el-aside>
-      <el-main class="layout-main fade-in-up">
-        <router-view />
-      </el-main>
-    </el-container>
-  </el-container>
+      <div class="nav-strip">
+        <button
+          v-for="item in primaryNav"
+          :key="item.path"
+          class="nav-chip"
+          :class="{ active: isActive(item.path) }"
+          type="button"
+          @click="go(item.path)"
+        >
+          {{ item.label }}
+        </button>
+      </div>
+    </header>
+
+    <main class="page-stage fade-in-up">
+      <router-view />
+    </main>
+  </div>
 </template>
 
 <script setup>
-import { useRouter } from "vue-router";
+import { computed, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useUserStore } from "@/stores/user";
 
 const router = useRouter();
+const route = useRoute();
 const userStore = useUserStore();
+const keyword = ref("");
 
-function handleLogout() {
-  userStore.logout();
-  router.push("/login");
+const primaryNav = [
+  { label: "首页", path: "/" },
+  { label: "商品市场", path: "/product" },
+  { label: "二手闲置", path: "/secondhand" },
+  { label: "发布闲置", path: "/secondhand/publish" },
+  { label: "领券中心", path: "/vouchers/claim" },
+  { label: "消息", path: "/messages" },
+  { label: "通知", path: "/notifications" },
+  { label: "卖家工作台", path: "/merchant" },
+  { label: "管理后台", path: "/admin" },
+];
+
+const profileItems = [
+  { label: "个人资料", path: "/profile" },
+  { label: "地址管理", path: "/addresses" },
+  { label: "我的订单", path: "/order" },
+  { label: "购物车", path: "/cart" },
+  { label: "我的评价", path: "/my-reviews" },
+  { label: "浏览记录", path: "/browse-history" },
+  { label: "我的优惠券", path: "/vouchers" },
+  { label: "售后 / 退款", path: "/after-sale" },
+  { label: "我的信用", path: "/credit" },
+  { label: "站内消息", path: "/messages" },
+  { label: "通知", path: "/notifications" },
+  { label: "申请成为卖家", path: "/merchant-apply" },
+];
+
+const displayName = computed(() => {
+  if (!userStore.isLoggedIn) return "登录";
+  return userStore.userInfo?.nickname || userStore.userInfo?.username || "我的";
+});
+
+const avatarText = computed(() => displayName.value.slice(0, 1).toUpperCase());
+
+function go(path) {
+  router.push(path);
 }
 
-function goProfile() {
-  router.push("/profile");
+function isActive(path) {
+  if (path === "/") return route.path === "/";
+  return route.path.startsWith(path);
+}
+
+function submitSearch() {
+  const value = keyword.value.trim();
+  router.push(value ? { path: "/product", query: { keyword: value } } : "/product");
+}
+
+function handleUserCommand(command) {
+  if (command === "logout") {
+    userStore.logout();
+    router.push("/login");
+    return;
+  }
+  router.push(command);
 }
 </script>
 
 <style scoped>
-.user-layout {
+.market-shell {
   min-height: 100vh;
+  background: #f2f4f6;
 }
 
-.layout-header {
-  display: flex;
-  justify-content: space-between;
+.market-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: #ffe100;
+  box-shadow: 0 2px 12px rgba(31, 35, 43, 0.08);
+}
+
+.header-inner {
+  width: min(1440px, calc(100% - 44px));
+  height: 76px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 180px minmax(280px, 1fr) auto;
   align-items: center;
-  height: 62px;
-  background: linear-gradient(120deg, #ffffff 0%, #f4faf8 100%);
-  border-bottom: 1px solid #e2eaf3;
-  box-shadow: 0 3px 14px rgba(18, 43, 82, 0.06);
+  gap: 22px;
+}
+
+.brand,
+.header-actions button,
+.nav-chip {
+  font: inherit;
 }
 
 .brand {
+  border: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  color: #20242d;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.brand-mark {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border: 3px solid #20242d;
+  border-radius: 14px;
   font-size: 18px;
-  letter-spacing: 0.3px;
+  letter-spacing: 0;
+  text-transform: lowercase;
+  line-height: 1;
 }
 
-.nickname {
-  color: #4a5a72;
+.brand-name {
+  font-size: 24px;
+  white-space: nowrap;
 }
 
-.layout-aside {
-  border-right: 1px solid #e2eaf3;
-  background: #fbfdff;
+.search-bar {
+  height: 42px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  border: 2px solid #20242d;
+  border-radius: 999px;
+  background: #fff;
+  overflow: hidden;
 }
 
-.layout-menu {
-  border-right: 0;
-  padding-top: 8px;
+.search-bar input {
+  min-width: 0;
+  flex: 1;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  padding: 0 20px;
+  background: transparent;
+  color: #20242d;
+  font-size: 15px;
 }
 
-.layout-main {
-  padding: 18px;
+.search-bar button {
+  height: 34px;
+  margin-right: 4px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 18px;
+  background: #20242d;
+  color: #ffe100;
+  cursor: pointer;
+  font-weight: 800;
 }
 
-@media (max-width: 900px) {
-  .layout-aside {
-    width: 86px !important;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-actions > button,
+.user-entry {
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.58);
+  color: #20242d;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.header-actions > button:hover,
+.user-entry:hover {
+  background: #fff;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #20242d;
+  color: #ffe100;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.nav-strip {
+  width: min(1440px, calc(100% - 44px));
+  margin: 0 auto;
+  padding: 0 0 12px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.nav-chip {
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 14px;
+  background: transparent;
+  color: #2b2f38;
+  cursor: pointer;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.nav-chip:hover,
+.nav-chip.active {
+  background: #fff;
+}
+
+.page-stage {
+  width: min(1440px, calc(100% - 44px));
+  margin: 18px auto 32px;
+  min-width: 0;
+}
+
+@media (max-width: 1180px) {
+  .header-inner {
+    grid-template-columns: 150px minmax(220px, 1fr) auto;
+    gap: 14px;
   }
 
-  .brand {
-    font-size: 15px;
+  .brand-name {
+    display: none;
+  }
+
+  .header-actions > button:first-child {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .header-inner {
+    width: calc(100% - 20px);
+    height: auto;
+    padding: 10px 0;
+    grid-template-columns: auto 1fr;
+  }
+
+  .brand-mark {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+
+  .search-bar {
+    grid-column: 1 / -1;
+    order: 3;
+  }
+
+  .header-actions {
+    justify-content: flex-end;
+  }
+
+  .header-actions > button:nth-child(n + 2) {
+    display: none;
+  }
+
+  .user-entry span:last-child {
+    display: none;
+  }
+
+  .nav-strip,
+  .page-stage {
+    width: calc(100% - 16px);
+  }
+
+  .page-stage {
+    margin-top: 10px;
   }
 }
 </style>

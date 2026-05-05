@@ -8,7 +8,7 @@
       <h3 class="title" v-html="highlightedTitle"></h3>
       <p class="desc">{{ descriptionText }}</p>
       <div class="meta">
-        <strong class="price">¥{{ formatPrice(mainPrice) }}</strong>
+        <strong class="price">￥{{ formatPrice(mainPrice) }}</strong>
         <span class="sub">{{ subText }}</span>
       </div>
     </div>
@@ -75,7 +75,7 @@ const mainPrice = computed(() => {
 
 const subText = computed(() => {
   if (isSecondhand.value) {
-    return `原价 ¥${formatPrice(props.product.originPrice)}`;
+    return `原价 ￥${formatPrice(props.product.originPrice)}`;
   }
   return `库存 ${props.product.stock ?? 0}`;
 });
@@ -119,11 +119,13 @@ function escapeRegExp(value) {
 
 <style scoped>
 .product-card {
-  background: var(--card-bg);
-  border: 1px solid var(--line-soft);
-  border-radius: 20px;
+  min-width: 0;
   overflow: hidden;
-  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+  border: 1px solid #eeeeee;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(30, 34, 40, 0.04);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
 .product-card.clickable {
@@ -131,15 +133,15 @@ function escapeRegExp(value) {
 }
 
 .product-card.clickable:hover {
-  transform: translateY(-4px);
-  border-color: #d6e5f6;
-  box-shadow: 0 16px 34px rgba(20, 38, 69, .16);
+  transform: translateY(-3px);
+  border-color: #ffe100;
+  box-shadow: 0 16px 34px rgba(30, 34, 40, 0.12);
 }
 
 .cover-wrap {
   position: relative;
-  aspect-ratio: 4 / 3;
-  background: linear-gradient(145deg, #f4f7fc, #eef3f9);
+  aspect-ratio: 1 / 1;
+  background: #eeeeee;
 }
 
 .cover {
@@ -151,26 +153,35 @@ function escapeRegExp(value) {
 
 .badge {
   position: absolute;
-  right: 10px;
+  left: 10px;
   top: 10px;
-  background: rgba(23, 34, 52, .84);
-  color: #fff;
+  max-width: calc(100% - 20px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   border-radius: 999px;
-  padding: 5px 11px;
+  padding: 4px 9px;
+  background: rgba(32, 36, 45, 0.78);
+  color: #fff;
   font-size: 12px;
-  letter-spacing: .2px;
 }
 
 .content {
-  padding: 14px;
+  padding: 12px 13px 13px;
 }
 
 .title {
+  min-height: 40px;
   margin: 0;
-  font-size: 17px;
+  color: #20242d;
+  font-size: 15px;
   font-weight: 700;
-  line-height: 1.3;
-  color: #1f2329;
+  line-height: 1.35;
+  letter-spacing: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .title :deep(.title-highlight) {
@@ -179,27 +190,50 @@ function escapeRegExp(value) {
 }
 
 .desc {
-  margin: 8px 0;
-  color: #68748a;
-  font-size: 13px;
-  line-height: 1.45;
-  min-height: 34px;
+  min-height: 18px;
+  margin: 7px 0 9px;
+  color: #858585;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .meta {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
+  gap: 8px;
 }
 
 .price {
-  color: #e06c1d;
-  font-size: 23px;
-  letter-spacing: .2px;
+  color: #ff4d00;
+  font-size: 21px;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .sub {
-  color: #7f8b9f;
+  min-width: 0;
+  color: #999;
   font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .content {
+    padding: 9px;
+  }
+
+  .title {
+    font-size: 14px;
+  }
+
+  .price {
+    font-size: 18px;
+  }
 }
 </style>

@@ -54,6 +54,12 @@ const routes = [
             {
                 path: "secondhand",
                 name: "secondhandList",
+                beforeEnter: (to) => {
+                    if (to.query.tab === "publish") {
+                        return { name: "secondhandPublish" };
+                    }
+                    return true;
+                },
                 component: () =>
                     import("@/views/secondhand/SecondhandListView.vue"),
             },
@@ -79,7 +85,8 @@ const routes = [
             {
                 path: "secondhand/publish",
                 name: "secondhandPublish",
-                redirect: "/secondhand?tab=publish",
+                component: () =>
+                    import("@/views/secondhand/SecondhandPublishView.vue"),
             },
             {
                 path: "secondhand/:id",

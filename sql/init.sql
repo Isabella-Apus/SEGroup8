@@ -6,8 +6,12 @@ DROP TABLE IF EXISTS `report`;
 DROP TABLE IF EXISTS `review`;
 DROP TABLE IF EXISTS `order_item`;
 DROP TABLE IF EXISTS `order_info`;
+DROP TABLE IF EXISTS `auction_log`;
+DROP TABLE IF EXISTS `product_auction`;
+DROP TABLE IF EXISTS `product_negotiation`;
 DROP TABLE IF EXISTS `secondhand_product`;
 DROP TABLE IF EXISTS `product`;
+DROP TABLE IF EXISTS `category`;
 DROP TABLE IF EXISTS `shop`;
 DROP TABLE IF EXISTS `address`;
 DROP TABLE IF EXISTS `user`;
@@ -45,6 +49,17 @@ CREATE TABLE `address` (
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_address_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `category` (
+  `id` INT NOT NULL,
+  `name` VARCHAR(50) NOT NULL,
+  `parent_id` INT DEFAULT NULL,
+  `sort_order` INT NOT NULL DEFAULT 0,
+  `status` TINYINT NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  KEY `idx_category_parent_id` (`parent_id`),
+  KEY `idx_category_status_sort` (`status`, `sort_order`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `merchant_application` (
@@ -145,12 +160,15 @@ CREATE TABLE `product` (
   `cover` VARCHAR(255) DEFAULT NULL,
   `description` TEXT,
   `price` DECIMAL(10,2) NOT NULL,
+  `category_id` INT NOT NULL DEFAULT 8,
+  `sub_category_id` INT NOT NULL DEFAULT 801,
   `stock` INT NOT NULL DEFAULT 0,
   `status` TINYINT NOT NULL DEFAULT 1,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_product_shop_id` (`shop_id`)
+  KEY `idx_product_shop_id` (`shop_id`),
+  KEY `idx_product_category` (`category_id`, `sub_category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `secondhand_product` (
@@ -161,12 +179,71 @@ CREATE TABLE `secondhand_product` (
   `description` TEXT,
   `origin_price` DECIMAL(10,2) DEFAULT NULL,
   `sale_price` DECIMAL(10,2) NOT NULL,
+  `category_id` INT NOT NULL DEFAULT 8,
+  `sub_category_id` INT NOT NULL DEFAULT 801,
   `condition_level` VARCHAR(30) DEFAULT NULL,
+  `is_negotiable` TINYINT NOT NULL DEFAULT 1,
   `status` TINYINT NOT NULL DEFAULT 1,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_secondhand_seller` (`seller_user_id`)
+  KEY `idx_secondhand_seller` (`seller_user_id`),
+  KEY `idx_secondhand_category` (`category_id`, `sub_category_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `product_auction` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `product_id` BIGINT NOT NULL,
+  `seller_user_id` BIGINT NOT NULL,
+  `start_price` DECIMAL(10,2) NOT NULL,
+  `increment_amount` DECIMAL(10,2) NOT NULL,
+  `current_price` DECIMAL(10,2) NOT NULL,
+  `current_bidder_user_id` BIGINT DEFAULT NULL,
+  `start_time` DATETIME NOT NULL,
+  `end_time` DATETIME NOT NULL,
+  `status` VARCHAR(20) NOT NULL,
+  `settled_order_id` BIGINT DEFAULT NULL,
+  `version` INT NOT NULL DEFAULT 0,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_product_auction_product` (`product_id`),
+  KEY `idx_product_auction_seller` (`seller_user_id`),
+  KEY `idx_product_auction_status_end` (`status`, `end_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `auction_log` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `auction_id` BIGINT NOT NULL,
+  `product_id` BIGINT NOT NULL,
+  `bidder_user_id` BIGINT NOT NULL,
+  `bid_amount` DECIMAL(10,2) NOT NULL,
+  `status` VARCHAR(20) NOT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_auction_log_auction` (`auction_id`, `create_time`),
+  KEY `idx_auction_log_bidder` (`bidder_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE `product_negotiation` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `product_id` BIGINT NOT NULL,
+  `buyer_user_id` BIGINT NOT NULL,
+  `seller_user_id` BIGINT NOT NULL,
+  `conversation_id` BIGINT DEFAULT NULL,
+  `proposed_price` DECIMAL(10,2) NOT NULL,
+  `confirmed_price` DECIMAL(10,2) DEFAULT NULL,
+  `status` VARCHAR(20) NOT NULL,
+  `effective_from` DATETIME DEFAULT NULL,
+  `effective_until` DATETIME DEFAULT NULL,
+  `used_order_id` BIGINT DEFAULT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_product_negotiation_product` (`product_id`),
+  KEY `idx_product_negotiation_buyer` (`buyer_user_id`),
+  KEY `idx_product_negotiation_seller` (`seller_user_id`),
+  KEY `idx_product_negotiation_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE `order_info` (
