@@ -393,14 +393,14 @@ git pull
 
 cd /srv/SE/SEGroup8/backend
 mvn clean package -DskipTests
-systemctl restart segroup8-backend
+sudo systemctl restart segroup8-backend
 
 cd /srv/SE/SEGroup8/frontend
 npm install
 npm run build:real
 
-nginx -t
-systemctl reload nginx
+sudo nginx -t
+sudo systemctl reload nginx
 ```
 
 然后访问：
