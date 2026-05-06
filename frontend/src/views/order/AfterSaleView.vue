@@ -118,6 +118,7 @@ import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { getOrderListApi } from "@/api/order";
 import { onRealtimeEvent } from "@/realtime/realtimeClient";
+import { toApiAssetUrl } from "@/utils/url";
 
 const router = useRouter();
 const total = ref(0);
@@ -196,9 +197,7 @@ function formatTime(value) {
 
 function toFullImageUrl(url) {
   if (!url) return '';
-  if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  const normalized = url.startsWith('/') ? url : `/${url}`;
-  return `http://127.0.0.1:8080${normalized}`;
+  return toApiAssetUrl(url);
 }
 
 function proofList(order) {

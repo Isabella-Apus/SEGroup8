@@ -1,4 +1,5 @@
 import { computed } from "vue";
+import { toApiAssetUrl } from "@/utils/url";
 
 function formatTime(value) {
   if (!value) return "-";
@@ -19,8 +20,8 @@ export function useAdminOrderProgress(drawerOrderRef) {
     if (!url) return "";
     if (url.startsWith("http://") || url.startsWith("https://")) return url;
     const normalized = url.startsWith("/") ? url : `/${url}`;
-    return `http://127.0.0.1:8080${normalized}`;
-  }
+    return toApiAssetUrl(normalized);
+}
 
   const orderTimeline = computed(() => {
     const o = drawerOrderRef.value;

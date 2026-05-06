@@ -18,6 +18,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { toApiAssetUrl } from '@/utils/url';
 
 const props = defineProps({
   product: {
@@ -88,7 +89,7 @@ const coverUrl = computed(() => {
   if (cover.startsWith('http')) {
     return cover;
   }
-  return `http://localhost:8080${cover}`;
+  return toApiAssetUrl(cover);
 });
 
 function goDetail() {

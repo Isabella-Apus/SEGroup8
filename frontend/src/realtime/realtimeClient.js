@@ -1,4 +1,5 @@
 import { getToken } from "@/utils/storage";
+import { buildRealtimeWsUrl } from "@/utils/url";
 
 const EVENT_BUS_NAME = "segroup8-realtime-event";
 let socket = null;
@@ -20,13 +21,7 @@ function isRealtimeEnabled() {
 }
 
 function buildWsUrl() {
-    const explicit = import.meta.env.VITE_WS_BASE_URL;
-    if (explicit) {
-        return `${String(explicit).replace(/\/$/, "")}/ws/realtime`;
-    }
-    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-    const hostname = window.location.hostname || "127.0.0.1";
-    return `${protocol}://${hostname}:8080/ws/realtime`;
+    return buildRealtimeWsUrl();
 }
 
 function emitRealtimeEvent(message) {

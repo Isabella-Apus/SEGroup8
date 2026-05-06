@@ -106,6 +106,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { toApiAssetUrl } from '@/utils/url'
 import {
   getMyProducts,
   updateProductStatus,
@@ -189,7 +190,7 @@ function toFullImageUrl(url) {
   if (!url) {
     return ''
   }
-  return url.startsWith('http') ? url : `http://localhost:8080${url}`
+  return toApiAssetUrl(url)
 }
 
 onMounted(loadProducts)

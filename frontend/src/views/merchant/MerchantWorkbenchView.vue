@@ -118,6 +118,7 @@ import {
     adjustSellerProductStockApi
 } from '@/api/product';
 import { uploadImageApi } from '@/api/upload';
+import { toApiAssetUrl } from '@/utils/url';
 
 const loading = ref(false);
 const list = ref([]);
@@ -286,11 +287,7 @@ function toFullImageUrl(url) {
     if (!url) {
         return '';
     }
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-        return url;
-    }
-    const normalized = url.startsWith('/') ? url : `/${url}`;
-    return `http://localhost:8080${normalized}`;
+    return toApiAssetUrl(url);
 }
 </script>
 

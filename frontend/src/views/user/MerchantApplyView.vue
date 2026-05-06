@@ -81,6 +81,7 @@ import { getMyMerchantApplicationApi, submitMerchantApplicationApi } from "@/api
 import { uploadImageApi } from "@/api/upload";
 import { useUserStore } from "@/stores/user";
 import { MAIN_CATEGORY_OPTIONS } from '@/constants/categories';
+import { toApiAssetUrl } from "@/utils/url";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -217,7 +218,7 @@ function toAbsoluteUrl(url) {
     if (!withPrefix.startsWith("/")) {
         withPrefix = withPrefix.startsWith("uploads/") ? `/${withPrefix}` : `/uploads/${withPrefix}`;
     }
-    return encodeURI(`http://localhost:8080${withPrefix}`);
+    return toApiAssetUrl(withPrefix);
 }
 </script>
 

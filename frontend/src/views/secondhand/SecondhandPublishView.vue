@@ -73,6 +73,7 @@ import { ElMessage } from 'element-plus';
 import { publishSecondhandApi } from '@/api/secondhand';
 import { uploadImageApi } from '@/api/upload';
 import { SECONDHAND_CATEGORY_TREE } from '@/constants/categories';
+import { toApiAssetUrl } from '@/utils/url';
 
 const cascaderProps = {
   emitPath: true,
@@ -149,9 +150,7 @@ function reset() {
 
 function toFullImageUrl(url) {
   if (!url) return '';
-  if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  const normalized = url.startsWith('/') ? url : `/${url}`;
-  return `http://localhost:8080${normalized}`;
+  return toApiAssetUrl(url);
 }
 </script>
 

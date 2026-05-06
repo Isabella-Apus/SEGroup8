@@ -2,6 +2,7 @@ import axios from "axios";
 import { ElMessage } from "element-plus";
 import { useUserStore } from "@/stores/user";
 import { mockRequest } from "@/mock-data";
+import { API_BASE_URL } from "@/utils/url";
 
 // 开发环境默认连真实后端；生产构建未配置时仍可用 mock。也可用 .env.development 显式设置 VITE_DATA_SOURCE。
 const DATA_SOURCE = (
@@ -10,7 +11,7 @@ const DATA_SOURCE = (
 ).toLowerCase();
 
 const realHttp = axios.create({
-    baseURL: "http://localhost:8080/api",
+    baseURL: API_BASE_URL,
     timeout: 10000,
 });
 

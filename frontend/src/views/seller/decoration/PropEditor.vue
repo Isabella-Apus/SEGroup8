@@ -215,6 +215,7 @@ import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Check } from '@element-plus/icons-vue'
 import { uploadImage, getMyProducts } from '@/api/seller'
+import { toApiAssetUrl } from '@/utils/url'
 
 const props = defineProps({
   component: { type: Object, required: true }
@@ -241,7 +242,7 @@ function beforeUpload(file) {
 async function handleUpload({ file }, field) {
   try {
     const res = await uploadImage(file)
-    props.component.props[field] = 'http://localhost:8080' + res.data.url
+    props.component.props[field] = toApiAssetUrl(res.data.url)
     ElMessage.success('上传成功')
   } catch (e) {
     ElMessage.error('上传失败')

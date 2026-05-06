@@ -85,6 +85,7 @@ import { uploadImageApi } from '@/api/upload';
 import { getFinanceDashboardApi, getMyWalletRecordsApi, rechargeCoinApi } from '@/api/finance';
 import { useUserStore } from '@/stores/user';
 import { resolveTradeTypeLabel } from '@/utils/finance';
+import { toApiAssetUrl } from '@/utils/url';
 
 const userStore = useUserStore();
 const formRef = ref();
@@ -152,7 +153,7 @@ function toAbsoluteUrl(url) {
     if (!withPrefix.startsWith('/')) {
         withPrefix = withPrefix.startsWith('uploads/') ? `/${withPrefix}` : `/uploads/${withPrefix}`;
     }
-    return encodeURI(`http://localhost:8080${withPrefix}`);
+    return toApiAssetUrl(withPrefix);
 }
 
 async function saveProfile() {

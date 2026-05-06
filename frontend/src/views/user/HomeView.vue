@@ -86,6 +86,7 @@ import { useRouter } from 'vue-router';
 import ProductCard from '@/components/ProductCard.vue';
 import { getProductListApi } from '@/api/product';
 import { useUserStore } from '@/stores/user';
+import { toApiAssetUrl } from '@/utils/url';
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -123,7 +124,7 @@ function goProduct(id) {
 function resolveCover(cover) {
   if (!cover) return '';
   if (cover.startsWith('http')) return cover;
-  return `http://localhost:8080${cover}`;
+  return toApiAssetUrl(cover);
 }
 
 function formatPrice(value) {

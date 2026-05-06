@@ -4,7 +4,7 @@
 
 服务器信息：
 
-- 项目目录：`/root/SE/SEGroup8`
+- 项目目录：`/srv/SE/SEGroup8`
 - 公网访问地址：`http://47.93.51.90`
 - 后端端口：`8080`
 - 前端开发端口：`5174`
@@ -19,7 +19,7 @@ ssh root@47.93.51.90
 进入项目目录：
 
 ```bash
-cd /root/SE/SEGroup8
+cd /srv/SE/SEGroup8
 ```
 
 ## 2. 拉取最新 Git 代码
@@ -27,7 +27,7 @@ cd /root/SE/SEGroup8
 先查看当前分支和本地改动：
 
 ```bash
-cd /root/SE/SEGroup8
+cd /srv/SE/SEGroup8
 git status
 git branch
 ```
@@ -51,8 +51,8 @@ git status
 后端配置文件位置：
 
 ```text
-/root/SE/SEGroup8/backend/src/main/resources/application.yml
-/root/SE/SEGroup8/backend/src/main/resources/application-local.yml
+/srv/SE/SEGroup8/backend/src/main/resources/application.yml
+/srv/SE/SEGroup8/backend/src/main/resources/application-local.yml
 ```
 
 `application.yml` 默认后端端口是 `8080`，数据库是：
@@ -66,7 +66,7 @@ spring:
 服务器上的数据库账号密码应放在：
 
 ```bash
-vim /root/SE/SEGroup8/backend/src/main/resources/application-local.yml
+vim /srv/SE/SEGroup8/backend/src/main/resources/application-local.yml
 ```
 
 示例：
@@ -87,7 +87,7 @@ spring:
 首次部署或需要重新导入初始化数据时：
 
 ```bash
-cd /root/SE/SEGroup8
+cd /srv/SE/SEGroup8
 mysql -uroot -p segroup8_platform < sql/init.sql
 ```
 
@@ -96,14 +96,14 @@ mysql -uroot -p segroup8_platform < sql/init.sql
 ## 5. 构建后端
 
 ```bash
-cd /root/SE/SEGroup8/backend
+cd /srv/SE/SEGroup8/backend
 mvn clean package -DskipTests
 ```
 
 构建成功后会生成：
 
 ```text
-/root/SE/SEGroup8/backend/target/platform-backend-0.0.1-SNAPSHOT.jar
+/srv/SE/SEGroup8/backend/target/platform-backend-0.0.1-SNAPSHOT.jar
 ```
 
 ## 6. 运行后端
@@ -127,8 +127,8 @@ After=network.target mysqld.service
 
 [Service]
 Type=simple
-WorkingDirectory=/root/SE/SEGroup8/backend
-ExecStart=/usr/bin/java -jar /root/SE/SEGroup8/backend/target/platform-backend-0.0.1-SNAPSHOT.jar
+WorkingDirectory=/srv/SE/SEGroup8/backend
+ExecStart=/usr/bin/java -jar /srv/SE/SEGroup8/backend/target/platform-backend-0.0.1-SNAPSHOT.jar
 Restart=always
 RestartSec=5
 User=root
@@ -187,7 +187,7 @@ http://47.93.51.90/swagger-ui.html
 
 ```bash
 tmux new -s backend
-cd /root/SE/SEGroup8/backend
+cd /srv/SE/SEGroup8/backend
 java -jar target/platform-backend-0.0.1-SNAPSHOT.jar
 ```
 
@@ -212,7 +212,7 @@ Ctrl + C
 ## 7. 构建前端
 
 ```bash
-cd /root/SE/SEGroup8/frontend
+cd /srv/SE/SEGroup8/frontend
 npm install
 npm run build:real
 ```
@@ -220,7 +220,7 @@ npm run build:real
 构建产物目录：
 
 ```text
-/root/SE/SEGroup8/frontend/dist
+/srv/SE/SEGroup8/frontend/dist
 ```
 
 正式公网访问推荐使用 Nginx 托管 `dist`，不要长期使用 `npm run dev`。
@@ -306,7 +306,7 @@ server {
     listen 80;
     server_name 47.93.51.90;
 
-    root /root/SE/SEGroup8/frontend/dist;
+    root /srv/SE/SEGroup8/frontend/dist;
     index index.html;
 
     location / {
@@ -366,7 +366,7 @@ http://47.93.51.90/
 如果只是临时调试，可以不走 Nginx，直接跑 Vite：
 
 ```bash
-cd /root/SE/SEGroup8/frontend
+cd /srv/SE/SEGroup8/frontend
 npm install
 npm run dev:real -- --host 0.0.0.0
 ```
@@ -388,14 +388,14 @@ http://47.93.51.90:5174/
 后端和前端都可能变化时：
 
 ```bash
-cd /root/SE/SEGroup8
+cd /srv/SE/SEGroup8
 git pull
 
-cd /root/SE/SEGroup8/backend
+cd /srv/SE/SEGroup8/backend
 mvn clean package -DskipTests
 systemctl restart segroup8-backend
 
-cd /root/SE/SEGroup8/frontend
+cd /srv/SE/SEGroup8/frontend
 npm install
 npm run build:real
 
@@ -423,7 +423,7 @@ curl http://127.0.0.1:8080/swagger-ui.html
 检查前端是否还在请求 `localhost:8080`：
 
 ```bash
-cd /root/SE/SEGroup8
+cd /srv/SE/SEGroup8
 grep -R "localhost:8080\|127.0.0.1:8080" frontend/src
 ```
 
@@ -470,7 +470,7 @@ location / {
 需要重新构建前端：
 
 ```bash
-cd /root/SE/SEGroup8/frontend
+cd /srv/SE/SEGroup8/frontend
 npm run build:real
 systemctl reload nginx
 ```
@@ -482,7 +482,7 @@ systemctl reload nginx
 需要重新打包并重启服务：
 
 ```bash
-cd /root/SE/SEGroup8/backend
+cd /srv/SE/SEGroup8/backend
 mvn clean package -DskipTests
 systemctl restart segroup8-backend
 ```

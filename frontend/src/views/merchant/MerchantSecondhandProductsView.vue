@@ -103,6 +103,7 @@ import { onMounted, reactive, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 import { changeSellerSecondhandStatusApi, deleteSellerSecondhandApi, getSellerSecondhandListApi } from "@/api/secondhand";
+import { toApiAssetUrl } from "@/utils/url";
 
 const router = useRouter();
 const loading = ref(false);
@@ -191,9 +192,7 @@ async function remove(row) {
 
 function toFullImageUrl(url) {
   if (!url) return "";
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  const normalized = url.startsWith("/") ? url : `/${url}`;
-  return `http://localhost:8080${normalized}`;
+  return toApiAssetUrl(url);
 }
 </script>
 

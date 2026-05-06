@@ -242,6 +242,7 @@ import OrderStatusTag from "@/components/order/OrderStatusTag.vue";
 import OrderSummaryCard from "@/components/order/OrderSummaryCard.vue";
 import OrderTimeline from "@/components/order/OrderTimeline.vue";
 import { onRealtimeEvent } from "@/realtime/realtimeClient";
+import { toApiAssetUrl } from "@/utils/url";
 
 const route = useRoute();
 const router = useRouter();
@@ -403,9 +404,7 @@ function formatTime(value) {
 
 function toFullImageUrl(url) {
   if (!url) return '';
-  if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  const normalized = url.startsWith('/') ? url : `/${url}`;
-  return `http://127.0.0.1:8080${normalized}`;
+  return toApiAssetUrl(url);
 }
 
 async function pay() {
@@ -826,4 +825,3 @@ const orderNextActionSummary = computed(() => {
   max-height: 560px;
 }
 </style>
-

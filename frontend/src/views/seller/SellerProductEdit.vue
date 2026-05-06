@@ -115,6 +115,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
+import { toApiAssetUrl } from '@/utils/url'
 import {
   getProductDetail,
   createProduct,
@@ -172,7 +173,7 @@ function toFullImageUrl(url) {
   if (!url) {
     return ''
   }
-  return url.startsWith('http') ? url : `http://localhost:8080${url}`
+  return toApiAssetUrl(url)
 }
 
 // 上传前校验

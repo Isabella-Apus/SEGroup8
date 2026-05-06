@@ -197,6 +197,7 @@ import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { uploadImage, updateShopProfile } from '@/api/seller'
+import { toApiAssetUrl } from '@/utils/url'
 
 const userStore = useUserStore()
 const formRef = ref(null)
@@ -242,7 +243,7 @@ const rules = {
 function toFullUrl(url) {
   if (!url) return ''
   if (url.startsWith('http')) return url
-  return 'http://localhost:8080' + url
+  return toApiAssetUrl(url)
 }
 
 async function loadShopInfo() {

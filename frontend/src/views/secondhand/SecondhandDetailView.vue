@@ -172,6 +172,7 @@ import {
 import { submitReportApi, blockUserApi, unblockUserApi, isBlockingApi, isBlockedByApi } from '@/api/credit';
 import { listAddressesApi } from '@/api/user';
 import { getUser } from '@/utils/storage';
+import { toApiAssetUrl } from '@/utils/url';
 
 const route = useRoute();
 const router = useRouter();
@@ -492,9 +493,7 @@ async function handleUnblock() {
 
 function toFullImageUrl(url) {
   if (!url) return '';
-  if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  const normalized = url.startsWith('/') ? url : `/${url}`;
-  return `http://localhost:8080${normalized}`;
+  return toApiAssetUrl(url);
 }
 
 function formatTime(value) {
