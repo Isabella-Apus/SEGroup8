@@ -114,6 +114,7 @@ CREATE TABLE `product` (
   `shop_id` BIGINT,
   `name` VARCHAR(120),
   `cover` VARCHAR(255),
+  `images` TEXT,
   `description` VARCHAR(255),
   `price` DECIMAL(10,2),
   `category_id` INT,
@@ -178,4 +179,3 @@ CREATE TABLE `idempotency_record` (
   `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `update_time` TIMESTAMP
 );
-

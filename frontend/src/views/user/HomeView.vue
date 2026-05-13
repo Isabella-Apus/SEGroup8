@@ -93,6 +93,7 @@ const userStore = useUserStore();
 const products = ref([]);
 
 const quickItems = [
+  { label: '常见问题', desc: '查看平台购物、二手、卖家和售后说明', path: '/faq', icon: '?' },
   { label: '购物车', desc: '继续结算未完成商品', path: '/cart', icon: '▣' },
   { label: '我的订单', desc: '查看付款、发货和售后', path: '/order', icon: '≡' },
   { label: '我的优惠券', desc: '管理已领取优惠', path: '/vouchers', icon: '%' },

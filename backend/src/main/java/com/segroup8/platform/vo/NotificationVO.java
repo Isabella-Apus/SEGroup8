@@ -7,6 +7,7 @@ public class NotificationVO {
     private Long id;
     private String title;
     private String content;
+    private String scope;
     private Integer isRead;
     private LocalDateTime createTime;
 
@@ -32,6 +33,14 @@ public class NotificationVO {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getScope() {
+        return scope;
+    }
+
+    public void setScope(String scope) {
+        this.scope = scope;
     }
 
     public Integer getIsRead() {

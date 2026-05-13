@@ -198,6 +198,7 @@ import { Plus } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { uploadImage, updateShopProfile } from '@/api/seller'
 import { toApiAssetUrl } from '@/utils/url'
+import { findCategoryLabel } from '@/constants/categories'
 
 const userStore = useUserStore()
 const formRef = ref(null)
@@ -246,6 +247,12 @@ function toFullUrl(url) {
   return toApiAssetUrl(url)
 }
 
+function getReadableCategory(category) {
+  if (!category) return ''
+  const label = findCategoryLabel(category)
+  return label || String(category)
+}
+
 async function loadShopInfo() {
   loading.value = true
   try {
@@ -253,7 +260,7 @@ async function loadShopInfo() {
     const info = userStore.userInfo || {}
     form.shopName = info.shopName || info.nickname || ''
     form.shopDesc = info.shopDesc || ''
-    form.category = info.category || ''
+    form.category = getReadableCategory(info.categoryId || info.category)
     form.phone = info.phone || ''
     form.region = info.region || ''
     form.shopContactName = info.shopContactName || ''

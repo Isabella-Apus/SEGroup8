@@ -52,7 +52,6 @@ public class OrderAutoConfirmScheduler {
         QueryWrapper<OrderInfo> wrapper = new QueryWrapper<>();
         wrapper.eq("refund_status", RefundStatusEnum.PROCESSING.getCode())
                 .le("refund_apply_time", deadline)
-                .and(w -> w.isNull("refund_mode").or().eq("refund_mode", "RETURN_REFUND"))
                 .last("limit 200");
         List<OrderInfo> orders = orderInfoMapper.selectList(wrapper);
         for (OrderInfo order : orders) {

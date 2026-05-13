@@ -15,6 +15,7 @@ public class Product {
     private Long shopId;
     private String name;
     private String cover;
+    private String images;
     private String description;
     private BigDecimal price;
     private Integer categoryId;
@@ -54,6 +55,14 @@ public class Product {
 
     public void setCover(String cover) {
         this.cover = cover;
+    }
+
+    public String getImages() {
+        return images;
+    }
+
+    public void setImages(String images) {
+        this.images = images;
     }
 
     public String getDescription() {

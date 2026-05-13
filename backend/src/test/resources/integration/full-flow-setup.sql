@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `product` (
   `shop_id` BIGINT,
   `name` VARCHAR(120),
   `cover` VARCHAR(255),
+  `images` TEXT,
   `description` VARCHAR(255),
   `price` DECIMAL(10,2),
   `stock` INT,
@@ -25,6 +26,7 @@ CREATE TABLE IF NOT EXISTS `secondhand_product` (
   `seller_user_id` BIGINT,
   `name` VARCHAR(120),
   `cover` VARCHAR(255),
+  `images` TEXT,
   `description` VARCHAR(255),
   `origin_price` DECIMAL(10,2),
   `sale_price` DECIMAL(10,2),
@@ -35,6 +37,7 @@ CREATE TABLE IF NOT EXISTS `secondhand_product` (
 );
 
 ALTER TABLE `product` ADD COLUMN IF NOT EXISTS `cover` VARCHAR(255);
+ALTER TABLE `product` ADD COLUMN IF NOT EXISTS `images` TEXT;
 ALTER TABLE `product` ADD COLUMN IF NOT EXISTS `description` VARCHAR(255);
 ALTER TABLE `product` ADD COLUMN IF NOT EXISTS `category_id` INT;
 ALTER TABLE `product` ADD COLUMN IF NOT EXISTS `sub_category_id` INT;
@@ -44,6 +47,7 @@ ALTER TABLE `shop` ADD COLUMN IF NOT EXISTS `contact_phone` VARCHAR(30);
 ALTER TABLE `shop` ADD COLUMN IF NOT EXISTS `id_card_no_masked` VARCHAR(50);
 ALTER TABLE `shop` ADD COLUMN IF NOT EXISTS `warehouse_addr` VARCHAR(255);
 ALTER TABLE `secondhand_product` ADD COLUMN IF NOT EXISTS `cover` VARCHAR(255);
+ALTER TABLE `secondhand_product` ADD COLUMN IF NOT EXISTS `images` TEXT;
 ALTER TABLE `secondhand_product` ADD COLUMN IF NOT EXISTS `description` VARCHAR(255);
 ALTER TABLE `secondhand_product` ADD COLUMN IF NOT EXISTS `origin_price` DECIMAL(10,2);
 

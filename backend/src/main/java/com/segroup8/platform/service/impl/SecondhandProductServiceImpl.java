@@ -3,6 +3,8 @@ package com.segroup8.platform.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.segroup8.platform.common.BusinessException;
 import com.segroup8.platform.context.UserContext;
 import com.segroup8.platform.dto.SecondhandOrderCreateRequest;
@@ -39,10 +41,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collections;
 
 @Service
 public class SecondhandProductServiceImpl implements SecondhandProductService {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final TypeReference<List<String>> STRING_LIST_TYPE = new TypeReference<>() {};
     private static final int ON_SHELF = 1;
     private static final int OFF_SHELF = 2;
     private static final int ORDER_PENDING_PAY = 0;
@@ -159,7 +165,9 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         SecondhandProduct product = new SecondhandProduct();
         product.setSellerUserId(sellerUserId);
         product.setName(request.getName().trim());
-        product.setCover(request.getCover());
+        List<String> images = normalizeImages(request.getImages(), request.getCover());
+        product.setCover(firstImage(images));
+        product.setImages(serializeImages(images));
         product.setDescription(request.getDescription());
         product.setOriginPrice(request.getOriginPrice());
         product.setSalePrice(request.getSalePrice());
@@ -178,7 +186,9 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         validateSecondhandCategory(request.getCategoryId(), request.getSubCategoryId());
         SecondhandProduct product = getSellerOwnedProduct(productId);
         product.setName(request.getName().trim());
-        product.setCover(request.getCover());
+        List<String> images = normalizeImages(request.getImages(), request.getCover());
+        product.setCover(firstImage(images));
+        product.setImages(serializeImages(images));
         product.setDescription(request.getDescription());
         product.setOriginPrice(request.getOriginPrice());
         product.setSalePrice(request.getSalePrice());
@@ -434,7 +444,9 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
             vo.setSellerName(StringUtils.hasText(seller.getNickname()) ? seller.getNickname() : seller.getUsername());
         }
         vo.setName(product.getName());
-        vo.setCover(product.getCover());
+        List<String> images = parseImages(product.getImages(), product.getCover());
+        vo.setCover(firstImage(images));
+        vo.setImages(images);
         vo.setDescription(product.getDescription());
         vo.setOriginPrice(product.getOriginPrice());
         vo.setSalePrice(product.getSalePrice());
@@ -448,6 +460,47 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         vo.setStatusName(Objects.equals(product.getStatus(), ON_SHELF) ? "在售" : "下架");
         vo.setCreateTime(product.getCreateTime());
         return vo;
+    }
+
+    private List<String> normalizeImages(List<String> images, String cover) {
+        List<String> normalized = new ArrayList<>();
+        if (images != null) {
+            for (String image : images) {
+                if (StringUtils.hasText(image) && !normalized.contains(image.trim())) {
+                    normalized.add(image.trim());
+                }
+            }
+        }
+        if (normalized.isEmpty() && StringUtils.hasText(cover)) {
+            normalized.add(cover.trim());
+        }
+        if (normalized.size() > 9) {
+            throw new BusinessException(400, "商品图片不能超过9张");
+        }
+        return normalized;
+    }
+
+    private List<String> parseImages(String imagesJson, String cover) {
+        if (StringUtils.hasText(imagesJson)) {
+            try {
+                return normalizeImages(OBJECT_MAPPER.readValue(imagesJson, STRING_LIST_TYPE), cover);
+            } catch (Exception ignored) {
+                return normalizeImages(Collections.emptyList(), cover);
+            }
+        }
+        return normalizeImages(Collections.emptyList(), cover);
+    }
+
+    private String serializeImages(List<String> images) {
+        try {
+            return OBJECT_MAPPER.writeValueAsString(images == null ? Collections.emptyList() : images);
+        } catch (Exception e) {
+            throw new BusinessException(500, "商品图片保存失败");
+        }
+    }
+
+    private String firstImage(List<String> images) {
+        return images == null || images.isEmpty() ? null : images.get(0);
     }
 
     private String generateOrderNo(Long userId) {

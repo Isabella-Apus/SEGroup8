@@ -3,6 +3,7 @@ import { ElMessage } from "element-plus";
 import { useUserStore } from "@/stores/user";
 import { mockRequest } from "@/mock-data";
 import { API_BASE_URL } from "@/utils/url";
+import { standardizeError } from "@/utils/errorStandard";
 
 // 开发环境默认连真实后端；生产构建未配置时仍可用 mock。也可用 .env.development 显式设置 VITE_DATA_SOURCE。
 const DATA_SOURCE = (
@@ -30,19 +31,29 @@ realHttp.interceptors.response.use(
     (response) => {
         const { data } = response;
         if (data && data.code !== 0) {
-            const message = data.message || "Request failed";
+            const message = standardizeError(data.message, data.code);
             ElMessage.error(message);
-            return Promise.reject(new Error(message));
+            const normalizedError = new Error(message);
+            normalizedError.userMessage = message;
+            normalizedError.response = { ...response, data: { ...data, message } };
+            return Promise.reject(normalizedError);
         }
         return data;
     },
     (error) => {
         const userStore = useUserStore();
-        const message =
-            error?.response?.data?.message || error.message || "Network error";
         const bizCode = error?.response?.data?.code;
+        const statusCode = error?.response?.status;
+        const message = standardizeError(
+            error?.response?.data?.message || error.message || "Network error",
+            bizCode || statusCode,
+        );
         if (error?.response?.status === 401 || bizCode === 401) {
             userStore.logout();
+        }
+        error.userMessage = message;
+        if (error.response?.data) {
+            error.response.data.message = message;
         }
         ElMessage.error(message);
         return Promise.reject(error);
@@ -66,7 +77,8 @@ async function mockAdapter(method, url, data, config) {
             headers,
         });
     } catch (error) {
-        const message = error?.message || "Mock request failed";
+        const message = standardizeError(error?.message || "Mock request failed", error?.code);
+        error.userMessage = message;
         ElMessage.error(message);
         return Promise.reject(error);
     }

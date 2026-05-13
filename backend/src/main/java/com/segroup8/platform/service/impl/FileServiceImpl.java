@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -25,9 +26,33 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public String uploadImage(MultipartFile file) {
+        validateFile(file, true);
+        return store(file);
+    }
+
+    @Override
+    public String uploadMedia(MultipartFile file) {
+        validateFile(file, false);
+        return store(file);
+    }
+
+    private void validateFile(MultipartFile file, boolean imageOnly) {
         if (file == null || file.isEmpty()) {
             throw new BusinessException(400, "上传文件不能为空");
         }
+        String contentType = file.getContentType();
+        if (!StringUtils.hasText(contentType)) {
+            throw new BusinessException(400, "无法识别文件类型");
+        }
+        String normalizedType = contentType.toLowerCase(Locale.ROOT);
+        boolean allowed = normalizedType.startsWith("image/")
+                || (!imageOnly && normalizedType.startsWith("video/"));
+        if (!allowed) {
+            throw new BusinessException(400, imageOnly ? "请上传图片文件" : "仅支持上传图片或视频");
+        }
+    }
+
+    private String store(MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         String ext = StringUtils.getFilenameExtension(originalFilename);
         String filename = UUID.randomUUID() + (ext == null ? "" : "." + ext);

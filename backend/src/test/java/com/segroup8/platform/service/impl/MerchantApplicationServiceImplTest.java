@@ -9,6 +9,7 @@ import com.segroup8.platform.mapper.MerchantApplicationMapper;
 import com.segroup8.platform.mapper.NotificationMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
+import com.segroup8.platform.realtime.RealtimePushService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,9 @@ class MerchantApplicationServiceImplTest {
     @Mock
     private ShopMapper shopMapper;
 
+    @Mock
+    private RealtimePushService realtimePushService;
+
     private MerchantApplicationServiceImpl merchantApplicationService;
 
     @BeforeEach
@@ -44,7 +48,8 @@ class MerchantApplicationServiceImplTest {
                 merchantApplicationMapper,
                 userMapper,
             notificationMapper,
-            shopMapper);
+            shopMapper,
+            realtimePushService);
     }
 
     @AfterEach

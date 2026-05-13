@@ -42,6 +42,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("unchecked")
 class SecondhandProductServiceImplTest {
 
     @Mock
@@ -176,4 +177,3 @@ class SecondhandProductServiceImplTest {
         assertEquals(new BigDecimal("180"), vo.getTotalAmount());
     }
 }
-

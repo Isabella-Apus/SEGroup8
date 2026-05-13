@@ -201,6 +201,7 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
             shopId: user.id,
             name: asText(data?.name),
             cover: asText(data?.cover),
+            images: Array.isArray(data?.images) ? data.images : (data?.cover ? [asText(data.cover)] : []),
             description: asText(data?.description),
             price: Number(data?.price || 0),
             stock: Number(data?.stock || 0),
@@ -222,6 +223,7 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
         Object.assign(product, {
             name: asText(data?.name),
             cover: asText(data?.cover),
+            images: Array.isArray(data?.images) ? data.images : (data?.cover ? [asText(data.cover)] : []),
             description: asText(data?.description),
             price: Number(data?.price || 0),
             stock: Number(data?.stock || 0),
@@ -292,6 +294,7 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
             sellerUserId: user.id,
             name: asText(data?.name),
             cover: asText(data?.cover),
+            images: Array.isArray(data?.images) ? data.images : (data?.cover ? [asText(data.cover)] : []),
             description: asText(data?.description),
             originPrice: Number(data?.originPrice || 0),
             salePrice: Number(data?.salePrice || 0),
@@ -322,6 +325,7 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
         Object.assign(item, {
             name: asText(data?.name || item.name),
             cover: asText(data?.cover || item.cover),
+            images: Array.isArray(data?.images) ? data.images : (item.images || (item.cover ? [item.cover] : [])),
             description: asText(data?.description || item.description),
             originPrice: Number(data?.originPrice ?? item.originPrice ?? 0),
             salePrice: Number(data?.salePrice ?? item.salePrice ?? 0),

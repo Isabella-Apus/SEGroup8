@@ -202,6 +202,7 @@ CREATE TABLE IF NOT EXISTS `product` (
   `shop_id` BIGINT NOT NULL,
   `name` VARCHAR(120) NOT NULL,
   `cover` VARCHAR(255) DEFAULT NULL,
+  `images` TEXT,
   `description` TEXT,
   `price` DECIMAL(10,2) NOT NULL,
   `category_id` INT NOT NULL DEFAULT 8,
@@ -242,6 +243,24 @@ SET @product_sub_category_id_add_sql = IF(
 PREPARE stmt_product_sub_category_id_add FROM @product_sub_category_id_add_sql;
 EXECUTE stmt_product_sub_category_id_add;
 DEALLOCATE PREPARE stmt_product_sub_category_id_add;
+
+SET @product_images_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'product' AND COLUMN_NAME = 'images'
+);
+SET @product_images_add_sql = IF(
+  @product_images_col_exists = 0,
+  'ALTER TABLE `product` ADD COLUMN `images` TEXT AFTER `cover`',
+  'SELECT 1'
+);
+PREPARE stmt_product_images_add FROM @product_images_add_sql;
+EXECUTE stmt_product_images_add;
+DEALLOCATE PREPARE stmt_product_images_add;
+
+UPDATE `product`
+SET `images` = CONCAT('["', REPLACE(REPLACE(`cover`, '\\', '\\\\'), '"', '\\"'), '"]')
+WHERE (`images` IS NULL OR `images` = '') AND `cover` IS NOT NULL AND `cover` <> '';
 
 CREATE TABLE IF NOT EXISTS `browse_history` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -307,6 +326,7 @@ CREATE TABLE IF NOT EXISTS `secondhand_product` (
   `seller_user_id` BIGINT NOT NULL,
   `name` VARCHAR(120) NOT NULL,
   `cover` VARCHAR(255) DEFAULT NULL,
+  `images` TEXT,
   `description` TEXT,
   `origin_price` DECIMAL(10,2) DEFAULT NULL,
   `sale_price` DECIMAL(10,2) NOT NULL,
@@ -363,6 +383,24 @@ SET @secondhand_is_negotiable_add_sql = IF(
 PREPARE stmt_secondhand_is_negotiable_add FROM @secondhand_is_negotiable_add_sql;
 EXECUTE stmt_secondhand_is_negotiable_add;
 DEALLOCATE PREPARE stmt_secondhand_is_negotiable_add;
+
+SET @secondhand_images_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'secondhand_product' AND COLUMN_NAME = 'images'
+);
+SET @secondhand_images_add_sql = IF(
+  @secondhand_images_col_exists = 0,
+  'ALTER TABLE `secondhand_product` ADD COLUMN `images` TEXT AFTER `cover`',
+  'SELECT 1'
+);
+PREPARE stmt_secondhand_images_add FROM @secondhand_images_add_sql;
+EXECUTE stmt_secondhand_images_add;
+DEALLOCATE PREPARE stmt_secondhand_images_add;
+
+UPDATE `secondhand_product`
+SET `images` = CONCAT('["', REPLACE(REPLACE(`cover`, '\\', '\\\\'), '"', '\\"'), '"]')
+WHERE (`images` IS NULL OR `images` = '') AND `cover` IS NOT NULL AND `cover` <> '';
 
 CREATE TABLE IF NOT EXISTS `product_auction` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,

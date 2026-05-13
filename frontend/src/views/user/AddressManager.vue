@@ -29,7 +29,15 @@
             </el-table-column>
         </el-table>
 
-        <el-dialog v-model="dialogVisible" :title="form.id ? '编辑地址' : '新增地址'" width="560px">
+        <el-dialog
+            v-model="dialogVisible"
+            :title="form.id ? '编辑地址' : '新增地址'"
+            width="560px"
+            append-to-body
+            align-center
+            class="kg-dialog"
+            modal-class="kg-dialog-overlay"
+        >
             <el-form ref="formRef" :model="form" :rules="rules" label-width="100px">
                 <el-form-item label="收件人" prop="receiverName">
                     <el-input v-model="form.receiverName" />

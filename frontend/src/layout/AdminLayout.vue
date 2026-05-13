@@ -12,7 +12,6 @@
 
         <nav class="admin-actions" aria-label="管理员快捷入口">
           <button type="button" @click="router.push('/')">返回商城</button>
-          <button type="button" @click="router.push('/merchant')">卖家工作台</button>
           <button class="danger" type="button" @click="logout">退出</button>
         </nav>
       </div>

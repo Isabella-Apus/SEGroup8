@@ -14,11 +14,13 @@ import com.segroup8.platform.mapper.AddressMapper;
 import com.segroup8.platform.mapper.MerchantApplicationMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
+import com.segroup8.platform.service.CategoryService;
 import com.segroup8.platform.service.MerchantApplicationService;
 import com.segroup8.platform.service.UserService;
 import com.segroup8.platform.vo.AddressVO;
 import com.segroup8.platform.vo.MerchantApplicationVO;
 import com.segroup8.platform.vo.UserVO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -32,17 +34,29 @@ public class UserServiceImpl implements UserService {
     private final MerchantApplicationService merchantApplicationService;
     private final ShopMapper shopMapper;
     private final MerchantApplicationMapper merchantApplicationMapper;
+    private final CategoryService categoryService;
+
+    @Autowired
+    public UserServiceImpl(UserMapper userMapper,
+            AddressMapper addressMapper,
+            MerchantApplicationService merchantApplicationService,
+            ShopMapper shopMapper,
+            MerchantApplicationMapper merchantApplicationMapper,
+            CategoryService categoryService) {
+        this.userMapper = userMapper;
+        this.addressMapper = addressMapper;
+        this.merchantApplicationService = merchantApplicationService;
+        this.shopMapper = shopMapper;
+        this.merchantApplicationMapper = merchantApplicationMapper;
+        this.categoryService = categoryService;
+    }
 
     public UserServiceImpl(UserMapper userMapper,
             AddressMapper addressMapper,
             MerchantApplicationService merchantApplicationService,
             ShopMapper shopMapper,
             MerchantApplicationMapper merchantApplicationMapper) {
-        this.userMapper = userMapper;
-        this.addressMapper = addressMapper;
-        this.merchantApplicationService = merchantApplicationService;
-        this.shopMapper = shopMapper;
-        this.merchantApplicationMapper = merchantApplicationMapper;
+        this(userMapper, addressMapper, merchantApplicationService, shopMapper, merchantApplicationMapper, null);
     }
 
     @Override
@@ -68,7 +82,9 @@ public class UserServiceImpl implements UserService {
         vo.setShopName(user.getShopName());
         vo.setShopDesc(user.getShopDesc());
         vo.setBannerUrl(user.getBannerUrl());
-        vo.setCategory(user.getCategory());
+        Integer userCategoryId = parseCategoryId(user.getCategory());
+        vo.setCategoryId(userCategoryId);
+        vo.setCategory(userCategoryId == null ? user.getCategory() : categoryName(userCategoryId));
         vo.setRegion(user.getRegion());
         vo.setBusinessHours(user.getBusinessHours());
         vo.setReturnPolicy(user.getReturnPolicy());
@@ -103,8 +119,9 @@ public class UserServiceImpl implements UserService {
             vo.setIdCardNoMasked(shop.getIdCardNoMasked());
         }
 
-        if (!StringUtils.hasText(vo.getCategory()) && approvedApp != null) {
-            vo.setCategory(mapCategoryLabel(approvedApp.getCategoryId()));
+        if ((vo.getCategoryId() == null || !StringUtils.hasText(vo.getCategory())) && approvedApp != null) {
+            vo.setCategoryId(approvedApp.getCategoryId());
+            vo.setCategory(categoryName(approvedApp.getCategoryId()));
         }
         return vo;
     }
@@ -308,16 +325,46 @@ public class UserServiceImpl implements UserService {
         return val.substring(0, 3) + "****" + val.substring(val.length() - 3);
     }
 
-    private String mapCategoryLabel(Integer categoryId) {
-        if (categoryId == null) {
+    private Integer parseCategoryId(String category) {
+        if (!StringUtils.hasText(category)) {
             return null;
         }
+        try {
+            return Integer.parseInt(category.trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+/*
         return switch (categoryId) {
             case 1 -> "食品";
             case 2 -> "3C";
             case 3 -> "美妆";
             case 4 -> "服装";
             case 5 -> "运动";
+            default -> String.valueOf(categoryId);
+        };
+*/
+    }
+
+    private String categoryName(Integer categoryId) {
+        if (categoryId == null) {
+            return null;
+        }
+        if (categoryService != null) {
+            String name = categoryService.getCategoryName(categoryId);
+            if (StringUtils.hasText(name)) {
+                return name;
+            }
+        }
+        return switch (categoryId) {
+            case 1 -> "电子数码";
+            case 2 -> "服饰鞋包";
+            case 3 -> "家居生活";
+            case 4 -> "美妆个护";
+            case 5 -> "运动户外";
+            case 6 -> "图书音像";
+            case 7 -> "食品生鲜";
+            case 8 -> "其他";
             default -> String.valueOf(categoryId);
         };
     }

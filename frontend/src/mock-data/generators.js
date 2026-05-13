@@ -49,6 +49,11 @@ export function generateProducts() {
             shopId,
             name: `${pick(productNames)} ${id}`,
             cover: `https://picsum.photos/seed/product-${id}/720/540`,
+            images: [
+                `https://picsum.photos/seed/product-${id}/720/540`,
+                `https://picsum.photos/seed/product-${id}-b/720/540`,
+                `https://picsum.photos/seed/product-${id}-c/720/540`,
+            ],
             description: "自动生成测试商品数据",
             price: randInt(39, 2999),
             stock: randInt(0, 120),
@@ -69,6 +74,11 @@ export function generateSecondhandProducts() {
             sellerUserId: idx % 2 === 0 ? 3 : 2,
             name: `${pick(secondhandNames)} ${id}`,
             cover: `https://picsum.photos/seed/second-${id}/720/540`,
+            images: [
+                `https://picsum.photos/seed/second-${id}/720/540`,
+                `https://picsum.photos/seed/second-${id}-b/720/540`,
+                `https://picsum.photos/seed/second-${id}-c/720/540`,
+            ],
             description: "自动生成二手商品测试数据",
             originPrice,
             salePrice,

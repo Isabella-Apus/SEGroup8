@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class SecondhandProductSaveRequest {
 
@@ -15,6 +16,9 @@ public class SecondhandProductSaveRequest {
 
     @Size(max = 255, message = "封面地址长度不能超过255")
     private String cover;
+
+    @Size(max = 9, message = "商品图片不能超过9张")
+    private List<String> images;
 
     @Size(max = 2000, message = "商品描述长度不能超过2000")
     private String description;
@@ -54,6 +58,14 @@ public class SecondhandProductSaveRequest {
 
     public void setCover(String cover) {
         this.cover = cover;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
     public String getDescription() {
@@ -120,4 +132,3 @@ public class SecondhandProductSaveRequest {
         this.status = status;
     }
 }
-

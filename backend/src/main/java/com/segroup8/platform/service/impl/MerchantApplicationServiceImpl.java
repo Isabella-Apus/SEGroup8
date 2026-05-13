@@ -16,6 +16,7 @@ import com.segroup8.platform.mapper.MerchantApplicationMapper;
 import com.segroup8.platform.mapper.NotificationMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
+import com.segroup8.platform.realtime.RealtimePushService;
 import com.segroup8.platform.service.MerchantApplicationService;
 import com.segroup8.platform.vo.MerchantApplicationVO;
 import com.segroup8.platform.vo.PageVO;
@@ -24,7 +25,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -34,15 +37,18 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
     private final UserMapper userMapper;
     private final NotificationMapper notificationMapper;
     private final ShopMapper shopMapper;
+    private final RealtimePushService realtimePushService;
 
     public MerchantApplicationServiceImpl(MerchantApplicationMapper merchantApplicationMapper,
             UserMapper userMapper,
             NotificationMapper notificationMapper,
-            ShopMapper shopMapper) {
+            ShopMapper shopMapper,
+            RealtimePushService realtimePushService) {
         this.merchantApplicationMapper = merchantApplicationMapper;
         this.userMapper = userMapper;
         this.notificationMapper = notificationMapper;
         this.shopMapper = shopMapper;
+        this.realtimePushService = realtimePushService;
     }
 
     @Override
@@ -149,6 +155,7 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
         notification.setIsRead(0);
         notification.setCreateTime(LocalDateTime.now());
         notificationMapper.insert(notification);
+        pushNotification(notification, "seller");
     }
 
     @Override
@@ -169,6 +176,21 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
         notification.setIsRead(0);
         notification.setCreateTime(LocalDateTime.now());
         notificationMapper.insert(notification);
+        pushNotification(notification, "buyer");
+    }
+
+    private void pushNotification(Notification notification, String scope) {
+        if (notification == null || realtimePushService == null) {
+            return;
+        }
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("id", notification.getId());
+        payload.put("title", notification.getTitle());
+        payload.put("content", notification.getContent());
+        payload.put("scope", scope);
+        payload.put("isRead", notification.getIsRead());
+        payload.put("createTime", notification.getCreateTime());
+        realtimePushService.pushToUser(notification.getUserId(), "NOTIFICATION_CREATED", payload);
     }
 
     private MerchantApplicationVO toVO(MerchantApplication app, User user, boolean includeSensitive) {

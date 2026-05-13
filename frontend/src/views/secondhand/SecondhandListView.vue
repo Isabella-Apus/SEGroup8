@@ -56,11 +56,13 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import ProductCard from '@/components/ProductCard.vue';
 import { getSecondhandListApi } from '@/api/secondhand';
 import { searchList } from '@/utils/search';
 
+const route = useRoute();
 const pageSize = 16;
 const loading = ref(false);
 const sentinel = ref(null);
@@ -102,9 +104,24 @@ const visibleItems = computed(() => allItems.value);
 const hasMore = computed(() => items.value.length < total.value);
 
 onMounted(async () => {
+  syncKeywordFromRoute();
   await fetchPage(true);
+  if (query.keyword.trim()) {
+    await ensureAllItemsLoaded();
+  }
   initObserver();
 });
+
+watch(
+  () => route.query.keyword,
+  async () => {
+    syncKeywordFromRoute();
+    await fetchPage(true);
+    if (query.keyword.trim()) {
+      await ensureAllItemsLoaded();
+    }
+  }
+);
 
 onBeforeUnmount(() => {
   if (observer) {
@@ -129,6 +146,11 @@ async function applyChip(chip) {
   if (query.keyword.trim()) {
     await ensureAllItemsLoaded();
   }
+}
+
+function syncKeywordFromRoute() {
+  const value = route.query.keyword;
+  query.keyword = Array.isArray(value) ? value[0] || '' : value || '';
 }
 
 async function fetchPage(reset = false) {

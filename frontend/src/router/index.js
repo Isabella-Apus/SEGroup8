@@ -145,6 +145,11 @@ const routes = [
                 component: () => import("@/views/notification/NotificationView.vue"),
             },
             {
+                path: "faq",
+                name: "faq",
+                component: () => import("@/views/user/FaqView.vue"),
+            },
+            {
                 path: "merchant-apply",
                 name: "merchantApply",
                 component: () => import("@/views/user/MerchantApplyView.vue"),
@@ -154,7 +159,7 @@ const routes = [
     {
         path: "/merchant",
         component: () => import("@/layout/MerchantLayout.vue"),
-        meta: { roles: ["OFFICIAL_SELLER"] },
+        meta: { roles: ["OFFICIAL_SELLER", "SELLER"] },
         children: [
             {
                 path: "",

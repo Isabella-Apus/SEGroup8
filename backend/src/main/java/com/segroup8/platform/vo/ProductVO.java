@@ -2,6 +2,7 @@ package com.segroup8.platform.vo;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ProductVO {
 
@@ -11,6 +12,7 @@ public class ProductVO {
     private String sellerName;
     private String name;
     private String cover;
+    private List<String> images;
     private String description;
     private BigDecimal price;
     private Integer categoryId;
@@ -68,6 +70,14 @@ public class ProductVO {
 
     public void setCover(String cover) {
         this.cover = cover;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
     public String getDescription() {
