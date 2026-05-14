@@ -62,7 +62,16 @@
       />
     </div>
 
-    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="680px" destroy-on-close>
+    <el-dialog
+      v-model="dialogVisible"
+      :title="dialogTitle"
+      width="680px"
+      destroy-on-close
+      append-to-body
+      align-center
+      class="kg-dialog"
+      modal-class="kg-dialog-overlay"
+    >
       <el-form ref="formRef" :model="form" :rules="rules" label-width="110px">
         <el-form-item label="名称" prop="name">
           <el-input v-model="form.name" maxlength="100" show-word-limit />

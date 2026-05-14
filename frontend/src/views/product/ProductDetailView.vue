@@ -105,7 +105,15 @@
 
     <p v-else class="empty-tip">商品不存在</p>
 
-    <el-dialog v-model="reportDialogVisible" title="举报卖家" width="480px" append-to-body>
+    <el-dialog
+      v-model="reportDialogVisible"
+      title="举报卖家"
+      width="480px"
+      append-to-body
+      align-center
+      class="kg-dialog"
+      modal-class="kg-dialog-overlay"
+    >
       <el-form :model="reportForm" label-width="90px" @submit.prevent>
         <el-form-item label="举报类型" required>
           <el-select v-model="reportForm.reasonType" placeholder="请选择举报类型" style="width: 100%">
@@ -134,7 +142,16 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="buyDialogVisible" title="立即购买" width="860px" destroy-on-close>
+    <el-dialog
+      v-model="buyDialogVisible"
+      title="立即购买"
+      width="860px"
+      destroy-on-close
+      append-to-body
+      align-center
+      class="kg-dialog"
+      modal-class="kg-dialog-overlay"
+    >
       <el-alert
         type="info"
         :closable="false"
@@ -199,7 +216,7 @@ import { listAddressesApi } from "@/api/user";
 import { myAvailableVoucherApi } from "@/api/voucher";
 import { addToCart, removeFromCart } from "@/utils/cart";
 import { getUser } from "@/utils/storage";
-import { toApiAssetUrl } from "@/utils/url";
+import { toFullProductImageUrls, toFullImageUrl } from "@/utils/productImages";
 
 const route = useRoute();
 const router = useRouter();
@@ -225,8 +242,7 @@ const praiseRate = computed(() => 90 + (Number(product.value?.id || 0) % 8));
 const wantCount = computed(() => 20 + (Number(product.value?.id || 0) % 31));
 const viewCount = computed(() => 300 + (Number(product.value?.id || 0) % 220));
 const galleryImages = computed(() => {
-  const cover = toFullImageUrl(product.value?.cover || "");
-  return [cover, cover, cover].filter(Boolean);
+  return toFullProductImageUrls(product.value);
 });
 const recommendedItems = computed(() => {
   return recommendations.value.filter((item) => Number(item.id) !== Number(product.value?.id)).slice(0, 4);
@@ -257,7 +273,7 @@ async function fetchDetail() {
   try {
     const result = await getProductDetailApi(route.params.id);
     product.value = result.data;
-    activeImage.value = toFullImageUrl(product.value?.cover || "");
+    activeImage.value = galleryImages.value[0] || "";
     if (maxQuantity.value > 0) quantity.value = 1;
   } finally {
     loading.value = false;
@@ -429,11 +445,6 @@ function handleContactSeller() {
     return;
   }
   router.push({ path: "/messages", query: { participantId: product.value.sellerUserId, sourceType: "PRODUCT", sourceId: product.value.id } });
-}
-
-function toFullImageUrl(url) {
-  if (!url) return "";
-  return toApiAssetUrl(url);
 }
 
 function goBack() {

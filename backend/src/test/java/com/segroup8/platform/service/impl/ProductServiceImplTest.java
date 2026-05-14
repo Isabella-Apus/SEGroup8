@@ -39,6 +39,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("unchecked")
 class ProductServiceImplTest {
 
     @Mock
@@ -77,12 +78,12 @@ class ProductServiceImplTest {
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> productService.pagePublicProducts(request));
         assertEquals(400, ex.getCode());
-        verify(productMapper, never()).selectPage(any(Page.class), any(LambdaQueryWrapper.class));
+        verify(productMapper, never()).selectPage(anyProductPage(), anyProductQuery());
     }
 
     @Test
     void getPublicProductDetail_shouldThrowWhenProductNotOnShelf() {
-        when(productMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        when(productMapper.selectOne(anyProductQuery())).thenReturn(null);
 
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> productService.getPublicProductDetail(1L));
@@ -206,7 +207,7 @@ class ProductServiceImplTest {
         mpPage.setRecords(List.of(p));
         mpPage.setTotal(1);
 
-        when(productMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class))).thenReturn(mpPage);
+        when(productMapper.selectPage(anyProductPage(), anyProductQuery())).thenReturn(mpPage);
 
         PageVO<ProductVO> vo = productService.pageSellerProducts(request);
 
@@ -215,5 +216,12 @@ class ProductServiceImplTest {
         assertEquals(1, vo.getRecords().size());
         assertEquals("P1", vo.getRecords().get(0).getName());
     }
-}
 
+    private Page<Product> anyProductPage() {
+        return any();
+    }
+
+    private LambdaQueryWrapper<Product> anyProductQuery() {
+        return any();
+    }
+}

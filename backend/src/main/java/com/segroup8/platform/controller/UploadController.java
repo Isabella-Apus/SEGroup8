@@ -32,4 +32,15 @@ public class UploadController {
         data.put("filename", StringUtils.hasText(file.getOriginalFilename()) ? file.getOriginalFilename() : "");
         return Result.success(data);
     }
+
+    @Operation(summary = "上传图片或视频")
+    @PostMapping("/media")
+    public Result<Map<String, String>> uploadMedia(@RequestParam("file") MultipartFile file) {
+        String path = fileService.uploadMedia(file);
+        Map<String, String> data = new HashMap<>();
+        data.put("url", path);
+        data.put("filename", StringUtils.hasText(file.getOriginalFilename()) ? file.getOriginalFilename() : "");
+        data.put("contentType", StringUtils.hasText(file.getContentType()) ? file.getContentType() : "");
+        return Result.success(data);
+    }
 }

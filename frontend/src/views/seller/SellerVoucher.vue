@@ -98,6 +98,10 @@
       v-model="dialogVisible"
       :title="editingId ? '编辑优惠券' : '创建优惠券'"
       width="500px"
+      append-to-body
+      align-center
+      class="kg-dialog"
+      modal-class="kg-dialog-overlay"
     >
       <el-form
         ref="formRef"

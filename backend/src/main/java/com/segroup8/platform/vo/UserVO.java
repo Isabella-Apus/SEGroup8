@@ -15,6 +15,7 @@ public class UserVO {
     private String shopDesc;
     private String bannerUrl;
     private String category;
+    private Integer categoryId;
     private String region;
     private String businessHours;
     private String returnPolicy;
@@ -107,6 +108,9 @@ public class UserVO {
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    public Integer getCategoryId() { return categoryId; }
+    public void setCategoryId(Integer categoryId) { this.categoryId = categoryId; }
 
     public String getRegion() { return region; }
     public void setRegion(String region) { this.region = region; }

@@ -45,7 +45,11 @@ public class AdminUserServiceImpl implements AdminUserService {
 
     @Override
     public void banUser(Long userId) {
+        Long currentUserId = UserContext.getUserId();
         assertAdmin();
+        if (Objects.equals(currentUserId, userId)) {
+            throw new BusinessException(400, "管理员不能封禁自己");
+        }
         updateUserStatus(userId, UserStatusEnum.BANNED.name());
     }
 

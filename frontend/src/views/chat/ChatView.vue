@@ -63,13 +63,27 @@
                 <div class="trade-card-line">商品：{{ parseTradeCard(message.content)?.productName || '二手商品' }}</div>
                 <div class="trade-card-line">买家出价：￥{{ parseTradeCard(message.content)?.proposedPrice }}</div>
                 <el-space v-if="canHandleBargainApply(message)" wrap>
-                  <el-button type="warning" size="small" @click="handleConfirmBargainFromCard(parseTradeCard(message.content))">
+                  <el-button
+                    type="warning"
+                    size="small"
+                    :disabled="isBargainHandled(parseTradeCard(message.content))"
+                    @click="handleConfirmBargainFromCard(parseTradeCard(message.content))"
+                  >
                     确认小刀价
                   </el-button>
-                  <el-button type="danger" plain size="small" @click="handleRejectBargainFromCard(parseTradeCard(message.content))">
+                  <el-button
+                    type="danger"
+                    plain
+                    size="small"
+                    :disabled="isBargainHandled(parseTradeCard(message.content))"
+                    @click="handleRejectBargainFromCard(parseTradeCard(message.content))"
+                  >
                     驳回小刀价
                   </el-button>
                 </el-space>
+                <div v-else-if="isBargainHandled(parseTradeCard(message.content))" class="trade-card-line handled">
+                  该议价已处理
+                </div>
               </div>
 
               <div v-else-if="parseTradeCard(message.content)?.type === 'BARGAIN_CONFIRM'" class="trade-card trade-card-confirmed">
@@ -93,6 +107,22 @@
                 <div class="trade-card-line">买家出价：￥{{ parseTradeCard(message.content)?.proposedPrice }}</div>
               </div>
 
+              <div v-else-if="parseMediaMessage(message.content)" class="media-message">
+                <el-image
+                  v-if="parseMediaMessage(message.content).mediaType === 'image'"
+                  :src="toFullMediaUrl(parseMediaMessage(message.content).url)"
+                  fit="cover"
+                  class="chat-image"
+                  :preview-src-list="[toFullMediaUrl(parseMediaMessage(message.content).url)]"
+                />
+                <video
+                  v-else
+                  class="chat-video"
+                  controls
+                  :src="toFullMediaUrl(parseMediaMessage(message.content).url)"
+                ></video>
+                <div class="media-name">{{ parseMediaMessage(message.content).filename || '附件' }}</div>
+              </div>
               <div v-else class="message-content">{{ message.content }}</div>
               <div class="message-time">{{ formatTime(message.createTime, true) }}</div>
             </div>
@@ -100,6 +130,17 @@
         </div>
 
         <footer class="chat-composer">
+          <input
+            ref="mediaInputRef"
+            class="hidden-file-input"
+            type="file"
+            accept="image/*,video/*"
+            @change="handleMediaSelected"
+          />
+          <div v-if="pendingMedia" class="media-preview">
+            <span>{{ pendingMedia.mediaType === 'image' ? '图片' : '视频' }}：{{ pendingMedia.filename }}</span>
+            <el-button text type="danger" @click="clearPendingMedia">移除</el-button>
+          </div>
           <el-input
             v-model="draft"
             type="textarea"
@@ -112,6 +153,7 @@
           />
           <div class="composer-actions">
             <span class="composer-tip">{{ sendStatus }}</span>
+            <el-button :loading="uploadingMedia" @click="mediaInputRef?.click()">图片/视频</el-button>
             <el-button type="primary" :loading="sending" @click="sendMessage">发送</el-button>
           </div>
         </footer>
@@ -130,9 +172,11 @@ import {
   listChatMessagesApi,
   sendChatMessageApi,
 } from '@/api/chat';
+import { uploadMediaApi } from '@/api/upload';
 import { confirmBargainApi, rejectBargainApi } from '@/api/secondhand';
 import { onRealtimeEvent, sendRealtimeMessage, startRealtimeClient } from '@/realtime/realtimeClient';
 import { useUserStore } from '@/stores/user';
+import { toApiAssetUrl } from '@/utils/url';
 import {
   MSG_TYPE_AUCTION_BID_ACCEPTED,
   MSG_TYPE_AUCTION_OUTBID,
@@ -153,6 +197,9 @@ const messages = ref([]);
 const activeConversationId = ref(null);
 const draft = ref('');
 const sendStatus = ref('正在连接实时通道...');
+const mediaInputRef = ref(null);
+const pendingMedia = ref(null);
+const uploadingMedia = ref(false);
 
 const currentUserId = computed(() => userStore.userInfo?.id);
 const chatRoutePath = computed(() => (route.path.startsWith('/merchant') ? '/merchant/messages' : '/messages'));
@@ -248,7 +295,8 @@ async function loadMessages(conversationId) {
 }
 
 async function sendMessage() {
-  const content = draft.value.trim();
+  const text = draft.value.trim();
+  const content = pendingMedia.value ? buildMediaMessage(pendingMedia.value, text) : text;
   if (!content || !activeConversation.value) return;
   sending.value = true;
   try {
@@ -262,10 +310,50 @@ async function sendMessage() {
       appendIncomingMessage(result.data);
     }
     draft.value = '';
+    clearPendingMedia();
     await scrollToBottom();
   } finally {
     sending.value = false;
   }
+}
+
+async function handleMediaSelected(event) {
+  const file = event?.target?.files?.[0];
+  if (!file) return;
+  const isImage = file.type?.startsWith('image/');
+  const isVideo = file.type?.startsWith('video/');
+  const maxMediaSizeMb = 200;
+  if (!isImage && !isVideo) {
+    ElMessage.warning('只能上传图片或视频');
+    event.target.value = '';
+    return;
+  }
+  if (file.size > maxMediaSizeMb * 1024 * 1024) {
+    ElMessage.warning(`视频或图片不能超过 ${maxMediaSizeMb}MB`);
+    event.target.value = '';
+    return;
+  }
+  uploadingMedia.value = true;
+  try {
+    const result = await uploadMediaApi(file);
+    pendingMedia.value = {
+      mediaType: isImage ? 'image' : 'video',
+      url: result.data?.url,
+      filename: result.data?.filename || file.name,
+    };
+    ElMessage.success('上传成功');
+  } catch (error) {
+    if (!error?.userMessage) {
+      ElMessage.error('上传失败，请检查文件大小或网络后重试');
+    }
+  } finally {
+    uploadingMedia.value = false;
+    event.target.value = '';
+  }
+}
+
+function clearPendingMedia() {
+  pendingMedia.value = null;
 }
 
 function handleComposerKeydown(event) {
@@ -306,6 +394,30 @@ function parseTradeCard(content) {
   return null;
 }
 
+function buildMediaMessage(media, text) {
+  return `[MEDIA]${JSON.stringify({
+    mediaType: media.mediaType,
+    url: media.url,
+    filename: media.filename,
+    text,
+  })}`;
+}
+
+function parseMediaMessage(content) {
+  if (!content || typeof content !== 'string' || !content.startsWith('[MEDIA]')) return null;
+  try {
+    const data = JSON.parse(content.slice('[MEDIA]'.length) || '{}');
+    if (!data.url || !['image', 'video'].includes(data.mediaType)) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+function toFullMediaUrl(url) {
+  return toApiAssetUrl(url);
+}
+
 function parseCardPayload(type, text) {
   try {
     const data = JSON.parse(text || '{}');
@@ -319,6 +431,16 @@ function canHandleBargainApply(message) {
   const card = parseTradeCard(message?.content);
   if (!card || card.type !== 'BARGAIN_APPLY') return false;
   return Number(message?.senderUserId) !== Number(currentUserId.value);
+}
+
+function isBargainHandled(card) {
+  if (!card?.negotiationId) return false;
+  return messages.value.some((message) => {
+    const current = parseTradeCard(message?.content);
+    return current
+      && Number(current.negotiationId) === Number(card.negotiationId)
+      && ['BARGAIN_CONFIRM', 'BARGAIN_REJECT'].includes(current.type);
+  });
 }
 
 function canBuyConfirmedBargain(card) {
@@ -565,6 +687,31 @@ async function scrollToBottom() {
   word-break: break-word;
 }
 
+.media-message {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chat-image {
+  width: min(280px, 60vw);
+  max-height: 220px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.chat-video {
+  width: min(360px, 64vw);
+  max-height: 260px;
+  border-radius: 10px;
+  background: #111827;
+}
+
+.media-name {
+  color: #64748b;
+  font-size: 12px;
+}
+
 .trade-card {
   border: 1px solid #f5d08a;
   background: #fffbeb;
@@ -594,6 +741,11 @@ async function scrollToBottom() {
   margin-bottom: 4px;
 }
 
+.trade-card-line.handled {
+  margin-top: 8px;
+  color: #94a3b8;
+}
+
 .message-time {
   margin-top: 8px;
   color: #94a3b8;
@@ -603,6 +755,24 @@ async function scrollToBottom() {
 .chat-composer {
   border-top: 1px solid #eef2f7;
   padding: 16px 18px 18px;
+}
+
+.hidden-file-input {
+  display: none;
+}
+
+.media-preview {
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 13px;
 }
 
 .composer-actions {

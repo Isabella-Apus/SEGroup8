@@ -5,8 +5,21 @@
 
     <div v-else-if="item" class="detail-wrap">
       <div class="cover-box">
-        <el-image v-if="item.cover" :src="toFullImageUrl(item.cover)" fit="cover" class="cover-image" />
+        <el-image v-if="activeImage" :src="activeImage" fit="cover" class="cover-image" />
         <div v-else class="cover-placeholder">暂无图片</div>
+      </div>
+
+      <div v-if="galleryImages.length > 1" class="thumb-list">
+        <button
+          v-for="(image, index) in galleryImages"
+          :key="`${image}-${index}`"
+          type="button"
+          class="thumb"
+          :class="{ active: activeImage === image }"
+          @click="activeImage = image"
+        >
+          <img :src="image" :alt="`${item.name}-${index + 1}`" />
+        </button>
       </div>
 
       <div class="info-box">
@@ -172,7 +185,7 @@ import {
 import { submitReportApi, blockUserApi, unblockUserApi, isBlockingApi, isBlockedByApi } from '@/api/credit';
 import { listAddressesApi } from '@/api/user';
 import { getUser } from '@/utils/storage';
-import { toApiAssetUrl } from '@/utils/url';
+import { toFullProductImageUrls } from '@/utils/productImages';
 
 const route = useRoute();
 const router = useRouter();
@@ -185,6 +198,7 @@ const reportForm = ref({ reasonType: '', reasonDesc: '' });
 const isSellerBlocked = ref(false);
 const effectiveBargain = ref(null);
 const auctionInfo = ref(null);
+const activeImage = ref('');
 
 const bargainDialogVisible = ref(false);
 const bargainSubmitting = ref(false);
@@ -228,6 +242,7 @@ const minBidPrice = computed(() => {
   if (!auctionInfo.value) return 0;
   return Number(auctionInfo.value?.currentPrice) > 0 ? current + 1 : current;
 });
+const galleryImages = computed(() => toFullProductImageUrls(item.value));
 
 onMounted(async () => {
   await fetchDetail();
@@ -244,6 +259,7 @@ async function fetchDetail() {
   try {
     const result = await getSecondhandDetailApi(route.params.id);
     item.value = result.data;
+    activeImage.value = galleryImages.value[0] || '';
     await loadTradeInfo();
 
     const sellerUserId = item.value?.sellerUserId;
@@ -491,11 +507,6 @@ async function handleUnblock() {
   }
 }
 
-function toFullImageUrl(url) {
-  if (!url) return '';
-  return toApiAssetUrl(url);
-}
-
 function formatTime(value) {
   if (!value) return '-';
   const date = new Date(value);
@@ -540,6 +551,42 @@ function isCancel(error) {
   justify-content: center;
   color: #6b7280;
   background: #f9fafb;
+}
+
+.thumb-list {
+  width: 280px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  grid-column: 1;
+}
+
+.thumb {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  padding: 0;
+  overflow: hidden;
+  background: #f3f4f6;
+  cursor: pointer;
+}
+
+.thumb.active {
+  border-color: #409eff;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.info-box {
+  grid-column: 2;
+  grid-row: 1 / span 2;
 }
 
 .price {
@@ -589,6 +636,18 @@ function isCancel(error) {
     width: 100%;
     max-width: 360px;
     margin: 0 auto;
+  }
+
+  .thumb-list {
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+    grid-column: auto;
+  }
+
+  .info-box {
+    grid-column: auto;
+    grid-row: auto;
   }
 }
 </style>

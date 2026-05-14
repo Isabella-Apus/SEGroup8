@@ -106,7 +106,7 @@
             <el-button v-if="order.orderStatus === 2" size="small" @click="viewLogistics(order)">查看物流</el-button>
             <el-button v-if="order.orderStatus === 2" size="small" type="primary" @click="confirmReceive(order.id)">确认收货</el-button>
             <el-button v-if="order.orderStatus === 3" size="small" type="primary" @click="goReview(order.id)">去评价</el-button>
-            <el-button v-if="canRefund(order.orderStatus, order.refundStatus)" size="small" type="danger" plain @click="openRefundDialog(order.id)">申请退货</el-button>
+            <el-button v-if="canRefund(order.orderStatus, order.refundStatus)" size="small" type="danger" plain @click="openRefundDialog(order)">申请退款/售后</el-button>
             <el-button size="small" @click="goDetail(order.id)">查看详情</el-button>
           </el-space>
         </div>
@@ -134,6 +134,17 @@
       append-to-body
     >
       <el-form label-width="90px">
+        <el-form-item label="退款方式">
+          <el-radio-group v-model="refundForm.refundMode">
+            <el-radio-button
+              v-for="mode in availableRefundModes"
+              :key="mode.value"
+              :label="mode.value"
+            >
+              {{ mode.label }}
+            </el-radio-button>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item label="退货原因">
           <el-select v-model="refundForm.reason" placeholder="请选择" style="width: 100%">
             <el-option label="不想要了/拍错了" value="不想要了/拍错了" />
@@ -255,10 +266,12 @@ const router = useRouter();
 const refundDialogVisible = ref(false);
 const refundSubmitting = ref(false);
 const refundTargetId = ref(null);
+const refundTargetOrder = ref(null);
 const payDialogVisible = ref(false);
 const paySubmitting = ref(false);
 const payTargetId = ref(null);
 const refundForm = reactive({
+  refundMode: 'ONLY_REFUND',
   reason: '',
   remark: '',
   proofUrls: []
@@ -267,6 +280,8 @@ const payForm = reactive({
   payMode: 'THIRD_PARTY',
   payChannel: 'WECHAT'
 });
+
+const availableRefundModes = computed(() => getAvailableRefundModes(refundTargetOrder.value));
 
 let unsubscribeRealtime = null;
 
@@ -424,12 +439,33 @@ function canRefund(status, refundStatus) {
   return status === 1 || status === 2 || status === 3 || status === 4;
 }
 
-function openRefundDialog(orderId) {
-  refundTargetId.value = orderId;
+function openRefundDialog(order) {
+  refundTargetId.value = order.id;
+  refundTargetOrder.value = order;
+  const modes = getAvailableRefundModes(order);
+  refundForm.refundMode = modes[0]?.value || 'ONLY_REFUND';
   refundForm.reason = '';
   refundForm.remark = '';
   refundForm.proofUrls = [];
   refundDialogVisible.value = true;
+}
+
+function getAvailableRefundModes(order) {
+  const status = Number(order?.orderStatus);
+  const logisticsStatus = String(order?.logisticsStatus || '').toUpperCase();
+  if (status === 1) {
+    return [{ label: '仅退款', value: 'ONLY_REFUND' }];
+  }
+  if (status === 2 && logisticsStatus !== 'ARRIVED') {
+    return [{ label: '仅退款', value: 'ONLY_REFUND' }];
+  }
+  if ((status === 2 && logisticsStatus === 'ARRIVED') || status === 3 || status === 4) {
+    return [
+      { label: '仅退款', value: 'ONLY_REFUND' },
+      { label: '退货退款', value: 'RETURN_REFUND' },
+    ];
+  }
+  return [];
 }
 
 async function handleProofChange(file) {
@@ -458,6 +494,7 @@ async function submitRefund() {
     const remark = refundForm.remark?.trim();
     const reason = remark ? `${refundForm.reason}（${remark}）` : refundForm.reason;
     await refundOrderApi(refundTargetId.value, {
+      refundMode: refundForm.refundMode,
       reason,
       proofUrls: refundForm.proofUrls
     });

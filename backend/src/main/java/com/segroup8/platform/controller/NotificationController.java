@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -23,8 +24,8 @@ public class NotificationController {
     }
 
     @GetMapping
-    public Result<List<NotificationVO>> listMyNotifications() {
-        return Result.success(notificationService.listMyNotifications(UserContext.getUserId()));
+    public Result<List<NotificationVO>> listMyNotifications(@RequestParam(required = false) String scope) {
+        return Result.success(notificationService.listMyNotifications(UserContext.getUserId(), scope));
     }
 
     @PostMapping("/{notificationId}/read")
@@ -34,8 +35,8 @@ public class NotificationController {
     }
 
     @PostMapping("/read-all")
-    public Result<Void> markAllRead() {
-        notificationService.markAllRead(UserContext.getUserId());
+    public Result<Void> markAllRead(@RequestParam(required = false) String scope) {
+        notificationService.markAllRead(UserContext.getUserId(), scope);
         return Result.success();
     }
 }

@@ -2,6 +2,7 @@ package com.segroup8.platform.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.segroup8.platform.context.UserContext;
 import com.segroup8.platform.entity.SearchKeywordStat;
 import com.segroup8.platform.entity.UserSearchHistory;
@@ -9,6 +10,10 @@ import com.segroup8.platform.mapper.SearchKeywordStatMapper;
 import com.segroup8.platform.mapper.UserSearchHistoryMapper;
 import com.segroup8.platform.service.SearchBehaviorService;
 import com.segroup8.platform.vo.SearchHotKeywordVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -21,6 +26,7 @@ import java.util.Map;
 @Service
 public class SearchBehaviorServiceImpl implements SearchBehaviorService {
 
+    private static final Logger log = LoggerFactory.getLogger(SearchBehaviorServiceImpl.class);
     private static final int MAX_HISTORY = 5;
     private static final int HOT_KEYWORD_LIMIT = 8;
 
@@ -42,10 +48,14 @@ public class SearchBehaviorServiceImpl implements SearchBehaviorService {
         if (!StringUtils.hasText(normalized)) {
             return;
         }
-        recordHotKeyword(normalized);
-        Long userId = UserContext.getUserId();
-        if (userId != null) {
-            recordUserHistory(userId, normalized);
+        try {
+            recordHotKeyword(normalized);
+            Long userId = UserContext.getUserId();
+            if (userId != null) {
+                recordUserHistory(userId, normalized);
+            }
+        } catch (RuntimeException ex) {
+            log.warn("Failed to record search keyword: {}", normalized, ex);
         }
     }
 
@@ -106,25 +116,33 @@ public class SearchBehaviorServiceImpl implements SearchBehaviorService {
         List<Long> removeIds = all.subList(MAX_HISTORY, all.size()).stream()
                 .map(UserSearchHistory::getId)
                 .toList();
-        userSearchHistoryMapper.deleteBatchIds(removeIds);
+        userSearchHistoryMapper.delete(new LambdaQueryWrapper<UserSearchHistory>()
+                .in(UserSearchHistory::getId, removeIds));
     }
 
     private void recordHotKeyword(String keyword) {
         LocalDate today = LocalDate.now();
-        SearchKeywordStat stat = searchKeywordStatMapper.selectOne(new LambdaQueryWrapper<SearchKeywordStat>()
-                .eq(SearchKeywordStat::getKeyword, keyword)
-                .eq(SearchKeywordStat::getStatDate, today)
-                .last("limit 1"));
-        if (stat == null) {
-            stat = new SearchKeywordStat();
-            stat.setKeyword(keyword);
-            stat.setStatDate(today);
-            stat.setSearchCount(1);
-            searchKeywordStatMapper.insert(stat);
+        int updated = incrementHotKeyword(keyword, today);
+        if (updated > 0) {
             return;
         }
-        stat.setSearchCount(stat.getSearchCount() == null ? 1 : stat.getSearchCount() + 1);
-        searchKeywordStatMapper.updateById(stat);
+
+        SearchKeywordStat stat = new SearchKeywordStat();
+        stat.setKeyword(keyword);
+        stat.setStatDate(today);
+        stat.setSearchCount(1);
+        try {
+            searchKeywordStatMapper.insert(stat);
+        } catch (DataIntegrityViolationException ex) {
+            incrementHotKeyword(keyword, today);
+        }
+    }
+
+    private int incrementHotKeyword(String keyword, LocalDate statDate) {
+        return searchKeywordStatMapper.update(null, new LambdaUpdateWrapper<SearchKeywordStat>()
+                .eq(SearchKeywordStat::getKeyword, keyword)
+                .eq(SearchKeywordStat::getStatDate, statDate)
+                .setSql("search_count = IFNULL(search_count, 0) + 1"));
     }
 
     private String normalize(String keyword) {

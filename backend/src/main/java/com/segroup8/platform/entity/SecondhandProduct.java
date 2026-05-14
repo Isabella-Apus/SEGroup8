@@ -15,6 +15,7 @@ public class SecondhandProduct {
     private Long sellerUserId;
     private String name;
     private String cover;
+    private String images;
     private String description;
     private BigDecimal originPrice;
     private BigDecimal salePrice;
@@ -56,6 +57,14 @@ public class SecondhandProduct {
 
     public void setCover(String cover) {
         this.cover = cover;
+    }
+
+    public String getImages() {
+        return images;
+    }
+
+    public void setImages(String images) {
+        this.images = images;
     }
 
     public String getDescription() {
@@ -138,4 +147,3 @@ public class SecondhandProduct {
         this.updateTime = updateTime;
     }
 }
-

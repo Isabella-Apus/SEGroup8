@@ -9,3 +9,14 @@ export function uploadImageApi(file) {
         },
     });
 }
+
+export function uploadMediaApi(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    return http.post("/upload/media", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+        timeout: 180000,
+    });
+}

@@ -18,7 +18,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { toApiAssetUrl } from '@/utils/url';
+import { getFirstProductImage, toFullImageUrl } from '@/utils/productImages';
 
 const props = defineProps({
   product: {
@@ -82,14 +82,11 @@ const subText = computed(() => {
 });
 
 const coverUrl = computed(() => {
-  const cover = props.product.cover || '';
+  const cover = getFirstProductImage(props.product);
   if (!cover) {
     return 'https://images.unsplash.com/photo-1511556820780-d912e42b4980?auto=format&fit=crop&w=900&q=80';
   }
-  if (cover.startsWith('http')) {
-    return cover;
-  }
-  return toApiAssetUrl(cover);
+  return toFullImageUrl(cover);
 });
 
 function goDetail() {
