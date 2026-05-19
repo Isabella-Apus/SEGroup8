@@ -1,45 +1,74 @@
 <template>
-  <div class="page-card">
-    <h2 class="page-title">二手商品详情</h2>
-    <el-skeleton v-if="loading" :rows="6" animated />
+  <section class="detail-page">
+    <el-skeleton v-if="loading" :rows="8" animated class="page-card" />
 
-    <div v-else-if="item" class="detail-wrap">
-      <div class="cover-box">
-        <el-image v-if="item.cover" :src="toFullImageUrl(item.cover)" fit="cover" class="cover-image" />
-        <div v-else class="cover-placeholder">暂无图片</div>
+    <div v-else-if="item" class="detail-shell">
+      <div class="gallery">
+        <el-image :src="selectedImage" fit="cover" class="main-image" />
+        <div class="thumbs" v-if="imageList.length > 1">
+          <button
+            v-for="image in imageList"
+            :key="image"
+            class="thumb"
+            :class="{ active: selectedImage === image }"
+            type="button"
+            @click="selectedImage = image"
+          >
+            <img :src="image" :alt="item.name" />
+          </button>
+        </div>
       </div>
 
-      <div class="info-box">
-        <h3>{{ item.name }}</h3>
-        <p class="price">￥{{ Number(item.salePrice || 0).toFixed(2) }}</p>
-        <p class="origin">原价：￥{{ Number(item.originPrice || item.salePrice || 0).toFixed(2) }}</p>
-        <p>成色：{{ item.conditionLevel || item.condition || "未知" }}</p>
-        <p>状态：{{ item.statusName || "在售" }}</p>
-        <p v-if="item.sellerName">卖家：{{ item.sellerName }}</p>
+      <div class="buy-panel">
+        <div class="crumb">二手市场 / 个人闲置</div>
+        <h1>{{ item.name }}</h1>
         <p class="desc">{{ item.description || "暂无商品描述" }}</p>
 
-        <p class="desc">二手商品仅支持单件下单购买。</p>
+        <div class="price-box">
+          <span>闲置价</span>
+          <strong>¥{{ Number(item.salePrice || 0).toFixed(2) }}</strong>
+          <em>原价 ¥{{ Number(item.originPrice || item.salePrice || 0).toFixed(2) }}</em>
+        </div>
 
-        <el-space wrap>
-          <el-button type="primary" @click="handleBuyNow" :disabled="!canBuy">立即购买</el-button>
-          <el-button v-if="canChatWithSeller" type="success" plain @click="handleContactSeller">联系卖家</el-button>
-          <el-button type="primary" plain @click="router.push('/secondhand/publish')">我也要发布</el-button>
-          <el-button text @click="router.push('/secondhand')">返回</el-button>
-        </el-space>
+        <dl class="info-grid">
+          <div>
+            <dt>成色</dt>
+            <dd>{{ item.conditionLevel || item.condition || "未知" }}</dd>
+          </div>
+          <div>
+            <dt>状态</dt>
+            <dd>{{ item.statusName || "在售" }}</dd>
+          </div>
+          <div>
+            <dt>卖家</dt>
+            <dd>{{ item.sellerName || item.sellerUserId || "个人卖家" }}</dd>
+          </div>
+        </dl>
 
-        <!-- 举报 / 拉黑（非本人商品时显示） -->
-        <el-divider v-if="canChatWithSeller" />
-        <el-space v-if="canChatWithSeller" wrap>
+        <div class="notice-box">
+          二手商品默认单件交易，请先阅读描述并确认卖家信息。付款后可在订单页查看进度。
+        </div>
+
+        <div class="actions">
+          <el-button type="warning" size="large" :disabled="!canBuy" @click="handleBuyNow">
+            立即购买
+          </el-button>
+          <el-button v-if="canChatWithSeller" type="primary" size="large" @click="handleContactSeller">
+            联系卖家
+          </el-button>
+          <el-button size="large" @click="router.push('/secondhand/publish')">我也要发布</el-button>
+        </div>
+
+        <div v-if="canChatWithSeller" class="risk-actions">
           <el-button type="warning" plain size="small" @click="openReportDialog">举报卖家</el-button>
           <el-button v-if="!isSellerBlocked" type="danger" plain size="small" @click="handleBlock">拉黑卖家</el-button>
           <el-button v-else type="info" plain size="small" @click="handleUnblock">取消拉黑</el-button>
-        </el-space>
+        </div>
       </div>
     </div>
 
-    <p v-else class="empty-tip">二手商品不存在</p>
+    <p v-else class="empty-tip page-card">二手商品不存在</p>
 
-    <!-- ===== 举报弹窗 ===== -->
     <el-dialog v-model="reportDialogVisible" title="举报卖家" width="480px">
       <el-form :model="reportForm" label-width="90px">
         <el-form-item label="举报类型" required>
@@ -60,7 +89,7 @@
         <el-button type="primary" :loading="reportSubmitting" @click="handleSubmitReport">提交举报</el-button>
       </template>
     </el-dialog>
-  </div>
+  </section>
 </template>
 
 <script setup>
@@ -70,20 +99,30 @@ import { useRoute, useRouter } from "vue-router";
 import { buySecondhandApi, getSecondhandDetailApi } from "@/api/secondhand";
 import { submitReportApi, blockUserApi, unblockUserApi, isBlockingApi, isBlockedByApi } from "@/api/credit";
 import { getUser } from "@/utils/storage";
+import { toAssetUrl } from "@/utils/url";
 
 const route = useRoute();
 const router = useRouter();
 
 const loading = ref(false);
 const item = ref(null);
-
-// 举报弹窗
+const selectedImage = ref("");
 const reportDialogVisible = ref(false);
 const reportSubmitting = ref(false);
 const reportForm = ref({ reasonType: "", reasonDesc: "" });
-
-// 拉黑状态
 const isSellerBlocked = ref(false);
+
+const imageList = computed(() => {
+  if (!item.value) {
+    return [];
+  }
+  const images = Array.isArray(item.value.images) ? item.value.images : [];
+  const list = [item.value.cover, ...images]
+    .filter(Boolean)
+    .map((source) => toAssetUrl(source))
+    .filter(Boolean);
+  return [...new Set(list)];
+});
 
 const canBuy = computed(() => !!item.value && Number(item.value.status || 1) === 1);
 const canChatWithSeller = computed(() => {
@@ -100,8 +139,8 @@ async function fetchDetail() {
   try {
     const result = await getSecondhandDetailApi(route.params.id);
     item.value = result.data;
+    selectedImage.value = imageList.value[0] || "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=900&q=80";
 
-    // 拉黑检查：任意一方拉黑对方，直接跳回列表
     const sellerUserId = item.value?.sellerUserId;
     const currentUserId = getUser()?.id;
     if (sellerUserId && currentUserId && Number(sellerUserId) !== Number(currentUserId)) {
@@ -114,7 +153,6 @@ async function fetchDetail() {
         router.replace("/secondhand");
         return;
       }
-      // 记录当前是否已拉黑该卖家（用于按钮切换）
       isSellerBlocked.value = iBlocked.data === true;
     }
   } finally {
@@ -179,7 +217,7 @@ async function handleBlock() {
     await ElMessageBox.confirm(
       `确认拉黑卖家「${item.value.sellerName || item.value.sellerUserId}」？拉黑后对方无法与你发起会话。`,
       "拉黑确认",
-      { type: "warning", confirmButtonText: "确认拉黑", cancelButtonText: "取消" }
+      { type: "warning", confirmButtonText: "确认拉黑", cancelButtonText: "取消" },
     );
     await blockUserApi(item.value.sellerUserId);
     isSellerBlocked.value = true;
@@ -195,7 +233,7 @@ async function handleUnblock() {
     await ElMessageBox.confirm(
       `确认取消拉黑卖家「${item.value.sellerName || item.value.sellerUserId}」？`,
       "取消拉黑",
-      { type: "warning", confirmButtonText: "确认取消", cancelButtonText: "取消" }
+      { type: "warning", confirmButtonText: "确认取消", cancelButtonText: "取消" },
     );
     await unblockUserApi(item.value.sellerUserId);
     isSellerBlocked.value = false;
@@ -205,74 +243,169 @@ async function handleUnblock() {
     ElMessage.error(e?.response?.data?.message || "操作失败");
   }
 }
-
-function toFullImageUrl(url) {
-  if (!url) return "";
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  const normalized = url.startsWith("/") ? url : `/${url}`;
-  return `http://localhost:8080${normalized}`;
-}
 </script>
 
 <style scoped>
-.detail-wrap {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 24px;
-}
-
-.cover-box {
-  width: 280px;
-  height: 280px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.cover-image {
-  width: 100%;
-  height: 100%;
-}
-
-.cover-placeholder {
-  width: 100%;
-  height: 100%;
+.detail-page {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6b7280;
-  background: #f9fafb;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.price {
-  color: #ef4444;
-  font-size: 22px;
+.detail-shell {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+  gap: 22px;
+}
+
+.gallery,
+.buy-panel {
+  border: 1px solid var(--line-soft);
+  border-radius: 24px;
+  background: #ffffff;
+  padding: 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+.main-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #f1efe6;
+}
+
+.thumbs {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.thumb {
+  aspect-ratio: 1 / 1;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  background: #f1efe6;
+  cursor: pointer;
+}
+
+.thumb.active {
+  border-color: var(--brand-primary);
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.buy-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.crumb {
+  color: var(--text-secondary);
+  font-size: 13px;
   font-weight: 700;
-  margin: 8px 0;
 }
 
-.origin {
-  color: #6b7280;
+.buy-panel h1 {
+  margin: 0;
+  font-size: clamp(26px, 4vw, 38px);
+  line-height: 1.18;
+  letter-spacing: 0;
 }
 
 .desc {
-  color: #4b5563;
+  margin: 0;
+  color: var(--text-secondary);
   line-height: 1.8;
 }
 
-.actions {
-  margin: 14px 0;
+.price-box {
+  border-radius: 18px;
+  background: #fff5d1;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.price-box span {
+  color: #6d5a15;
+  font-weight: 800;
+}
+
+.price-box strong {
+  color: var(--brand-warm);
+  font-size: 36px;
+  line-height: 1;
+}
+
+.price-box em {
+  color: var(--text-muted);
+  font-style: normal;
+  text-decoration: line-through;
+}
+
+.info-grid {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.info-grid div {
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.info-grid dt {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.info-grid dd {
+  margin: 6px 0 0;
+  font-weight: 800;
+}
+
+.notice-box {
+  border-radius: 16px;
+  background: var(--surface-soft);
+  color: var(--text-secondary);
+  padding: 13px 14px;
+  line-height: 1.7;
+}
+
+.actions,
+.risk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.risk-actions {
+  border-top: 1px solid var(--line-soft);
+  padding-top: 14px;
 }
 
 @media (max-width: 900px) {
-  .detail-wrap {
+  .detail-shell {
     grid-template-columns: 1fr;
   }
 
-  .cover-box {
-    width: 100%;
-    max-width: 360px;
-    margin: 0 auto;
+  .info-grid,
+  .price-box {
+    grid-template-columns: 1fr;
   }
 }
 </style>

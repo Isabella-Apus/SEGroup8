@@ -72,7 +72,7 @@
             maxlength="1000"
             show-word-limit
             resize="none"
-            placeholder="输入消息，按 Ctrl/Cmd + Enter 发送"
+            placeholder="输入消息"
             @keydown="handleComposerKeydown"
           />
           <div class="composer-actions">
@@ -377,7 +377,7 @@ async function scrollToBottom() {
 .conversation-panel,
 .chat-panel {
   background: #fff;
-  border: 1px solid #e5ebf3;
+  border: 1px solid var(--line-soft);
   border-radius: 18px;
   overflow: hidden;
 }
@@ -388,8 +388,8 @@ async function scrollToBottom() {
   justify-content: space-between;
   align-items: center;
   padding: 18px 20px;
-  border-bottom: 1px solid #eef2f7;
-  background: linear-gradient(135deg, #f7fbff 0%, #f4f9f2 100%);
+  border-bottom: 1px solid var(--line-soft);
+  background: linear-gradient(135deg, #edf7f3 0%, #f1f0fb 100%);
 }
 
 .panel-head h2,
@@ -417,7 +417,7 @@ async function scrollToBottom() {
 .conversation-item {
   width: 100%;
   border: 0;
-  border-bottom: 1px solid #eef2f7;
+  border-bottom: 1px solid var(--line-soft);
   background: transparent;
   padding: 16px 18px;
   text-align: left;
@@ -427,7 +427,7 @@ async function scrollToBottom() {
 
 .conversation-item:hover,
 .conversation-item.active {
-  background: #f5f9ff;
+  background: #edf7f3;
 }
 
 .conversation-top,

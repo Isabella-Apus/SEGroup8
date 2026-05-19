@@ -1,19 +1,28 @@
 :root {
-  --bg-base: #f4f7fb;
-  --bg-layer: linear-gradient(180deg, #f8fbff 0%, #f4f7fb 46%, #eef3fa 100%);
+  --bg-base: #f6f4ef;
+  --bg-layer: linear-gradient(135deg, #f7efe5 0, #edf7f3 42%, #f1f0fb 100%);
   --surface: #ffffff;
-  --surface-soft: #fbfdff;
-  --line-soft: #e5ebf2;
-  --text-main: #1e2633;
-  --text-secondary: #5f6c80;
-  --brand-primary: #11806a;
-  --brand-primary-weak: #e8f7f2;
-  --brand-accent: #ea7c2b;
+  --surface-soft: #fbfaf6;
+  --line-soft: #e5ddd2;
+  --line-strong: #27323a;
+  --text-main: #27323a;
+  --text-secondary: #65706c;
+  --text-muted: #9a9389;
+  --brand-primary: #27323a;
+  --brand-primary-weak: #dcefe9;
+  --brand-accent: #9fd8cb;
+  --brand-accent-strong: #78c4b6;
+  --brand-lilac: #c9c3e6;
+  --brand-sky: #b7d8ee;
+  --brand-warm: #e99872;
   --danger: #d14343;
-  --radius-lg: 18px;
-  --radius-md: 12px;
-  --shadow-soft: 0 6px 18px rgba(20, 40, 76, 0.07);
-  --shadow-float: 0 10px 24px rgba(17, 35, 66, 0.12);
+  --success: #1a8f5a;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --shadow-soft: 0 10px 24px rgba(32, 36, 45, 0.08);
+  --shadow-float: 0 18px 40px rgba(32, 36, 45, 0.16);
+  --container: 1200px;
 }
 
 * {
@@ -31,6 +40,14 @@ body {
   font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
   color: var(--text-main);
   background: var(--bg-layer);
+  background-attachment: fixed;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
 }
 
 a {
@@ -38,8 +55,12 @@ a {
   text-decoration: none;
 }
 
+img {
+  max-width: 100%;
+}
+
 .page-card {
-  background: linear-gradient(180deg, #ffffff 0%, #fdfefe 100%);
+  background: var(--surface);
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-lg);
   padding: 22px;
@@ -48,11 +69,12 @@ a {
 
 .page-title {
   margin: 0 0 16px;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0;
 }
 
+.page-subtitle,
 .empty-tip {
   color: var(--text-secondary);
 }
@@ -66,13 +88,13 @@ a {
 .skeleton-panel {
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-md);
-  background: #ffffff;
+  background: var(--surface);
   padding: 16px;
 }
 
 .query-form,
 .toolbar {
-  background: var(--surface-soft);
+  background: var(--surface);
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-md);
   padding: 12px 12px 2px;
@@ -92,21 +114,36 @@ a {
 }
 
 .el-table th.el-table__cell {
-  background: #f5f8fc;
-  color: #344055;
-  font-weight: 600;
+  background: #f2eee6;
+  color: #34312a;
+  font-weight: 700;
+}
+
+.el-button {
+  font-weight: 700;
 }
 
 .el-button--primary {
   --el-button-bg-color: var(--brand-primary);
   --el-button-border-color: var(--brand-primary);
-  --el-button-hover-bg-color: #0e6d5b;
-  --el-button-hover-border-color: #0e6d5b;
+  --el-button-hover-bg-color: #3a3a3a;
+  --el-button-hover-border-color: #3a3a3a;
+  --el-button-active-bg-color: #000000;
+  --el-button-active-border-color: #000000;
 }
 
 .el-button--warning {
-  --el-button-bg-color: var(--brand-accent);
-  --el-button-border-color: var(--brand-accent);
+  --el-button-bg-color: var(--brand-warm);
+  --el-button-border-color: var(--brand-warm);
+  --el-button-text-color: #ffffff;
+  --el-button-hover-bg-color: #d98763;
+  --el-button-hover-border-color: #d98763;
+  --el-button-hover-text-color: #ffffff;
+}
+
+.el-button--success {
+  --el-button-bg-color: var(--success);
+  --el-button-border-color: var(--success);
 }
 
 .el-button--danger {
@@ -118,14 +155,20 @@ a {
   color: var(--danger);
 }
 
+.el-input__wrapper,
+.el-select__wrapper,
+.el-textarea__inner {
+  border-radius: 999px;
+}
+
 .status-tag {
   border-radius: 999px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 0 10px;
 }
 
 .status-tag.status-pending {
-  color: #965a09;
+  color: #765206;
   background: #fff5db;
   border-color: #f6d37f;
 }
@@ -166,7 +209,7 @@ a {
 .el-menu-item.is-active {
   background: var(--brand-primary-weak);
   color: var(--brand-primary);
-  font-weight: 600;
+  font-weight: 800;
 }
 
 .fade-in-up {
@@ -201,7 +244,7 @@ a {
   }
 
   .page-title {
-    font-size: 19px;
+    font-size: 20px;
   }
 
   .query-form,

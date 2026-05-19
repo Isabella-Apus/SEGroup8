@@ -1,12 +1,10 @@
 :root {
-    --bg-main: #f5f7fb;
-    --bg-grad: radial-gradient(circle at 15% 15%, #ffe9d5 0, transparent 35%),
-        radial-gradient(circle at 85% 0, #e8f6ff 0, transparent 32%),
-        linear-gradient(180deg, #fffaf4 0%, #f5f7fb 100%);
-    --brand-orange: #ff5a1f;
-    --brand-yellow: #ffb11b;
-    --text-main: #202329;
-    --line-soft: #eceef3;
+    --bg-main: #f6f4ef;
+    --bg-grad: linear-gradient(135deg, #f7efe5 0, #edf7f3 42%, #f1f0fb 100%);
+    --brand-orange: #e99872;
+    --brand-yellow: #9fd8cb;
+    --text-main: #27323a;
+    --line-soft: #e5ddd2;
     --card-bg: #ffffff;
 }
 

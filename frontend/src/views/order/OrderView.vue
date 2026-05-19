@@ -1,16 +1,24 @@
 <template>
-  <div class="page-card">
-    <h2 class="page-title">
-      我的订单
-      <span v-if="!listLoading" class="page-title-sub">（{{ tabLabel }} · 共 {{ filteredRecords.length }} 条）</span>
-    </h2>
+  <div class="page-card order-page">
+    <section class="order-head">
+      <div>
+        <span class="eyebrow">Orders</span>
+        <h2 class="page-title">我的订单</h2>
+        <p>查看交易进度、物流状态和售后入口。</p>
+      </div>
+      <div v-if="!listLoading" class="head-stats">
+        <span>{{ tabLabel }}</span>
+        <strong>{{ filteredRecords.length }}</strong>
+        <small>当前结果</small>
+      </div>
+    </section>
 
-    <div class="toolbar">
+    <div class="toolbar order-toolbar">
       <el-input
         v-model="query.keyword"
         placeholder="搜索订单号/商品名"
         clearable
-        style="max-width: 360px"
+        class="search-input"
         @keyup.enter="handleSearch"
       />
       <el-date-picker
@@ -18,7 +26,7 @@
         type="datetime"
         placeholder="开始时间"
         value-format="x"
-        style="width: 200px"
+        class="time-input"
         clearable
       />
       <el-date-picker
@@ -26,16 +34,16 @@
         type="datetime"
         placeholder="结束时间"
         value-format="x"
-        style="width: 200px"
+        class="time-input"
         clearable
       />
-      <el-input-number v-model="query.minAmount" :min="0" :precision="2" placeholder="最小金额" style="width: 160px" />
-      <el-input-number v-model="query.maxAmount" :min="0" :precision="2" placeholder="最大金额" style="width: 160px" />
+      <el-input-number v-model="query.minAmount" :min="0" :precision="2" placeholder="最小金额" class="amount-input" />
+      <el-input-number v-model="query.maxAmount" :min="0" :precision="2" placeholder="最大金额" class="amount-input" />
       <el-button type="primary" @click="handleSearch">搜索</el-button>
       <el-button @click="handleReset">重置</el-button>
     </div>
 
-    <el-tabs v-model="activeTab" @tab-click="handleTabClick">
+    <el-tabs v-model="activeTab" class="status-tabs" @tab-click="handleTabClick">
       <el-tab-pane label="全部" name="ALL" />
       <el-tab-pane label="待付款" name="PENDING_PAY" />
       <el-tab-pane label="待发货" name="PENDING_SHIP" />
@@ -52,32 +60,36 @@
     <el-empty v-else-if="!listLoading && filteredRecords.length === 0" description="暂无订单" />
 
     <div v-else v-loading="listLoading" class="order-list">
-      <el-card v-for="order in filteredRecords" :key="order.id" shadow="hover" class="order-card" @click="goDetail(order.id)">
+      <article v-for="order in filteredRecords" :key="order.id" class="order-card" @click="goDetail(order.id)">
         <div class="order-card__header">
-          <OrderStatusTag
-            :status="order.orderStatus"
-            :status-name="order.orderStatusName"
-            :refund-status="order.refundStatus"
-            :refund-status-name="order.refundStatusName"
-            size="default"
-          />
-          <div class="meta">
+          <div class="status-cluster">
+            <OrderStatusTag
+              :status="order.orderStatus"
+              :status-name="order.orderStatusName"
+              :refund-status="order.refundStatus"
+              :refund-status-name="order.refundStatusName"
+              size="default"
+            />
             <span class="no">订单号：{{ order.orderNo }}</span>
-            <span class="time">{{ formatTime(order.createTime) }}</span>
           </div>
+          <span class="time">{{ formatTime(order.createTime) }}</span>
         </div>
 
-        <div v-for="item in order.items || []" :key="item.id" class="order-item">
-          <div class="name">
-            {{ item.productName }}
-            <el-tag v-if="item.productType" size="small" style="margin-left: 8px" :type="item.productType === 'SECONDHAND' ? 'warning' : 'info'">
-              {{ item.productType === 'SECONDHAND' ? '二手' : '新品' }}
-            </el-tag>
-            <el-tag v-if="item.conditionLevel" size="small" type="success" style="margin-left: 6px">
-              {{ item.conditionLevel }}
-            </el-tag>
+        <div class="order-items">
+          <div v-for="item in order.items || []" :key="item.id" class="order-item">
+            <div class="item-main">
+              <strong class="name">{{ item.productName }}</strong>
+              <span class="item-tags">
+                <el-tag v-if="item.productType || item.itemType" size="small" :type="(item.productType || item.itemType) === 'SECONDHAND' ? 'warning' : 'info'">
+                  {{ (item.productType || item.itemType) === 'SECONDHAND' ? '二手' : '新品' }}
+                </el-tag>
+                <el-tag v-if="item.conditionLevel" size="small" type="success">
+                  {{ item.conditionLevel }}
+                </el-tag>
+              </span>
+            </div>
+            <div class="price">￥{{ Number(item.price || 0).toFixed(2) }} × {{ item.quantity }}</div>
           </div>
-          <div class="price">￥{{ Number(item.price || 0).toFixed(2) }} × {{ item.quantity }}</div>
         </div>
 
         <div class="order-extra">
@@ -98,8 +110,11 @@
         </div>
 
         <div class="order-card__footer" @click.stop>
-          <div class="amount">实付：<strong>￥{{ Number(order.totalAmount || 0).toFixed(2) }}</strong></div>
-          <el-space>
+          <div class="amount">
+            <span>实付</span>
+            <strong>￥{{ Number(order.totalAmount || 0).toFixed(2) }}</strong>
+          </div>
+          <el-space wrap class="order-actions">
             <el-button v-if="order.orderStatus === 0" size="small" @click="cancel(order.id)">取消订单</el-button>
             <el-button v-if="order.orderStatus === 0" size="small" type="primary" @click="pay(order.id)">立即付款</el-button>
             <el-button v-if="order.orderStatus === 1" size="small" @click="remindShip(order.id)">提醒发货</el-button>
@@ -111,7 +126,7 @@
             <el-button v-if="getOrderPrimarySeller(order)?.sellerUserId" size="small" type="success" plain @click="contactSeller(order)">联系卖家</el-button>
           </el-space>
         </div>
-      </el-card>
+      </article>
     </div>
 
     <div class="pager-wrap">
@@ -516,80 +531,219 @@ function handleRealtimeEvent(event) {
 </script>
 
 <style scoped>
-.page-title-sub {
-  margin-left: 8px;
-  font-size: 14px;
-  font-weight: normal;
-  color: #6b7280;
+.order-page {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
 }
 
-.toolbar {
+.order-head {
   display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: stretch;
+  margin-bottom: 18px;
+  border: 1px solid rgba(229, 221, 210, 0.92);
+  border-radius: 24px;
+  background:
+    linear-gradient(135deg, rgba(220, 239, 233, 0.92), rgba(247, 239, 229, 0.9) 54%, rgba(241, 240, 251, 0.92)),
+    #ffffff;
+  padding: 22px;
+  box-shadow: var(--shadow-soft);
+}
+
+.eyebrow {
+  display: inline-flex;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 5px 11px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--brand-primary);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.page-title {
+  margin: 10px 0 6px;
+  font-size: 30px;
+}
+
+.order-head p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.head-stats {
+  min-width: 132px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  padding: 14px 16px;
+  text-align: right;
+  box-shadow: 0 10px 24px rgba(39, 50, 58, 0.08);
+}
+
+.head-stats span,
+.head-stats small {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.head-stats strong {
+  display: block;
+  margin: 2px 0;
+  font-size: 32px;
+  line-height: 1;
+}
+
+.order-toolbar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.35fr) repeat(2, minmax(180px, 0.75fr)) repeat(2, 150px) auto auto;
   gap: 10px;
   align-items: center;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
+  margin-bottom: 12px;
+  border-radius: 20px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: var(--shadow-soft);
+}
+
+.search-input,
+.time-input,
+.amount-input {
+  width: 100%;
+}
+
+.status-tabs {
+  margin-bottom: 12px;
+}
+
+.status-tabs :deep(.el-tabs__nav-wrap::after) {
+  height: 1px;
+  background: rgba(101, 112, 108, 0.16);
+}
+
+.status-tabs :deep(.el-tabs__item) {
+  font-weight: 800;
+  color: var(--text-secondary);
+}
+
+.status-tabs :deep(.el-tabs__item.is-active) {
+  color: var(--brand-primary);
+}
+
+.status-tabs :deep(.el-tabs__active-bar) {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--brand-accent-strong);
 }
 
 .order-list {
   display: grid;
-  gap: 12px;
+  gap: 14px;
 }
 
 .order-card {
   cursor: pointer;
+  border: 1px solid rgba(229, 221, 210, 0.92);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.86);
+  padding: 18px;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(120, 196, 182, 0.55);
+  box-shadow: var(--shadow-float);
 }
 
 .order-card__header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+  gap: 14px;
+  align-items: flex-start;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(229, 221, 210, 0.72);
 }
 
-.meta {
+.status-cluster {
   display: flex;
-  gap: 12px;
-  color: #6b7280;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.no,
+.time {
+  color: var(--text-secondary);
   font-size: 12px;
+  font-weight: 700;
+}
+
+.time {
+  white-space: nowrap;
+}
+
+.order-items {
+  display: grid;
+  gap: 0;
+  padding: 6px 0;
 }
 
 .order-item {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 8px 0;
-  border-top: 1px dashed #e5e7eb;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  min-height: 46px;
+  border-bottom: 1px dashed rgba(101, 112, 108, 0.14);
 }
 
-.order-item:first-of-type {
-  border-top: 0;
-  padding-top: 0;
+.order-item:last-child {
+  border-bottom: 0;
+}
+
+.item-main {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
 }
 
 .order-item .name {
-  flex: 1;
+  color: var(--text-main);
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-tags {
+  display: inline-flex;
+  gap: 6px;
 }
 
 .order-item .price {
   white-space: nowrap;
-  color: #374151;
-}
-
-.order-card__footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #e5e7eb;
+  color: var(--text-main);
+  font-weight: 800;
 }
 
 .order-extra {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #f3f4f6;
-  color: #4b5563;
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  border-radius: 16px;
+  background: rgba(246, 244, 239, 0.72);
+  padding: 12px;
+  color: var(--text-secondary);
   font-size: 12px;
 }
 
@@ -598,22 +752,44 @@ function handleRealtimeEvent(event) {
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
-  margin-top: 6px;
 }
 
 .order-extra .label {
-  color: #6b7280;
+  color: var(--text-muted);
+  font-weight: 800;
 }
 
 .order-extra .sep {
   width: 1px;
   height: 12px;
-  background: #e5e7eb;
+  background: rgba(101, 112, 108, 0.2);
   margin: 0 6px;
 }
 
+.order-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(229, 221, 210, 0.72);
+}
+
+.amount span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .amount strong {
-  color: #ef4444;
+  color: var(--danger);
+  font-size: 20px;
+}
+
+.order-actions {
+  justify-content: flex-end;
 }
 
 .pager-wrap {
@@ -623,7 +799,7 @@ function handleRealtimeEvent(event) {
 }
 
 .hint {
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 12px;
   margin-top: 6px;
 }
@@ -631,11 +807,45 @@ function handleRealtimeEvent(event) {
 .pay-qr-placeholder {
   margin: 8px 0;
   height: 180px;
-  border: 2px dashed #d1d5db;
-  border-radius: 12px;
+  border: 2px dashed rgba(120, 196, 182, 0.45);
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
+  color: var(--text-secondary);
+  background: rgba(220, 239, 233, 0.28);
+}
+
+@media (max-width: 1080px) {
+  .order-toolbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .order-head,
+  .order-card__header,
+  .order-card__footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .head-stats {
+    text-align: left;
+  }
+
+  .order-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .order-item {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 9px 0;
+  }
+
+  .time {
+    white-space: normal;
+  }
 }
 </style>

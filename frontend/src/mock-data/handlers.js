@@ -62,6 +62,43 @@ function asText(value) {
     return String(value || "").trim();
 }
 
+function userPublic(user) {
+    if (!user) {
+        return null;
+    }
+    return {
+        id: user.id,
+        username: user.username,
+        nickname: user.nickname,
+        role: user.role,
+        avatar: user.avatar,
+    };
+}
+
+function creditLevel(score) {
+    const value = Number(score || 100);
+    if (value < 60) return "较差";
+    if (value < 80) return "良好";
+    if (value < 95) return "优秀";
+    return "极好";
+}
+
+function chatConversationVO(conversation, currentUserId) {
+    const otherId = (conversation.participantIds || []).find((id) => Number(id) !== Number(currentUserId));
+    const other = mockStore.users.find((user) => Number(user.id) === Number(otherId));
+    return {
+        id: conversation.id,
+        other: userPublic(other),
+        participantIds: conversation.participantIds,
+        sourceType: conversation.sourceType,
+        sourceId: conversation.sourceId,
+        sourceTitle: conversation.sourceTitle,
+        lastMessageContent: conversation.lastMessageContent,
+        lastMessageTime: conversation.lastMessageTime,
+        unreadCount: Number(conversation.unreadByUserId) === Number(currentUserId) ? 1 : 0,
+    };
+}
+
 export async function handleMockRequest({ method, url, params, data, headers }) {
     const m = String(method || "get").toLowerCase();
     const p = String(url || "");
@@ -371,9 +408,13 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
             totalAmount: Number(item.salePrice || 0),
             payStatus: 1,
             orderStatus: 1,
+            orderStatusName: "待发货",
+            refundStatus: 0,
+            refundStatusName: "",
             createTime: new Date().toISOString(),
             items: [
                 {
+                    id: `${orderId}-1`,
                     productId: item.id,
                     productName: item.name,
                     itemType: "SECONDHAND",
@@ -388,12 +429,13 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
 
     if (m === "post" && p === "/order/create") {
         const user = requireLogin(headers);
-        const items = (data?.items || []).map((it) => {
+        const items = (data?.items || []).map((it, idx) => {
             const product = mockStore.products.find((x) => x.id === Number(it.productId));
             if (!product) {
                 fail(404, `商品不存在: ${it.productId}`);
             }
             return {
+                id: `${product.id}-${idx + 1}`,
                 productId: product.id,
                 productName: product.name,
                 itemType: "NEW",
@@ -410,6 +452,9 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
             totalAmount,
             payStatus: 1,
             orderStatus: 1,
+            orderStatusName: "待发货",
+            refundStatus: 0,
+            refundStatusName: "",
             createTime: new Date().toISOString(),
             items,
         };
@@ -420,10 +465,42 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
     if (m === "get" && p === "/order/list") {
         const user = requireLogin(headers);
         let records = mockStore.orders.filter((o) => o.buyerUserId === user.id);
+        const keyword = asText(params?.keyword);
         const rawStatus = params?.orderStatus;
         if (rawStatus !== undefined && rawStatus !== null && rawStatus !== "") {
             const st = Number(rawStatus);
             records = records.filter((o) => Number(o.orderStatus) === st);
+        }
+        const rawRefundStatus = params?.refundStatus;
+        if (rawRefundStatus !== undefined && rawRefundStatus !== null && rawRefundStatus !== "") {
+            const st = Number(rawRefundStatus);
+            records = records.filter((o) => Number(o.refundStatus || 0) === st);
+        }
+        if (params?.afterSaleOnly === true || params?.afterSaleOnly === "true" || Number(params?.afterSaleOnly) === 1) {
+            records = records.filter((o) => Number(o.refundStatus || 0) > 0);
+        }
+        if (keyword) {
+            records = records.filter((o) => {
+                const hitOrderNo = String(o.orderNo || "").includes(keyword);
+                const hitProduct = (o.items || []).some((i) => String(i.productName || "").includes(keyword));
+                return hitOrderNo || hitProduct;
+            });
+        }
+        const minAmount = params?.minAmount === undefined || params?.minAmount === null || params?.minAmount === "" ? null : Number(params.minAmount);
+        const maxAmount = params?.maxAmount === undefined || params?.maxAmount === null || params?.maxAmount === "" ? null : Number(params.maxAmount);
+        if (minAmount !== null && Number.isFinite(minAmount)) {
+            records = records.filter((o) => Number(o.totalAmount || 0) >= minAmount);
+        }
+        if (maxAmount !== null && Number.isFinite(maxAmount)) {
+            records = records.filter((o) => Number(o.totalAmount || 0) <= maxAmount);
+        }
+        const startTime = params?.startTime ? Number(params.startTime) : null;
+        const endTime = params?.endTime ? Number(params.endTime) : null;
+        if (startTime) {
+            records = records.filter((o) => new Date(o.createTime).getTime() >= startTime);
+        }
+        if (endTime) {
+            records = records.filter((o) => new Date(o.createTime).getTime() <= endTime);
         }
         return ok(paginate(records, params?.pageNum, params?.pageSize));
     }
@@ -454,7 +531,7 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
         }
         if (action === "cancel") {
             if (order.buyerUserId !== user.id) fail(403, "无权操作该订单");
-            order.orderStatus = 5;
+            order.orderStatus = 9;
             order.orderStatusName = "已关闭";
             return ok(order);
         }
@@ -475,6 +552,8 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
             order.refundStatus = 1;
             order.refundStatusName = "待处理";
             order.refundReason = asText(data?.reason);
+            order.refundProofUrls = Array.isArray(data?.proofUrls) ? data.proofUrls.join(",") : asText(data?.proofUrls || "");
+            order.refundApplyTime = new Date().toISOString();
             return ok(order);
         }
         if (action === "ship") {
@@ -509,8 +588,10 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
         if (!ownNew) fail(403, "无权操作该订单");
         order.refundStatus = action === "approve" ? 2 : 3;
         order.refundStatusName = action === "approve" ? "已通过" : "已拒绝";
-        order.orderStatus = 5;
+        order.orderStatus = 9;
         order.orderStatusName = "已关闭";
+        order.refundDecisionSource = "SELLER";
+        order.refundDecisionTime = new Date().toISOString();
         return ok(order);
     }
 
@@ -614,7 +695,7 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
                 failedItems.push({ orderId: id, reason: "订单不存在" });
                 return;
             }
-            order.orderStatus = 5;
+            order.orderStatus = 9;
             order.orderStatusName = "已关闭";
             successIds.push(id);
         });
@@ -631,9 +712,11 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
         if (!order) fail(404, "订单不存在");
         order.refundStatus = action === "approve" ? 2 : 3;
         order.refundStatusName = action === "approve" ? "已通过" : "已拒绝";
-        order.orderStatus = 5;
+        order.orderStatus = 9;
         order.orderStatusName = "已关闭";
+        order.refundDecisionSource = "ADMIN";
         order.refundDecisionRemark = asText(data?.remark);
+        order.refundDecisionTime = new Date().toISOString();
         return ok(order);
     }
 
@@ -768,9 +851,238 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
         return ok(app);
     }
 
+    if (m === "get" && p === "/chat/conversations") {
+        const user = requireLogin(headers);
+        const records = mockStore.chatConversations
+            .filter((item) => (item.participantIds || []).some((id) => Number(id) === Number(user.id)))
+            .sort((a, b) => new Date(b.lastMessageTime || 0).getTime() - new Date(a.lastMessageTime || 0).getTime())
+            .map((item) => chatConversationVO(item, user.id));
+        return ok(records);
+    }
+
+    if (m === "post" && p === "/chat/conversations") {
+        const user = requireLogin(headers);
+        const targetUserId = Number(data?.targetUserId);
+        if (!targetUserId || targetUserId === Number(user.id)) {
+            fail(400, "会话对象不正确");
+        }
+        const target = mockStore.users.find((item) => Number(item.id) === targetUserId);
+        if (!target) {
+            fail(404, "用户不存在");
+        }
+        const sourceType = asText(data?.sourceType || "DIRECT").toUpperCase();
+        const sourceId = data?.sourceId == null ? null : Number(data.sourceId);
+        let sourceTitle = "站内私聊";
+        if (sourceType === "PRODUCT") {
+            sourceTitle = mockStore.products.find((item) => Number(item.id) === sourceId)?.name || "商品咨询";
+        }
+        if (sourceType === "SECONDHAND") {
+            sourceTitle = mockStore.secondhandProducts.find((item) => Number(item.id) === sourceId)?.name || "二手商品咨询";
+        }
+        let conversation = mockStore.chatConversations.find((item) => {
+            const members = item.participantIds || [];
+            return members.includes(user.id)
+                && members.includes(targetUserId)
+                && item.sourceType === sourceType
+                && Number(item.sourceId || 0) === Number(sourceId || 0);
+        });
+        if (!conversation) {
+            conversation = {
+                id: mockStore.next.chatConversationId++,
+                participantIds: [user.id, targetUserId],
+                sourceType,
+                sourceId,
+                sourceTitle,
+                lastMessageContent: "",
+                lastMessageTime: new Date().toISOString(),
+                unreadByUserId: 0,
+            };
+            mockStore.chatConversations.unshift(conversation);
+        }
+        return ok(chatConversationVO(conversation, user.id));
+    }
+
+    const chatMessagesMatch = p.match(/^\/chat\/conversations\/(\d+)\/messages$/);
+    if (m === "get" && chatMessagesMatch) {
+        const user = requireLogin(headers);
+        const conversationId = Number(chatMessagesMatch[1]);
+        const conversation = mockStore.chatConversations.find((item) => Number(item.id) === conversationId);
+        if (!conversation || !(conversation.participantIds || []).some((id) => Number(id) === Number(user.id))) {
+            fail(404, "会话不存在");
+        }
+        conversation.unreadByUserId = 0;
+        const records = mockStore.chatMessages
+            .filter((item) => Number(item.conversationId) === conversationId)
+            .sort((a, b) => new Date(a.createTime || 0).getTime() - new Date(b.createTime || 0).getTime())
+            .map((item) => ({ ...item, sender: userPublic(item.sender) }));
+        return ok(records);
+    }
+
+    if (m === "post" && chatMessagesMatch) {
+        const user = requireLogin(headers);
+        const conversationId = Number(chatMessagesMatch[1]);
+        const conversation = mockStore.chatConversations.find((item) => Number(item.id) === conversationId);
+        if (!conversation || !(conversation.participantIds || []).some((id) => Number(id) === Number(user.id))) {
+            fail(404, "会话不存在");
+        }
+        const content = asText(data?.content);
+        if (!content) {
+            fail(400, "消息内容不能为空");
+        }
+        const targetId = (conversation.participantIds || []).find((id) => Number(id) !== Number(user.id));
+        const message = {
+            id: mockStore.next.chatMessageId++,
+            conversationId,
+            senderUserId: user.id,
+            sender: userPublic(user),
+            content,
+            createTime: new Date().toISOString(),
+        };
+        mockStore.chatMessages.push(message);
+        conversation.lastMessageContent = content;
+        conversation.lastMessageTime = message.createTime;
+        conversation.unreadByUserId = targetId || 0;
+        return ok(message);
+    }
+
+    if (m === "get" && p === "/credit/me") {
+        const user = requireLogin(headers);
+        const baseScore = Number(user.creditScore || 100);
+        const buyerLogs = mockStore.creditLogs.filter((item) => Number(item.userId) === Number(user.id) && item.role === "BUYER");
+        const shSellerLogs = mockStore.creditLogs.filter((item) => Number(item.userId) === Number(user.id) && item.role === "SH_SELLER");
+        const buyerScore = Math.max(0, Math.min(100, baseScore + buyerLogs.reduce((sum, item) => sum + Number(item.delta || 0), 0)));
+        const shSellerScore = Math.max(0, Math.min(100, 96 + shSellerLogs.reduce((sum, item) => sum + Number(item.delta || 0), 0)));
+        return ok({
+            buyerScore,
+            buyerLevel: creditLevel(buyerScore),
+            buyerLogs,
+            shSellerScore,
+            shSellerLevel: creditLevel(shSellerScore),
+            shSellerLogs,
+        });
+    }
+
+    const userCreditMatch = p.match(/^\/credit\/(\d+)$/);
+    if (m === "get" && userCreditMatch) {
+        requireLogin(headers);
+        const target = mockStore.users.find((item) => Number(item.id) === Number(userCreditMatch[1]));
+        if (!target) fail(404, "用户不存在");
+        const score = Number(target.creditScore || 100);
+        return ok({ userId: target.id, buyerScore: score, buyerLevel: creditLevel(score), shSellerScore: score, shSellerLevel: creditLevel(score) });
+    }
+
+    if (m === "post" && p === "/report-block/report") {
+        const user = requireLogin(headers);
+        const reportedId = Number(data?.reportedId);
+        if (!reportedId) fail(400, "被举报用户不能为空");
+        const report = {
+            id: mockStore.next.reportId++,
+            reporterId: user.id,
+            reportedId,
+            tradeContext: asText(data?.tradeContext || "SH_BUYER"),
+            reasonType: asText(data?.reasonType || "OTHER"),
+            reasonDesc: asText(data?.reasonDesc),
+            evidenceUrls: asText(data?.evidenceUrls),
+            status: 0,
+            createTime: new Date().toISOString(),
+        };
+        mockStore.reports.unshift(report);
+        return ok(report);
+    }
+
+    if (m === "get" && p === "/report-block/report/my") {
+        const user = requireLogin(headers);
+        const records = mockStore.reports.filter((item) => Number(item.reporterId) === Number(user.id));
+        return ok(paginate(records, params?.page, params?.size));
+    }
+
+    if (m === "post" && p === "/report-block/block") {
+        const user = requireLogin(headers);
+        const targetUserId = Number(data?.targetUserId);
+        if (!targetUserId || targetUserId === Number(user.id)) fail(400, "拉黑用户不正确");
+        const exists = mockStore.blocks.some((item) => Number(item.blockerId) === Number(user.id) && Number(item.blockedId) === targetUserId);
+        if (!exists) {
+            mockStore.blocks.unshift({
+                id: mockStore.next.blockId++,
+                blockerId: user.id,
+                blockedId: targetUserId,
+                createTime: new Date().toISOString(),
+            });
+        }
+        return ok(null);
+    }
+
+    const unblockMatch = p.match(/^\/report-block\/block\/(\d+)$/);
+    if (m === "delete" && unblockMatch) {
+        const user = requireLogin(headers);
+        const targetUserId = Number(unblockMatch[1]);
+        mockStore.blocks = mockStore.blocks.filter((item) => !(Number(item.blockerId) === Number(user.id) && Number(item.blockedId) === targetUserId));
+        return ok(null);
+    }
+
+    if (m === "get" && p === "/report-block/block/my") {
+        const user = requireLogin(headers);
+        return ok(mockStore.blocks.filter((item) => Number(item.blockerId) === Number(user.id)));
+    }
+
+    const blockCheckMatch = p.match(/^\/report-block\/block\/check\/(\d+)$/);
+    if (m === "get" && blockCheckMatch) {
+        const user = requireLogin(headers);
+        const targetUserId = Number(blockCheckMatch[1]);
+        return ok(mockStore.blocks.some((item) => Number(item.blockerId) === Number(user.id) && Number(item.blockedId) === targetUserId));
+    }
+
+    const blockedByMatch = p.match(/^\/report-block\/block\/blocked-by\/(\d+)$/);
+    if (m === "get" && blockedByMatch) {
+        const user = requireLogin(headers);
+        const targetUserId = Number(blockedByMatch[1]);
+        return ok(mockStore.blocks.some((item) => Number(item.blockerId) === targetUserId && Number(item.blockedId) === Number(user.id)));
+    }
+
     if (m === "post" && p === "/upload/image") {
         const ts = Date.now();
         return ok({ url: `/uploads/mock-${ts}.png`, filename: `mock-${ts}.png` });
+    }
+
+    if (m === "get" && p === "/notifications") {
+        const user = requireLogin(headers);
+        const scope = asText(params?.scope).toLowerCase();
+        const records = mockStore.notifications
+            .filter((item) => Number(item.userId) === Number(user.id))
+            .filter((item) => !scope || item.scope === scope)
+            .sort((a, b) => {
+                const readDiff = Number(a.isRead || 0) - Number(b.isRead || 0);
+                if (readDiff !== 0) return readDiff;
+                return new Date(b.createTime || 0).getTime() - new Date(a.createTime || 0).getTime();
+            })
+            .map((item) => ({ ...item }));
+        return ok(records);
+    }
+
+    const notificationReadMatch = p.match(/^\/notifications\/(\d+)\/read$/);
+    if (m === "post" && notificationReadMatch) {
+        const user = requireLogin(headers);
+        const id = Number(notificationReadMatch[1]);
+        const notification = mockStore.notifications.find(
+            (item) => Number(item.id) === id && Number(item.userId) === Number(user.id),
+        );
+        if (!notification) {
+            fail(404, "通知不存在");
+        }
+        notification.isRead = 1;
+        return ok(null);
+    }
+
+    if (m === "post" && p === "/notifications/read-all") {
+        const user = requireLogin(headers);
+        const scope = asText(params?.scope).toLowerCase();
+        mockStore.notifications
+            .filter((item) => Number(item.userId) === Number(user.id))
+            .filter((item) => !scope || item.scope === scope)
+            .forEach((item) => {
+                item.isRead = 1;
+            });
+        return ok(null);
     }
 
     fail(404, `Mock route not found: ${m.toUpperCase()} ${p}`);

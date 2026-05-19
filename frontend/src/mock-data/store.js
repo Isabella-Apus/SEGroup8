@@ -1,9 +1,14 @@
 import {
     generateAddresses,
     generateAuditLogs,
+    generateBlocks,
+    generateChatData,
+    generateCreditLogs,
     generateMerchantApplications,
+    generateNotifications,
     generateOrders,
     generateProducts,
+    generateReports,
     generateSecondhandProducts,
     generateUsers,
 } from "./generators";
@@ -22,6 +27,11 @@ const addresses = generateAddresses();
 const merchantApplications = generateMerchantApplications();
 const auditLogs = generateAuditLogs();
 const orders = generateOrders(products);
+const notifications = generateNotifications();
+const creditLogs = generateCreditLogs();
+const reports = generateReports();
+const blocks = generateBlocks();
+const chat = generateChatData(users, products, secondhandProducts);
 
 export const mockStore = {
     users,
@@ -31,6 +41,12 @@ export const mockStore = {
     merchantApplications,
     auditLogs,
     orders,
+    notifications,
+    creditLogs,
+    reports,
+    blocks,
+    chatConversations: chat.conversations,
+    chatMessages: chat.messages,
     next: {
         userId: nextIdOf(users),
         productId: nextIdOf(products),
@@ -39,5 +55,11 @@ export const mockStore = {
         merchantApplicationId: nextIdOf(merchantApplications),
         auditLogId: nextIdOf(auditLogs),
         orderId: nextIdOf(orders),
+        notificationId: nextIdOf(notifications),
+        creditLogId: nextIdOf(creditLogs),
+        reportId: nextIdOf(reports),
+        blockId: nextIdOf(blocks),
+        chatConversationId: nextIdOf(chat.conversations),
+        chatMessageId: nextIdOf(chat.messages),
     },
 };

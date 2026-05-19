@@ -1,38 +1,76 @@
 <template>
-  <div class="page-card">
-    <h2 class="page-title">商品详情</h2>
-    <el-skeleton v-if="loading" :rows="6" animated />
+  <section class="detail-page">
+    <el-skeleton v-if="loading" :rows="8" animated class="page-card" />
 
-    <div v-else-if="product" class="detail-wrap">
-      <div class="cover-box">
-        <el-image v-if="product.cover" :src="toFullImageUrl(product.cover)" fit="cover" class="cover-image" />
-        <div v-else class="cover-placeholder">暂无图片</div>
+    <div v-else-if="product" class="detail-shell">
+      <div class="gallery">
+        <el-image :src="selectedImage" fit="cover" class="main-image" />
+        <div class="thumbs" v-if="imageList.length > 1">
+          <button
+            v-for="image in imageList"
+            :key="image"
+            class="thumb"
+            :class="{ active: selectedImage === image }"
+            type="button"
+            @click="selectedImage = image"
+          >
+            <img :src="image" :alt="product.name" />
+          </button>
+        </div>
       </div>
 
-      <div class="info-box">
-        <h3>{{ product.name }}</h3>
-        <p class="price">￥{{ Number(product.price || 0).toFixed(2) }}</p>
-        <p>库存：{{ product.stock }}</p>
-        <p>状态：{{ product.statusName }}</p>
-        <p v-if="product.sellerName">卖家：{{ product.sellerName }}</p>
+      <div class="buy-panel">
+        <div class="crumb">商品市场 / 官方商品</div>
+        <h1>{{ product.name }}</h1>
         <p class="desc">{{ product.description || "暂无商品描述" }}</p>
 
-        <div class="actions">
-          <span>购买数量：</span>
-          <el-input-number v-model="quantity" :min="1" :max="maxQuantity" />
+        <div class="price-box">
+          <span>到手价</span>
+          <strong>¥{{ Number(product.price || 0).toFixed(2) }}</strong>
         </div>
 
-        <el-space>
-          <el-button type="primary" :disabled="maxQuantity <= 0" @click="handleAddToCart">加入购物车</el-button>
-          <el-button :disabled="maxQuantity <= 0" @click="handleBuyNow">立即购买</el-button>
-          <el-button v-if="canChatWithSeller" type="success" plain @click="handleContactSeller">联系卖家</el-button>
-          <el-button text @click="goBack">返回</el-button>
-        </el-space>
+        <dl class="info-grid">
+          <div>
+            <dt>库存</dt>
+            <dd>{{ product.stock ?? 0 }}</dd>
+          </div>
+          <div>
+            <dt>状态</dt>
+            <dd>{{ product.statusName || "在售" }}</dd>
+          </div>
+          <div>
+            <dt>卖家</dt>
+            <dd>{{ product.sellerName || product.shopName || "官方商家" }}</dd>
+          </div>
+        </dl>
+
+        <div class="quantity-row">
+          <span>购买数量</span>
+          <el-input-number v-model="quantity" :min="1" :max="maxQuantity || 1" />
+        </div>
+
+        <div class="actions">
+          <el-button type="warning" size="large" :disabled="maxQuantity <= 0" @click="handleBuyNow">
+            立即购买
+          </el-button>
+          <el-button type="primary" size="large" :disabled="maxQuantity <= 0" @click="handleAddToCart">
+            加入购物车
+          </el-button>
+          <el-button v-if="canChatWithSeller" size="large" @click="handleContactSeller">
+            联系卖家
+          </el-button>
+        </div>
+
+        <div class="service-row">
+          <span>支持售后</span>
+          <span>地址确认后下单</span>
+          <span>订单页可追踪状态</span>
+        </div>
       </div>
     </div>
 
-    <p v-else class="empty-tip">商品不存在</p>
-  </div>
+    <p v-else class="empty-tip page-card">商品不存在</p>
+  </section>
 </template>
 
 <script setup>
@@ -44,6 +82,7 @@ import { createOrderApi } from "@/api/order";
 import { listAddressesApi } from "@/api/user";
 import { addToCart, removeFromCart } from "@/utils/cart";
 import { getUser } from "@/utils/storage";
+import { toAssetUrl } from "@/utils/url";
 
 const route = useRoute();
 const router = useRouter();
@@ -51,8 +90,21 @@ const router = useRouter();
 const loading = ref(false);
 const product = ref(null);
 const quantity = ref(1);
+const selectedImage = ref("");
 
 const maxQuantity = computed(() => Number(product.value?.stock || 0));
+const imageList = computed(() => {
+  if (!product.value) {
+    return [];
+  }
+  const images = Array.isArray(product.value.images) ? product.value.images : [];
+  const list = [product.value.cover, ...images]
+    .filter(Boolean)
+    .map((item) => toAssetUrl(item))
+    .filter(Boolean);
+  return [...new Set(list)];
+});
+
 const canChatWithSeller = computed(() => {
   if (!product.value?.sellerUserId) {
     return false;
@@ -69,9 +121,8 @@ async function fetchDetail() {
   try {
     const result = await getProductDetailApi(route.params.id);
     product.value = result.data;
-    if (maxQuantity.value > 0) {
-      quantity.value = 1;
-    }
+    selectedImage.value = imageList.value[0] || "https://images.unsplash.com/photo-1511556820780-d912e42b4980?auto=format&fit=crop&w=900&q=80";
+    quantity.value = maxQuantity.value > 0 ? 1 : 0;
   } finally {
     loading.value = false;
   }
@@ -108,11 +159,7 @@ async function handleBuyNow() {
   removeFromCart(product.value.id);
   ElMessage.success("下单成功");
   const orderId = result?.data?.id;
-  if (orderId) {
-    router.push({ path: `/order/${orderId}`, query: { action: "pay" } });
-    return;
-  }
-  router.push("/order");
+  router.push(orderId ? { path: `/order/${orderId}`, query: { action: "pay" } } : "/order");
 }
 
 function handleContactSeller() {
@@ -153,82 +200,168 @@ async function confirmAddressAndPickId() {
   }
   return preferred.id;
 }
-
-function toFullImageUrl(url) {
-  if (!url) {
-    return "";
-  }
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    return url;
-  }
-  const normalized = url.startsWith("/") ? url : `/${url}`;
-  return `http://localhost:8080${normalized}`;
-}
-
-function goBack() {
-  if (route.query.from === "browse-history") {
-    router.push("/browse-history");
-    return;
-  }
-  router.push("/product");
-}
 </script>
 
 <style scoped>
-.detail-wrap {
-  display: grid;
-  grid-template-columns: 280px 1fr;
-  gap: 24px;
-}
-
-.cover-box {
-  width: 280px;
-  height: 280px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.cover-image {
-  width: 100%;
-  height: 100%;
-}
-
-.cover-placeholder {
-  width: 100%;
-  height: 100%;
+.detail-page {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #6b7280;
-  background: #f9fafb;
+  flex-direction: column;
+  gap: 18px;
 }
 
-.price {
-  color: #ef4444;
-  font-size: 22px;
+.detail-shell {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+  gap: 22px;
+}
+
+.gallery,
+.buy-panel {
+  border: 1px solid var(--line-soft);
+  border-radius: 24px;
+  background: #ffffff;
+  padding: 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+.main-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #f1efe6;
+}
+
+.thumbs {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.thumb {
+  aspect-ratio: 1 / 1;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  background: #f1efe6;
+  cursor: pointer;
+}
+
+.thumb.active {
+  border-color: var(--brand-primary);
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.buy-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.crumb {
+  color: var(--text-secondary);
+  font-size: 13px;
   font-weight: 700;
-  margin: 8px 0;
+}
+
+.buy-panel h1 {
+  margin: 0;
+  font-size: clamp(26px, 4vw, 38px);
+  line-height: 1.18;
+  letter-spacing: 0;
 }
 
 .desc {
-  color: #4b5563;
+  margin: 0;
+  color: var(--text-secondary);
   line-height: 1.8;
 }
 
+.price-box {
+  border-radius: 18px;
+  background: #fff5d1;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.price-box span {
+  color: #6d5a15;
+  font-weight: 800;
+}
+
+.price-box strong {
+  color: var(--brand-warm);
+  font-size: 36px;
+  line-height: 1;
+}
+
+.info-grid {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.info-grid div {
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.info-grid dt {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.info-grid dd {
+  margin: 6px 0 0;
+  font-weight: 800;
+}
+
+.quantity-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 800;
+}
+
 .actions {
-  margin: 14px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.service-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.service-row span {
+  border-radius: 999px;
+  background: var(--surface-soft);
+  padding: 6px 10px;
 }
 
 @media (max-width: 900px) {
-  .detail-wrap {
+  .detail-shell {
     grid-template-columns: 1fr;
   }
 
-  .cover-box {
-    width: 100%;
-    max-width: 360px;
-    margin: 0 auto;
+  .info-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

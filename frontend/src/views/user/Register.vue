@@ -2,9 +2,9 @@
     <div class="auth-wrap">
         <div class="auth-stage fade-in-up">
             <aside class="auth-side">
-                <h1>Join SoftWhere</h1>
-                <p>创建账户，开启购物与二手交易体验</p>
-                <p class="hint">注册后即可使用订单、地址、评价、二手发布等完整功能。</p>
+                <span class="brand-mark">kg</span>
+                <h1>Kinda Goods</h1>
+                <p>注册后即可使用购物车、订单、地址、评价、二手发布和信用中心。</p>
             </aside>
 
             <div class="auth-card page-card">
@@ -19,15 +19,17 @@
                     <el-form-item label="昵称" prop="nickname">
                         <el-input v-model="form.nickname" placeholder="请输入昵称" />
                     </el-form-item>
-                    <el-form-item label="手机号" prop="phone">
-                        <el-input v-model="form.phone" placeholder="请输入手机号" />
-                    </el-form-item>
-                    <el-form-item label="邮箱" prop="email">
-                        <el-input v-model="form.email" placeholder="请输入邮箱" />
-                    </el-form-item>
+                    <div class="form-grid">
+                        <el-form-item label="手机号" prop="phone">
+                            <el-input v-model="form.phone" placeholder="请输入手机号" />
+                        </el-form-item>
+                        <el-form-item label="邮箱" prop="email">
+                            <el-input v-model="form.email" placeholder="请输入邮箱" />
+                        </el-form-item>
+                    </div>
                     <el-form-item class="action-row">
                         <el-button type="primary" :loading="loading" @click="handleRegister">注册</el-button>
-                        <el-button @click="router.push('/login')">去登录</el-button>
+                        <el-button @click="router.push('/login')">返回登录</el-button>
                     </el-form-item>
                 </el-form>
             </div>
@@ -36,10 +38,10 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
-import { ElMessage } from 'element-plus';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/user';
+import { reactive, ref } from "vue";
+import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/user";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -47,18 +49,18 @@ const formRef = ref();
 const loading = ref(false);
 
 const form = reactive({
-    username: '',
-    password: '',
-    nickname: '',
-    phone: '',
-    email: ''
+    username: "",
+    password: "",
+    nickname: "",
+    phone: "",
+    email: "",
 });
 
 const rules = {
-    username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-    password: [{ required: true, message: '请输入密码', trigger: 'blur' }, { min: 6, message: '密码至少6位', trigger: 'blur' }],
-    nickname: [{ required: true, message: '请输入昵称', trigger: 'blur' }],
-    phone: [{ pattern: /^$|^1\d{10}$/, message: '手机号需为11位', trigger: 'blur' }]
+    username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+    password: [{ required: true, message: "请输入密码", trigger: "blur" }, { min: 6, message: "密码至少6位", trigger: "blur" }],
+    nickname: [{ required: true, message: "请输入昵称", trigger: "blur" }],
+    phone: [{ pattern: /^$|^1\d{10}$/, message: "手机号需为11位", trigger: "blur" }],
 };
 
 async function handleRegister() {
@@ -66,8 +68,8 @@ async function handleRegister() {
     loading.value = true;
     try {
         await userStore.register(form);
-        ElMessage.success('注册成功，请登录');
-        router.push('/login');
+        ElMessage.success("注册成功，请登录");
+        router.push("/login");
     } finally {
         loading.value = false;
     }
@@ -80,54 +82,76 @@ async function handleRegister() {
     padding: 24px;
     display: grid;
     place-items: center;
-    background: radial-gradient(circle at 20% 10%, #d9f6ef 0, transparent 30%),
-        radial-gradient(circle at 100% 0, #ffe9cc 0, transparent 26%),
-        linear-gradient(170deg, #f7fbff 0%, #eef4fb 100%);
+    background:
+        linear-gradient(120deg, rgba(220, 239, 233, 0.96), rgba(247, 239, 229, 0.9)),
+        url("https://images.unsplash.com/photo-1556742044-3c52d6e88c62?auto=format&fit=crop&w=1600&q=80");
+    background-size: cover;
+    background-position: center;
 }
 
 .auth-stage {
     width: 100%;
-    max-width: 980px;
+    max-width: 1040px;
     display: grid;
-    grid-template-columns: 1.1fr 1fr;
-    border-radius: 24px;
+    grid-template-columns: 0.95fr 1.05fr;
+    border: 2px solid var(--brand-primary);
+    border-radius: 28px;
     overflow: hidden;
-    border: 1px solid #dce5f2;
-    box-shadow: 0 16px 40px rgba(24, 43, 79, 0.16);
+    box-shadow: var(--shadow-float);
+    background: #ffffff;
 }
 
 .auth-side {
-    padding: 44px 36px;
-    background: linear-gradient(145deg, #0f7f6b 0%, #0c6556 52%, #144b6e 100%);
-    color: #f4fffd;
+    padding: 44px 38px;
+    background: var(--brand-primary);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.brand-mark {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    background: var(--brand-accent);
+    color: var(--brand-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 900;
 }
 
 .auth-side h1 {
-    margin: 0;
-    font-size: 38px;
-    letter-spacing: 0.8px;
+    margin: 20px 0 12px;
+    font-size: 46px;
+    letter-spacing: 0;
 }
 
 .auth-side p {
-    margin: 14px 0 0;
-    font-size: 18px;
-}
-
-.auth-side .hint {
-    margin-top: 18px;
-    font-size: 14px;
-    line-height: 1.75;
-    opacity: 0.9;
+    margin: 0;
+    max-width: 380px;
+    color: #dcefe9;
+    font-size: 17px;
+    line-height: 1.8;
+    font-weight: 700;
 }
 
 .auth-card {
     border-radius: 0;
     border: 0;
     box-shadow: none;
-    min-height: 540px;
+    min-height: 560px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
 }
 
 .action-row :deep(.el-form-item__content) {
@@ -136,16 +160,17 @@ async function handleRegister() {
 }
 
 @media (max-width: 900px) {
-    .auth-stage {
+    .auth-stage,
+    .form-grid {
         grid-template-columns: 1fr;
     }
 
     .auth-side {
-        padding: 24px;
+        padding: 28px;
     }
 
     .auth-side h1 {
-        font-size: 30px;
+        font-size: 34px;
     }
 
     .auth-card {
