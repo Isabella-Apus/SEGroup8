@@ -31,7 +31,9 @@ realHttp.interceptors.response.use(
         const { data } = response;
         if (data && data.code !== 0) {
             const message = data.message || "Request failed";
-            ElMessage.error(message);
+            if (!response.config?.silent) {
+                ElMessage.error(message);
+            }
             return Promise.reject(new Error(message));
         }
         return data;
@@ -44,7 +46,9 @@ realHttp.interceptors.response.use(
         if (error?.response?.status === 401 || bizCode === 401) {
             userStore.logout();
         }
-        ElMessage.error(message);
+        if (!error?.config?.silent) {
+            ElMessage.error(message);
+        }
         return Promise.reject(error);
     },
 );
@@ -67,7 +71,9 @@ async function mockAdapter(method, url, data, config) {
         });
     } catch (error) {
         const message = error?.message || "Mock request failed";
-        ElMessage.error(message);
+        if (!config?.silent) {
+            ElMessage.error(message);
+        }
         return Promise.reject(error);
     }
 }

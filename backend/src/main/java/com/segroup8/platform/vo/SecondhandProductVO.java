@@ -14,6 +14,7 @@ public class SecondhandProductVO {
     private BigDecimal originPrice;
     private BigDecimal salePrice;
     private String conditionLevel;
+    private Integer isNegotiable;
     private Integer status;
     private String statusName;
     private LocalDateTime createTime;
@@ -88,6 +89,14 @@ public class SecondhandProductVO {
 
     public void setConditionLevel(String conditionLevel) {
         this.conditionLevel = conditionLevel;
+    }
+
+    public Integer getIsNegotiable() {
+        return isNegotiable;
+    }
+
+    public void setIsNegotiable(Integer isNegotiable) {
+        this.isNegotiable = isNegotiable;
     }
 
     public Integer getStatus() {

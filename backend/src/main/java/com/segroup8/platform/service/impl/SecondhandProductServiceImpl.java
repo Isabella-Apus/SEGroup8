@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.segroup8.platform.common.BusinessException;
+import com.segroup8.platform.common.OrderStatusEnum;
 import com.segroup8.platform.context.UserContext;
 import com.segroup8.platform.dto.SecondhandOrderCreateRequest;
 import com.segroup8.platform.dto.SecondhandProductPageQueryRequest;
@@ -130,6 +131,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         product.setOriginPrice(request.getOriginPrice());
         product.setSalePrice(request.getSalePrice());
         product.setConditionLevel(request.getConditionLevel());
+        product.setIsNegotiable(normalizeNegotiable(request.getIsNegotiable()));
         product.setStatus(normalizeStatus(request.getStatus(), ON_SHELF));
         secondhandProductMapper.insert(product);
         return toVO(secondhandProductMapper.selectById(product.getId()));
@@ -145,6 +147,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         product.setOriginPrice(request.getOriginPrice());
         product.setSalePrice(request.getSalePrice());
         product.setConditionLevel(request.getConditionLevel());
+        product.setIsNegotiable(normalizeNegotiable(request.getIsNegotiable()));
         if (request.getStatus() != null) {
             product.setStatus(normalizeStatus(request.getStatus(), null));
         }
@@ -201,11 +204,12 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         order.setOrderNo(generateOrderNo(buyerUserId));
         order.setBuyerUserId(buyerUserId);
         order.setTotalAmount(product.getSalePrice());
-        order.setPayStatus(1);
-        order.setOrderStatus(1);
+        order.setPayStatus(0);
+        order.setOrderStatus(OrderStatusEnum.PENDING_PAY.getCode());
         order.setCanRefund(1);
         order.setLogisticsStatus("PENDING");
         order.setLogisticsCurrentIndex(0);
+        order.setPayMethod("待付款");
         order.setRemark(request == null ? null : request.getRemark());
         order.setCreateTime(LocalDateTime.now());
         orderInfoMapper.insert(order);
@@ -267,6 +271,10 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         return target;
     }
 
+    private Integer normalizeNegotiable(Integer isNegotiable) {
+        return 1;
+    }
+
     private SecondhandProduct getSellerOwnedProduct(Long productId) {
         Long sellerUserId = requireUserId();
         SecondhandProduct product = secondhandProductMapper.selectById(productId);
@@ -302,6 +310,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         vo.setOriginPrice(product.getOriginPrice());
         vo.setSalePrice(product.getSalePrice());
         vo.setConditionLevel(product.getConditionLevel());
+        vo.setIsNegotiable(product.getIsNegotiable() == null ? 1 : product.getIsNegotiable());
         vo.setStatus(product.getStatus());
         vo.setStatusName(Objects.equals(product.getStatus(), ON_SHELF) ? "在售" : "下架");
         vo.setCreateTime(product.getCreateTime());
@@ -327,6 +336,8 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         vo.setTotalAmount(order.getTotalAmount());
         vo.setPayStatus(order.getPayStatus());
         vo.setOrderStatus(order.getOrderStatus());
+        OrderStatusEnum statusEnum = OrderStatusEnum.of(order.getOrderStatus());
+        vo.setOrderStatusName(statusEnum == null ? "未知" : statusEnum.getDesc());
         vo.setRemark(order.getRemark());
         vo.setCreateTime(order.getCreateTime());
         vo.setItems(List.of(itemVO));

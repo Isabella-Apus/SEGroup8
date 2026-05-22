@@ -31,3 +31,47 @@ export function deleteSellerSecondhandApi(id) {
 export function changeSellerSecondhandStatusApi(id, status) {
     return http.post(`/secondhand/seller/${id}/status`, { status });
 }
+
+export function applyBargainApi(payload) {
+    return http.post("/secondhand/trade/bargain/apply", payload);
+}
+
+export function confirmBargainApi(payload) {
+    return http.post("/secondhand/trade/bargain/confirm", payload);
+}
+
+export function rejectBargainApi(negotiationId) {
+    return http.post(`/secondhand/trade/bargain/${negotiationId}/reject`);
+}
+
+export function listBargainRequestsApi(params = {}) {
+    return http.get("/secondhand/trade/bargain/list", { params });
+}
+
+export function getMyEffectiveBargainApi(productId) {
+    return http.get("/secondhand/trade/bargain/effective", { params: { productId }, silent: true });
+}
+
+export function createAuctionApi(payload) {
+    return http.post("/secondhand/trade/auction", payload);
+}
+
+export function getAuctionByProductIdApi(productId) {
+    return http.get(`/secondhand/trade/auction/product/${productId}`, { silent: true });
+}
+
+export function getMyAuctionListApi(params = {}) {
+    return http.get("/secondhand/trade/auction/seller/list", { params });
+}
+
+export function closeAuctionEarlyApi(auctionId) {
+    return http.post(`/secondhand/trade/auction/${auctionId}/close`);
+}
+
+export function markAuctionFlowApi(auctionId) {
+    return http.post(`/secondhand/trade/auction/${auctionId}/flow`);
+}
+
+export function placeAuctionBidApi(auctionId, payload) {
+    return http.post(`/secondhand/trade/auction/${auctionId}/bid`, payload);
+}

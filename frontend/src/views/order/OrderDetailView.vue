@@ -79,8 +79,8 @@
         <el-table-column prop="productName" label="商品" min-width="240" />
         <el-table-column label="类型" width="120">
           <template #default="scope">
-            <el-tag size="small" :type="scope.row.productType === 'SECONDHAND' ? 'warning' : 'info'">
-              {{ scope.row.productType === 'SECONDHAND' ? '二手' : '新品' }}
+            <el-tag size="small" :type="getItemType(scope.row) === 'SECONDHAND' ? 'warning' : 'info'">
+              {{ getItemType(scope.row) === 'SECONDHAND' ? '二手' : '新品' }}
             </el-tag>
           </template>
         </el-table-column>
@@ -91,7 +91,7 @@
           <template #default="scope">￥{{ Number(scope.row.price || 0).toFixed(2) }}</template>
         </el-table-column>
         <el-table-column prop="quantity" label="数量" width="100" />
-        <el-table-column v-if="!isSellerView" label="鎿嶄綔" width="140">
+        <el-table-column v-if="!isSellerView" label="操作" width="140">
           <template #default="scope">
             <el-button v-if="scope.row.sellerUserId" size="small" type="success" plain @click="contactSellerByItem(scope.row)">联系卖家</el-button>
           </template>
@@ -614,6 +614,10 @@ function goBack() {
     router.push("/merchant/orders");
     return;
   }
+  if (route.meta?.orderScope === "SECONDHAND") {
+    router.push("/secondhand/orders");
+    return;
+  }
   router.push("/order");
 }
 
@@ -625,9 +629,15 @@ function contactSellerByItem(item) {
   router.push({
     path: "/messages",
     query: {
-      participantId: item.sellerUserId
+      participantId: item.sellerUserId,
+      sourceType: getItemType(item) === "SECONDHAND" ? "SECONDHAND" : "PRODUCT",
+      sourceId: item.productId
     }
   });
+}
+
+function getItemType(item) {
+  return String(item?.productType || item?.itemType || "NEW").toUpperCase() === "SECONDHAND" ? "SECONDHAND" : "NEW";
 }
 
 function maybeOpenPayDialog() {

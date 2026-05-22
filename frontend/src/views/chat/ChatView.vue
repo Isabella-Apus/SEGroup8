@@ -49,6 +49,40 @@
           </div>
         </header>
 
+        <div v-if="bargainRequests.length" class="trade-panel">
+          <article v-for="request in bargainRequests" :key="request.id" class="trade-card">
+            <div class="trade-copy">
+              <span>{{ request.statusName || request.status }}</span>
+              <strong>{{ request.buyerName || "买家" }} 出价 ¥{{ Number(request.proposedPrice || 0).toFixed(2) }}</strong>
+              <small>{{ request.productName || activeConversation.sourceTitle }}</small>
+            </div>
+            <div class="trade-actions">
+              <template v-if="request.status === 'PENDING' && isSellerForBargain(request)">
+                <el-button
+                  size="small"
+                  type="primary"
+                  :loading="actionLoadingKey === `confirm-${request.id}`"
+                  @click="handleConfirmBargain(request)"
+                >
+                  同意并生成订单
+                </el-button>
+                <el-button
+                  size="small"
+                  :loading="actionLoadingKey === `reject-${request.id}`"
+                  @click="handleRejectBargain(request)"
+                >
+                  拒绝
+                </el-button>
+              </template>
+              <span v-else-if="request.status === 'PENDING'" class="trade-note">等待卖家处理</span>
+              <el-button v-else-if="request.orderId" size="small" type="success" plain @click="router.push('/secondhand/orders')">
+                查看订单
+              </el-button>
+              <span v-else class="trade-note">{{ request.statusName || "已结束" }}</span>
+            </div>
+          </article>
+        </div>
+
         <div v-loading="loadingMessages" class="message-list">
           <div
             v-for="message in messages"
@@ -96,8 +130,12 @@ import {
   sendChatMessageApi,
 } from "@/api/chat";
 import {
+  confirmBargainApi,
+  listBargainRequestsApi,
+  rejectBargainApi,
+} from "@/api/secondhand";
+import {
   onRealtimeEvent,
-  sendRealtimeMessage,
   startRealtimeClient,
 } from "@/realtime/realtimeClient";
 import { useUserStore } from "@/stores/user";
@@ -111,9 +149,11 @@ const loadingMessages = ref(false);
 const sending = ref(false);
 const conversations = ref([]);
 const messages = ref([]);
+const bargainRequests = ref([]);
 const activeConversationId = ref(null);
 const draft = ref("");
-const sendStatus = ref("正在连接实时通道...");
+const sendStatus = ref("消息会自动同步给对方");
+const actionLoadingKey = ref("");
 
 const currentUserId = computed(() => userStore.userInfo?.id);
 const chatRoutePath = computed(() =>
@@ -124,17 +164,26 @@ const activeConversation = computed(() =>
 );
 
 let unsubscribeRealtime = null;
+let chatPollTimer = null;
+let syncingChat = false;
+const MOCK_STORE_KEY = "segroup8_mock_store_v1";
 
 onMounted(async () => {
   startRealtimeClient();
   unsubscribeRealtime = onRealtimeEvent(handleRealtimeEvent);
+  window.addEventListener("storage", handleStorageEvent);
   await bootstrap();
+  chatPollTimer = window.setInterval(syncActiveChat, 4000);
 });
 
 onUnmounted(() => {
   if (typeof unsubscribeRealtime === "function") {
     unsubscribeRealtime();
   }
+  if (chatPollTimer) {
+    window.clearInterval(chatPollTimer);
+  }
+  window.removeEventListener("storage", handleStorageEvent);
 });
 
 watch(
@@ -170,13 +219,27 @@ async function bootstrap() {
   }
 }
 
-async function refreshConversations() {
-  loadingConversations.value = true;
+async function refreshConversations(options = {}) {
+  const silent = options.silent === true;
+  if (!silent) {
+    loadingConversations.value = true;
+  }
   try {
+    const activeId = activeConversationId.value;
     const result = await listChatConversationsApi();
-    conversations.value = result.data || [];
+    const next = result.data || [];
+    if (collectionSignature(conversations.value) !== collectionSignature(next)) {
+      conversations.value = next;
+    }
+    if (activeId && !next.some((item) => Number(item.id) === Number(activeId))) {
+      activeConversationId.value = null;
+      messages.value = [];
+      bargainRequests.value = [];
+    }
   } finally {
-    loadingConversations.value = false;
+    if (!silent) {
+      loadingConversations.value = false;
+    }
   }
 }
 
@@ -185,6 +248,7 @@ async function ensureConversation() {
   if (!participantId) {
     return;
   }
+  const initialMessage = String(route.query.initialMessage || "");
   const result = await createChatConversationApi({
     targetUserId: participantId,
     sourceType: route.query.sourceType || "DIRECT",
@@ -199,6 +263,9 @@ async function ensureConversation() {
   }
   await router.replace({ path: chatRoutePath.value, query: { conversationId: conversation.id } });
   await selectConversation(conversation);
+  if (initialMessage && !draft.value.trim()) {
+    draft.value = initialMessage;
+  }
 }
 
 async function selectConversation(conversation) {
@@ -207,21 +274,59 @@ async function selectConversation(conversation) {
   }
   activeConversationId.value = conversation.id;
   await loadMessages(conversation.id);
+  await loadBargainRequests();
   const currentQueryId = String(route.query.conversationId || "");
   if (currentQueryId !== String(conversation.id)) {
     router.replace({ path: chatRoutePath.value, query: { conversationId: conversation.id } });
   }
 }
 
-async function loadMessages(conversationId) {
-  loadingMessages.value = true;
+async function loadMessages(conversationId, options = {}) {
+  const silent = options.silent === true;
+  if (!silent) {
+    loadingMessages.value = true;
+  }
   try {
+    const before = messages.value;
     const result = await listChatMessagesApi(conversationId);
-    messages.value = result.data || [];
+    const next = result.data || [];
+    const changed = collectionSignature(before) !== collectionSignature(next);
+    if (changed) {
+      messages.value = next;
+    }
     clearConversationUnread(conversationId);
-    await scrollToBottom();
+    if (!silent || changed) {
+      await scrollToBottom();
+    }
   } finally {
-    loadingMessages.value = false;
+    if (!silent) {
+      loadingMessages.value = false;
+    }
+  }
+}
+
+async function loadBargainRequests(options = {}) {
+  const silent = options.silent === true;
+  const conversation = activeConversation.value;
+  if (!conversation || String(conversation.sourceType || "").toUpperCase() !== "SECONDHAND" || !conversation.sourceId) {
+    if (bargainRequests.value.length) {
+      bargainRequests.value = [];
+    }
+    return;
+  }
+  try {
+    const result = await listBargainRequestsApi({
+      productId: conversation.sourceId,
+      counterpartUserId: conversation.other?.id,
+    });
+    const next = result.data?.records || result.data || [];
+    if (collectionSignature(bargainRequests.value) !== collectionSignature(next)) {
+      bargainRequests.value = next;
+    }
+  } catch {
+    if (!silent && bargainRequests.value.length) {
+      bargainRequests.value = [];
+    }
   }
 }
 
@@ -232,25 +337,97 @@ async function sendMessage() {
   }
   sending.value = true;
   try {
-    const sentByRealtime = sendRealtimeMessage({
-      eventType: "CHAT_SEND",
-      payload: {
-        conversationId: activeConversation.value.id,
-        content,
-      },
-    });
-
-    if (!sentByRealtime) {
-      sendStatus.value = "实时通道未连上，已切换为普通发送";
-      const result = await sendChatMessageApi(activeConversation.value.id, { content });
-      appendIncomingMessage(result.data);
-    }
-
+    const conversationId = activeConversation.value.id;
+    const result = await sendChatMessageApi(conversationId, { content });
+    appendIncomingMessage(result.data);
     draft.value = "";
+    sendStatus.value = "已发送，正在自动同步";
+    await refreshConversations({ silent: true });
+    await loadMessages(conversationId, { silent: true });
     await scrollToBottom();
   } finally {
     sending.value = false;
   }
+}
+
+async function syncActiveChat() {
+  if (syncingChat || sending.value) {
+    return;
+  }
+  syncingChat = true;
+  try {
+    const activeId = activeConversationId.value;
+    await refreshConversations({ silent: true });
+    if (activeId && conversations.value.some((item) => Number(item.id) === Number(activeId))) {
+      await loadMessages(activeId, { silent: true });
+      await loadBargainRequests({ silent: true });
+      return;
+    }
+    if (!activeId && conversations.value.length) {
+      await selectConversation(conversations.value[0]);
+    }
+  } finally {
+    syncingChat = false;
+  }
+}
+
+function isSellerForBargain(request) {
+  return Number(request?.sellerUserId) === Number(currentUserId.value);
+}
+
+async function handleConfirmBargain(request) {
+  actionLoadingKey.value = `confirm-${request.id}`;
+  try {
+    const result = await confirmBargainApi({
+      negotiationId: request.id,
+      confirmedPrice: request.proposedPrice,
+      createOrder: true,
+    });
+    ElMessage.success("已同意议价，并生成二手订单");
+    await loadBargainRequests();
+    await loadMessages(activeConversation.value.id, { silent: true });
+    updateBargainInList(result.data);
+  } finally {
+    actionLoadingKey.value = "";
+  }
+}
+
+async function handleRejectBargain(request) {
+  actionLoadingKey.value = `reject-${request.id}`;
+  try {
+    await rejectBargainApi(request.id);
+    ElMessage.success("已拒绝议价");
+    await loadBargainRequests();
+    await loadMessages(activeConversation.value.id, { silent: true });
+  } finally {
+    actionLoadingKey.value = "";
+  }
+}
+
+function updateBargainInList(next) {
+  if (!next?.id) {
+    return;
+  }
+  const index = bargainRequests.value.findIndex((item) => Number(item.id) === Number(next.id));
+  if (index >= 0) {
+    bargainRequests.value.splice(index, 1, next);
+  }
+}
+
+function collectionSignature(records) {
+  return (records || []).map((item) => [
+    item.id,
+    item.proposedPrice,
+    item.confirmedPrice,
+    item.status,
+    item.statusName,
+    item.orderId,
+    item.lastMessageContent,
+    item.lastMessageTime,
+    item.unreadCount,
+    item.content,
+    item.createTime,
+  ].join("|")).join(";");
 }
 
 function handleComposerKeydown(event) {
@@ -266,17 +443,15 @@ function handleRealtimeEvent(event) {
     return;
   }
   if (detail.eventType === "CONNECTED") {
-    sendStatus.value = "实时通道已连接";
+    sendStatus.value = "消息会自动同步给对方";
     return;
   }
   if (detail.eventType === "PONG") {
-    if (sendStatus.value !== "实时通道已连接") {
-      sendStatus.value = "实时通道已连接";
-    }
+    sendStatus.value = "消息会自动同步给对方";
     return;
   }
   if (detail.eventType === "CHAT_MESSAGE" && detail.payload) {
-    sendStatus.value = "实时通道已连接";
+    sendStatus.value = "收到新消息";
     appendIncomingMessage(detail.payload);
     return;
   }
@@ -335,7 +510,16 @@ function formatSource(conversation) {
   if (type === "SECONDHAND") {
     return `二手商品咨询：${conversation?.sourceTitle || "商品"}`;
   }
+  if (type === "BARGAIN") {
+    return `议价沟通：${conversation?.sourceTitle || "商品"}`;
+  }
   return conversation?.sourceTitle || "站内私聊";
+}
+
+function handleStorageEvent(event) {
+  if (event.key === MOCK_STORE_KEY) {
+    syncActiveChat();
+  }
 }
 
 function formatTime(value, withTime = false) {
@@ -466,6 +650,63 @@ async function scrollToBottom() {
   flex: 1;
 }
 
+.trade-panel {
+  display: grid;
+  gap: 10px;
+  border-bottom: 1px solid #eef2f7;
+  background: #fbfdff;
+  padding: 12px 18px;
+}
+
+.trade-card {
+  border: 1px solid rgba(137, 199, 255, 0.32);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #e9fff8 0%, #eaf4ff 100%);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.trade-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.trade-copy span {
+  width: fit-content;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--brand-primary);
+  padding: 3px 9px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.trade-copy strong,
+.trade-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trade-copy small,
+.trade-note {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.trade-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
 .message-list {
   flex: 1;
   min-height: 420px;
@@ -538,6 +779,11 @@ async function scrollToBottom() {
 @media (max-width: 960px) {
   .chat-page {
     grid-template-columns: 1fr;
+  }
+
+  .trade-card {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .message-bubble {

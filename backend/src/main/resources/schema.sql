@@ -280,12 +280,32 @@ CREATE TABLE IF NOT EXISTS `secondhand_product` (
   `origin_price` DECIMAL(10,2) DEFAULT NULL,
   `sale_price` DECIMAL(10,2) NOT NULL,
   `condition_level` VARCHAR(30) DEFAULT NULL,
+  `is_negotiable` TINYINT NOT NULL DEFAULT 1,
   `status` TINYINT NOT NULL DEFAULT 1,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_secondhand_seller` (`seller_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @secondhand_is_negotiable_sql = IF (
+  EXISTS (
+    SELECT 1 FROM INFORMATION_SCHEMA.TABLES
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'secondhand_product'
+  )
+  AND NOT EXISTS (
+    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'secondhand_product'
+      AND COLUMN_NAME = 'is_negotiable'
+  ),
+  'ALTER TABLE `secondhand_product` ADD COLUMN `is_negotiable` TINYINT NOT NULL DEFAULT 1 AFTER `condition_level`',
+  'SELECT 1'
+);
+PREPARE stmt_secondhand_is_negotiable FROM @secondhand_is_negotiable_sql;
+EXECUTE stmt_secondhand_is_negotiable;
+DEALLOCATE PREPARE stmt_secondhand_is_negotiable;
 
 CREATE TABLE IF NOT EXISTS `order_info` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,

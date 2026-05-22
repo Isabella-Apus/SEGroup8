@@ -6,8 +6,27 @@
         <h1>商品市场</h1>
         <p>按分类和预算挑选一手商品，适合直接下单购买。</p>
       </div>
-      <div class="hero-actions">
-        <el-button type="primary" size="large" @click="router.push('/order')">我的订单</el-button>
+      <div class="hero-deal">
+        <strong>Daily Discover</strong>
+        <span>热度、库存、券标一屏看清</span>
+      </div>
+    </div>
+
+    <div class="market-servicebar">
+      <strong>新品商城</strong>
+      <div class="service-actions">
+        <el-button type="primary" @click="router.push('/cart')">购物车</el-button>
+        <el-button @click="router.push('/order')">订单</el-button>
+        <el-dropdown trigger="click" @command="handleServiceCommand">
+          <el-button>更多</el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="coupons">领券中心</el-dropdown-item>
+              <el-dropdown-item command="afterSale">售后</el-dropdown-item>
+              <el-dropdown-item command="seller">{{ sellerEntryLabel }}</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </div>
     </div>
 
@@ -28,7 +47,8 @@
       <el-button @click="onReset">重置</el-button>
     </div>
 
-    <div class="category-row">
+    <div class="filter-row">
+      <span>类目</span>
       <button
         v-for="item in categories"
         :key="item"
@@ -41,7 +61,8 @@
       </button>
     </div>
 
-    <div class="category-row">
+    <div class="filter-row">
+      <span>预算</span>
       <button
         v-for="chip in chips"
         :key="chip.range"
@@ -52,6 +73,11 @@
       >
         {{ chip.label }}
       </button>
+    </div>
+
+    <div class="result-strip">
+      <strong>猜你喜欢</strong>
+      <span>{{ visibleItems.length }} 件商品正在展示</span>
     </div>
 
     <div v-if="visibleItems.length" class="grid">
@@ -78,10 +104,14 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router";
 import ProductCard from "@/components/ProductCard.vue";
 import { getProductListApi } from "@/api/product";
+import { useUserStore } from "@/stores/user";
+import { ALL_CATEGORY, matchProductCategory, productCategories } from "@/utils/categoryRules";
+import { searchList } from "@/utils/search/searchService";
 
 const route = useRoute();
 const router = useRouter();
-const pageSize = 16;
+const userStore = useUserStore();
+const pageSize = 100;
 const loading = ref(false);
 const sentinel = ref(null);
 const queryPageNum = ref(1);
@@ -92,10 +122,10 @@ const total = ref(0);
 const query = reactive({
   keyword: "",
   priceRange: "all",
-  category: "全部分类",
+  category: ALL_CATEGORY,
 });
 
-const categories = ["全部分类", "电子数码", "服装鞋包", "学习办公", "生活百货", "运动户外"];
+const categories = productCategories;
 
 const chips = [
   { label: "全部商品", range: "all" },
@@ -103,15 +133,24 @@ const chips = [
   { label: "100-500 元", range: "mid" },
   { label: "500 元以上", range: "high" },
 ];
+const sellerEntryLabel = computed(() => (userStore.currentRole === "OFFICIAL_SELLER" ? "卖家工作台" : "申请开店"));
+const sellerEntryPath = computed(() => (userStore.currentRole === "OFFICIAL_SELLER" ? "/merchant" : "/product/merchant-apply"));
+
+const searchedItems = computed(() => searchList({
+  items: items.value,
+  keyword: query.keyword,
+  keys: ["name", "description", "categoryName", "category"],
+  options: { threshold: 0.42 },
+}));
 
 const visibleItems = computed(() => {
-  return items.value.filter((item) => {
+  return searchedItems.value.filter((item) => {
     const price = Number(item.price || 0);
     let hitPrice = true;
     if (query.priceRange === "low") hitPrice = price < 100;
     if (query.priceRange === "mid") hitPrice = price >= 100 && price <= 500;
     if (query.priceRange === "high") hitPrice = price > 500;
-    const hitCategory = query.category === "全部分类" || item.categoryName === query.category || item.category === query.category;
+    const hitCategory = matchProductCategory(item, query.category);
     return hitPrice && hitCategory;
   });
 });
@@ -125,7 +164,7 @@ onMounted(async () => {
 });
 
 watch(
-  () => [route.query.keyword, route.query.category],
+  () => [route.query.keyword, route.query.category, route.query.price],
   async () => {
     syncKeywordFromRoute();
     await fetchPage(true);
@@ -143,7 +182,8 @@ async function onSearch() {
     path: "/product",
     query: {
       ...(query.keyword.trim() ? { keyword: query.keyword.trim() } : {}),
-      ...(query.category !== "全部分类" ? { category: query.category } : {}),
+      ...(query.category !== ALL_CATEGORY ? { category: query.category } : {}),
+      ...(query.priceRange !== "all" ? { price: query.priceRange } : {}),
     },
   });
   await fetchPage(true);
@@ -152,13 +192,21 @@ async function onSearch() {
 async function onReset() {
   query.keyword = "";
   query.priceRange = "all";
-  query.category = "全部分类";
+  query.category = ALL_CATEGORY;
   await router.replace("/product");
   await fetchPage(true);
 }
 
 async function applyChip(chip) {
   query.priceRange = chip.range;
+  await router.replace({
+    path: "/product",
+    query: {
+      ...(query.keyword.trim() ? { keyword: query.keyword.trim() } : {}),
+      ...(query.category !== ALL_CATEGORY ? { category: query.category } : {}),
+      ...(chip.range !== "all" ? { price: chip.range } : {}),
+    },
+  });
   await fetchPage(true);
 }
 
@@ -168,7 +216,8 @@ async function applyCategory(category) {
     path: "/product",
     query: {
       ...(query.keyword.trim() ? { keyword: query.keyword.trim() } : {}),
-      ...(category !== "全部分类" ? { category } : {}),
+      ...(category !== ALL_CATEGORY ? { category } : {}),
+      ...(query.priceRange !== "all" ? { price: query.priceRange } : {}),
     },
   });
   await fetchPage(true);
@@ -187,12 +236,18 @@ async function fetchPage(reset = false) {
     const res = await getProductListApi({
       pageNum: queryPageNum.value,
       pageSize,
-      keyword: query.keyword.trim() || undefined,
+      ...(query.category !== ALL_CATEGORY ? { category: query.category } : {}),
+      ...priceParams(),
     });
     const records = res.data?.records || [];
     total.value = Number(res.data?.total || records.length || 0);
     items.value = reset ? records : items.value.concat(records);
     queryPageNum.value += 1;
+  } catch {
+    if (reset) {
+      items.value = [];
+      total.value = 0;
+    }
   } finally {
     loading.value = false;
   }
@@ -200,7 +255,32 @@ async function fetchPage(reset = false) {
 
 function syncKeywordFromRoute() {
   query.keyword = String(route.query.keyword || "");
-  query.category = String(route.query.category || "全部分类");
+  const nextCategory = String(route.query.category || ALL_CATEGORY);
+  query.category = categories.includes(nextCategory) ? nextCategory : ALL_CATEGORY;
+  const nextPrice = String(route.query.price || "all");
+  query.priceRange = chips.some((item) => item.range === nextPrice) ? nextPrice : "all";
+}
+
+function priceParams() {
+  if (query.priceRange === "low") {
+    return { maxPrice: 99.99 };
+  }
+  if (query.priceRange === "mid") {
+    return { minPrice: 100, maxPrice: 500 };
+  }
+  if (query.priceRange === "high") {
+    return { minPrice: 500.01 };
+  }
+  return {};
+}
+
+function handleServiceCommand(command) {
+  const map = {
+    coupons: "/product/coupons",
+    afterSale: "/product/after-sale",
+    seller: sellerEntryPath.value,
+  };
+  router.push(map[command] || "/product");
 }
 
 function initObserver() {
@@ -223,31 +303,34 @@ function initObserver() {
 .market-page {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .market-hero {
-  min-height: 210px;
-  border: 2px solid var(--brand-primary);
-  border-radius: 26px;
-  padding: 28px;
+  min-height: 188px;
+  border: 1px solid rgba(60, 146, 255, 0.24);
+  border-radius: 8px;
+  padding: 24px;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 18px;
   background:
-    linear-gradient(90deg, rgba(220, 239, 233, 0.96), rgba(241, 240, 251, 0.72), rgba(255, 255, 255, 0.38)),
+    linear-gradient(90deg, rgba(234, 244, 255, 0.94), rgba(233, 255, 248, 0.82), rgba(255, 247, 251, 0.62)),
     url("https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1400&q=80");
   background-position: center;
   background-size: cover;
+  color: var(--text-main);
+  overflow: hidden;
 }
 
 .eyebrow {
   display: inline-flex;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.92);
   border-radius: 999px;
   padding: 5px 12px;
   font-weight: 900;
+  color: var(--text-main);
 }
 
 .market-hero h1 {
@@ -259,15 +342,59 @@ function initObserver() {
 .market-hero p {
   max-width: 520px;
   margin: 0;
-  color: #3d382b;
+  color: var(--text-secondary);
   font-weight: 700;
   line-height: 1.7;
 }
 
-.hero-actions {
+.hero-deal {
+  margin-left: auto;
+  width: 190px;
+  border: 1px solid rgba(137, 199, 255, 0.42);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 14px;
+  backdrop-filter: blur(8px);
+}
+
+.hero-deal strong,
+.hero-deal span {
+  display: block;
+}
+
+.hero-deal strong {
+  font-size: 18px;
+}
+
+.hero-deal span {
+  margin-top: 7px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.market-servicebar {
+  min-height: 58px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 10px 12px;
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: var(--shadow-soft);
+}
+
+.market-servicebar strong {
+  font-size: 17px;
+}
+
+.service-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex-wrap: wrap;
-  gap: 10px;
 }
 
 .market-toolbar {
@@ -276,25 +403,35 @@ function initObserver() {
   gap: 10px;
   align-items: center;
   border: 1px solid var(--line-soft);
-  border-radius: 20px;
+  border-radius: 8px;
   background: #ffffff;
   padding: 12px;
   box-shadow: var(--shadow-soft);
 }
 
-.category-row {
+.filter-row {
   display: flex;
+  align-items: center;
   gap: 10px;
   overflow-x: auto;
-  padding-bottom: 2px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 10px 12px;
+}
+
+.filter-row > span {
+  flex: 0 0 auto;
+  color: var(--text-secondary);
+  font-weight: 900;
 }
 
 .category-chip {
-  min-height: 38px;
+  min-height: 32px;
   border: 1px solid var(--line-soft);
   border-radius: 999px;
   background: #ffffff;
-  padding: 0 16px;
+  padding: 0 13px;
   color: var(--text-main);
   font-weight: 800;
   white-space: nowrap;
@@ -303,14 +440,36 @@ function initObserver() {
 
 .category-chip.active,
 .category-chip:hover {
-  border-color: var(--brand-primary);
-  background: var(--brand-accent);
+  border-color: rgba(60, 146, 255, 0.35);
+  background: var(--brand-primary-weak);
+  color: var(--brand-primary);
+}
+
+.result-strip {
+  min-height: 46px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.result-strip strong {
+  font-size: 18px;
+}
+
+.result-strip span {
+  color: var(--text-muted);
+  font-size: 13px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .sentinel {
@@ -333,12 +492,21 @@ function initObserver() {
   .market-hero {
     align-items: flex-start;
     flex-direction: column;
-    border-radius: 20px;
     padding: 18px;
+  }
+
+  .hero-deal {
+    margin-left: 0;
+    width: 100%;
   }
 
   .market-toolbar {
     grid-template-columns: 1fr;
+  }
+
+  .market-servicebar {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .grid {

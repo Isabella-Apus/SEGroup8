@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS `secondhand_product` (
   `origin_price` DECIMAL(10,2),
   `sale_price` DECIMAL(10,2),
   `condition_level` VARCHAR(30),
+  `is_negotiable` TINYINT DEFAULT 1,
   `status` TINYINT,
   `create_time` TIMESTAMP,
   `update_time` TIMESTAMP
@@ -39,6 +40,7 @@ ALTER TABLE `product` ADD COLUMN IF NOT EXISTS `description` VARCHAR(255);
 ALTER TABLE `secondhand_product` ADD COLUMN IF NOT EXISTS `cover` VARCHAR(255);
 ALTER TABLE `secondhand_product` ADD COLUMN IF NOT EXISTS `description` VARCHAR(255);
 ALTER TABLE `secondhand_product` ADD COLUMN IF NOT EXISTS `origin_price` DECIMAL(10,2);
+ALTER TABLE `secondhand_product` ADD COLUMN IF NOT EXISTS `is_negotiable` TINYINT DEFAULT 1;
 
 CREATE TABLE IF NOT EXISTS `balance` (
   `user_id` BIGINT PRIMARY KEY,

@@ -6,9 +6,31 @@
         <h1>二手市场</h1>
         <p>从学习设备到生活用品，低价淘闲置，也可以快速发布自己的物品。</p>
       </div>
-      <div class="hero-actions">
-        <el-button type="primary" size="large" @click="router.push('/secondhand/publish')">发布闲置</el-button>
-        <el-button size="large" @click="router.push('/order')">我的订单</el-button>
+      <div class="hero-deal">
+        <strong>闲置瀑布流</strong>
+        <span>先看价格和成色，再进详情沟通</span>
+      </div>
+    </div>
+
+    <div class="market-servicebar">
+      <strong>二手商城</strong>
+      <div class="service-actions">
+        <el-button type="primary" @click="router.push('/secondhand/publish')">发布闲置</el-button>
+        <el-button @click="router.push('/secondhand/mine')">我的闲置/拍卖</el-button>
+        <el-button @click="router.push('/messages')">议价消息</el-button>
+        <el-button @click="router.push('/secondhand/cart')">购物车</el-button>
+        <el-button @click="router.push('/secondhand/orders')">订单</el-button>
+        <el-dropdown trigger="click" @command="handleServiceCommand">
+          <el-button>更多</el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item command="mine">我的闲置</el-dropdown-item>
+              <el-dropdown-item command="messages">买家消息</el-dropdown-item>
+              <el-dropdown-item command="coupons">领券中心</el-dropdown-item>
+              <el-dropdown-item command="afterSale">售后</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </div>
     </div>
 
@@ -29,7 +51,8 @@
       <el-button @click="onReset">重置</el-button>
     </div>
 
-    <div class="category-row">
+    <div class="filter-row">
+      <span>分类</span>
       <button
         v-for="item in categories"
         :key="item"
@@ -42,7 +65,8 @@
       </button>
     </div>
 
-    <div class="category-row">
+    <div class="filter-row">
+      <span>成色</span>
       <button
         v-for="chip in chips"
         :key="chip.condition"
@@ -53,6 +77,11 @@
       >
         {{ chip.label }}
       </button>
+    </div>
+
+    <div class="result-strip">
+      <strong>新鲜上架</strong>
+      <span>{{ visibleItems.length }} 件闲置正在展示</span>
     </div>
 
     <div v-if="visibleItems.length" class="grid">
@@ -79,10 +108,12 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router";
 import ProductCard from "@/components/ProductCard.vue";
 import { getSecondhandListApi } from "@/api/secondhand";
+import { ALL_CATEGORY, matchSecondhandCategory, secondhandCategories } from "@/utils/categoryRules";
+import { searchList } from "@/utils/search/searchService";
 
 const route = useRoute();
 const router = useRouter();
-const pageSize = 16;
+const pageSize = 100;
 const loading = ref(false);
 const sentinel = ref(null);
 const queryPageNum = ref(1);
@@ -93,10 +124,11 @@ const total = ref(0);
 const query = reactive({
   keyword: "",
   condition: "all",
-  category: "全部分类",
+  category: ALL_CATEGORY,
+  sort: "",
 });
 
-const categories = ["全部分类", "数码闲置", "服饰鞋包", "教材书籍", "宿舍生活", "运动器材"];
+const categories = secondhandCategories;
 
 const chips = [
   { label: "全部闲置", condition: "all" },
@@ -105,14 +137,25 @@ const chips = [
   { label: "8 成新", condition: "80%" },
 ];
 
+const searchedItems = computed(() => searchList({
+  items: items.value,
+  keyword: query.keyword,
+  keys: ["name", "description", "categoryName", "category"],
+  options: { threshold: 0.42 },
+}));
+
 const visibleItems = computed(() => {
-  return items.value.filter((item) => {
+  const filtered = searchedItems.value.filter((item) => {
     const hitCondition = query.condition === "all"
       || item.condition === query.condition
       || item.conditionLevel === query.condition;
-    const hitCategory = query.category === "全部分类" || item.categoryName === query.category || item.category === query.category;
+    const hitCategory = matchSecondhandCategory(item, query.category);
     return hitCondition && hitCategory;
   });
+  if (query.sort === "price-asc") {
+    return [...filtered].sort((a, b) => Number(a.salePrice || a.price || 0) - Number(b.salePrice || b.price || 0));
+  }
+  return filtered;
 });
 
 const hasMore = computed(() => items.value.length < total.value);
@@ -124,7 +167,7 @@ onMounted(async () => {
 });
 
 watch(
-  () => [route.query.keyword, route.query.category],
+  () => [route.query.keyword, route.query.category, route.query.condition, route.query.sort],
   async () => {
     syncKeywordFromRoute();
     await fetchPage(true);
@@ -142,7 +185,7 @@ async function onSearch() {
     path: "/secondhand",
     query: {
       ...(query.keyword.trim() ? { keyword: query.keyword.trim() } : {}),
-      ...(query.category !== "全部分类" ? { category: query.category } : {}),
+      ...(query.category !== ALL_CATEGORY ? { category: query.category } : {}),
     },
   });
   await fetchPage(true);
@@ -151,7 +194,7 @@ async function onSearch() {
 async function onReset() {
   query.keyword = "";
   query.condition = "all";
-  query.category = "全部分类";
+  query.category = ALL_CATEGORY;
   await router.replace("/secondhand");
   await fetchPage(true);
 }
@@ -167,7 +210,7 @@ async function applyCategory(category) {
     path: "/secondhand",
     query: {
       ...(query.keyword.trim() ? { keyword: query.keyword.trim() } : {}),
-      ...(category !== "全部分类" ? { category } : {}),
+      ...(category !== ALL_CATEGORY ? { category } : {}),
     },
   });
   await fetchPage(true);
@@ -190,7 +233,8 @@ async function fetchPage(reset = false) {
     const res = await getSecondhandListApi({
       pageNum: queryPageNum.value,
       pageSize,
-      keyword: query.keyword.trim() || undefined,
+      ...(query.category !== ALL_CATEGORY ? { category: query.category } : {}),
+      ...(query.condition !== "all" ? { conditionLevel: query.condition } : {}),
     });
     const records = (res.data?.records || []).map((item) => ({
       ...item,
@@ -201,6 +245,11 @@ async function fetchPage(reset = false) {
     total.value = Number(res.data?.total || records.length || 0);
     items.value = reset ? records : items.value.concat(records);
     queryPageNum.value += 1;
+  } catch {
+    if (reset) {
+      items.value = [];
+      total.value = 0;
+    }
   } finally {
     loading.value = false;
   }
@@ -208,7 +257,21 @@ async function fetchPage(reset = false) {
 
 function syncKeywordFromRoute() {
   query.keyword = String(route.query.keyword || "");
-  query.category = String(route.query.category || "全部分类");
+  const nextCategory = String(route.query.category || ALL_CATEGORY);
+  query.category = categories.includes(nextCategory) ? nextCategory : ALL_CATEGORY;
+  const nextCondition = String(route.query.condition || "all");
+  query.condition = chips.some((chip) => chip.condition === nextCondition) ? nextCondition : "all";
+  query.sort = String(route.query.sort || "");
+}
+
+function handleServiceCommand(command) {
+  const map = {
+    mine: "/secondhand/mine",
+    messages: "/messages",
+    coupons: "/secondhand/coupons",
+    afterSale: "/secondhand/after-sale",
+  };
+  router.push(map[command] || "/secondhand");
 }
 
 function initObserver() {
@@ -231,31 +294,34 @@ function initObserver() {
 .market-page {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .market-hero {
-  min-height: 210px;
-  border: 2px solid var(--brand-primary);
-  border-radius: 26px;
-  padding: 28px;
+  min-height: 188px;
+  border: 1px solid rgba(53, 216, 171, 0.24);
+  border-radius: 8px;
+  padding: 24px;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 18px;
   background:
-    linear-gradient(90deg, rgba(247, 239, 229, 0.96), rgba(183, 216, 238, 0.62)),
+    linear-gradient(90deg, rgba(233, 255, 248, 0.94), rgba(234, 244, 255, 0.82), rgba(255, 247, 251, 0.62)),
     url("https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1400&q=80");
   background-position: center;
   background-size: cover;
+  color: var(--text-main);
+  overflow: hidden;
 }
 
 .eyebrow {
   display: inline-flex;
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.92);
   border-radius: 999px;
   padding: 5px 12px;
   font-weight: 900;
+  color: var(--text-main);
 }
 
 .market-hero h1 {
@@ -267,15 +333,59 @@ function initObserver() {
 .market-hero p {
   max-width: 520px;
   margin: 0;
-  color: #3d382b;
+  color: var(--text-secondary);
   font-weight: 700;
   line-height: 1.7;
 }
 
-.hero-actions {
+.hero-deal {
+  margin-left: auto;
+  width: 190px;
+  border: 1px solid rgba(137, 199, 255, 0.42);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 14px;
+  backdrop-filter: blur(8px);
+}
+
+.hero-deal strong,
+.hero-deal span {
+  display: block;
+}
+
+.hero-deal strong {
+  font-size: 18px;
+}
+
+.hero-deal span {
+  margin-top: 7px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.market-servicebar {
+  min-height: 58px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 10px 12px;
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: var(--shadow-soft);
+}
+
+.market-servicebar strong {
+  font-size: 17px;
+}
+
+.service-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex-wrap: wrap;
-  gap: 10px;
 }
 
 .market-toolbar {
@@ -284,25 +394,35 @@ function initObserver() {
   gap: 10px;
   align-items: center;
   border: 1px solid var(--line-soft);
-  border-radius: 20px;
+  border-radius: 8px;
   background: #ffffff;
   padding: 12px;
   box-shadow: var(--shadow-soft);
 }
 
-.category-row {
+.filter-row {
   display: flex;
+  align-items: center;
   gap: 10px;
   overflow-x: auto;
-  padding-bottom: 2px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 10px 12px;
+}
+
+.filter-row > span {
+  flex: 0 0 auto;
+  color: var(--text-secondary);
+  font-weight: 900;
 }
 
 .category-chip {
-  min-height: 38px;
+  min-height: 32px;
   border: 1px solid var(--line-soft);
   border-radius: 999px;
   background: #ffffff;
-  padding: 0 16px;
+  padding: 0 13px;
   color: var(--text-main);
   font-weight: 800;
   white-space: nowrap;
@@ -311,14 +431,36 @@ function initObserver() {
 
 .category-chip.active,
 .category-chip:hover {
-  border-color: var(--brand-primary);
-  background: var(--brand-accent);
+  border-color: rgba(18, 165, 148, 0.35);
+  background: #e9fbf8;
+  color: var(--brand-accent-strong);
+}
+
+.result-strip {
+  min-height: 46px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.result-strip strong {
+  font-size: 18px;
+}
+
+.result-strip span {
+  color: var(--text-muted);
+  font-size: 13px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .sentinel {
@@ -341,12 +483,21 @@ function initObserver() {
   .market-hero {
     align-items: flex-start;
     flex-direction: column;
-    border-radius: 20px;
     padding: 18px;
+  }
+
+  .hero-deal {
+    margin-left: 0;
+    width: 100%;
   }
 
   .market-toolbar {
     grid-template-columns: 1fr;
+  }
+
+  .market-servicebar {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .grid {

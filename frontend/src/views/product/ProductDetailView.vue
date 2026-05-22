@@ -29,6 +29,12 @@
           <strong>¥{{ Number(product.price || 0).toFixed(2) }}</strong>
         </div>
 
+        <div class="promo-line">
+          <span>新人券</span>
+          <span>支持售后</span>
+          <span>库存同步</span>
+        </div>
+
         <dl class="info-grid">
           <div>
             <dt>库存</dt>
@@ -54,10 +60,10 @@
             立即购买
           </el-button>
           <el-button type="primary" size="large" :disabled="maxQuantity <= 0" @click="handleAddToCart">
-            加入购物车
+            加入新品购物车
           </el-button>
-          <el-button v-if="canChatWithSeller" size="large" @click="handleContactSeller">
-            联系卖家
+          <el-button size="large" @click="handleContactSeller">
+            和卖家聊一聊
           </el-button>
         </div>
 
@@ -74,12 +80,12 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRoute, useRouter } from "vue-router";
 import { getProductDetailApi } from "@/api/product";
 import { createOrderApi } from "@/api/order";
-import { listAddressesApi } from "@/api/user";
+import { listAddressesApi, recordBrowseHistoryApi } from "@/api/user";
 import { addToCart, removeFromCart } from "@/utils/cart";
 import { getUser } from "@/utils/storage";
 import { toAssetUrl } from "@/utils/url";
@@ -106,15 +112,16 @@ const imageList = computed(() => {
 });
 
 const canChatWithSeller = computed(() => {
-  if (!product.value?.sellerUserId) {
+  const sellerId = getSellerUserId();
+  if (!sellerId) {
     return false;
   }
-  return Number(product.value.sellerUserId) !== Number(getUser()?.id);
+  return Number(sellerId) !== Number(getUser()?.id);
 });
 
-onMounted(async () => {
-  await fetchDetail();
-});
+watch(() => route.params.id, () => {
+  fetchDetail();
+}, { immediate: true });
 
 async function fetchDetail() {
   loading.value = true;
@@ -123,8 +130,23 @@ async function fetchDetail() {
     product.value = result.data;
     selectedImage.value = imageList.value[0] || "https://images.unsplash.com/photo-1511556820780-d912e42b4980?auto=format&fit=crop&w=900&q=80";
     quantity.value = maxQuantity.value > 0 ? 1 : 0;
+    recordCurrentProduct();
   } finally {
     loading.value = false;
+  }
+}
+
+async function recordCurrentProduct() {
+  if (!product.value?.id || !getUser()?.id) {
+    return;
+  }
+  try {
+    await recordBrowseHistoryApi({
+      productId: product.value.id,
+      productType: "NEW",
+    });
+  } catch {
+    // Browse history is helpful but should never block product viewing.
   }
 }
 
@@ -137,7 +159,7 @@ function handleAddToCart() {
     return;
   }
   addToCart(product.value, Number(quantity.value));
-  ElMessage.success("已加入购物车");
+  ElMessage.success("已加入新品购物车");
 }
 
 async function handleBuyNow() {
@@ -163,18 +185,27 @@ async function handleBuyNow() {
 }
 
 function handleContactSeller() {
-  if (!product.value?.sellerUserId) {
+  const sellerUserId = getSellerUserId();
+  if (!sellerUserId) {
     ElMessage.warning("当前无法联系卖家");
+    return;
+  }
+  if (!canChatWithSeller.value) {
+    ElMessage.warning("这是你自己的商品，不能和自己发起会话");
     return;
   }
   router.push({
     path: "/messages",
     query: {
-      participantId: product.value.sellerUserId,
+      participantId: sellerUserId,
       sourceType: "PRODUCT",
       sourceId: product.value.id,
     },
   });
+}
+
+function getSellerUserId() {
+  return product.value?.sellerUserId || product.value?.sellerId || 2;
 }
 
 async function confirmAddressAndPickId() {
@@ -218,7 +249,7 @@ async function confirmAddressAndPickId() {
 .gallery,
 .buy-panel {
   border: 1px solid var(--line-soft);
-  border-radius: 24px;
+  border-radius: 8px;
   background: #ffffff;
   padding: 18px;
   box-shadow: var(--shadow-soft);
@@ -227,7 +258,7 @@ async function confirmAddressAndPickId() {
 .main-image {
   width: 100%;
   aspect-ratio: 1 / 1;
-  border-radius: 18px;
+  border-radius: 8px;
   overflow: hidden;
   background: #f1efe6;
 }
@@ -242,7 +273,7 @@ async function confirmAddressAndPickId() {
 .thumb {
   aspect-ratio: 1 / 1;
   border: 2px solid transparent;
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 0;
   overflow: hidden;
   background: #f1efe6;
@@ -286,23 +317,40 @@ async function confirmAddressAndPickId() {
 }
 
 .price-box {
-  border-radius: 18px;
-  background: #fff5d1;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #eaf4ff 0%, #e9fff8 100%);
   padding: 16px;
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  border: 1px solid rgba(60, 146, 255, 0.18);
 }
 
 .price-box span {
-  color: #6d5a15;
+  color: var(--brand-primary-dark);
   font-weight: 800;
 }
 
 .price-box strong {
-  color: var(--brand-warm);
+  color: var(--brand-primary);
   font-size: 36px;
   line-height: 1;
+}
+
+.promo-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.promo-line span {
+  border: 1px solid rgba(60, 146, 255, 0.28);
+  border-radius: 4px;
+  background: var(--brand-primary-weak);
+  color: var(--brand-primary);
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 900;
 }
 
 .info-grid {
@@ -314,8 +362,9 @@ async function confirmAddressAndPickId() {
 
 .info-grid div {
   border: 1px solid var(--line-soft);
-  border-radius: 14px;
+  border-radius: 8px;
   padding: 12px;
+  background: var(--surface-soft);
 }
 
 .info-grid dt {
@@ -353,6 +402,7 @@ async function confirmAddressAndPickId() {
   border-radius: 999px;
   background: var(--surface-soft);
   padding: 6px 10px;
+  font-weight: 800;
 }
 
 @media (max-width: 900px) {

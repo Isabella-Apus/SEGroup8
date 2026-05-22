@@ -2,12 +2,12 @@
   <div class="page-card order-page">
     <section class="order-head">
       <div>
-        <span class="eyebrow">Orders</span>
-        <h2 class="page-title">我的订单</h2>
-        <p>查看交易进度、物流状态和售后入口。</p>
+        <span class="eyebrow">{{ pageCopy.eyebrow }}</span>
+        <h2 class="page-title">{{ pageCopy.title }}</h2>
+        <p>{{ pageCopy.desc }}</p>
       </div>
       <div v-if="!listLoading" class="head-stats">
-        <span>{{ tabLabel }}</span>
+        <span>{{ orderTypeLabel }} · {{ tabLabel }}</span>
         <strong>{{ filteredRecords.length }}</strong>
         <small>当前结果</small>
       </div>
@@ -43,6 +43,20 @@
       <el-button @click="handleReset">重置</el-button>
     </div>
 
+    <div v-if="!isScopedOrderPage" class="order-type-row" aria-label="订单类型筛选">
+      <button
+        v-for="item in orderTypeOptions"
+        :key="item.value"
+        type="button"
+        class="order-type-card"
+        :class="{ active: query.orderType === item.value }"
+        @click="changeOrderType(item.value)"
+      >
+        <strong>{{ item.label }}</strong>
+        <span>{{ item.desc }}</span>
+      </button>
+    </div>
+
     <el-tabs v-model="activeTab" class="status-tabs" @tab-click="handleTabClick">
       <el-tab-pane label="全部" name="ALL" />
       <el-tab-pane label="待付款" name="PENDING_PAY" />
@@ -63,6 +77,7 @@
       <article v-for="order in filteredRecords" :key="order.id" class="order-card" @click="goDetail(order.id)">
         <div class="order-card__header">
           <div class="status-cluster">
+            <span class="order-kind" :class="orderKindClass(order)">{{ orderKindLabel(order) }}</span>
             <OrderStatusTag
               :status="order.orderStatus"
               :status-name="order.orderStatusName"
@@ -80,8 +95,8 @@
             <div class="item-main">
               <strong class="name">{{ item.productName }}</strong>
               <span class="item-tags">
-                <el-tag v-if="item.productType || item.itemType" size="small" :type="(item.productType || item.itemType) === 'SECONDHAND' ? 'warning' : 'info'">
-                  {{ (item.productType || item.itemType) === 'SECONDHAND' ? '二手' : '新品' }}
+                <el-tag size="small" :type="getItemType(item) === 'SECONDHAND' ? 'warning' : 'info'">
+                  {{ getItemType(item) === 'SECONDHAND' ? '二手' : '新品' }}
                 </el-tag>
                 <el-tag v-if="item.conditionLevel" size="small" type="success">
                   {{ item.conditionLevel }}
@@ -182,7 +197,14 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="payDialogVisible" title="确认支付" width="520px">
+    <el-dialog
+      v-model="payDialogVisible"
+      title="确认支付"
+      width="520px"
+      align-center
+      append-to-body
+      class="order-pay-dialog"
+    >
       <el-form label-width="90px">
         <el-form-item label="支付方式">
           <el-radio-group v-model="payForm.payMode">
@@ -214,9 +236,9 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
 import { Plus } from '@element-plus/icons-vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { cancelOrderApi, confirmReceiveOrderApi, getOrderListApi, payOrderApi, refundOrderApi, remindShipOrderApi } from '@/api/order';
 import { uploadImageApi } from '@/api/upload';
 import { confirmOrderAction, showOrderActionError, showOrderActionSuccess } from '@/utils/orderUi';
@@ -232,12 +254,15 @@ const query = reactive({
   startTime: null,
   endTime: null,
   minAmount: null,
-  maxAmount: null
+  maxAmount: null,
+  orderType: 'ALL'
 });
 const total = ref(0);
 const records = ref([]);
 const activeTab = ref('ALL');
 const listLoading = ref(false);
+const route = useRoute();
+const router = useRouter();
 
 const filteredRecords = computed(() => {
   const keyword = String(query.keyword || '').trim();
@@ -266,7 +291,38 @@ const tabLabelMap = {
   CLOSED: '已关闭'
 };
 const tabLabel = computed(() => tabLabelMap[activeTab.value] || '全部');
-const router = useRouter();
+const orderTypeOptions = [
+  { label: '全部订单', value: 'ALL', desc: '新品和二手一起看' },
+  { label: '新品订单', value: 'NEW', desc: '官方商品、商城下单' },
+  { label: '二手订单', value: 'SECONDHAND', desc: '闲置交易、议价沟通' }
+];
+const orderTypeLabel = computed(() => orderTypeOptions.find((item) => item.value === query.orderType)?.label || '全部订单');
+const scopedOrderType = computed(() => {
+  const scope = String(route.meta?.orderScope || '').toUpperCase();
+  return scope === 'NEW' || scope === 'SECONDHAND' ? scope : '';
+});
+const isScopedOrderPage = computed(() => !!scopedOrderType.value);
+const pageCopy = computed(() => {
+  if (scopedOrderType.value === 'SECONDHAND') {
+    return {
+      eyebrow: 'Secondhand Orders',
+      title: '二手订单',
+      desc: '只展示二手商城产生的订单，便于查看闲置交易进度。'
+    };
+  }
+  if (scopedOrderType.value === 'NEW') {
+    return {
+      eyebrow: 'New Goods Orders',
+      title: '新品订单',
+      desc: '只展示新品商城产生的订单，购物车结算和售后都在这里。'
+    };
+  }
+  return {
+    eyebrow: 'Orders',
+    title: '我的订单',
+    desc: '查看交易进度、物流状态和售后入口。'
+  };
+});
 
 const refundDialogVisible = ref(false);
 const refundSubmitting = ref(false);
@@ -287,6 +343,7 @@ const payForm = reactive({
 let unsubscribeRealtime = null;
 
 onMounted(() => {
+  syncOrderScopeFromRoute();
   syncQueryFromTab();
   fetchOrders();
   unsubscribeRealtime = onRealtimeEvent(handleRealtimeEvent);
@@ -330,6 +387,21 @@ function syncQueryFromTab() {
   query.orderStatus = tabToStatus(activeTab.value);
 }
 
+function syncOrderScopeFromRoute() {
+  query.orderType = scopedOrderType.value || 'ALL';
+}
+
+watch(
+  () => route.meta?.orderScope,
+  () => {
+    activeTab.value = 'ALL';
+    query.pageNum = 1;
+    syncOrderScopeFromRoute();
+    syncQueryFromTab();
+    fetchOrders();
+  },
+);
+
 async function handleTabClick() {
   await nextTick();
   query.pageNum = 1;
@@ -349,7 +421,17 @@ function handleReset() {
   query.minAmount = null;
   query.maxAmount = null;
   activeTab.value = 'ALL';
+  syncOrderScopeFromRoute();
   query.orderStatus = undefined;
+  query.pageNum = 1;
+  fetchOrders();
+}
+
+function changeOrderType(type) {
+  if (isScopedOrderPage.value) {
+    return;
+  }
+  query.orderType = type;
   query.pageNum = 1;
   fetchOrders();
 }
@@ -370,13 +452,41 @@ function formatTime(value) {
   return String(value).replace('T', ' ');
 }
 
-function goDetail(id) {
-  router.push(`/order/${id}`);
+function orderDetailPath(orderOrId) {
+  const id = typeof orderOrId === 'object' ? orderOrId.id : orderOrId;
+  if (scopedOrderType.value === 'SECONDHAND' || (typeof orderOrId === 'object' && getOrderKind(orderOrId) === 'SECONDHAND')) {
+    return `/secondhand/orders/${id}`;
+  }
+  return `/order/${id}`;
+}
+
+function goDetail(orderOrId) {
+  router.push(orderDetailPath(orderOrId));
 }
 
 function getOrderPrimarySeller(order) {
   const items = order?.items || [];
   return items.find((item) => item?.sellerUserId) || null;
+}
+
+function getItemType(item) {
+  return String(item?.productType || item?.itemType || 'NEW').toUpperCase() === 'SECONDHAND' ? 'SECONDHAND' : 'NEW';
+}
+
+function getOrderKind(order) {
+  const explicit = String(order?.orderType || '').toUpperCase();
+  if (explicit === 'NEW' || explicit === 'SECONDHAND') {
+    return explicit;
+  }
+  return (order?.items || []).some((item) => getItemType(item) === 'SECONDHAND') ? 'SECONDHAND' : 'NEW';
+}
+
+function orderKindLabel(order) {
+  return getOrderKind(order) === 'SECONDHAND' ? '二手订单' : '新品订单';
+}
+
+function orderKindClass(order) {
+  return getOrderKind(order) === 'SECONDHAND' ? 'secondhand' : 'new';
 }
 
 function contactSeller(order) {
@@ -388,7 +498,9 @@ function contactSeller(order) {
   router.push({
     path: '/messages',
     query: {
-      participantId: seller.sellerUserId
+      participantId: seller.sellerUserId,
+      sourceType: getItemType(seller) === 'SECONDHAND' ? 'SECONDHAND' : 'PRODUCT',
+      sourceId: seller.productId
     }
   });
 }
@@ -451,7 +563,7 @@ async function confirmReceive(orderId) {
 }
 
 function goReview(orderId) {
-  router.push({ path: `/order/${orderId}`, query: { action: 'review' } });
+  router.push({ path: orderDetailPath(orderId), query: { action: 'review' } });
 }
 
 function canRefund(status, refundStatus) {
@@ -517,7 +629,7 @@ async function remindShip(orderId) {
 
 function viewLogistics(order) {
   router.push({
-    path: `/order/${order.id}`,
+    path: orderDetailPath(order),
     query: { tab: 'logistics' }
   });
 }
@@ -622,6 +734,48 @@ function handleRealtimeEvent(event) {
   margin-bottom: 12px;
 }
 
+.order-type-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.order-type-card {
+  min-height: 68px;
+  border: 1px solid var(--line-soft);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--text-main);
+  padding: 12px 14px;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+}
+
+.order-type-card strong,
+.order-type-card span {
+  display: block;
+}
+
+.order-type-card strong {
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.order-type-card span {
+  margin-top: 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.order-type-card.active,
+.order-type-card:hover {
+  border-color: rgba(60, 146, 255, 0.42);
+  background: linear-gradient(135deg, #eaf4ff 0%, #e9fff8 100%);
+}
+
 .status-tabs :deep(.el-tabs__nav-wrap::after) {
   height: 1px;
   background: rgba(101, 112, 108, 0.16);
@@ -677,6 +831,28 @@ function handleRealtimeEvent(event) {
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
+}
+
+.order-kind {
+  min-height: 28px;
+  border-radius: 999px;
+  padding: 0 11px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.order-kind.new {
+  color: var(--brand-primary);
+  background: var(--brand-primary-weak);
+  border: 1px solid rgba(60, 146, 255, 0.22);
+}
+
+.order-kind.secondhand {
+  color: var(--brand-accent-strong);
+  background: var(--brand-mint-weak);
+  border: 1px solid rgba(53, 216, 171, 0.28);
 }
 
 .no,
@@ -816,9 +992,22 @@ function handleRealtimeEvent(event) {
   background: rgba(220, 239, 233, 0.28);
 }
 
+:global(.order-pay-dialog.el-dialog) {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+:global(.order-pay-dialog .el-dialog__body) {
+  padding-top: 10px;
+}
+
 @media (max-width: 1080px) {
   .order-toolbar {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .order-type-row {
+    grid-template-columns: 1fr;
   }
 }
 

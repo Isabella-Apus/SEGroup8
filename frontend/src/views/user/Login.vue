@@ -2,19 +2,17 @@
     <div class="auth-wrap">
         <div class="auth-stage fade-in-up">
             <aside class="auth-side">
-                <span class="brand-mark">kg</span>
-                <h1>Kinda Goods</h1>
-                <p>一手商品、二手闲置、订单售后和卖家工作台都在这里。</p>
-                <div class="account-grid">
-                    <button type="button" @click="fillAccount('user', 'user123')">普通用户</button>
-                    <button type="button" @click="fillAccount('seller', 'seller123')">卖家</button>
-                    <button type="button" @click="fillAccount('admin', 'admin123')">管理员</button>
+                <div class="brand-plate">
+                    <img :src="logoUrl" alt="Kinda Goods" />
                 </div>
+                <h1>欢迎回来</h1>
+                <p>继续逛好物、淘闲置、查订单。</p>
             </aside>
 
             <div class="auth-card page-card">
+                <span class="login-kicker">Kinda Goods</span>
                 <h2 class="page-title">账号登录</h2>
-                <p class="auth-subtitle">欢迎回来，继续发现好物。</p>
+                <p class="auth-subtitle">好物还在，购物车也在。</p>
                 <el-form :model="form" label-position="top" @submit.prevent>
                     <el-form-item label="账号">
                         <el-input v-model="form.username" placeholder="请输入账号" />
@@ -27,7 +25,6 @@
                         <el-button @click="router.push('/register')">注册新账号</el-button>
                     </el-form-item>
                 </el-form>
-                <p class="empty-tip">测试账号：admin/admin123、seller/seller123、user/user123</p>
             </div>
         </div>
     </div>
@@ -38,19 +35,15 @@ import { reactive, ref } from "vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/user";
+import logoUrl from "@/assets/kinda-goods-logo.svg";
 
 const router = useRouter();
 const userStore = useUserStore();
 const loading = ref(false);
 const form = reactive({
-    username: "user",
-    password: "user123",
+    username: "",
+    password: "",
 });
-
-function fillAccount(username, password) {
-    form.username = username;
-    form.password = password;
-}
 
 async function handleLogin() {
     if (!form.username || !form.password) {
@@ -83,95 +76,120 @@ async function handleLogin() {
     display: grid;
     place-items: center;
     background:
-        linear-gradient(120deg, rgba(220, 239, 233, 0.96), rgba(241, 240, 251, 0.9)),
-        url("https://images.unsplash.com/photo-1556742502-ec7c0e9f34b1?auto=format&fit=crop&w=1600&q=80");
-    background-size: cover;
-    background-position: center;
+        radial-gradient(circle at 18% 18%, rgba(95, 230, 189, 0.24), transparent 26%),
+        radial-gradient(circle at 82% 18%, rgba(137, 199, 255, 0.25), transparent 26%),
+        radial-gradient(circle at 82% 84%, rgba(255, 185, 214, 0.22), transparent 28%),
+        linear-gradient(135deg, #f8fffc 0%, #eff9ff 45%, #fff7fb 100%);
 }
 
 .auth-stage {
     width: 100%;
-    max-width: 980px;
+    max-width: 920px;
     display: grid;
-    grid-template-columns: 1.05fr 0.95fr;
-    border: 2px solid var(--brand-primary);
-    border-radius: 28px;
+    grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1fr);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: var(--shadow-float);
-    background: #ffffff;
+    box-shadow: 0 22px 60px rgba(57, 118, 166, 0.14);
+    background: rgba(255, 255, 255, 0.86);
+    backdrop-filter: blur(14px);
 }
 
 .auth-side {
     padding: 44px 38px;
-    background: var(--brand-primary);
-    color: #ffffff;
+    background: linear-gradient(145deg, rgba(233, 255, 248, 0.82), rgba(234, 244, 255, 0.74));
+    color: var(--text-main);
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: flex-start;
 }
 
-.brand-mark {
-    width: 58px;
-    height: 58px;
-    border-radius: 18px;
-    background: var(--brand-accent);
-    color: var(--brand-primary);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    font-weight: 900;
+.brand-plate {
+    width: min(100%, 310px);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 14px 16px;
+    box-shadow: 0 16px 34px rgba(60, 146, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+}
+
+.brand-plate img {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 .auth-side h1 {
-    margin: 20px 0 12px;
-    font-size: 48px;
+    margin: 24px 0 12px;
+    font-size: 42px;
+    line-height: 1.12;
     letter-spacing: 0;
 }
 
 .auth-side p {
     margin: 0;
-    max-width: 420px;
-    color: #dcefe9;
-    font-size: 17px;
-    line-height: 1.8;
+    max-width: 320px;
+    color: var(--text-secondary);
+    font-size: 16px;
+    line-height: 1.7;
     font-weight: 700;
-}
-
-.account-grid {
-    margin-top: 28px;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-}
-
-.account-grid button {
-    min-height: 44px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.08);
-    color: #ffffff;
-    font-weight: 800;
-    cursor: pointer;
-}
-
-.account-grid button:hover {
-    background: rgba(255, 255, 255, 0.16);
 }
 
 .auth-card {
     border-radius: 0;
     border: 0;
     box-shadow: none;
-    min-height: 500px;
+    min-height: 520px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    padding: 44px;
+    background: rgba(255, 255, 255, 0.96);
+}
+
+.auth-card :deep(.el-form-item__label) {
+    color: var(--text-main);
+    font-weight: 800;
+}
+
+.auth-card :deep(.el-input__wrapper) {
+    min-height: 46px;
+    border-radius: 10px;
+    box-shadow: 0 0 0 1px rgba(137, 199, 255, 0.3) inset;
+}
+
+.auth-card :deep(.el-input__wrapper.is-focus) {
+    box-shadow: 0 0 0 1px var(--brand-primary) inset, 0 0 0 4px rgba(137, 199, 255, 0.18);
+}
+
+.auth-card :deep(.el-button) {
+    min-height: 42px;
+    border-radius: 10px;
+    padding-inline: 22px;
+}
+
+.login-kicker {
+    width: fit-content;
+    border-radius: 999px;
+    background: var(--brand-primary-weak);
+    color: #1d7d8f;
+    padding: 5px 11px;
+    font-size: 12px;
+    font-weight: 900;
+    border: 1px solid rgba(137, 199, 255, 0.28);
+}
+
+.auth-card .page-title {
+    margin-top: 14px;
+    margin-bottom: 10px;
+    font-size: 30px;
 }
 
 .auth-subtitle {
-    margin: -6px 0 20px;
+    margin: 0 0 24px;
     color: var(--text-secondary);
+    line-height: 1.7;
 }
 
 .action-row :deep(.el-form-item__content) {
@@ -186,14 +204,37 @@ async function handleLogin() {
 
     .auth-side {
         padding: 28px;
-    }
-
-    .auth-side h1 {
-        font-size: 34px;
+        align-items: center;
+        text-align: center;
     }
 
     .auth-card {
         min-height: unset;
+        padding: 28px;
+    }
+}
+
+@media (max-width: 620px) {
+    .auth-wrap {
+        padding: 14px;
+        overflow: auto;
+    }
+
+    .auth-side,
+    .auth-card {
+        padding: 22px;
+    }
+
+    .brand-plate {
+        width: 220px;
+    }
+
+    .action-row :deep(.el-form-item__content) {
+        flex-direction: column;
+    }
+
+    .auth-card :deep(.el-button) {
+        width: 100%;
     }
 }
 </style>

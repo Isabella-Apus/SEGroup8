@@ -4,28 +4,40 @@
       <img class="cover" :src="coverUrl" :alt="product.name" loading="lazy" />
       <span class="badge">{{ badgeText }}</span>
       <span v-if="isLowStock" class="stock-badge">库存紧张</span>
+      <span class="quick-view">看详情</span>
     </button>
 
     <div class="content">
       <button class="title-button" type="button" @click="goDetail">
+        <span v-if="isSecondhand" class="title-tag">闲置</span>
+        <span v-else class="title-tag official">官方</span>
         {{ product.name }}
       </button>
-      <p class="desc">{{ descriptionText }}</p>
 
-      <div class="seller-row">
-        <span>{{ sellerText }}</span>
-        <span>{{ subText }}</span>
+      <div class="coupon-row">
+        <span>{{ couponText }}</span>
+        <span>{{ shippingText }}</span>
       </div>
 
       <div class="meta">
         <div>
-          <strong class="price">¥{{ formatPrice(mainPrice) }}</strong>
+          <strong class="price"><small>¥</small>{{ priceInteger }}<em>.{{ priceDecimal }}</em></strong>
           <span v-if="isSecondhand" class="origin">¥{{ formatPrice(product.originPrice || product.price) }}</span>
         </div>
-        <div class="actions">
-          <el-button v-if="!isSecondhand" size="small" @click.stop="handleAddCart">加购</el-button>
-          <el-button size="small" type="primary" @click.stop="goDetail">查看</el-button>
-        </div>
+        <span class="sales-text">{{ salesText }}</span>
+      </div>
+
+      <div class="seller-row">
+        <span class="seller-avatar">{{ sellerInitial }}</span>
+        <span class="seller-name">{{ sellerText }}</span>
+        <span class="sub-text">{{ subText }}</span>
+      </div>
+
+      <div class="actions">
+        <el-button v-if="!isSecondhand" size="small" @click.stop="handleAddCart">加购</el-button>
+        <el-button size="small" type="primary" @click.stop="goDetail">
+          {{ isSecondhand ? "聊一聊" : "去看看" }}
+        </el-button>
       </div>
     </div>
   </article>
@@ -78,7 +90,7 @@ const mainPrice = computed(() => {
 
 const subText = computed(() => {
   if (isSecondhand.value) {
-    return "单件闲置";
+    return "个人发布";
   }
   return `库存 ${props.product.stock ?? 0}`;
 });
@@ -92,6 +104,30 @@ const coverUrl = computed(() => {
 });
 
 const isLowStock = computed(() => !isSecondhand.value && Number(props.product.stock || 0) > 0 && Number(props.product.stock || 0) <= 5);
+
+const formattedMainPrice = computed(() => formatPrice(mainPrice.value));
+const priceInteger = computed(() => formattedMainPrice.value.split(".")[0]);
+const priceDecimal = computed(() => formattedMainPrice.value.split(".")[1] || "00");
+
+const couponText = computed(() => {
+  if (isSecondhand.value) {
+    return props.product.conditionLevel || props.product.condition || "成色良好";
+  }
+  const price = Number(mainPrice.value || 0);
+  if (price >= 500) {
+    return "大件保障";
+  }
+  return "新人券";
+});
+
+const shippingText = computed(() => (isSecondhand.value ? "可沟通" : "售后无忧"));
+
+const salesText = computed(() => {
+  const seed = Number(props.product.id || 1);
+  return isSecondhand.value ? `${20 + (seed % 76)} 人想要` : `${100 + (seed * 17) % 900} 件热度`;
+});
+
+const sellerInitial = computed(() => sellerText.value.slice(0, 1).toUpperCase());
 
 function goDetail() {
   if (!props.clickable) {
@@ -119,15 +155,15 @@ function formatPrice(value) {
 .product-card {
   background: var(--surface);
   border: 1px solid var(--line-soft);
-  border-radius: 18px;
+  border-radius: 8px;
   overflow: hidden;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
   min-width: 0;
 }
 
 .product-card:hover {
-  transform: translateY(-3px);
-  border-color: #d9c989;
+  transform: translateY(-2px);
+  border-color: rgba(60, 146, 255, 0.45);
   box-shadow: var(--shadow-float);
 }
 
@@ -156,39 +192,58 @@ function formatPrice(value) {
 }
 
 .badge,
-.stock-badge {
+.stock-badge,
+.quick-view {
   position: absolute;
-  top: 10px;
   border-radius: 999px;
-  padding: 5px 10px;
+  padding: 5px 9px;
   font-size: 12px;
   font-weight: 900;
   line-height: 1;
 }
 
 .badge {
-  left: 10px;
-  background: var(--brand-accent);
+  top: 8px;
+  left: 8px;
+  background: rgba(234, 244, 255, 0.9);
   color: var(--brand-primary);
+  backdrop-filter: blur(8px);
 }
 
 .secondhand .badge {
-  background: #ffffff;
+  background: rgba(233, 255, 248, 0.92);
+  color: var(--brand-accent-strong);
 }
 
 .stock-badge {
-  right: 10px;
+  top: 8px;
+  right: 8px;
   background: var(--brand-warm);
+  color: var(--text-main);
+}
+
+.quick-view {
+  left: 8px;
+  bottom: 8px;
+  background: var(--brand-gradient-strong);
   color: #ffffff;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.product-card:hover .quick-view {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .content {
-  padding: 13px;
+  padding: 10px;
 }
 
 .title-button {
   width: 100%;
-  min-height: 44px;
+  min-height: 42px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -198,71 +253,141 @@ function formatPrice(value) {
   padding: 0;
   text-align: left;
   color: var(--text-main);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 800;
-  line-height: 1.38;
+  line-height: 1.45;
   cursor: pointer;
 }
 
 .title-button:hover {
-  color: #000000;
+  color: var(--brand-primary);
 }
 
-.desc {
-  margin: 8px 0;
-  color: var(--text-secondary);
-  font-size: 13px;
-  line-height: 1.5;
-  min-height: 38px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+.title-tag {
+  display: inline-flex;
+  vertical-align: 1px;
+  margin-right: 4px;
+  border-radius: 4px;
+  background: var(--brand-accent);
+  color: #ffffff;
+  padding: 1px 4px;
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 900;
+}
+
+.title-tag.official {
+  background: var(--brand-primary);
+}
+
+.coupon-row {
+  min-height: 24px;
+  margin-top: 7px;
+  display: flex;
+  gap: 5px;
   overflow: hidden;
 }
 
+.coupon-row span {
+  border: 1px solid rgba(60, 146, 255, 0.24);
+  border-radius: 4px;
+  color: var(--brand-primary);
+  background: var(--brand-primary-weak);
+  padding: 2px 5px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
 .seller-row {
+  margin-top: 8px;
   display: flex;
-  justify-content: space-between;
+  align-items: center;
   gap: 8px;
   color: var(--text-muted);
   font-size: 12px;
   min-width: 0;
 }
 
-.seller-row span {
+.seller-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--brand-gradient);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.seller-name,
+.sub-text {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.seller-name {
+  min-width: 0;
+  flex: 1;
+}
+
+.sub-text {
+  flex: 0 0 auto;
+}
+
 .meta {
-  margin-top: 10px;
+  margin-top: 8px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: baseline;
   gap: 10px;
 }
 
 .price {
-  display: block;
-  color: var(--brand-warm);
-  font-size: 22px;
+  display: inline-flex;
+  align-items: baseline;
+  color: var(--brand-primary);
+  font-size: 24px;
   line-height: 1;
   letter-spacing: 0;
 }
 
+.price small,
+.price em {
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 900;
+}
+
 .origin {
   display: block;
-  margin-top: 5px;
+  margin-top: 4px;
   color: var(--text-muted);
   font-size: 12px;
   text-decoration: line-through;
 }
 
+.sales-text {
+  color: var(--text-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 .actions {
+  margin-top: 10px;
   display: flex;
   gap: 6px;
-  flex-shrink: 0;
+}
+
+.actions :deep(.el-button) {
+  flex: 1;
+  min-width: 0;
+  border-radius: 6px;
+  font-weight: 900;
 }
 
 @media (max-width: 680px) {
@@ -274,13 +399,8 @@ function formatPrice(value) {
     font-size: 14px;
   }
 
-  .desc {
-    min-height: 0;
-  }
-
-  .meta {
-    align-items: flex-start;
-    flex-direction: column;
+  .actions {
+    display: none;
   }
 }
 </style>

@@ -2,8 +2,10 @@
     <div class="auth-wrap">
         <div class="auth-stage fade-in-up">
             <aside class="auth-side">
-                <span class="brand-mark">kg</span>
-                <h1>Kinda Goods</h1>
+                <div class="brand-plate">
+                    <img :src="logoUrl" alt="Kinda Goods" />
+                </div>
+                <h1>加入 Kinda Goods</h1>
                 <p>注册后即可使用购物车、订单、地址、评价、二手发布和信用中心。</p>
             </aside>
 
@@ -42,6 +44,7 @@ import { reactive, ref } from "vue";
 import { ElMessage } from "element-plus";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/user";
+import logoUrl from "@/assets/kinda-goods-logo.svg";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -83,7 +86,7 @@ async function handleRegister() {
     display: grid;
     place-items: center;
     background:
-        linear-gradient(120deg, rgba(220, 239, 233, 0.96), rgba(247, 239, 229, 0.9)),
+        linear-gradient(120deg, rgba(233, 255, 248, 0.9), rgba(234, 244, 255, 0.86), rgba(255, 247, 251, 0.82)),
         url("https://images.unsplash.com/photo-1556742044-3c52d6e88c62?auto=format&fit=crop&w=1600&q=80");
     background-size: cover;
     background-position: center;
@@ -94,8 +97,8 @@ async function handleRegister() {
     max-width: 1040px;
     display: grid;
     grid-template-columns: 0.95fr 1.05fr;
-    border: 2px solid var(--brand-primary);
-    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    border-radius: 8px;
     overflow: hidden;
     box-shadow: var(--shadow-float);
     background: #ffffff;
@@ -103,24 +106,29 @@ async function handleRegister() {
 
 .auth-side {
     padding: 44px 38px;
-    background: var(--brand-primary);
-    color: #ffffff;
+    background:
+        linear-gradient(145deg, rgba(233, 255, 248, 0.94), rgba(234, 244, 255, 0.82), rgba(255, 247, 251, 0.78)),
+        url("https://images.unsplash.com/photo-1607083206968-13611e3d76db?auto=format&fit=crop&w=1100&q=80");
+    background-size: cover;
+    background-position: center;
+    color: var(--text-main);
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
-.brand-mark {
-    width: 58px;
-    height: 58px;
-    border-radius: 18px;
-    background: var(--brand-accent);
-    color: var(--brand-primary);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    font-weight: 900;
+.brand-plate {
+    width: min(100%, 340px);
+    border-radius: 12px;
+    background: #ffffff;
+    padding: 14px 16px;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.18);
+}
+
+.brand-plate img {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 .auth-side h1 {
@@ -132,7 +140,7 @@ async function handleRegister() {
 .auth-side p {
     margin: 0;
     max-width: 380px;
-    color: #dcefe9;
+    color: var(--text-secondary);
     font-size: 17px;
     line-height: 1.8;
     font-weight: 700;

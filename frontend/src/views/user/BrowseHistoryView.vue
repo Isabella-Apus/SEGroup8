@@ -347,6 +347,10 @@ async function loadBrowseHistory() {
     query.pageNum = 1;
     query.keyword = "";
     manageMode.value = false;
+  } catch {
+    allHistory.value = [];
+    selectedIds.value = [];
+    manageMode.value = false;
   } finally {
     loading.value = false;
   }

@@ -29,6 +29,8 @@ public class SecondhandProductSaveRequest {
     @Size(max = 30, message = "成色长度不能超过30")
     private String conditionLevel;
 
+    private Integer isNegotiable;
+
     private Integer status;
 
     public String getName() {
@@ -77,6 +79,14 @@ public class SecondhandProductSaveRequest {
 
     public void setConditionLevel(String conditionLevel) {
         this.conditionLevel = conditionLevel;
+    }
+
+    public Integer getIsNegotiable() {
+        return isNegotiable;
+    }
+
+    public void setIsNegotiable(Integer isNegotiable) {
+        this.isNegotiable = isNegotiable;
     }
 
     public Integer getStatus() {

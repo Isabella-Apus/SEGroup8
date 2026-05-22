@@ -1,28 +1,44 @@
 :root {
-  --bg-base: #f6f4ef;
-  --bg-layer: linear-gradient(135deg, #f7efe5 0, #edf7f3 42%, #f1f0fb 100%);
+  --bg-base: #f7fbff;
+  --bg-layer:
+    radial-gradient(circle at 12% 8%, rgba(164, 244, 224, 0.45) 0, transparent 28%),
+    radial-gradient(circle at 88% 2%, rgba(187, 214, 255, 0.5) 0, transparent 30%),
+    linear-gradient(135deg, #f8fffc 0%, #f3fbff 44%, #fff7fb 100%);
   --surface: #ffffff;
-  --surface-soft: #fbfaf6;
-  --line-soft: #e5ddd2;
-  --line-strong: #27323a;
-  --text-main: #27323a;
-  --text-secondary: #65706c;
-  --text-muted: #9a9389;
-  --brand-primary: #27323a;
-  --brand-primary-weak: #dcefe9;
-  --brand-accent: #9fd8cb;
-  --brand-accent-strong: #78c4b6;
-  --brand-lilac: #c9c3e6;
-  --brand-sky: #b7d8ee;
-  --brand-warm: #e99872;
-  --danger: #d14343;
-  --success: #1a8f5a;
-  --radius-lg: 20px;
-  --radius-md: 14px;
-  --radius-sm: 10px;
-  --shadow-soft: 0 10px 24px rgba(32, 36, 45, 0.08);
-  --shadow-float: 0 18px 40px rgba(32, 36, 45, 0.16);
-  --container: 1200px;
+  --surface-soft: #f7fbff;
+  --surface-tint: #edfdf8;
+  --line-soft: #dbe7f1;
+  --line-strong: #7ebff2;
+  --text-main: #123241;
+  --text-secondary: #51707e;
+  --text-muted: #8ca4b0;
+  --brand-primary: #3c92ff;
+  --brand-primary-dark: #2477e8;
+  --brand-primary-weak: #eaf4ff;
+  --brand-accent: #35d8ab;
+  --brand-accent-strong: #17a987;
+  --brand-lilac: #b7a6ff;
+  --brand-sky: #89c7ff;
+  --brand-warm: #ffd36e;
+  --brand-rose: #ffb9d6;
+  --brand-mint-weak: #e9fff8;
+  --brand-gradient: linear-gradient(135deg, #5fe6bd 0%, #89c7ff 52%, #ffb9d6 100%);
+  --brand-gradient-strong: linear-gradient(135deg, #20d6a0 0%, #287cff 100%);
+  --danger: #dc2626;
+  --success: #16a34a;
+  --radius-lg: 8px;
+  --radius-md: 8px;
+  --radius-sm: 6px;
+  --shadow-soft: 0 8px 22px rgba(53, 157, 202, 0.08);
+  --shadow-float: 0 18px 40px rgba(40, 124, 255, 0.16);
+  --container: 1240px;
+  --el-color-primary: #3c92ff;
+  --el-color-primary-light-3: #72b2ff;
+  --el-color-primary-light-5: #9cccff;
+  --el-color-primary-light-7: #c4e1ff;
+  --el-color-primary-light-8: #d9ecff;
+  --el-color-primary-light-9: #eaf4ff;
+  --el-color-primary-dark-2: #2477e8;
 }
 
 * {
@@ -41,6 +57,7 @@ body {
   color: var(--text-main);
   background: var(--bg-layer);
   background-attachment: fixed;
+  font-size: 14px;
 }
 
 button,
@@ -63,13 +80,13 @@ img {
   background: var(--surface);
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-lg);
-  padding: 22px;
+  padding: 18px;
   box-shadow: var(--shadow-soft);
 }
 
 .page-title {
   margin: 0 0 16px;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: 0;
 }
@@ -114,8 +131,8 @@ img {
 }
 
 .el-table th.el-table__cell {
-  background: #f2eee6;
-  color: #34312a;
+  background: #f4fbff;
+  color: var(--text-main);
   font-weight: 700;
 }
 
@@ -126,19 +143,19 @@ img {
 .el-button--primary {
   --el-button-bg-color: var(--brand-primary);
   --el-button-border-color: var(--brand-primary);
-  --el-button-hover-bg-color: #3a3a3a;
-  --el-button-hover-border-color: #3a3a3a;
-  --el-button-active-bg-color: #000000;
-  --el-button-active-border-color: #000000;
+  --el-button-hover-bg-color: var(--brand-primary-dark);
+  --el-button-hover-border-color: var(--brand-primary-dark);
+  --el-button-active-bg-color: #bd2e08;
+  --el-button-active-border-color: #bd2e08;
 }
 
 .el-button--warning {
-  --el-button-bg-color: var(--brand-warm);
-  --el-button-border-color: var(--brand-warm);
-  --el-button-text-color: #ffffff;
-  --el-button-hover-bg-color: #d98763;
-  --el-button-hover-border-color: #d98763;
-  --el-button-hover-text-color: #ffffff;
+  --el-button-bg-color: var(--brand-accent);
+  --el-button-border-color: var(--brand-accent);
+  --el-button-text-color: #073949;
+  --el-button-hover-bg-color: #20c899;
+  --el-button-hover-border-color: #20c899;
+  --el-button-hover-text-color: #073949;
 }
 
 .el-button--success {
@@ -158,7 +175,7 @@ img {
 .el-input__wrapper,
 .el-select__wrapper,
 .el-textarea__inner {
-  border-radius: 999px;
+  border-radius: 8px;
 }
 
 .status-tag {

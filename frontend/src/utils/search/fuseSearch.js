@@ -100,6 +100,22 @@ const ZH_TO_EN_ALIAS = {
   台灯: ["lamp"],
 };
 
+const ZH_TO_ZH_ALIAS = {
+  机械键盘: ["键盘", "电子数码", "数码闲置"],
+  平板: ["学习平板", "电子数码", "数码闲置"],
+  教材: ["教材书籍", "教材", "课程资料", "学习办公"],
+  宿舍收纳: ["收纳", "收纳盒", "宿舍生活", "生活百货"],
+  运动耳机: ["耳机", "运动户外", "运动器材"],
+  数码: ["电子数码", "数码闲置", "键盘", "耳机", "平板"],
+  办公: ["学习办公", "文件架", "台灯", "办公椅"],
+  学习: ["学习办公", "教材书籍", "课程资料", "笔记"],
+  生活: ["生活百货", "宿舍生活", "收纳", "台灯"],
+  宿舍: ["宿舍生活", "生活百货", "收纳", "小桌板"],
+  运动: ["运动户外", "运动器材", "羽毛球", "健身", "耳机"],
+  户外: ["运动户外", "运动器材", "露营"],
+  耳机: ["耳机", "运动耳机", "电子数码", "数码闲置"],
+};
+
 // 常用拼音词 -> 中文词（用于 jianpan / erji / zixingche 等输入）
 const PINYIN_TO_ZH_ALIAS = {
   jianpan: ["键盘"],
@@ -243,6 +259,12 @@ function buildQueries(keyword) {
   }
 
   if (containsChinese(normalized)) {
+    Object.keys(ZH_TO_ZH_ALIAS).forEach((zh) => {
+      if (normalized.includes(zh) || zh.includes(normalized)) {
+        ZH_TO_ZH_ALIAS[zh].forEach((alias) => queries.add(alias));
+      }
+    });
+
     Object.keys(ZH_TO_EN_ALIAS).forEach((zh) => {
       // 支持中文“前缀/子串”触发中英扩展：如“键”也能触发“键盘 -> keyboard”
       if (normalized.includes(zh) || zh.includes(normalized)) {

@@ -56,13 +56,12 @@
         <!-- 商品分类 -->
         <el-form-item label="商品分类" prop="category">
           <el-select v-model="form.category" placeholder="请选择分类" style="width: 200px">
-            <el-option label="电子数码" value="electronics" />
-            <el-option label="服装鞋帽" value="clothing" />
-            <el-option label="食品饮料" value="food" />
-            <el-option label="家居用品" value="home" />
-            <el-option label="运动户外" value="sports" />
-            <el-option label="图书文具" value="books" />
-            <el-option label="其他" value="other" />
+            <el-option
+              v-for="item in productCategoryOptions"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
           </el-select>
         </el-form-item>
 
@@ -121,12 +120,14 @@ import {
   updateProduct,
   uploadImage
 } from '@/api/seller'
+import { ALL_CATEGORY, productCategories } from '@/utils/categoryRules'
 
 const route = useRoute()
 const router = useRouter()
 const formRef = ref(null)
 const loading = ref(false)
 const submitting = ref(false)
+const productCategoryOptions = productCategories.filter((item) => item !== ALL_CATEGORY)
 
 // 判断是编辑还是新建
 const isEdit = computed(() => !!route.params.id)
@@ -160,6 +161,7 @@ async function loadDetail() {
     form.description = d.description
     form.price = d.price
     form.stock = d.stock
+    form.category = d.categoryName || d.category || ''
     form.imageUrl = d.cover || ''
   } catch (e) {
     ElMessage.error('加载商品信息失败')
@@ -213,6 +215,8 @@ async function handleSubmit() {
         price: form.price,
         stock: form.stock,
         cover: form.imageUrl,
+        categoryName: form.category,
+        category: form.category,
         status: 1
       }
       if (isEdit.value) {

@@ -1,28 +1,59 @@
 <template>
   <div class="user-layout">
     <header class="market-header">
+      <div class="top-strip">
+        <div class="top-inner">
+          <span>欢迎来到 Kinda Goods</span>
+          <div class="top-links">
+            <button type="button" @click="router.push('/faq')">常见问题</button>
+            <button type="button" @click="router.push('/credit')">信用中心</button>
+            <button type="button" @click="router.push('/messages')">消息</button>
+            <button type="button" @click="router.push('/notifications')">通知</button>
+          </div>
+        </div>
+      </div>
+
       <div class="header-inner">
         <button class="brand" type="button" @click="router.push('/')">
-          <span class="brand-mark">kg</span>
-          <span class="brand-copy">
-            <strong>Kinda Goods</strong>
-            <small>一手好物和二手闲置</small>
-          </span>
+          <img class="brand-logo" :src="logoUrl" alt="Kinda Goods" />
         </button>
 
-        <form class="search-bar" @submit.prevent="submitSearch">
-          <el-input
-            v-model="keyword"
-            class="search-input"
-            placeholder="搜索商品、二手闲置"
-            clearable
-          />
-          <el-segmented v-model="searchMode" :options="searchModes" size="small" />
-          <el-button type="primary" native-type="submit">搜索</el-button>
-        </form>
+        <div class="search-stack">
+          <form class="search-bar" @submit.prevent="submitSearch">
+            <el-segmented v-model="searchMode" :options="searchModes" size="small" @change="handleSearchModeChange" />
+            <el-input
+              v-model="keyword"
+              class="search-input"
+              :placeholder="searchPlaceholder"
+              clearable
+            />
+            <el-button type="primary" native-type="submit">搜索</el-button>
+          </form>
+        </div>
 
         <div class="header-actions">
-          <button class="quick-action" type="button" @click="router.push('/order')">我的订单</button>
+          <nav class="main-nav" aria-label="主导航">
+            <button
+              v-for="item in navItems"
+              :key="item.path"
+              class="nav-action"
+              :class="{ active: isNavActive(item) }"
+              type="button"
+              @click="router.push(item.path)"
+            >
+              {{ item.label }}
+            </button>
+          </nav>
+
+          <button
+            v-if="isOfficialSeller"
+            class="nav-action seller-entry"
+            type="button"
+            @click="router.push('/merchant')"
+          >
+            卖家工作台
+          </button>
+
           <el-dropdown trigger="click" @command="handleCommand">
             <button class="user-pill" type="button">
               <span class="avatar">{{ avatarText }}</span>
@@ -31,28 +62,20 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="profile">个人资料</el-dropdown-item>
-                <el-dropdown-item command="cart">购物车</el-dropdown-item>
+                <el-dropdown-item command="messages">消息中心</el-dropdown-item>
+                <el-dropdown-item command="secondhandMine">我的闲置/拍卖</el-dropdown-item>
+                <el-dropdown-item command="orders">新品订单</el-dropdown-item>
+                <el-dropdown-item command="secondhandOrders">二手订单</el-dropdown-item>
+                <el-dropdown-item command="browseHistory">浏览记录</el-dropdown-item>
                 <el-dropdown-item command="addresses">地址管理</el-dropdown-item>
-                <el-dropdown-item command="credit">我的信用</el-dropdown-item>
+                <el-dropdown-item command="credit">信用中心</el-dropdown-item>
+                <el-dropdown-item v-if="isOfficialSeller" command="merchant">卖家工作台</el-dropdown-item>
                 <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
         </div>
       </div>
-
-      <nav class="nav-row">
-        <button
-          v-for="item in primaryNav"
-          :key="item.path"
-          type="button"
-          class="nav-item"
-          :class="{ active: isActive(item) }"
-          @click="router.push(item.path)"
-        >
-          {{ item.label }}
-        </button>
-      </nav>
     </header>
 
     <main class="layout-main fade-in-up">
@@ -62,10 +85,11 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { useUserStore } from "@/stores/user";
+import logoUrl from "@/assets/kinda-goods-logo.svg";
 
 const route = useRoute();
 const router = useRouter();
@@ -74,28 +98,47 @@ const userStore = useUserStore();
 const keyword = ref("");
 const searchMode = ref("product");
 const searchModes = [
-  { label: "商品", value: "product" },
+  { label: "新品", value: "product" },
   { label: "二手", value: "secondhand" },
 ];
 
-const primaryNav = computed(() => [
-  { label: "首页", path: "/" },
-  { label: "商品市场", path: "/product" },
-  { label: "二手市场", path: "/secondhand" },
-  { label: "发布闲置", path: "/secondhand/publish" },
-  { label: "消息", path: "/messages" },
-  { label: "通知", path: "/notifications" },
-  { label: "售后", path: "/after-sale" },
-  userStore.currentRole === "OFFICIAL_SELLER"
-    ? { label: "卖家工作台", path: "/merchant" }
-    : { label: "申请开店", path: "/merchant-apply" },
-]);
+const navItems = [
+  { label: "首页", path: "/", match: (path) => path === "/" },
+  { label: "新品商城", path: "/product", match: (path) => path.startsWith("/product") || path === "/cart" || path.startsWith("/order") },
+  { label: "二手商城", path: "/secondhand", match: (path) => path.startsWith("/secondhand") },
+];
 
 const displayName = computed(() =>
   userStore.userInfo?.nickname || userStore.userInfo?.username || "普通用户",
 );
+const isOfficialSeller = computed(() => userStore.currentRole === "OFFICIAL_SELLER" || userStore.currentRole === "SELLER");
 
 const avatarText = computed(() => displayName.value.slice(0, 1).toUpperCase());
+const searchPlaceholder = computed(() =>
+  searchMode.value === "secondhand"
+    ? "搜索二手教材、闲置耳机、宿舍收纳"
+    : "搜索新品键盘、耳机、教材、宿舍好物",
+);
+
+watch(
+  () => route.path,
+  () => {
+    searchMode.value = route.path.startsWith("/secondhand") ? "secondhand" : "product";
+  },
+  { immediate: true },
+);
+
+watch(
+  () => route.query.keyword,
+  (value) => {
+    keyword.value = typeof value === "string" ? value : "";
+  },
+  { immediate: true },
+);
+
+function isNavActive(item) {
+  return item.match(route.path);
+}
 
 function submitSearch() {
   const target = searchMode.value === "secondhand" ? "/secondhand" : "/product";
@@ -106,11 +149,13 @@ function submitSearch() {
   });
 }
 
-function isActive(item) {
-  if (item.path === "/") {
-    return route.path === "/";
-  }
-  return route.path === item.path || route.path.startsWith(`${item.path}/`);
+function handleSearchModeChange() {
+  const target = searchMode.value === "secondhand" ? "/secondhand" : "/product";
+  const trimmed = keyword.value.trim();
+  router.push({
+    path: target,
+    query: trimmed ? { keyword: trimmed } : {},
+  });
 }
 
 function handleCommand(command) {
@@ -122,9 +167,14 @@ function handleCommand(command) {
   }
   const map = {
     profile: "/profile",
-    cart: "/cart",
+    messages: "/messages",
+    secondhandMine: "/secondhand/mine",
+    orders: "/order",
+    secondhandOrders: "/secondhand/orders",
+    browseHistory: "/browse-history",
     addresses: "/addresses",
     credit: "/credit",
+    merchant: "/merchant",
   };
   router.push(map[command] || "/profile");
 }
@@ -139,17 +189,53 @@ function handleCommand(command) {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: linear-gradient(115deg, #dcefe9 0%, #f7efe5 48%, #f1f0fb 100%);
-  border-bottom: 1px solid rgba(39, 50, 58, 0.12);
-  box-shadow: 0 10px 24px rgba(32, 36, 45, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+  border-bottom: 1px solid rgba(137, 199, 255, 0.28);
+  box-shadow: 0 8px 24px rgba(137, 199, 255, 0.12);
+  backdrop-filter: blur(14px);
+}
+
+.top-strip {
+  background: linear-gradient(90deg, #e9fff8 0%, #eaf4ff 54%, #fff7fb 100%);
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.top-inner {
+  width: min(var(--container), calc(100% - 32px));
+  height: 32px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.top-links {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.top-links button {
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 0;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.top-links button:hover {
+  color: var(--brand-primary);
 }
 
 .header-inner {
   width: min(var(--container), calc(100% - 32px));
-  min-height: 72px;
+  min-height: 74px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: auto minmax(280px, 1fr) auto;
+  grid-template-columns: 190px minmax(320px, 560px) minmax(310px, 1fr);
   align-items: center;
   gap: 18px;
 }
@@ -157,77 +243,73 @@ function handleCommand(command) {
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
   border: 0;
   background: transparent;
   padding: 0;
   cursor: pointer;
-  color: var(--brand-primary);
+  color: var(--text-main);
 }
 
-.brand-mark {
-  width: 52px;
-  height: 52px;
-  border: 3px solid var(--brand-primary);
-  border-radius: 16px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 23px;
-  font-weight: 900;
-  line-height: 1;
+.brand-logo {
+  width: 168px;
+  height: 58px;
+  object-fit: contain;
+  object-position: left center;
+  display: block;
 }
 
-.brand-copy {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  line-height: 1.15;
-}
-
-.brand-copy strong {
-  font-size: 18px;
-  font-weight: 900;
-}
-
-.brand-copy small {
-  margin-top: 4px;
-  color: #4a473d;
-  font-weight: 700;
+.search-stack {
+  min-width: 0;
 }
 
 .search-bar {
-  height: 48px;
+  height: 44px;
   display: grid;
-  grid-template-columns: minmax(160px, 1fr) auto auto;
+  grid-template-columns: auto minmax(150px, 1fr) 82px;
   align-items: center;
-  gap: 8px;
-  padding: 5px;
+  gap: 6px;
+  padding: 4px;
   background: #ffffff;
-  border: 2px solid var(--brand-primary);
-  border-radius: 999px;
+  border: 2px solid #b9defb;
+  border-radius: 14px;
+  box-shadow: 0 12px 24px rgba(137, 199, 255, 0.14);
 }
 
 .search-input :deep(.el-input__wrapper) {
   box-shadow: none;
-  border-radius: 999px;
+  border-radius: 6px;
+}
+
+.search-bar :deep(.el-segmented) {
+  --el-segmented-item-selected-color: #ffffff;
+  --el-segmented-item-selected-bg-color: #69c7ef;
+  --el-border-radius-base: 6px;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: flex-end;
+  gap: 10px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   min-width: 0;
 }
 
-.quick-action,
+.nav-action,
 .user-pill {
-  height: 42px;
-  border: 0;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  color: var(--brand-primary);
-  padding: 0 16px;
+  height: 38px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--text-main);
+  padding: 0 13px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -237,94 +319,103 @@ function handleCommand(command) {
   white-space: nowrap;
 }
 
-.quick-action:hover,
+.nav-action:hover,
 .user-pill:hover {
-  background: #ffffff;
+  border-color: #9bd8f9;
+  color: var(--brand-primary);
+  background: var(--brand-primary-weak);
+}
+
+.nav-action.active {
+  border-color: rgba(105, 199, 239, 0.55);
+  background: linear-gradient(135deg, rgba(233, 255, 248, 0.9), rgba(234, 244, 255, 0.95));
+  color: var(--brand-primary);
+}
+
+.seller-entry {
+  border-color: rgba(95, 230, 189, 0.45);
+  background: linear-gradient(135deg, #e9fff8 0%, #eaf4ff 100%);
+  color: #0f8f70;
+}
+
+.user-pill {
+  flex: 0 0 auto;
+  padding-right: 14px;
 }
 
 .avatar {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: var(--brand-primary);
-  color: var(--brand-accent);
+  background: var(--brand-gradient-strong);
+  color: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: 900;
 }
 
-.nav-row {
-  width: min(var(--container), calc(100% - 32px));
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 0 14px;
-  overflow-x: auto;
-}
-
-.nav-item {
-  min-height: 38px;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--brand-primary);
-  padding: 0 16px;
-  font-size: 15px;
-  font-weight: 900;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.nav-item.active,
-.nav-item:hover {
-  background: #ffffff;
-}
-
 .layout-main {
   width: min(var(--container), calc(100% - 32px));
   margin: 0 auto;
-  padding: 24px 0 36px;
+  padding: 18px 0 36px;
 }
 
-@media (max-width: 1050px) {
+@media (max-width: 1120px) {
   .header-inner {
-    grid-template-columns: 1fr;
+    grid-template-columns: 170px minmax(260px, 1fr);
     gap: 12px;
-    padding: 14px 0 10px;
-  }
-
-  .brand-copy small {
-    display: none;
+    padding: 10px 0;
   }
 
   .header-actions {
+    grid-column: 1 / -1;
     justify-content: space-between;
+  }
+
+  .main-nav {
+    overflow-x: auto;
   }
 }
 
 @media (max-width: 680px) {
+  .top-inner {
+    width: min(100% - 20px, var(--container));
+  }
+
+  .top-links {
+    display: none;
+  }
+
   .header-inner,
-  .nav-row,
   .layout-main {
     width: min(100% - 20px, var(--container));
+  }
+
+  .header-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-logo {
+    width: 154px;
+    height: 52px;
   }
 
   .search-bar {
     grid-template-columns: 1fr;
     height: auto;
-    border-radius: 20px;
+    border-radius: 10px;
     padding: 8px;
   }
 
   .header-actions {
+    align-items: flex-start;
     overflow-x: auto;
   }
 
-  .quick-action,
+  .nav-action,
   .user-pill {
-    height: 38px;
+    height: 36px;
     padding: 0 12px;
   }
 

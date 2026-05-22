@@ -2,13 +2,13 @@
   <div class="page-card aftersale-page">
     <section class="aftersale-head">
       <div>
-        <span class="eyebrow">After-sale</span>
-        <h2 class="page-title">退款/售后</h2>
-        <p>跟进退款申请、处理进度和相关凭证。</p>
+        <span class="eyebrow">{{ pageCopy.eyebrow }}</span>
+        <h2 class="page-title">{{ pageCopy.title }}</h2>
+        <p>{{ pageCopy.desc }}</p>
       </div>
       <div class="head-stats">
         <strong>{{ total }}</strong>
-        <span>售后订单</span>
+        <span>{{ pageCopy.statLabel }}</span>
       </div>
     </section>
 
@@ -129,12 +129,13 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
-import { useRouter } from "vue-router";
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { getOrderListApi } from "@/api/order";
 import { onRealtimeEvent } from "@/realtime/realtimeClient";
 import { toAssetUrl } from "@/utils/url";
 
+const route = useRoute();
 const router = useRouter();
 const total = ref(0);
 const records = ref([]);
@@ -144,13 +145,35 @@ const query = reactive({
   pageSize: 10,
   keyword: "",
   refundStatus: undefined,
-  afterSaleOnly: 1
+  afterSaleOnly: 1,
+  orderType: "NEW"
 });
 
 const proofPreviewVisible = ref(false);
 const proofPreviewUrl = ref("");
+const afterSaleScope = computed(() => {
+  const scope = String(route.meta?.afterSaleScope || "").toUpperCase();
+  return scope === "SECONDHAND" ? "SECONDHAND" : "NEW";
+});
+const pageCopy = computed(() => {
+  if (afterSaleScope.value === "SECONDHAND") {
+    return {
+      eyebrow: "Secondhand After-sale",
+      title: "二手售后",
+      desc: "只跟进二手商城订单的退款、凭证和处理进度。",
+      statLabel: "二手售后订单",
+    };
+  }
+  return {
+    eyebrow: "New Goods After-sale",
+    title: "新品售后",
+    desc: "只处理新品商城订单的退款、退货和相关凭证。",
+    statLabel: "新品售后订单",
+  };
+});
 
 onMounted(() => {
+  syncAfterSaleScope();
   fetchList();
   unsubscribeRealtime = onRealtimeEvent(handleRealtimeEvent);
 });
@@ -158,6 +181,19 @@ onBeforeUnmount(() => {
   if (unsubscribeRealtime) unsubscribeRealtime();
 });
 let unsubscribeRealtime = null;
+
+watch(afterSaleScope, () => {
+  activeTab.value = "ALL";
+  query.keyword = "";
+  query.refundStatus = undefined;
+  query.pageNum = 1;
+  syncAfterSaleScope();
+  fetchList();
+});
+
+function syncAfterSaleScope() {
+  query.orderType = afterSaleScope.value;
+}
 
 async function fetchList() {
   const res = await getOrderListApi(query);
@@ -187,6 +223,7 @@ function handleReset() {
   query.keyword = "";
   activeTab.value = "ALL";
   query.refundStatus = undefined;
+  syncAfterSaleScope();
   query.pageNum = 1;
   fetchList();
 }
