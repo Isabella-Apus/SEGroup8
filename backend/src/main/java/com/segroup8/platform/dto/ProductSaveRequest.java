@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class ProductSaveRequest {
 
@@ -16,6 +17,9 @@ public class ProductSaveRequest {
 
     @Size(max = 255, message = "封面地址长度不能超过255")
     private String cover;
+
+    @Size(max = 9, message = "商品图片不能超过9张")
+    private List<String> images;
 
     @Size(max = 2000, message = "商品描述长度不能超过2000")
     private String description;
@@ -27,6 +31,12 @@ public class ProductSaveRequest {
     @NotNull(message = "库存不能为空")
     @Min(value = 0, message = "库存不能小于0")
     private Integer stock;
+
+    @NotNull(message = "一级分类不能为空")
+    private Integer categoryId;
+
+    @NotNull(message = "二级分类不能为空")
+    private Integer subCategoryId;
 
     private Integer status;
 
@@ -44,6 +54,14 @@ public class ProductSaveRequest {
 
     public void setCover(String cover) {
         this.cover = cover;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
     public String getDescription() {
@@ -68,6 +86,22 @@ public class ProductSaveRequest {
 
     public void setStock(Integer stock) {
         this.stock = stock;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Integer getSubCategoryId() {
+        return subCategoryId;
+    }
+
+    public void setSubCategoryId(Integer subCategoryId) {
+        this.subCategoryId = subCategoryId;
     }
 
     public Integer getStatus() {

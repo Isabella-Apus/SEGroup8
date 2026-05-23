@@ -1,6 +1,6 @@
-# 购物与二手交易平台基础工程
+# kinda goods 基础工程
 
-本项目是一个前后端分离的课程项目基础框架，适合作为“购物与二手交易平台”的开发起点。当前重点是把工程跑起来，并提供统一的目录结构、公共能力和基础联调链路，方便后续多人并行开发。
+本项目是一个前后端分离的课程项目基础框架，适合作为“kinda goods”的开发起点。当前重点是把工程跑起来，并提供统一的目录结构、公共能力和基础联调链路，方便后续多人并行开发。
 
 ## 1. 项目结构
 
@@ -238,30 +238,50 @@ spring:
 - `application-local.yml` 是本机私有配置，不会提交到仓库。
 - `application-local.example.yml` 只保留占位符，不能填写真实密码后提交。
 
-## 6. SQL 初始化怎么做
+## 6. SQL 初始化与两种启动模式
 
-### 6.1 自动初始化
+后端现在区分为两种启动模式：
 
-当前后端已经配置了启动时自动执行 SQL：
+- 日常测试启动：不强制执行 SQL 初始化，不会自动清空或覆盖已有业务数据。
+- 全量初始化启动：会执行“全表清空 + 重新初始化”脚本，适合需要重置环境时使用。
 
-- [schema.sql](/c:/Users/34267/Desktop/code/SEGroup8/backend/src/main/resources/schema.sql)
-- [data.sql](/c:/Users/34267/Desktop/code/SEGroup8/backend/src/main/resources/data.sql)
+### 6.1 日常测试启动（默认）
 
-也就是说，只要：
+默认配置文件：
 
-- MySQL 能正常连接
-- `application.yml` + `application-local.yml` 的用户名和密码写对
+- [backend/src/main/resources/application.yml](backend/src/main/resources/application.yml)
 
-后端第一次启动时会自动：
+其中已设置：
 
-- 创建数据库表
-- 插入初始测试数据
+- `spring.sql.init.mode: never`
 
-### 6.2 手动初始化
+这意味着正常启动后端时，不会自动执行 [backend/src/main/resources/schema.sql](backend/src/main/resources/schema.sql) 和 [backend/src/main/resources/data.sql](backend/src/main/resources/data.sql)。
+
+### 6.2 全量初始化启动（清空后重建）
+
+> [!WARNING]
+> 高风险操作：该模式会清空当前数据库中的业务数据（包括订单、商品、优惠券、余额流水等）并重建基础数据。
+> 请勿在需要保留数据的环境执行。
+
+> [!IMPORTANT]
+> 为防误触，`start-reset.ps1` / `start-reset.bat` 已加入二次确认：
+> 第一步必须输入 `YES`，第二步必须输入 `RESET-ALL`，任一步不匹配都会立即取消。
+
+专用配置文件：
+
+- [backend/src/main/resources/application-reset-all.yml](backend/src/main/resources/application-reset-all.yml)
+
+专用数据脚本：
+
+- [backend/src/main/resources/data-reset-all.sql](backend/src/main/resources/data-reset-all.sql)
+
+该模式会先清空业务表，再按初始化脚本重建基础数据，请谨慎使用。
+
+### 6.3 手动初始化（可选）
 
 如果你想手动执行 SQL，可以使用：
 
-[init.sql](/c:/Users/34267/Desktop/code/SEGroup8/sql/init.sql)
+- [sql/init.sql](sql/init.sql)
 
 你可以在 MySQL 客户端里执行这个文件。
 
@@ -277,21 +297,60 @@ spring:
 
 后端必须在 `backend` 目录下启动。
 
-### 方式一：使用 Maven 启动
+### 方式一：日常测试启动（推荐，不清库）
+
+#### 1) 使用脚本启动
 
 ```powershell
 cd backend
-mvn spring-boot:run
+powershell -ExecutionPolicy ByPass -File .\start.ps1
 ```
 
-### 方式二：使用脚本启动
+或：
 
 ```bat
 cd backend
 start.bat
 ```
 
-### 方式三：运行打包好的 jar
+#### 2) 使用 Maven 启动
+
+```powershell
+cd backend
+mvn spring-boot:run
+```
+
+### 方式二：全量初始化启动（会清空并重建数据）
+
+#### 1) 使用 reset 脚本启动
+
+```powershell
+cd backend
+powershell -ExecutionPolicy ByPass -File .\start-reset.ps1
+```
+
+执行后会出现二次确认：
+
+1. Step 1/2: 输入 `YES`
+2. Step 2/2: 输入 `RESET-ALL`
+
+任一步输入不匹配，脚本会直接退出，不会执行清库。
+
+或：
+
+```bat
+cd backend
+start-reset.bat
+```
+
+#### 2) 使用 Maven 指定 profile 启动
+
+```powershell
+cd backend
+mvn spring-boot:run -Dspring-boot.run.profiles=reset-all
+```
+
+### 方式三：运行打包好的 jar（不清库）
 
 ```powershell
 cd backend

@@ -1,19 +1,23 @@
 package com.segroup8.platform.controller;
 
 import com.segroup8.platform.common.Result;
-import com.segroup8.platform.service.SecondhandTradeService;
+import com.segroup8.platform.dto.AuctionBidRequest;
+import com.segroup8.platform.dto.AuctionCreateRequest;
+import com.segroup8.platform.dto.BargainApplyRequest;
+import com.segroup8.platform.dto.BargainConfirmRequest;
 import com.segroup8.platform.vo.PageVO;
+import com.segroup8.platform.service.SecondhandTradeService;
+import com.segroup8.platform.vo.ProductAuctionVO;
+import com.segroup8.platform.vo.ProductNegotiationVO;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Collections;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/secondhand/trade")
@@ -25,83 +29,66 @@ public class SecondhandTradeController {
         this.secondhandTradeService = secondhandTradeService;
     }
 
-    @Operation(summary = "买家发起二手议价")
+    @Operation(summary = "买家发起议价")
     @PostMapping("/bargain/apply")
-    public Result<Map<String, Object>> applyBargain(@RequestBody(required = false) Map<String, Object> request) {
-        return Result.success(secondhandTradeService.applyBargain(emptyIfNull(request)));
+    public Result<ProductNegotiationVO> applyBargain(@Valid @RequestBody BargainApplyRequest request) {
+        return Result.success(secondhandTradeService.applyBargain(request));
     }
 
-    @Operation(summary = "卖家同意二手议价")
+    @Operation(summary = "卖家确认议价")
     @PostMapping("/bargain/confirm")
-    public Result<Map<String, Object>> confirmBargain(@RequestBody(required = false) Map<String, Object> request) {
-        return Result.success(secondhandTradeService.confirmBargain(emptyIfNull(request)));
+    public Result<ProductNegotiationVO> confirmBargain(@Valid @RequestBody BargainConfirmRequest request) {
+        return Result.success(secondhandTradeService.confirmBargain(request));
     }
 
-    @Operation(summary = "卖家拒绝二手议价")
+    @Operation(summary = "卖家驳回议价")
     @PostMapping("/bargain/{negotiationId}/reject")
-    public Result<Map<String, Object>> rejectBargain(@PathVariable Long negotiationId) {
+    public Result<ProductNegotiationVO> rejectBargain(@PathVariable Long negotiationId) {
         return Result.success(secondhandTradeService.rejectBargain(negotiationId));
     }
 
-    @Operation(summary = "查询二手议价记录")
-    @GetMapping("/bargain/list")
-    public Result<PageVO<Map<String, Object>>> pageBargains(
-            @RequestParam(defaultValue = "1") Long pageNum,
-            @RequestParam(defaultValue = "10") Long pageSize,
-            @RequestParam(required = false) Long productId,
-            @RequestParam(required = false) Long counterpartUserId,
-            @RequestParam(required = false) String status) {
-        return Result.success(secondhandTradeService.pageBargains(pageNum, pageSize, productId, counterpartUserId, status));
-    }
-
-    @Operation(summary = "查询当前买家可用议价")
+    @Operation(summary = "查询我对某二手商品的有效议价")
     @GetMapping("/bargain/effective")
-    public Result<Map<String, Object>> getMyEffectiveBargain(@RequestParam Long productId) {
-        return Result.success(secondhandTradeService.getMyEffectiveBargain(productId));
+    public Result<ProductNegotiationVO> getMyEffectiveBargain(@RequestParam Long productId) {
+        return Result.success(secondhandTradeService.getMyEffectiveNegotiation(productId));
     }
 
-    @Operation(summary = "卖家发起二手拍卖")
+    @Operation(summary = "卖家创建拍卖")
     @PostMapping("/auction")
-    public Result<Map<String, Object>> createAuction(@RequestBody(required = false) Map<String, Object> request) {
-        return Result.success(secondhandTradeService.createAuction(emptyIfNull(request)));
+    public Result<ProductAuctionVO> createAuction(@Valid @RequestBody AuctionCreateRequest request) {
+        return Result.success(secondhandTradeService.createAuction(request));
     }
 
-    @Operation(summary = "按商品查询二手拍卖")
+    @Operation(summary = "查看商品拍卖详情")
     @GetMapping("/auction/product/{productId}")
-    public Result<Map<String, Object>> getAuctionByProductId(@PathVariable Long productId) {
+    public Result<ProductAuctionVO> getAuctionByProductId(@PathVariable Long productId) {
         return Result.success(secondhandTradeService.getAuctionByProductId(productId));
     }
 
-    @Operation(summary = "卖家查询自己的二手拍卖")
+    @Operation(summary = "分页查看我发起的拍卖")
     @GetMapping("/auction/seller/list")
-    public Result<PageVO<Map<String, Object>>> pageMyAuctions(
+    public Result<PageVO<ProductAuctionVO>> pageMyAuctions(
             @RequestParam(defaultValue = "1") Long pageNum,
             @RequestParam(defaultValue = "10") Long pageSize,
             @RequestParam(required = false) String status) {
         return Result.success(secondhandTradeService.pageMyAuctions(pageNum, pageSize, status));
     }
 
-    @Operation(summary = "卖家提前结束二手拍卖")
+    @Operation(summary = "卖家提前结束拍卖")
     @PostMapping("/auction/{auctionId}/close")
-    public Result<Map<String, Object>> closeAuctionEarly(@PathVariable Long auctionId) {
+    public Result<ProductAuctionVO> closeAuctionEarly(@PathVariable Long auctionId) {
         return Result.success(secondhandTradeService.closeAuctionEarly(auctionId));
     }
 
-    @Operation(summary = "卖家标记二手拍卖流拍")
+    @Operation(summary = "卖家将拍卖标记为流拍")
     @PostMapping("/auction/{auctionId}/flow")
-    public Result<Map<String, Object>> markAuctionFlow(@PathVariable Long auctionId) {
+    public Result<ProductAuctionVO> markAuctionFlow(@PathVariable Long auctionId) {
         return Result.success(secondhandTradeService.markAuctionFlow(auctionId));
     }
 
-    @Operation(summary = "买家参与二手拍卖出价")
+    @Operation(summary = "参与竞价")
     @PostMapping("/auction/{auctionId}/bid")
-    public Result<Map<String, Object>> placeBid(
-            @PathVariable Long auctionId,
-            @RequestBody(required = false) Map<String, Object> request) {
-        return Result.success(secondhandTradeService.placeBid(auctionId, emptyIfNull(request)));
-    }
-
-    private Map<String, Object> emptyIfNull(Map<String, Object> request) {
-        return request == null ? Collections.emptyMap() : request;
+    public Result<ProductAuctionVO> placeBid(@PathVariable Long auctionId, @Valid @RequestBody AuctionBidRequest request) {
+        return Result.success(secondhandTradeService.placeBid(auctionId, request));
     }
 }

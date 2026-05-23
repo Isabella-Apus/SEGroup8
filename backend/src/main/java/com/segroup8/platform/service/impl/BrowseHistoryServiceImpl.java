@@ -25,8 +25,8 @@ public class BrowseHistoryServiceImpl implements BrowseHistoryService {
     private final SecondhandProductMapper secondhandProductMapper;
 
     public BrowseHistoryServiceImpl(BrowseHistoryMapper browseHistoryMapper,
-                                    ProductMapper productMapper,
-                                    SecondhandProductMapper secondhandProductMapper) {
+            ProductMapper productMapper,
+            SecondhandProductMapper secondhandProductMapper) {
         this.browseHistoryMapper = browseHistoryMapper;
         this.productMapper = productMapper;
         this.secondhandProductMapper = secondhandProductMapper;
@@ -84,18 +84,16 @@ public class BrowseHistoryServiceImpl implements BrowseHistoryService {
                 if (secondhand == null) {
                     return null;
                 }
-                BrowseHistoryVO vo = new BrowseHistoryVO();
-                vo.setId(history.getId());
-                vo.setBrowseTime(history.getBrowseTime());
-                vo.setProductType("SECONDHAND");
-
-                BrowseHistoryVO.ProductVO productVO = new BrowseHistoryVO.ProductVO();
-                productVO.setId(secondhand.getId());
-                productVO.setName(secondhand.getName());
-                productVO.setPrice(secondhand.getSalePrice());
-                productVO.setCover(secondhand.getCover());
-                vo.setProduct(productVO);
-                return vo;
+                BrowseHistoryVO.ProductVO productVO = new BrowseHistoryVO.ProductVO(
+                        secondhand.getId(),
+                        secondhand.getName(),
+                        secondhand.getSalePrice(),
+                        secondhand.getCover());
+                return new BrowseHistoryVO(
+                        history.getId(),
+                        productVO,
+                        "SECONDHAND",
+                        history.getBrowseTime());
             }
 
             Product product = productMapper.selectById(history.getProductId());
@@ -103,19 +101,17 @@ public class BrowseHistoryServiceImpl implements BrowseHistoryService {
                 return null;
             }
 
-            BrowseHistoryVO vo = new BrowseHistoryVO();
-            vo.setId(history.getId());
-            vo.setBrowseTime(history.getBrowseTime());
-            vo.setProductType("NEW");
+            BrowseHistoryVO.ProductVO productVO = new BrowseHistoryVO.ProductVO(
+                    product.getId(),
+                    product.getName(),
+                    product.getPrice(),
+                    product.getCover());
 
-            BrowseHistoryVO.ProductVO productVO = new BrowseHistoryVO.ProductVO();
-            productVO.setId(product.getId());
-            productVO.setName(product.getName());
-            productVO.setPrice(product.getPrice());
-            productVO.setCover(product.getCover());
-            vo.setProduct(productVO);
-
-            return vo;
+            return new BrowseHistoryVO(
+                    history.getId(),
+                    productVO,
+                    "NEW",
+                    history.getBrowseTime());
         }).filter(v -> v != null).collect(Collectors.toList());
     }
 

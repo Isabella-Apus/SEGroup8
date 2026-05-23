@@ -2,6 +2,7 @@ package com.segroup8.platform.vo;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class ProductVO {
 
@@ -11,8 +12,13 @@ public class ProductVO {
     private String sellerName;
     private String name;
     private String cover;
+    private List<String> images;
     private String description;
     private BigDecimal price;
+    private Integer categoryId;
+    private Integer subCategoryId;
+    private String categoryName;
+    private String subCategoryName;
     private Integer stock;
     private Integer status;
     private String statusName;
@@ -66,6 +72,14 @@ public class ProductVO {
         this.cover = cover;
     }
 
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -80,6 +94,38 @@ public class ProductVO {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Integer getSubCategoryId() {
+        return subCategoryId;
+    }
+
+    public void setSubCategoryId(Integer subCategoryId) {
+        this.subCategoryId = subCategoryId;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public String getSubCategoryName() {
+        return subCategoryName;
+    }
+
+    public void setSubCategoryName(String subCategoryName) {
+        this.subCategoryName = subCategoryName;
     }
 
     public Integer getStock() {

@@ -15,3 +15,12 @@ INSERT INTO `order_info` (
 INSERT INTO `order_item` (`order_id`, `product_type`, `product_id`, `product_name`, `price`, `quantity`)
 VALUES (101, 'NEW', 1001, '测试商品', 99.00, 1);
 
+
+INSERT INTO `user` (`id`, `username`, `password`, `nickname`, `role`, `status`, `create_time`, `update_time`)
+VALUES (3, 'seller1', 'x', 'seller1', 'OFFICIAL_SELLER', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO `shop` (`id`, `owner_user_id`, `name`, `status`, `create_time`, `update_time`)
+VALUES (100, 3, 'test shop', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO `product` (`id`, `shop_id`, `name`, `price`, `stock`, `status`, `create_time`, `update_time`)
+VALUES (1001, 100, 'test product', 99.00, 100, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

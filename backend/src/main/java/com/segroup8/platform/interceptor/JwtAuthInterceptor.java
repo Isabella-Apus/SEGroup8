@@ -28,7 +28,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
 
         String auth = request.getHeader("Authorization");
         if (auth == null || !auth.startsWith("Bearer ")) {
-            throw new BusinessException(401, "Not logged in");
+            throw new BusinessException(401, "请先登录");
         }
 
         String token = auth.substring(7);

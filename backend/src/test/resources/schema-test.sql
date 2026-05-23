@@ -1,6 +1,12 @@
+DROP TABLE IF EXISTS `idempotency_record`;
+DROP TABLE IF EXISTS `notification`;
+DROP TABLE IF EXISTS `transaction_record`;
+DROP TABLE IF EXISTS `balance`;
 DROP TABLE IF EXISTS `order_after_sale_log`;
 DROP TABLE IF EXISTS `order_item`;
 DROP TABLE IF EXISTS `order_info`;
+DROP TABLE IF EXISTS `product`;
+DROP TABLE IF EXISTS `shop`;
 DROP TABLE IF EXISTS `user`;
 
 CREATE TABLE `user` (
@@ -14,6 +20,17 @@ CREATE TABLE `user` (
   `role` VARCHAR(20),
   `status` VARCHAR(20),
   `credit_score` INT,
+  `shop_name` VARCHAR(100),
+  `shop_desc` VARCHAR(255),
+  `banner_url` VARCHAR(255),
+  `category` VARCHAR(100),
+  `region` VARCHAR(100),
+  `business_hours` VARCHAR(100),
+  `return_policy` VARCHAR(255),
+  `shipping_policy` VARCHAR(255),
+  `announcement` VARCHAR(255),
+  `seller_credit_score` INT,
+  `buyer_credit_score` INT,
   `create_time` TIMESTAMP,
   `update_time` TIMESTAMP
 );
@@ -45,6 +62,20 @@ CREATE TABLE `order_info` (
   `refund_decision_user_id` BIGINT,
   `refund_decision_remark` VARCHAR(255),
   `refund_decision_source` VARCHAR(20),
+  `logistics_template_id` BIGINT,
+  `logistics_status` VARCHAR(30),
+  `logistics_current_index` INT,
+  `can_refund` INT,
+  `after_sales_deadline` TIMESTAMP,
+  `delivery_time` TIMESTAMP,
+  `arrival_time` TIMESTAMP,
+  `auto_confirm_deadline` TIMESTAMP,
+  `refund_mode` VARCHAR(30),
+  `voucher_id` BIGINT,
+  `voucher_discount_amount` DECIMAL(10,2),
+  `seller_bear_amount` DECIMAL(10,2),
+  `platform_bear_amount` DECIMAL(10,2),
+  `payable_amount` DECIMAL(10,2),
   `version` INT DEFAULT 0,
   `closed_time` TIMESTAMP,
   `create_time` TIMESTAMP,
@@ -64,6 +95,36 @@ CREATE TABLE `order_item` (
   `update_time` TIMESTAMP
 );
 
+CREATE TABLE `shop` (
+  `id` BIGINT PRIMARY KEY,
+  `owner_user_id` BIGINT,
+  `name` VARCHAR(80),
+  `region` VARCHAR(100),
+  `contact_name` VARCHAR(50),
+  `contact_phone` VARCHAR(30),
+  `id_card_no_masked` VARCHAR(50),
+  `warehouse_addr` VARCHAR(255),
+  `status` TINYINT,
+  `create_time` TIMESTAMP,
+  `update_time` TIMESTAMP
+);
+
+CREATE TABLE `product` (
+  `id` BIGINT PRIMARY KEY,
+  `shop_id` BIGINT,
+  `name` VARCHAR(120),
+  `cover` VARCHAR(255),
+  `images` TEXT,
+  `description` VARCHAR(255),
+  `price` DECIMAL(10,2),
+  `category_id` INT,
+  `sub_category_id` INT,
+  `stock` INT,
+  `status` TINYINT,
+  `create_time` TIMESTAMP,
+  `update_time` TIMESTAMP
+);
+
 CREATE TABLE `order_after_sale_log` (
   `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `order_id` BIGINT NOT NULL,
@@ -71,6 +132,37 @@ CREATE TABLE `order_after_sale_log` (
   `operator_user_id` BIGINT,
   `operator_role` VARCHAR(30),
   `remark` VARCHAR(255),
+  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `balance` (
+  `user_id` BIGINT PRIMARY KEY,
+  `personal_balance` DECIMAL(10,2) DEFAULT 0,
+  `business_balance` DECIMAL(10,2) DEFAULT 0,
+  `version` INT DEFAULT 0,
+  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `update_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `transaction_record` (
+  `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+  `order_id` BIGINT,
+  `user_id` BIGINT,
+  `account_type` VARCHAR(20),
+  `change_type` VARCHAR(40),
+  `trade_type` VARCHAR(40),
+  `amount` DECIMAL(10,2),
+  `balance_after` DECIMAL(10,2),
+  `remark` VARCHAR(255),
+  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `notification` (
+  `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` BIGINT,
+  `title` VARCHAR(100),
+  `content` VARCHAR(500),
+  `is_read` INT DEFAULT 0,
   `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -87,4 +179,3 @@ CREATE TABLE `idempotency_record` (
   `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `update_time` TIMESTAMP
 );
-

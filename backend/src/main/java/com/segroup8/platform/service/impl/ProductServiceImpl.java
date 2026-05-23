@@ -3,6 +3,8 @@ package com.segroup8.platform.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.segroup8.platform.common.BusinessException;
 import com.segroup8.platform.common.ProductStatusEnum;
 import com.segroup8.platform.common.RoleEnum;
@@ -16,6 +18,7 @@ import com.segroup8.platform.mapper.ProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
+import com.segroup8.platform.service.CategoryService;
 import com.segroup8.platform.service.ProductService;
 import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.vo.ProductVO;
@@ -23,30 +26,40 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.Objects;
+import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class ProductServiceImpl implements ProductService {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final TypeReference<List<String>> STRING_LIST_TYPE = new TypeReference<>() {};
 
     private final ProductMapper productMapper;
     private final ShopMapper shopMapper;
     private final UserMapper userMapper;
     private final BrowseHistoryService browseHistoryService;
+    private final CategoryService categoryService;
 
     public ProductServiceImpl(ProductMapper productMapper, ShopMapper shopMapper, UserMapper userMapper,
-            BrowseHistoryService browseHistoryService) {
+            BrowseHistoryService browseHistoryService,
+            CategoryService categoryService) {
         this.productMapper = productMapper;
         this.shopMapper = shopMapper;
         this.userMapper = userMapper;
         this.browseHistoryService = browseHistoryService;
+        this.categoryService = categoryService;
     }
 
     @Override
     public PageVO<ProductVO> pagePublicProducts(ProductPageQueryRequest request) {
         validatePriceRange(request.getMinPrice(), request.getMaxPrice());
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<Product>()
-                .eq(Product::getStatus, ProductStatusEnum.ON_SHELF.getCode())
-                .orderByDesc(Product::getCreateTime);
+            .eq(Product::getStatus, ProductStatusEnum.ON_SHELF.getCode());
         appendCommonFilters(wrapper, request);
+        applySort(wrapper, request.getSortBy());
         Page<Product> page = productMapper.selectPage(Page.of(request.getPageNum(), request.getPageSize()), wrapper);
         return toPageVO(page);
     }
@@ -69,12 +82,12 @@ public class ProductServiceImpl implements ProductService {
         validatePriceRange(request.getMinPrice(), request.getMaxPrice());
         Long shopId = getCurrentSellerShopId();
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<Product>()
-                .eq(Product::getShopId, shopId)
-                .orderByDesc(Product::getCreateTime);
+                .eq(Product::getShopId, shopId);
         appendCommonFilters(wrapper, request);
         if (request.getStatus() != null) {
             wrapper.eq(Product::getStatus, request.getStatus());
         }
+        applySort(wrapper, request.getSortBy());
         Page<Product> page = productMapper.selectPage(Page.of(request.getPageNum(), request.getPageSize()), wrapper);
         return toPageVO(page);
     }
@@ -82,14 +95,19 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductVO createSellerProduct(ProductSaveRequest request) {
         Long shopId = getCurrentSellerShopId();
+        validateCategoryForSeller(request.getCategoryId(), request.getSubCategoryId());
         Integer targetStatus = normalizeStatus(request.getStatus(), ProductStatusEnum.ON_SHELF.getCode());
 
         Product product = new Product();
         product.setShopId(shopId);
         product.setName(request.getName().trim());
-        product.setCover(request.getCover());
+        List<String> images = normalizeImages(request.getImages(), request.getCover());
+        product.setCover(firstImage(images));
+        product.setImages(serializeImages(images));
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
+        product.setCategoryId(request.getCategoryId());
+        product.setSubCategoryId(request.getSubCategoryId());
         product.setStock(request.getStock());
         product.setStatus(targetStatus);
         productMapper.insert(product);
@@ -99,13 +117,18 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductVO updateSellerProduct(Long productId, ProductSaveRequest request) {
         Product product = getSellerOwnedProduct(productId);
+        validateCategoryForSeller(request.getCategoryId(), request.getSubCategoryId());
         Integer targetStatus = request.getStatus() == null ? product.getStatus()
                 : normalizeStatus(request.getStatus(), null);
 
         product.setName(request.getName().trim());
-        product.setCover(request.getCover());
+        List<String> images = normalizeImages(request.getImages(), request.getCover());
+        product.setCover(firstImage(images));
+        product.setImages(serializeImages(images));
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
+        product.setCategoryId(request.getCategoryId());
+        product.setSubCategoryId(request.getSubCategoryId());
         product.setStock(request.getStock());
         product.setStatus(targetStatus);
         productMapper.updateById(product);
@@ -154,6 +177,38 @@ public class ProductServiceImpl implements ProductService {
         }
         if (request.getMaxPrice() != null) {
             wrapper.le(Product::getPrice, request.getMaxPrice());
+        }
+        if (request.getCategoryId() != null) {
+            Set<Integer> leafIds = categoryService.resolveLeafCategoryIds(request.getCategoryId());
+            if (leafIds.isEmpty()) {
+                wrapper.eq(Product::getSubCategoryId, -1);
+            } else {
+                wrapper.in(Product::getSubCategoryId, leafIds);
+            }
+        }
+    }
+
+    private void applySort(LambdaQueryWrapper<Product> wrapper, String sortBy) {
+        String rule = StringUtils.hasText(sortBy) ? sortBy.trim() : "time_desc";
+        switch (rule) {
+            case "price_asc" -> wrapper.orderByAsc(Product::getPrice).orderByDesc(Product::getCreateTime);
+            case "price_desc" -> wrapper.orderByDesc(Product::getPrice).orderByDesc(Product::getCreateTime);
+            case "sales_desc" -> wrapper.last(
+                    "ORDER BY (SELECT IFNULL(SUM(oi.quantity), 0) FROM order_item oi WHERE oi.product_type = 'NEW' AND oi.product_id = product.id) DESC, create_time DESC");
+            default -> wrapper.orderByDesc(Product::getCreateTime);
+        }
+    }
+
+    private void validateCategoryForSeller(Integer categoryId, Integer subCategoryId) {
+        if (!categoryService.isMainCategory(categoryId)) {
+            throw new BusinessException(400, "一级分类非法");
+        }
+        if (!categoryService.isSubCategoryOf(categoryId, subCategoryId)) {
+            throw new BusinessException(400, "二级分类不属于所选一级分类");
+        }
+        Integer sellerMainCategoryId = getCurrentSellerMainCategoryId();
+        if (sellerMainCategoryId == null || !sellerMainCategoryId.equals(categoryId)) {
+            throw new BusinessException(400, "仅允许发布店铺主营一级类目下的商品");
         }
     }
 
@@ -208,6 +263,19 @@ public class ProductServiceImpl implements ProductService {
         return shop.getId();
     }
 
+    private Integer getCurrentSellerMainCategoryId() {
+        Long userId = UserContext.getUserId();
+        User user = userId == null ? null : userMapper.selectById(userId);
+        if (user == null || !StringUtils.hasText(user.getCategory())) {
+            return null;
+        }
+        try {
+            return Integer.parseInt(user.getCategory().trim());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
     private PageVO<ProductVO> toPageVO(Page<Product> page) {
         PageVO<ProductVO> vo = new PageVO<>();
         vo.setTotal(page.getTotal());
@@ -232,14 +300,61 @@ public class ProductServiceImpl implements ProductService {
             }
         }
         vo.setName(product.getName());
-        vo.setCover(product.getCover());
+        List<String> images = parseImages(product.getImages(), product.getCover());
+        vo.setCover(firstImage(images));
+        vo.setImages(images);
         vo.setDescription(product.getDescription());
         vo.setPrice(product.getPrice());
+        vo.setCategoryId(product.getCategoryId());
+        vo.setSubCategoryId(product.getSubCategoryId());
+        vo.setCategoryName(categoryService.getCategoryName(product.getCategoryId()));
+        vo.setSubCategoryName(categoryService.getCategoryName(product.getSubCategoryId()));
         vo.setStock(product.getStock());
         vo.setStatus(product.getStatus());
         ProductStatusEnum statusEnum = ProductStatusEnum.of(product.getStatus());
         vo.setStatusName(statusEnum == null ? "未知" : statusEnum.getDesc());
         vo.setCreateTime(product.getCreateTime());
         return vo;
+    }
+
+    private List<String> normalizeImages(List<String> images, String cover) {
+        List<String> normalized = new ArrayList<>();
+        if (images != null) {
+            for (String image : images) {
+                if (StringUtils.hasText(image) && !normalized.contains(image.trim())) {
+                    normalized.add(image.trim());
+                }
+            }
+        }
+        if (normalized.isEmpty() && StringUtils.hasText(cover)) {
+            normalized.add(cover.trim());
+        }
+        if (normalized.size() > 9) {
+            throw new BusinessException(400, "商品图片不能超过9张");
+        }
+        return normalized;
+    }
+
+    private List<String> parseImages(String imagesJson, String cover) {
+        if (StringUtils.hasText(imagesJson)) {
+            try {
+                return normalizeImages(OBJECT_MAPPER.readValue(imagesJson, STRING_LIST_TYPE), cover);
+            } catch (Exception ignored) {
+                return normalizeImages(Collections.emptyList(), cover);
+            }
+        }
+        return normalizeImages(Collections.emptyList(), cover);
+    }
+
+    private String serializeImages(List<String> images) {
+        try {
+            return OBJECT_MAPPER.writeValueAsString(images == null ? Collections.emptyList() : images);
+        } catch (Exception e) {
+            throw new BusinessException(500, "商品图片保存失败");
+        }
+    }
+
+    private String firstImage(List<String> images) {
+        return images == null || images.isEmpty() ? null : images.get(0);
     }
 }

@@ -1,0 +1,7 @@
+spring:
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data-reset-all.sql, classpath:data.sql

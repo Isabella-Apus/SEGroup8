@@ -16,6 +16,7 @@ import com.segroup8.platform.mapper.ProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
+import com.segroup8.platform.service.CategoryService;
 import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.vo.ProductVO;
 import org.junit.jupiter.api.AfterEach;
@@ -38,6 +39,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("unchecked")
 class ProductServiceImplTest {
 
     @Mock
@@ -52,11 +54,14 @@ class ProductServiceImplTest {
     @Mock
     private BrowseHistoryService browseHistoryService;
 
+    @Mock
+    private CategoryService categoryService;
+
     private ProductServiceImpl productService;
 
     @BeforeEach
     void setUp() {
-        productService = new ProductServiceImpl(productMapper, shopMapper, userMapper, browseHistoryService);
+        productService = new ProductServiceImpl(productMapper, shopMapper, userMapper, browseHistoryService, categoryService);
     }
 
     @AfterEach
@@ -73,12 +78,12 @@ class ProductServiceImplTest {
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> productService.pagePublicProducts(request));
         assertEquals(400, ex.getCode());
-        verify(productMapper, never()).selectPage(any(Page.class), any(LambdaQueryWrapper.class));
+        verify(productMapper, never()).selectPage(anyProductPage(), anyProductQuery());
     }
 
     @Test
     void getPublicProductDetail_shouldThrowWhenProductNotOnShelf() {
-        when(productMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
+        when(productMapper.selectOne(anyProductQuery())).thenReturn(null);
 
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> productService.getPublicProductDetail(1L));
@@ -94,6 +99,7 @@ class ProductServiceImplTest {
         User user = new User();
         user.setId(userId);
         user.setRole(RoleEnum.SELLER.name());
+        user.setCategory("1");
         when(userMapper.selectById(userId)).thenReturn(user);
 
         Shop shop = new Shop();
@@ -107,7 +113,12 @@ class ProductServiceImplTest {
         request.setDescription("desc");
         request.setPrice(new BigDecimal("9.99"));
         request.setStock(5);
+        request.setCategoryId(1);
+        request.setSubCategoryId(101);
         request.setStatus(ProductStatusEnum.ON_SHELF.getCode());
+
+        when(categoryService.isMainCategory(1)).thenReturn(true);
+        when(categoryService.isSubCategoryOf(1, 101)).thenReturn(true);
 
         Product inserted = new Product();
         inserted.setId(1L);
@@ -130,6 +141,8 @@ class ProductServiceImplTest {
         assertEquals("Test Product", toInsert.getName());
         assertEquals(new BigDecimal("9.99"), toInsert.getPrice());
         assertEquals(5, toInsert.getStock());
+        assertEquals(1, toInsert.getCategoryId());
+        assertEquals(101, toInsert.getSubCategoryId());
     }
 
     @Test
@@ -194,7 +207,7 @@ class ProductServiceImplTest {
         mpPage.setRecords(List.of(p));
         mpPage.setTotal(1);
 
-        when(productMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class))).thenReturn(mpPage);
+        when(productMapper.selectPage(anyProductPage(), anyProductQuery())).thenReturn(mpPage);
 
         PageVO<ProductVO> vo = productService.pageSellerProducts(request);
 
@@ -203,5 +216,12 @@ class ProductServiceImplTest {
         assertEquals(1, vo.getRecords().size());
         assertEquals("P1", vo.getRecords().get(0).getName());
     }
-}
 
+    private Page<Product> anyProductPage() {
+        return any();
+    }
+
+    private LambdaQueryWrapper<Product> anyProductQuery() {
+        return any();
+    }
+}

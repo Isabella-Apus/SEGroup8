@@ -15,8 +15,11 @@ public class Product {
     private Long shopId;
     private String name;
     private String cover;
+    private String images;
     private String description;
     private BigDecimal price;
+    private Integer categoryId;
+    private Integer subCategoryId;
     private Integer stock;
     private Integer status;
     private LocalDateTime createTime;
@@ -54,6 +57,14 @@ public class Product {
         this.cover = cover;
     }
 
+    public String getImages() {
+        return images;
+    }
+
+    public void setImages(String images) {
+        this.images = images;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -68,6 +79,22 @@ public class Product {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Integer getSubCategoryId() {
+        return subCategoryId;
+    }
+
+    public void setSubCategoryId(Integer subCategoryId) {
+        this.subCategoryId = subCategoryId;
     }
 
     public Integer getStock() {

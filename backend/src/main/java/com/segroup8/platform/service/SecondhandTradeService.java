@@ -1,30 +1,40 @@
 package com.segroup8.platform.service;
 
+import com.segroup8.platform.dto.AuctionBidRequest;
+import com.segroup8.platform.dto.AuctionCreateRequest;
+import com.segroup8.platform.dto.BargainApplyRequest;
+import com.segroup8.platform.dto.BargainConfirmRequest;
 import com.segroup8.platform.vo.PageVO;
+import com.segroup8.platform.vo.ProductAuctionVO;
+import com.segroup8.platform.vo.ProductNegotiationVO;
 
-import java.util.Map;
+import java.math.BigDecimal;
 
 public interface SecondhandTradeService {
 
-    Map<String, Object> applyBargain(Map<String, Object> request);
+    ProductNegotiationVO applyBargain(BargainApplyRequest request);
 
-    Map<String, Object> confirmBargain(Map<String, Object> request);
+    ProductNegotiationVO confirmBargain(BargainConfirmRequest request);
 
-    Map<String, Object> rejectBargain(Long negotiationId);
+    ProductNegotiationVO rejectBargain(Long negotiationId);
 
-    PageVO<Map<String, Object>> pageBargains(Long pageNum, Long pageSize, Long productId, Long counterpartUserId, String status);
+    ProductNegotiationVO getMyEffectiveNegotiation(Long productId);
 
-    Map<String, Object> getMyEffectiveBargain(Long productId);
+    BigDecimal resolveEffectivePriceForBuyer(Long productId, Long buyerUserId);
 
-    Map<String, Object> createAuction(Map<String, Object> request);
+    void markNegotiationUsed(Long productId, Long buyerUserId, Long orderId);
 
-    Map<String, Object> getAuctionByProductId(Long productId);
+    ProductAuctionVO createAuction(AuctionCreateRequest request);
 
-    PageVO<Map<String, Object>> pageMyAuctions(Long pageNum, Long pageSize, String status);
+    ProductAuctionVO getAuctionByProductId(Long productId);
 
-    Map<String, Object> closeAuctionEarly(Long auctionId);
+    PageVO<ProductAuctionVO> pageMyAuctions(Long pageNum, Long pageSize, String status);
 
-    Map<String, Object> markAuctionFlow(Long auctionId);
+    ProductAuctionVO closeAuctionEarly(Long auctionId);
 
-    Map<String, Object> placeBid(Long auctionId, Map<String, Object> request);
+    ProductAuctionVO markAuctionFlow(Long auctionId);
+
+    ProductAuctionVO placeBid(Long auctionId, AuctionBidRequest request);
+
+    void settleExpiredAuctions();
 }

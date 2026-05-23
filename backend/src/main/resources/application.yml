@@ -1,5 +1,7 @@
 server:
   port: 8080
+  tomcat:
+    max-swallow-size: -1
   servlet:
     encoding:
       charset: UTF-8
@@ -20,12 +22,12 @@ spring:
       connection-init-sql: SET NAMES utf8mb4 COLLATE utf8mb4_general_ci
   sql:
     init:
-      mode: always
+      mode: never
       encoding: UTF-8
   servlet:
     multipart:
-      max-file-size: 5MB
-      max-request-size: 20MB
+      max-file-size: 200MB
+      max-request-size: 220MB
 
 mybatis-plus:
   configuration:

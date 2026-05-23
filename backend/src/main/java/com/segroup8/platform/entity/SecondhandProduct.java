@@ -15,9 +15,12 @@ public class SecondhandProduct {
     private Long sellerUserId;
     private String name;
     private String cover;
+    private String images;
     private String description;
     private BigDecimal originPrice;
     private BigDecimal salePrice;
+    private Integer categoryId;
+    private Integer subCategoryId;
     private String conditionLevel;
     private Integer isNegotiable;
     private Integer status;
@@ -56,6 +59,14 @@ public class SecondhandProduct {
         this.cover = cover;
     }
 
+    public String getImages() {
+        return images;
+    }
+
+    public void setImages(String images) {
+        this.images = images;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -78,6 +89,22 @@ public class SecondhandProduct {
 
     public void setSalePrice(BigDecimal salePrice) {
         this.salePrice = salePrice;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Integer getSubCategoryId() {
+        return subCategoryId;
+    }
+
+    public void setSubCategoryId(Integer subCategoryId) {
+        this.subCategoryId = subCategoryId;
     }
 
     public String getConditionLevel() {
@@ -120,4 +147,3 @@ public class SecondhandProduct {
         this.updateTime = updateTime;
     }
 }
-

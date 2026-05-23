@@ -9,6 +9,7 @@ backend/src/main/resources/application-local.yml
 
 # uploads
 backend/uploads/
+backend/.m2repo/
 uploads/
 
 # IDE

@@ -202,15 +202,65 @@ CREATE TABLE IF NOT EXISTS `product` (
   `shop_id` BIGINT NOT NULL,
   `name` VARCHAR(120) NOT NULL,
   `cover` VARCHAR(255) DEFAULT NULL,
+  `images` TEXT,
   `description` TEXT,
   `price` DECIMAL(10,2) NOT NULL,
+  `category_id` INT NOT NULL DEFAULT 8,
+  `sub_category_id` INT NOT NULL DEFAULT 801,
   `stock` INT NOT NULL DEFAULT 0,
   `status` TINYINT NOT NULL DEFAULT 1,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_product_shop_id` (`shop_id`)
+  KEY `idx_product_shop_id` (`shop_id`),
+  KEY `idx_product_category` (`category_id`, `sub_category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @product_category_id_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'product' AND COLUMN_NAME = 'category_id'
+);
+SET @product_category_id_add_sql = IF(
+  @product_category_id_col_exists = 0,
+  'ALTER TABLE `product` ADD COLUMN `category_id` INT NOT NULL DEFAULT 8 AFTER `price`',
+  'SELECT 1'
+);
+PREPARE stmt_product_category_id_add FROM @product_category_id_add_sql;
+EXECUTE stmt_product_category_id_add;
+DEALLOCATE PREPARE stmt_product_category_id_add;
+
+SET @product_sub_category_id_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'product' AND COLUMN_NAME = 'sub_category_id'
+);
+SET @product_sub_category_id_add_sql = IF(
+  @product_sub_category_id_col_exists = 0,
+  'ALTER TABLE `product` ADD COLUMN `sub_category_id` INT NOT NULL DEFAULT 801 AFTER `category_id`',
+  'SELECT 1'
+);
+PREPARE stmt_product_sub_category_id_add FROM @product_sub_category_id_add_sql;
+EXECUTE stmt_product_sub_category_id_add;
+DEALLOCATE PREPARE stmt_product_sub_category_id_add;
+
+SET @product_images_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'product' AND COLUMN_NAME = 'images'
+);
+SET @product_images_add_sql = IF(
+  @product_images_col_exists = 0,
+  'ALTER TABLE `product` ADD COLUMN `images` TEXT AFTER `cover`',
+  'SELECT 1'
+);
+PREPARE stmt_product_images_add FROM @product_images_add_sql;
+EXECUTE stmt_product_images_add;
+DEALLOCATE PREPARE stmt_product_images_add;
+
+UPDATE `product`
+SET `images` = CONCAT('["', REPLACE(REPLACE(`cover`, '\\', '\\\\'), '"', '\\"'), '"]')
+WHERE (`images` IS NULL OR `images` = '') AND `cover` IS NOT NULL AND `cover` <> '';
 
 CREATE TABLE IF NOT EXISTS `browse_history` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -276,36 +326,136 @@ CREATE TABLE IF NOT EXISTS `secondhand_product` (
   `seller_user_id` BIGINT NOT NULL,
   `name` VARCHAR(120) NOT NULL,
   `cover` VARCHAR(255) DEFAULT NULL,
+  `images` TEXT,
   `description` TEXT,
   `origin_price` DECIMAL(10,2) DEFAULT NULL,
   `sale_price` DECIMAL(10,2) NOT NULL,
+  `category_id` INT NOT NULL DEFAULT 8,
+  `sub_category_id` INT NOT NULL DEFAULT 801,
   `condition_level` VARCHAR(30) DEFAULT NULL,
   `is_negotiable` TINYINT NOT NULL DEFAULT 1,
   `status` TINYINT NOT NULL DEFAULT 1,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_secondhand_seller` (`seller_user_id`)
+  KEY `idx_secondhand_seller` (`seller_user_id`),
+  KEY `idx_secondhand_category` (`category_id`, `sub_category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-SET @secondhand_is_negotiable_sql = IF (
-  EXISTS (
-    SELECT 1 FROM INFORMATION_SCHEMA.TABLES
-    WHERE TABLE_SCHEMA = DATABASE()
-      AND TABLE_NAME = 'secondhand_product'
-  )
-  AND NOT EXISTS (
-    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
-    WHERE TABLE_SCHEMA = DATABASE()
-      AND TABLE_NAME = 'secondhand_product'
-      AND COLUMN_NAME = 'is_negotiable'
-  ),
+SET @secondhand_category_id_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'secondhand_product' AND COLUMN_NAME = 'category_id'
+);
+SET @secondhand_category_id_add_sql = IF(
+  @secondhand_category_id_col_exists = 0,
+  'ALTER TABLE `secondhand_product` ADD COLUMN `category_id` INT NOT NULL DEFAULT 8 AFTER `sale_price`',
+  'SELECT 1'
+);
+PREPARE stmt_secondhand_category_id_add FROM @secondhand_category_id_add_sql;
+EXECUTE stmt_secondhand_category_id_add;
+DEALLOCATE PREPARE stmt_secondhand_category_id_add;
+
+SET @secondhand_sub_category_id_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'secondhand_product' AND COLUMN_NAME = 'sub_category_id'
+);
+SET @secondhand_sub_category_id_add_sql = IF(
+  @secondhand_sub_category_id_col_exists = 0,
+  'ALTER TABLE `secondhand_product` ADD COLUMN `sub_category_id` INT NOT NULL DEFAULT 801 AFTER `category_id`',
+  'SELECT 1'
+);
+PREPARE stmt_secondhand_sub_category_id_add FROM @secondhand_sub_category_id_add_sql;
+EXECUTE stmt_secondhand_sub_category_id_add;
+DEALLOCATE PREPARE stmt_secondhand_sub_category_id_add;
+
+SET @secondhand_is_negotiable_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'secondhand_product' AND COLUMN_NAME = 'is_negotiable'
+);
+SET @secondhand_is_negotiable_add_sql = IF(
+  @secondhand_is_negotiable_col_exists = 0,
   'ALTER TABLE `secondhand_product` ADD COLUMN `is_negotiable` TINYINT NOT NULL DEFAULT 1 AFTER `condition_level`',
   'SELECT 1'
 );
-PREPARE stmt_secondhand_is_negotiable FROM @secondhand_is_negotiable_sql;
-EXECUTE stmt_secondhand_is_negotiable;
-DEALLOCATE PREPARE stmt_secondhand_is_negotiable;
+PREPARE stmt_secondhand_is_negotiable_add FROM @secondhand_is_negotiable_add_sql;
+EXECUTE stmt_secondhand_is_negotiable_add;
+DEALLOCATE PREPARE stmt_secondhand_is_negotiable_add;
+
+SET @secondhand_images_col_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'secondhand_product' AND COLUMN_NAME = 'images'
+);
+SET @secondhand_images_add_sql = IF(
+  @secondhand_images_col_exists = 0,
+  'ALTER TABLE `secondhand_product` ADD COLUMN `images` TEXT AFTER `cover`',
+  'SELECT 1'
+);
+PREPARE stmt_secondhand_images_add FROM @secondhand_images_add_sql;
+EXECUTE stmt_secondhand_images_add;
+DEALLOCATE PREPARE stmt_secondhand_images_add;
+
+UPDATE `secondhand_product`
+SET `images` = CONCAT('["', REPLACE(REPLACE(`cover`, '\\', '\\\\'), '"', '\\"'), '"]')
+WHERE (`images` IS NULL OR `images` = '') AND `cover` IS NOT NULL AND `cover` <> '';
+
+CREATE TABLE IF NOT EXISTS `product_auction` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `product_id` BIGINT NOT NULL,
+  `seller_user_id` BIGINT NOT NULL,
+  `start_price` DECIMAL(10,2) NOT NULL,
+  `increment_amount` DECIMAL(10,2) NOT NULL,
+  `current_price` DECIMAL(10,2) NOT NULL,
+  `current_bidder_user_id` BIGINT DEFAULT NULL,
+  `start_time` DATETIME NOT NULL,
+  `end_time` DATETIME NOT NULL,
+  `status` VARCHAR(20) NOT NULL,
+  `settled_order_id` BIGINT DEFAULT NULL,
+  `version` INT NOT NULL DEFAULT 0,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_product_auction_product` (`product_id`),
+  KEY `idx_product_auction_seller` (`seller_user_id`),
+  KEY `idx_product_auction_status_end` (`status`, `end_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `auction_log` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `auction_id` BIGINT NOT NULL,
+  `product_id` BIGINT NOT NULL,
+  `bidder_user_id` BIGINT NOT NULL,
+  `bid_amount` DECIMAL(10,2) NOT NULL,
+  `status` VARCHAR(20) NOT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_auction_log_auction` (`auction_id`, `create_time`),
+  KEY `idx_auction_log_bidder` (`bidder_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `product_negotiation` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `product_id` BIGINT NOT NULL,
+  `buyer_user_id` BIGINT NOT NULL,
+  `seller_user_id` BIGINT NOT NULL,
+  `conversation_id` BIGINT DEFAULT NULL,
+  `proposed_price` DECIMAL(10,2) NOT NULL,
+  `confirmed_price` DECIMAL(10,2) DEFAULT NULL,
+  `status` VARCHAR(20) NOT NULL,
+  `effective_from` DATETIME DEFAULT NULL,
+  `effective_until` DATETIME DEFAULT NULL,
+  `used_order_id` BIGINT DEFAULT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_product_negotiation_product` (`product_id`),
+  KEY `idx_product_negotiation_buyer` (`buyer_user_id`),
+  KEY `idx_product_negotiation_seller` (`seller_user_id`),
+  KEY `idx_product_negotiation_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `order_info` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -336,6 +486,11 @@ CREATE TABLE IF NOT EXISTS `order_info` (
   `pay_method` VARCHAR(30) DEFAULT NULL,
   `delivery_no` VARCHAR(60) DEFAULT NULL,
   `remark` VARCHAR(255) DEFAULT NULL,
+  `voucher_id` BIGINT DEFAULT NULL,
+  `voucher_discount_amount` DECIMAL(10,2) NOT NULL DEFAULT 0,
+  `seller_bear_amount` DECIMAL(10,2) NOT NULL DEFAULT 0,
+  `platform_bear_amount` DECIMAL(10,2) NOT NULL DEFAULT 0,
+  `payable_amount` DECIMAL(10,2) DEFAULT NULL,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -639,6 +794,76 @@ PREPARE stmt_order_add_version FROM @order_version_add_sql;
 EXECUTE stmt_order_add_version;
 DEALLOCATE PREPARE stmt_order_add_version;
 
+SET @order_voucher_id_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'voucher_id'
+);
+SET @order_voucher_id_sql = IF(
+  @order_voucher_id_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `voucher_id` BIGINT DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_voucher_id FROM @order_voucher_id_sql;
+EXECUTE stmt_order_voucher_id;
+DEALLOCATE PREPARE stmt_order_voucher_id;
+
+SET @order_voucher_discount_amount_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'voucher_discount_amount'
+);
+SET @order_voucher_discount_amount_sql = IF(
+  @order_voucher_discount_amount_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `voucher_discount_amount` DECIMAL(10,2) NOT NULL DEFAULT 0',
+  'SELECT 1'
+);
+PREPARE stmt_order_voucher_discount_amount FROM @order_voucher_discount_amount_sql;
+EXECUTE stmt_order_voucher_discount_amount;
+DEALLOCATE PREPARE stmt_order_voucher_discount_amount;
+
+SET @order_seller_bear_amount_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'seller_bear_amount'
+);
+SET @order_seller_bear_amount_sql = IF(
+  @order_seller_bear_amount_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `seller_bear_amount` DECIMAL(10,2) NOT NULL DEFAULT 0',
+  'SELECT 1'
+);
+PREPARE stmt_order_seller_bear_amount FROM @order_seller_bear_amount_sql;
+EXECUTE stmt_order_seller_bear_amount;
+DEALLOCATE PREPARE stmt_order_seller_bear_amount;
+
+SET @order_platform_bear_amount_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'platform_bear_amount'
+);
+SET @order_platform_bear_amount_sql = IF(
+  @order_platform_bear_amount_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `platform_bear_amount` DECIMAL(10,2) NOT NULL DEFAULT 0',
+  'SELECT 1'
+);
+PREPARE stmt_order_platform_bear_amount FROM @order_platform_bear_amount_sql;
+EXECUTE stmt_order_platform_bear_amount;
+DEALLOCATE PREPARE stmt_order_platform_bear_amount;
+
+SET @order_payable_amount_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'order_info' AND COLUMN_NAME = 'payable_amount'
+);
+SET @order_payable_amount_sql = IF(
+  @order_payable_amount_exists = 0,
+  'ALTER TABLE `order_info` ADD COLUMN `payable_amount` DECIMAL(10,2) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_order_payable_amount FROM @order_payable_amount_sql;
+EXECUTE stmt_order_payable_amount;
+DEALLOCATE PREPARE stmt_order_payable_amount;
+
 CREATE TABLE IF NOT EXISTS `order_after_sale_log` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `order_id` BIGINT NOT NULL,
@@ -739,6 +964,17 @@ CREATE TABLE IF NOT EXISTS `report` (
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_report_reporter` (`reporter_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `category` (
+  `id` INT NOT NULL,
+  `name` VARCHAR(50) NOT NULL,
+  `parent_id` INT DEFAULT NULL,
+  `sort_order` INT NOT NULL DEFAULT 0,
+  `status` TINYINT NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  KEY `idx_category_parent_id` (`parent_id`),
+  KEY `idx_category_status_sort` (`status`, `sort_order`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS `merchant_application` (
@@ -1206,6 +1442,182 @@ CREATE TABLE IF NOT EXISTS `voucher` (
   KEY `idx_voucher_shop_id` (`shop_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+SET @voucher_issuer_type_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'issuer_type'
+);
+SET @voucher_issuer_type_sql = IF(
+  @voucher_issuer_type_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `issuer_type` TINYINT NOT NULL DEFAULT 1',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_issuer_type FROM @voucher_issuer_type_sql;
+EXECUTE stmt_voucher_issuer_type;
+DEALLOCATE PREPARE stmt_voucher_issuer_type;
+
+SET @voucher_type_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'voucher_type'
+);
+SET @voucher_type_sql = IF(
+  @voucher_type_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `voucher_type` TINYINT NOT NULL DEFAULT 1',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_type FROM @voucher_type_sql;
+EXECUTE stmt_voucher_type;
+DEALLOCATE PREPARE stmt_voucher_type;
+
+SET @voucher_issuer_user_id_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'issuer_user_id'
+);
+SET @voucher_issuer_user_id_sql = IF(
+  @voucher_issuer_user_id_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `issuer_user_id` BIGINT DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_issuer_user_id FROM @voucher_issuer_user_id_sql;
+EXECUTE stmt_voucher_issuer_user_id;
+DEALLOCATE PREPARE stmt_voucher_issuer_user_id;
+
+SET @voucher_scope_type_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'scope_type'
+);
+SET @voucher_scope_type_sql = IF(
+  @voucher_scope_type_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `scope_type` TINYINT NOT NULL DEFAULT 1',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_scope_type FROM @voucher_scope_type_sql;
+EXECUTE stmt_voucher_scope_type;
+DEALLOCATE PREPARE stmt_voucher_scope_type;
+
+SET @voucher_product_id_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'product_id'
+);
+SET @voucher_product_id_sql = IF(
+  @voucher_product_id_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `product_id` BIGINT DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_product_id FROM @voucher_product_id_sql;
+EXECUTE stmt_voucher_product_id;
+DEALLOCATE PREPARE stmt_voucher_product_id;
+
+SET @voucher_can_stack_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'can_stack'
+);
+SET @voucher_can_stack_sql = IF(
+  @voucher_can_stack_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `can_stack` TINYINT(1) NOT NULL DEFAULT 0',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_can_stack FROM @voucher_can_stack_sql;
+EXECUTE stmt_voucher_can_stack;
+DEALLOCATE PREPARE stmt_voucher_can_stack;
+
+SET @voucher_received_count_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'received_count'
+);
+SET @voucher_received_count_sql = IF(
+  @voucher_received_count_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `received_count` INT NOT NULL DEFAULT 0',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_received_count FROM @voucher_received_count_sql;
+EXECUTE stmt_voucher_received_count;
+DEALLOCATE PREPARE stmt_voucher_received_count;
+
+SET @voucher_grab_start_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'grab_start_time'
+);
+SET @voucher_grab_start_sql = IF(
+  @voucher_grab_start_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `grab_start_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_grab_start FROM @voucher_grab_start_sql;
+EXECUTE stmt_voucher_grab_start;
+DEALLOCATE PREPARE stmt_voucher_grab_start;
+
+SET @voucher_grab_end_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'voucher' AND COLUMN_NAME = 'grab_end_time'
+);
+SET @voucher_grab_end_sql = IF(
+  @voucher_grab_end_exists = 0,
+  'ALTER TABLE `voucher` ADD COLUMN `grab_end_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_voucher_grab_end FROM @voucher_grab_end_sql;
+EXECUTE stmt_voucher_grab_end;
+DEALLOCATE PREPARE stmt_voucher_grab_end;
+ALTER TABLE `voucher` MODIFY COLUMN `shop_id` BIGINT DEFAULT NULL;
+ALTER TABLE `voucher` MODIFY COLUMN `start_time` DATETIME DEFAULT NULL;
+ALTER TABLE `voucher` MODIFY COLUMN `end_time` DATETIME DEFAULT NULL;
+
+CREATE TABLE IF NOT EXISTS `user_voucher` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `voucher_id` BIGINT NOT NULL,
+  `status` TINYINT NOT NULL DEFAULT 1,
+  `received_time` DATETIME DEFAULT NULL,
+  `used_order_id` BIGINT DEFAULT NULL,
+  `used_time` DATETIME DEFAULT NULL,
+  `expire_time` DATETIME DEFAULT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_voucher_user_id` (`user_id`),
+  KEY `idx_user_voucher_voucher_id` (`voucher_id`),
+  KEY `idx_user_voucher_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @user_voucher_used_order_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_voucher' AND COLUMN_NAME = 'used_order_id'
+);
+SET @user_voucher_used_order_sql = IF(
+  @user_voucher_used_order_exists = 0,
+  'ALTER TABLE `user_voucher` ADD COLUMN `used_order_id` BIGINT DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_user_voucher_used_order FROM @user_voucher_used_order_sql;
+EXECUTE stmt_user_voucher_used_order;
+DEALLOCATE PREPARE stmt_user_voucher_used_order;
+
+SET @user_voucher_used_time_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_voucher' AND COLUMN_NAME = 'used_time'
+);
+SET @user_voucher_used_time_sql = IF(
+  @user_voucher_used_time_exists = 0,
+  'ALTER TABLE `user_voucher` ADD COLUMN `used_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_user_voucher_used_time FROM @user_voucher_used_time_sql;
+EXECUTE stmt_user_voucher_used_time;
+DEALLOCATE PREPARE stmt_user_voucher_used_time;
+
+SET @user_voucher_expire_exists = (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_voucher' AND COLUMN_NAME = 'expire_time'
+);
+SET @user_voucher_expire_sql = IF(
+  @user_voucher_expire_exists = 0,
+  'ALTER TABLE `user_voucher` ADD COLUMN `expire_time` DATETIME DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt_user_voucher_expire FROM @user_voucher_expire_sql;
+EXECUTE stmt_user_voucher_expire;
+DEALLOCATE PREPARE stmt_user_voucher_expire;
+
 CREATE TABLE IF NOT EXISTS `chat_conversation` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `buyer_user_id` BIGINT NOT NULL,
@@ -1375,4 +1787,4 @@ CREATE TABLE IF NOT EXISTS `user_block` (
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_block` (`blocker_id`, `blocked_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

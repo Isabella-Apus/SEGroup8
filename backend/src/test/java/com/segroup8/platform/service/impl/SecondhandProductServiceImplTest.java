@@ -12,10 +12,14 @@ import com.segroup8.platform.entity.OrderInfo;
 import com.segroup8.platform.entity.SecondhandProduct;
 import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.OrderItemMapper;
+import com.segroup8.platform.mapper.ProductAuctionMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
+import com.segroup8.platform.mapper.AddressMapper;
 import com.segroup8.platform.mapper.UserBlockMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
+import com.segroup8.platform.service.CategoryService;
+import com.segroup8.platform.service.SecondhandTradeService;
 import com.segroup8.platform.vo.OrderVO;
 import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.vo.SecondhandProductVO;
@@ -38,6 +42,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("unchecked")
 class SecondhandProductServiceImplTest {
 
     @Mock
@@ -50,10 +55,22 @@ class SecondhandProductServiceImplTest {
     private OrderItemMapper orderItemMapper;
 
     @Mock
+    private ProductAuctionMapper productAuctionMapper;
+
+    @Mock
+    private AddressMapper addressMapper;
+
+    @Mock
     private BrowseHistoryService browseHistoryService;
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private CategoryService categoryService;
+
+    @Mock
+    private SecondhandTradeService secondhandTradeService;
 
     private SecondhandProductServiceImpl secondhandProductService;
 
@@ -63,7 +80,8 @@ class SecondhandProductServiceImplTest {
     @BeforeEach
     void setUp() {
         secondhandProductService = new SecondhandProductServiceImpl(secondhandProductMapper, orderInfoMapper,
-                orderItemMapper, userMapper, browseHistoryService,userBlockMapper );
+                orderItemMapper, productAuctionMapper, userMapper, addressMapper, browseHistoryService, userBlockMapper, categoryService,
+                secondhandTradeService);
     }
 
     @AfterEach
@@ -89,6 +107,9 @@ class SecondhandProductServiceImplTest {
         request.setName("test");
         request.setOriginPrice(new BigDecimal("100"));
         request.setSalePrice(new BigDecimal("150"));
+        request.setCategoryId(1);
+        request.setSubCategoryId(101);
+        request.setIsNegotiable(1);
 
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> secondhandProductService.createSellerProduct(request));
@@ -146,6 +167,7 @@ class SecondhandProductServiceImplTest {
         product.setStatus(1);
         when(secondhandProductMapper.selectById(2L)).thenReturn(product);
         when(secondhandProductMapper.update(any(), any(UpdateWrapper.class))).thenReturn(1);
+        when(secondhandTradeService.resolveEffectivePriceForBuyer(2L, 5L)).thenReturn(null);
 
         OrderVO vo = secondhandProductService.buySecondhandProduct(2L, new SecondhandOrderCreateRequest());
 
@@ -155,4 +177,3 @@ class SecondhandProductServiceImplTest {
         assertEquals(new BigDecimal("180"), vo.getTotalAmount());
     }
 }
-

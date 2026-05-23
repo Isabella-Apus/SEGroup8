@@ -18,6 +18,7 @@ public class OrderPageQueryRequest {
     private Double minAmount;
     private Double maxAmount;
     private Integer refundStatus;
+    private String productType;
 
     public Long getPageNum() {
         return pageNum;
@@ -89,5 +90,13 @@ public class OrderPageQueryRequest {
 
     public void setRefundStatus(Integer refundStatus) {
         this.refundStatus = refundStatus;
+    }
+
+    public String getProductType() {
+        return productType;
+    }
+
+    public void setProductType(String productType) {
+        this.productType = productType;
     }
 }

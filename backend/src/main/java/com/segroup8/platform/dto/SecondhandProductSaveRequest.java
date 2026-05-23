@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class SecondhandProductSaveRequest {
 
@@ -15,6 +16,9 @@ public class SecondhandProductSaveRequest {
 
     @Size(max = 255, message = "封面地址长度不能超过255")
     private String cover;
+
+    @Size(max = 9, message = "商品图片不能超过9张")
+    private List<String> images;
 
     @Size(max = 2000, message = "商品描述长度不能超过2000")
     private String description;
@@ -26,9 +30,16 @@ public class SecondhandProductSaveRequest {
     @DecimalMin(value = "0.01", message = "售价必须大于0")
     private BigDecimal salePrice;
 
+    @NotNull(message = "一级分类不能为空")
+    private Integer categoryId;
+
+    @NotNull(message = "二级分类不能为空")
+    private Integer subCategoryId;
+
     @Size(max = 30, message = "成色长度不能超过30")
     private String conditionLevel;
 
+    @NotNull(message = "是否可议价不能为空")
     private Integer isNegotiable;
 
     private Integer status;
@@ -47,6 +58,14 @@ public class SecondhandProductSaveRequest {
 
     public void setCover(String cover) {
         this.cover = cover;
+    }
+
+    public List<String> getImages() {
+        return images;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
     }
 
     public String getDescription() {
@@ -73,6 +92,22 @@ public class SecondhandProductSaveRequest {
         this.salePrice = salePrice;
     }
 
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Integer getSubCategoryId() {
+        return subCategoryId;
+    }
+
+    public void setSubCategoryId(Integer subCategoryId) {
+        this.subCategoryId = subCategoryId;
+    }
+
     public String getConditionLevel() {
         return conditionLevel;
     }
@@ -97,4 +132,3 @@ public class SecondhandProductSaveRequest {
         this.status = status;
     }
 }
-

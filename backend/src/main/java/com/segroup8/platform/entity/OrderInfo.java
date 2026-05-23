@@ -49,6 +49,11 @@ public class OrderInfo {
     private LocalDateTime arrivalTime;
     private LocalDateTime autoConfirmDeadline;
     private String refundMode;
+    private Long voucherId;
+    private BigDecimal voucherDiscountAmount;
+    private BigDecimal sellerBearAmount;
+    private BigDecimal platformBearAmount;
+    private BigDecimal payableAmount;
     @Version
     private Integer version;
     private LocalDateTime updateTime;
@@ -347,6 +352,46 @@ public class OrderInfo {
 
     public void setRefundMode(String refundMode) {
         this.refundMode = refundMode;
+    }
+
+    public Long getVoucherId() {
+        return voucherId;
+    }
+
+    public void setVoucherId(Long voucherId) {
+        this.voucherId = voucherId;
+    }
+
+    public BigDecimal getVoucherDiscountAmount() {
+        return voucherDiscountAmount;
+    }
+
+    public void setVoucherDiscountAmount(BigDecimal voucherDiscountAmount) {
+        this.voucherDiscountAmount = voucherDiscountAmount;
+    }
+
+    public BigDecimal getSellerBearAmount() {
+        return sellerBearAmount;
+    }
+
+    public void setSellerBearAmount(BigDecimal sellerBearAmount) {
+        this.sellerBearAmount = sellerBearAmount;
+    }
+
+    public BigDecimal getPlatformBearAmount() {
+        return platformBearAmount;
+    }
+
+    public void setPlatformBearAmount(BigDecimal platformBearAmount) {
+        this.platformBearAmount = platformBearAmount;
+    }
+
+    public BigDecimal getPayableAmount() {
+        return payableAmount;
+    }
+
+    public void setPayableAmount(BigDecimal payableAmount) {
+        this.payableAmount = payableAmount;
     }
 
     public Integer getVersion() {
