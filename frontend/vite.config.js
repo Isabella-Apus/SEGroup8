@@ -27,18 +27,5 @@ export default defineConfig({
                 ws: true
             }
         }
-    },
-    build: {
-        chunkSizeWarningLimit: 1300,
-        rollupOptions: {
-            output: {
-                manualChunks: {
-                    vue: ['vue', 'vue-router', 'pinia'],
-                    element: ['element-plus'],
-                    charts: ['echarts'],
-                    search: ['fuse.js']
-                }
-            }
-        }
     }
 });

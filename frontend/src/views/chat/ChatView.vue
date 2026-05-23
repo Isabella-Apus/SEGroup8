@@ -12,6 +12,7 @@
       <div v-if="loadingConversations" class="panel-loading">
         <el-skeleton :rows="6" animated />
       </div>
+
       <el-empty v-else-if="!conversations.length" description="暂无会话" />
 
       <div v-else class="conversation-list">
@@ -23,12 +24,12 @@
           @click="selectConversation(item)"
         >
           <div class="conversation-top">
-            <strong>{{ item.other?.nickname || '未知用户' }}</strong>
+            <strong>{{ item.other?.nickname || "未知用户" }}</strong>
             <span>{{ formatTime(item.lastMessageTime) }}</span>
           </div>
           <div class="conversation-source">{{ formatSource(item) }}</div>
           <div class="conversation-bottom">
-            <span class="conversation-preview">{{ item.lastMessageContent || '点击开始聊天' }}</span>
+            <span class="conversation-preview">{{ item.lastMessageContent || "点击开始聊天" }}</span>
             <el-badge v-if="item.unreadCount" :value="item.unreadCount" />
           </div>
         </button>
@@ -43,10 +44,44 @@
       <template v-else>
         <header class="chat-head">
           <div>
-            <h3>{{ activeConversation.other?.nickname || '未知用户' }}</h3>
+            <h3>{{ activeConversation.other?.nickname || "未知用户" }}</h3>
             <p>{{ formatSource(activeConversation) }}</p>
           </div>
         </header>
+
+        <div v-if="bargainRequests.length" class="trade-panel">
+          <article v-for="request in bargainRequests" :key="request.id" class="trade-card">
+            <div class="trade-copy">
+              <span>{{ request.statusName || request.status }}</span>
+              <strong>{{ request.buyerName || "买家" }} 出价 ¥{{ Number(request.proposedPrice || 0).toFixed(2) }}</strong>
+              <small>{{ request.productName || activeConversation.sourceTitle }}</small>
+            </div>
+            <div class="trade-actions">
+              <template v-if="request.status === 'PENDING' && isSellerForBargain(request)">
+                <el-button
+                  size="small"
+                  type="primary"
+                  :loading="actionLoadingKey === `confirm-${request.id}`"
+                  @click="handleConfirmBargain(request)"
+                >
+                  同意并生成订单
+                </el-button>
+                <el-button
+                  size="small"
+                  :loading="actionLoadingKey === `reject-${request.id}`"
+                  @click="handleRejectBargain(request)"
+                >
+                  拒绝
+                </el-button>
+              </template>
+              <span v-else-if="request.status === 'PENDING'" class="trade-note">等待卖家处理</span>
+              <el-button v-else-if="request.orderId" size="small" type="success" plain @click="router.push('/secondhand/orders')">
+                查看订单
+              </el-button>
+              <span v-else class="trade-note">{{ request.statusName || "已结束" }}</span>
+            </div>
+          </article>
+        </div>
 
         <div v-loading="loadingMessages" class="message-list">
           <div
@@ -56,91 +91,14 @@
             :class="{ self: Number(message.senderUserId) === Number(currentUserId) }"
           >
             <div class="message-bubble">
-              <div class="message-author">{{ message.sender?.nickname || '用户' }}</div>
-
-              <div v-if="parseTradeCard(message.content)?.type === 'BARGAIN_APPLY'" class="trade-card">
-                <div class="trade-card-title">议价申请</div>
-                <div class="trade-card-line">商品：{{ parseTradeCard(message.content)?.productName || '二手商品' }}</div>
-                <div class="trade-card-line">买家出价：￥{{ parseTradeCard(message.content)?.proposedPrice }}</div>
-                <el-space v-if="canHandleBargainApply(message)" wrap>
-                  <el-button
-                    type="warning"
-                    size="small"
-                    :disabled="isBargainHandled(parseTradeCard(message.content))"
-                    @click="handleConfirmBargainFromCard(parseTradeCard(message.content))"
-                  >
-                    确认小刀价
-                  </el-button>
-                  <el-button
-                    type="danger"
-                    plain
-                    size="small"
-                    :disabled="isBargainHandled(parseTradeCard(message.content))"
-                    @click="handleRejectBargainFromCard(parseTradeCard(message.content))"
-                  >
-                    驳回小刀价
-                  </el-button>
-                </el-space>
-                <div v-else-if="isBargainHandled(parseTradeCard(message.content))" class="trade-card-line handled">
-                  该议价已处理
-                </div>
-              </div>
-
-              <div v-else-if="parseTradeCard(message.content)?.type === 'BARGAIN_CONFIRM'" class="trade-card trade-card-confirmed">
-                <div class="trade-card-title">议价已确认</div>
-                <div class="trade-card-line">商品：{{ parseTradeCard(message.content)?.productName || '二手商品' }}</div>
-                <div class="trade-card-line">成交小刀价：￥{{ parseTradeCard(message.content)?.confirmedPrice }}</div>
-                <div class="trade-card-line">有效期至：{{ formatTime(parseTradeCard(message.content)?.effectiveUntil, true) }}</div>
-                <el-button
-                  v-if="canBuyConfirmedBargain(parseTradeCard(message.content))"
-                  type="success"
-                  size="small"
-                  @click="goBuyBargainProduct(parseTradeCard(message.content))"
-                >
-                  去购买
-                </el-button>
-              </div>
-
-              <div v-else-if="parseTradeCard(message.content)?.type === 'BARGAIN_REJECT'" class="trade-card trade-card-rejected">
-                <div class="trade-card-title">议价已驳回</div>
-                <div class="trade-card-line">商品：{{ parseTradeCard(message.content)?.productName || '二手商品' }}</div>
-                <div class="trade-card-line">买家出价：￥{{ parseTradeCard(message.content)?.proposedPrice }}</div>
-              </div>
-
-              <div v-else-if="parseMediaMessage(message.content)" class="media-message">
-                <el-image
-                  v-if="parseMediaMessage(message.content).mediaType === 'image'"
-                  :src="toFullMediaUrl(parseMediaMessage(message.content).url)"
-                  fit="cover"
-                  class="chat-image"
-                  :preview-src-list="[toFullMediaUrl(parseMediaMessage(message.content).url)]"
-                />
-                <video
-                  v-else
-                  class="chat-video"
-                  controls
-                  :src="toFullMediaUrl(parseMediaMessage(message.content).url)"
-                ></video>
-                <div class="media-name">{{ parseMediaMessage(message.content).filename || '附件' }}</div>
-              </div>
-              <div v-else class="message-content">{{ message.content }}</div>
+              <div class="message-author">{{ message.sender?.nickname || "用户" }}</div>
+              <div class="message-content">{{ message.content }}</div>
               <div class="message-time">{{ formatTime(message.createTime, true) }}</div>
             </div>
           </div>
         </div>
 
         <footer class="chat-composer">
-          <input
-            ref="mediaInputRef"
-            class="hidden-file-input"
-            type="file"
-            accept="image/*,video/*"
-            @change="handleMediaSelected"
-          />
-          <div v-if="pendingMedia" class="media-preview">
-            <span>{{ pendingMedia.mediaType === 'image' ? '图片' : '视频' }}：{{ pendingMedia.filename }}</span>
-            <el-button text type="danger" @click="clearPendingMedia">移除</el-button>
-          </div>
           <el-input
             v-model="draft"
             type="textarea"
@@ -148,12 +106,11 @@
             maxlength="1000"
             show-word-limit
             resize="none"
-            placeholder="输入消息，按 Ctrl/Cmd + Enter 发送"
+            placeholder="输入消息"
             @keydown="handleComposerKeydown"
           />
           <div class="composer-actions">
             <span class="composer-tip">{{ sendStatus }}</span>
-            <el-button :loading="uploadingMedia" @click="mediaInputRef?.click()">图片/视频</el-button>
             <el-button type="primary" :loading="sending" @click="sendMessage">发送</el-button>
           </div>
         </footer>
@@ -163,27 +120,25 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
-import { useRoute, useRouter } from 'vue-router';
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { ElMessage } from "element-plus";
+import { useRoute, useRouter } from "vue-router";
 import {
   createChatConversationApi,
   listChatConversationsApi,
   listChatMessagesApi,
   sendChatMessageApi,
-} from '@/api/chat';
-import { uploadMediaApi } from '@/api/upload';
-import { confirmBargainApi, rejectBargainApi } from '@/api/secondhand';
-import { onRealtimeEvent, sendRealtimeMessage, startRealtimeClient } from '@/realtime/realtimeClient';
-import { useUserStore } from '@/stores/user';
-import { toApiAssetUrl } from '@/utils/url';
+} from "@/api/chat";
 import {
-  MSG_TYPE_AUCTION_BID_ACCEPTED,
-  MSG_TYPE_AUCTION_OUTBID,
-  MSG_TYPE_AUCTION_SETTLED,
-  MSG_TYPE_BARGAIN_APPLY,
-  MSG_TYPE_BARGAIN_CONFIRM,
-} from '@/realtime/messageTypes';
+  confirmBargainApi,
+  listBargainRequestsApi,
+  rejectBargainApi,
+} from "@/api/secondhand";
+import {
+  onRealtimeEvent,
+  startRealtimeClient,
+} from "@/realtime/realtimeClient";
+import { useUserStore } from "@/stores/user";
 
 const route = useRoute();
 const router = useRouter();
@@ -194,40 +149,54 @@ const loadingMessages = ref(false);
 const sending = ref(false);
 const conversations = ref([]);
 const messages = ref([]);
+const bargainRequests = ref([]);
 const activeConversationId = ref(null);
-const draft = ref('');
-const sendStatus = ref('正在连接实时通道...');
-const mediaInputRef = ref(null);
-const pendingMedia = ref(null);
-const uploadingMedia = ref(false);
+const draft = ref("");
+const sendStatus = ref("消息会自动同步给对方");
+const actionLoadingKey = ref("");
 
 const currentUserId = computed(() => userStore.userInfo?.id);
-const chatRoutePath = computed(() => (route.path.startsWith('/merchant') ? '/merchant/messages' : '/messages'));
+const chatRoutePath = computed(() =>
+  route.path.startsWith("/merchant") ? "/merchant/messages" : "/messages",
+);
 const activeConversation = computed(() =>
-  conversations.value.find((item) => Number(item.id) === Number(activeConversationId.value)) || null
+  conversations.value.find((item) => Number(item.id) === Number(activeConversationId.value)) || null,
 );
 
 let unsubscribeRealtime = null;
+let chatPollTimer = null;
+let syncingChat = false;
+const MOCK_STORE_KEY = "segroup8_mock_store_v1";
 
 onMounted(async () => {
   startRealtimeClient();
   unsubscribeRealtime = onRealtimeEvent(handleRealtimeEvent);
+  window.addEventListener("storage", handleStorageEvent);
   await bootstrap();
+  chatPollTimer = window.setInterval(syncActiveChat, 4000);
 });
 
 onUnmounted(() => {
-  if (typeof unsubscribeRealtime === 'function') unsubscribeRealtime();
+  if (typeof unsubscribeRealtime === "function") {
+    unsubscribeRealtime();
+  }
+  if (chatPollTimer) {
+    window.clearInterval(chatPollTimer);
+  }
+  window.removeEventListener("storage", handleStorageEvent);
 });
 
 watch(
   () => route.query.conversationId,
   async (conversationId) => {
-    if (!conversationId) return;
+    if (!conversationId) {
+      return;
+    }
     const found = conversations.value.find((item) => Number(item.id) === Number(conversationId));
     if (found && Number(activeConversationId.value) !== Number(found.id)) {
       await selectConversation(found);
     }
-  }
+  },
 );
 
 async function bootstrap() {
@@ -240,124 +209,229 @@ async function bootstrap() {
       return;
     }
   }
-  if (route.query.participantId) {
+  const participantId = route.query.participantId;
+  if (participantId) {
     await ensureConversation();
     return;
   }
-  if (conversations.value.length) await selectConversation(conversations.value[0]);
+  if (conversations.value.length) {
+    await selectConversation(conversations.value[0]);
+  }
 }
 
-async function refreshConversations() {
-  loadingConversations.value = true;
+async function refreshConversations(options = {}) {
+  const silent = options.silent === true;
+  if (!silent) {
+    loadingConversations.value = true;
+  }
   try {
+    const activeId = activeConversationId.value;
     const result = await listChatConversationsApi();
-    conversations.value = result.data || [];
+    const next = result.data || [];
+    if (collectionSignature(conversations.value) !== collectionSignature(next)) {
+      conversations.value = next;
+    }
+    if (activeId && !next.some((item) => Number(item.id) === Number(activeId))) {
+      activeConversationId.value = null;
+      messages.value = [];
+      bargainRequests.value = [];
+    }
   } finally {
-    loadingConversations.value = false;
+    if (!silent) {
+      loadingConversations.value = false;
+    }
   }
 }
 
 async function ensureConversation() {
   const participantId = Number(route.query.participantId);
-  if (!participantId) return;
+  if (!participantId) {
+    return;
+  }
+  const initialMessage = String(route.query.initialMessage || "");
   const result = await createChatConversationApi({
     targetUserId: participantId,
-    sourceType: route.query.sourceType || 'DIRECT',
+    sourceType: route.query.sourceType || "DIRECT",
     sourceId: route.query.sourceId ? Number(route.query.sourceId) : null,
   });
   const conversation = result.data;
   const existingIndex = conversations.value.findIndex((item) => Number(item.id) === Number(conversation.id));
-  if (existingIndex >= 0) conversations.value.splice(existingIndex, 1, conversation);
-  else conversations.value.unshift(conversation);
+  if (existingIndex >= 0) {
+    conversations.value.splice(existingIndex, 1, conversation);
+  } else {
+    conversations.value.unshift(conversation);
+  }
   await router.replace({ path: chatRoutePath.value, query: { conversationId: conversation.id } });
   await selectConversation(conversation);
+  if (initialMessage && !draft.value.trim()) {
+    draft.value = initialMessage;
+  }
 }
 
 async function selectConversation(conversation) {
-  if (!conversation?.id) return;
+  if (!conversation?.id) {
+    return;
+  }
   activeConversationId.value = conversation.id;
   await loadMessages(conversation.id);
-  if (String(route.query.conversationId || '') !== String(conversation.id)) {
+  await loadBargainRequests();
+  const currentQueryId = String(route.query.conversationId || "");
+  if (currentQueryId !== String(conversation.id)) {
     router.replace({ path: chatRoutePath.value, query: { conversationId: conversation.id } });
   }
 }
 
-async function loadMessages(conversationId) {
-  loadingMessages.value = true;
+async function loadMessages(conversationId, options = {}) {
+  const silent = options.silent === true;
+  if (!silent) {
+    loadingMessages.value = true;
+  }
   try {
+    const before = messages.value;
     const result = await listChatMessagesApi(conversationId);
-    messages.value = result.data || [];
+    const next = result.data || [];
+    const changed = collectionSignature(before) !== collectionSignature(next);
+    if (changed) {
+      messages.value = next;
+    }
     clearConversationUnread(conversationId);
-    await scrollToBottom();
+    if (!silent || changed) {
+      await scrollToBottom();
+    }
   } finally {
-    loadingMessages.value = false;
+    if (!silent) {
+      loadingMessages.value = false;
+    }
+  }
+}
+
+async function loadBargainRequests(options = {}) {
+  const silent = options.silent === true;
+  const conversation = activeConversation.value;
+  if (!conversation || String(conversation.sourceType || "").toUpperCase() !== "SECONDHAND" || !conversation.sourceId) {
+    if (bargainRequests.value.length) {
+      bargainRequests.value = [];
+    }
+    return;
+  }
+  try {
+    const result = await listBargainRequestsApi({
+      productId: conversation.sourceId,
+      counterpartUserId: conversation.other?.id,
+    });
+    const next = result.data?.records || result.data || [];
+    if (collectionSignature(bargainRequests.value) !== collectionSignature(next)) {
+      bargainRequests.value = next;
+    }
+  } catch {
+    if (!silent && bargainRequests.value.length) {
+      bargainRequests.value = [];
+    }
   }
 }
 
 async function sendMessage() {
-  const text = draft.value.trim();
-  const content = pendingMedia.value ? buildMediaMessage(pendingMedia.value, text) : text;
-  if (!content || !activeConversation.value) return;
+  const content = draft.value.trim();
+  if (!content || !activeConversation.value) {
+    return;
+  }
   sending.value = true;
   try {
-    const sentByRealtime = sendRealtimeMessage({
-      eventType: 'CHAT_SEND',
-      payload: { conversationId: activeConversation.value.id, content },
-    });
-    if (!sentByRealtime) {
-      sendStatus.value = '实时通道未连上，已切换为普通发送';
-      const result = await sendChatMessageApi(activeConversation.value.id, { content });
-      appendIncomingMessage(result.data);
-    }
-    draft.value = '';
-    clearPendingMedia();
+    const conversationId = activeConversation.value.id;
+    const result = await sendChatMessageApi(conversationId, { content });
+    appendIncomingMessage(result.data);
+    draft.value = "";
+    sendStatus.value = "已发送，正在自动同步";
+    await refreshConversations({ silent: true });
+    await loadMessages(conversationId, { silent: true });
     await scrollToBottom();
   } finally {
     sending.value = false;
   }
 }
 
-async function handleMediaSelected(event) {
-  const file = event?.target?.files?.[0];
-  if (!file) return;
-  const isImage = file.type?.startsWith('image/');
-  const isVideo = file.type?.startsWith('video/');
-  const maxMediaSizeMb = 200;
-  if (!isImage && !isVideo) {
-    ElMessage.warning('只能上传图片或视频');
-    event.target.value = '';
+async function syncActiveChat() {
+  if (syncingChat || sending.value) {
     return;
   }
-  if (file.size > maxMediaSizeMb * 1024 * 1024) {
-    ElMessage.warning(`视频或图片不能超过 ${maxMediaSizeMb}MB`);
-    event.target.value = '';
-    return;
-  }
-  uploadingMedia.value = true;
+  syncingChat = true;
   try {
-    const result = await uploadMediaApi(file);
-    pendingMedia.value = {
-      mediaType: isImage ? 'image' : 'video',
-      url: result.data?.url,
-      filename: result.data?.filename || file.name,
-    };
-    ElMessage.success('上传成功');
-  } catch (error) {
-    if (!error?.userMessage) {
-      ElMessage.error('上传失败，请检查文件大小或网络后重试');
+    const activeId = activeConversationId.value;
+    await refreshConversations({ silent: true });
+    if (activeId && conversations.value.some((item) => Number(item.id) === Number(activeId))) {
+      await loadMessages(activeId, { silent: true });
+      await loadBargainRequests({ silent: true });
+      return;
+    }
+    if (!activeId && conversations.value.length) {
+      await selectConversation(conversations.value[0]);
     }
   } finally {
-    uploadingMedia.value = false;
-    event.target.value = '';
+    syncingChat = false;
   }
 }
 
-function clearPendingMedia() {
-  pendingMedia.value = null;
+function isSellerForBargain(request) {
+  return Number(request?.sellerUserId) === Number(currentUserId.value);
+}
+
+async function handleConfirmBargain(request) {
+  actionLoadingKey.value = `confirm-${request.id}`;
+  try {
+    const result = await confirmBargainApi({
+      negotiationId: request.id,
+      confirmedPrice: request.proposedPrice,
+      createOrder: true,
+    });
+    ElMessage.success("已同意议价，并生成二手订单");
+    await loadBargainRequests();
+    await loadMessages(activeConversation.value.id, { silent: true });
+    updateBargainInList(result.data);
+  } finally {
+    actionLoadingKey.value = "";
+  }
+}
+
+async function handleRejectBargain(request) {
+  actionLoadingKey.value = `reject-${request.id}`;
+  try {
+    await rejectBargainApi(request.id);
+    ElMessage.success("已拒绝议价");
+    await loadBargainRequests();
+    await loadMessages(activeConversation.value.id, { silent: true });
+  } finally {
+    actionLoadingKey.value = "";
+  }
+}
+
+function updateBargainInList(next) {
+  if (!next?.id) {
+    return;
+  }
+  const index = bargainRequests.value.findIndex((item) => Number(item.id) === Number(next.id));
+  if (index >= 0) {
+    bargainRequests.value.splice(index, 1, next);
+  }
+}
+
+function collectionSignature(records) {
+  return (records || []).map((item) => [
+    item.id,
+    item.proposedPrice,
+    item.confirmedPrice,
+    item.status,
+    item.statusName,
+    item.orderId,
+    item.lastMessageContent,
+    item.lastMessageTime,
+    item.unreadCount,
+    item.content,
+    item.createTime,
+  ].join("|")).join(";");
 }
 
 function handleComposerKeydown(event) {
-  if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+  if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
     event.preventDefault();
     sendMessage();
   }
@@ -365,125 +439,31 @@ function handleComposerKeydown(event) {
 
 function handleRealtimeEvent(event) {
   const detail = event?.detail;
-  if (!detail) return;
-  if (detail.eventType === 'CONNECTED' || detail.eventType === 'PONG') {
-    sendStatus.value = '实时通道已连接';
+  if (!detail) {
     return;
   }
-  if (detail.eventType === 'CHAT_MESSAGE' && detail.payload) {
-    sendStatus.value = '实时通道已连接';
+  if (detail.eventType === "CONNECTED") {
+    sendStatus.value = "消息会自动同步给对方";
+    return;
+  }
+  if (detail.eventType === "PONG") {
+    sendStatus.value = "消息会自动同步给对方";
+    return;
+  }
+  if (detail.eventType === "CHAT_MESSAGE" && detail.payload) {
+    sendStatus.value = "收到新消息";
     appendIncomingMessage(detail.payload);
     return;
   }
-  if (detail.eventType === 'CHAT_ERROR') {
-    ElMessage.error(detail.payload?.message || '消息发送失败');
-    return;
+  if (detail.eventType === "CHAT_ERROR") {
+    ElMessage.error(detail.payload?.message || "消息发送失败");
   }
-  if (detail.eventType === MSG_TYPE_BARGAIN_APPLY) ElMessage.info('收到新的议价申请');
-  if (detail.eventType === MSG_TYPE_BARGAIN_CONFIRM) ElMessage.success('议价状态已更新');
-  if (detail.eventType === MSG_TYPE_AUCTION_BID_ACCEPTED) ElMessage.success('拍卖出价成功');
-  if (detail.eventType === MSG_TYPE_AUCTION_OUTBID) ElMessage.warning('您已被他人超价，预扣金额已退回');
-  if (detail.eventType === MSG_TYPE_AUCTION_SETTLED) ElMessage.info('拍卖已完成结算');
-}
-
-function parseTradeCard(content) {
-  if (!content || typeof content !== 'string') return null;
-  if (content.startsWith('[BARGAIN_APPLY]')) return parseCardPayload('BARGAIN_APPLY', content.slice('[BARGAIN_APPLY]'.length));
-  if (content.startsWith('[BARGAIN_CONFIRM]')) return parseCardPayload('BARGAIN_CONFIRM', content.slice('[BARGAIN_CONFIRM]'.length));
-  if (content.startsWith('[BARGAIN_REJECT]')) return parseCardPayload('BARGAIN_REJECT', content.slice('[BARGAIN_REJECT]'.length));
-  return null;
-}
-
-function buildMediaMessage(media, text) {
-  return `[MEDIA]${JSON.stringify({
-    mediaType: media.mediaType,
-    url: media.url,
-    filename: media.filename,
-    text,
-  })}`;
-}
-
-function parseMediaMessage(content) {
-  if (!content || typeof content !== 'string' || !content.startsWith('[MEDIA]')) return null;
-  try {
-    const data = JSON.parse(content.slice('[MEDIA]'.length) || '{}');
-    if (!data.url || !['image', 'video'].includes(data.mediaType)) return null;
-    return data;
-  } catch {
-    return null;
-  }
-}
-
-function toFullMediaUrl(url) {
-  return toApiAssetUrl(url);
-}
-
-function parseCardPayload(type, text) {
-  try {
-    const data = JSON.parse(text || '{}');
-    return { type, ...data };
-  } catch {
-    return null;
-  }
-}
-
-function canHandleBargainApply(message) {
-  const card = parseTradeCard(message?.content);
-  if (!card || card.type !== 'BARGAIN_APPLY') return false;
-  return Number(message?.senderUserId) !== Number(currentUserId.value);
-}
-
-function isBargainHandled(card) {
-  if (!card?.negotiationId) return false;
-  return messages.value.some((message) => {
-    const current = parseTradeCard(message?.content);
-    return current
-      && Number(current.negotiationId) === Number(card.negotiationId)
-      && ['BARGAIN_CONFIRM', 'BARGAIN_REJECT'].includes(current.type);
-  });
-}
-
-function canBuyConfirmedBargain(card) {
-  if (!card || card.type !== 'BARGAIN_CONFIRM') return false;
-  return Number(card.buyerUserId) === Number(currentUserId.value);
-}
-
-async function handleConfirmBargainFromCard(card) {
-  if (!card?.negotiationId) return;
-  const defaultPrice = Number(card.proposedPrice || 0);
-  const finalPrice = Number.isFinite(defaultPrice) && defaultPrice > 0 ? defaultPrice : 0.01;
-  try {
-    await confirmBargainApi({
-      negotiationId: Number(card.negotiationId),
-      confirmedPrice: finalPrice.toFixed(2),
-    });
-    ElMessage.success('已确认小刀价');
-    if (activeConversationId.value) await loadMessages(activeConversationId.value);
-  } catch (e) {
-    ElMessage.error(e?.response?.data?.message || '确认议价失败');
-  }
-}
-
-async function handleRejectBargainFromCard(card) {
-  if (!card?.negotiationId) return;
-  try {
-    await ElMessageBox.confirm('确认驳回该小刀价？', '驳回小刀价', { type: 'warning' });
-    await rejectBargainApi(Number(card.negotiationId));
-    ElMessage.success('已驳回小刀价');
-    if (activeConversationId.value) await loadMessages(activeConversationId.value);
-  } catch (e) {
-    if (e === 'cancel' || e?.toString?.().includes('cancel')) return;
-    ElMessage.error(e?.response?.data?.message || '驳回议价失败');
-  }
-}
-
-function goBuyBargainProduct(card) {
-  if (!card?.productId || !canBuyConfirmedBargain(card)) return;
-  router.push({ path: `/secondhand/${card.productId}`, query: { action: 'buy' } });
 }
 
 function appendIncomingMessage(message) {
-  if (!message?.conversationId) return;
+  if (!message?.conversationId) {
+    return;
+  }
   updateConversationFromMessage(message);
   if (Number(message.conversationId) === Number(activeConversationId.value)) {
     const exists = messages.value.some((item) => Number(item.id) === Number(message.id));
@@ -495,7 +475,9 @@ function appendIncomingMessage(message) {
     return;
   }
   const target = conversations.value.find((item) => Number(item.id) === Number(message.conversationId));
-  if (target) target.unreadCount = Number(target.unreadCount || 0) + 1;
+  if (target) {
+    target.unreadCount = Number(target.unreadCount || 0) + 1;
+  }
 }
 
 function updateConversationFromMessage(message) {
@@ -515,29 +497,56 @@ function updateConversationFromMessage(message) {
 
 function clearConversationUnread(conversationId) {
   const conversation = conversations.value.find((item) => Number(item.id) === Number(conversationId));
-  if (conversation) conversation.unreadCount = 0;
+  if (conversation) {
+    conversation.unreadCount = 0;
+  }
 }
 
 function formatSource(conversation) {
-  const type = String(conversation?.sourceType || 'DIRECT').toUpperCase();
-  if (type === 'PRODUCT') return `商品咨询：${conversation?.sourceTitle || '商品'}`;
-  if (type === 'SECONDHAND') return `二手商品咨询：${conversation?.sourceTitle || '商品'}`;
-  return conversation?.sourceTitle || '站内私聊';
+  const type = String(conversation?.sourceType || "DIRECT").toUpperCase();
+  if (type === "PRODUCT") {
+    return `商品咨询：${conversation?.sourceTitle || "商品"}`;
+  }
+  if (type === "SECONDHAND") {
+    return `二手商品咨询：${conversation?.sourceTitle || "商品"}`;
+  }
+  if (type === "BARGAIN") {
+    return `议价沟通：${conversation?.sourceTitle || "商品"}`;
+  }
+  return conversation?.sourceTitle || "站内私聊";
+}
+
+function handleStorageEvent(event) {
+  if (event.key === MOCK_STORE_KEY) {
+    syncActiveChat();
+  }
 }
 
 function formatTime(value, withTime = false) {
-  if (!value) return '';
+  if (!value) {
+    return "";
+  }
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
   return withTime
-    ? date.toLocaleString('zh-CN', { hour12: false })
-    : date.toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
+    ? date.toLocaleString("zh-CN", { hour12: false })
+    : date.toLocaleString("zh-CN", {
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
 }
 
 async function scrollToBottom() {
   await nextTick();
-  const container = document.querySelector('.message-list');
-  if (container) container.scrollTop = container.scrollHeight;
+  const container = document.querySelector(".message-list");
+  if (container) {
+    container.scrollTop = container.scrollHeight;
+  }
 }
 </script>
 
@@ -552,7 +561,7 @@ async function scrollToBottom() {
 .conversation-panel,
 .chat-panel {
   background: #fff;
-  border: 1px solid #e5ebf3;
+  border: 1px solid var(--line-soft);
   border-radius: 18px;
   overflow: hidden;
 }
@@ -563,8 +572,8 @@ async function scrollToBottom() {
   justify-content: space-between;
   align-items: center;
   padding: 18px 20px;
-  border-bottom: 1px solid #eef2f7;
-  background: linear-gradient(135deg, #f7fbff 0%, #f4f9f2 100%);
+  border-bottom: 1px solid var(--line-soft);
+  background: linear-gradient(135deg, #edf7f3 0%, #f1f0fb 100%);
 }
 
 .panel-head h2,
@@ -592,7 +601,7 @@ async function scrollToBottom() {
 .conversation-item {
   width: 100%;
   border: 0;
-  border-bottom: 1px solid #eef2f7;
+  border-bottom: 1px solid var(--line-soft);
   background: transparent;
   padding: 16px 18px;
   text-align: left;
@@ -602,7 +611,7 @@ async function scrollToBottom() {
 
 .conversation-item:hover,
 .conversation-item.active {
-  background: #f5f9ff;
+  background: #edf7f3;
 }
 
 .conversation-top,
@@ -639,6 +648,63 @@ async function scrollToBottom() {
   align-items: center;
   justify-content: center;
   flex: 1;
+}
+
+.trade-panel {
+  display: grid;
+  gap: 10px;
+  border-bottom: 1px solid #eef2f7;
+  background: #fbfdff;
+  padding: 12px 18px;
+}
+
+.trade-card {
+  border: 1px solid rgba(137, 199, 255, 0.32);
+  border-radius: 12px;
+  background: linear-gradient(135deg, #e9fff8 0%, #eaf4ff 100%);
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.trade-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.trade-copy span {
+  width: fit-content;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--brand-primary);
+  padding: 3px 9px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.trade-copy strong,
+.trade-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trade-copy small,
+.trade-note {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.trade-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 0 0 auto;
 }
 
 .message-list {
@@ -687,65 +753,6 @@ async function scrollToBottom() {
   word-break: break-word;
 }
 
-.media-message {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.chat-image {
-  width: min(280px, 60vw);
-  max-height: 220px;
-  border-radius: 10px;
-  overflow: hidden;
-}
-
-.chat-video {
-  width: min(360px, 64vw);
-  max-height: 260px;
-  border-radius: 10px;
-  background: #111827;
-}
-
-.media-name {
-  color: #64748b;
-  font-size: 12px;
-}
-
-.trade-card {
-  border: 1px solid #f5d08a;
-  background: #fffbeb;
-  border-radius: 12px;
-  padding: 10px;
-}
-
-.trade-card-confirmed {
-  border-color: #86efac;
-  background: #f0fdf4;
-}
-
-.trade-card-rejected {
-  border-color: #fecaca;
-  background: #fff1f2;
-}
-
-.trade-card-title {
-  font-weight: 700;
-  color: #92400e;
-  margin-bottom: 6px;
-}
-
-.trade-card-line {
-  color: #3f3f46;
-  font-size: 13px;
-  margin-bottom: 4px;
-}
-
-.trade-card-line.handled {
-  margin-top: 8px;
-  color: #94a3b8;
-}
-
 .message-time {
   margin-top: 8px;
   color: #94a3b8;
@@ -755,24 +762,6 @@ async function scrollToBottom() {
 .chat-composer {
   border-top: 1px solid #eef2f7;
   padding: 16px 18px 18px;
-}
-
-.hidden-file-input {
-  display: none;
-}
-
-.media-preview {
-  margin-bottom: 8px;
-  padding: 8px 10px;
-  border: 1px solid #dbeafe;
-  border-radius: 10px;
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: center;
-  background: #eff6ff;
-  color: #1d4ed8;
-  font-size: 13px;
 }
 
 .composer-actions {
@@ -790,6 +779,11 @@ async function scrollToBottom() {
 @media (max-width: 960px) {
   .chat-page {
     grid-template-columns: 1fr;
+  }
+
+  .trade-card {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .message-bubble {

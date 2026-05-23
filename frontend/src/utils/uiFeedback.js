@@ -1,9 +1,8 @@
 import { ElMessage, ElMessageBox } from "element-plus";
-import { standardizeError } from "@/utils/errorStandard";
 
 export const uiMessage = {
   success: (message) => ElMessage.success(message),
-  error: (message) => ElMessage.error(standardizeError(message)),
+  error: (message) => ElMessage.error(message),
   warning: (message) => ElMessage.warning(message)
 };
 

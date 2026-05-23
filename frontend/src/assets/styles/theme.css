@@ -1,10 +1,10 @@
 :root {
-    --bg-main: #f2f4f6;
-    --bg-grad: #f2f4f6;
-    --brand-orange: #ff4d00;
-    --brand-yellow: #ffe100;
-    --text-main: #20242d;
-    --line-soft: #eeeeee;
+    --bg-main: #f6f4ef;
+    --bg-grad: linear-gradient(135deg, #f7efe5 0, #edf7f3 42%, #f1f0fb 100%);
+    --brand-orange: #e99872;
+    --brand-yellow: #9fd8cb;
+    --text-main: #27323a;
+    --line-soft: #e5ddd2;
     --card-bg: #ffffff;
 }
 

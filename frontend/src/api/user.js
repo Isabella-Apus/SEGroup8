@@ -32,6 +32,10 @@ export function getBrowseHistoryApi() {
     return http.get("/user/browse-history");
 }
 
+export function recordBrowseHistoryApi(payload) {
+    return http.post("/user/browse-history", payload, { silent: true });
+}
+
 export function deleteBrowseHistoryApi(historyId) {
     return http.delete(`/user/browse-history/${historyId}`);
 }

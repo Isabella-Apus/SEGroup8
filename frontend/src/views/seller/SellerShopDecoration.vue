@@ -175,7 +175,6 @@ import { updateShopProfile } from '@/api/seller'
 import ComponentRenderer from './decoration/ComponentRenderer.vue'
 import PropEditor from './decoration/PropEditor.vue'
 import { COMPONENT_TEMPLATES, createComponent } from './decoration/componentConfig.js'
-import { toApiAssetUrl } from '@/utils/url'
 
 const userStore = useUserStore()
 const saving = ref(false)
@@ -258,7 +257,7 @@ async function loadData() {
     shopInfo.shopName = info.shopName || info.nickname || ''
     shopInfo.shopDesc = info.shopDesc || ''
     shopInfo.avatarUrl = info.avatar
-      ? toApiAssetUrl(info.avatar)
+      ? (info.avatar.startsWith('http') ? info.avatar : 'http://localhost:8080' + info.avatar)
       : ''
 
     const saved = localStorage.getItem('shop_decoration_v2')

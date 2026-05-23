@@ -2,8 +2,8 @@
   <div class="page-card">
     <div class="page-head">
       <div>
-        <h2 class="page-title">{{ pageTitle }}</h2>
-        <p class="page-subtitle">{{ pageSubtitle }}</p>
+        <h2 class="page-title">通知</h2>
+        <p class="page-subtitle">订单、物流、售后和店铺提醒都会出现在这里</p>
       </div>
       <el-button :disabled="!hasUnread" @click="markAllRead">全部标为已读</el-button>
     </div>
@@ -47,7 +47,6 @@
 
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import {
   listNotificationsApi,
@@ -58,16 +57,8 @@ import { onRealtimeEvent, startRealtimeClient } from "@/realtime/realtimeClient"
 
 const loading = ref(false);
 const notifications = ref([]);
-const route = useRoute();
 let unsubscribeRealtime = null;
 
-const notificationScope = computed(() => (route.path.startsWith("/merchant") ? "seller" : "buyer"));
-const pageTitle = computed(() => (notificationScope.value === "seller" ? "卖家通知" : "通知"));
-const pageSubtitle = computed(() =>
-  notificationScope.value === "seller"
-    ? "订单、发货、售后和店铺提醒会出现在这里"
-    : "购买、物流、售后和账号提醒会出现在这里",
-);
 const hasUnread = computed(() =>
   notifications.value.some((item) => Number(item.isRead) === 0),
 );
@@ -87,7 +78,7 @@ onUnmounted(() => {
 async function fetchNotifications() {
   loading.value = true;
   try {
-    const result = await listNotificationsApi(notificationScope.value);
+    const result = await listNotificationsApi();
     notifications.value = result.data || [];
   } finally {
     loading.value = false;
@@ -100,7 +91,7 @@ async function markRead(item) {
 }
 
 async function markAllRead() {
-  await markAllNotificationsReadApi(notificationScope.value);
+  await markAllNotificationsReadApi();
   notifications.value = notifications.value.map((item) => ({ ...item, isRead: 1 }));
   ElMessage.success("已全部标为已读");
 }
@@ -111,9 +102,6 @@ function handleRealtimeEvent(event) {
     return;
   }
   if (detail.eventType === "NOTIFICATION_CREATED" && detail.payload) {
-    if (!isCurrentScopeNotification(detail.payload)) {
-      return;
-    }
     prependNotification(detail.payload);
     return;
   }
@@ -125,28 +113,6 @@ function handleRealtimeEvent(event) {
   ) {
     fetchNotifications();
   }
-}
-
-function isCurrentScopeNotification(item) {
-  const itemScope = item?.scope || item?.notificationScope || item?.scene || inferNotificationScope(item);
-  return itemScope === notificationScope.value;
-}
-
-function inferNotificationScope(item) {
-  const text = `${item?.title || ""} ${item?.content || ""}`;
-  const sellerKeywords = [
-    "\u53d1\u8d27",
-    "\u5356\u5bb6",
-    "\u5e97\u94fa",
-    "\u5de5\u4f5c\u53f0",
-  ];
-  if (
-    sellerKeywords.some((keyword) => text.includes(keyword)) ||
-    (text.includes("\u5165\u9a7b") && text.includes("\u901a\u8fc7"))
-  ) {
-    return "seller";
-  }
-  return "buyer";
 }
 
 function prependNotification(item) {

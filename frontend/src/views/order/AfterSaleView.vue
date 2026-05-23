@@ -1,20 +1,30 @@
 <template>
-  <div class="page-card">
-    <h2 class="page-title">退款/售后</h2>
+  <div class="page-card aftersale-page">
+    <section class="aftersale-head">
+      <div>
+        <span class="eyebrow">{{ pageCopy.eyebrow }}</span>
+        <h2 class="page-title">{{ pageCopy.title }}</h2>
+        <p>{{ pageCopy.desc }}</p>
+      </div>
+      <div class="head-stats">
+        <strong>{{ total }}</strong>
+        <span>{{ pageCopy.statLabel }}</span>
+      </div>
+    </section>
 
-    <div class="toolbar">
+    <div class="toolbar aftersale-toolbar">
       <el-input
         v-model="query.keyword"
         placeholder="搜索订单号/商品名"
         clearable
-        style="max-width: 360px"
+        class="search-input"
         @keyup.enter="handleSearch"
       />
       <el-button type="primary" @click="handleSearch">搜索</el-button>
       <el-button @click="handleReset">重置</el-button>
     </div>
 
-    <el-tabs v-model="activeTab" @tab-change="handleTabChange">
+    <el-tabs v-model="activeTab" class="status-tabs" @tab-change="handleTabChange">
       <el-tab-pane label="全部售后" name="ALL" />
       <el-tab-pane label="退款中" name="REFUNDING" />
       <el-tab-pane label="已退款" name="REFUNDED" />
@@ -24,21 +34,23 @@
     <el-empty v-if="records.length === 0" description="暂无售后订单" />
 
     <div v-else class="order-list">
-      <el-card v-for="order in records" :key="order.id" shadow="hover" class="order-card" @click="goDetail(order.id)">
+      <article v-for="order in records" :key="order.id" class="order-card" @click="goDetail(order.id)">
         <div class="order-card__header">
-          <el-space>
-            <el-tag type="danger" size="small">{{ order.refundStatusName || '-' }}</el-tag>
-            <el-tag v-if="order.orderStatusName" size="small" type="info">{{ order.orderStatusName }}</el-tag>
-          </el-space>
-          <div class="meta">
+          <div class="status-cluster">
+            <span class="refund-badge" :class="`refund-${order.refundStatus || 0}`">
+              {{ order.refundStatusName || '-' }}
+            </span>
+            <el-tag v-if="order.orderStatusName" size="small" type="info" effect="plain">{{ order.orderStatusName }}</el-tag>
             <span class="no">订单号：{{ order.orderNo }}</span>
-            <span class="time">{{ formatTime(order.createTime) }}</span>
           </div>
+          <span class="time">{{ formatTime(order.createTime) }}</span>
         </div>
 
-        <div v-for="item in order.items || []" :key="item.id" class="order-item">
-          <div class="name">{{ item.productName }}</div>
-          <div class="price">￥{{ Number(item.price || 0).toFixed(2) }} × {{ item.quantity }}</div>
+        <div class="order-items">
+          <div v-for="item in order.items || []" :key="item.id" class="order-item">
+            <strong class="name">{{ item.productName }}</strong>
+            <div class="price">￥{{ Number(item.price || 0).toFixed(2) }} × {{ item.quantity }}</div>
+          </div>
         </div>
 
         <div class="order-extra" @click.stop>
@@ -83,12 +95,15 @@
         </div>
 
         <div class="order-card__footer" @click.stop>
-          <div class="amount">实付：<strong>￥{{ Number(order.totalAmount || 0).toFixed(2) }}</strong></div>
+          <div class="amount">
+            <span>实付</span>
+            <strong>￥{{ Number(order.totalAmount || 0).toFixed(2) }}</strong>
+          </div>
           <el-space>
             <el-button size="small" @click="goDetail(order.id)">查看详情</el-button>
           </el-space>
         </div>
-      </el-card>
+      </article>
     </div>
 
     <div class="pager-wrap">
@@ -114,12 +129,13 @@
 </template>
 
 <script setup>
-import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
-import { useRouter } from "vue-router";
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { getOrderListApi } from "@/api/order";
 import { onRealtimeEvent } from "@/realtime/realtimeClient";
-import { toApiAssetUrl } from "@/utils/url";
+import { toAssetUrl } from "@/utils/url";
 
+const route = useRoute();
 const router = useRouter();
 const total = ref(0);
 const records = ref([]);
@@ -128,13 +144,36 @@ const query = reactive({
   pageNum: 1,
   pageSize: 10,
   keyword: "",
-  refundStatus: undefined
+  refundStatus: undefined,
+  afterSaleOnly: 1,
+  orderType: "NEW"
 });
 
 const proofPreviewVisible = ref(false);
 const proofPreviewUrl = ref("");
+const afterSaleScope = computed(() => {
+  const scope = String(route.meta?.afterSaleScope || "").toUpperCase();
+  return scope === "SECONDHAND" ? "SECONDHAND" : "NEW";
+});
+const pageCopy = computed(() => {
+  if (afterSaleScope.value === "SECONDHAND") {
+    return {
+      eyebrow: "Secondhand After-sale",
+      title: "二手售后",
+      desc: "只跟进二手商城订单的退款、凭证和处理进度。",
+      statLabel: "二手售后订单",
+    };
+  }
+  return {
+    eyebrow: "New Goods After-sale",
+    title: "新品售后",
+    desc: "只处理新品商城订单的退款、退货和相关凭证。",
+    statLabel: "新品售后订单",
+  };
+});
 
 onMounted(() => {
+  syncAfterSaleScope();
   fetchList();
   unsubscribeRealtime = onRealtimeEvent(handleRealtimeEvent);
 });
@@ -142,6 +181,19 @@ onBeforeUnmount(() => {
   if (unsubscribeRealtime) unsubscribeRealtime();
 });
 let unsubscribeRealtime = null;
+
+watch(afterSaleScope, () => {
+  activeTab.value = "ALL";
+  query.keyword = "";
+  query.refundStatus = undefined;
+  query.pageNum = 1;
+  syncAfterSaleScope();
+  fetchList();
+});
+
+function syncAfterSaleScope() {
+  query.orderType = afterSaleScope.value;
+}
 
 async function fetchList() {
   const res = await getOrderListApi(query);
@@ -171,6 +223,7 @@ function handleReset() {
   query.keyword = "";
   activeTab.value = "ALL";
   query.refundStatus = undefined;
+  syncAfterSaleScope();
   query.pageNum = 1;
   fetchList();
 }
@@ -197,7 +250,7 @@ function formatTime(value) {
 
 function toFullImageUrl(url) {
   if (!url) return '';
-  return toApiAssetUrl(url);
+  return toAssetUrl(url);
 }
 
 function proofList(order) {
@@ -243,147 +296,331 @@ function handleRealtimeEvent(event) {
 </script>
 
 <style scoped>
-.toolbar {
+.aftersale-page {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.aftersale-head {
   display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: stretch;
+  margin-bottom: 18px;
+  border: 1px solid rgba(229, 221, 210, 0.92);
+  border-radius: 24px;
+  background:
+    linear-gradient(135deg, rgba(241, 240, 251, 0.92), rgba(247, 239, 229, 0.9) 55%, rgba(220, 239, 233, 0.92)),
+    #ffffff;
+  padding: 22px;
+  box-shadow: var(--shadow-soft);
+}
+
+.eyebrow {
+  display: inline-flex;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 5px 11px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--brand-primary);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.page-title {
+  margin: 10px 0 6px;
+  font-size: 30px;
+}
+
+.aftersale-head p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.head-stats {
+  min-width: 132px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  padding: 14px 16px;
+  text-align: right;
+  box-shadow: 0 10px 24px rgba(39, 50, 58, 0.08);
+}
+
+.head-stats strong {
+  display: block;
+  font-size: 32px;
+  line-height: 1;
+}
+
+.head-stats span {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.aftersale-toolbar {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto auto;
   gap: 10px;
   align-items: center;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
+  margin-bottom: 12px;
+  border-radius: 20px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: var(--shadow-soft);
+}
+
+.search-input {
+  width: 100%;
+}
+
+.status-tabs {
+  margin-bottom: 12px;
+}
+
+.status-tabs :deep(.el-tabs__nav-wrap::after) {
+  height: 1px;
+  background: rgba(101, 112, 108, 0.16);
+}
+
+.status-tabs :deep(.el-tabs__item) {
+  font-weight: 800;
+  color: var(--text-secondary);
+}
+
+.status-tabs :deep(.el-tabs__item.is-active) {
+  color: var(--brand-primary);
+}
+
+.status-tabs :deep(.el-tabs__active-bar) {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--brand-accent-strong);
 }
 
 .order-list {
   display: grid;
-  gap: 12px;
+  gap: 14px;
 }
 
 .order-card {
   cursor: pointer;
+  border: 1px solid rgba(229, 221, 210, 0.92);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.86);
+  padding: 18px;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(120, 196, 182, 0.55);
+  box-shadow: var(--shadow-float);
 }
 
 .order-card__header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+  gap: 14px;
+  align-items: flex-start;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(229, 221, 210, 0.72);
 }
 
-.meta {
+.status-cluster {
   display: flex;
-  gap: 12px;
-  color: #6b7280;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.refund-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border-radius: 999px;
+  padding: 0 11px;
+  background: #f7efe5;
+  border: 1px solid #ead5c4;
+  color: #8a4d2f;
   font-size: 12px;
+  font-weight: 900;
+}
+
+.refund-badge.refund-1 {
+  background: #fff5db;
+  border-color: #f2d48a;
+  color: #765206;
+}
+
+.refund-badge.refund-2 {
+  background: #e4f6ef;
+  border-color: #9fd8cb;
+  color: #146c53;
+}
+
+.refund-badge.refund-3 {
+  background: #fff0ef;
+  border-color: #f3b3aa;
+  color: #a63a35;
+}
+
+.no,
+.time {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.time {
+  white-space: nowrap;
+}
+
+.order-items {
+  display: grid;
+  padding: 6px 0;
 }
 
 .order-item {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 8px 0;
-  border-top: 1px dashed #e5e7eb;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  min-height: 46px;
+  border-bottom: 1px dashed rgba(101, 112, 108, 0.14);
 }
 
-.order-item:first-of-type {
-  border-top: 0;
-  padding-top: 0;
+.order-item:last-child {
+  border-bottom: 0;
+}
+
+.order-item .name {
+  color: var(--text-main);
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.order-item .price {
+  white-space: nowrap;
+  color: var(--text-main);
+  font-weight: 800;
 }
 
 .order-extra {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #f3f4f6;
-  color: #4b5563;
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  border-radius: 16px;
+  background: rgba(246, 244, 239, 0.72);
+  padding: 12px;
+  color: var(--text-secondary);
   font-size: 12px;
 }
 
 .order-extra .line {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
-  margin-top: 6px;
 }
 
 .order-extra .label {
-  color: #6b7280;
-}
-
-.order-card__footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid #e5e7eb;
+  color: var(--text-muted);
+  font-weight: 800;
 }
 
 .refund-timeline {
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: #fff7ed;
-  border: 1px solid #fed7aa;
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(247, 239, 229, 0.9), rgba(220, 239, 233, 0.56));
+  border: 1px solid rgba(229, 221, 210, 0.88);
 }
 
 .refund-timeline__title {
-  font-weight: 600;
-  color: #9a3412;
-  margin-bottom: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+  color: var(--text-main);
+  font-weight: 900;
 }
 
 .refund-timeline__summary {
-  margin-left: 8px;
-  font-weight: 400;
-  color: #b45309;
+  color: #8a5a22;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .refund-timeline__summary.reject {
-  color: #b91c1c;
+  color: #a63a35;
 }
 
 .refund-timeline__steps {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .refund-timeline__step {
-  display: flex;
-  gap: 8px;
-  align-items: center;
+  position: relative;
+  display: grid;
+  gap: 5px;
+  align-content: flex-start;
+  min-height: 72px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.62);
+  padding: 12px;
 }
 
 .refund-timeline__dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #e5e7eb;
-  flex: 0 0 auto;
+  background: #d8d2c7;
 }
 
 .refund-timeline__dot.done {
-  background: #f97316;
+  background: var(--brand-accent-strong);
 }
 
 .refund-timeline__dot.active {
-  background: #ef4444;
+  background: var(--brand-warm);
 }
 
 .refund-timeline__dot.todo {
-  background: #e5e7eb;
+  background: #d8d2c7;
 }
 
 .refund-timeline__label {
+  color: var(--text-main);
   font-size: 13px;
-  color: #9a3412;
+  font-weight: 900;
+}
+
+.refund-timeline__time {
+  color: var(--text-secondary);
+  font-size: 12px;
 }
 
 .proof-thumb {
   width: 62px;
   height: 62px;
-  border-radius: 8px;
-  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  border: 1px solid rgba(229, 221, 210, 0.92);
   cursor: pointer;
   overflow: hidden;
+  background: #ffffff;
 }
 
 .proof-preview-image {
@@ -391,19 +628,66 @@ function handleRealtimeEvent(event) {
   max-height: 560px;
 }
 
-.refund-timeline__time {
+.order-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(229, 221, 210, 0.72);
+}
+
+.amount span {
+  display: block;
+  color: var(--text-muted);
   font-size: 12px;
-  color: #b45309;
+  font-weight: 800;
 }
 
 .amount strong {
-  color: #ef4444;
+  color: var(--danger);
+  font-size: 20px;
 }
 
 .pager-wrap {
   margin-top: 16px;
   display: flex;
   justify-content: flex-end;
+}
+
+@media (max-width: 860px) {
+  .refund-timeline__steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .aftersale-head,
+  .order-card__header,
+  .order-card__footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .head-stats {
+    text-align: left;
+  }
+
+  .aftersale-toolbar,
+  .order-item,
+  .refund-timeline__steps {
+    grid-template-columns: 1fr;
+  }
+
+  .order-item {
+    gap: 4px;
+    padding: 9px 0;
+  }
+
+  .time {
+    white-space: normal;
+  }
 }
 </style>
 

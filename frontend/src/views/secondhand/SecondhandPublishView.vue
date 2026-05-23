@@ -1,103 +1,127 @@
 <template>
   <section class="publish-page">
-    <div class="hero">
+    <div class="publish-hero">
       <div>
+        <span class="eyebrow">Secondhand Studio</span>
         <h1>发布二手商品</h1>
+        <p>把闲置整理成清爽的商品卡片，更容易被买家看见。</p>
       </div>
-      <div class="hero-dot"></div>
+      <div class="hero-summary">
+        <span>预估展示价</span>
+        <strong>￥{{ Number(form.salePrice || 0).toFixed(2) }}</strong>
+        <small>{{ discountText }}</small>
+      </div>
     </div>
 
-    <div class="form-shell">
-      <el-form :model="form" label-width="96px">
-        <el-form-item label="商品名称">
-          <el-input v-model="form.name" placeholder="请输入商品名称" />
-        </el-form-item>
+    <div class="publish-grid">
+      <section class="form-shell">
+        <div class="panel-head">
+          <div>
+            <h2>商品信息</h2>
+            <p>标题、图片、价格和成色会同步到右侧预览。</p>
+          </div>
+          <span>{{ form.condition }}</span>
+        </div>
 
-        <el-form-item label="商品图片">
-          <el-space alignment="flex-start">
-            <el-upload
-              :show-file-list="false"
-              multiple
-              :disabled="!canUploadMore"
-              :http-request="uploadCover"
-              accept="image/*"
-            >
-              <el-button :loading="coverUploading">{{ canUploadMore ? '上传图片' : '最多 9 张' }}</el-button>
-            </el-upload>
-            <el-image v-if="form.cover" :src="toFullImageUrl(form.cover)" fit="cover" class="cover-preview" />
-          </el-space>
+        <el-form
+          ref="formRef"
+          :model="form"
+          :rules="rules"
+          label-position="top"
+          class="publish-form"
+        >
+          <div class="form-grid">
+            <el-form-item label="商品名称" prop="name">
+              <el-input v-model="form.name" maxlength="120" show-word-limit placeholder="例如：九成新办公椅" />
+            </el-form-item>
+            <el-form-item label="闲置分类" prop="category">
+              <el-select v-model="form.category" placeholder="请选择分类" style="width: 100%">
+                <el-option
+                  v-for="item in secondhandCategoryOptions"
+                  :key="item"
+                  :label="item"
+                  :value="item"
+                />
+              </el-select>
+            </el-form-item>
+          </div>
 
-          <draggable
-            v-if="form.images.length"
-            v-model="form.images"
-            class="image-list"
-            :item-key="imageKey"
-            handle=".drag-handle"
-            :animation="160"
-            @change="syncCover"
-          >
-            <template #item="{ element: url, index }">
-              <div class="image-item">
-                <el-image :src="toFullImageUrl(url)" fit="cover" class="image-thumb" />
-                <el-tag v-if="index === 0" class="cover-tag" size="small">封面</el-tag>
-                <div class="drag-handle" aria-label="调整图片顺序"></div>
-                <el-button class="image-remove" size="small" text type="danger" @click="removeImage(index)">
-                  删除
-                </el-button>
-              </div>
-            </template>
-          </draggable>
-        </el-form-item>
+          <div class="form-grid">
+            <el-form-item label="成色" prop="condition">
+              <el-segmented v-model="form.condition" :options="conditionOptions" />
+            </el-form-item>
+          </div>
 
-        <el-form-item label="原价">
-          <el-input-number v-model="form.originPrice" :min="1" :precision="2" :step="10" />
-        </el-form-item>
+          <div class="form-grid">
+            <el-form-item label="封面链接">
+              <el-input v-model="form.cover" placeholder="请输入图片 URL" />
+            </el-form-item>
+          </div>
 
-        <el-form-item label="售价">
-          <el-input-number v-model="form.salePrice" :min="1" :precision="2" :step="10" />
-        </el-form-item>
+          <div class="form-grid price-grid">
+            <el-form-item label="原价">
+              <el-input-number v-model="form.originPrice" :min="1" :precision="2" :step="10" />
+            </el-form-item>
+            <el-form-item label="售价" prop="salePrice">
+              <el-input-number v-model="form.salePrice" :min="1" :precision="2" :step="10" />
+            </el-form-item>
+          </div>
 
-        <el-form-item label="商品分类">
-          <el-cascader
-            v-model="form.categoryPath"
-            :options="SECONDHAND_CATEGORY_TREE"
-            :props="cascaderProps"
-            clearable
-            filterable
-            placeholder="先选择一级分类，再选择二级分类"
-            style="width: 320px"
-          />
-        </el-form-item>
+          <el-form-item label="商品描述">
+            <el-input
+              v-model="form.description"
+              type="textarea"
+              :rows="5"
+              maxlength="500"
+              show-word-limit
+              placeholder="写清楚使用情况、配件、瑕疵和交易方式"
+            />
+          </el-form-item>
 
-        <el-form-item label="成色">
-          <el-select v-model="form.condition" style="width: 180px">
-            <el-option label="全新" value="全新" />
-            <el-option label="99新" value="99新" />
-            <el-option label="9成新" value="9成新" />
-            <el-option label="8成新及以下" value="8成新及以下" />
-          </el-select>
-        </el-form-item>
+          <div class="action-bar">
+            <el-button type="primary" size="large" :loading="submitting" @click="submit">发布二手</el-button>
+            <el-button size="large" @click="reset">重置</el-button>
+            <el-button text @click="router.push('/secondhand')">返回列表</el-button>
+          </div>
+        </el-form>
+      </section>
 
-        <el-form-item label="可议价">
-          <el-switch
-            v-model="form.isNegotiable"
-            :active-value="1"
-            :inactive-value="0"
-            active-text="支持议价"
-            inactive-text="不议价"
-          />
-        </el-form-item>
+      <aside class="preview-shell">
+        <article class="preview-card">
+          <div class="preview-cover">
+            <img v-if="previewCover" :src="previewCover" :alt="previewName" />
+            <div v-else class="cover-placeholder">
+              <strong>KG</strong>
+              <span>封面预览</span>
+            </div>
+            <span class="condition-badge">{{ form.condition }}</span>
+          </div>
+          <div class="preview-body">
+            <div class="preview-tags">
+              <span>个人闲置</span>
+              <span>{{ form.category }}</span>
+              <span>可议价</span>
+            </div>
+            <h3>{{ previewName }}</h3>
+            <p>{{ previewDesc }}</p>
+            <div class="preview-price">
+              <strong>￥{{ Number(form.salePrice || 0).toFixed(2) }}</strong>
+              <span>原价 ￥{{ Number(form.originPrice || 0).toFixed(2) }}</span>
+            </div>
+          </div>
+        </article>
 
-        <el-form-item label="商品描述">
-          <el-input v-model="form.description" type="textarea" :rows="4" />
-        </el-form-item>
-
-        <el-form-item>
-          <el-button type="primary" :loading="submitting" @click="submit">发布二手</el-button>
-          <el-button @click="reset">重置</el-button>
-          <el-button text @click="$router.push('/secondhand')">返回二手市场</el-button>
-        </el-form-item>
-      </el-form>
+        <div class="publish-meter">
+          <div>
+            <span>价格差</span>
+            <strong>￥{{ priceGap }}</strong>
+          </div>
+          <div>
+            <span>展示完整度</span>
+            <strong>{{ completionScore }}%</strong>
+          </div>
+        </div>
+      </aside>
     </div>
   </section>
 </template>
@@ -105,220 +129,418 @@
 <script setup>
 import { computed, reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus';
-import draggable from 'vuedraggable';
+import { useRouter } from 'vue-router';
 import { publishSecondhandApi } from '@/api/secondhand';
-import { uploadImageApi } from '@/api/upload';
-import { SECONDHAND_CATEGORY_TREE } from '@/constants/categories';
-import { toApiAssetUrl } from '@/utils/url';
+import { ALL_CATEGORY, secondhandCategories } from '@/utils/categoryRules';
 
-const cascaderProps = {
-  emitPath: true,
-  checkStrictly: false,
-  value: 'value',
-  label: 'label',
-  children: 'children',
-};
-
+const router = useRouter();
+const formRef = ref();
 const form = reactive({
   name: '',
   cover: '',
-  images: [],
   originPrice: 100,
   salePrice: 80,
-  categoryPath: [],
-  condition: '9成新',
-  isNegotiable: 1,
-  description: '',
+  category: '宿舍生活',
+  condition: '90%',
+  description: ''
 });
 
 const submitting = ref(false);
-const coverUploading = ref(false);
-const canUploadMore = computed(() => form.images.length < 9);
+const conditionOptions = ['95%', '90%', '80%'];
+const secondhandCategoryOptions = secondhandCategories.filter((item) => item !== ALL_CATEGORY);
+
+const rules = {
+  name: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
+  category: [{ required: true, message: '请选择闲置分类', trigger: 'change' }],
+  salePrice: [{ required: true, message: '请输入售价', trigger: 'change' }],
+};
+
+const previewCover = computed(() => form.cover.trim());
+const previewName = computed(() => form.name.trim() || '你的闲置商品');
+const previewDesc = computed(() => form.description.trim() || '补充使用情况、配件和交易说明后，商品卡片会更完整。');
+const priceGap = computed(() => Math.max(0, Number(form.originPrice || 0) - Number(form.salePrice || 0)).toFixed(2));
+const discountText = computed(() => {
+  const origin = Number(form.originPrice || 0);
+  const sale = Number(form.salePrice || 0);
+  if (!origin || !sale) {
+    return '等待定价';
+  }
+  return `${Math.max(1, Math.round((sale / origin) * 100))}% 原价`;
+});
+
+const completionScore = computed(() => {
+  const checks = [
+    form.name.trim(),
+    form.cover.trim(),
+    Number(form.salePrice || 0) > 0,
+    form.category,
+    form.condition,
+    form.description.trim(),
+  ];
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+});
 
 async function submit() {
+  await formRef.value.validate();
   submitting.value = true;
   try {
-    const [categoryId, subCategoryId] = form.categoryPath || [];
-    if (!categoryId || !subCategoryId) {
-      ElMessage.warning('请先选择一级与二级分类');
-      return;
-    }
     await publishSecondhandApi({
       name: form.name,
-      cover: form.images[0] || form.cover,
-      images: form.images,
+      cover: form.cover,
       description: form.description,
       originPrice: form.originPrice,
       salePrice: form.salePrice,
-      categoryId,
-      subCategoryId,
+      categoryName: form.category,
+      category: form.category,
       conditionLevel: form.condition,
-      isNegotiable: form.isNegotiable,
+      isNegotiable: 1,
     });
     ElMessage.success('二手商品发布成功');
     reset();
+    router.push('/secondhand');
+  } catch {
+    // API layer already shows the backend message; keep the form state for retry.
   } finally {
     submitting.value = false;
-  }
-}
-
-async function uploadCover(option) {
-  if (!canUploadMore.value) {
-    ElMessage.warning('商品图片最多上传 9 张');
-    option.onError?.(new Error('image limit exceeded'));
-    return;
-  }
-  coverUploading.value = true;
-  try {
-    const result = await uploadImageApi(option.file);
-    const url = result.data?.url || result.data || '';
-    if (url && !form.images.includes(url)) {
-      form.images.push(url);
-    }
-    syncCover();
-    option.onSuccess?.(result);
-  } catch (error) {
-    ElMessage.error(error?.response?.data?.message || '图片上传失败');
-    option.onError?.(error);
-  } finally {
-    coverUploading.value = false;
   }
 }
 
 function reset() {
   form.name = '';
   form.cover = '';
-  form.images = [];
   form.originPrice = 100;
   form.salePrice = 80;
-  form.categoryPath = [];
-  form.condition = '9成新';
-  form.isNegotiable = 1;
+  form.category = '宿舍生活';
+  form.condition = '90%';
   form.description = '';
-}
-
-function removeImage(index) {
-  form.images.splice(index, 1);
-  syncCover();
-}
-
-function syncCover() {
-  form.cover = form.images[0] || '';
-}
-
-function imageKey(url) {
-  return url;
-}
-
-function toFullImageUrl(url) {
-  return url ? toApiAssetUrl(url) : '';
 }
 </script>
 
 <style scoped>
 .publish-page {
-  padding: 8px 10px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.hero {
-  border-radius: 22px;
-  padding: 20px;
+.publish-hero {
+  min-height: 188px;
+  border: 1px solid rgba(53, 216, 171, 0.24);
+  border-radius: 12px;
+  padding: 24px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  color: #fff;
-  margin-bottom: 14px;
-  background: linear-gradient(120deg, #ff6f2f, #ff9822);
+  align-items: flex-end;
+  color: var(--text-main);
+  gap: 18px;
+  background:
+    linear-gradient(120deg, rgba(233, 255, 248, 0.94), rgba(234, 244, 255, 0.86), rgba(255, 247, 251, 0.72)),
+    url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1400&q=80");
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
 }
 
-.hero h1 {
+.eyebrow {
+  display: inline-flex;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-main);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.publish-hero h1 {
+  margin: 12px 0 8px;
+  font-size: clamp(32px, 5vw, 48px);
+  line-height: 1;
+}
+
+.publish-hero p {
   margin: 0;
-  font-size: 30px;
+  max-width: 560px;
+  color: var(--text-secondary);
+  font-weight: 800;
+  line-height: 1.7;
 }
 
-.hero-dot {
-  width: 86px;
-  height: 86px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 25% 25%, #fff5, #fff1 60%, transparent 70%);
+.hero-summary {
+  min-width: 190px;
+  border: 1px solid rgba(137, 199, 255, 0.45);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 14px;
+  text-align: right;
+  backdrop-filter: blur(10px);
+}
+
+.hero-summary span,
+.hero-summary strong,
+.hero-summary small {
+  display: block;
+}
+
+.hero-summary span,
+.hero-summary small {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.hero-summary strong {
+  margin: 5px 0;
+  color: var(--brand-primary);
+  font-size: 28px;
+}
+
+.publish-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 14px;
+  align-items: start;
 }
 
 .form-shell {
-  background: #fff;
   border: 1px solid var(--line-soft);
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 18px;
+  box-shadow: var(--shadow-soft);
 }
 
-.cover-preview {
-  width: 96px;
-  height: 96px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+.panel-head {
+  margin-bottom: 18px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
 }
 
-.image-list {
-  margin-top: 10px;
+.panel-head h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.panel-head p {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+}
+
+.panel-head span {
+  border-radius: 999px;
+  background: var(--brand-mint-weak);
+  color: var(--brand-accent-strong);
+  padding: 6px 10px;
+  font-weight: 900;
+}
+
+.publish-form :deep(.el-segmented) {
+  --el-segmented-item-selected-color: #073949;
+  --el-segmented-item-selected-bg-color: #a4f4e0;
+  width: 100%;
+}
+
+.publish-form :deep(.el-input-number) {
+  width: 100%;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 240px;
+  gap: 14px;
+}
+
+.price-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.action-bar {
+  border-top: 1px solid var(--line-soft);
+  padding-top: 16px;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
 }
 
-.image-item {
+.preview-shell {
+  position: sticky;
+  top: 166px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.preview-card,
+.publish-meter {
+  border: 1px solid rgba(60, 146, 255, 0.2);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+}
+
+.preview-cover {
   position: relative;
-  width: 72px;
-  height: 72px;
+  aspect-ratio: 1 / 1;
+  background: linear-gradient(135deg, #e9fff8, #eaf4ff);
 }
 
-.image-thumb {
-  width: 72px;
-  height: 72px;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
+.preview-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
-.cover-tag {
+.cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  color: var(--brand-primary);
+}
+
+.cover-placeholder strong {
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
+  background: var(--brand-gradient);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.cover-placeholder span {
+  color: var(--text-secondary);
+  font-weight: 900;
+}
+
+.condition-badge {
   position: absolute;
-  left: 2px;
-  top: 2px;
-  z-index: 2;
-}
-
-.drag-handle {
-  position: absolute;
-  inset: 0;
-  cursor: move;
-  user-select: none;
-  z-index: 1;
-}
-
-.image-remove {
-  position: absolute;
-  right: 2px;
-  bottom: 2px;
-  padding: 2px 4px;
-  background: rgba(255, 255, 255, 0.9);
-  z-index: 2;
-}
-
-.tip {
-  margin-top: 6px;
-  color: #909399;
+  left: 12px;
+  top: 12px;
+  border-radius: 999px;
+  background: rgba(53, 216, 171, 0.92);
+  color: #073949;
+  padding: 5px 10px;
   font-size: 12px;
+  font-weight: 900;
+}
+
+.preview-body {
+  padding: 14px;
+}
+
+.preview-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.preview-tags span {
+  border: 1px solid rgba(53, 216, 171, 0.32);
+  border-radius: 999px;
+  background: var(--brand-mint-weak);
+  color: var(--brand-accent-strong);
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.preview-body h3 {
+  margin: 12px 0 8px;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.preview-body p {
+  min-height: 44px;
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.preview-price {
+  margin-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.preview-price strong {
+  color: var(--brand-primary);
+  font-size: 24px;
+}
+
+.preview-price span {
+  color: var(--text-muted);
+  font-size: 12px;
+  text-decoration: line-through;
+}
+
+.publish-meter {
+  padding: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.publish-meter div {
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(233, 255, 248, 0.9), rgba(234, 244, 255, 0.9));
+  padding: 12px;
+}
+
+.publish-meter span,
+.publish-meter strong {
+  display: block;
+}
+
+.publish-meter span {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.publish-meter strong {
+  margin-top: 6px;
+  color: var(--text-main);
+  font-size: 20px;
 }
 
 @media (max-width: 760px) {
-  .publish-page {
-    padding: 6px;
+  .publish-hero,
+  .panel-head {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  .hero {
-    padding: 14px;
-    border-radius: 16px;
+  .hero-summary {
+    text-align: left;
   }
 
-  .hero h1 {
-    font-size: 24px;
+  .publish-grid,
+  .form-grid,
+  .price-grid,
+  .publish-meter {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-shell {
+    position: static;
   }
 }
 </style>

@@ -156,7 +156,6 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { deleteBrowseHistoryBatchApi, getBrowseHistoryApi } from "@/api/user";
 import { searchBrowseHistory } from "@/utils/search";
 import { useRouter } from "vue-router";
-import { toApiAssetUrl } from "@/utils/url";
 
 const router = useRouter();
 const loading = ref(false);
@@ -348,6 +347,10 @@ async function loadBrowseHistory() {
     query.pageNum = 1;
     query.keyword = "";
     manageMode.value = false;
+  } catch {
+    allHistory.value = [];
+    selectedIds.value = [];
+    manageMode.value = false;
   } finally {
     loading.value = false;
   }
@@ -456,7 +459,11 @@ function toFullImageUrl(url) {
   if (!url) {
     return "";
   }
-  return toApiAssetUrl(url);
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    return url;
+  }
+  const normalized = url.startsWith("/") ? url : `/${url}`;
+  return `http://localhost:8080${normalized}`;
 }
 
 function onCheckOne(id, checked) {

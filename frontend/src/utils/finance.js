@@ -4,6 +4,9 @@ const TRADE_TYPE_LABELS = {
     EXPENSE_PURCHASE: "消费支出",
     RECHARGE: "钱包充值",
     REFUND_BACKFLOW: "退款回流",
+    ORDER_INCOME: "订单收入",
+    ORDER_REFUND: "订单退款",
+    WITHDRAW: "提现",
     UNKNOWN: "未知类型",
 };
 

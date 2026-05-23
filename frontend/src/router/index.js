@@ -30,6 +30,23 @@ const routes = [
                 component: () => import("@/views/product/ProductListView.vue"),
             },
             {
+                path: "product/coupons",
+                name: "productCoupons",
+                component: () => import("@/views/user/CouponCenterView.vue"),
+                meta: { couponScope: "NEW" },
+            },
+            {
+                path: "product/after-sale",
+                name: "productAfterSale",
+                component: () => import("@/views/order/AfterSaleView.vue"),
+                meta: { afterSaleScope: "NEW" },
+            },
+            {
+                path: "product/merchant-apply",
+                name: "productMerchantApply",
+                component: () => import("@/views/user/MerchantApplyView.vue"),
+            },
+            {
                 path: "product/:id",
                 name: "productDetail",
                 component: () =>
@@ -44,6 +61,7 @@ const routes = [
                 path: "order",
                 name: "order",
                 component: () => import("@/views/order/OrderView.vue"),
+                meta: { orderScope: "NEW" },
             },
             {
                 path: "order/:id",
@@ -54,33 +72,43 @@ const routes = [
             {
                 path: "secondhand",
                 name: "secondhandList",
-                beforeEnter: (to) => {
-                    if (to.query.tab === "publish") {
-                        return { name: "secondhandPublish" };
-                    }
-                    return true;
-                },
                 component: () =>
                     import("@/views/secondhand/SecondhandListView.vue"),
             },
             {
+                path: "secondhand/cart",
+                name: "secondhandCart",
+                component: () =>
+                    import("@/views/secondhand/SecondhandCartView.vue"),
+            },
+            {
                 path: "secondhand/orders",
                 name: "secondhandOrders",
-                redirect: "/secondhand?tab=boughtOrders",
+                component: () => import("@/views/secondhand/SecondhandOrdersView.vue"),
+                meta: { orderScope: "SECONDHAND" },
             },
             {
                 path: "secondhand/orders/:id",
-                name: "secondhandBuyerOrderDetail",
-                component: () =>
-                    import("@/views/secondhand/SecondhandOrderDetailView.vue"),
-                meta: { detailMode: "buyer" },
+                name: "secondhandOrderDetail",
+                component: () => import("@/views/secondhand/SecondhandOrderDetailView.vue"),
+                meta: { detailMode: "buyer", orderScope: "SECONDHAND" },
             },
             {
-                path: "secondhand/sold-orders/:id",
-                name: "secondhandSellerOrderDetail",
-                component: () =>
-                    import("@/views/secondhand/SecondhandOrderDetailView.vue"),
-                meta: { detailMode: "seller" },
+                path: "secondhand/coupons",
+                name: "secondhandCoupons",
+                component: () => import("@/views/user/CouponCenterView.vue"),
+                meta: { couponScope: "SECONDHAND" },
+            },
+            {
+                path: "secondhand/after-sale",
+                name: "secondhandAfterSale",
+                component: () => import("@/views/order/AfterSaleView.vue"),
+                meta: { afterSaleScope: "SECONDHAND" },
+            },
+            {
+                path: "secondhand/mine",
+                name: "secondhandMine",
+                component: () => import("@/views/merchant/MerchantSecondhandProductsView.vue"),
             },
             {
                 path: "secondhand/publish",
@@ -115,19 +143,17 @@ const routes = [
                 component: () => import("@/views/user/BrowseHistoryView.vue"),
             },
             {
-                path: "vouchers",
-                name: "voucherCenter",
-                component: () => import("@/views/voucher/MyVoucherView.vue"),
+                path: "coupons",
+                redirect: "/product/coupons",
             },
             {
-                path: "vouchers/claim",
-                name: "voucherClaim",
-                component: () => import("@/views/voucher/VoucherClaimView.vue"),
+                path: "faq",
+                name: "faq",
+                component: () => import("@/views/user/FaqView.vue"),
             },
             {
                 path: "after-sale",
-                name: "afterSale",
-                component: () => import("@/views/order/AfterSaleView.vue"),
+                redirect: "/product/after-sale",
             },
             {
                 path: "credit",
@@ -145,21 +171,15 @@ const routes = [
                 component: () => import("@/views/notification/NotificationView.vue"),
             },
             {
-                path: "faq",
-                name: "faq",
-                component: () => import("@/views/user/FaqView.vue"),
-            },
-            {
                 path: "merchant-apply",
-                name: "merchantApply",
-                component: () => import("@/views/user/MerchantApplyView.vue"),
+                redirect: "/product/merchant-apply",
             },
         ],
     },
     {
         path: "/merchant",
         component: () => import("@/layout/MerchantLayout.vue"),
-        meta: { roles: ["OFFICIAL_SELLER", "SELLER"] },
+        meta: { roles: ["OFFICIAL_SELLER"] },
         children: [
             {
                 path: "",
@@ -215,10 +235,10 @@ const routes = [
             {
                 path: "secondhand-products",
                 name: "merchantSecondhandProducts",
-                component: () =>
-                    import("@/views/merchant/MerchantSecondhandProductsView.vue"),
+                component: () => import("@/views/merchant/MerchantSecondhandProductsView.vue"),
             },
-            {                path: "seller-products/edit/:id?",
+            {
+                path: "seller-products/edit/:id?",
                 name: "sellerProductEdit",
                 component: () => import("@/views/seller/SellerProductEdit.vue"),
             },
@@ -281,11 +301,6 @@ const routes = [
                 name: "adminOrders",
                 component: () =>
                     import("@/views/admin/AdminOrderManageView.vue"),
-            },
-            {
-                path: "vouchers",
-                name: "adminVouchers",
-                component: () => import("@/views/admin/AdminVoucherView.vue"),
             },
             {
                 path: "reports",

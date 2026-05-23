@@ -1,33 +1,29 @@
 <template>
-  <section class="cart-page">
+  <section class="cart-page secondhand-cart">
     <div class="cart-hero">
       <div>
-        <span class="eyebrow">New Goods Cart</span>
-        <h1>新品购物车</h1>
-        <p>这里仅结算新品商城商品；二手商品请到二手购物车处理。</p>
+        <span class="eyebrow">Secondhand Cart</span>
+        <h1>二手购物车</h1>
+        <p>二手商品通常一件一单，先收藏到车里，再统一确认要买哪些。</p>
       </div>
       <div class="hero-total">
         <span>已选合计</span>
         <strong>￥{{ selectedTotalAmount }}</strong>
-        <small>{{ selectedItems.length }} / {{ items.length }} 件商品</small>
+        <small>{{ selectedItems.length }} / {{ items.length }} 件闲置</small>
       </div>
     </div>
 
-    <el-empty v-if="items.length === 0" class="empty-cart" description="新品购物车暂无商品">
-      <el-button type="primary" @click="router.push('/product')">去逛新品商城</el-button>
+    <el-empty v-if="items.length === 0" class="empty-cart" description="二手购物车暂无商品">
+      <el-button type="primary" @click="router.push('/secondhand')">去逛二手商城</el-button>
     </el-empty>
 
     <div v-else class="cart-layout">
       <section class="cart-list-panel">
         <div class="list-toolbar">
-          <el-checkbox
-            :model-value="allSelected"
-            :indeterminate="isIndeterminate"
-            @change="toggleAll"
-          >
+          <el-checkbox :model-value="allSelected" :indeterminate="isIndeterminate" @change="toggleAll">
             全选
           </el-checkbox>
-          <span>{{ items.length }} 件商品</span>
+          <span>{{ items.length }} 件闲置</span>
           <el-button text type="danger" @click="clear">清空</el-button>
         </div>
 
@@ -37,44 +33,29 @@
           class="cart-item"
           :class="{ selected: isSelected(item) }"
         >
-          <el-checkbox
-            class="item-check"
-            :model-value="isSelected(item)"
-            @change="(checked) => toggleItem(item, checked)"
-          />
-
+          <el-checkbox class="item-check" :model-value="isSelected(item)" @change="(checked) => toggleItem(item, checked)" />
           <img class="item-cover" :src="toAssetUrl(item.cover) || fallbackCover" :alt="item.name" />
 
           <div class="item-info">
-            <button type="button" class="item-name" @click="router.push(`/product/${item.productId}`)">
+            <button type="button" class="item-name" @click="router.push(`/secondhand/${item.productId}`)">
               {{ item.name }}
             </button>
             <div class="item-tags">
-              <span>官方商品</span>
-              <span>售后无忧</span>
-              <span>库存同步</span>
+              <span>{{ item.conditionLevel || "成色良好" }}</span>
+              <span>{{ item.sellerName || "个人卖家" }}</span>
+              <span>可沟通</span>
             </div>
           </div>
 
           <div class="item-price">
-            <span>单价</span>
+            <span>闲置价</span>
             <strong>￥{{ Number(item.price || 0).toFixed(2) }}</strong>
-          </div>
-
-          <div class="item-quantity">
-            <span>数量</span>
-            <el-input-number
-              v-model="item.quantity"
-              :min="1"
-              :max="999"
-              size="small"
-              @change="handleQtyChange(item)"
-            />
+            <small v-if="item.originPrice">原价 ￥{{ Number(item.originPrice || 0).toFixed(2) }}</small>
           </div>
 
           <div class="item-subtotal">
-            <span>小计</span>
-            <strong>￥{{ subtotal(item) }}</strong>
+            <span>交易方式</span>
+            <strong>一件一单</strong>
             <button type="button" @click="remove(item)">移除</button>
           </div>
         </article>
@@ -82,39 +63,34 @@
 
       <aside class="checkout-panel">
         <div class="checkout-card">
-          <span class="checkout-kicker">Checkout</span>
-          <h2>结算</h2>
+          <span class="checkout-kicker">Secondhand Checkout</span>
+          <h2>二手结算</h2>
           <dl>
             <div>
-              <dt>已选商品</dt>
+              <dt>已选闲置</dt>
               <dd>{{ selectedItems.length }} 件</dd>
             </div>
             <div>
-              <dt>商品金额</dt>
+              <dt>预估金额</dt>
               <dd>￥{{ selectedTotalAmount }}</dd>
             </div>
             <div>
-              <dt>服务保障</dt>
-              <dd>已包含</dd>
+              <dt>订单规则</dt>
+              <dd>每件生成独立二手订单</dd>
             </div>
           </dl>
           <div class="coupon-note">
-            <strong>平台交易保障</strong>
-            <span>下单前会确认收货地址，订单状态可在订单页查看。</span>
+            <strong>二手交易提醒</strong>
+            <span>付款前可以先和卖家聊一聊；确认购买后，可在二手订单里查看状态。</span>
           </div>
           <div class="payable">
             <span>应付合计</span>
             <strong>￥{{ selectedTotalAmount }}</strong>
           </div>
-          <el-button
-            type="primary"
-            size="large"
-            :disabled="selectedItems.length === 0"
-            @click="checkout"
-          >
-            结算选中商品
+          <el-button type="primary" size="large" :disabled="selectedItems.length === 0" @click="checkout">
+            购买选中闲置
           </el-button>
-          <el-button size="large" @click="router.push('/product')">继续逛新品</el-button>
+          <el-button size="large" @click="router.push('/secondhand')">继续逛二手</el-button>
         </div>
       </aside>
     </div>
@@ -122,78 +98,62 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
-import { useRouter } from 'vue-router';
-import { createOrderApi } from '@/api/order';
-import { getProductDetailApi } from '@/api/product';
-import { listAddressesApi } from '@/api/user';
-import { clearCart, getCartItems, removeFromCart, saveCartItems } from '@/utils/cart';
-import { toAssetUrl } from '@/utils/url';
+import { computed, onMounted, ref } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { useRouter } from "vue-router";
+import { buySecondhandApi, getSecondhandDetailApi } from "@/api/secondhand";
+import { listAddressesApi } from "@/api/user";
+import {
+  clearSecondhandCart,
+  getSecondhandCartItems,
+  removeSecondhandFromCart,
+  saveSecondhandCartItems,
+} from "@/utils/secondhandCart";
+import { toAssetUrl } from "@/utils/url";
 
 const router = useRouter();
 const items = ref([]);
 const selectedItems = ref([]);
-const fallbackCover = 'https://images.unsplash.com/photo-1511556820780-d912e42b4980?auto=format&fit=crop&w=900&q=80';
+const fallbackCover = "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=900&q=80";
 
-const selectedTotalAmount = computed(() => {
-  return selectedItems.value
-    .reduce((sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0), 0)
-    .toFixed(2);
-});
-
+const selectedTotalAmount = computed(() => selectedItems.value
+  .reduce((sum, item) => sum + Number(item.price || 0), 0)
+  .toFixed(2));
 const allSelected = computed(() => items.value.length > 0 && selectedItems.value.length === items.value.length);
-
 const isIndeterminate = computed(() => selectedItems.value.length > 0 && selectedItems.value.length < items.value.length);
 
-onMounted(async () => {
-  await refreshCartItems();
-});
+onMounted(refreshCartItems);
 
 async function refreshCartItems() {
-  const rawItems = getCartItems();
-  const checks = await Promise.allSettled(
-    rawItems.map((item) => getProductDetailApi(item.productId))
-  );
-  const validItems = rawItems.filter((_, index) => checks[index].status === 'fulfilled');
+  const rawItems = getSecondhandCartItems();
+  const checks = await Promise.allSettled(rawItems.map((item) => getSecondhandDetailApi(item.productId)));
+  const validItems = rawItems.filter((_, index) => checks[index].status === "fulfilled");
   items.value = validItems;
   selectedItems.value = [];
-  saveCartItems(validItems);
-}
-
-function handleQtyChange() {
-  saveCartItems(items.value);
+  saveSecondhandCartItems(validItems);
 }
 
 function isSelected(row) {
-  return selectedItems.value.some((item) => item.productId === row.productId);
+  return selectedItems.value.some((item) => Number(item.productId) === Number(row.productId));
 }
 
 function toggleItem(row, checked) {
-  if (checked) {
-    if (!isSelected(row)) {
-      selectedItems.value = selectedItems.value.concat(row);
-    }
-    return;
-  }
-  selectedItems.value = selectedItems.value.filter((item) => item.productId !== row.productId);
+  selectedItems.value = checked
+    ? (isSelected(row) ? selectedItems.value : selectedItems.value.concat(row))
+    : selectedItems.value.filter((item) => Number(item.productId) !== Number(row.productId));
 }
 
 function toggleAll(checked) {
   selectedItems.value = checked ? [...items.value] : [];
 }
 
-function subtotal(item) {
-  return (Number(item.price || 0) * Number(item.quantity || 0)).toFixed(2);
-}
-
 function remove(row) {
-  items.value = removeFromCart(row.productId);
-  selectedItems.value = selectedItems.value.filter((item) => item.productId !== row.productId);
+  items.value = removeSecondhandFromCart(row.productId);
+  selectedItems.value = selectedItems.value.filter((item) => Number(item.productId) !== Number(row.productId));
 }
 
 function clear() {
-  clearCart();
+  clearSecondhandCart();
   items.value = [];
   selectedItems.value = [];
 }
@@ -201,70 +161,52 @@ function clear() {
 async function checkout() {
   const toCheckout = [...selectedItems.value];
   if (!toCheckout.length) {
-    ElMessage.warning('请先选择要结算的商品');
-    return;
-  }
-  const checks = await Promise.allSettled(
-    toCheckout.map((item) => getProductDetailApi(item.productId))
-  );
-  const validCheckoutItems = toCheckout.filter((_, index) => checks[index].status === 'fulfilled');
-  if (!validCheckoutItems.length) {
-    ElMessage.warning('选中商品已失效，请重新选择');
-    await refreshCartItems();
+    ElMessage.warning("请先选择要购买的二手商品");
     return;
   }
   const selectedAddressId = await confirmAddressAndPickId();
   if (!selectedAddressId) {
     return;
   }
-
-  try {
-    const result = await createOrderApi({
-      addressId: selectedAddressId,
-      items: validCheckoutItems.map((item) => ({
-        productId: item.productId,
-        quantity: Number(item.quantity || 0)
-      }))
-    });
-    const checkoutIds = new Set(validCheckoutItems.map((item) => item.productId));
-    const remain = items.value.filter((item) => !checkoutIds.has(item.productId));
-    saveCartItems(remain);
-    items.value = remain;
-    selectedItems.value = [];
-    ElMessage.success('下单成功');
-    const orderId = result?.data?.id;
-    if (orderId) {
-      router.push({ path: `/order/${orderId}`, query: { action: 'pay' } });
-      return;
-    }
-    router.push('/order');
-  } catch {
-    await refreshCartItems();
+  const results = [];
+  for (const item of toCheckout) {
+    results.push(await buySecondhandApi(item.productId, { addressId: selectedAddressId }).then(
+      (res) => ({ ok: true, item, res }),
+      () => ({ ok: false, item }),
+    ));
   }
+  const successIds = new Set(results.filter((result) => result.ok).map((result) => Number(result.item.productId)));
+  const remain = items.value.filter((item) => !successIds.has(Number(item.productId)));
+  saveSecondhandCartItems(remain);
+  items.value = remain;
+  selectedItems.value = [];
+  if (successIds.size) {
+    ElMessage.success(`已生成 ${successIds.size} 个二手订单`);
+    router.push("/secondhand/orders");
+    return;
+  }
+  await refreshCartItems();
 }
 
 async function confirmAddressAndPickId() {
   const result = await listAddressesApi();
   const addresses = result?.data || [];
   if (!addresses.length) {
-    ElMessage.warning('请先新增收货地址后再下单');
-    router.push({ name: 'addressManager' });
+    ElMessage.warning("请先新增收货地址后再下单");
+    router.push({ name: "addressManager" });
     return null;
   }
   const preferred = addresses.find((a) => Number(a.isDefault) === 1) || addresses[0];
   const summary = `${preferred.receiverName} ${preferred.receiverPhone}\n${preferred.province}${preferred.city}${preferred.detailAddress}`;
-  const confirmed = await ElMessageBox.confirm(`请确认本次收货地址：\n${summary}`, '确认收货地址', {
-    confirmButtonText: '确认下单',
-    cancelButtonText: '去改地址',
-    type: 'warning'
+  const confirmed = await ElMessageBox.confirm(`请确认本次收货地址：\n${summary}`, "确认收货地址", {
+    confirmButtonText: "确认购买",
+    cancelButtonText: "去改地址",
+    type: "warning",
   }).then(() => true).catch(() => {
-    router.push({ name: 'addressManager' });
+    router.push({ name: "addressManager" });
     return false;
   });
-  if (!confirmed) {
-    return null;
-  }
-  return preferred.id;
+  return confirmed ? preferred.id : null;
 }
 </script>
 
@@ -277,11 +219,11 @@ async function confirmAddressAndPickId() {
 
 .cart-hero {
   min-height: 170px;
-  border: 1px solid rgba(60, 146, 255, 0.22);
+  border: 1px solid rgba(53, 216, 171, 0.24);
   border-radius: 12px;
   background:
     linear-gradient(120deg, rgba(233, 255, 248, 0.94), rgba(234, 244, 255, 0.86), rgba(255, 247, 251, 0.74)),
-    url("https://images.unsplash.com/photo-1607082349566-187342175e2f?auto=format&fit=crop&w=1400&q=80");
+    url("https://images.unsplash.com/photo-1526178613552-2b45c6c302f0?auto=format&fit=crop&w=1400&q=80");
   background-size: cover;
   background-position: center;
   color: var(--text-main);
@@ -309,7 +251,8 @@ async function confirmAddressAndPickId() {
   line-height: 1;
 }
 
-.cart-hero p {
+.cart-hero p,
+.list-toolbar span {
   margin: 0;
   color: var(--text-secondary);
   font-weight: 800;
@@ -340,7 +283,7 @@ async function confirmAddressAndPickId() {
 
 .hero-total strong {
   margin: 5px 0;
-  color: var(--brand-primary);
+  color: var(--brand-accent-strong);
   font-size: 28px;
 }
 
@@ -364,21 +307,21 @@ async function confirmAddressAndPickId() {
   gap: 10px;
 }
 
-.list-toolbar {
-  min-height: 52px;
+.list-toolbar,
+.cart-item,
+.checkout-card {
   border: 1px solid var(--line-soft);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow-soft);
+}
+
+.list-toolbar {
+  min-height: 52px;
   padding: 0 14px;
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: var(--shadow-soft);
-}
-
-.list-toolbar span {
-  color: var(--text-secondary);
-  font-weight: 800;
 }
 
 .list-toolbar .el-button {
@@ -386,30 +329,17 @@ async function confirmAddressAndPickId() {
 }
 
 .cart-item {
-  border: 1px solid var(--line-soft);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.92);
   padding: 14px;
   display: grid;
-  grid-template-columns: auto 88px minmax(0, 1fr) 110px 150px 118px;
+  grid-template-columns: auto 88px minmax(0, 1fr) 130px 118px;
   gap: 14px;
   align-items: center;
-  box-shadow: var(--shadow-soft);
-  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
 
 .cart-item.selected,
 .cart-item:hover {
-  border-color: rgba(60, 146, 255, 0.35);
+  border-color: rgba(53, 216, 171, 0.38);
   box-shadow: var(--shadow-float);
-}
-
-.cart-item:hover {
-  transform: translateY(-1px);
-}
-
-.item-check {
-  width: 22px;
 }
 
 .item-cover {
@@ -417,15 +347,9 @@ async function confirmAddressAndPickId() {
   height: 88px;
   border-radius: 12px;
   object-fit: cover;
-  background: var(--surface-soft);
-}
-
-.item-info {
-  min-width: 0;
 }
 
 .item-name {
-  max-width: 100%;
   border: 0;
   background: transparent;
   padding: 0;
@@ -435,21 +359,12 @@ async function confirmAddressAndPickId() {
   line-height: 1.45;
   text-align: left;
   cursor: pointer;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.item-name:hover {
-  color: var(--brand-primary);
 }
 
 .item-tags {
   margin-top: 10px;
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   gap: 6px;
 }
 
@@ -464,7 +379,6 @@ async function confirmAddressAndPickId() {
 }
 
 .item-price span,
-.item-quantity span,
 .item-subtotal span {
   display: block;
   margin-bottom: 6px;
@@ -480,8 +394,11 @@ async function confirmAddressAndPickId() {
   font-size: 16px;
 }
 
-.item-subtotal strong {
-  color: var(--brand-primary);
+.item-price small {
+  display: block;
+  margin-top: 5px;
+  color: var(--text-muted);
+  text-decoration: line-through;
 }
 
 .item-subtotal button {
@@ -500,11 +417,8 @@ async function confirmAddressAndPickId() {
 }
 
 .checkout-card {
-  border: 1px solid rgba(60, 146, 255, 0.22);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(53, 216, 171, 0.24);
   padding: 18px;
-  box-shadow: var(--shadow-float);
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -513,8 +427,8 @@ async function confirmAddressAndPickId() {
 .checkout-kicker {
   width: fit-content;
   border-radius: 999px;
-  background: var(--brand-primary-weak);
-  color: var(--brand-primary);
+  background: var(--brand-mint-weak);
+  color: var(--brand-accent-strong);
   padding: 5px 10px;
   font-size: 12px;
   font-weight: 900;
@@ -522,7 +436,6 @@ async function confirmAddressAndPickId() {
 
 .checkout-card h2 {
   margin: 0;
-  font-size: 22px;
 }
 
 .checkout-card dl {
@@ -549,19 +462,15 @@ async function confirmAddressAndPickId() {
 }
 
 .coupon-note {
-  border: 1px solid rgba(255, 185, 214, 0.5);
+  border: 1px solid rgba(53, 216, 171, 0.32);
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(255, 185, 214, 0.22), rgba(137, 199, 255, 0.22));
+  background: linear-gradient(135deg, rgba(233, 255, 248, 0.9), rgba(234, 244, 255, 0.68));
   padding: 12px;
 }
 
 .coupon-note strong,
 .coupon-note span {
   display: block;
-}
-
-.coupon-note strong {
-  color: var(--text-main);
 }
 
 .coupon-note span {
@@ -583,9 +492,8 @@ async function confirmAddressAndPickId() {
 }
 
 .payable strong {
-  color: var(--brand-primary);
+  color: var(--brand-accent-strong);
   font-size: 28px;
-  line-height: 1;
 }
 
 .checkout-card :deep(.el-button) {
@@ -607,7 +515,6 @@ async function confirmAddressAndPickId() {
   }
 
   .item-price,
-  .item-quantity,
   .item-subtotal {
     grid-column: 3;
   }
@@ -627,18 +534,17 @@ async function confirmAddressAndPickId() {
     grid-template-columns: auto minmax(0, 1fr);
   }
 
-  .item-cover {
+  .item-cover,
+  .item-info,
+  .item-price,
+  .item-subtotal {
     grid-column: 1 / -1;
+  }
+
+  .item-cover {
     width: 100%;
     height: auto;
     aspect-ratio: 16 / 10;
-  }
-
-  .item-info,
-  .item-price,
-  .item-quantity,
-  .item-subtotal {
-    grid-column: 1 / -1;
   }
 }
 </style>

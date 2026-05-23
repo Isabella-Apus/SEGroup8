@@ -197,8 +197,6 @@ import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { uploadImage, updateShopProfile } from '@/api/seller'
-import { toApiAssetUrl } from '@/utils/url'
-import { findCategoryLabel } from '@/constants/categories'
 
 const userStore = useUserStore()
 const formRef = ref(null)
@@ -244,13 +242,7 @@ const rules = {
 function toFullUrl(url) {
   if (!url) return ''
   if (url.startsWith('http')) return url
-  return toApiAssetUrl(url)
-}
-
-function getReadableCategory(category) {
-  if (!category) return ''
-  const label = findCategoryLabel(category)
-  return label || String(category)
+  return 'http://localhost:8080' + url
 }
 
 async function loadShopInfo() {
@@ -260,7 +252,7 @@ async function loadShopInfo() {
     const info = userStore.userInfo || {}
     form.shopName = info.shopName || info.nickname || ''
     form.shopDesc = info.shopDesc || ''
-    form.category = getReadableCategory(info.categoryId || info.category)
+    form.category = info.category || ''
     form.phone = info.phone || ''
     form.region = info.region || ''
     form.shopContactName = info.shopContactName || ''

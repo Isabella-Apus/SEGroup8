@@ -44,8 +44,12 @@ export function rejectBargainApi(negotiationId) {
     return http.post(`/secondhand/trade/bargain/${negotiationId}/reject`);
 }
 
+export function listBargainRequestsApi(params = {}) {
+    return http.get("/secondhand/trade/bargain/list", { params });
+}
+
 export function getMyEffectiveBargainApi(productId) {
-    return http.get("/secondhand/trade/bargain/effective", { params: { productId } });
+    return http.get("/secondhand/trade/bargain/effective", { params: { productId }, silent: true });
 }
 
 export function createAuctionApi(payload) {
@@ -53,7 +57,7 @@ export function createAuctionApi(payload) {
 }
 
 export function getAuctionByProductIdApi(productId) {
-    return http.get(`/secondhand/trade/auction/product/${productId}`);
+    return http.get(`/secondhand/trade/auction/product/${productId}`, { silent: true });
 }
 
 export function getMyAuctionListApi(params = {}) {

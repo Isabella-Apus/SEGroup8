@@ -42,7 +42,7 @@ export function rejectRefund(id) {
 
 // ===== 评价管理 =====
 export function getMyReviews(params) {
-    return http.get('/review/my', { params })
+    return http.get('/review/seller/list', { params })
 }
 export function replyReview(reviewId, content) {
     return http.post(`/review/seller/${reviewId}/reply`, { content })

@@ -3,7 +3,7 @@
     <!-- Banner -->
     <div v-if="component.type === 'banner'" class="comp-banner"
       :style="{ borderRadius: component.props.borderRadius + 'px', height: component.props.height + 'px', overflow: 'hidden' }">
-      <el-image v-if="component.props.imageUrl" :src="toFullImageUrl(component.props.imageUrl)" fit="cover" style="width:100%;height:100%" />
+      <el-image v-if="component.props.imageUrl" :src="component.props.imageUrl" fit="cover" style="width:100%;height:100%" />
       <div v-else class="comp-banner-placeholder">
         <span>🖼️ 点击编辑上传 Banner 图片</span>
       </div>
@@ -54,7 +54,7 @@
     <div v-else-if="component.type === 'image_text'" class="comp-image-text"
       :class="component.props.layout">
       <div class="comp-image-text-img" :style="{ width: component.props.imageWidth + '%' }">
-        <el-image v-if="component.props.imageUrl" :src="toFullImageUrl(component.props.imageUrl)" fit="cover" style="width:100%;height:140px;border-radius:6px" />
+        <el-image v-if="component.props.imageUrl" :src="component.props.imageUrl" fit="cover" style="width:100%;height:140px;border-radius:6px" />
         <div v-else class="comp-banner-placeholder" style="height:140px">🖼️ 上传图片</div>
       </div>
       <div class="comp-image-text-content">
@@ -84,7 +84,6 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { toApiAssetUrl } from '@/utils/url'
 
 const props = defineProps({
   component: { type: Object, required: true },
@@ -98,7 +97,7 @@ function toFullImageUrl(url) {
   if (!url) {
     return ''
   }
-  return toApiAssetUrl(url)
+  return url.startsWith('http') ? url : `http://localhost:8080${url}`
 }
 
 function updateCountdown() {

@@ -1,33 +1,17 @@
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
-export function toApiAssetUrl(url) {
+export const ASSET_BASE_URL = import.meta.env.VITE_ASSET_BASE_URL || "";
+
+export function toAssetUrl(url) {
     if (!url) {
         return "";
     }
-    const normalizedUrl = String(url).replace(/\\/g, "/");
-    const legacyLocalOrigin = normalizedUrl.match(/^https?:\/\/(?:localhost|127\.0\.0\.1):8080(\/.*)?$/i);
-    if (legacyLocalOrigin) {
-        return encodeURI(legacyLocalOrigin[1] || "");
+    if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
+        return url;
     }
-    if (/^(https?:)?\/\//i.test(normalizedUrl) || /^(data|blob):/i.test(normalizedUrl)) {
-        return encodeURI(normalizedUrl);
+    const normalized = url.startsWith("/") ? url : `/${url}`;
+    if (!ASSET_BASE_URL) {
+        return normalized;
     }
-    let path = normalizedUrl;
-    if (!path.startsWith("/")) {
-        path = path.startsWith("uploads/") ? `/${path}` : `/uploads/${path}`;
-    }
-    return encodeURI(path);
-}
-
-export function buildRealtimeWsUrl() {
-    const explicit = import.meta.env.VITE_WS_BASE_URL;
-    if (explicit) {
-        const base = String(explicit).replace(/\/$/, "");
-        if (/^wss?:\/\//i.test(base)) {
-            return `${base}/ws/realtime`;
-        }
-        return `${window.location.origin.replace(/^http/, "ws")}${base.startsWith("/") ? base : `/${base}`}/ws/realtime`;
-    }
-    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-    return `${protocol}://${window.location.host}/ws/realtime`;
+    return `${ASSET_BASE_URL.replace(/\/$/, "")}${normalized}`;
 }

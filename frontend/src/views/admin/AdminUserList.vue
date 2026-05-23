@@ -6,7 +6,7 @@
         <el-option label="NORMAL" value="NORMAL" />
         <el-option label="BANNED" value="BANNED" />
       </el-select>
-      <el-button type="primary" @click="loadUsers">搜索</el-button>
+      <el-button type="primary" @click="loadUsers">查询</el-button>
     </div>
 
     <el-table :data="records" border>
@@ -15,16 +15,13 @@
       <el-table-column prop="nickname" label="昵称" width="140" />
       <el-table-column prop="phone" label="手机号" width="140" />
       <el-table-column prop="email" label="邮箱" min-width="180" />
-      <el-table-column prop="role" label="角色" width="120" />
+      <el-table-column prop="role" label="角色" width="100" />
       <el-table-column prop="status" label="状态" width="110" />
       <el-table-column prop="creditScore" label="信用分" width="100" />
       <el-table-column label="操作" width="180">
         <template #default="{ row }">
-          <el-tag v-if="isCurrentUser(row)" type="info">当前账号</el-tag>
-          <template v-else>
-            <el-button v-if="row.status !== 'BANNED'" link type="danger" @click="changeStatus(row, 'ban')">封禁</el-button>
-            <el-button v-else link type="success" @click="changeStatus(row, 'unban')">解封</el-button>
-          </template>
+          <el-button v-if="row.status !== 'BANNED'" link type="danger" @click="changeStatus(row, 'ban')">封禁</el-button>
+          <el-button v-else link type="success" @click="changeStatus(row, 'unban')">解封</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -45,11 +42,9 @@
 import { onMounted, reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { banUserApi, pageUsersApi, unbanUserApi } from '@/api/adminUser';
-import { getUser } from '@/utils/storage';
 
 const records = ref([]);
 const total = ref(0);
-const currentUser = ref(getUser());
 const query = reactive({
   pageNum: 1,
   pageSize: 10,
@@ -60,7 +55,6 @@ const query = reactive({
 onMounted(loadUsers);
 
 async function loadUsers() {
-  currentUser.value = getUser();
   try {
     const result = await pageUsersApi(query);
     records.value = result.data.records || [];
@@ -80,10 +74,6 @@ async function changeStatus(row, action) {
     ElMessage.success('解封成功');
   }
   await loadUsers();
-}
-
-function isCurrentUser(row) {
-  return Number(row?.id) === Number(currentUser.value?.id);
 }
 </script>
 

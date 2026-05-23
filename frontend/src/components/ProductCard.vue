@@ -1,93 +1,133 @@
 <template>
-  <article class="product-card" :class="{ clickable }" @click="goDetail">
-    <div class="cover-wrap">
+  <article class="product-card" :class="{ secondhand: isSecondhand }">
+    <button class="cover-wrap" type="button" @click="goDetail">
       <img class="cover" :src="coverUrl" :alt="product.name" loading="lazy" />
       <span class="badge">{{ badgeText }}</span>
-    </div>
+      <span v-if="isLowStock" class="stock-badge">库存紧张</span>
+      <span class="quick-view">看详情</span>
+    </button>
+
     <div class="content">
-      <h3 class="title" v-html="highlightedTitle"></h3>
-      <p class="desc">{{ descriptionText }}</p>
+      <button class="title-button" type="button" @click="goDetail">
+        <span v-if="isSecondhand" class="title-tag">闲置</span>
+        <span v-else class="title-tag official">官方</span>
+        {{ product.name }}
+      </button>
+
+      <div class="coupon-row">
+        <span>{{ couponText }}</span>
+        <span>{{ shippingText }}</span>
+      </div>
+
       <div class="meta">
-        <strong class="price">￥{{ formatPrice(mainPrice) }}</strong>
-        <span class="sub">{{ subText }}</span>
+        <div>
+          <strong class="price"><small>¥</small>{{ priceInteger }}<em>.{{ priceDecimal }}</em></strong>
+          <span v-if="isSecondhand" class="origin">¥{{ formatPrice(product.originPrice || product.price) }}</span>
+        </div>
+        <span class="sales-text">{{ salesText }}</span>
+      </div>
+
+      <div class="seller-row">
+        <span class="seller-avatar">{{ sellerInitial }}</span>
+        <span class="seller-name">{{ sellerText }}</span>
+        <span class="sub-text">{{ subText }}</span>
+      </div>
+
+      <div class="actions">
+        <el-button v-if="!isSecondhand" size="small" @click.stop="handleAddCart">加购</el-button>
+        <el-button size="small" type="primary" @click.stop="goDetail">
+          {{ isSecondhand ? "聊一聊" : "去看看" }}
+        </el-button>
       </div>
     </div>
   </article>
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { getFirstProductImage, toFullImageUrl } from '@/utils/productImages';
+import { computed } from "vue";
+import { useRouter } from "vue-router";
+import { ElMessage } from "element-plus";
+import { addToCart } from "@/utils/cart";
+import { toAssetUrl } from "@/utils/url";
 
 const props = defineProps({
   product: {
     type: Object,
-    required: true
+    required: true,
   },
   mode: {
     type: String,
-    default: 'product'
+    default: "product",
   },
   clickable: {
     type: Boolean,
-    default: true
+    default: true,
   },
   routeBase: {
     type: String,
-    default: '/product'
+    default: "/product",
   },
-  highlightKeyword: {
-    type: String,
-    default: ''
-  }
 });
 
 const router = useRouter();
 
-const isSecondhand = computed(() => props.mode === 'secondhand');
+const isSecondhand = computed(() => props.mode === "secondhand");
 
 const badgeText = computed(() => {
   if (isSecondhand.value) {
-    return props.product.conditionLevel || props.product.condition || '二手';
+    return props.product.conditionLevel || props.product.condition || "二手";
   }
-  return props.product.statusName || '在售';
+  return props.product.statusName || "在售";
 });
 
 const descriptionText = computed(() => {
-  return props.product.description || '品质好物，支持快速发货';
-});
-
-const highlightedTitle = computed(() => {
-  const source = String(props.product.name || '');
-  const escaped = escapeHtml(source);
-  const keyword = String(props.highlightKeyword || '').trim();
-  if (!keyword) {
-    return escaped;
-  }
-  const escapedKeyword = escapeRegExp(keyword);
-  const reg = new RegExp(`(${escapedKeyword})`, 'ig');
-  return escaped.replace(reg, '<span class="title-highlight">$1</span>');
+  return props.product.description || (isSecondhand.value ? "个人闲置，详情页可联系卖家" : "官方好物，支持下单和售后");
 });
 
 const mainPrice = computed(() => {
-  return isSecondhand.value ? props.product.salePrice : props.product.price;
+  return isSecondhand.value ? props.product.salePrice ?? props.product.price : props.product.price;
 });
 
 const subText = computed(() => {
   if (isSecondhand.value) {
-    return `原价 ￥${formatPrice(props.product.originPrice)}`;
+    return "个人发布";
   }
   return `库存 ${props.product.stock ?? 0}`;
 });
 
-const coverUrl = computed(() => {
-  const cover = getFirstProductImage(props.product);
-  if (!cover) {
-    return 'https://images.unsplash.com/photo-1511556820780-d912e42b4980?auto=format&fit=crop&w=900&q=80';
-  }
-  return toFullImageUrl(cover);
+const sellerText = computed(() => {
+  return props.product.sellerName || props.product.shopName || (isSecondhand.value ? "个人卖家" : "官方商家");
 });
+
+const coverUrl = computed(() => {
+  return toAssetUrl(props.product.cover) || "https://images.unsplash.com/photo-1511556820780-d912e42b4980?auto=format&fit=crop&w=900&q=80";
+});
+
+const isLowStock = computed(() => !isSecondhand.value && Number(props.product.stock || 0) > 0 && Number(props.product.stock || 0) <= 5);
+
+const formattedMainPrice = computed(() => formatPrice(mainPrice.value));
+const priceInteger = computed(() => formattedMainPrice.value.split(".")[0]);
+const priceDecimal = computed(() => formattedMainPrice.value.split(".")[1] || "00");
+
+const couponText = computed(() => {
+  if (isSecondhand.value) {
+    return props.product.conditionLevel || props.product.condition || "成色良好";
+  }
+  const price = Number(mainPrice.value || 0);
+  if (price >= 500) {
+    return "大件保障";
+  }
+  return "新人券";
+});
+
+const shippingText = computed(() => (isSecondhand.value ? "可沟通" : "售后无忧"));
+
+const salesText = computed(() => {
+  const seed = Number(props.product.id || 1);
+  return isSecondhand.value ? `${20 + (seed % 76)} 人想要` : `${100 + (seed * 17) % 900} 件热度`;
+});
+
+const sellerInitial = computed(() => sellerText.value.slice(0, 1).toUpperCase());
 
 function goDetail() {
   if (!props.clickable) {
@@ -96,50 +136,47 @@ function goDetail() {
   router.push(`${props.routeBase}/${props.product.id}`);
 }
 
+function handleAddCart() {
+  if (Number(props.product.stock || 0) <= 0) {
+    ElMessage.warning("商品库存不足");
+    return;
+  }
+  addToCart(props.product, 1);
+  ElMessage.success("已加入购物车");
+}
+
 function formatPrice(value) {
   const num = Number(value || 0);
   return num.toFixed(2);
-}
-
-function escapeHtml(value) {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
-}
-
-function escapeRegExp(value) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 </script>
 
 <style scoped>
 .product-card {
-  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
   overflow: hidden;
-  border: 1px solid #eeeeee;
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 8px 20px rgba(30, 34, 40, 0.04);
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  min-width: 0;
 }
 
-.product-card.clickable {
-  cursor: pointer;
-}
-
-.product-card.clickable:hover {
-  transform: translateY(-3px);
-  border-color: #ffe100;
-  box-shadow: 0 16px 34px rgba(30, 34, 40, 0.12);
+.product-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(60, 146, 255, 0.45);
+  box-shadow: var(--shadow-float);
 }
 
 .cover-wrap {
   position: relative;
+  width: 100%;
   aspect-ratio: 1 / 1;
-  background: #eeeeee;
+  border: 0;
+  padding: 0;
+  background: #f1efe6;
+  display: block;
+  overflow: hidden;
+  cursor: pointer;
 }
 
 .cover {
@@ -147,91 +184,223 @@ function escapeRegExp(value) {
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.22s ease;
+}
+
+.product-card:hover .cover {
+  transform: scale(1.035);
+}
+
+.badge,
+.stock-badge,
+.quick-view {
+  position: absolute;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .badge {
-  position: absolute;
-  left: 10px;
-  top: 10px;
-  max-width: calc(100% - 20px);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  border-radius: 999px;
-  padding: 4px 9px;
-  background: rgba(32, 36, 45, 0.78);
-  color: #fff;
-  font-size: 12px;
+  top: 8px;
+  left: 8px;
+  background: rgba(234, 244, 255, 0.9);
+  color: var(--brand-primary);
+  backdrop-filter: blur(8px);
+}
+
+.secondhand .badge {
+  background: rgba(233, 255, 248, 0.92);
+  color: var(--brand-accent-strong);
+}
+
+.stock-badge {
+  top: 8px;
+  right: 8px;
+  background: var(--brand-warm);
+  color: var(--text-main);
+}
+
+.quick-view {
+  left: 8px;
+  bottom: 8px;
+  background: var(--brand-gradient-strong);
+  color: #ffffff;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.product-card:hover .quick-view {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .content {
-  padding: 12px 13px 13px;
+  padding: 10px;
 }
 
-.title {
-  min-height: 40px;
-  margin: 0;
-  color: #20242d;
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.35;
-  letter-spacing: 0;
+.title-button {
+  width: 100%;
+  min-height: 42px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.45;
+  cursor: pointer;
 }
 
-.title :deep(.title-highlight) {
-  color: #e6a23c;
-  font-weight: 700;
+.title-button:hover {
+  color: var(--brand-primary);
 }
 
-.desc {
-  min-height: 18px;
-  margin: 7px 0 9px;
-  color: #858585;
-  font-size: 12px;
-  line-height: 1.5;
+.title-tag {
+  display: inline-flex;
+  vertical-align: 1px;
+  margin-right: 4px;
+  border-radius: 4px;
+  background: var(--brand-accent);
+  color: #ffffff;
+  padding: 1px 4px;
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 900;
+}
+
+.title-tag.official {
+  background: var(--brand-primary);
+}
+
+.coupon-row {
+  min-height: 24px;
+  margin-top: 7px;
+  display: flex;
+  gap: 5px;
+  overflow: hidden;
+}
+
+.coupon-row span {
+  border: 1px solid rgba(60, 146, 255, 0.24);
+  border-radius: 4px;
+  color: var(--brand-primary);
+  background: var(--brand-primary-weak);
+  padding: 2px 5px;
+  font-size: 11px;
+  font-weight: 800;
   white-space: nowrap;
+}
+
+.seller-row {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  min-width: 0;
+}
+
+.seller-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--brand-gradient);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.seller-name,
+.sub-text {
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-name {
+  min-width: 0;
+  flex: 1;
+}
+
+.sub-text {
+  flex: 0 0 auto;
 }
 
 .meta {
+  margin-top: 8px;
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  gap: 8px;
+  gap: 10px;
 }
 
 .price {
-  color: #ff4d00;
-  font-size: 21px;
+  display: inline-flex;
+  align-items: baseline;
+  color: var(--brand-primary);
+  font-size: 24px;
   line-height: 1;
-  white-space: nowrap;
+  letter-spacing: 0;
 }
 
-.sub {
-  min-width: 0;
-  color: #999;
+.price small,
+.price em {
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.origin {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-muted);
   font-size: 12px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  text-decoration: line-through;
+}
+
+.sales-text {
+  color: var(--text-muted);
+  font-size: 12px;
   white-space: nowrap;
 }
 
-@media (max-width: 760px) {
+.actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 6px;
+}
+
+.actions :deep(.el-button) {
+  flex: 1;
+  min-width: 0;
+  border-radius: 6px;
+  font-weight: 900;
+}
+
+@media (max-width: 680px) {
   .content {
-    padding: 9px;
+    padding: 10px;
   }
 
-  .title {
+  .title-button {
     font-size: 14px;
   }
 
-  .price {
-    font-size: 18px;
+  .actions {
+    display: none;
   }
 }
 </style>
