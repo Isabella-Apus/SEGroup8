@@ -13,12 +13,10 @@
         label-width="100px"
         v-loading="loading"
       >
-        <!-- 商品名称 -->
         <el-form-item label="商品名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入商品名称" maxlength="100" show-word-limit />
         </el-form-item>
 
-        <!-- 商品描述 -->
         <el-form-item label="商品描述" prop="description">
           <el-input
             v-model="form.description"
@@ -30,7 +28,6 @@
           />
         </el-form-item>
 
-        <!-- 价格 -->
         <el-form-item label="价格" prop="price">
           <el-input-number
             v-model="form.price"
@@ -39,10 +36,9 @@
             :step="1"
             style="width: 200px"
           />
-          <span style="margin-left: 8px; color: #999">元</span>
+          <span class="field-unit">元</span>
         </el-form-item>
 
-        <!-- 库存 -->
         <el-form-item label="库存" prop="stock">
           <el-input-number
             v-model="form.stock"
@@ -50,50 +46,48 @@
             :step="1"
             style="width: 200px"
           />
-          <span style="margin-left: 8px; color: #999">件</span>
+          <span class="field-unit">件</span>
         </el-form-item>
 
-        <!-- 商品分类 -->
-        <el-form-item label="商品分类" prop="category">
-          <el-select v-model="form.category" placeholder="请选择分类" style="width: 200px">
-            <el-option
-              v-for="item in productCategoryOptions"
-              :key="item"
-              :label="item"
-              :value="item"
-            />
-          </el-select>
+        <el-form-item label="商品分类" prop="categoryIds">
+          <el-cascader
+            v-model="form.categoryIds"
+            :options="categoryOptions"
+            :props="{ value: 'id', label: 'name', children: 'children', emitPath: true }"
+            placeholder="请选择商品分类"
+            style="width: 280px"
+          />
         </el-form-item>
 
-        <!-- 商品图片 -->
-        <el-form-item label="商品图片" prop="imageUrl">
-          <div class="upload-area">
+        <el-form-item label="商品图片" prop="images">
+          <div class="image-uploader">
+            <div v-if="form.images.length" class="image-list">
+              <div v-for="(url, index) in form.images" :key="url" class="image-item">
+                <el-image :src="toFullImageUrl(url)" fit="cover" class="image-thumb" />
+                <span v-if="index === 0" class="cover-badge">封面</span>
+                <button type="button" class="remove-image" @click="removeImage(index)">
+                  <el-icon><DeleteIcon /></el-icon>
+                </button>
+              </div>
+            </div>
+
             <el-upload
+              v-if="form.images.length < 9"
               :show-file-list="false"
               :before-upload="beforeUpload"
               :http-request="handleUpload"
               accept="image/*"
+              multiple
             >
-              <div v-if="form.imageUrl" class="preview-wrap">
-                <el-image
-                  :src="toFullImageUrl(form.imageUrl)"
-                  fit="cover"
-                  style="width: 120px; height: 120px; border-radius: 6px"
-                />
-                <div class="preview-mask">点击更换</div>
-              </div>
-              <div v-else class="upload-placeholder">
-                <el-icon style="font-size: 28px; color: #bbb"><Plus /></el-icon>
-                <div style="margin-top: 8px; color: #bbb; font-size: 13px">点击上传图片</div>
+              <div class="upload-placeholder">
+                <el-icon class="upload-icon"><Plus /></el-icon>
+                <span>上传图片</span>
               </div>
             </el-upload>
           </div>
-          <div style="color: #999; font-size: 12px; margin-top: 4px">
-            支持 jpg / png，大小不超过 2MB
-          </div>
+          <div class="upload-tip">支持 jpg / png，最多 9 张，第一张会作为封面</div>
         </el-form-item>
 
-        <!-- 提交按钮 -->
         <el-form-item>
           <el-button
             type="primary"
@@ -113,23 +107,22 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { Plus } from '@element-plus/icons-vue'
+import { Delete as DeleteIcon, Plus } from '@element-plus/icons-vue'
 import {
   getProductDetail,
   createProduct,
   updateProduct,
-  uploadImage
+  uploadImage,
+  getCategoryTree
 } from '@/api/seller'
-import { ALL_CATEGORY, productCategories } from '@/utils/categoryRules'
 
 const route = useRoute()
 const router = useRouter()
 const formRef = ref(null)
 const loading = ref(false)
 const submitting = ref(false)
-const productCategoryOptions = productCategories.filter((item) => item !== ALL_CATEGORY)
+const categoryOptions = ref([])
 
-// 判断是编辑还是新建
 const isEdit = computed(() => !!route.params.id)
 
 const form = reactive({
@@ -137,8 +130,8 @@ const form = reactive({
   description: '',
   price: 0.01,
   stock: 0,
-  category: '',
-  imageUrl: ''
+  categoryIds: [],
+  images: []
 })
 
 const rules = {
@@ -146,11 +139,21 @@ const rules = {
   description: [{ required: true, message: '请输入商品描述', trigger: 'blur' }],
   price: [{ required: true, message: '请输入价格', trigger: 'blur' }],
   stock: [{ required: true, message: '请输入库存', trigger: 'blur' }],
-  category: [{ required: true, message: '请选择分类', trigger: 'change' }],
-  imageUrl: [{ required: true, message: '请上传商品图片', trigger: 'change' }]
+  categoryIds: [{ required: true, message: '请选择分类', trigger: 'change' }],
+  images: [{
+    validator: (_, value, callback) => {
+      if (value?.length) callback()
+      else callback(new Error('请至少上传一张商品图片'))
+    },
+    trigger: 'change'
+  }]
 }
 
-// 如果是编辑，加载已有数据
+async function loadCategories() {
+  const res = await getCategoryTree('NEW')
+  categoryOptions.value = res.data || []
+}
+
 async function loadDetail() {
   if (!isEdit.value) return
   loading.value = true
@@ -161,8 +164,8 @@ async function loadDetail() {
     form.description = d.description
     form.price = d.price
     form.stock = d.stock
-    form.category = d.categoryName || d.category || ''
-    form.imageUrl = d.cover || ''
+    form.categoryIds = d.categoryId && d.subCategoryId ? [d.categoryId, d.subCategoryId] : []
+    form.images = Array.isArray(d.images) && d.images.length ? [...d.images] : (d.cover ? [d.cover] : [])
   } catch (e) {
     ElMessage.error('加载商品信息失败')
   } finally {
@@ -171,14 +174,15 @@ async function loadDetail() {
 }
 
 function toFullImageUrl(url) {
-  if (!url) {
-    return ''
-  }
+  if (!url) return ''
   return url.startsWith('http') ? url : `http://localhost:8080${url}`
 }
 
-// 上传前校验
 function beforeUpload(file) {
+  if (form.images.length >= 9) {
+    ElMessage.warning('商品图片最多上传 9 张')
+    return false
+  }
   const isImage = file.type.startsWith('image/')
   const isLt2M = file.size / 1024 / 1024 < 2
   if (!isImage) {
@@ -192,18 +196,26 @@ function beforeUpload(file) {
   return true
 }
 
-// 自定义上传
 async function handleUpload({ file }) {
   try {
+    if (form.images.length >= 9) return
     const res = await uploadImage(file)
-    form.imageUrl = res.data.url
+    const url = res.data.url
+    if (url && !form.images.includes(url)) {
+      form.images.push(url)
+      formRef.value?.validateField('images')
+    }
     ElMessage.success('图片上传成功')
   } catch (e) {
     ElMessage.error('图片上传失败')
   }
 }
 
-// 提交表单
+function removeImage(index) {
+  form.images.splice(index, 1)
+  formRef.value?.validateField('images')
+}
+
 async function handleSubmit() {
   await formRef.value.validate(async (valid) => {
     if (!valid) return
@@ -214,9 +226,10 @@ async function handleSubmit() {
         description: form.description,
         price: form.price,
         stock: form.stock,
-        cover: form.imageUrl,
-        categoryName: form.category,
-        category: form.category,
+        cover: form.images[0] || '',
+        images: [...form.images],
+        categoryId: form.categoryIds?.[0],
+        subCategoryId: form.categoryIds?.[1],
         status: 1
       }
       if (isEdit.value) {
@@ -235,7 +248,10 @@ async function handleSubmit() {
   })
 }
 
-onMounted(loadDetail)
+onMounted(async () => {
+  await loadCategories()
+  await loadDetail()
+})
 </script>
 
 <style scoped>
@@ -245,48 +261,99 @@ onMounted(loadDetail)
   align-items: center;
   margin-bottom: 16px;
 }
+
 .page-title {
   margin: 0;
   font-size: 20px;
 }
-.upload-area {
-  display: inline-block;
+
+.field-unit {
+  margin-left: 8px;
+  color: #999;
 }
-.preview-wrap {
+
+.image-uploader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.image-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.image-item {
   position: relative;
-  width: 120px;
-  height: 120px;
-  cursor: pointer;
+  width: 104px;
+  height: 104px;
+  border: 1px solid #dcdfe6;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f7f8fa;
 }
-.preview-mask {
+
+.image-thumb {
+  width: 100%;
+  height: 100%;
+}
+
+.cover-badge {
   position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  left: 6px;
+  top: 6px;
+  border-radius: 999px;
+  background: rgba(64, 158, 255, 0.92);
   color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  opacity: 0;
-  transition: opacity 0.2s;
-  font-size: 13px;
+  padding: 2px 7px;
+  font-size: 12px;
+  font-weight: 800;
 }
-.preview-wrap:hover .preview-mask {
-  opacity: 1;
-}
-.upload-placeholder {
-  width: 120px;
-  height: 120px;
-  border: 1px dashed #ddd;
-  border-radius: 6px;
-  display: flex;
-  flex-direction: column;
+
+.remove-image {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.52);
+  color: #fff;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: border-color 0.2s;
 }
+
+.upload-placeholder {
+  width: 104px;
+  height: 104px;
+  border: 1px dashed #cfd5df;
+  border-radius: 8px;
+  color: #909399;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+
 .upload-placeholder:hover {
   border-color: #409eff;
+  color: #409eff;
+}
+
+.upload-icon {
+  font-size: 26px;
+}
+
+.upload-tip {
+  color: #999;
+  font-size: 12px;
+  margin-top: 6px;
 }
 </style>

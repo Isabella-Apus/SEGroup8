@@ -17,6 +17,7 @@ import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
 import com.segroup8.platform.service.CategoryService;
+import com.segroup8.platform.service.ProductRiskAuditService;
 import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.vo.ProductVO;
 import org.junit.jupiter.api.AfterEach;
@@ -57,11 +58,15 @@ class ProductServiceImplTest {
     @Mock
     private CategoryService categoryService;
 
+    @Mock
+    private ProductRiskAuditService productRiskAuditService;
+
     private ProductServiceImpl productService;
 
     @BeforeEach
     void setUp() {
-        productService = new ProductServiceImpl(productMapper, shopMapper, userMapper, browseHistoryService, categoryService);
+        productService = new ProductServiceImpl(productMapper, shopMapper, userMapper, browseHistoryService,
+                categoryService, productRiskAuditService);
     }
 
     @AfterEach

@@ -23,6 +23,7 @@ public class SecondhandProductVO {
     private Integer isNegotiable;
     private Integer status;
     private String statusName;
+    private ProductRiskAuditVO riskAudit;
     private LocalDateTime createTime;
 
     public Long getId() {
@@ -159,6 +160,14 @@ public class SecondhandProductVO {
 
     public void setStatusName(String statusName) {
         this.statusName = statusName;
+    }
+
+    public ProductRiskAuditVO getRiskAudit() {
+        return riskAudit;
+    }
+
+    public void setRiskAudit(ProductRiskAuditVO riskAudit) {
+        this.riskAudit = riskAudit;
     }
 
     public LocalDateTime getCreateTime() {

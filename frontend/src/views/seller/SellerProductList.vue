@@ -95,6 +95,17 @@
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="AI审核" width="150">
+          <template #default="{ row }">
+            <div v-if="row.riskAudit" class="risk-cell">
+              <el-tag :type="riskTagType(row.riskAudit.riskLevel)" effect="plain">
+                {{ riskLabel(row.riskAudit.riskLevel) }} · {{ row.riskAudit.riskScore }}
+              </el-tag>
+              <small>{{ auditStatusLabel(row.riskAudit.auditStatus) }}</small>
+            </div>
+            <span v-else class="risk-empty">待生成</span>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
             <el-button
@@ -166,7 +177,7 @@ async function loadProducts() {
   loading.value = true
   try {
     const res = await getMyProducts({
-      page: page.value,
+      pageNum: page.value,
       pageSize: pageSize.value,
       keyword: searchForm.keyword || undefined,
       status: searchForm.status ?? undefined
@@ -222,6 +233,21 @@ function statusTagType(status) {
 function statusLabel(status) {
   const map = { 1: '在售', 0: '已下架', 2: '审核中' }
   return map[status] ?? status
+}
+
+function riskLabel(level) {
+  const map = { LOW: '低风险', MEDIUM: '中风险', HIGH: '高风险' }
+  return map[level] ?? '未评估'
+}
+
+function riskTagType(level) {
+  const map = { LOW: 'success', MEDIUM: 'warning', HIGH: 'danger' }
+  return map[level] ?? 'info'
+}
+
+function auditStatusLabel(status) {
+  const map = { PENDING: '待处理', APPROVED: '已通过', REJECTED: '已驳回', CHANGE_REQUESTED: '要求修改' }
+  return map[status] ?? '待处理'
 }
 
 function toFullImageUrl(url) {
@@ -400,6 +426,19 @@ onMounted(loadProducts)
   color: var(--text-muted);
   font-size: 12px;
   font-weight: 700;
+}
+
+.risk-cell {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+
+.risk-cell small,
+.risk-empty {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .pagination {

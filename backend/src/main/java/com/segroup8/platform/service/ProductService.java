@@ -11,6 +11,8 @@ public interface ProductService {
 
     ProductVO getPublicProductDetail(Long productId);
 
+    ProductVO getSellerProductDetail(Long productId);
+
     PageVO<ProductVO> pageSellerProducts(ProductPageQueryRequest request);
 
     ProductVO createSellerProduct(ProductSaveRequest request);

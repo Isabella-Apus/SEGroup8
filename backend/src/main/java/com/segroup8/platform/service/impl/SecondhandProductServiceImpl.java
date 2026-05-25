@@ -25,6 +25,7 @@ import com.segroup8.platform.mapper.UserBlockMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
 import com.segroup8.platform.service.CategoryService;
+import com.segroup8.platform.service.ProductRiskAuditService;
 import com.segroup8.platform.service.SecondhandProductService;
 import com.segroup8.platform.service.SecondhandTradeService;
 import com.segroup8.platform.vo.OrderItemVO;
@@ -65,6 +66,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
     private final UserBlockMapper userBlockMapper;
     private final CategoryService categoryService;
     private final SecondhandTradeService secondhandTradeService;
+    private final ProductRiskAuditService productRiskAuditService;
 
     public SecondhandProductServiceImpl(SecondhandProductMapper secondhandProductMapper,
             OrderInfoMapper orderInfoMapper,
@@ -75,7 +77,8 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
             BrowseHistoryService browseHistoryService,
             UserBlockMapper userBlockMapper,
             CategoryService categoryService,
-            SecondhandTradeService secondhandTradeService) {
+            SecondhandTradeService secondhandTradeService,
+            ProductRiskAuditService productRiskAuditService) {
         this.secondhandProductMapper = secondhandProductMapper;
         this.orderInfoMapper = orderInfoMapper;
         this.orderItemMapper = orderItemMapper;
@@ -85,7 +88,9 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         this.browseHistoryService = browseHistoryService;
         this.userBlockMapper = userBlockMapper;
         this.categoryService = categoryService;
-        this.secondhandTradeService = secondhandTradeService;    }
+        this.secondhandTradeService = secondhandTradeService;
+        this.productRiskAuditService = productRiskAuditService;
+    }
 
     @Override
     public PageVO<SecondhandProductVO> pagePublicProducts(SecondhandProductPageQueryRequest request) {
@@ -177,6 +182,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         product.setIsNegotiable(request.getIsNegotiable());
         product.setStatus(normalizeStatus(request.getStatus(), ON_SHELF));
         secondhandProductMapper.insert(product);
+        productRiskAuditService.auditSecondhandProduct(secondhandProductMapper.selectById(product.getId()));
         return toVO(secondhandProductMapper.selectById(product.getId()));
     }
 
@@ -200,6 +206,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
             product.setStatus(normalizeStatus(request.getStatus(), null));
         }
         secondhandProductMapper.updateById(product);
+        productRiskAuditService.auditSecondhandProduct(secondhandProductMapper.selectById(productId));
         return toVO(secondhandProductMapper.selectById(productId));
     }
 
@@ -458,6 +465,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         vo.setIsNegotiable(product.getIsNegotiable());
         vo.setStatus(product.getStatus());
         vo.setStatusName(Objects.equals(product.getStatus(), ON_SHELF) ? "在售" : "下架");
+        vo.setRiskAudit(productRiskAuditService.getLatestAudit("SECONDHAND", product.getId()));
         vo.setCreateTime(product.getCreateTime());
         return vo;
     }

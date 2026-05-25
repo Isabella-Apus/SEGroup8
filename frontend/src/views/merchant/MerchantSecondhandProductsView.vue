@@ -127,6 +127,17 @@
           </el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="AI审核" width="150">
+        <template #default="{ row }">
+          <div v-if="row.riskAudit" class="risk-cell">
+            <el-tag :type="riskTagType(row.riskAudit.riskLevel)" effect="plain">
+              {{ riskLabel(row.riskAudit.riskLevel) }} · {{ row.riskAudit.riskScore }}
+            </el-tag>
+            <small>{{ auditStatusLabel(row.riskAudit.auditStatus) }}</small>
+          </div>
+          <span v-else class="muted">待生成</span>
+        </template>
+      </el-table-column>
       <el-table-column label="拍卖" min-width="190">
         <template #default="{ row }">
           <div v-if="auctionFor(row)" class="auction-cell">
@@ -433,6 +444,21 @@ function auctionTagType(auction) {
   if (auction.status === "FINISHED") return "primary";
   if (auction.status === "FLOW") return "warning";
   return "info";
+}
+
+function riskLabel(level) {
+  const map = { LOW: "低风险", MEDIUM: "中风险", HIGH: "高风险" };
+  return map[level] ?? "未评估";
+}
+
+function riskTagType(level) {
+  const map = { LOW: "success", MEDIUM: "warning", HIGH: "danger" };
+  return map[level] ?? "info";
+}
+
+function auditStatusLabel(status) {
+  const map = { PENDING: "待处理", APPROVED: "已通过", REJECTED: "已驳回", CHANGE_REQUESTED: "要求修改" };
+  return map[status] ?? "待处理";
 }
 
 function openMessageCenter() {
@@ -836,8 +862,15 @@ function formatTime(value) {
   align-items: start;
 }
 
+.risk-cell {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+
 .auction-cell span,
 .auction-cell small,
+.risk-cell small,
 .muted {
   color: var(--text-muted);
   font-size: 12px;

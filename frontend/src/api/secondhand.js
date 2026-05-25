@@ -20,6 +20,10 @@ export function getSellerSecondhandListApi(params = {}) {
     return http.get('/secondhand/seller/list', { params });
 }
 
+export function getSecondhandCategoryTreeApi() {
+    return http.get('/category/tree', { params: { scene: 'SECONDHAND' } });
+}
+
 export function updateSellerSecondhandApi(id, payload) {
     return http.put(`/secondhand/seller/${id}`, payload);
 }

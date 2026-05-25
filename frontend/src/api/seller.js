@@ -5,7 +5,7 @@ export function getMyProducts(params) {
     return http.get('/product/seller/list', { params })
 }
 export function getProductDetail(id) {
-    return http.get(`/product/detail/${id}`)
+    return http.get(`/product/seller/${id}`)
 }
 export function createProduct(data) {
     return http.post('/product/seller', data)
@@ -55,6 +55,10 @@ export async function uploadImage(file) {
     return http.post('/upload/image', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
     })
+}
+
+export function getCategoryTree(scene = 'NEW') {
+    return http.get('/category/tree', { params: { scene } })
 }
 
 // ===== 优惠券管理 =====

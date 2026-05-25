@@ -19,6 +19,7 @@ import com.segroup8.platform.mapper.UserBlockMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
 import com.segroup8.platform.service.CategoryService;
+import com.segroup8.platform.service.ProductRiskAuditService;
 import com.segroup8.platform.service.SecondhandTradeService;
 import com.segroup8.platform.vo.OrderVO;
 import com.segroup8.platform.vo.PageVO;
@@ -72,6 +73,9 @@ class SecondhandProductServiceImplTest {
     @Mock
     private SecondhandTradeService secondhandTradeService;
 
+    @Mock
+    private ProductRiskAuditService productRiskAuditService;
+
     private SecondhandProductServiceImpl secondhandProductService;
 
     @Mock
@@ -81,7 +85,7 @@ class SecondhandProductServiceImplTest {
     void setUp() {
         secondhandProductService = new SecondhandProductServiceImpl(secondhandProductMapper, orderInfoMapper,
                 orderItemMapper, productAuctionMapper, userMapper, addressMapper, browseHistoryService, userBlockMapper, categoryService,
-                secondhandTradeService);
+                secondhandTradeService, productRiskAuditService);
     }
 
     @AfterEach
