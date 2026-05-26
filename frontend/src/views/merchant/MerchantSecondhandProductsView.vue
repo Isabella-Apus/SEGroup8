@@ -156,6 +156,7 @@
       <el-table-column label="操作" width="390" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" @click="router.push(`/secondhand/${row.id}`)">查看</el-button>
+          <el-button link type="primary" @click="openDescriptionDialog(row)">修改描述</el-button>
           <el-button
             v-if="auctionFor(row)?.status === 'ONGOING'"
             link
@@ -288,6 +289,34 @@
         </div>
       </template>
     </el-dialog>
+
+    <el-dialog
+      v-model="descriptionDialogVisible"
+      title="修改商品描述"
+      width="520px"
+      append-to-body
+      :close-on-click-modal="false"
+    >
+      <el-form label-position="top">
+        <el-form-item label="商品">
+          <span>{{ descriptionTarget?.name || '-' }}</span>
+        </el-form-item>
+        <el-form-item label="商品描述">
+          <el-input
+            v-model="descriptionForm.description"
+            type="textarea"
+            :rows="6"
+            maxlength="2000"
+            show-word-limit
+            placeholder="请根据实际商品补充描述"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="descriptionDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="descriptionSubmitting" @click="submitDescriptionUpdate">提交修改并重新审核</el-button>
+      </template>
+    </el-dialog>
   </section>
 </template>
 
@@ -306,6 +335,7 @@ import {
   listBargainRequestsApi,
   markAuctionFlowApi,
   rejectBargainApi,
+  updateSellerSecondhandApi,
 } from "@/api/secondhand";
 import { useUserStore } from "@/stores/user";
 import { toAssetUrl } from "@/utils/url";
@@ -325,6 +355,12 @@ const auctionActionKey = ref("");
 const auctionDialogVisible = ref(false);
 const auctionSubmitting = ref(false);
 const auctionTarget = ref(null);
+const descriptionDialogVisible = ref(false);
+const descriptionSubmitting = ref(false);
+const descriptionTarget = ref(null);
+const descriptionForm = reactive({
+  description: "",
+});
 const auctionForm = reactive({
   startPrice: 1,
   incrementAmount: 5,
@@ -478,6 +514,38 @@ function openBuyerChat(request) {
       sourceId: request.productId,
     },
   });
+}
+
+function openDescriptionDialog(row) {
+  descriptionTarget.value = row;
+  descriptionForm.description = row?.description || "";
+  descriptionDialogVisible.value = true;
+}
+
+async function submitDescriptionUpdate() {
+  const target = descriptionTarget.value;
+  if (!target?.id) return;
+  descriptionSubmitting.value = true;
+  try {
+    await updateSellerSecondhandApi(target.id, {
+      name: target.name,
+      cover: target.cover || "",
+      images: Array.isArray(target.images) ? target.images : (target.cover ? [target.cover] : []),
+      description: descriptionForm.description,
+      originPrice: target.originPrice,
+      salePrice: target.salePrice,
+      categoryId: target.categoryId,
+      subCategoryId: target.subCategoryId,
+      conditionLevel: target.conditionLevel,
+      isNegotiable: target.isNegotiable ?? 1,
+      status: 1,
+    });
+    ElMessage.success("Description updated and resubmitted for audit");
+    descriptionDialogVisible.value = false;
+    await fetchList(false);
+  } finally {
+    descriptionSubmitting.value = false;
+  }
 }
 
 async function handleConfirmBargain(request) {

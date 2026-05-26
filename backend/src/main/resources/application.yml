@@ -44,6 +44,16 @@ app:
     cleanup-fixed-delay-ms: 60000
   upload:
     dir: uploads
+  risk-audit:
+    llm:
+      enabled: true
+      api-key: "sk-9558bcceacce364d8c0db20380fcd93c305acf38433e0eb613cd5a48be660781"
+      model: gpt-5.4
+      endpoint: https://ai-pixel.online/v1/responses
+      base-url: https://ai-pixel.online
+      wire-api: responses
+      disable-response-storage: true
+      timeout-seconds: 12
 
 springdoc:
   api-docs:

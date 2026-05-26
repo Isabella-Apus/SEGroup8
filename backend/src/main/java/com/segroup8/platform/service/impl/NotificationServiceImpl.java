@@ -145,6 +145,9 @@ public class NotificationServiceImpl implements NotificationService {
                 || text.contains("卖家")
                 || text.contains("店铺")
                 || text.contains("工作台")
+                || text.contains("商品审核")
+                || text.contains("商品需要修改")
+                || text.contains("商品审核未通过")
                 || (text.contains("入驻") && text.contains("通过"))) {
             return "seller";
         }

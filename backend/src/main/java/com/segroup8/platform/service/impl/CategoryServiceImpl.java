@@ -17,6 +17,50 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
+    private static final Map<Integer, String> CATEGORY_NAME_BY_ID = Map.ofEntries(
+            Map.entry(1, "电子数码"),
+            Map.entry(2, "服饰鞋包"),
+            Map.entry(3, "家居生活"),
+            Map.entry(4, "美妆个护"),
+            Map.entry(5, "运动户外"),
+            Map.entry(6, "图书音像"),
+            Map.entry(7, "美食"),
+            Map.entry(8, "其他"),
+            Map.entry(101, "手机"),
+            Map.entry(102, "电脑/平板"),
+            Map.entry(103, "摄影摄像"),
+            Map.entry(104, "影音娱乐"),
+            Map.entry(105, "智能穿戴"),
+            Map.entry(201, "女装"),
+            Map.entry(202, "男装"),
+            Map.entry(203, "运动服饰"),
+            Map.entry(204, "鞋包"),
+            Map.entry(205, "配饰"),
+            Map.entry(301, "家具家装"),
+            Map.entry(302, "厨房用具"),
+            Map.entry(303, "居家日用"),
+            Map.entry(304, "家用电器"),
+            Map.entry(305, "收纳整理"),
+            Map.entry(401, "面部护肤"),
+            Map.entry(402, "彩妆"),
+            Map.entry(403, "个人护理"),
+            Map.entry(404, "香水香氛"),
+            Map.entry(405, "美容仪器"),
+            Map.entry(501, "健身器材"),
+            Map.entry(502, "户外装备"),
+            Map.entry(503, "体育用品"),
+            Map.entry(504, "骑行运动"),
+            Map.entry(601, "教材教辅"),
+            Map.entry(602, "小说文学"),
+            Map.entry(603, "艺术收藏"),
+            Map.entry(604, "办公文具"),
+            Map.entry(701, "休闲零食"),
+            Map.entry(702, "粮油调味"),
+            Map.entry(703, "生鲜果蔬"),
+            Map.entry(704, "冲调饮品"),
+            Map.entry(705, "地方特产"),
+            Map.entry(801, "未分类"));
+
     private final CategoryMapper categoryMapper;
 
     public CategoryServiceImpl(CategoryMapper categoryMapper) {
@@ -92,7 +136,7 @@ public class CategoryServiceImpl implements CategoryService {
             return null;
         }
         Category category = categoryMapper.selectById(categoryId);
-        return category == null ? null : category.getName();
+        return category == null ? CATEGORY_NAME_BY_ID.get(categoryId) : displayName(category);
     }
 
     private List<Category> listEnabledCategories() {
@@ -103,8 +147,15 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryTreeNodeVO toNode(Category category) {
         CategoryTreeNodeVO node = new CategoryTreeNodeVO();
         node.setId(category.getId());
-        node.setName(category.getName());
+        node.setName(displayName(category));
         node.setParentId(category.getParentId());
         return node;
+    }
+
+    private String displayName(Category category) {
+        if (category == null) {
+            return null;
+        }
+        return CATEGORY_NAME_BY_ID.getOrDefault(category.getId(), category.getName());
     }
 }
