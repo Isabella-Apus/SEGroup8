@@ -402,6 +402,28 @@ UPDATE `secondhand_product`
 SET `images` = CONCAT('["', REPLACE(REPLACE(`cover`, '\\', '\\\\'), '"', '\\"'), '"]')
 WHERE (`images` IS NULL OR `images` = '') AND `cover` IS NOT NULL AND `cover` <> '';
 
+CREATE TABLE IF NOT EXISTS `product_risk_audit` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `product_type` VARCHAR(20) NOT NULL,
+  `product_id` BIGINT NOT NULL,
+  `seller_user_id` BIGINT DEFAULT NULL,
+  `product_name` VARCHAR(120) DEFAULT NULL,
+  `risk_level` VARCHAR(20) NOT NULL DEFAULT 'LOW',
+  `risk_score` INT NOT NULL DEFAULT 0,
+  `risk_reasons` TEXT,
+  `suggestion` VARCHAR(40) NOT NULL DEFAULT 'AUTO_PASS',
+  `audit_status` VARCHAR(30) NOT NULL DEFAULT 'PENDING',
+  `admin_user_id` BIGINT DEFAULT NULL,
+  `admin_remark` VARCHAR(500) DEFAULT NULL,
+  `audit_time` DATETIME DEFAULT NULL,
+  `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_product_risk_audit_product` (`product_type`, `product_id`),
+  KEY `idx_product_risk_audit_status` (`audit_status`, `risk_level`, `create_time`),
+  KEY `idx_product_risk_audit_seller` (`seller_user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 CREATE TABLE IF NOT EXISTS `product_auction` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `product_id` BIGINT NOT NULL,

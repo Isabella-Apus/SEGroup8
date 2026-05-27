@@ -20,6 +20,7 @@ import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
 import com.segroup8.platform.service.CategoryService;
 import com.segroup8.platform.service.ProductService;
+import com.segroup8.platform.service.ProductRiskAuditService;
 import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.vo.ProductVO;
 import org.springframework.stereotype.Service;
@@ -42,15 +43,18 @@ public class ProductServiceImpl implements ProductService {
     private final UserMapper userMapper;
     private final BrowseHistoryService browseHistoryService;
     private final CategoryService categoryService;
+    private final ProductRiskAuditService productRiskAuditService;
 
     public ProductServiceImpl(ProductMapper productMapper, ShopMapper shopMapper, UserMapper userMapper,
             BrowseHistoryService browseHistoryService,
-            CategoryService categoryService) {
+            CategoryService categoryService,
+            ProductRiskAuditService productRiskAuditService) {
         this.productMapper = productMapper;
         this.shopMapper = shopMapper;
         this.userMapper = userMapper;
         this.browseHistoryService = browseHistoryService;
         this.categoryService = categoryService;
+        this.productRiskAuditService = productRiskAuditService;
     }
 
     @Override
@@ -75,6 +79,11 @@ public class ProductServiceImpl implements ProductService {
         }
         browseHistoryService.saveBrowseHistory(productId, "NEW");
         return toVO(product);
+    }
+
+    @Override
+    public ProductVO getSellerProductDetail(Long productId) {
+        return toVO(getSellerOwnedProduct(productId));
     }
 
     @Override
@@ -111,6 +120,7 @@ public class ProductServiceImpl implements ProductService {
         product.setStock(request.getStock());
         product.setStatus(targetStatus);
         productMapper.insert(product);
+        productRiskAuditService.auditNewProduct(productMapper.selectById(product.getId()));
         return toVO(productMapper.selectById(product.getId()));
     }
 
@@ -132,6 +142,7 @@ public class ProductServiceImpl implements ProductService {
         product.setStock(request.getStock());
         product.setStatus(targetStatus);
         productMapper.updateById(product);
+        productRiskAuditService.auditNewProduct(productMapper.selectById(product.getId()));
         return toVO(productMapper.selectById(product.getId()));
     }
 
@@ -313,6 +324,7 @@ public class ProductServiceImpl implements ProductService {
         vo.setStatus(product.getStatus());
         ProductStatusEnum statusEnum = ProductStatusEnum.of(product.getStatus());
         vo.setStatusName(statusEnum == null ? "未知" : statusEnum.getDesc());
+        vo.setRiskAudit(productRiskAuditService.getLatestAudit("NEW", product.getId()));
         vo.setCreateTime(product.getCreateTime());
         return vo;
     }

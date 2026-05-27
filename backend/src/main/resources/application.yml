@@ -44,6 +44,16 @@ app:
     cleanup-fixed-delay-ms: 60000
   upload:
     dir: uploads
+  risk-audit:
+    llm:
+      enabled: true
+      api-key: "${RISK_AUDIT_LLM_API_KEY:${OPENAI_API_KEY:}}"
+      model: gpt-5.4
+      endpoint: "${RISK_AUDIT_LLM_ENDPOINT:https://ai-pixel.online/v1/responses}"
+      base-url: "${RISK_AUDIT_LLM_BASE_URL:https://ai-pixel.online}"
+      wire-api: responses
+      disable-response-storage: true
+      timeout-seconds: 12
 
 springdoc:
   api-docs:

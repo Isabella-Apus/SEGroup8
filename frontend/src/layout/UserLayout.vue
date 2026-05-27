@@ -290,14 +290,17 @@ function handleCommand(command) {
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 10px;
   min-width: 0;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .main-nav {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 6px;
   min-width: 0;
 }
@@ -317,6 +320,7 @@ function handleCommand(command) {
   font-weight: 800;
   cursor: pointer;
   white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .nav-action:hover,
@@ -361,7 +365,7 @@ function handleCommand(command) {
   padding: 18px 0 36px;
 }
 
-@media (max-width: 1120px) {
+@media (max-width: 1320px) {
   .header-inner {
     grid-template-columns: 170px minmax(260px, 1fr);
     gap: 12px;
@@ -370,11 +374,11 @@ function handleCommand(command) {
 
   .header-actions {
     grid-column: 1 / -1;
-    justify-content: space-between;
+    justify-content: flex-end;
   }
 
   .main-nav {
-    overflow-x: auto;
+    overflow: visible;
   }
 }
 

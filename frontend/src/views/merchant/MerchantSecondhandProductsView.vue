@@ -127,6 +127,17 @@
           </el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="AI审核" width="150">
+        <template #default="{ row }">
+          <div v-if="row.riskAudit" class="risk-cell">
+            <el-tag :type="riskTagType(row.riskAudit.riskLevel)" effect="plain">
+              {{ riskLabel(row.riskAudit.riskLevel) }} · {{ row.riskAudit.riskScore }}
+            </el-tag>
+            <small>{{ auditStatusLabel(row.riskAudit.auditStatus) }}</small>
+          </div>
+          <span v-else class="muted">待生成</span>
+        </template>
+      </el-table-column>
       <el-table-column label="拍卖" min-width="190">
         <template #default="{ row }">
           <div v-if="auctionFor(row)" class="auction-cell">
@@ -145,6 +156,7 @@
       <el-table-column label="操作" width="390" fixed="right">
         <template #default="{ row }">
           <el-button link type="primary" @click="router.push(`/secondhand/${row.id}`)">查看</el-button>
+          <el-button link type="primary" @click="openDescriptionDialog(row)">修改描述</el-button>
           <el-button
             v-if="auctionFor(row)?.status === 'ONGOING'"
             link
@@ -277,6 +289,34 @@
         </div>
       </template>
     </el-dialog>
+
+    <el-dialog
+      v-model="descriptionDialogVisible"
+      title="修改商品描述"
+      width="520px"
+      append-to-body
+      :close-on-click-modal="false"
+    >
+      <el-form label-position="top">
+        <el-form-item label="商品">
+          <span>{{ descriptionTarget?.name || '-' }}</span>
+        </el-form-item>
+        <el-form-item label="商品描述">
+          <el-input
+            v-model="descriptionForm.description"
+            type="textarea"
+            :rows="6"
+            maxlength="2000"
+            show-word-limit
+            placeholder="请根据实际商品补充描述"
+          />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="descriptionDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="descriptionSubmitting" @click="submitDescriptionUpdate">提交修改并重新审核</el-button>
+      </template>
+    </el-dialog>
   </section>
 </template>
 
@@ -295,6 +335,7 @@ import {
   listBargainRequestsApi,
   markAuctionFlowApi,
   rejectBargainApi,
+  updateSellerSecondhandApi,
 } from "@/api/secondhand";
 import { useUserStore } from "@/stores/user";
 import { toAssetUrl } from "@/utils/url";
@@ -314,6 +355,12 @@ const auctionActionKey = ref("");
 const auctionDialogVisible = ref(false);
 const auctionSubmitting = ref(false);
 const auctionTarget = ref(null);
+const descriptionDialogVisible = ref(false);
+const descriptionSubmitting = ref(false);
+const descriptionTarget = ref(null);
+const descriptionForm = reactive({
+  description: "",
+});
 const auctionForm = reactive({
   startPrice: 1,
   incrementAmount: 5,
@@ -435,6 +482,21 @@ function auctionTagType(auction) {
   return "info";
 }
 
+function riskLabel(level) {
+  const map = { LOW: "低风险", MEDIUM: "中风险", HIGH: "高风险" };
+  return map[level] ?? "未评估";
+}
+
+function riskTagType(level) {
+  const map = { LOW: "success", MEDIUM: "warning", HIGH: "danger" };
+  return map[level] ?? "info";
+}
+
+function auditStatusLabel(status) {
+  const map = { PENDING: "待处理", APPROVED: "已通过", REJECTED: "已驳回", CHANGE_REQUESTED: "要求修改" };
+  return map[status] ?? "待处理";
+}
+
 function openMessageCenter() {
   router.push(messageCenterPath.value);
 }
@@ -452,6 +514,38 @@ function openBuyerChat(request) {
       sourceId: request.productId,
     },
   });
+}
+
+function openDescriptionDialog(row) {
+  descriptionTarget.value = row;
+  descriptionForm.description = row?.description || "";
+  descriptionDialogVisible.value = true;
+}
+
+async function submitDescriptionUpdate() {
+  const target = descriptionTarget.value;
+  if (!target?.id) return;
+  descriptionSubmitting.value = true;
+  try {
+    await updateSellerSecondhandApi(target.id, {
+      name: target.name,
+      cover: target.cover || "",
+      images: Array.isArray(target.images) ? target.images : (target.cover ? [target.cover] : []),
+      description: descriptionForm.description,
+      originPrice: target.originPrice,
+      salePrice: target.salePrice,
+      categoryId: target.categoryId,
+      subCategoryId: target.subCategoryId,
+      conditionLevel: target.conditionLevel,
+      isNegotiable: target.isNegotiable ?? 1,
+      status: 1,
+    });
+    ElMessage.success("Description updated and resubmitted for audit");
+    descriptionDialogVisible.value = false;
+    await fetchList(false);
+  } finally {
+    descriptionSubmitting.value = false;
+  }
 }
 
 async function handleConfirmBargain(request) {
@@ -836,8 +930,15 @@ function formatTime(value) {
   align-items: start;
 }
 
+.risk-cell {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+
 .auction-cell span,
 .auction-cell small,
+.risk-cell small,
 .muted {
   color: var(--text-muted);
   font-size: 12px;

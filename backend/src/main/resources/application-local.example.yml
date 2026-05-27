@@ -2,3 +2,15 @@ spring:
   datasource:
     username: root
     password: your_mysql_password
+
+app:
+  risk-audit:
+    llm:
+      enabled: true
+      api-key: your_llm_api_key
+      model: gpt-5.4
+      endpoint: https://ai-pixel.online/v1/responses
+      base-url: https://ai-pixel.online
+      wire-api: responses
+      disable-response-storage: true
+      timeout-seconds: 12

@@ -65,6 +65,12 @@ public class ProductController {
         return Result.success(productService.pageSellerProducts(request));
     }
 
+    @Operation(summary = "卖家获取自己的商品详情")
+    @GetMapping("/seller/{productId}")
+    public Result<ProductVO> sellerDetail(@PathVariable Long productId) {
+        return Result.success(productService.getSellerProductDetail(productId));
+    }
+
     @Operation(summary = "卖家新增商品")
     @PostMapping("/seller")
     public Result<ProductVO> sellerCreate(@Valid @RequestBody ProductSaveRequest request) {

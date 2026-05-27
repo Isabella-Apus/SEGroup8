@@ -307,6 +307,11 @@ const routes = [
                 name: "adminReports",
                 component: () => import("@/views/admin/AdminReportView.vue"),
             },
+            {
+                path: "product-risk-audits",
+                name: "adminProductRiskAudits",
+                component: () => import("@/views/admin/AdminProductRiskAuditView.vue"),
+            },
         ],
     },
 ];

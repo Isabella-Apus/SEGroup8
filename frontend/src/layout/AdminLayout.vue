@@ -56,6 +56,7 @@ const navItems = [
   { label: "入驻审核", path: "/admin/merchant-review", color: "#ffc6dc" },
   { label: "订单管理", path: "/admin/orders", color: "#b7a6ff" },
   { label: "举报审核", path: "/admin/reports", color: "#ffd36e" },
+  { label: "AI 风险审核", path: "/admin/product-risk-audits", color: "#ff8f70" },
   { label: "审计日志", path: "/admin/audit-logs", color: "#7ee8cb" },
 ];
 
