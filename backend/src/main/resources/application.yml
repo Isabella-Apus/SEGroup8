@@ -47,10 +47,10 @@ app:
   risk-audit:
     llm:
       enabled: true
-      api-key: "sk-9558bcceacce364d8c0db20380fcd93c305acf38433e0eb613cd5a48be660781"
+      api-key: "${RISK_AUDIT_LLM_API_KEY:${OPENAI_API_KEY:}}"
       model: gpt-5.4
-      endpoint: https://ai-pixel.online/v1/responses
-      base-url: https://ai-pixel.online
+      endpoint: "${RISK_AUDIT_LLM_ENDPOINT:https://ai-pixel.online/v1/responses}"
+      base-url: "${RISK_AUDIT_LLM_BASE_URL:https://ai-pixel.online}"
       wire-api: responses
       disable-response-storage: true
       timeout-seconds: 12
