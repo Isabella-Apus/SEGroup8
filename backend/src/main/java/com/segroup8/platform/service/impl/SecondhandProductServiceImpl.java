@@ -26,11 +26,13 @@ import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
 import com.segroup8.platform.service.CategoryService;
 import com.segroup8.platform.service.ProductRiskAuditService;
+import com.segroup8.platform.service.SellerRatingAssembler;
 import com.segroup8.platform.service.SecondhandProductService;
 import com.segroup8.platform.service.SecondhandTradeService;
 import com.segroup8.platform.vo.OrderItemVO;
 import com.segroup8.platform.vo.OrderVO;
 import com.segroup8.platform.vo.PageVO;
+import com.segroup8.platform.vo.SecondhandSellerPublicVO;
 import com.segroup8.platform.vo.SecondhandProductVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,6 +69,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
     private final CategoryService categoryService;
     private final SecondhandTradeService secondhandTradeService;
     private final ProductRiskAuditService productRiskAuditService;
+    private final SellerRatingAssembler sellerRatingAssembler;
 
     public SecondhandProductServiceImpl(SecondhandProductMapper secondhandProductMapper,
             OrderInfoMapper orderInfoMapper,
@@ -78,7 +81,8 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
             UserBlockMapper userBlockMapper,
             CategoryService categoryService,
             SecondhandTradeService secondhandTradeService,
-            ProductRiskAuditService productRiskAuditService) {
+            ProductRiskAuditService productRiskAuditService,
+            SellerRatingAssembler sellerRatingAssembler) {
         this.secondhandProductMapper = secondhandProductMapper;
         this.orderInfoMapper = orderInfoMapper;
         this.orderItemMapper = orderItemMapper;
@@ -90,6 +94,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         this.categoryService = categoryService;
         this.secondhandTradeService = secondhandTradeService;
         this.productRiskAuditService = productRiskAuditService;
+        this.sellerRatingAssembler = sellerRatingAssembler;
     }
 
     @Override
@@ -128,6 +133,49 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
             page.setTotal(secondhandProductMapper.selectCount(wrapper));
         }
         return toPageVO(page);
+    }
+
+    @Override
+    public PageVO<SecondhandProductVO> pagePublicSellerProducts(Long sellerUserId,
+            SecondhandProductPageQueryRequest request) {
+        validatePriceRange(request.getMinPrice(), request.getMaxPrice());
+        if (userMapper.selectById(sellerUserId) == null) {
+            throw new BusinessException(404, "卖家不存在");
+        }
+        LambdaQueryWrapper<SecondhandProduct> wrapper = new LambdaQueryWrapper<SecondhandProduct>()
+                .eq(SecondhandProduct::getSellerUserId, sellerUserId);
+        List<Long> auctionProductIds = listOngoingAuctionProductIds();
+        if (auctionProductIds.isEmpty()) {
+            wrapper.eq(SecondhandProduct::getStatus, ON_SHELF);
+        } else {
+            wrapper.and(w -> w.eq(SecondhandProduct::getStatus, ON_SHELF)
+                    .or()
+                    .in(SecondhandProduct::getId, auctionProductIds));
+        }
+        appendCommonFilters(wrapper, request);
+        applySort(wrapper, request.getSortBy());
+        Page<SecondhandProduct> page = secondhandProductMapper.selectPage(
+                Page.of(request.getPageNum(), request.getPageSize()),
+                wrapper);
+        if (page.getTotal() == 0 && !page.getRecords().isEmpty()) {
+            page.setTotal(secondhandProductMapper.selectCount(wrapper));
+        }
+        return toPageVO(page);
+    }
+
+    @Override
+    public SecondhandSellerPublicVO getPublicSeller(Long sellerUserId) {
+        User user = sellerUserId == null ? null : userMapper.selectById(sellerUserId);
+        if (user == null) {
+            throw new BusinessException(404, "卖家不存在");
+        }
+        SecondhandSellerPublicVO vo = new SecondhandSellerPublicVO();
+        vo.setUserId(user.getId());
+        vo.setNickname(StringUtils.hasText(user.getNickname()) ? user.getNickname() : user.getUsername());
+        vo.setAvatar(user.getAvatar());
+        vo.setRegion(user.getRegion());
+        vo.setRating(sellerRatingAssembler.build(user.getId()));
+        return vo;
     }
 
     @Override

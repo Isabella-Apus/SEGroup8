@@ -53,6 +53,11 @@ const routes = [
                     import("@/views/product/ProductDetailView.vue"),
             },
             {
+                path: "shop/:shopId",
+                name: "publicShop",
+                component: () => import("@/views/shop/PublicShopView.vue"),
+            },
+            {
                 path: "cart",
                 name: "cart",
                 component: () => import("@/views/order/CartView.vue"),
@@ -115,6 +120,11 @@ const routes = [
                 name: "secondhandPublish",
                 component: () =>
                     import("@/views/secondhand/SecondhandPublishView.vue"),
+            },
+            {
+                path: "secondhand/seller/:sellerId",
+                name: "secondhandSeller",
+                component: () => import("@/views/secondhand/SecondhandSellerView.vue"),
             },
             {
                 path: "secondhand/:id",

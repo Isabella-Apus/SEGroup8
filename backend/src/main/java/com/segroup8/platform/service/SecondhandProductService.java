@@ -5,11 +5,16 @@ import com.segroup8.platform.dto.SecondhandProductPageQueryRequest;
 import com.segroup8.platform.dto.SecondhandProductSaveRequest;
 import com.segroup8.platform.vo.OrderVO;
 import com.segroup8.platform.vo.PageVO;
+import com.segroup8.platform.vo.SecondhandSellerPublicVO;
 import com.segroup8.platform.vo.SecondhandProductVO;
 
 public interface SecondhandProductService {
 
     PageVO<SecondhandProductVO> pagePublicProducts(SecondhandProductPageQueryRequest request);
+
+    PageVO<SecondhandProductVO> pagePublicSellerProducts(Long sellerUserId, SecondhandProductPageQueryRequest request);
+
+    SecondhandSellerPublicVO getPublicSeller(Long sellerUserId);
 
     SecondhandProductVO getPublicProductDetail(Long productId);
 

@@ -9,6 +9,7 @@ import com.segroup8.platform.service.SearchBehaviorService;
 import com.segroup8.platform.service.SecondhandProductService;
 import com.segroup8.platform.vo.OrderVO;
 import com.segroup8.platform.vo.PageVO;
+import com.segroup8.platform.vo.SecondhandSellerPublicVO;
 import com.segroup8.platform.vo.SecondhandProductVO;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -46,6 +47,20 @@ public class SecondhandProductController {
     @GetMapping("/detail/{productId}")
     public Result<SecondhandProductVO> detail(@PathVariable Long productId) {
         return Result.success(secondhandProductService.getPublicProductDetail(productId));
+    }
+
+    @Operation(summary = "公开二手卖家信息")
+    @GetMapping("/seller-public/{sellerUserId}")
+    public Result<SecondhandSellerPublicVO> publicSeller(@PathVariable Long sellerUserId) {
+        return Result.success(secondhandProductService.getPublicSeller(sellerUserId));
+    }
+
+    @Operation(summary = "公开二手卖家在售商品")
+    @GetMapping("/seller-public/{sellerUserId}/products")
+    public Result<PageVO<SecondhandProductVO>> publicSellerProducts(
+            @PathVariable Long sellerUserId,
+            @Valid @ModelAttribute SecondhandProductPageQueryRequest request) {
+        return Result.success(secondhandProductService.pagePublicSellerProducts(sellerUserId, request));
     }
 
     @Operation(summary = "卖家分页查询我的二手商品")
@@ -89,4 +104,3 @@ public class SecondhandProductController {
         return Result.success(secondhandProductService.buySecondhandProduct(productId, request));
     }
 }
-
