@@ -4,12 +4,16 @@ public class SellerRatingVO {
 
     private Integer overallScore;
     private String overallLevel;
+    private Integer buyerScore;
+    private String buyerLevel;
     private Integer shopScore;
     private String shopLevel;
     private Integer shopSoldCount;
     private Double shopGoodRate;
     private Integer shSellerScore;
     private String shSellerLevel;
+    private Integer shSellerRatingScore;
+    private String shSellerRatingLevel;
     private Integer shSellerSoldCount;
     private Double shSellerGoodRate;
 
@@ -27,6 +31,22 @@ public class SellerRatingVO {
 
     public void setOverallLevel(String overallLevel) {
         this.overallLevel = overallLevel;
+    }
+
+    public Integer getBuyerScore() {
+        return buyerScore;
+    }
+
+    public void setBuyerScore(Integer buyerScore) {
+        this.buyerScore = buyerScore;
+    }
+
+    public String getBuyerLevel() {
+        return buyerLevel;
+    }
+
+    public void setBuyerLevel(String buyerLevel) {
+        this.buyerLevel = buyerLevel;
     }
 
     public Integer getShopScore() {
@@ -75,6 +95,22 @@ public class SellerRatingVO {
 
     public void setShSellerLevel(String shSellerLevel) {
         this.shSellerLevel = shSellerLevel;
+    }
+
+    public Integer getShSellerRatingScore() {
+        return shSellerRatingScore;
+    }
+
+    public void setShSellerRatingScore(Integer shSellerRatingScore) {
+        this.shSellerRatingScore = shSellerRatingScore;
+    }
+
+    public String getShSellerRatingLevel() {
+        return shSellerRatingLevel;
+    }
+
+    public void setShSellerRatingLevel(String shSellerRatingLevel) {
+        this.shSellerRatingLevel = shSellerRatingLevel;
     }
 
     public Integer getShSellerSoldCount() {

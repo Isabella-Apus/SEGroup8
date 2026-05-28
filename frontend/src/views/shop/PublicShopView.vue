@@ -123,6 +123,25 @@
           />
         </div>
       </section>
+
+      <section v-if="hasPolicies" class="policy-section">
+        <div class="section-head">
+          <div>
+            <span class="section-kicker">Shop Policies</span>
+            <h2>店铺政策</h2>
+          </div>
+        </div>
+        <div class="policy-list">
+          <div v-if="shop.shippingPolicy" class="policy-item">
+            <span>发货政策</span>
+            <p>{{ shop.shippingPolicy }}</p>
+          </div>
+          <div v-if="shop.returnPolicy" class="policy-item">
+            <span>售后政策</span>
+            <p>{{ shop.returnPolicy }}</p>
+          </div>
+        </div>
+      </section>
     </template>
 
     <el-empty v-else description="店铺不存在或已关闭" />
@@ -186,6 +205,7 @@ const decorationComponents = computed(() => {
 });
 
 const hasDecoration = computed(() => decorationComponents.value.length > 0);
+const hasPolicies = computed(() => Boolean(shop.value?.shippingPolicy || shop.value?.returnPolicy));
 
 onMounted(async () => {
   await fetchShop();
@@ -353,6 +373,7 @@ function handlePageChange(page) {
 
 .announcement-strip,
 .default-decoration,
+.policy-section,
 .product-section,
 .decoration-preview {
   border: 1px solid var(--line-soft);
@@ -401,6 +422,41 @@ function handlePageChange(page) {
 
 .product-section {
   padding: 14px;
+}
+
+.policy-section {
+  padding: 14px;
+}
+
+.policy-list {
+  display: grid;
+  gap: 12px;
+}
+
+.policy-item {
+  border-top: 1px solid var(--line-soft);
+  padding-top: 12px;
+}
+
+.policy-item:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.policy-item span {
+  display: block;
+  color: var(--brand-primary);
+  font-size: 13px;
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+
+.policy-item p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .section-head {
