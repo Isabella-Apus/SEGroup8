@@ -11,11 +11,14 @@ public class Shop {
     private Long id;
     private Long ownerUserId;
     private String name;
+    private String logo;
+    private String description;
     private String region;
     private String contactName;
     private String contactPhone;
     private String idCardNoMasked;
     private String warehouseAddr;
+    private String decorationJson;
     private Integer status;
 
     public Long getId() {
@@ -40,6 +43,22 @@ public class Shop {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getRegion() {
@@ -80,6 +99,14 @@ public class Shop {
 
     public void setWarehouseAddr(String warehouseAddr) {
         this.warehouseAddr = warehouseAddr;
+    }
+
+    public String getDecorationJson() {
+        return decorationJson;
+    }
+
+    public void setDecorationJson(String decorationJson) {
+        this.decorationJson = decorationJson;
     }
 
     public Integer getStatus() {

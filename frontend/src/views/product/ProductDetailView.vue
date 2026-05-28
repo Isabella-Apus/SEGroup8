@@ -65,6 +65,10 @@
           <el-button size="large" @click="handleContactSeller">
             和卖家聊一聊
           </el-button>
+          <el-button size="large" :disabled="!product.shopId" @click="handleEnterShop">
+            <el-icon><Shop /></el-icon>
+            进入店家
+          </el-button>
         </div>
 
         <div class="service-row">
@@ -82,6 +86,7 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { Shop } from "@element-plus/icons-vue";
 import { useRoute, useRouter } from "vue-router";
 import { getProductDetailApi } from "@/api/product";
 import { createOrderApi } from "@/api/order";
@@ -202,6 +207,14 @@ function handleContactSeller() {
       sourceId: product.value.id,
     },
   });
+}
+
+function handleEnterShop() {
+  if (!product.value?.shopId) {
+    ElMessage.warning("当前商品暂未关联店铺");
+    return;
+  }
+  router.push({ name: "publicShop", params: { shopId: product.value.shopId } });
 }
 
 function getSellerUserId() {

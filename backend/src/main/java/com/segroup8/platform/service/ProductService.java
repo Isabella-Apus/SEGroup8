@@ -9,6 +9,8 @@ public interface ProductService {
 
     PageVO<ProductVO> pagePublicProducts(ProductPageQueryRequest request);
 
+    PageVO<ProductVO> pagePublicShopProducts(Long shopId, ProductPageQueryRequest request);
+
     ProductVO getPublicProductDetail(Long productId);
 
     ProductVO getSellerProductDetail(Long productId);

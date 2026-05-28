@@ -8,6 +8,14 @@ export function getSecondhandDetailApi(id) {
     return http.get(`/secondhand/detail/${id}`);
 }
 
+export function getPublicSecondhandSellerApi(sellerUserId) {
+    return http.get(`/secondhand/seller-public/${sellerUserId}`);
+}
+
+export function getPublicSecondhandSellerProductsApi(sellerUserId, params = {}) {
+    return http.get(`/secondhand/seller-public/${sellerUserId}/products`, { params });
+}
+
 export function publishSecondhandApi(payload) {
     return http.post("/secondhand/seller", payload);
 }

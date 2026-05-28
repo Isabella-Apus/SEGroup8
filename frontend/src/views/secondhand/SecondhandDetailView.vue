@@ -115,6 +115,10 @@
           <el-button type="primary" size="large" @click="handleContactSeller">
             和卖家聊一聊
           </el-button>
+          <el-button size="large" :disabled="!item.sellerUserId" @click="handleEnterSeller">
+            <el-icon><User /></el-icon>
+            进入卖家
+          </el-button>
           <el-button size="large" :type="canBargain ? 'primary' : 'default'" @click="openBargainDialog">
             我要议价
           </el-button>
@@ -233,6 +237,7 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { User } from "@element-plus/icons-vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   applyBargainApi,
@@ -473,6 +478,15 @@ function handleAddToSecondhandCart() {
 
 function handleContactSeller() {
   openSellerChat();
+}
+
+function handleEnterSeller() {
+  const sellerUserId = getSellerUserId();
+  if (!sellerUserId) {
+    ElMessage.warning("当前商品暂未关联卖家");
+    return;
+  }
+  router.push({ name: "secondhandSeller", params: { sellerId: sellerUserId } });
 }
 
 function openBargainDialog() {

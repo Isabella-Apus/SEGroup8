@@ -125,6 +125,7 @@ CREATE TABLE IF NOT EXISTS `shop` (
   `contact_phone` VARCHAR(20) DEFAULT NULL,
   `id_card_no_masked` VARCHAR(50) DEFAULT NULL,
   `warehouse_addr` VARCHAR(255) DEFAULT NULL,
+  `decoration_json` TEXT,
   `status` TINYINT NOT NULL DEFAULT 1,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -191,6 +192,19 @@ SET @shop_warehouse_addr_exists = (
 );
 SET @sql = IF(@shop_warehouse_addr_exists = 0,
   'ALTER TABLE `shop` ADD COLUMN `warehouse_addr` VARCHAR(255) DEFAULT NULL',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @shop_decoration_json_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'shop' AND COLUMN_NAME = 'decoration_json'
+);
+SET @sql = IF(@shop_decoration_json_exists = 0,
+  'ALTER TABLE `shop` ADD COLUMN `decoration_json` TEXT',
   'SELECT 1'
 );
 PREPARE stmt FROM @sql;

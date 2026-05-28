@@ -69,6 +69,22 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public PageVO<ProductVO> pagePublicShopProducts(Long shopId, ProductPageQueryRequest request) {
+        validatePriceRange(request.getMinPrice(), request.getMaxPrice());
+        Shop shop = shopId == null ? null : shopMapper.selectById(shopId);
+        if (shop == null || !Objects.equals(shop.getStatus(), 1)) {
+            throw new BusinessException(404, "店铺不存在或已关闭");
+        }
+        LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<Product>()
+                .eq(Product::getShopId, shopId)
+                .eq(Product::getStatus, ProductStatusEnum.ON_SHELF.getCode());
+        appendCommonFilters(wrapper, request);
+        applySort(wrapper, request.getSortBy());
+        Page<Product> page = productMapper.selectPage(Page.of(request.getPageNum(), request.getPageSize()), wrapper);
+        return toPageVO(page);
+    }
+
+    @Override
     public ProductVO getPublicProductDetail(Long productId) {
         Product product = productMapper.selectOne(new LambdaQueryWrapper<Product>()
                 .eq(Product::getId, productId)

@@ -171,12 +171,13 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Delete, Rank } from '@element-plus/icons-vue'
 import draggable from 'vuedraggable'
 import { useUserStore } from '@/stores/user'
-import { updateShopProfile } from '@/api/seller'
+import { getCurrentSellerShopApi, saveShopDecorationApi } from '@/api/shop'
 import ComponentRenderer from './decoration/ComponentRenderer.vue'
 import PropEditor from './decoration/PropEditor.vue'
 import { COMPONENT_TEMPLATES, createComponent } from './decoration/componentConfig.js'
 
 const userStore = useUserStore()
+const DECORATION_STORAGE_KEY = 'shop_decoration_v2'
 const saving = ref(false)
 const previewVisible = ref(false)
 const previewMode = ref('pc')
@@ -239,9 +240,8 @@ async function handleSave() {
       globalSettings: { ...globalSettings },
       components: components.value
     }
-    localStorage.setItem('shop_decoration_v2', JSON.stringify(decoration))
-    // 同步保存一个标记到后端（可选）
-    await updateShopProfile({ announcement: userStore.userInfo?.announcement || '' })
+    await saveShopDecorationApi(decoration)
+    localStorage.setItem(DECORATION_STORAGE_KEY, JSON.stringify(decoration))
     ElMessage.success('店铺装修已保存发布！')
   } catch {
     ElMessage.error('保存失败，请稍后重试')
@@ -260,7 +260,9 @@ async function loadData() {
       ? (info.avatar.startsWith('http') ? info.avatar : 'http://localhost:8080' + info.avatar)
       : ''
 
-    const saved = localStorage.getItem('shop_decoration_v2')
+    const shopResult = await getCurrentSellerShopApi()
+    const serverDecoration = shopResult.data?.decorationJson
+    const saved = serverDecoration || localStorage.getItem(DECORATION_STORAGE_KEY)
     if (saved) {
       try {
         const parsed = JSON.parse(saved)
@@ -282,8 +284,10 @@ onMounted(loadData)
 .decoration-editor {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 60px);
-  margin: -18px;
+  height: calc(100vh - 82px);
+  height: calc(100dvh - 82px);
+  min-height: 0;
+  margin: -18px -22px -36px;
 }
 .editor-toolbar {
   display: flex;
@@ -298,7 +302,7 @@ onMounted(loadData)
 .toolbar-right { display: flex; gap: 8px; }
 .toolbar-title { margin: 0; font-size: 18px; font-weight: 600; }
 
-.editor-body { display: flex; flex: 1; overflow: hidden; }
+.editor-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }
 
 .editor-panel {
   width: 240px;
@@ -357,17 +361,21 @@ onMounted(loadData)
 
 .editor-canvas-wrap {
   flex: 1;
+  min-width: 0;
+  min-height: 0;
   overflow-y: auto;
   background: #f0f2f5;
   display: flex;
+  align-items: flex-start;
   justify-content: center;
-  padding: 20px;
+  padding: 20px 20px 48px;
 }
 .editor-canvas {
   background: #fff;
   width: 100%;
   max-width: 900px;
   min-height: 100%;
+  flex: 0 0 auto;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0,0,0,0.08);

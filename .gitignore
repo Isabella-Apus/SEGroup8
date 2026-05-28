@@ -38,6 +38,7 @@ backend/.env.*
 !backend/.env.example
 
 # runtime logs
+frontend/*.log
 backend/*.log
 backend/springboot_run.out.log
 backend/springboot_run.err.log
