@@ -106,7 +106,7 @@ public class ShopServiceImpl implements ShopService {
         vo.setShippingPolicy(owner == null ? null : owner.getShippingPolicy());
         vo.setAnnouncement(owner == null ? null : owner.getAnnouncement());
         vo.setDecorationJson(shop.getDecorationJson());
-        vo.setRating(sellerRatingAssembler.build(shop.getOwnerUserId()));
+        vo.setRating(sellerRatingAssembler.buildForShop(shop.getOwnerUserId()));
         return vo;
     }
 

@@ -174,7 +174,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         vo.setNickname(StringUtils.hasText(user.getNickname()) ? user.getNickname() : user.getUsername());
         vo.setAvatar(user.getAvatar());
         vo.setRegion(user.getRegion());
-        vo.setRating(sellerRatingAssembler.build(user.getId()));
+        vo.setRating(sellerRatingAssembler.buildForSecondhand(user.getId()));
         return vo;
     }
 

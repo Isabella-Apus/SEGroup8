@@ -195,7 +195,7 @@ const paidOrders = computed(() => orders.value.filter(o => o.payStatus === 1).le
 const completedOrders = computed(() => orders.value.filter(o => o.orderStatus === 4).length)
 const refundOrders = computed(() => orders.value.filter(o => o.refundStatus > 0).length)
 const shippedOrders = computed(() => orders.value.filter(o => o.orderStatus >= 2).length)
-const positiveReviews = computed(() => reviews.value.filter(r => r.rating >= 4).length)
+const positiveReviews = computed(() => reviews.value.filter(r => Number(r.score ?? r.rating ?? 0) >= 4).length)
 
 const positiveRate = computed(() => {
   if (!reviews.value.length) return 100
