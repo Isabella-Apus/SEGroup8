@@ -316,7 +316,7 @@ const isOwner = computed(() => {
 const bargainBlockedReason = computed(() => {
   if (!item.value) return "商品还在加载，请稍后再试";
   if (!currentUser.value?.id) return "请先登录后再议价";
-  if (isOwner.value) return "这是你自己发布的闲置，不能向自己议价";
+  if (isOwner.value) return "！！！不能购买自己发布的闲置！！！";
   if (!canBuy.value) return "商品已下架或已售出，不能议价";
   if (auctionInfo.value?.status === "ONGOING") return "该商品正在拍卖中，请直接参与竞拍";
   return "";

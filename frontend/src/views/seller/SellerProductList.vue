@@ -4,7 +4,7 @@
       <div>
         <span>Seller Center</span>
         <h1>卖家工作台</h1>
-        <p>管理新品商品、库存和上下架状态。二手闲置和拍卖在左侧“二手管理”里单独查看。</p>
+        <p>管理新品商品、库存和上下架状态。</p>
       </div>
       <div class="hero-actions">
         <el-button @click="router.push('/')">返回商城</el-button>

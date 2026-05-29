@@ -32,7 +32,6 @@
         </div>
         <div class="top-actions">
           <button type="button" @click="router.push('/merchant/seller-products/edit')">发布商品</button>
-          <button type="button" @click="router.push('/secondhand/publish')">发布闲置</button>
           <button type="button" @click="router.push('/')">返回商城</button>
         </div>
       </header>
@@ -58,7 +57,6 @@ const navGroups = [
     items: [
       { label: "商品管理", path: "/merchant", color: "#35d8ab" },
       { label: "发布商品", path: "/merchant/seller-products/edit", color: "#69b9ff" },
-      { label: "二手管理", path: "/merchant/secondhand-products", color: "#17a987" },
       { label: "订单管理", path: "/merchant/orders", color: "#ffc6dc" },
       { label: "优惠券", path: "/merchant/vouchers", color: "#ffd36e" },
     ],

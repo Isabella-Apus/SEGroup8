@@ -4,30 +4,31 @@
       <div>
         <span class="eyebrow">官方商品</span>
         <h1>商品市场</h1>
-        <p>按分类和预算挑选一手商品，适合直接下单购买。</p>
-      </div>
-      <div class="hero-deal">
-        <strong>Daily Discover</strong>
-        <span>热度、库存、券标一屏看清</span>
+        <p>浏览正在出售的新品商品，按分类、价格快速筛选。</p>
       </div>
     </div>
 
     <div class="market-servicebar">
-      <strong>新品商城</strong>
-      <div class="service-actions">
-        <el-button type="primary" @click="router.push('/cart')">购物车</el-button>
-        <el-button @click="router.push('/order')">订单</el-button>
-        <el-dropdown trigger="click" @command="handleServiceCommand">
-          <el-button>更多</el-button>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item command="coupons">领券中心</el-dropdown-item>
-              <el-dropdown-item command="afterSale">售后</el-dropdown-item>
-              <el-dropdown-item command="seller">{{ sellerEntryLabel }}</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-      </div>
+      <button type="button" class="service-tile" @click="router.push('/cart')">
+        <span class="tile-icon"><el-icon><ShoppingCart /></el-icon></span>
+        <span class="tile-label">购物车</span>
+      </button>
+      <button type="button" class="service-tile" @click="router.push('/order')">
+        <span class="tile-icon"><el-icon><Document /></el-icon></span>
+        <span class="tile-label">我的订单</span>
+      </button>
+      <button type="button" class="service-tile" @click="router.push('/product/coupons')">
+        <span class="tile-icon"><el-icon><Ticket /></el-icon></span>
+        <span class="tile-label">领券中心</span>
+      </button>
+      <button type="button" class="service-tile" @click="router.push('/product/after-sale')">
+        <span class="tile-icon"><el-icon><Service /></el-icon></span>
+        <span class="tile-label">售后服务</span>
+      </button>
+      <button type="button" class="service-tile" @click="router.push(sellerEntryPath)">
+        <span class="tile-icon"><el-icon><Shop /></el-icon></span>
+        <span class="tile-label">{{ sellerEntryLabel }}</span>
+      </button>
     </div>
 
     <div class="market-toolbar">
@@ -37,42 +38,14 @@
         clearable
         @keyup.enter="onSearch"
       />
-      <el-select v-model="query.priceRange" placeholder="价格区间" @change="onSearch">
+      <el-select v-model="query.priceRange" placeholder="全部商品" @change="onSearch">
         <el-option v-for="chip in chips" :key="chip.range" :label="chip.label" :value="chip.range" />
       </el-select>
-      <el-select v-model="query.category" placeholder="商品分类" @change="onSearch">
+      <el-select v-model="query.category" placeholder="全部分类" @change="onSearch">
         <el-option v-for="item in categories" :key="item" :label="item" :value="item" />
       </el-select>
       <el-button type="primary" @click="onSearch">搜索</el-button>
       <el-button @click="onReset">重置</el-button>
-    </div>
-
-    <div class="filter-row">
-      <span>类目</span>
-      <button
-        v-for="item in categories"
-        :key="item"
-        class="category-chip"
-        :class="{ active: query.category === item }"
-        type="button"
-        @click="applyCategory(item)"
-      >
-        {{ item }}
-      </button>
-    </div>
-
-    <div class="filter-row">
-      <span>预算</span>
-      <button
-        v-for="chip in chips"
-        :key="chip.range"
-        class="category-chip"
-        :class="{ active: query.priceRange === chip.range }"
-        type="button"
-        @click="applyChip(chip)"
-      >
-        {{ chip.label }}
-      </button>
     </div>
 
     <div class="result-strip">
@@ -107,6 +80,13 @@ import { getProductListApi } from "@/api/product";
 import { useUserStore } from "@/stores/user";
 import { ALL_CATEGORY, matchProductCategory, productCategories } from "@/utils/categoryRules";
 import { searchList } from "@/utils/search/searchService";
+import {
+  Document,
+  Service,
+  Shop,
+  ShoppingCart,
+  Ticket,
+} from "@element-plus/icons-vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -274,15 +254,6 @@ function priceParams() {
   return {};
 }
 
-function handleServiceCommand(command) {
-  const map = {
-    coupons: "/product/coupons",
-    afterSale: "/product/after-sale",
-    seller: sellerEntryPath.value,
-  };
-  router.push(map[command] || "/product");
-}
-
 function initObserver() {
   observer = new IntersectionObserver(
     (entries) => {
@@ -374,39 +345,105 @@ function initObserver() {
 }
 
 .market-servicebar {
-  min-height: 58px;
-  border: 1px solid var(--line-soft);
-  border-radius: 8px;
-  background: #ffffff;
-  padding: 10px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  box-shadow: var(--shadow-soft);
-}
-
-.market-servicebar strong {
-  font-size: 17px;
-}
-
-.service-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.market-toolbar {
-  display: grid;
-  grid-template-columns: minmax(220px, 1fr) 180px 160px auto auto;
-  gap: 10px;
-  align-items: center;
+  min-height: 112px;
   border: 1px solid var(--line-soft);
   border-radius: 8px;
   background: #ffffff;
   padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
   box-shadow: var(--shadow-soft);
+}
+
+.service-tile {
+  position: relative;
+  min-width: 0;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  color: var(--text-main);
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.service-tile {
+  cursor: pointer;
+}
+
+.service-tile:hover {
+  border-color: var(--brand-primary);
+  background: var(--brand-primary-weak);
+}
+
+.tile-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--brand-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(137, 199, 255, 0.16);
+}
+
+.tile-icon :deep(.el-icon) {
+  font-size: 24px;
+}
+
+.tile-label {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.market-toolbar {
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) minmax(180px, 0.26fr) minmax(180px, 0.26fr) 88px 88px;
+  gap: 16px;
+  align-items: center;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 16px 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+.market-toolbar > .el-input,
+.market-toolbar > .el-select {
+  width: 100%;
+}
+
+.market-toolbar :deep(.el-input__wrapper),
+.market-toolbar :deep(.el-select__wrapper) {
+  min-height: 46px;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px var(--line-soft) inset;
+}
+
+.market-toolbar :deep(.el-input__wrapper.is-focus),
+.market-toolbar :deep(.el-select__wrapper.is-focused) {
+  box-shadow: 0 0 0 1px var(--brand-primary) inset;
+}
+
+.market-toolbar :deep(.el-input__inner),
+.market-toolbar :deep(.el-select__placeholder) {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.market-toolbar > .el-button {
+  height: 46px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 900;
 }
 
 .filter-row {
@@ -480,7 +517,11 @@ function initObserver() {
 
 @media (max-width: 980px) {
   .market-toolbar {
-    grid-template-columns: 1fr 160px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .market-toolbar > .el-input {
+    grid-column: 1 / -1;
   }
 
   .grid {
@@ -505,8 +546,7 @@ function initObserver() {
   }
 
   .market-servicebar {
-    align-items: flex-start;
-    flex-direction: column;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .grid {

@@ -45,22 +45,44 @@
         <div class="panel-head">
           <span class="member-avatar">{{ avatarText }}</span>
           <div>
-            <strong>{{ userStore.userInfo?.nickname || userStore.userInfo?.username }}</strong>
-            <small>今天也有新好价</small>
+            <strong>{{ userStore.userInfo?.nickname || userStore.userInfo?.username }}</strong> 
+            <small>好心情和好商品更配哦</small>
           </div>
         </div>
         <div class="metric-grid">
           <button type="button" class="metric" @click="router.push('/order')">
-            <strong>{{ stats.orderCount }}</strong>
-            <span>新品订单</span>
+            <span class="metric-icon">
+              <el-icon><Document /></el-icon>
+            </span>
+            <span class="metric-label">我的订单</span>
           </button>
           <button type="button" class="metric" @click="router.push('/notifications')">
-            <strong>{{ stats.noticeCount }}</strong>
-            <span>通知</span>
+            <span v-if="stats.noticeCount" class="metric-badge">{{ stats.noticeCount }}</span>
+            <span class="metric-icon">
+              <el-icon><Bell /></el-icon>
+            </span>
+            <span class="metric-label">通知</span>
           </button>
           <button type="button" class="metric" @click="router.push('/browse-history')">
-            <strong>历史</strong>
-            <span>浏览记录</span>
+            <span class="metric-icon">
+              <el-icon><Clock /></el-icon>
+            </span>
+            <span class="metric-label">浏览记录</span>
+          </button>
+          <button type="button" class="metric" @click="router.push('/coupons')">
+            <span class="metric-icon">
+              <el-icon><Ticket /></el-icon>
+            </span>
+            <span class="metric-label">我的优惠券</span>
+          </button>
+          <button v-if="false" type="button" class="metric" @click="router.push('/order')" >
+            <strong>订单数：{{ stats.orderCount }}</strong>
+          </button>
+          <button v-if="false" type="button" class="metric" @click="router.push('/notifications')">
+            <strong>通知数：{{ stats.noticeCount }}</strong>
+          </button>
+          <button v-if="false" type="button" class="metric" @click="router.push('/browse-history')">
+            <strong>浏览记录</strong>
           </button>
         </div>
       </aside>
@@ -68,19 +90,19 @@
 
     <section class="promo-grid">
       <button type="button" class="promo-card promo-main" @click="router.push('/product')">
-        <span>限时精选</span>
-        <strong>热卖商品直达</strong>
-        <small>数码、学习、生活用品集中看</small>
+        <span>官方商城</span>
+        <strong>新品商城</strong>
+        <small>按分类选购在售新品</small>
       </button>
-      <button type="button" class="promo-card promo-blue" @click="router.push('/secondhand')">
-        <span>二手好价</span>
-        <strong>预算更轻</strong>
-        <small>个人闲置快速沟通</small>
+      <button type="button" class="promo-card promo-blue" @click="router.push('/secondhand/publish')">
+        <span>出售闲置</span>
+        <strong>发布我的闲置</strong>
+        <small>把不用的物品转给需要的人</small>
       </button>
       <button type="button" class="promo-card promo-green" @click="router.push('/secondhand')">
-        <span>二手商城</span>
-        <strong>闲置专区</strong>
-        <small>购物车、订单和服务都在二手商城里</small>
+        <span>购买二手</span>
+        <strong>二手商城</strong>
+        <small>发现更多实用二手低价好物</small>
       </button>
     </section>
 
@@ -110,7 +132,7 @@
       <div class="section-head">
         <div>
           <h2>闲置捡漏</h2>
-          <p>像逛闲置集市一样刷，优先看价格、成色和卖家。</p>
+          <p>看看大家正在转让的闲置好物，按成色、价格慢慢挑^_^</p>
         </div>
         <div class="section-tabs">
           <button v-for="tab in secondhandTabs" :key="tab.label" type="button" @click="goTab(tab)">{{ tab.label }}</button>
@@ -140,6 +162,8 @@ import { getSecondhandListApi } from "@/api/secondhand";
 import { getOrderListApi } from "@/api/order";
 import { listNotificationsApi } from "@/api/notification";
 import { useUserStore } from "@/stores/user";
+import { toAssetUrl } from "@/utils/url";
+import { Bell, Clock, Document, Ticket } from "@element-plus/icons-vue";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -178,33 +202,33 @@ const secondhandTabs = [
 ];
 
 const bannerSlides = computed(() => {
-  const product = products.value[0];
-  const product2 = products.value[1];
-  const second = secondhandItems.value[0];
+  const product = products.value.find(hasProductImage) || products.value[0];
+  const product2 = products.value.filter(hasProductImage)[1] || products.value[1];
+  const second = secondhandItems.value.find(hasProductImage) || secondhandItems.value[0];
   return [
     {
       key: "top-sales",
       tag: "Top Sales",
       title: product ? product.name : "本周热卖好物",
-      desc: product ? `到手价 ¥${Number(product.price || 0).toFixed(2)}，库存 ${product.stock ?? 0}` : "精选高热度商品，适合快速下单。",
+      desc: product ? `到手价 ¥${Number(product.price || 0).toFixed(2)}，库存 ${product.stock ?? 0}` : "精选高热度商品，先到先得。",
       actionText: "查看商品",
       actionPath: product ? `/product/${product.id}` : "/product",
       secondaryText: "逛商品市场",
       secondaryPath: "/product",
-      coupons: ["满 99 减 10", "48h 发货", "支持售后"],
-      background: "linear-gradient(100deg, rgba(11,63,82,.78), rgba(60,146,255,.56), rgba(53,216,171,.28)), url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1400&q=80')",
+      coupons: ["官方新品", "多图展示", "安心交易"],
+      background: bannerBackground(product),
     },
     {
       key: "secondhand",
       tag: "二手精选",
-      title: second ? second.name : "把闲置重新流动起来",
+      title: second ? second.name : "二手闲置商品",
       desc: second ? `闲置价 ¥${Number(second.salePrice || 0).toFixed(2)}，成色 ${second.conditionLevel || second.condition || "良好"}` : "校园闲置、个人转手、快速沟通。",
       actionText: "查看闲置",
       actionPath: second ? `/secondhand/${second.id}` : "/secondhand",
       secondaryText: "逛二手市场",
       secondaryPath: "/secondhand",
       coupons: ["同城可看", "成色筛选", "一键沟通"],
-      background: "linear-gradient(100deg, rgba(53,216,171,.78), rgba(11,63,82,.52), rgba(255,185,214,.22)), url('https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=1400&q=80')",
+      background: bannerBackground(second),
     },
     {
       key: "daily",
@@ -216,9 +240,9 @@ const bannerSlides = computed(() => {
       secondaryText: "二手捡漏",
       secondaryPath: "/secondhand",
       coupons: ["分类直达", "价格筛选", "猜你喜欢"],
-      background: "linear-gradient(100deg, rgba(60,146,255,.72), rgba(183,166,255,.46), rgba(255,185,214,.2)), url('https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=1400&q=80')",
+      background: bannerBackground(product2),
     },
-  ];
+  ].filter((slide) => slide.background);
 });
 
 onMounted(async () => {
@@ -228,8 +252,8 @@ onMounted(async () => {
 
 async function loadProducts() {
   try {
-    const result = await getProductListApi({ pageNum: 1, pageSize: 8 });
-    products.value = result.data?.records || [];
+    const result = await getProductListApi({ pageNum: 1, pageSize: 24 });
+    products.value = prioritizeProductsWithImages(result.data?.records || []).slice(0, 8);
   } catch {
     products.value = [];
   }
@@ -237,12 +261,12 @@ async function loadProducts() {
 
 async function loadSecondhand() {
   try {
-    const result = await getSecondhandListApi({ pageNum: 1, pageSize: 8 });
-    secondhandItems.value = (result.data?.records || []).map((item) => ({
+    const result = await getSecondhandListApi({ pageNum: 1, pageSize: 24 });
+    secondhandItems.value = prioritizeProductsWithImages((result.data?.records || []).map((item) => ({
       ...item,
       originPrice: item.originPrice ?? item.salePrice,
       salePrice: item.salePrice ?? item.price,
-    }));
+    }))).slice(0, 8);
   } catch {
     secondhandItems.value = [];
   }
@@ -266,6 +290,62 @@ function goTab(tab) {
     path: tab.path,
     query: tab.query || {},
   });
+}
+
+function bannerBackground(item) {
+  const imageUrl = pickProductImageUrl(item);
+  return imageUrl ? `url("${imageUrl}")` : "";
+}
+
+function pickProductImageUrl(item) {
+  if (!item) {
+    return "";
+  }
+  const directUrl = item.cover || item.coverUrl || item.imageUrl;
+  if (hasText(directUrl)) {
+    return toAssetUrl(directUrl);
+  }
+  if (Array.isArray(item.images)) {
+    return toAssetUrl(item.images.find(hasText) || "");
+  }
+  if (typeof item.images === "string" && hasText(item.images) && item.images !== "[]") {
+    try {
+      const parsed = JSON.parse(item.images);
+      if (Array.isArray(parsed)) {
+        return toAssetUrl(parsed.find(hasText) || "");
+      }
+    } catch {
+      return toAssetUrl(item.images);
+    }
+  }
+  return "";
+}
+
+function prioritizeProductsWithImages(list) {
+  return [...list]
+    .map((item, index) => ({ item, index }))
+    .sort((a, b) => Number(hasProductImage(b.item)) - Number(hasProductImage(a.item)) || a.index - b.index)
+    .map(({ item }) => item);
+}
+
+function hasProductImage(item) {
+  if (!item) {
+    return false;
+  }
+  if (hasText(item.cover) || hasText(item.coverUrl) || hasText(item.imageUrl)) {
+    return true;
+  }
+  if (Array.isArray(item.images)) {
+    return item.images.some(hasText);
+  }
+  if (typeof item.images === "string") {
+    return hasText(item.images) && item.images !== "[]";
+  }
+  return false;
+}
+
+function hasText(value) {
+  return typeof value === "string" && value.trim().length > 0;
 }
 
 </script>
@@ -485,17 +565,26 @@ function goTab(tab) {
 
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  flex: 1;
+  min-height: 0;
 }
 
 .metric {
+  position: relative;
   border: 1px solid var(--line-soft);
   border-radius: 8px;
   background: var(--surface-soft);
   color: var(--text-main);
-  min-height: 64px;
-  padding: 10px 6px;
+  min-height: 0;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   text-align: center;
   cursor: pointer;
 }
@@ -505,19 +594,52 @@ function goTab(tab) {
   background: var(--brand-primary-weak);
 }
 
-.metric strong {
-  display: block;
+.metric-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #ffffff;
   color: var(--brand-primary);
-  font-size: 22px;
-  line-height: 1;
+  box-shadow: 0 6px 16px rgba(137, 199, 255, 0.16);
 }
 
-.metric span {
-  display: block;
-  margin-top: 6px;
+.metric-icon :deep(.el-icon) {
+  font-size: 24px;
+}
+
+.metric-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 auto;
+  min-width: 0;
+  margin-top: 0;
   color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.metric-badge {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  padding: 0 5px;
+  background: #ef4444;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .promo-grid {
@@ -688,8 +810,5 @@ function goTab(tab) {
     right: 18px;
   }
 
-  .metric-grid {
-    grid-template-columns: 1fr;
-  }
 }
 </style>

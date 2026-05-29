@@ -89,6 +89,14 @@
             </el-form-item>
           </div>
 
+          <el-form-item label="议价设置">
+            <el-switch
+              v-model="form.isNegotiable"
+              active-text="可议价"
+              inactive-text="不议价"
+            />
+          </el-form-item>
+
           <el-form-item label="商品描述">
             <el-input
               v-model="form.description"
@@ -122,7 +130,7 @@
             <div class="preview-tags">
               <span>个人闲置</span>
               <span>{{ selectedCategoryName || "未选择分类" }}</span>
-              <span>可议价</span>
+              <span>{{ form.isNegotiable ? "可议价" : "不议价" }}</span>
             </div>
             <h3>{{ previewName }}</h3>
             <p>{{ previewDesc }}</p>
@@ -167,6 +175,7 @@ const form = reactive({
   salePrice: 80,
   categoryIds: [],
   condition: '90%',
+  isNegotiable: true,
   description: ''
 });
 
@@ -269,7 +278,7 @@ async function submit() {
       categoryId: form.categoryIds[0],
       subCategoryId: form.categoryIds[1],
       conditionLevel: form.condition,
-      isNegotiable: 1,
+      isNegotiable: form.isNegotiable ? 1 : 0,
     });
     ElMessage.success('二手商品发布成功');
     reset();
@@ -288,6 +297,7 @@ function reset() {
   form.salePrice = 80;
   form.categoryIds = [];
   form.condition = '90%';
+  form.isNegotiable = true;
   form.description = '';
 }
 

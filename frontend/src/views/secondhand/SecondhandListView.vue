@@ -6,32 +6,29 @@
         <h1>二手市场</h1>
         <p>从学习设备到生活用品，低价淘闲置，也可以快速发布自己的物品。</p>
       </div>
-      <div class="hero-deal">
-        <strong>闲置瀑布流</strong>
-        <span>先看价格和成色，再进详情沟通</span>
-      </div>
     </div>
 
     <div class="market-servicebar">
-      <strong>二手商城</strong>
-      <div class="service-actions">
-        <el-button type="primary" @click="router.push('/secondhand/publish')">发布闲置</el-button>
-        <el-button @click="router.push('/secondhand/mine')">我的闲置/拍卖</el-button>
-        <el-button @click="router.push('/messages')">议价消息</el-button>
-        <el-button @click="router.push('/secondhand/cart')">购物车</el-button>
-        <el-button @click="router.push('/secondhand/orders')">订单</el-button>
-        <el-dropdown trigger="click" @command="handleServiceCommand">
-          <el-button>更多</el-button>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item command="mine">我的闲置</el-dropdown-item>
-              <el-dropdown-item command="messages">买家消息</el-dropdown-item>
-              <el-dropdown-item command="coupons">领券中心</el-dropdown-item>
-              <el-dropdown-item command="afterSale">售后</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
-      </div>
+      <button type="button" class="service-tile" @click="router.push('/secondhand/publish')">
+        <span class="tile-icon"><el-icon><EditPen /></el-icon></span>
+        <span class="tile-label">发布闲置</span>
+      </button>
+      <button type="button" class="service-tile" @click="router.push('/secondhand/mine')">
+        <span class="tile-icon"><el-icon><Goods /></el-icon></span>
+        <span class="tile-label">我的闲置</span>
+      </button>
+      <button type="button" class="service-tile" @click="router.push('/messages')">
+        <span class="tile-icon"><el-icon><ChatDotRound /></el-icon></span>
+        <span class="tile-label">议价消息</span>
+      </button>
+      <button type="button" class="service-tile" @click="router.push('/cart')">
+        <span class="tile-icon"><el-icon><ShoppingCart /></el-icon></span>
+        <span class="tile-label">购物车</span>
+      </button>
+      <button type="button" class="service-tile" @click="router.push('/secondhand/orders')">
+        <span class="tile-icon"><el-icon><Document /></el-icon></span>
+        <span class="tile-label">订单</span>
+      </button>
     </div>
 
     <div class="market-toolbar">
@@ -41,42 +38,14 @@
         clearable
         @keyup.enter="onSearch"
       />
-      <el-select v-model="query.condition" placeholder="成色" @change="onSearch">
+      <el-select v-model="query.condition" placeholder="全部闲置" @change="onSearch">
         <el-option v-for="chip in chips" :key="chip.condition" :label="chip.label" :value="chip.condition" />
       </el-select>
-      <el-select v-model="query.category" placeholder="闲置分类" @change="onSearch">
+      <el-select v-model="query.category" placeholder="全部分类" @change="onSearch">
         <el-option v-for="item in categories" :key="item" :label="item" :value="item" />
       </el-select>
       <el-button type="primary" @click="onSearch">搜索</el-button>
       <el-button @click="onReset">重置</el-button>
-    </div>
-
-    <div class="filter-row">
-      <span>分类</span>
-      <button
-        v-for="item in categories"
-        :key="item"
-        class="category-chip"
-        :class="{ active: query.category === item }"
-        type="button"
-        @click="applyCategory(item)"
-      >
-        {{ item }}
-      </button>
-    </div>
-
-    <div class="filter-row">
-      <span>成色</span>
-      <button
-        v-for="chip in chips"
-        :key="chip.condition"
-        class="category-chip"
-        :class="{ active: query.condition === chip.condition }"
-        type="button"
-        @click="applyChip(chip)"
-      >
-        {{ chip.label }}
-      </button>
     </div>
 
     <div class="result-strip">
@@ -110,6 +79,13 @@ import ProductCard from "@/components/ProductCard.vue";
 import { getSecondhandListApi } from "@/api/secondhand";
 import { ALL_CATEGORY, matchSecondhandCategory, secondhandCategories } from "@/utils/categoryRules";
 import { searchList } from "@/utils/search/searchService";
+import {
+  ChatDotRound,
+  Document,
+  EditPen,
+  Goods,
+  ShoppingCart,
+} from "@element-plus/icons-vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -186,6 +162,7 @@ async function onSearch() {
     query: {
       ...(query.keyword.trim() ? { keyword: query.keyword.trim() } : {}),
       ...(query.category !== ALL_CATEGORY ? { category: query.category } : {}),
+      ...(query.condition !== "all" ? { condition: query.condition } : {}),
     },
   });
   await fetchPage(true);
@@ -201,6 +178,14 @@ async function onReset() {
 
 async function applyChip(chip) {
   query.condition = chip.condition;
+  await router.replace({
+    path: "/secondhand",
+    query: {
+      ...(query.keyword.trim() ? { keyword: query.keyword.trim() } : {}),
+      ...(query.category !== ALL_CATEGORY ? { category: query.category } : {}),
+      ...(query.condition !== "all" ? { condition: query.condition } : {}),
+    },
+  });
   await fetchPage(true);
 }
 
@@ -211,6 +196,7 @@ async function applyCategory(category) {
     query: {
       ...(query.keyword.trim() ? { keyword: query.keyword.trim() } : {}),
       ...(category !== ALL_CATEGORY ? { category } : {}),
+      ...(query.condition !== "all" ? { condition: query.condition } : {}),
     },
   });
   await fetchPage(true);
@@ -262,16 +248,6 @@ function syncKeywordFromRoute() {
   const nextCondition = String(route.query.condition || "all");
   query.condition = chips.some((chip) => chip.condition === nextCondition) ? nextCondition : "all";
   query.sort = String(route.query.sort || "");
-}
-
-function handleServiceCommand(command) {
-  const map = {
-    mine: "/secondhand/mine",
-    messages: "/messages",
-    coupons: "/secondhand/coupons",
-    afterSale: "/secondhand/after-sale",
-  };
-  router.push(map[command] || "/secondhand");
 }
 
 function initObserver() {
@@ -365,39 +341,102 @@ function initObserver() {
 }
 
 .market-servicebar {
-  min-height: 58px;
-  border: 1px solid var(--line-soft);
-  border-radius: 8px;
-  background: #ffffff;
-  padding: 10px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  box-shadow: var(--shadow-soft);
-}
-
-.market-servicebar strong {
-  font-size: 17px;
-}
-
-.service-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.market-toolbar {
-  display: grid;
-  grid-template-columns: minmax(220px, 1fr) 180px 160px auto auto;
-  gap: 10px;
-  align-items: center;
+  min-height: 112px;
   border: 1px solid var(--line-soft);
   border-radius: 8px;
   background: #ffffff;
   padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
   box-shadow: var(--shadow-soft);
+}
+
+.service-tile {
+  position: relative;
+  min-width: 0;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  color: var(--text-main);
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.service-tile:hover {
+  border-color: var(--brand-accent-strong);
+  background: #e9fbf8;
+}
+
+.tile-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--brand-accent-strong);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(18, 165, 148, 0.14);
+}
+
+.tile-icon :deep(.el-icon) {
+  font-size: 24px;
+}
+
+.tile-label {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.market-toolbar {
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) minmax(180px, 0.26fr) minmax(180px, 0.26fr) 88px 88px;
+  gap: 16px;
+  align-items: center;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 16px 18px;
+  box-shadow: var(--shadow-soft);
+}
+
+.market-toolbar > .el-input,
+.market-toolbar > .el-select {
+  width: 100%;
+}
+
+.market-toolbar :deep(.el-input__wrapper),
+.market-toolbar :deep(.el-select__wrapper) {
+  min-height: 46px;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px var(--line-soft) inset;
+}
+
+.market-toolbar :deep(.el-input__wrapper.is-focus),
+.market-toolbar :deep(.el-select__wrapper.is-focused) {
+  box-shadow: 0 0 0 1px var(--brand-accent-strong) inset;
+}
+
+.market-toolbar :deep(.el-input__inner),
+.market-toolbar :deep(.el-select__placeholder) {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.market-toolbar > .el-button {
+  height: 46px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 900;
 }
 
 .filter-row {
@@ -471,7 +510,11 @@ function initObserver() {
 
 @media (max-width: 980px) {
   .market-toolbar {
-    grid-template-columns: 1fr 160px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .market-toolbar > .el-input {
+    grid-column: 1 / -1;
   }
 
   .grid {
@@ -496,8 +539,7 @@ function initObserver() {
   }
 
   .market-servicebar {
-    align-items: flex-start;
-    flex-direction: column;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .grid {

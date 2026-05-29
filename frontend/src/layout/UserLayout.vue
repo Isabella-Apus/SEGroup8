@@ -34,26 +34,17 @@
         <div class="header-actions">
           <nav class="main-nav" aria-label="主导航">
             <button
-              v-for="item in navItems"
+              v-for="item in visibleNavItems"
               :key="item.path"
               class="nav-action"
               :class="{ active: isNavActive(item) }"
               type="button"
               @click="router.push(item.path)"
             >
-              {{ item.label }}
+              <span>{{ item.label }}</span>
             </button>
           </nav>
-
-          <button
-            v-if="isOfficialSeller"
-            class="nav-action seller-entry"
-            type="button"
-            @click="router.push('/merchant')"
-          >
-            卖家工作台
-          </button>
-
+          
           <el-dropdown trigger="click" @command="handleCommand">
             <button class="user-pill" type="button">
               <span class="avatar">{{ avatarText }}</span>
@@ -106,12 +97,16 @@ const navItems = [
   { label: "首页", path: "/", match: (path) => path === "/" },
   { label: "新品商城", path: "/product", match: (path) => path.startsWith("/product") || path === "/cart" || path.startsWith("/order") },
   { label: "二手商城", path: "/secondhand", match: (path) => path.startsWith("/secondhand") },
+  { label: "卖家工作台", path: "/merchant", match: (path) => path.startsWith("/merchant") },
 ];
 
 const displayName = computed(() =>
   userStore.userInfo?.nickname || userStore.userInfo?.username || "普通用户",
 );
 const isOfficialSeller = computed(() => userStore.currentRole === "OFFICIAL_SELLER" || userStore.currentRole === "SELLER");
+const visibleNavItems = computed(() =>
+  navItems.filter((item) => item.path !== "/merchant" || isOfficialSeller.value),
+);
 
 const avatarText = computed(() => displayName.value.slice(0, 1).toUpperCase());
 const searchPlaceholder = computed(() =>
@@ -235,9 +230,9 @@ function handleCommand(command) {
   min-height: 74px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 190px minmax(320px, 560px) minmax(310px, 1fr);
+  grid-template-columns: 180px minmax(280px, 1fr) max-content;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
 }
 
 .brand {
@@ -290,17 +285,17 @@ function handleCommand(command) {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 10px;
   min-width: 0;
-  white-space: normal;
+  white-space: nowrap;
 }
 
 .main-nav {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 6px;
   min-width: 0;
 }

@@ -224,6 +224,13 @@ public class OrderServiceImpl implements OrderService {
             List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
                     .eq(OrderItem::getOrderId, order.getId())
                     .orderByAsc(OrderItem::getId));
+            String productType = normalizeProductType(request.getProductType());
+            if (productType != null) {
+                items = filterItemsByProductType(items, productType);
+                if (items.isEmpty()) {
+                    return null;
+                }
+            }
             if (StringUtils.hasText(request.getKeyword())) {
                 String kw = request.getKeyword().trim();
                 boolean hitOrderNo = order.getOrderNo() != null && order.getOrderNo().contains(kw);
@@ -237,7 +244,7 @@ public class OrderServiceImpl implements OrderService {
         }).filter(Objects::nonNull).toList();
 
         PageVO<OrderVO> vo = new PageVO<>();
-        vo.setTotal(page.getTotal());
+        vo.setTotal((long) records.size());
         vo.setPageNum(page.getCurrent());
         vo.setPageSize(page.getSize());
         vo.setRecords(records);
@@ -741,6 +748,10 @@ public class OrderServiceImpl implements OrderService {
             if (items.isEmpty()) {
                 return null;
             }
+            String productType = normalizeProductType(request.getProductType());
+            if (productType != null) {
+                items = filterItemsByProductType(items, productType);
+            }
             boolean hasSellerItem = items.stream().anyMatch(item -> isItemOwnedBySeller(item, sellerUserId));
             if (!hasSellerItem) {
                 return null;
@@ -997,6 +1008,33 @@ public class OrderServiceImpl implements OrderService {
         }
         log.setCreateTime(LocalDateTime.now());
         orderAfterSaleLogMapper.insert(log);
+    }
+
+    private String normalizeProductType(String productType) {
+        if (!StringUtils.hasText(productType)) {
+            return null;
+        }
+        String normalized = productType.trim().toUpperCase();
+        if ("ALL".equals(normalized)) {
+            return null;
+        }
+        if ("SECONDHAND".equals(normalized)) {
+            return "SECONDHAND";
+        }
+        if ("NEW".equals(normalized) || "PRODUCT".equals(normalized)) {
+            return "NEW";
+        }
+        return null;
+    }
+
+    private List<OrderItem> filterItemsByProductType(List<OrderItem> items, String productType) {
+        if (!StringUtils.hasText(productType)) {
+            return items;
+        }
+        return items.stream()
+                .filter(item -> productType.equalsIgnoreCase(
+                        StringUtils.hasText(item.getProductType()) ? item.getProductType().trim() : "NEW"))
+                .toList();
     }
 
     private OrderItemVO toItemVO(OrderItem item) {

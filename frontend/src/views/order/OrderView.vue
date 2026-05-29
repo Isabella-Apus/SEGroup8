@@ -49,7 +49,7 @@
         :key="item.value"
         type="button"
         class="order-type-card"
-        :class="{ active: query.orderType === item.value }"
+        :class="{ active: query.productType === item.value }"
         @click="changeOrderType(item.value)"
       >
         <strong>{{ item.label }}</strong>
@@ -255,7 +255,7 @@ const query = reactive({
   endTime: null,
   minAmount: null,
   maxAmount: null,
-  orderType: 'ALL'
+  productType: 'ALL'
 });
 const total = ref(0);
 const records = ref([]);
@@ -296,7 +296,7 @@ const orderTypeOptions = [
   { label: '新品订单', value: 'NEW', desc: '官方商品、商城下单' },
   { label: '二手订单', value: 'SECONDHAND', desc: '闲置交易、议价沟通' }
 ];
-const orderTypeLabel = computed(() => orderTypeOptions.find((item) => item.value === query.orderType)?.label || '全部订单');
+const orderTypeLabel = computed(() => orderTypeOptions.find((item) => item.value === query.productType)?.label || '全部订单');
 const scopedOrderType = computed(() => {
   const scope = String(route.meta?.orderScope || '').toUpperCase();
   return scope === 'NEW' || scope === 'SECONDHAND' ? scope : '';
@@ -388,7 +388,7 @@ function syncQueryFromTab() {
 }
 
 function syncOrderScopeFromRoute() {
-  query.orderType = scopedOrderType.value || 'ALL';
+  query.productType = scopedOrderType.value || 'ALL';
 }
 
 watch(
@@ -431,7 +431,7 @@ function changeOrderType(type) {
   if (isScopedOrderPage.value) {
     return;
   }
-  query.orderType = type;
+  query.productType = type;
   query.pageNum = 1;
   fetchOrders();
 }

@@ -226,7 +226,7 @@ function filterOrders(records, params = {}) {
     const keyword = asText(params.keyword);
     const rawStatus = params.orderStatus;
     const rawRefundStatus = params.refundStatus;
-    const rawOrderType = asText(params.orderType).toUpperCase();
+    const rawOrderType = asText(params.productType || params.orderType).toUpperCase();
     if (rawOrderType === "NEW" || rawOrderType === "SECONDHAND") {
         result = result.filter((o) => orderType(o) === rawOrderType);
     }

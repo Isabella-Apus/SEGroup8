@@ -21,6 +21,7 @@ import com.segroup8.platform.service.BrowseHistoryService;
 import com.segroup8.platform.service.CategoryService;
 import com.segroup8.platform.service.ProductRiskAuditService;
 import com.segroup8.platform.service.SecondhandTradeService;
+import com.segroup8.platform.service.SellerRatingAssembler;
 import com.segroup8.platform.vo.OrderVO;
 import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.vo.SecondhandProductVO;
@@ -31,7 +32,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -81,11 +81,15 @@ class SecondhandProductServiceImplTest {
     @Mock
     private UserBlockMapper userBlockMapper;
 
+    @Mock
+    private SellerRatingAssembler sellerRatingAssembler;
+
     @BeforeEach
     void setUp() {
         secondhandProductService = new SecondhandProductServiceImpl(secondhandProductMapper, orderInfoMapper,
-                orderItemMapper, productAuctionMapper, userMapper, addressMapper, browseHistoryService, userBlockMapper, categoryService,
-                secondhandTradeService, productRiskAuditService);
+                orderItemMapper, productAuctionMapper, userMapper, addressMapper, browseHistoryService, userBlockMapper,
+                categoryService,
+                secondhandTradeService, productRiskAuditService, sellerRatingAssembler);
     }
 
     @AfterEach

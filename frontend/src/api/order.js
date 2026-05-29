@@ -5,7 +5,11 @@ export function createOrderApi(payload) {
 }
 
 export function getOrderListApi(params = {}) {
-    return http.get("/order/list", { params });
+    const query = { ...params };
+    if (query.orderType && !query.productType) {
+        query.productType = query.orderType;
+    }
+    return http.get("/order/list", { params: query });
 }
 
 export function getOrderDetailApi(orderId) {
@@ -13,7 +17,11 @@ export function getOrderDetailApi(orderId) {
 }
 
 export function getSellerOrderListApi(params = {}) {
-    return http.get("/order/seller/list", { params });
+    const query = { ...params };
+    if (query.orderType && !query.productType) {
+        query.productType = query.orderType;
+    }
+    return http.get("/order/seller/list", { params: query });
 }
 
 export function getSellerOrderDetailApi(orderId) {
