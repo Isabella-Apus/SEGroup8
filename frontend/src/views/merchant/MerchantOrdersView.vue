@@ -2,7 +2,7 @@
   <div class="page-card fade-in-up">
     <h2 class="page-title">卖家订单管理</h2>
 
-    <div class="toolbar">
+    <div class="toolbar table-toolbar">
       <el-input v-model="query.keyword" placeholder="订单号/商品名" clearable style="max-width: 320px" @keyup.enter="handleSearch" />
       <el-select v-model="query.orderStatus" placeholder="订单状态" clearable style="width: 160px">
         <el-option label="待付款" :value="0" />
@@ -17,11 +17,11 @@
     </div>
 
     <div class="table-mobile-wrap">
-      <el-table v-loading="loading" :data="records" border>
-        <el-table-column prop="orderNo" label="订单号" min-width="200" />
+      <el-table v-loading="loading" :data="records" border class="kg-table">
+        <el-table-column prop="orderNo" label="订单号" min-width="200" show-overflow-tooltip />
         <el-table-column prop="buyerUserId" label="买家ID" width="90" />
         <el-table-column label="金额" width="120">
-          <template #default="scope">￥{{ Number(scope.row.totalAmount || 0).toFixed(2) }}</template>
+          <template #default="scope"><span class="amount-text">￥{{ Number(scope.row.totalAmount || 0).toFixed(2) }}</span></template>
         </el-table-column>
         <el-table-column label="订单状态" width="130">
           <template #default="scope">
@@ -42,25 +42,27 @@
         </el-table-column>
         <el-table-column label="操作" min-width="340" fixed="right">
           <template #default="scope">
-            <el-button link type="primary" @click="goDetail(scope.row.id)">详情页</el-button>
-            <el-button link type="primary" @click="openDetail(scope.row)">弹窗详情</el-button>
-            <el-button v-if="canShip(scope.row)" link type="success" @click="ship(scope.row)">发货</el-button>
-            <el-button v-if="canPushLogistics(scope.row)" link type="primary" @click="pushLogistics(scope.row)">更新进度</el-button>
-            <el-button v-if="canApproveRefund(scope.row)" link type="success" @click="approveRefund(scope.row)">同意退货</el-button>
-            <el-button v-if="canRejectRefund(scope.row)" link class="danger-action" @click="rejectRefund(scope.row)">拒绝退货</el-button>
-            <el-button link type="warning" @click="openReportBuyerDialog(scope.row)">举报买家</el-button>
-            <el-button
-              v-if="!blockedBuyerIds.has(scope.row.buyerUserId)"
-              link
-              class="danger-action"
-              @click="handleBlockBuyer(scope.row)"
-            >拉黑买家</el-button>
-            <el-button
-              v-else
-              link
-              type="info"
-              @click="handleUnblockBuyer(scope.row)"
-            >取消拉黑</el-button>
+            <div class="table-actions">
+              <el-button link type="primary" @click="goDetail(scope.row.id)">详情页</el-button>
+              <el-button link type="primary" @click="openDetail(scope.row)">弹窗详情</el-button>
+              <el-button v-if="canShip(scope.row)" link type="success" @click="ship(scope.row)">发货</el-button>
+              <el-button v-if="canPushLogistics(scope.row)" link type="primary" @click="pushLogistics(scope.row)">更新进度</el-button>
+              <el-button v-if="canApproveRefund(scope.row)" link type="success" @click="approveRefund(scope.row)">同意退货</el-button>
+              <el-button v-if="canRejectRefund(scope.row)" link class="danger-action" @click="rejectRefund(scope.row)">拒绝退货</el-button>
+              <el-button link type="warning" @click="openReportBuyerDialog(scope.row)">举报买家</el-button>
+              <el-button
+                v-if="!blockedBuyerIds.has(scope.row.buyerUserId)"
+                link
+                class="danger-action"
+                @click="handleBlockBuyer(scope.row)"
+              >拉黑买家</el-button>
+              <el-button
+                v-else
+                link
+                type="info"
+                @click="handleUnblockBuyer(scope.row)"
+              >取消拉黑</el-button>
+            </div>
           </template>
         </el-table-column>
         <template #empty>

@@ -238,7 +238,7 @@ function logout() {
 }
 
 .admin-main :deep(.el-table th.el-table__cell) {
-  background: #f4fbff;
+  background: linear-gradient(180deg, #f2ffff 0%, #eef8ff 100%);
 }
 
 @media (max-width: 860px) {
