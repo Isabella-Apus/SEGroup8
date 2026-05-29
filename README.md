@@ -1,19 +1,52 @@
-# kinda goods 基础工程
+# Kinda Goods 购物与二手交易平台
 
-本项目是一个前后端分离的课程项目基础框架，适合作为“kinda goods”的开发起点。当前重点是把工程跑起来，并提供统一的目录结构、公共能力和基础联调链路，方便后续多人并行开发。
+这是一个面向校园/社区场景的全栈交易平台，包含官方商城、个人闲置交易、卖家工作台和后台管理端。前端使用 Vue 3 + Vite + Pinia + Element Plus，后端使用 Spring Boot 3 + MyBatis-Plus + MySQL。
 
-## 1. 项目结构
+项目当前的核心设计是：用户入口可以统一，但业务规则在结算和订单侧保持区分。新品订单和二手订单不会混在同一个订单里，统一购物车在结算时会自动拆分为官方商城订单和个人闲置订单。
 
-```text
-SEGroup8/
-  backend/                 # Spring Boot 后端
-  frontend/                # 当前前端
-    src/mock-data/         # 统一测试数据生成与接口模拟
-  sql/
-    init.sql               # 手动初始化数据库脚本
-```
+## 功能概览
 
-## 2. 技术栈
+### 用户端
+
+- 首页商品推荐、商品搜索、分类筛选、商品详情。
+- 官方商城商品浏览、购物车、下单、订单详情、售后与优惠券。
+- 二手商城商品浏览、发布闲置、二手详情、二手购物车、二手订单、议价/拍卖相关流程。
+- 统一购物车入口 `/cart`：
+  - 新品商品合并为官方商城订单。
+  - 二手商品按商品/卖家拆分为个人闲置订单。
+- 地址管理、个人资料、浏览记录、消息通知、信用中心、评价记录、常见问题。
+
+### 卖家端
+
+- 官方卖家工作台。
+- 商品管理、商品发布与编辑。
+- 订单管理、财务概览、优惠券/代金券管理。
+- 评价管理、消息通知、店铺设置、店铺装修、经营看板、账号健康。
+
+当前卖家工作台主要服务官方商城卖家，二手商品发布入口保留在用户端的闲置发布流程中。
+
+### 管理端
+
+- 用户管理。
+- 商家入驻审核。
+- 订单管理。
+- 举报/报表处理。
+- 审计日志。
+- 商品风险审核，支持接入大模型进行内容风险判断。
+
+### 后端能力
+
+- JWT 登录鉴权。
+- MyBatis-Plus 数据访问。
+- 订单、支付、退款、售后、物流提醒与自动确认收货。
+- 官方商品与二手商品分类型订单处理。
+- 文件上传。
+- WebSocket 实时消息。
+- 幂等请求处理。
+- Swagger/OpenAPI 接口文档。
+- 商品风险审核大模型配置。
+
+## 技术栈
 
 ### 前端
 
@@ -21,359 +54,131 @@ SEGroup8/
 - Vite
 - Vue Router
 - Pinia
-- Axios
 - Element Plus
+- Axios
+- ECharts
+- SortableJS / VueDraggable
+- Fuse.js
 
 ### 后端
 
-- Java
-- Spring Boot
-- Spring MVC
-- MyBatis-Plus
-- MySQL
+- Java 17
+- Spring Boot 3.3.4
+- MyBatis-Plus 3.5.7
+- MySQL 8
+- Maven
 - JWT
-- Swagger / OpenAPI
+- SpringDoc OpenAPI
+- H2 测试数据库
 
-## 3. 环境准备
-
-启动项目之前，请先安装这些依赖。
-
-### 3.1 安装 Node.js
-
-前端运行需要 Node.js。
-
-建议版本：
-
-- Node.js 18 及以上
-
-官网下载：
-
-- <https://nodejs.org/>
-
-安装完成后，在命令行输入：
-
-```bash
-node -v
-npm -v
-```
-
-如果能看到版本号，说明安装成功。
-
-### 3.2 安装 Java
-
-后端使用 Spring Boot，要求 JDK 17 及以上。
-
-建议版本：
-
-- JDK 17 或更高
-
-安装完成后，在命令行输入：
-
-```bash
-java -version
-```
-
-如果能看到 Java 版本号，说明安装成功。
-
-### 3.3 安装 Maven
-
-后端使用 Maven 管理依赖。
-
-#### 下载 Maven
-
-Maven 官网：
-
-- <https://maven.apache.org/download.cgi>
-
-建议下载：
-
-- `Binary zip archive`
-
-#### 安装 Maven
-
-1. 下载 zip 包
-2. 解压到本地目录，例如：
+## 目录结构
 
 ```text
-C:\Users\你的用户名\tools\apache-maven-3.9.11
+SEGroup8
+├── backend/                 # Spring Boot 后端
+│   ├── src/main/java/       # 业务代码
+│   ├── src/main/resources/  # 配置、SQL、静态资源
+│   ├── src/test/java/       # 后端测试
+│   ├── start.ps1            # 常规启动脚本
+│   ├── start-reset.ps1      # 重置数据库启动脚本
+│   └── pom.xml
+├── frontend/                # Vue 3 前端
+│   ├── src/api/             # API 封装
+│   ├── src/assets/          # 静态资源
+│   ├── src/components/      # 公共组件
+│   ├── src/layout/          # 用户端/卖家端/管理端布局
+│   ├── src/mock-data/       # 前端 mock 数据
+│   ├── src/router/          # 路由配置
+│   ├── src/stores/          # Pinia 状态管理
+│   ├── src/utils/           # 工具方法
+│   ├── src/views/           # 页面视图
+│   └── package.json
+├── sql/                     # 数据库脚本
+├── DEPLOY_ALIYUN.md         # 阿里云部署说明
+├── SECURITY.md              # 安全说明
+└── README.md
 ```
 
-1. 配置环境变量：
+## 环境要求
 
-- 新建用户变量或系统变量：`MAVEN_HOME`
-- 值填写 Maven 解压目录，例如：
+- Node.js 18 或更高版本
+- npm
+- JDK 17
+- Maven 3.8 或更高版本
+- MySQL 8
 
-```text
-C:\Users\你的用户名\tools\apache-maven-3.9.11
-```
+## 快速启动
 
-- 在 `Path` 中追加：
-
-```text
-%MAVEN_HOME%\bin
-```
-
-1. 关闭当前终端，重新打开一个新的终端窗口
-
-#### 验证 Maven
+### 1. 克隆项目
 
 ```bash
-mvn -version
+git clone <repository-url>
+cd SEGroup8
 ```
 
-如果能看到 Maven 版本和 Java 版本，说明 Maven 安装成功。
+### 2. 配置后端本地环境
 
-### 3.4 安装 MySQL
+后端默认会读取 `backend/src/main/resources/application.yml`，并额外尝试加载本地配置文件：
 
-后端需要 MySQL。
-
-建议版本：
-
-- MySQL 8.x
-
-请确认：
-
-- MySQL 服务已经启动
-- 你知道数据库账号和密码
-
-如果你的电脑没有 `mysql` 命令，但安装了 MySQL Shell，可以使用：
-
-```bat
-"C:\Program Files\MySQL\MySQL Shell 8.0\bin\mysqlsh.exe" --sql root@localhost -p
+```text
+backend/src/main/resources/application-local.yml
 ```
 
-## 4. 前后端依赖怎么下载
-
-### 4.1 前端依赖怎么下载
-
-进入前端目录后执行：
-
-```powershell
-cd frontend
-npm install
-```
-
-这条命令会根据 [package.json](/c:/Users/34267/Desktop/code/SEGroup8/frontend/package.json) 自动下载前端依赖，包括：
-
-- vue
-- vite
-- vue-router
-- pinia
-- axios
-- element-plus
-
-### 4.2 后端依赖怎么下载
-
-进入后端目录后执行：
+首次启动前可以复制示例配置：
 
 ```powershell
 cd backend
-mvn clean install
+Copy-Item src/main/resources/application-local.example.yml src/main/resources/application-local.yml
 ```
 
-或者直接：
+然后根据本机环境修改：
 
-```powershell
-mvn spring-boot:run
-```
-
-Maven 会根据 [pom.xml](/c:/Users/34267/Desktop/code/SEGroup8/backend/pom.xml) 自动下载后端依赖，包括：
-Maven 会根据 `backend/pom.xml` 自动下载后端依赖，包括：
-
-- spring-boot-starter-web
-- spring-boot-starter-validation
-- mybatis-plus-spring-boot3-starter
-- mysql-connector-j
-- lombok
-- jjwt
-- springdoc-openapi
-
-## 5. 数据库账号和密码在哪里填写
-
-公共配置文件在：
-
-- `backend/src/main/resources/application.yml`
-
-请不要在公共配置里填写个人数据库密码。
-
-### 5.1 本地私有配置（推荐）
-
-在下面路径创建本地文件（该文件已被 `.gitignore` 忽略）：
-
-- `backend/src/main/resources/application-local.yml`
-
-可选：复制示例文件作为模板（示例仅用于参考）：
-
-- `backend/src/main/resources/application-local.example.yml`
-
-示例内容：
-
-```yml
+```yaml
 spring:
   datasource:
     username: root
-    password: 你的MySQL密码
+    password: your_mysql_password
+
+risk-audit:
+  llm:
+    api-key: your_llm_api_key
 ```
 
-如果你的账号不是 `root`，请改成你自己的账号。
+大模型审核不是本地启动的必需项。没有密钥时，可以先保留示例值或关闭相关配置。
 
-### 5.2 自动创建（脚本启动）
+### 3. 启动后端
 
-如果你使用下面脚本启动后端：
-
-- `backend/start.bat`
-- `backend/start.ps1`
-
-当 `application-local.yml` 不存在时，脚本会自动从 `application-local.example.yml` 复制并创建本地文件。
-
-你只需要修改新生成文件里的这两项：
-
-- `spring.datasource.username`
-- `spring.datasource.password`
-
-注意：如果你直接使用 `mvn spring-boot:run`，脚本不会执行，需先手动创建 `application-local.yml`。
-
-注意：
-
-- `application-local.yml` 是本机私有配置，不会提交到仓库。
-- `application-local.example.yml` 只保留占位符，不能填写真实密码后提交。
-
-## 6. SQL 初始化与两种启动模式
-
-后端现在区分为两种启动模式：
-
-- 日常测试启动：不强制执行 SQL 初始化，不会自动清空或覆盖已有业务数据。
-- 全量初始化启动：会执行“全表清空 + 重新初始化”脚本，适合需要重置环境时使用。
-
-### 6.1 日常测试启动（默认）
-
-默认配置文件：
-
-- [backend/src/main/resources/application.yml](backend/src/main/resources/application.yml)
-
-其中已设置：
-
-- `spring.sql.init.mode: never`
-
-这意味着正常启动后端时，不会自动执行 [backend/src/main/resources/schema.sql](backend/src/main/resources/schema.sql) 和 [backend/src/main/resources/data.sql](backend/src/main/resources/data.sql)。
-
-### 6.2 全量初始化启动（清空后重建）
-
-> [!WARNING]
-> 高风险操作：该模式会清空当前数据库中的业务数据（包括订单、商品、优惠券、余额流水等）并重建基础数据。
-> 请勿在需要保留数据的环境执行。
-
-> [!IMPORTANT]
-> 为防误触，`start-reset.ps1` / `start-reset.bat` 已加入二次确认：
-> 第一步必须输入 `YES`，第二步必须输入 `RESET-ALL`，任一步不匹配都会立即取消。
-
-专用配置文件：
-
-- [backend/src/main/resources/application-reset-all.yml](backend/src/main/resources/application-reset-all.yml)
-
-专用数据脚本：
-
-- [backend/src/main/resources/data-reset-all.sql](backend/src/main/resources/data-reset-all.sql)
-
-该模式会先清空业务表，再按初始化脚本重建基础数据，请谨慎使用。
-
-### 6.3 手动初始化（可选）
-
-如果你想手动执行 SQL，可以使用：
-
-- [sql/init.sql](sql/init.sql)
-
-你可以在 MySQL 客户端里执行这个文件。
-
-## 7. 默认测试账号
-
-项目自带测试数据，默认账号如下：
-
-- `admin / admin123`
-- `seller / seller123`
-- `user / user123`
-
-## 8. 怎么启动后端
-
-后端必须在 `backend` 目录下启动。
-
-### 方式一：日常测试启动（推荐，不清库）
-
-#### 1) 使用脚本启动
+推荐使用项目提供的启动脚本：
 
 ```powershell
 cd backend
-powershell -ExecutionPolicy ByPass -File .\start.ps1
+.\start.ps1
 ```
 
-或：
+脚本会在本地配置不存在时自动复制 `application-local.example.yml`，并使用 `start-schema` 配置启动后端。
 
-```bat
-cd backend
-start.bat
-```
-
-#### 2) 使用 Maven 启动
-
-```powershell
-cd backend
-mvn spring-boot:run
-```
-
-### 方式二：全量初始化启动（会清空并重建数据）
-
-#### 1) 使用 reset 脚本启动
-
-```powershell
-cd backend
-powershell -ExecutionPolicy ByPass -File .\start-reset.ps1
-```
-
-执行后会出现二次确认：
-
-1. Step 1/2: 输入 `YES`
-2. Step 2/2: 输入 `RESET-ALL`
-
-任一步输入不匹配，脚本会直接退出，不会执行清库。
-
-或：
-
-```bat
-cd backend
-start-reset.bat
-```
-
-#### 2) 使用 Maven 指定 profile 启动
-
-```powershell
-cd backend
-mvn spring-boot:run -Dspring-boot.run.profiles=reset-all
-```
-
-### 方式三：运行打包好的 jar（不清库）
-
-```powershell
-cd backend
-java -jar target\platform-backend-0.0.1-SNAPSHOT.jar
-```
-
-### 后端启动成功标志
-
-如果后端启动成功，日志中会出现类似：
+后端默认地址：
 
 ```text
-Tomcat started on port 8080
-Started PlatformApplication
+http://localhost:8080
 ```
 
-后端访问地址：
+Swagger 接口文档：
 
-- 接口地址：`http://localhost:8080`
-- Swagger 地址：`http://localhost:8080/swagger-ui.html`
+```text
+http://localhost:8080/swagger-ui.html
+```
 
-## 9. 怎么启动前端
+如果需要重置全部数据库数据，可以使用：
 
-前端必须在 `frontend` 目录下启动。
+```powershell
+cd backend
+.\start-reset.ps1
+```
+
+注意：重置脚本会清空并重新初始化数据，执行前会要求输入确认文本。
+
+### 4. 启动前端
 
 ```powershell
 cd frontend
@@ -383,119 +188,280 @@ npm run dev
 
 前端默认地址：
 
-- `http://localhost:5174`
-
-说明：
-
-- `dev:mock` / `dev:real` 已在 `frontend/package.json` 配置。
-- 数据源统一入口在 `frontend/src/api/http.js`。
-- 测试数据统一放在 `frontend/src/mock-data/`。
-
-## 10. 推荐启动顺序
-
-推荐按这个顺序启动：
-
-1. 启动 MySQL
-2. 启动后端
-3. 启动前端
-
-## 11. 常见问题
-
-### 11.1 `mvn` 不是内部或外部命令
-
-说明 Maven 没有正确安装，或者当前终端还没刷新环境变量。
-
-处理方法：
-
-1. 确认已经配置 `MAVEN_HOME`
-2. 确认 `Path` 里包含 `%MAVEN_HOME%\bin`
-3. 关闭当前终端，重新打开后再执行：
-
-```bash
-mvn -version
+```text
+http://localhost:5174
 ```
 
-### 11.2 `No plugin found for prefix 'spring-boot'`
+如果 5174 端口被占用，Vite 会自动切换到下一个可用端口，请以终端输出为准。
 
-通常说明你在错误目录执行了命令。
+## 前端数据源模式
 
-正确方式：
-
-```powershell
-cd backend
-mvn spring-boot:run
-```
-
-不要在 `frontend` 目录执行 `mvn spring-boot:run`。
-
-### 11.6 二手模块报 `No static resource api/secondhand/list`
-
-原因通常是：当前使用 `real` 数据源，但后端尚未提供二手接口。
-
-处理方法：
-
-1. 临时切到 mock：在 `frontend` 下执行 `npm run dev:mock`
-2. 或补齐后端二手接口后再使用 `npm run dev:real`
-
-### 11.3 前端报 `AxiosError: Network Error`
-
-这通常不是前端依赖有问题，而是后端没成功启动。
-
-请先检查：
-
-- `http://localhost:8080/swagger-ui.html` 是否能打开
-- 后端日志里是否有 `Tomcat started on port 8080`
-
-### 11.4 数据库连接失败
-
-如果看到类似：
+前端通过 `VITE_DATA_SOURCE` 控制使用真实后端还是 mock 数据。
 
 ```text
-Access denied for user 'root'@'localhost'
+frontend/.env.development   # 默认真实后端
+frontend/.env.mock          # mock 数据
+frontend/.env.real          # 真实后端
+frontend/.env.production    # 生产环境真实后端
 ```
 
-说明 `application.yml` 或 `application-local.yml` 里的数据库账号或密码不对。
+常用命令：
 
-请修改：
+```bash
+npm run dev        # 开发模式，默认读取 .env.development
+npm run dev:mock   # 使用 mock 数据
+npm run dev:real   # 使用真实后端
+npm run build      # 生产构建
+npm run build:mock # mock 模式构建
+npm run build:real # 真实后端模式构建
+```
 
-- `spring.datasource.username`
-- `spring.datasource.password`
+如果页面没有请求到真实数据，优先检查：
 
-### 11.5 浏览器报 CORS 错误
+- 后端是否运行在 `http://localhost:8080`。
+- 当前前端环境是否为 `VITE_DATA_SOURCE=real`。
+- 浏览器控制台和 Network 面板中是否存在接口错误。
 
-如果后端没有真正启动，浏览器经常会表现成 CORS 或 Network Error。
+## 主要路由
 
-所以遇到 CORS 时，先确认后端是否启动成功，而不是先改前端。
+### 用户端
 
-## 12. 当前已完成的基础能力
+```text
+/                         首页
+/login                    登录
+/register                 注册
+/product                  官方商城
+/product/:id              官方商品详情
+/secondhand               二手商城
+/secondhand/:id           二手商品详情
+/secondhand/publish       发布闲置
+/cart                     统一购物车
+/order                    新品订单
+/secondhand/orders        二手订单
+/profile                  个人资料
+/addresses                地址管理
+/browse-history           浏览记录
+/messages                 消息
+/notifications            通知
+```
+
+### 卖家端
+
+```text
+/merchant                 卖家工作台
+/merchant/orders          卖家订单
+/merchant/finance         财务管理
+/merchant/reviews         评价管理
+/merchant/shop            店铺设置
+/merchant/seller-products 商品管理
+/merchant/vouchers        优惠券管理
+/merchant/account-health  账号健康
+```
+
+### 管理端
+
+```text
+/admin                    管理首页
+/admin/users              用户管理
+/admin/merchant-review    商家审核
+/admin/orders             订单管理
+/admin/reports            举报与报表
+/admin/audit-logs         审计日志
+/admin/product-risk-audits 商品风险审核
+```
+
+## 订单与购物车规则
+
+当前项目区分两类商品：
+
+- 新品：官方商城商品，通常由商家统一发货，支持多个商品合并下单。
+- 二手：个人闲置商品，通常库存为 1，更适合按商品和卖家拆分订单。
+
+因此，购物车入口可以统一，但结算时会自动分组：
+
+```text
+官方商城订单
+- 键盘
+- 耳机
+
+个人闲置订单
+- 自行车，卖家 A
+
+个人闲置订单
+- 教材，卖家 B
+```
+
+订单列表也按类型区分：
+
+- `/order` 只展示新品订单。
+- `/secondhand/orders` 只展示二手订单。
+
+## 常用开发命令
 
 ### 前端
 
-- Vue Router 路由配置
-- Pinia 登录状态管理
-- Axios 请求封装
-- 请求与响应拦截器
-- Token 自动携带
-- 登录状态持久化
-- 用户端、卖家端、管理端布局基础壳子
+```bash
+cd frontend
+npm install
+npm run dev
+npm run build
+```
 
 ### 后端
 
-- 统一返回体 `Result`
-- 全局异常处理
-- JWT 登录鉴权
-- 登录拦截器
-- CORS 配置
-- Swagger / OpenAPI
-- 文件上传接口
+```bash
+cd backend
+mvn spring-boot:run
+mvn -DskipTests compile
+mvn test
+```
 
-## 13. 团队后续开发建议
+如果直接使用 Maven 启动，需要确认本地数据库和配置文件已经准备好。日常开发更推荐使用 `start.ps1`。
 
-- 用户模块：`frontend/src/views/user`、`backend/controller/user`
-- 商品模块：`frontend/src/views/product`、`backend/service/product`
-- 订单模块：`frontend/src/views/order`
-- 二手模块：`frontend/src/views/secondhand`
-- 店铺模块：`frontend/src/views/seller`
-- 管理后台模块：`frontend/src/views/admin`
+## 数据库说明
 
-这套基础工程已经适合作为课程项目正式开发起点。
+默认数据库连接配置位于：
+
+```text
+backend/src/main/resources/application.yml
+```
+
+默认数据库名：
+
+```text
+segroup8_platform
+```
+
+建议不要直接修改 `application.yml` 中的公共配置，而是在本地创建：
+
+```text
+backend/src/main/resources/application-local.yml
+```
+
+这个文件用于保存本机数据库密码、API Key 等私有配置，并且不应提交到 Git。
+
+## 文件上传
+
+后端默认上传目录为：
+
+```text
+backend/uploads
+```
+
+上传目录属于运行时数据，不建议提交到版本库。
+
+## 实时消息
+
+后端提供 WebSocket 实时通道：
+
+```text
+/ws/realtime
+```
+
+本地开发默认允许 `localhost` 和局域网地址访问。
+
+## 商品风险审核
+
+商品风险审核配置位于后端配置文件的 `risk-audit.llm` 节点。项目支持通过环境变量注入密钥：
+
+```text
+RISK_AUDIT_LLM_API_KEY
+OPENAI_API_KEY
+```
+
+本地没有密钥时，可以先使用普通商品流程开发；涉及风险审核的能力需要补充有效 API Key。
+
+## Git 忽略项
+
+项目会忽略常见运行时和本地配置文件，例如：
+
+- `node_modules/`
+- `dist/`
+- `target/`
+- `backend/uploads/`
+- `backend/src/main/resources/application-local.yml`
+- `.playwright-mcp/`
+
+其中 `.playwright-mcp/` 是 Playwright MCP 工具生成的页面快照目录，只用于本地浏览器调试，不属于业务代码。
+
+## 常见问题
+
+### 前端页面没有数据
+
+先确认当前是否使用真实后端模式：
+
+```bash
+npm run dev:real
+```
+
+然后检查后端是否已经启动：
+
+```text
+http://localhost:8080
+```
+
+### 登录或接口请求失败
+
+检查以下几项：
+
+- MySQL 服务是否启动。
+- `application-local.yml` 中账号密码是否正确。
+- 后端控制台是否有 SQL 或鉴权错误。
+- 前端当前是否连接真实后端。
+
+### 想使用 mock 数据开发
+
+使用：
+
+```bash
+cd frontend
+npm run dev:mock
+```
+
+mock 数据位于：
+
+```text
+frontend/src/mock-data
+```
+
+### 数据库需要重新初始化
+
+使用重置脚本：
+
+```powershell
+cd backend
+.\start-reset.ps1
+```
+
+执行前请确认本地数据可以被清空。
+
+## 交付与构建
+
+前端生产构建：
+
+```bash
+cd frontend
+npm run build
+```
+
+后端编译：
+
+```bash
+cd backend
+mvn -DskipTests compile
+```
+
+云服务器部署可以参考：
+
+```text
+DEPLOY_ALIYUN.md
+```
+
+## 项目定位
+
+本项目不是单纯的商品展示页面，而是一个包含用户端、卖家端、管理端、官方商品交易和个人闲置交易的综合平台。后续扩展时建议继续保持以下边界：
+
+- 用户入口可以统一。
+- 新品和二手的订单、库存、发货、售后规则需要保持区分。
+- 卖家端主要面向官方商城商家。
+- 个人闲置发布和管理更适合保留在用户端流程中。
