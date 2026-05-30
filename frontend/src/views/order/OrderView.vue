@@ -64,6 +64,7 @@
       <el-tab-pane label="待收货" name="SHIPPED" />
       <el-tab-pane label="待评价" name="RECEIVED" />
       <el-tab-pane label="已完成" name="COMPLETED" />
+      <el-tab-pane label="售后/退款" name="AFTER_SALE" />
       <el-tab-pane label="已关闭" name="CLOSED" />
     </el-tabs>
 
@@ -255,7 +256,8 @@ const query = reactive({
   endTime: null,
   minAmount: null,
   maxAmount: null,
-  productType: 'ALL'
+  productType: 'ALL',
+  refundStatus: undefined
 });
 const total = ref(0);
 const records = ref([]);
@@ -288,6 +290,7 @@ const tabLabelMap = {
   SHIPPED: '待收货',
   RECEIVED: '待评价',
   COMPLETED: '已完成',
+  AFTER_SALE: '售后/退款',
   CLOSED: '已关闭'
 };
 const tabLabel = computed(() => tabLabelMap[activeTab.value] || '全部');
@@ -320,7 +323,7 @@ const pageCopy = computed(() => {
   return {
     eyebrow: 'Orders',
     title: '我的订单',
-    desc: '查看交易进度、物流状态和售后入口。'
+    desc: '查看下单商品的交易进度、物流状态和售后入口。'
   };
 });
 
@@ -344,6 +347,7 @@ let unsubscribeRealtime = null;
 
 onMounted(() => {
   syncOrderScopeFromRoute();
+  syncOrderTypeFromQuery();
   syncQueryFromTab();
   fetchOrders();
   unsubscribeRealtime = onRealtimeEvent(handleRealtimeEvent);
@@ -376,6 +380,8 @@ function tabToStatus(tab) {
       return 3;
     case 'COMPLETED':
       return 4;
+    case 'AFTER_SALE':
+      return undefined;
     case 'CLOSED':
       return 9;
     default:
@@ -385,10 +391,21 @@ function tabToStatus(tab) {
 
 function syncQueryFromTab() {
   query.orderStatus = tabToStatus(activeTab.value);
+  query.refundStatus = activeTab.value === 'AFTER_SALE' ? 1 : undefined;
 }
 
 function syncOrderScopeFromRoute() {
   query.productType = scopedOrderType.value || 'ALL';
+}
+
+function syncOrderTypeFromQuery() {
+  if (isScopedOrderPage.value) {
+    return;
+  }
+  const type = String(route.query.type || '').toUpperCase();
+  if (type === 'NEW' || type === 'SECONDHAND') {
+    query.productType = type;
+  }
 }
 
 watch(
@@ -422,7 +439,9 @@ function handleReset() {
   query.maxAmount = null;
   activeTab.value = 'ALL';
   syncOrderScopeFromRoute();
+  syncOrderTypeFromQuery();
   query.orderStatus = undefined;
+  query.refundStatus = undefined;
   query.pageNum = 1;
   fetchOrders();
 }
@@ -454,7 +473,7 @@ function formatTime(value) {
 
 function orderDetailPath(orderOrId) {
   const id = typeof orderOrId === 'object' ? orderOrId.id : orderOrId;
-  if (scopedOrderType.value === 'SECONDHAND' || (typeof orderOrId === 'object' && getOrderKind(orderOrId) === 'SECONDHAND')) {
+  if (scopedOrderType.value === 'SECONDHAND') {
     return `/secondhand/orders/${id}`;
   }
   return `/order/${id}`;

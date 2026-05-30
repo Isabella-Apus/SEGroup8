@@ -30,7 +30,7 @@
         </div>
 
         <div class="promo-line">
-          <span>新人券</span>
+          <span>价格清晰</span>
           <span>支持售后</span>
           <span>库存同步</span>
         </div>
@@ -60,10 +60,10 @@
             立即购买
           </el-button>
           <el-button type="primary" size="large" :disabled="maxQuantity <= 0" @click="handleAddToCart">
-            加入新品购物车
+            加入购物车
           </el-button>
           <el-button size="large" @click="handleContactSeller">
-            和卖家聊一聊
+            联系卖家
           </el-button>
           <el-button size="large" :disabled="!product.shopId" @click="handleEnterShop">
             <el-icon><Shop /></el-icon>
@@ -164,7 +164,7 @@ function handleAddToCart() {
     return;
   }
   addToCart(product.value, Number(quantity.value));
-  ElMessage.success("已加入新品购物车");
+  ElMessage.success("已加入购物车");
 }
 
 async function handleBuyNow() {

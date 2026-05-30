@@ -208,7 +208,7 @@ const bannerSlides = computed(() => {
   return [
     {
       key: "top-sales",
-      tag: "Top Sales",
+      tag: "新品热卖",
       title: product ? product.name : "本周热卖好物",
       desc: product ? `到手价 ¥${Number(product.price || 0).toFixed(2)}，库存 ${product.stock ?? 0}` : "精选高热度商品，先到先得。",
       actionText: "查看商品",
@@ -232,9 +232,9 @@ const bannerSlides = computed(() => {
     },
     {
       key: "daily",
-      tag: "Daily Picks",
+      tag: "大家都在看",
       title: product2 ? product2.name : "按预算挑选刚刚好",
-      desc: "按分类、价格、成色快速筛选，少翻页也能找到合适商品。",
+      desc: "按分类、价格、成色快速筛选，快速找到合适商品。",
       actionText: "价格筛选",
       actionPath: "/product",
       secondaryText: "二手捡漏",

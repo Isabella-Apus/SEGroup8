@@ -2,9 +2,9 @@
   <section class="cart-page">
     <div class="cart-hero">
       <div>
-        <span class="eyebrow">Unified Cart</span>
+        <span class="eyebrow">Shopping Cart</span>
         <h1>购物车</h1>
-        <p>新品和二手可以放在同一个入口里确认，提交时会按交易规则自动拆成不同订单。</p>
+        <p>你感兴趣的商品都在这里~</p>
       </div>
       <div class="hero-total">
         <span>已选合计</span>
@@ -407,7 +407,7 @@ async function checkout() {
       return;
     }
     if (!officialOrderId && createdSecondhandIds.size) {
-      router.push("/secondhand/orders");
+      router.push({ path: "/order", query: { type: "SECONDHAND" } });
       return;
     }
     router.push("/order");

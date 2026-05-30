@@ -29,7 +29,7 @@
           </div>
           <div class="conversation-source">{{ formatSource(item) }}</div>
           <div class="conversation-bottom">
-            <span class="conversation-preview">{{ item.lastMessageContent || "点击开始聊天" }}</span>
+            <span class="conversation-preview">{{ formatMessagePreview(item.lastMessageContent) }}</span>
             <el-badge v-if="item.unreadCount" :value="item.unreadCount" />
           </div>
         </button>
@@ -46,6 +46,12 @@
           <div>
             <h3>{{ activeConversation.other?.nickname || "未知用户" }}</h3>
             <p>{{ formatSource(activeConversation) }}</p>
+          </div>
+          <div class="chat-head-actions">
+            <el-button type="warning" plain :loading="blockLoading" :disabled="isCurrentUserBlocked" @click="handleBlockUser">
+              {{ isCurrentUserBlocked ? "已拉黑" : "拉黑" }}
+            </el-button>
+            <el-button type="danger" plain @click="goToReport">举报</el-button>
           </div>
         </header>
 
@@ -75,7 +81,7 @@
                 </el-button>
               </template>
               <span v-else-if="request.status === 'PENDING'" class="trade-note">等待卖家处理</span>
-              <el-button v-else-if="request.orderId" size="small" type="success" plain @click="router.push('/secondhand/orders')">
+              <el-button v-else-if="request.orderId" size="small" type="success" plain @click="router.push({ path: '/order', query: { type: 'SECONDHAND' } })">
                 查看订单
               </el-button>
               <span v-else class="trade-note">{{ request.statusName || "已结束" }}</span>
@@ -92,13 +98,48 @@
           >
             <div class="message-bubble">
               <div class="message-author">{{ message.sender?.nickname || "用户" }}</div>
-              <div class="message-content">{{ message.content }}</div>
+              <div class="message-content">
+                <template v-if="getMessagePayload(message).type === 'image'">
+                  <el-image
+                    class="message-media message-image"
+                    :src="getMessagePayload(message).url"
+                    :preview-src-list="[getMessagePayload(message).url]"
+                    :initial-index="0"
+                    fit="cover"
+                    preview-teleported
+                  />
+                  <div v-if="getMessagePayload(message).caption" class="message-caption">
+                    {{ getMessagePayload(message).caption }}
+                  </div>
+                </template>
+                <template v-else-if="getMessagePayload(message).type === 'video'">
+                  <video
+                    class="message-media message-video"
+                    :src="getMessagePayload(message).url"
+                    controls
+                    preload="metadata"
+                  />
+                  <div v-if="getMessagePayload(message).caption" class="message-caption">
+                    {{ getMessagePayload(message).caption }}
+                  </div>
+                </template>
+                <template v-else>
+                  {{ getMessagePayload(message).text }}
+                </template>
+              </div>
               <div class="message-time">{{ formatTime(message.createTime, true) }}</div>
             </div>
           </div>
         </div>
 
         <footer class="chat-composer">
+          <input
+            ref="mediaInputRef"
+            class="media-input"
+            type="file"
+            accept="image/*,video/*"
+            @change="handleMediaSelected"
+          />
           <el-input
             v-model="draft"
             type="textarea"
@@ -106,12 +147,16 @@
             maxlength="1000"
             show-word-limit
             resize="none"
-            placeholder="输入消息"
+            :disabled="isCurrentUserBlocked"
+            :placeholder="isCurrentUserBlocked ? '已拉黑该用户，无法继续发送消息' : '输入消息'"
             @keydown="handleComposerKeydown"
           />
           <div class="composer-actions">
             <span class="composer-tip">{{ sendStatus }}</span>
-            <el-button type="primary" :loading="sending" @click="sendMessage">发送</el-button>
+            <div class="composer-buttons">
+              <el-button :disabled="sending || isCurrentUserBlocked" @click="openMediaPicker">上传图片/视频</el-button>
+              <el-button type="primary" :loading="sending" :disabled="isCurrentUserBlocked" @click="sendMessage">发送</el-button>
+            </div>
           </div>
         </footer>
       </template>
@@ -121,7 +166,7 @@
 
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { useRoute, useRouter } from "vue-router";
 import {
   createChatConversationApi,
@@ -135,10 +180,16 @@ import {
   rejectBargainApi,
 } from "@/api/secondhand";
 import {
+  blockUserApi,
+  isBlockingApi,
+} from "@/api/credit";
+import { uploadMediaApi } from "@/api/upload";
+import {
   onRealtimeEvent,
   startRealtimeClient,
 } from "@/realtime/realtimeClient";
 import { useUserStore } from "@/stores/user";
+import { toAssetUrl } from "@/utils/url";
 
 const route = useRoute();
 const router = useRouter();
@@ -147,11 +198,14 @@ const userStore = useUserStore();
 const loadingConversations = ref(false);
 const loadingMessages = ref(false);
 const sending = ref(false);
+const blockLoading = ref(false);
 const conversations = ref([]);
 const messages = ref([]);
 const bargainRequests = ref([]);
 const activeConversationId = ref(null);
 const draft = ref("");
+const mediaInputRef = ref(null);
+const blockedUserIds = ref(new Set());
 const sendStatus = ref("消息会自动同步给对方");
 const actionLoadingKey = ref("");
 
@@ -161,6 +215,13 @@ const chatRoutePath = computed(() =>
 );
 const activeConversation = computed(() =>
   conversations.value.find((item) => Number(item.id) === Number(activeConversationId.value)) || null,
+);
+const activeOtherUserId = computed(() => {
+  const other = activeConversation.value?.other || {};
+  return other.userId || other.id || null;
+});
+const isCurrentUserBlocked = computed(() =>
+  activeOtherUserId.value ? blockedUserIds.value.has(Number(activeOtherUserId.value)) : false,
 );
 
 let unsubscribeRealtime = null;
@@ -275,6 +336,7 @@ async function selectConversation(conversation) {
   activeConversationId.value = conversation.id;
   await loadMessages(conversation.id);
   await loadBargainRequests();
+  await loadBlockStatus();
   const currentQueryId = String(route.query.conversationId || "");
   if (currentQueryId !== String(conversation.id)) {
     router.replace({ path: chatRoutePath.value, query: { conversationId: conversation.id } });
@@ -332,7 +394,7 @@ async function loadBargainRequests(options = {}) {
 
 async function sendMessage() {
   const content = draft.value.trim();
-  if (!content || !activeConversation.value) {
+  if (!content || !activeConversation.value || isCurrentUserBlocked.value) {
     return;
   }
   sending.value = true;
@@ -348,6 +410,151 @@ async function sendMessage() {
   } finally {
     sending.value = false;
   }
+}
+
+function openMediaPicker() {
+  if (!activeConversation.value || sending.value || isCurrentUserBlocked.value) {
+    return;
+  }
+  mediaInputRef.value?.click();
+}
+
+async function handleMediaSelected(event) {
+  const file = event.target?.files?.[0];
+  if (event.target) {
+    event.target.value = "";
+  }
+  if (!file || !activeConversation.value || isCurrentUserBlocked.value) {
+    return;
+  }
+  const type = getMediaType(file);
+  if (!type) {
+    ElMessage.warning("仅支持上传图片或视频");
+    return;
+  }
+  sending.value = true;
+  try {
+    const conversationId = activeConversation.value.id;
+    const uploadResult = await uploadMediaApi(file);
+    const uploaded = uploadResult.data || {};
+    const content = createMediaMessageContent({
+      type,
+      url: uploaded.url,
+      filename: uploaded.filename || file.name,
+      contentType: uploaded.contentType || file.type,
+    });
+    const result = await sendChatMessageApi(conversationId, { content });
+    appendIncomingMessage(result.data);
+    sendStatus.value = type === "image" ? "图片已发送" : "视频已发送";
+    await refreshConversations({ silent: true });
+    await loadMessages(conversationId, { silent: true });
+    await scrollToBottom();
+  } finally {
+    sending.value = false;
+  }
+}
+
+function goToReport() {
+  const other = activeConversation.value?.other || {};
+  const reportedId = other.userId || other.id;
+  if (!reportedId) {
+    ElMessage.warning("无法识别当前对话用户");
+    return;
+  }
+  router.push({
+    path: "/credit",
+    query: {
+      reportUserId: reportedId,
+      reportUserName: other.nickname || `用户 ${reportedId}`,
+      reportContext: inferReportContext(activeConversation.value),
+      fromConversationId: activeConversation.value.id,
+    },
+  });
+}
+
+async function loadBlockStatus() {
+  const targetUserId = activeOtherUserId.value;
+  if (!targetUserId) {
+    return;
+  }
+  try {
+    const result = await isBlockingApi(targetUserId);
+    const isBlocked = Boolean(result.data);
+    setBlockedUser(targetUserId, isBlocked);
+  } catch {
+    setBlockedUser(targetUserId, false);
+  }
+}
+
+async function handleBlockUser() {
+  const targetUserId = activeOtherUserId.value;
+  const targetName = activeConversation.value?.other?.nickname || `用户 ${targetUserId}`;
+  if (!targetUserId || blockLoading.value || isCurrentUserBlocked.value) {
+    return;
+  }
+  try {
+    await ElMessageBox.confirm(
+      `确认拉黑 ${targetName}？拉黑后对方将无法继续向你发送消息。`,
+      "拉黑用户",
+      {
+        type: "warning",
+        confirmButtonText: "确认拉黑",
+        cancelButtonText: "取消",
+      },
+    );
+  } catch {
+    return;
+  }
+  blockLoading.value = true;
+  try {
+    await blockUserApi(targetUserId);
+    setBlockedUser(targetUserId, true);
+    ElMessage.success("已拉黑该用户");
+  } finally {
+    blockLoading.value = false;
+  }
+}
+
+function setBlockedUser(userId, blocked) {
+  const next = new Set(blockedUserIds.value);
+  if (blocked) {
+    next.add(Number(userId));
+  } else {
+    next.delete(Number(userId));
+  }
+  blockedUserIds.value = next;
+}
+
+function inferReportContext(conversation) {
+  const sourceType = String(conversation?.sourceType || "").toUpperCase();
+  if (sourceType === "PRODUCT") {
+    return "SHOP";
+  }
+  if (sourceType === "SECONDHAND") {
+    return route.path.startsWith("/merchant") ? "SH_SELLER" : "SH_BUYER";
+  }
+  return route.path.startsWith("/merchant") ? "SH_SELLER" : "SHOP";
+}
+
+function getMediaType(file) {
+  const contentType = String(file?.type || "").toLowerCase();
+  if (contentType.startsWith("image/")) {
+    return "image";
+  }
+  if (contentType.startsWith("video/")) {
+    return "video";
+  }
+  return "";
+}
+
+function createMediaMessageContent(payload) {
+  return JSON.stringify({
+    messageKind: "media",
+    type: payload.type,
+    url: payload.url,
+    filename: payload.filename || "",
+    contentType: payload.contentType || "",
+  });
 }
 
 async function syncActiveChat() {
@@ -516,6 +723,71 @@ function formatSource(conversation) {
   return conversation?.sourceTitle || "站内私聊";
 }
 
+function getMessagePayload(message) {
+  return parseMessageContent(message?.content);
+}
+
+function formatMessagePreview(content) {
+  const payload = parseMessageContent(content);
+  if (payload.type === "image") {
+    return "[图片]";
+  }
+  if (payload.type === "video") {
+    return "[视频]";
+  }
+  return payload.text || "点击开始聊天";
+}
+
+function parseMessageContent(content) {
+  const text = String(content || "");
+  if (!text) {
+    return { type: "text", text: "" };
+  }
+  try {
+    const parsed = JSON.parse(text);
+    if (parsed && typeof parsed === "object" && parsed.url) {
+      const type = normalizeMediaType(parsed.type, parsed.contentType, parsed.url);
+      if (type) {
+        return {
+          type,
+          url: toAssetUrl(parsed.url),
+          caption: parsed.caption || "",
+          filename: parsed.filename || "",
+        };
+      }
+    }
+  } catch {
+    // Plain text messages are expected for existing chat history.
+  }
+  const type = normalizeMediaType("", "", text);
+  if (type) {
+    return { type, url: toAssetUrl(text), caption: "", filename: "" };
+  }
+  return { type: "text", text };
+}
+
+function normalizeMediaType(type, contentType, url) {
+  const normalizedType = String(type || "").toLowerCase();
+  if (normalizedType === "image" || normalizedType === "video") {
+    return normalizedType;
+  }
+  const normalizedContentType = String(contentType || "").toLowerCase();
+  if (normalizedContentType.startsWith("image/")) {
+    return "image";
+  }
+  if (normalizedContentType.startsWith("video/")) {
+    return "video";
+  }
+  const normalizedUrl = String(url || "").split("?")[0].toLowerCase();
+  if (/\.(png|jpe?g|gif|webp|bmp|svg)$/.test(normalizedUrl)) {
+    return "image";
+  }
+  if (/\.(mp4|webm|ogg|mov|m4v)$/.test(normalizedUrl)) {
+    return "video";
+  }
+  return "";
+}
+
 function handleStorageEvent(event) {
   if (event.key === MOCK_STORE_KEY) {
     syncActiveChat();
@@ -587,6 +859,13 @@ async function scrollToBottom() {
   margin: 6px 0 0;
   color: #718096;
   font-size: 13px;
+}
+
+.chat-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
 }
 
 .panel-loading {
@@ -753,6 +1032,30 @@ async function scrollToBottom() {
   word-break: break-word;
 }
 
+.message-media {
+  display: block;
+  max-width: min(360px, 100%);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.message-image {
+  width: min(300px, 100%);
+  max-height: 320px;
+}
+
+.message-video {
+  width: min(360px, 100%);
+  max-height: 320px;
+  background: #0f172a;
+}
+
+.message-caption {
+  margin-top: 8px;
+  color: #334155;
+  white-space: pre-wrap;
+}
+
 .message-time {
   margin-top: 8px;
   color: #94a3b8;
@@ -764,11 +1067,24 @@ async function scrollToBottom() {
   padding: 16px 18px 18px;
 }
 
+.media-input {
+  display: none;
+}
+
 .composer-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 12px;
+  gap: 12px;
+}
+
+.composer-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .composer-tip {

@@ -2,9 +2,9 @@
   <section class="cart-page secondhand-cart">
     <div class="cart-hero">
       <div>
-        <span class="eyebrow">Secondhand Cart</span>
-        <h1>二手购物车</h1>
-        <p>二手商品通常一件一单，先收藏到车里，再统一确认要买哪些。</p>
+        <span class="eyebrow">Want List</span>
+        <h1>想买清单</h1>
+        <p>二手商品会进入统一购物车，结算时按个人闲置订单拆分。</p>
       </div>
       <div class="hero-total">
         <span>已选合计</span>
@@ -13,7 +13,7 @@
       </div>
     </div>
 
-    <el-empty v-if="items.length === 0" class="empty-cart" description="二手购物车暂无商品">
+    <el-empty v-if="items.length === 0" class="empty-cart" description="想买清单暂无商品">
       <el-button type="primary" @click="router.push('/secondhand')">去逛二手商城</el-button>
     </el-empty>
 
@@ -64,7 +64,7 @@
       <aside class="checkout-panel">
         <div class="checkout-card">
           <span class="checkout-kicker">Secondhand Checkout</span>
-          <h2>二手结算</h2>
+          <h2>二手结算预览</h2>
           <dl>
             <div>
               <dt>已选闲置</dt>
@@ -81,7 +81,7 @@
           </dl>
           <div class="coupon-note">
             <strong>二手交易提醒</strong>
-            <span>付款前可以先和卖家聊一聊；确认购买后，可在二手订单里查看状态。</span>
+            <span>付款前可以先和卖家聊一聊；确认购买后，可在我的订单里查看状态。</span>
           </div>
           <div class="payable">
             <span>应付合计</span>
@@ -182,7 +182,7 @@ async function checkout() {
   selectedItems.value = [];
   if (successIds.size) {
     ElMessage.success(`已生成 ${successIds.size} 个二手订单`);
-    router.push("/secondhand/orders");
+    router.push({ path: "/order", query: { type: "SECONDHAND" } });
     return;
   }
   await refreshCartItems();

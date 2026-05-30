@@ -4,7 +4,7 @@
       <div>
         <span class="eyebrow">个人闲置</span>
         <h1>二手市场</h1>
-        <p>从学习设备到生活用品，低价淘闲置，也可以快速发布自己的物品。</p>
+        <p>教材、数码、生活用品都能转一转，让闲置物品继续被使用。</p>
       </div>
     </div>
 
@@ -25,7 +25,7 @@
         <span class="tile-icon"><el-icon><ShoppingCart /></el-icon></span>
         <span class="tile-label">购物车</span>
       </button>
-      <button type="button" class="service-tile" @click="router.push('/secondhand/orders')">
+      <button type="button" class="service-tile" @click="router.push({ path: '/order', query: { type: 'SECONDHAND' } })">
         <span class="tile-icon"><el-icon><Document /></el-icon></span>
         <span class="tile-label">订单</span>
       </button>

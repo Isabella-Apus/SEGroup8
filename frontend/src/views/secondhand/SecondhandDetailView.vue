@@ -106,14 +106,17 @@
         </div>
 
         <div class="actions">
+          <el-button type="primary" size="large" @click="handleContactSeller">
+            聊一聊
+          </el-button>
+          <el-button size="large" :disabled="!canBuy" @click="handleWant">
+            我想要
+          </el-button>
           <el-button type="warning" size="large" :disabled="!canBuyOnePrice" @click="handleBuyNow">
             立即购买
           </el-button>
           <el-button size="large" :disabled="!canBuy" @click="handleAddToSecondhandCart">
-            加入二手购物车
-          </el-button>
-          <el-button type="primary" size="large" @click="handleContactSeller">
-            和卖家聊一聊
+            加入想买清单
           </el-button>
           <el-button size="large" :disabled="!item.sellerUserId" @click="handleEnterSeller">
             <el-icon><User /></el-icon>
@@ -344,7 +347,7 @@ const auctionStageCopy = computed(() => {
     return "出价成功后会实时刷新当前最高价。";
   }
   if (auctionInfo.value.status === "FLOW") return "本次拍卖已流拍，没有买家成交。";
-  if (isLeadingAuction.value) return "你已竞拍成功，请到二手订单里完成付款。";
+  if (isLeadingAuction.value) return "你已竞拍成功，请到我的订单里完成付款。";
   return "本次拍卖已结束。";
 });
 const auctionRoleHint = computed(() => {
@@ -457,23 +460,36 @@ async function confirmBuyWithAddress() {
     await buySecondhandApi(item.value.id, { addressId: selectedAddressId.value });
     addressDialogVisible.value = false;
     ElMessage.success("下单成功");
-    router.push("/secondhand/orders");
+    router.push({ path: "/order", query: { type: "SECONDHAND" } });
   } finally {
     buySubmitting.value = false;
   }
 }
 
-function handleAddToSecondhandCart() {
+function handleWant() {
   if (!canBuyOnePrice.value) {
-    ElMessage.warning("当前商品暂不可加入购物车");
+    ElMessage.warning("当前商品暂不可加入想买清单");
     return;
   }
   if (!canChatWithSeller.value) {
-    ElMessage.warning("这是你自己的闲置，不能加入二手购物车");
+    ElMessage.warning("这是你自己的闲置，不能加入想买清单");
     return;
   }
   addSecondhandToCart(item.value);
-  ElMessage.success("已加入二手购物车");
+  ElMessage.success("已加入想买清单，可在购物车中统一结算");
+}
+
+function handleAddToSecondhandCart() {
+  if (!canBuyOnePrice.value) {
+    ElMessage.warning("当前商品暂不可加入想买清单");
+    return;
+  }
+  if (!canChatWithSeller.value) {
+    ElMessage.warning("这是你自己的闲置，不能加入想买清单");
+    return;
+  }
+  addSecondhandToCart(item.value);
+  ElMessage.success("已加入想买清单，可在购物车中统一结算");
 }
 
 function handleContactSeller() {

@@ -127,6 +127,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<UserVO> searchUsers(String keyword) {
+        Long currentUserId = requireUserId();
+        String normalized = StringUtils.hasText(keyword) ? keyword.trim() : "";
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<User>()
+                .ne(User::getId, currentUserId)
+                .ne(User::getRole, "ADMIN")
+                .orderByDesc(User::getId)
+                .last("limit 10");
+        if (StringUtils.hasText(normalized)) {
+            Long id = parseLong(normalized);
+            wrapper.and(query -> {
+                if (id != null) {
+                    query.eq(User::getId, id)
+                            .or();
+                }
+                query.like(User::getUsername, normalized)
+                        .or()
+                        .like(User::getNickname, normalized);
+            });
+        }
+        return userMapper.selectList(wrapper)
+                .stream()
+                .map(this::toPublicUserVO)
+                .toList();
+    }
+
+    @Override
     public void updateCurrentUserProfile(UserProfileUpdateRequest request) {
         User update = new User();
         update.setId(requireUserId());
@@ -230,6 +257,26 @@ public class UserServiceImpl implements UserService {
         vo.setDetailAddress(address.getDetailAddress());
         vo.setIsDefault(address.getIsDefault());
         return vo;
+    }
+
+    private UserVO toPublicUserVO(User user) {
+        UserVO vo = new UserVO();
+        vo.setId(user.getId());
+        vo.setUsername(user.getUsername());
+        vo.setNickname(user.getNickname());
+        vo.setAvatar(user.getAvatar());
+        vo.setRole(user.getRole());
+        vo.setStatus(user.getStatus());
+        vo.setShopName(user.getShopName());
+        return vo;
+    }
+
+    private Long parseLong(String value) {
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 
     private Long requireUserId() {

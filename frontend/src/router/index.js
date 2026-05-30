@@ -66,7 +66,6 @@ const routes = [
                 path: "order",
                 name: "order",
                 component: () => import("@/views/order/OrderView.vue"),
-                meta: { orderScope: "NEW" },
             },
             {
                 path: "order/:id",
@@ -82,15 +81,11 @@ const routes = [
             },
             {
                 path: "secondhand/cart",
-                name: "secondhandCart",
-                component: () =>
-                    import("@/views/secondhand/SecondhandCartView.vue"),
+                redirect: "/cart",
             },
             {
                 path: "secondhand/orders",
-                name: "secondhandOrders",
-                component: () => import("@/views/secondhand/SecondhandOrdersView.vue"),
-                meta: { orderScope: "SECONDHAND" },
+                redirect: "/order",
             },
             {
                 path: "secondhand/orders/:id",
@@ -114,6 +109,11 @@ const routes = [
                 path: "secondhand/mine",
                 name: "secondhandMine",
                 component: () => import("@/views/merchant/MerchantSecondhandProductsView.vue"),
+            },
+            {
+                path: "secondhand/sold",
+                name: "secondhandSold",
+                component: () => import("@/views/secondhand/SecondhandSoldView.vue"),
             },
             {
                 path: "secondhand/publish",

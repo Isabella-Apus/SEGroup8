@@ -611,11 +611,15 @@ async function maybeFocusLogistics() {
 
 function goBack() {
   if (isSellerView.value) {
+    if (route.query.scope === "secondhand") {
+      router.push("/secondhand/sold");
+      return;
+    }
     router.push("/merchant/orders");
     return;
   }
   if (route.meta?.orderScope === "SECONDHAND") {
-    router.push("/secondhand/orders");
+    router.push({ path: "/order", query: { type: "SECONDHAND" } });
     return;
   }
   router.push("/order");

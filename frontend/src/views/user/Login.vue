@@ -3,12 +3,7 @@
         <div class="ambient ambient-one"></div>
         <div class="ambient ambient-two"></div>
         <div class="ambient ambient-three"></div>
-        <div class="inject-layer" aria-hidden="true">
-            <span style="--x: 8%; --y: 12%; --d: 0s;">const auth = inject('session')</span>
-            <span style="--x: 70%; --y: 18%; --d: -2.4s;">mount(LoginForm)</span>
-            <span style="--x: 14%; --y: 72%; --d: -4.8s;">token.sync()</span>
-            <span style="--x: 76%; --y: 68%; --d: -7.2s;">route.push('/')</span>
-        </div>
+        
         <div class="scan-beam" aria-hidden="true"></div>
         <main class="minimal-card">
             <div class="trace-ring" aria-hidden="true"></div>

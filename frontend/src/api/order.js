@@ -24,6 +24,10 @@ export function getSellerOrderListApi(params = {}) {
     return http.get("/order/seller/list", { params: query });
 }
 
+export function getSoldSecondhandOrderListApi(params = {}) {
+    return getSellerOrderListApi({ ...params, productType: "SECONDHAND" });
+}
+
 export function getSellerOrderDetailApi(orderId) {
     return http.get(`/order/seller/detail/${orderId}`);
 }

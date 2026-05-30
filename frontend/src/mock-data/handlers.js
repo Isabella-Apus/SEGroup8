@@ -580,6 +580,23 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
         return ok({ ...user, password: undefined });
     }
 
+    if (m === "get" && p === "/user/search") {
+        const user = requireLogin(headers);
+        const keyword = asText(params?.keyword).trim().toLowerCase();
+        const records = mockStore.users
+            .filter((item) => Number(item.id) !== Number(user.id))
+            .filter((item) => String(item.role || "").toUpperCase() !== "ADMIN")
+            .filter((item) => {
+                if (!keyword) return true;
+                return String(item.id).includes(keyword)
+                    || String(item.username || "").toLowerCase().includes(keyword)
+                    || String(item.nickname || "").toLowerCase().includes(keyword);
+            })
+            .slice(0, 10)
+            .map((item) => ({ ...item, password: undefined }));
+        return ok(records);
+    }
+
     if (m === "get" && p === "/user/addresses") {
         const user = requireLogin(headers);
         return ok(mockStore.addresses.filter((a) => a.userId === user.id));
@@ -971,7 +988,7 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
         negotiation.updateTime = new Date().toISOString();
         appendNegotiationDecisionMessage(
             negotiation,
-            `我已同意 ¥${confirmedPrice.toFixed(2)} 的议价，系统已生成二手订单，请到二手订单里查看。`,
+            `我已同意 ¥${confirmedPrice.toFixed(2)} 的议价，系统已生成二手订单，请到我的订单里查看。`,
         );
         return ok(negotiationVO(negotiation));
     }
@@ -2093,6 +2110,11 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
     if (m === "post" && p === "/upload/image") {
         const ts = Date.now();
         return ok({ url: `/uploads/mock-${ts}.png`, filename: `mock-${ts}.png` });
+    }
+
+    if (m === "post" && p === "/upload/media") {
+        const ts = Date.now();
+        return ok({ url: `/uploads/mock-${ts}.png`, filename: `mock-${ts}.png`, contentType: "image/png" });
     }
 
     if (m === "get" && p === "/notifications") {

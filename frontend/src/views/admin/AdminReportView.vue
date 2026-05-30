@@ -102,8 +102,8 @@
           <el-input-number
             v-model="auditForm.customDelta"
             :min="1" :max="30"
-            style="width:140px"
-            placeholder="不填=自动计算"
+            style="width:170px"
+            placeholder="不填自动计算"
           />
           <span class="form-hint">不填则按举报类型自动计算</span>
         </el-form-item>

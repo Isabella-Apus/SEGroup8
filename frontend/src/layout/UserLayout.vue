@@ -54,9 +54,9 @@
               <el-dropdown-menu>
                 <el-dropdown-item command="profile">个人资料</el-dropdown-item>
                 <el-dropdown-item command="messages">消息中心</el-dropdown-item>
-                <el-dropdown-item command="secondhandMine">我的闲置/拍卖</el-dropdown-item>
-                <el-dropdown-item command="orders">新品订单</el-dropdown-item>
-                <el-dropdown-item command="secondhandOrders">二手订单</el-dropdown-item>
+                <el-dropdown-item command="secondhandMine">我的闲置</el-dropdown-item>
+                <el-dropdown-item command="secondhandSold">我卖出的</el-dropdown-item>
+                <el-dropdown-item command="orders">我的订单</el-dropdown-item>
                 <el-dropdown-item command="browseHistory">浏览记录</el-dropdown-item>
                 <el-dropdown-item command="addresses">地址管理</el-dropdown-item>
                 <el-dropdown-item command="credit">信用中心</el-dropdown-item>
@@ -165,7 +165,7 @@ function handleCommand(command) {
     messages: "/messages",
     secondhandMine: "/secondhand/mine",
     orders: "/order",
-    secondhandOrders: "/secondhand/orders",
+    secondhandSold: "/secondhand/sold",
     browseHistory: "/browse-history",
     addresses: "/addresses",
     credit: "/credit",
