@@ -25,13 +25,14 @@
     </el-form>
 
     <!-- 举报列表 -->
-    <el-table v-loading="loading" :data="records" border>
+    <div class="table-mobile-wrap">
+      <el-table v-loading="loading" :data="records" border class="kg-table">
       <el-table-column prop="id" label="ID" width="70" />
       <el-table-column prop="reporterId" label="举报人ID" width="100" />
       <el-table-column prop="reportedId" label="被举报ID" width="100" />
       <el-table-column prop="reporterRole" label="举报人身份" width="110">
         <template #default="{ row }">
-          <el-tag size="small" :type="row.reporterRole === 'SELLER' ? 'warning' : 'primary'">
+          <el-tag class="tag-soft" size="small" :type="row.reporterRole === 'SELLER' ? 'warning' : 'primary'" effect="plain">
             {{ row.reporterRole === 'SELLER' ? '卖家' : '买家' }}
           </el-tag>
         </template>
@@ -52,7 +53,7 @@
       </el-table-column>
       <el-table-column label="状态" width="90">
         <template #default="{ row }">
-          <el-tag :type="reportStatusType(row.status)" size="small">
+          <el-tag class="status-tag" :class="reportStatusClass(row.status)" size="small" effect="plain">
             {{ reportStatusLabel(row.status) }}
           </el-tag>
         </template>
@@ -61,15 +62,21 @@
       <el-table-column prop="createTime" label="提交时间" min-width="170" />
       <el-table-column label="操作" width="100" fixed="right">
         <template #default="{ row }">
-          <el-button
-            v-if="row.status === 0"
-            link type="primary" size="small"
-            @click="openAudit(row)"
-          >审核</el-button>
-          <span v-else class="text-muted">已处理</span>
+          <div class="table-actions">
+            <el-button
+              v-if="row.status === 0"
+              link type="primary" size="small"
+              @click="openAudit(row)"
+            >审核</el-button>
+            <span v-else class="muted-pill">已处理</span>
+          </div>
         </template>
       </el-table-column>
-    </el-table>
+      <template #empty>
+        <div class="empty-state">暂无举报记录</div>
+      </template>
+      </el-table>
+    </div>
 
     <!-- 分页 -->
     <div class="pager">
@@ -334,8 +341,8 @@ function reportStatusLabel(status) {
   return ["待审核", "已成立", "已驳回"][status] ?? "-";
 }
 
-function reportStatusType(status) {
-  return ["warning", "danger", "info"][status] ?? "";
+function reportStatusClass(status) {
+  return ["status-pending", "status-danger", "status-muted"][status] ?? "status-muted";
 }
 </script>
 

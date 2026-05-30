@@ -1,6 +1,6 @@
 <template>
   <div class="page-card">
-    <div class="toolbar">
+    <div class="toolbar table-toolbar">
       <el-select v-model="query.status" clearable placeholder="审核状态" style="width: 180px">
         <el-option label="待审核" :value="0" />
         <el-option label="已通过" :value="1" />
@@ -9,7 +9,8 @@
       <el-button type="primary" @click="load">查询</el-button>
     </div>
 
-    <el-table :data="records" border>
+    <div class="table-mobile-wrap">
+      <el-table :data="records" border class="kg-table">
       <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="username" label="申请用户" width="120" />
       <el-table-column prop="storeName" label="店名" min-width="150" />
@@ -20,21 +21,31 @@
       <el-table-column prop="contactPhone" label="电话" width="140" />
       <el-table-column prop="idCardNo" label="身份证(脱敏)" width="160" />
       <el-table-column prop="status" label="状态" width="100">
-        <template #default="{ row }">{{ statusText(row.status) }}</template>
+        <template #default="{ row }">
+          <el-tag class="status-tag" :class="statusClass(row.status)" size="small" effect="plain">
+            {{ statusText(row.status) }}
+          </el-tag>
+        </template>
       </el-table-column>
       <el-table-column prop="applyTime" label="申请时间" min-width="180" />
       <el-table-column label="操作" width="220">
         <template #default="{ row }">
-          <el-button v-if="row.status === 0" link type="success" @click="approve(row.id)">通过</el-button>
-          <el-button v-if="row.status === 0" link type="danger" @click="openReject(row.id)">驳回</el-button>
-          <span v-if="row.status !== 0">-</span>
+          <div class="table-actions">
+            <el-button v-if="row.status === 0" link type="success" @click="approve(row.id)">通过</el-button>
+            <el-button v-if="row.status === 0" link type="danger" @click="openReject(row.id)">驳回</el-button>
+            <span v-if="row.status !== 0" class="muted-pill">已处理</span>
+          </div>
         </template>
       </el-table-column>
-    </el-table>
+      <template #empty>
+        <div class="empty-state">暂无入驻申请</div>
+      </template>
+      </el-table>
+    </div>
 
     <div class="pager">
       <el-pagination v-model:current-page="query.pageNum" v-model:page-size="query.pageSize"
-        layout="total, prev, pager, next" :total="total" @current-change="load" />
+        background layout="total, prev, pager, next" :total="total" @current-change="load" />
     </div>
 
     <el-dialog v-model="rejectVisible" title="驳回申请" width="460px">
@@ -74,6 +85,12 @@ function statusText(status) {
   if (status === 1) return "通过";
   if (status === 2) return "驳回";
   return "待审核";
+}
+
+function statusClass(status) {
+  if (status === 1) return "status-success";
+  if (status === 2) return "status-danger";
+  return "status-pending";
 }
 
 async function load() {
