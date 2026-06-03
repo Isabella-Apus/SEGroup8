@@ -155,7 +155,7 @@
     <el-empty v-else description="订单不存在" />
 
     <el-dialog v-if="!isSellerView" v-model="reviewDialogVisible" title="提交评价（按商品逐条）" width="720px">
-      <el-alert type="info" show-icon title="每个商品都可以单独评价，更像淘宝" style="margin-bottom: 10px" />
+      <el-alert type="info" show-icon title="每个商品可单独评分并填写评价内容" style="margin-bottom: 10px" />
       <el-table :data="reviewItems" border>
         <el-table-column prop="productName" label="商品" min-width="220" />
         <el-table-column label="评分" width="200">
@@ -186,8 +186,8 @@
       <el-form label-width="90px">
         <el-form-item label="退款方式">
           <el-radio-group v-model="refundForm.mode">
-            <el-radio-button label="ONLY_REFUND" :disabled="!canOnlyRefund">仅退款</el-radio-button>
-            <el-radio-button label="RETURN_REFUND">退货退款</el-radio-button>
+            <el-radio-button value="ONLY_REFUND" :disabled="!canOnlyRefund">仅退款</el-radio-button>
+            <el-radio-button value="RETURN_REFUND">退货退款</el-radio-button>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="退货原因">
@@ -213,7 +213,7 @@
           >
             <el-icon><Plus /></el-icon>
           </el-upload>
-          <div class="hint">最多3张（演示：上传后会保存URL）</div>
+          <div class="hint">最多3张，上传后会作为售后凭证保存。</div>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -233,17 +233,17 @@
       <el-form label-width="90px">
         <el-form-item label="支付方式">
           <el-radio-group v-model="payForm.payMode">
-            <el-radio-button label="THIRD_PARTY">微信/支付宝</el-radio-button>
-            <el-radio-button label="COIN">商城币</el-radio-button>
+            <el-radio-button value="THIRD_PARTY">微信/支付宝</el-radio-button>
+            <el-radio-button value="COIN">商城币</el-radio-button>
           </el-radio-group>
         </el-form-item>
         <el-form-item v-if="payForm.payMode === 'THIRD_PARTY'" label="渠道">
           <el-radio-group v-model="payForm.payChannel">
-            <el-radio-button label="WECHAT">微信</el-radio-button>
-            <el-radio-button label="ALIPAY">支付宝</el-radio-button>
+            <el-radio-button value="WECHAT">微信</el-radio-button>
+            <el-radio-button value="ALIPAY">支付宝</el-radio-button>
           </el-radio-group>
         </el-form-item>
-        <div v-if="payForm.payMode === 'THIRD_PARTY'" class="pay-qr-placeholder">第三方支付二维码占位（模拟）</div>
+        <div v-if="payForm.payMode === 'THIRD_PARTY'" class="pay-qr-placeholder">选择渠道并完成付款后，点击“我已支付”。</div>
         <el-alert
           v-else
           type="info"

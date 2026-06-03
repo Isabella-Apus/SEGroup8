@@ -1,19 +1,32 @@
 <template>
-    <div class="page-card">
-        <h2 class="page-title">{{ isOfficialSeller ? "卖家工作台入口" : "申请成为卖家" }}</h2>
+    <div class="merchant-apply-page">
+        <section class="merchant-hero">
+            <div>
+                <span>Seller Onboarding</span>
+                <h1>{{ isOfficialSeller ? "卖家工作台入口" : "申请成为卖家" }}</h1>
+                <p>填写店铺、资质与仓库信息，提交后由管理员审核。</p>
+            </div>
+            <div class="hero-steps" aria-hidden="true">
+                <span>店铺信息</span>
+                <span>资质图片</span>
+                <span>仓库地址</span>
+            </div>
+        </section>
+
+        <section class="application-card">
 
         <div v-if="isOfficialSeller" class="merchant-entry">
-            <el-alert title="您已通过官方卖家认证" type="success" show-icon style="margin-bottom: 16px" />
+            <el-alert class="status-alert" title="您已通过官方卖家认证" type="success" show-icon />
             <el-button type="primary" size="large" @click="router.push('/merchant')">进入卖家工作台</el-button>
         </div>
 
         <template v-else>
 
-            <el-alert v-if="myApplication" :title="statusText(myApplication.status)"
+            <el-alert v-if="myApplication" class="status-alert" :title="statusText(myApplication.status)"
                 :type="myApplication.status === 1 ? 'success' : myApplication.status === 2 ? 'error' : 'info'"
-                :description="myApplication.rejectReason || '已提交申请，管理员审核中。'" show-icon style="margin-bottom: 16px" />
+                :description="myApplication.rejectReason || '已提交申请，管理员审核中。'" show-icon />
 
-            <el-form ref="formRef" :model="form" :rules="rules" label-width="120px" style="max-width: 760px">
+            <el-form ref="formRef" class="application-form" :model="form" :rules="rules" label-position="top">
                 <el-form-item label="店名" prop="storeName">
                     <el-input v-model="form.storeName" />
                 </el-form-item>
@@ -70,6 +83,7 @@
                 </el-form-item>
             </el-form>
         </template>
+        </section>
     </div>
 </template>
 
@@ -227,10 +241,187 @@ function toAbsoluteUrl(url) {
 </script>
 
 <style scoped>
+.merchant-apply-page {
+    display: grid;
+    gap: 16px;
+}
+
+.merchant-hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 172px;
+    border: 1px solid rgba(137, 199, 255, 0.36);
+    border-radius: 8px;
+    padding: 24px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px;
+    background:
+        linear-gradient(115deg, rgba(234, 244, 255, 0.94), rgba(233, 255, 248, 0.82), rgba(255, 247, 251, 0.72)),
+        url("https://images.unsplash.com/photo-1556742044-3c52d6e88c62?auto=format&fit=crop&w=1400&q=80");
+    background-size: cover;
+    background-position: center;
+    box-shadow: var(--shadow-soft);
+}
+
+.merchant-hero::before {
+    position: absolute;
+    inset: 0;
+    content: "";
+    background-image:
+        linear-gradient(rgba(60, 146, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(53, 216, 171, 0.08) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: linear-gradient(110deg, black 0%, black 72%, transparent 100%);
+}
+
+.merchant-hero::after {
+    position: absolute;
+    top: -36%;
+    bottom: -36%;
+    left: -28%;
+    width: 26%;
+    content: "";
+    background: linear-gradient(110deg, transparent 0%, rgba(255, 255, 255, 0.66) 48%, transparent 100%);
+    transform: skewX(-13deg);
+    animation: heroSweep 7s ease-in-out infinite;
+}
+
+.merchant-hero > * {
+    position: relative;
+    z-index: 1;
+}
+
+.merchant-hero span {
+    color: var(--brand-primary);
+    font-weight: 900;
+}
+
+.merchant-hero h1 {
+    margin: 10px 0 8px;
+    color: var(--text-main);
+    font-size: clamp(30px, 4vw, 44px);
+    line-height: 1.08;
+    letter-spacing: 0;
+}
+
+.merchant-hero p {
+    max-width: 520px;
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 16px;
+    line-height: 1.7;
+    font-weight: 800;
+}
+
+.hero-steps {
+    min-width: 300px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.hero-steps span {
+    min-height: 42px;
+    border: 1px solid rgba(137, 199, 255, 0.34);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.76);
+    color: var(--text-main);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    box-shadow: 0 12px 24px rgba(137, 199, 255, 0.12);
+    backdrop-filter: blur(10px);
+}
+
+.application-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(137, 199, 255, 0.28);
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(247, 251, 255, 0.94)),
+        #ffffff;
+    padding: 22px;
+    box-shadow: var(--shadow-soft);
+}
+
+.application-card::before {
+    position: absolute;
+    inset: 0;
+    content: "";
+    background:
+        linear-gradient(118deg, transparent 0%, transparent 28%, rgba(95, 230, 189, 0.1) 42%, transparent 62%),
+        linear-gradient(250deg, transparent 8%, rgba(255, 185, 214, 0.12) 34%, transparent 58%);
+    pointer-events: none;
+}
+
+.application-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.status-alert {
+    margin-bottom: 16px;
+    border-radius: 8px;
+}
+
 .merchant-entry {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+}
+
+.application-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px 16px;
+}
+
+.application-form :deep(.el-form-item) {
+    margin-bottom: 14px;
+}
+
+.application-form :deep(.el-form-item__label) {
+    color: var(--text-main);
+    font-weight: 900;
+}
+
+.application-form :deep(.el-input__wrapper),
+.application-form :deep(.el-select__wrapper),
+.application-form :deep(.el-textarea__inner) {
+    border-radius: 8px;
+    background: #ffffff;
+    box-shadow: 0 0 0 1px var(--line-soft) inset;
+    transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.application-form :deep(.el-input__wrapper),
+.application-form :deep(.el-select__wrapper) {
+    min-height: 44px;
+}
+
+.application-form :deep(.el-input__wrapper:hover),
+.application-form :deep(.el-select__wrapper:hover),
+.application-form :deep(.el-textarea__inner:hover) {
+    box-shadow: 0 0 0 1px rgba(60, 146, 255, 0.38) inset;
+}
+
+.application-form :deep(.el-input__wrapper.is-focus),
+.application-form :deep(.el-select__wrapper.is-focused),
+.application-form :deep(.el-textarea__inner:focus) {
+    transform: translateY(-1px);
+    box-shadow:
+        0 0 0 1px var(--brand-primary) inset,
+        0 12px 24px rgba(137, 199, 255, 0.18);
+}
+
+.application-form > :deep(.el-form-item:nth-child(7)),
+.application-form > :deep(.el-form-item:nth-child(10)),
+.application-form > :deep(.el-form-item:nth-child(11)) {
+    grid-column: 1 / -1;
 }
 
 .license-upload-block {
@@ -240,8 +431,8 @@ function toAbsoluteUrl(url) {
 }
 
 .license-preview-wrap {
-    width: 260px;
-    height: 160px;
+    width: min(360px, 100%);
+    height: 190px;
     margin-bottom: 12px;
 }
 
@@ -249,7 +440,8 @@ function toAbsoluteUrl(url) {
     width: 100%;
     height: 100%;
     border-radius: 8px;
-    border: 1px solid #dcdfe6;
+    border: 1px solid var(--line-soft);
+    box-shadow: 0 12px 24px rgba(137, 199, 255, 0.12);
 }
 
 .license-error {
@@ -268,11 +460,57 @@ function toAbsoluteUrl(url) {
     width: 100%;
     height: 100%;
     border-radius: 8px;
-    border: 1px dashed #c0c4cc;
-    color: #909399;
+    border: 1px dashed rgba(60, 146, 255, 0.42);
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #fafafa;
+    background: linear-gradient(135deg, #eaf4ff 0%, #e9fff8 100%);
+    font-weight: 800;
+}
+
+@keyframes heroSweep {
+    0%,
+    34% {
+        opacity: 0;
+        transform: translateX(0) skewX(-13deg);
+    }
+    54% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(520%) skewX(-13deg);
+    }
+}
+
+@media (max-width: 980px) {
+    .merchant-hero {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .hero-steps,
+    .application-form {
+        width: 100%;
+        grid-template-columns: 1fr;
+    }
+
+    .application-form > :deep(.el-form-item:nth-child(7)),
+    .application-form > :deep(.el-form-item:nth-child(10)),
+    .application-form > :deep(.el-form-item:nth-child(11)) {
+        grid-column: auto;
+    }
+}
+
+@media (max-width: 640px) {
+    .merchant-hero,
+    .application-card {
+        padding: 18px;
+    }
+
+    .hero-steps {
+        grid-template-columns: 1fr;
+    }
 }
 </style>

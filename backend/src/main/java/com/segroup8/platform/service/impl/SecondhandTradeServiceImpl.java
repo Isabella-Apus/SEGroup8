@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -235,6 +236,43 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                 "status", NEGOTIATION_REJECTED));
 
         return toNegotiationVO(negotiation);
+    }
+
+    @Override
+    public PageVO<ProductNegotiationVO> pageMyBargains(Long pageNum, Long pageSize, Long productId, Long counterpartUserId, String status) {
+        Long userId = requireUserId();
+        long safePageNum = pageNum == null || pageNum < 1 ? 1L : pageNum;
+        long safePageSize = pageSize == null || pageSize < 1 ? 10L : Math.min(pageSize, 50L);
+
+        LambdaQueryWrapper<ProductNegotiation> wrapper = new LambdaQueryWrapper<ProductNegotiation>()
+                .and(w -> w.eq(ProductNegotiation::getSellerUserId, userId)
+                        .or()
+                        .eq(ProductNegotiation::getBuyerUserId, userId))
+                .eq(productId != null, ProductNegotiation::getProductId, productId);
+        if (counterpartUserId != null) {
+            wrapper.and(w -> w.eq(ProductNegotiation::getSellerUserId, counterpartUserId)
+                    .or()
+                    .eq(ProductNegotiation::getBuyerUserId, counterpartUserId));
+        }
+        List<String> statuses = normalizeNegotiationStatuses(status);
+        if (!statuses.isEmpty()) {
+            wrapper.in(ProductNegotiation::getStatus, statuses);
+        }
+        wrapper.orderByDesc(ProductNegotiation::getUpdateTime)
+                .orderByDesc(ProductNegotiation::getCreateTime)
+                .orderByDesc(ProductNegotiation::getId);
+
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ProductNegotiation> page = productNegotiationMapper.selectPage(
+                com.baomidou.mybatisplus.extension.plugins.pagination.Page.of(safePageNum, safePageSize), wrapper);
+        if (page.getTotal() == 0 && !page.getRecords().isEmpty()) {
+            page.setTotal(productNegotiationMapper.selectCount(wrapper));
+        }
+        PageVO<ProductNegotiationVO> vo = new PageVO<>();
+        vo.setTotal(page.getTotal());
+        vo.setPageNum(page.getCurrent());
+        vo.setPageSize(page.getSize());
+        vo.setRecords(page.getRecords().stream().map(this::toNegotiationVO).toList());
+        return vo;
     }
 
     @Override
@@ -603,11 +641,36 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         vo.setProductId(negotiation.getProductId());
         vo.setBuyerUserId(negotiation.getBuyerUserId());
         vo.setSellerUserId(negotiation.getSellerUserId());
+        vo.setOrderId(negotiation.getUsedOrderId());
+        if (negotiation.getUsedOrderId() != null) {
+            OrderInfo order = orderInfoMapper.selectById(negotiation.getUsedOrderId());
+            if (order != null) {
+                vo.setOrderNo(order.getOrderNo());
+            }
+        }
         vo.setProposedPrice(negotiation.getProposedPrice());
         vo.setConfirmedPrice(negotiation.getConfirmedPrice());
         vo.setStatus(negotiation.getStatus());
+        vo.setStatusName(negotiationStatusName(negotiation.getStatus()));
         vo.setEffectiveFrom(negotiation.getEffectiveFrom());
         vo.setEffectiveUntil(negotiation.getEffectiveUntil());
+        vo.setCreateTime(negotiation.getCreateTime());
+        vo.setUpdateTime(negotiation.getUpdateTime());
+
+        SecondhandProduct product = negotiation.getProductId() == null ? null : secondhandProductMapper.selectById(negotiation.getProductId());
+        if (product != null) {
+            vo.setProductName(product.getName());
+            vo.setProductCover(product.getCover());
+            vo.setProductStatus(product.getStatus());
+        }
+        User buyer = negotiation.getBuyerUserId() == null ? null : userMapper.selectById(negotiation.getBuyerUserId());
+        if (buyer != null) {
+            vo.setBuyerName(resolveUserName(buyer));
+        }
+        User seller = negotiation.getSellerUserId() == null ? null : userMapper.selectById(negotiation.getSellerUserId());
+        if (seller != null) {
+            vo.setSellerName(resolveUserName(seller));
+        }
         return vo;
     }
 
@@ -616,6 +679,13 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         vo.setId(auction.getId());
         vo.setProductId(auction.getProductId());
         vo.setSellerUserId(auction.getSellerUserId());
+        SecondhandProduct product = auction.getProductId() == null ? null : secondhandProductMapper.selectById(auction.getProductId());
+        if (product != null) {
+            vo.setProductName(product.getName());
+            vo.setSellerName(resolveSellerName(product.getSellerUserId()));
+        } else {
+            vo.setSellerName(resolveSellerName(auction.getSellerUserId()));
+        }
         vo.setStartPrice(auction.getStartPrice());
         vo.setIncrementAmount(auction.getIncrementAmount());
         vo.setCurrentPrice(auction.getCurrentPrice());
@@ -623,7 +693,10 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         vo.setStartTime(auction.getStartTime());
         vo.setEndTime(auction.getEndTime());
         vo.setStatus(auction.getStatus());
+        vo.setStatusName(auctionStatusName(auction.getStatus()));
         vo.setSettledOrderId(auction.getSettledOrderId());
+        vo.setCreateTime(auction.getCreateTime());
+        vo.setUpdateTime(auction.getUpdateTime());
 
         if (auction.getCurrentBidderUserId() != null) {
             User user = userMapper.selectById(auction.getCurrentBidderUserId());
@@ -636,6 +709,8 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                 .eq(AuctionLog::getAuctionId, auction.getId())
                 .orderByDesc(AuctionLog::getCreateTime)
                 .last("limit 20"));
+        vo.setBidCount(auctionLogMapper.selectCount(new LambdaQueryWrapper<AuctionLog>()
+                .eq(AuctionLog::getAuctionId, auction.getId())));
         Map<Long, User> userMap = new HashMap<>();
         for (AuctionLog log : logs) {
             if (log.getBidderUserId() != null && !userMap.containsKey(log.getBidderUserId())) {
@@ -656,6 +731,71 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
             return logVO;
         }).toList());
         return vo;
+    }
+
+    private List<String> normalizeNegotiationStatuses(String status) {
+        List<String> statuses = new ArrayList<>();
+        if (status == null || status.isBlank()) {
+            return statuses;
+        }
+        for (String item : status.split(",")) {
+            String normalized = normalizeNegotiationStatus(item);
+            if (normalized != null && !statuses.contains(normalized)) {
+                statuses.add(normalized);
+            }
+            if ("PENDING".equalsIgnoreCase(item == null ? "" : item.trim())
+                    && !statuses.contains(NEGOTIATION_APPLIED)) {
+                statuses.add(NEGOTIATION_APPLIED);
+            }
+        }
+        return statuses;
+    }
+
+    private String normalizeNegotiationStatus(String status) {
+        if (status == null || status.isBlank()) {
+            return null;
+        }
+        String value = status.trim().toUpperCase(Locale.ROOT);
+        return switch (value) {
+            case "PENDING", "APPLIED" -> NEGOTIATION_APPLIED;
+            case "CONFIRMED" -> NEGOTIATION_CONFIRMED;
+            case "REJECTED" -> NEGOTIATION_REJECTED;
+            case "USED", "ORDER_CREATED" -> NEGOTIATION_USED;
+            default -> value;
+        };
+    }
+
+    private String negotiationStatusName(String status) {
+        if (status == null) {
+            return "";
+        }
+        return switch (status.toUpperCase(Locale.ROOT)) {
+            case NEGOTIATION_APPLIED, "PENDING" -> "待卖家处理";
+            case NEGOTIATION_CONFIRMED -> "卖家已同意";
+            case NEGOTIATION_REJECTED -> "卖家已拒绝";
+            case NEGOTIATION_USED, "ORDER_CREATED" -> "已生成订单";
+            default -> status;
+        };
+    }
+
+    private String auctionStatusName(String status) {
+        if (status == null) {
+            return "";
+        }
+        return switch (status.toUpperCase(Locale.ROOT)) {
+            case AUCTION_ONGOING -> "进行中";
+            case AUCTION_FINISHED -> "已结束";
+            case AUCTION_FLOW -> "已流拍";
+            default -> status;
+        };
+    }
+
+    private String resolveSellerName(Long sellerUserId) {
+        if (sellerUserId == null) {
+            return "";
+        }
+        User seller = userMapper.selectById(sellerUserId);
+        return seller == null ? "" : resolveUserName(seller);
     }
 
     private BigDecimal resolveMinBid(ProductAuction auction) {

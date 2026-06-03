@@ -3,7 +3,7 @@
     <header class="market-header">
       <div class="top-strip">
         <div class="top-inner">
-          <span>欢迎来到 Kinda Goods</span>
+          <span>Kinda Goods 校园交易平台</span>
           <div class="top-links">
             <button type="button" @click="router.push('/faq')">常见问题</button>
             <button type="button" @click="router.push('/credit')">信用中心</button>
@@ -112,7 +112,7 @@ const avatarText = computed(() => displayName.value.slice(0, 1).toUpperCase());
 const searchPlaceholder = computed(() =>
   searchMode.value === "secondhand"
     ? "搜索二手教材、闲置耳机、宿舍收纳"
-    : "搜索新品键盘、耳机、教材、宿舍好物",
+    : "搜索新品键盘、耳机、教材、宿舍用品",
 );
 
 watch(
@@ -409,7 +409,15 @@ function handleCommand(command) {
 
   .header-actions {
     align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
     overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .main-nav {
+    justify-content: flex-start;
+    flex: 0 0 auto;
   }
 
   .nav-action,

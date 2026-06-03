@@ -4,7 +4,7 @@
       <div>
         <span>Credit Center</span>
         <h1>我的信用</h1>
-        <p>买家信用、二手卖家信用和举报记录集中查看，交易前后都更清楚。</p>
+        <p>查看买家信用、二手卖家信用、举报记录和拉黑名单，用于判断交易风险。</p>
       </div>
       <el-button type="primary" @click="reportDialogVisible = true">发起举报</el-button>
     </div>

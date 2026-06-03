@@ -9,6 +9,27 @@
       </div>
     </div>
 
+    <div v-else-if="component.type === 'quick_banner'" class="quick-banner" :style="quickBannerStyle(component)">
+      <div class="quick-banner-shade">
+        <span>{{ component.props.badge || 'Kinda Goods' }}</span>
+        <strong>{{ component.props.title || '本店商品与服务说明' }}</strong>
+        <p>{{ component.props.subtitle || '查看主营商品、发货安排和售后规则。' }}</p>
+      </div>
+    </div>
+
+    <div v-else-if="component.type === 'feature_cards'" class="quick-features">
+      <div class="quick-section-title" :style="{ color: themeColor }">
+        {{ component.props.title || '店铺亮点' }}
+      </div>
+      <div class="quick-feature-grid">
+        <article v-for="(item, index) in component.props.items || []" :key="index" class="quick-feature-card">
+          <span :style="{ background: themeColor }">{{ index + 1 }}</span>
+          <strong>{{ item.title }}</strong>
+          <p>{{ item.desc }}</p>
+        </article>
+      </div>
+    </div>
+
     <!-- 商品展示 -->
     <div v-else-if="component.type === 'product_grid'" class="comp-product-grid">
       <div v-if="component.props.title" class="comp-section-title" :style="{ color: themeColor }">
@@ -100,6 +121,14 @@ function toFullImageUrl(url) {
   return url.startsWith('http') ? url : `http://localhost:8080${url}`
 }
 
+function quickBannerStyle(item) {
+  const imageUrl = toFullImageUrl(item.props?.imageUrl)
+  const gradient = item.props?.gradient || 'linear-gradient(135deg, rgba(32, 214, 160, 0.88), rgba(40, 124, 255, 0.82))'
+  return {
+    backgroundImage: imageUrl ? `${gradient}, url("${imageUrl}")` : gradient
+  }
+}
+
 function updateCountdown() {
   if (props.component.type !== 'countdown' || !props.component.props.endTime) return
   const end = new Date(props.component.props.endTime).getTime()
@@ -127,6 +156,103 @@ onUnmounted(() => { if (timer) clearInterval(timer) })
 
 <style scoped>
 .component-wrapper { width: 100%; }
+.quick-banner {
+  min-height: 220px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-position: center;
+  background-size: cover;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow: 0 16px 34px rgba(40, 124, 255, 0.16);
+}
+.quick-banner-shade {
+  min-height: 220px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background:
+    linear-gradient(90deg, rgba(18, 50, 65, 0.62), rgba(18, 50, 65, 0.16)),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.18), transparent 48%);
+  color: #ffffff;
+}
+.quick-banner-shade span {
+  width: fit-content;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #123241;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 900;
+}
+.quick-banner-shade strong {
+  max-width: 680px;
+  margin-top: 14px;
+  font-size: clamp(26px, 5vw, 44px);
+  line-height: 1.08;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+.quick-banner-shade p {
+  max-width: 620px;
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.7;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+.quick-features {
+  border: 1px solid rgba(137, 199, 255, 0.3);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(247, 251, 255, 0.9)),
+    #ffffff;
+  padding: 16px;
+  box-shadow: 0 12px 26px rgba(137, 199, 255, 0.1);
+}
+.quick-section-title {
+  margin-bottom: 12px;
+  font-size: 18px;
+  font-weight: 900;
+}
+.quick-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.quick-feature-card {
+  min-height: 104px;
+  border: 1px solid #dbe7f1;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 14px;
+  display: grid;
+  gap: 7px;
+}
+.quick-feature-card span {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 900;
+}
+.quick-feature-card strong {
+  color: #123241;
+  font-size: 15px;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+.quick-feature-card p {
+  margin: 0;
+  color: #51707e;
+  line-height: 1.55;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
 .comp-banner { background: #f3f4f6; }
 .comp-banner-placeholder {
   width: 100%;
@@ -248,5 +374,20 @@ onUnmounted(() => { if (timer) clearInterval(timer) })
 .comp-countdown-sep {
   font-size: 24px;
   font-weight: 700;
+}
+
+@media (max-width: 680px) {
+  .quick-feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-banner,
+  .quick-banner-shade {
+    min-height: 190px;
+  }
+
+  .quick-banner-shade {
+    padding: 18px;
+  }
 }
 </style>

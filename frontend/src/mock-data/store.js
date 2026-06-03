@@ -27,6 +27,87 @@ function nextIdOf(list) {
 
 const STORAGE_KEY = "segroup8_mock_store_v2";
 
+const LEGACY_COPY_REPLACEMENTS = {
+    "Kinda 官方好物店": "Kinda 校园数码店",
+    "主营校园学习、数码和生活好物。": "销售学习设备、数码配件和宿舍生活用品。",
+    "数码装备限时上新": "本店商品与服务说明",
+    "精选键盘、鼠标和学习效率装备，今天下单尽快发货。": "查看主营商品、发货安排和售后规则。",
+    "新店上新中，欢迎收藏店铺并浏览更多商品。": "下单前可先查看商品详情、库存和店铺说明。",
+    "精选好物": "主营清晰",
+    "围绕学习与宿舍场景精选": "展示店铺主要品类",
+    "及时处理": "响应及时",
+    "订单与消息会尽快响应": "订单与消息按时处理",
+    "稳定售后": "规则明确",
+    "购物问题按平台规则处理": "售后说明按平台规则执行",
+};
+
+function normalizeCopy(value) {
+    if (typeof value !== "string") {
+        return value;
+    }
+    const replaced = LEGACY_COPY_REPLACEMENTS[value] || value;
+    return replaced.replace("（演示售后数据）", "");
+}
+
+function normalizeCopyDeep(value) {
+    if (typeof value === "string") {
+        return normalizeCopy(value);
+    }
+    if (Array.isArray(value)) {
+        return value.map((item) => normalizeCopyDeep(item));
+    }
+    if (value && typeof value === "object") {
+        return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, normalizeCopyDeep(item)]));
+    }
+    return value;
+}
+
+function normalizeDecorationJson(value) {
+    if (!value) {
+        return value;
+    }
+    try {
+        const parsed = typeof value === "string" ? JSON.parse(value) : value;
+        const normalized = normalizeCopyDeep(parsed);
+        return typeof value === "string" ? JSON.stringify(normalized) : normalized;
+    } catch {
+        return normalizeCopy(value);
+    }
+}
+
+function normalizeStoreCopy(store) {
+    const users = Array.isArray(store.users) ? store.users : [];
+    users.forEach((user) => {
+        user.nickname = normalizeCopy(user.nickname);
+        user.shopName = normalizeCopy(user.shopName);
+        user.shopDesc = normalizeCopy(user.shopDesc);
+        user.shopDecorationJson = normalizeDecorationJson(user.shopDecorationJson);
+    });
+
+    const products = Array.isArray(store.products) ? store.products : [];
+    products.forEach((product) => {
+        product.sellerName = normalizeCopy(product.sellerName);
+        product.shopName = normalizeCopy(product.shopName);
+        product.description = normalizeCopy(product.description);
+    });
+
+    const vouchers = Array.isArray(store.vouchers) ? store.vouchers : [];
+    vouchers.forEach((voucher) => {
+        voucher.sellerName = normalizeCopy(voucher.sellerName);
+    });
+
+    const orders = Array.isArray(store.orders) ? store.orders : [];
+    orders.forEach((order) => {
+        order.refundReason = normalizeCopy(order.refundReason);
+        (order.items || []).forEach((item) => {
+            item.productName = normalizeCopy(item.productName);
+            item.sellerName = normalizeCopy(item.sellerName);
+        });
+    });
+
+    return store;
+}
+
 function createInitialStore() {
     const users = generateUsers();
     const products = generateProducts();
@@ -108,16 +189,16 @@ function readStoredSnapshot() {
 
 function mergeStore(base, saved) {
     if (!saved || typeof saved !== "object") {
-        return base;
+        return normalizeStoreCopy(base);
     }
-    return {
+    return normalizeStoreCopy({
         ...base,
         ...saved,
         next: {
             ...base.next,
             ...(saved.next || {}),
         },
-    };
+    });
 }
 
 function replaceStore(target, next) {

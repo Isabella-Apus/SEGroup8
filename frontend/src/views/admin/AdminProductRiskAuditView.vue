@@ -2,8 +2,8 @@
   <div class="page-card risk-page">
     <div class="page-head">
       <div>
-        <h2 class="page-title">AI 商品风险审核</h2>
-        <p class="page-subtitle">平台治理 Agent 自动筛查商品风险，管理员保留最终处理权。</p>
+        <h2 class="page-title">商品风险审核</h2>
+        <p class="page-subtitle">系统自动筛查商品风险，管理员负责最终审核处理。</p>
       </div>
       <el-button type="primary" :loading="loading" @click="load">刷新</el-button>
     </div>

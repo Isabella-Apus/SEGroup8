@@ -4,9 +4,9 @@
     <div class="page-header">
       <h2 class="page-title">📊 数据看板</h2>
       <el-radio-group v-model="timeRange" @change="loadAll">
-        <el-radio-button label="7">近7天</el-radio-button>
-        <el-radio-button label="30">近30天</el-radio-button>
-        <el-radio-button label="90">近90天</el-radio-button>
+        <el-radio-button value="7">近7天</el-radio-button>
+        <el-radio-button value="30">近30天</el-radio-button>
+        <el-radio-button value="90">近90天</el-radio-button>
       </el-radio-group>
     </div>
 
@@ -66,8 +66,8 @@
             <div class="card-header">
               <span>{{ chartType === 'revenue' ? '销售额趋势' : '订单数趋势' }}</span>
               <el-radio-group v-model="chartType" size="small" @change="loadCharts">
-                <el-radio-button label="revenue">销售额</el-radio-button>
-                <el-radio-button label="orders">订单数</el-radio-button>
+                <el-radio-button value="revenue">销售额</el-radio-button>
+                <el-radio-button value="orders">订单数</el-radio-button>
               </el-radio-group>
             </div>
           </template>

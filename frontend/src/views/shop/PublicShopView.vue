@@ -16,7 +16,7 @@
             <div class="hero-copy">
               <span class="eyebrow">{{ shop.category || "官方店铺" }}</span>
               <h1>{{ shop.name || "店铺" }}</h1>
-              <p>{{ shop.description || "店主暂未填写简介，欢迎浏览店内商品。" }}</p>
+              <p>{{ shop.description || "店主暂未填写简介，可先查看店内在售商品和店铺政策。" }}</p>
               <div class="shop-tags">
                 <span v-if="shop.region">{{ shop.region }}</span>
                 <span v-if="shop.businessHours">{{ shop.businessHours }}</span>
@@ -60,7 +60,7 @@
       <section v-else class="default-decoration">
         <div>
           <strong>店铺装修待发布</strong>
-          <span>先看看这家店已经上架的商品。</span>
+          <span>当前展示店铺资料、在售商品和售后政策。</span>
         </div>
       </section>
 

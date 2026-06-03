@@ -46,7 +46,7 @@
           <span class="member-avatar">{{ avatarText }}</span>
           <div>
             <strong>{{ userStore.userInfo?.nickname || userStore.userInfo?.username }}</strong> 
-            <small>好心情和好商品更配哦</small>
+            <small>订单、通知、足迹集中管理</small>
           </div>
         </div>
         <div class="metric-grid">
@@ -92,17 +92,17 @@
       <button type="button" class="promo-card promo-main" @click="router.push('/product')">
         <span>官方商城</span>
         <strong>新品商城</strong>
-        <small>按分类选购在售新品</small>
+        <small>查看库存、价格和售后入口</small>
       </button>
       <button type="button" class="promo-card promo-blue" @click="router.push('/secondhand/publish')">
         <span>出售闲置</span>
         <strong>发布我的闲置</strong>
-        <small>把不用的物品转给需要的人</small>
+        <small>填写成色、价格和交易说明</small>
       </button>
       <button type="button" class="promo-card promo-green" @click="router.push('/secondhand')">
         <span>购买二手</span>
         <strong>二手商城</strong>
-        <small>发现更多实用二手低价好物</small>
+        <small>按成色、分类和预算筛选</small>
       </button>
     </section>
 
@@ -110,7 +110,7 @@
       <div class="section-head">
         <div>
           <h2>今日热卖</h2>
-          <p>官方商品、快速下单、售后更清楚。</p>
+          <p>在售新品按库存、分类和价格展示。</p>
         </div>
         <div class="section-tabs">
           <button v-for="tab in productTabs" :key="tab.label" type="button" @click="goTab(tab)">{{ tab.label }}</button>
@@ -131,8 +131,8 @@
     <section class="section-block secondhand-block">
       <div class="section-head">
         <div>
-          <h2>闲置捡漏</h2>
-          <p>看看大家正在转让的闲置好物，按成色、价格慢慢挑^_^</p>
+          <h2>二手闲置</h2>
+          <p>个人闲置按成色、价格和发布时间展示。</p>
         </div>
         <div class="section-tabs">
           <button v-for="tab in secondhandTabs" :key="tab.label" type="button" @click="goTab(tab)">{{ tab.label }}</button>
@@ -181,11 +181,11 @@ const avatarText = computed(() => {
 
 const categoryCards = [
   { label: "电子数码", short: "数", desc: "键盘、耳机、平板", path: "/product?category=电子数码", color: "#2563eb" },
-  { label: "服装鞋包", short: "穿", desc: "日常穿搭好物", path: "/product?category=服装鞋包", color: "#ffb9d6" },
-  { label: "学习办公", short: "学", desc: "效率工具和资料", path: "/product?category=学习办公", color: "#8b5cf6" },
-  { label: "生活百货", short: "家", desc: "宿舍与日用", path: "/product?category=生活百货", color: "#12a594" },
-  { label: "二手数码", short: "闲", desc: "更轻预算淘设备", path: "/secondhand?category=数码闲置", color: "#ffd36e" },
-  { label: "教材书籍", short: "书", desc: "教材资料低价淘", path: "/secondhand?category=教材书籍", color: "#b7a6ff" },
+  { label: "服装鞋包", short: "穿", desc: "尺码、款式、配饰", path: "/product?category=服装鞋包", color: "#ffb9d6" },
+  { label: "学习办公", short: "学", desc: "文具、资料、设备", path: "/product?category=学习办公", color: "#8b5cf6" },
+  { label: "生活百货", short: "家", desc: "宿舍、收纳、日用", path: "/product?category=生活百货", color: "#12a594" },
+  { label: "二手数码", short: "闲", desc: "耳机、平板、配件", path: "/secondhand?category=数码闲置", color: "#ffd36e" },
+  { label: "教材书籍", short: "书", desc: "教材、资料、读物", path: "/secondhand?category=教材书籍", color: "#b7a6ff" },
 ];
 
 const productTabs = [
@@ -209,20 +209,20 @@ const bannerSlides = computed(() => {
     {
       key: "top-sales",
       tag: "Top Sales",
-      title: product ? product.name : "本周热卖好物",
-      desc: product ? `到手价 ¥${Number(product.price || 0).toFixed(2)}，库存 ${product.stock ?? 0}` : "精选高热度商品，先到先得。",
+      title: product ? product.name : "本周热卖商品",
+      desc: product ? `到手价 ¥${Number(product.price || 0).toFixed(2)}，库存 ${product.stock ?? 0}` : "展示近期销量和浏览热度较高的在售商品。",
       actionText: "查看商品",
       actionPath: product ? `/product/${product.id}` : "/product",
       secondaryText: "逛商品市场",
       secondaryPath: "/product",
-      coupons: ["官方新品", "多图展示", "安心交易"],
+      coupons: ["官方新品", "库存可查", "售后入口"],
       background: bannerBackground(product),
     },
     {
       key: "secondhand",
-      tag: "二手精选",
+      tag: "二手推荐",
       title: second ? second.name : "二手闲置商品",
-      desc: second ? `闲置价 ¥${Number(second.salePrice || 0).toFixed(2)}，成色 ${second.conditionLevel || second.condition || "良好"}` : "校园闲置、个人转手、快速沟通。",
+      desc: second ? `闲置价 ¥${Number(second.salePrice || 0).toFixed(2)}，成色 ${second.conditionLevel || second.condition || "良好"}` : "展示个人发布的二手闲置，可查看成色并联系卖家。",
       actionText: "查看闲置",
       actionPath: second ? `/secondhand/${second.id}` : "/secondhand",
       secondaryText: "逛二手市场",
@@ -234,12 +234,12 @@ const bannerSlides = computed(() => {
       key: "daily",
       tag: "Daily Picks",
       title: product2 ? product2.name : "按预算挑选刚刚好",
-      desc: "按分类、价格、成色快速筛选，少翻页也能找到合适商品。",
+      desc: "使用分类、价格和成色筛选，缩小商品范围后再比较。",
       actionText: "价格筛选",
       actionPath: "/product",
       secondaryText: "二手捡漏",
       secondaryPath: "/secondhand",
-      coupons: ["分类直达", "价格筛选", "猜你喜欢"],
+      coupons: ["分类直达", "预算筛选", "成色筛选"],
       background: bannerBackground(product2),
     },
   ].filter((slide) => slide.background);

@@ -156,7 +156,7 @@ public class ReviewController {
     }
 
     @Operation(summary = "卖家回复评价")
-    @PostMapping("/{reviewId}/reply")
+    @PostMapping({"/{reviewId}/reply", "/seller/{reviewId}/reply"})
     public Result<Void> reply(@PathVariable Long reviewId, @Valid @RequestBody ReviewReplyRequest request) {
         Long sellerUserId = UserContext.getUserId();
         if (sellerUserId == null) {

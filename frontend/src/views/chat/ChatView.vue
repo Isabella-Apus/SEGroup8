@@ -57,14 +57,14 @@
               <small>{{ request.productName || activeConversation.sourceTitle }}</small>
             </div>
             <div class="trade-actions">
-              <template v-if="request.status === 'PENDING' && isSellerForBargain(request)">
+              <template v-if="isPendingBargain(request) && isSellerForBargain(request)">
                 <el-button
                   size="small"
                   type="primary"
                   :loading="actionLoadingKey === `confirm-${request.id}`"
                   @click="handleConfirmBargain(request)"
                 >
-                  同意并生成订单
+                  同意议价
                 </el-button>
                 <el-button
                   size="small"
@@ -74,7 +74,7 @@
                   拒绝
                 </el-button>
               </template>
-              <span v-else-if="request.status === 'PENDING'" class="trade-note">等待卖家处理</span>
+              <span v-else-if="isPendingBargain(request)" class="trade-note">等待卖家处理</span>
               <el-button v-else-if="request.orderId" size="small" type="success" plain @click="router.push('/secondhand/orders')">
                 查看订单
               </el-button>
@@ -375,15 +375,19 @@ function isSellerForBargain(request) {
   return Number(request?.sellerUserId) === Number(currentUserId.value);
 }
 
+function isPendingBargain(request) {
+  const status = String(request?.status || "").toUpperCase();
+  return status === "PENDING" || status === "APPLIED";
+}
+
 async function handleConfirmBargain(request) {
   actionLoadingKey.value = `confirm-${request.id}`;
   try {
     const result = await confirmBargainApi({
       negotiationId: request.id,
       confirmedPrice: request.proposedPrice,
-      createOrder: true,
     });
-    ElMessage.success("已同意议价，并生成二手订单");
+    ElMessage.success("已同意议价，买家可按确认价下单");
     await loadBargainRequests();
     await loadMessages(activeConversation.value.id, { silent: true });
     updateBargainInList(result.data);

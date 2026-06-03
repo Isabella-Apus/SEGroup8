@@ -13,7 +13,6 @@
           <el-button type="primary" :loading="loading" @click="handleLogin">登录</el-button>
         </el-form-item>
       </el-form>
-      <p class="empty-tip">测试账号：admin/admin123 或 user/user123</p>
     </div>
   </div>
 </template>

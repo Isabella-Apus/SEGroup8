@@ -1,8 +1,8 @@
 <template>
   <div class="shell">
     <header class="topbar">
-      <div class="brand" @click="$router.push('/')">SEGroup8 · 好物市场</div>
-      <div class="search-fake">重构版前端 · 淘宝/闲鱼风格商品流</div>
+      <div class="brand" @click="$router.push('/')">Kinda Goods · 校园交易平台</div>
+      <div class="search-fake">新品购买、闲置交易与卖家管理</div>
     </header>
     <nav class="nav-wrap">
       <el-scrollbar>

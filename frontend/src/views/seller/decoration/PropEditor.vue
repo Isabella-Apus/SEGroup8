@@ -30,13 +30,13 @@
     <template v-else-if="component.type === 'product_grid'">
       <div class="prop-group">
         <div class="prop-label">标题</div>
-        <el-input v-model="component.props.title" placeholder="例如：精选商品" />
+        <el-input v-model="component.props.title" placeholder="例如：本周上架" />
       </div>
       <div class="prop-group">
         <div class="prop-label">列数</div>
         <el-radio-group v-model="component.props.columns">
-          <el-radio-button :label="2">2列</el-radio-button>
-          <el-radio-button :label="4">4列</el-radio-button>
+          <el-radio-button :value="2">2列</el-radio-button>
+          <el-radio-button :value="4">4列</el-radio-button>
         </el-radio-group>
       </div>
       <div class="prop-group">
@@ -72,9 +72,9 @@
       <div class="prop-group">
         <div class="prop-label">对齐方式</div>
         <el-radio-group v-model="component.props.align">
-          <el-radio-button label="left">左对齐</el-radio-button>
-          <el-radio-button label="center">居中</el-radio-button>
-          <el-radio-button label="right">右对齐</el-radio-button>
+          <el-radio-button value="left">左对齐</el-radio-button>
+          <el-radio-button value="center">居中</el-radio-button>
+          <el-radio-button value="right">右对齐</el-radio-button>
         </el-radio-group>
       </div>
       <div class="prop-group">
@@ -128,8 +128,8 @@
       <div class="prop-group">
         <div class="prop-label">布局</div>
         <el-radio-group v-model="component.props.layout">
-          <el-radio-button label="image-left">图左文右</el-radio-button>
-          <el-radio-button label="image-right">图右文左</el-radio-button>
+          <el-radio-button value="image-left">图左文右</el-radio-button>
+          <el-radio-button value="image-right">图右文左</el-radio-button>
         </el-radio-group>
       </div>
       <div class="prop-group">
@@ -151,9 +151,9 @@
       <div class="prop-group">
         <div class="prop-label">线条样式</div>
         <el-radio-group v-model="component.props.style">
-          <el-radio-button label="solid">实线</el-radio-button>
-          <el-radio-button label="dashed">虚线</el-radio-button>
-          <el-radio-button label="dotted">点线</el-radio-button>
+          <el-radio-button value="solid">实线</el-radio-button>
+          <el-radio-button value="dashed">虚线</el-radio-button>
+          <el-radio-button value="dotted">点线</el-radio-button>
         </el-radio-group>
       </div>
       <div class="prop-group">

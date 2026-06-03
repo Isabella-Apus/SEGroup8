@@ -9,15 +9,21 @@ public class ProductAuctionVO {
     private Long id;
     private Long productId;
     private Long sellerUserId;
+    private String productName;
+    private String sellerName;
     private BigDecimal startPrice;
     private BigDecimal incrementAmount;
     private BigDecimal currentPrice;
     private Long currentBidderUserId;
     private String currentBidderName;
+    private Long bidCount;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String status;
+    private String statusName;
     private Long settledOrderId;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
     private List<AuctionLogVO> logs;
 
     public Long getId() {
@@ -42,6 +48,22 @@ public class ProductAuctionVO {
 
     public void setSellerUserId(Long sellerUserId) {
         this.sellerUserId = sellerUserId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public String getSellerName() {
+        return sellerName;
+    }
+
+    public void setSellerName(String sellerName) {
+        this.sellerName = sellerName;
     }
 
     public BigDecimal getStartPrice() {
@@ -84,6 +106,14 @@ public class ProductAuctionVO {
         this.currentBidderName = currentBidderName;
     }
 
+    public Long getBidCount() {
+        return bidCount;
+    }
+
+    public void setBidCount(Long bidCount) {
+        this.bidCount = bidCount;
+    }
+
     public LocalDateTime getStartTime() {
         return startTime;
     }
@@ -108,12 +138,36 @@ public class ProductAuctionVO {
         this.status = status;
     }
 
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
+
     public Long getSettledOrderId() {
         return settledOrderId;
     }
 
     public void setSettledOrderId(Long settledOrderId) {
         this.settledOrderId = settledOrderId;
+    }
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
+
+    public LocalDateTime getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(LocalDateTime updateTime) {
+        this.updateTime = updateTime;
     }
 
     public List<AuctionLogVO> getLogs() {

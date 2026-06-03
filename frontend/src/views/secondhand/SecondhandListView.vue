@@ -4,7 +4,7 @@
       <div>
         <span class="eyebrow">个人闲置</span>
         <h1>二手市场</h1>
-        <p>从学习设备到生活用品，低价淘闲置，也可以快速发布自己的物品。</p>
+        <p>浏览个人发布的闲置商品，按分类、成色和价格筛选后再联系卖家。</p>
       </div>
     </div>
 
@@ -21,7 +21,7 @@
         <span class="tile-icon"><el-icon><ChatDotRound /></el-icon></span>
         <span class="tile-label">议价消息</span>
       </button>
-      <button type="button" class="service-tile" @click="router.push('/cart')">
+      <button type="button" class="service-tile" @click="router.push('/secondhand/cart')">
         <span class="tile-icon"><el-icon><ShoppingCart /></el-icon></span>
         <span class="tile-label">购物车</span>
       </button>

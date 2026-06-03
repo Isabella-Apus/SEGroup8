@@ -55,19 +55,19 @@
             </el-table>
         </div>
 
-        <el-dialog v-model="rechargeDialogVisible" title="充值商城币（模拟）" width="520px">
+        <el-dialog v-model="rechargeDialogVisible" title="充值商城币" width="520px">
             <el-form label-width="90px">
                 <el-form-item label="充值金额">
                     <el-input-number v-model="rechargeForm.amount" :min="0.01" :step="10" :precision="2" style="width: 220px" />
                 </el-form-item>
                 <el-form-item label="支付方式">
                     <el-radio-group v-model="rechargeForm.channel">
-                        <el-radio-button label="WECHAT">微信</el-radio-button>
-                        <el-radio-button label="ALIPAY">支付宝</el-radio-button>
+                        <el-radio-button value="WECHAT">微信</el-radio-button>
+                        <el-radio-button value="ALIPAY">支付宝</el-radio-button>
                     </el-radio-group>
                 </el-form-item>
-                <div class="qr-placeholder">二维码占位（模拟）</div>
-                <div class="qr-tip">请在真实项目接入支付网关后替换为可扫码二维码。</div>
+                <div class="qr-placeholder">支付确认区</div>
+                <div class="qr-tip">确认支付后，充值金额会写入钱包流水。</div>
             </el-form>
             <template #footer>
                 <el-button @click="rechargeDialogVisible = false">取消</el-button>
@@ -197,7 +197,7 @@ async function confirmRechargePaid() {
             channel: rechargeForm.channel
         });
         rechargeDialogVisible.value = false;
-        ElMessage.success('充值成功（模拟）');
+        ElMessage.success('充值成功');
         await loadWalletData();
     } finally {
         rechargeLoading.value = false;

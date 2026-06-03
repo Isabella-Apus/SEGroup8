@@ -37,7 +37,7 @@
               :loading="actionLoadingKey === `confirm-${request.id}`"
               @click="handleConfirmBargain(request)"
             >
-              同意生成订单
+              同意议价
             </el-button>
             <el-button
               size="small"
@@ -453,7 +453,9 @@ async function fetchPendingBargains() {
   try {
     const res = await listBargainRequestsApi({ pageNum: 1, pageSize: 20, status: "PENDING" });
     const records = res.data?.records || res.data || [];
-    pendingBargains.value = records.filter((item) => Number(item.sellerUserId) === Number(currentUserId.value));
+    pendingBargains.value = records.filter((item) =>
+      Number(item.sellerUserId) === Number(currentUserId.value) && isPendingBargain(item)
+    );
   } finally {
     bargainLoading.value = false;
   }
@@ -516,6 +518,11 @@ function openBuyerChat(request) {
   });
 }
 
+function isPendingBargain(request) {
+  const status = String(request?.status || "").toUpperCase();
+  return status === "PENDING" || status === "APPLIED";
+}
+
 function openDescriptionDialog(row) {
   descriptionTarget.value = row;
   descriptionForm.description = row?.description || "";
@@ -554,9 +561,8 @@ async function handleConfirmBargain(request) {
     await confirmBargainApi({
       negotiationId: request.id,
       confirmedPrice: request.proposedPrice,
-      createOrder: true,
     });
-    ElMessage.success("已同意议价，并生成二手订单");
+    ElMessage.success("已同意议价，买家可按确认价下单");
     await Promise.all([fetchPendingBargains(), fetchList(false)]);
   } finally {
     actionLoadingKey.value = "";

@@ -188,7 +188,7 @@
           >
             <el-icon><Plus /></el-icon>
           </el-upload>
-          <div class="hint">最多3张（演示：上传后会保存URL）</div>
+          <div class="hint">最多3张，上传后会作为售后凭证保存。</div>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -208,17 +208,17 @@
       <el-form label-width="90px">
         <el-form-item label="支付方式">
           <el-radio-group v-model="payForm.payMode">
-            <el-radio-button label="THIRD_PARTY">微信/支付宝</el-radio-button>
-            <el-radio-button label="COIN">商城币</el-radio-button>
+            <el-radio-button value="THIRD_PARTY">微信/支付宝</el-radio-button>
+            <el-radio-button value="COIN">商城币</el-radio-button>
           </el-radio-group>
         </el-form-item>
         <el-form-item v-if="payForm.payMode === 'THIRD_PARTY'" label="渠道">
           <el-radio-group v-model="payForm.payChannel">
-            <el-radio-button label="WECHAT">微信</el-radio-button>
-            <el-radio-button label="ALIPAY">支付宝</el-radio-button>
+            <el-radio-button value="WECHAT">微信</el-radio-button>
+            <el-radio-button value="ALIPAY">支付宝</el-radio-button>
           </el-radio-group>
         </el-form-item>
-        <div v-if="payForm.payMode === 'THIRD_PARTY'" class="pay-qr-placeholder">第三方支付二维码占位（模拟）</div>
+        <div v-if="payForm.payMode === 'THIRD_PARTY'" class="pay-qr-placeholder">选择渠道并完成付款后，点击“我已支付”。</div>
         <el-alert
           v-else
           type="info"

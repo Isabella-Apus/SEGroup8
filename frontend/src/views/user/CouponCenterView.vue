@@ -70,13 +70,13 @@ const pageCopy = computed(() => {
     return {
       eyebrow: "Secondhand Coupons",
       title: "二手领券中心",
-      desc: "二手商城的交易优惠集中在这里，适合淘闲置前先看一眼。",
+      desc: "二手交易可用优惠集中在这里，下单前可先确认门槛和有效期。",
     };
   }
   return {
     eyebrow: "New Goods Coupons",
     title: "新品领券中心",
-    desc: "新品商城专属优惠券，先领券再下单更清楚。",
+    desc: "新品商城可用优惠券，展示适用店铺、满减门槛和到期时间。",
   };
 });
 

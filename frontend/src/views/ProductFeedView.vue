@@ -3,7 +3,7 @@
     <div class="hero">
       <div>
         <h1>猜你喜欢</h1>
-        <p>发现每日上新，沉浸式浏览无限滚动商品流</p>
+        <p>根据当前筛选条件浏览商品，可按名称和价格继续缩小范围。</p>
       </div>
       <div class="hero-dot"></div>
     </div>
@@ -76,7 +76,7 @@ const query = reactive({
 
 const chips = [
   { label: '全部', minPrice: undefined, maxPrice: undefined },
-  { label: '百元好物', minPrice: 0, maxPrice: 100 },
+  { label: '百元以内', minPrice: 0, maxPrice: 100 },
   { label: '200-500', minPrice: 200, maxPrice: 500 },
   { label: '千元以上', minPrice: 1000, maxPrice: undefined }
 ];

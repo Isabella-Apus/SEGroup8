@@ -81,7 +81,7 @@ const badgeText = computed(() => {
 });
 
 const descriptionText = computed(() => {
-  return props.product.description || (isSecondhand.value ? "个人闲置，详情页可联系卖家" : "官方好物，支持下单和售后");
+  return props.product.description || (isSecondhand.value ? "个人发布的闲置商品，详情页可查看成色并联系卖家" : "在售新品，详情页可查看库存、店铺和售后入口");
 });
 
 const mainPrice = computed(() => {
@@ -115,12 +115,12 @@ const couponText = computed(() => {
   }
   const price = Number(mainPrice.value || 0);
   if (price >= 500) {
-    return "大件保障";
+    return "高价商品";
   }
-  return "新人券";
+  return "可领券";
 });
 
-const shippingText = computed(() => (isSecondhand.value ? "可沟通" : "售后无忧"));
+const shippingText = computed(() => (isSecondhand.value ? "可沟通" : "售后入口"));
 
 const salesText = computed(() => {
   const seed = Number(props.product.id || 1);

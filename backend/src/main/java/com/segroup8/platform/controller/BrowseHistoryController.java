@@ -1,9 +1,11 @@
 package com.segroup8.platform.controller;
 
 import com.segroup8.platform.common.Result;
+import com.segroup8.platform.dto.BrowseHistoryRecordRequest;
 import com.segroup8.platform.service.BrowseHistoryService;
 import com.segroup8.platform.vo.BrowseHistoryVO;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +30,13 @@ public class BrowseHistoryController {
     @GetMapping("/browse-history")
     public Result<List<BrowseHistoryVO>> browseHistory() {
         return Result.success(browseHistoryService.getBrowseHistory());
+    }
+
+    @Operation(summary = "记录当前用户浏览商品")
+    @PostMapping("/browse-history")
+    public Result<Void> recordBrowseHistory(@Valid @RequestBody BrowseHistoryRecordRequest request) {
+        browseHistoryService.saveBrowseHistory(request.getProductId(), request.getProductType());
+        return Result.success();
     }
 
     @Operation(summary = "删除单条浏览记录")

@@ -26,9 +26,9 @@ export const COMPONENT_TEMPLATES = [
     type: COMPONENT_TYPES.PRODUCT_GRID,
     label: '商品展示',
     icon: '🛍️',
-    description: '展示精选商品，2或4列布局',
+    description: '展示指定商品，支持2或4列布局',
     defaultProps: {
-      title: '精选商品',
+      title: '商品分组',
       columns: 2,
       productIds: [],
       products: []
@@ -53,7 +53,7 @@ export const COMPONENT_TEMPLATES = [
     icon: '📢',
     description: '店铺公告或促销信息',
     defaultProps: {
-      text: '欢迎光临本店！',
+      text: '下单前可先查看商品详情、库存和店铺说明。',
       bgColor: '#fffbeb',
       textColor: '#b45309',
       icon: '📢'
@@ -87,7 +87,7 @@ export const COMPONENT_TEMPLATES = [
     type: COMPONENT_TYPES.COUNTDOWN,
     label: '倒计时',
     icon: '⏱️',
-    description: '活动倒计时，制造紧迫感',
+    description: '展示活动结束时间',
     defaultProps: {
       title: '限时特惠',
       endTime: '',

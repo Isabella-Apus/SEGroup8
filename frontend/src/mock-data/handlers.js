@@ -83,6 +83,122 @@ const categoryAliases = {
     other: "生活百货",
 };
 
+const mockCategoryTree = [
+    {
+        id: 1,
+        name: "电子数码",
+        parentId: null,
+        children: [
+            { id: 101, name: "手机", parentId: 1, children: [] },
+            { id: 102, name: "电脑/平板", parentId: 1, children: [] },
+            { id: 103, name: "摄影摄像", parentId: 1, children: [] },
+            { id: 104, name: "影音娱乐", parentId: 1, children: [] },
+            { id: 105, name: "智能穿戴", parentId: 1, children: [] },
+        ],
+    },
+    {
+        id: 2,
+        name: "服饰鞋包",
+        parentId: null,
+        children: [
+            { id: 201, name: "女装", parentId: 2, children: [] },
+            { id: 202, name: "男装", parentId: 2, children: [] },
+            { id: 203, name: "运动服饰", parentId: 2, children: [] },
+            { id: 204, name: "鞋包", parentId: 2, children: [] },
+            { id: 205, name: "配饰", parentId: 2, children: [] },
+        ],
+    },
+    {
+        id: 3,
+        name: "家居生活",
+        parentId: null,
+        children: [
+            { id: 301, name: "家具家装", parentId: 3, children: [] },
+            { id: 302, name: "厨房用具", parentId: 3, children: [] },
+            { id: 303, name: "居家日用", parentId: 3, children: [] },
+            { id: 304, name: "家用电器", parentId: 3, children: [] },
+            { id: 305, name: "收纳整理", parentId: 3, children: [] },
+        ],
+    },
+    {
+        id: 4,
+        name: "美妆个护",
+        parentId: null,
+        children: [
+            { id: 401, name: "面部护肤", parentId: 4, children: [] },
+            { id: 402, name: "彩妆", parentId: 4, children: [] },
+            { id: 403, name: "个人护理", parentId: 4, children: [] },
+            { id: 404, name: "香水香氛", parentId: 4, children: [] },
+            { id: 405, name: "美容仪器", parentId: 4, children: [] },
+        ],
+    },
+    {
+        id: 5,
+        name: "运动户外",
+        parentId: null,
+        children: [
+            { id: 501, name: "健身器材", parentId: 5, children: [] },
+            { id: 502, name: "户外装备", parentId: 5, children: [] },
+            { id: 503, name: "体育用品", parentId: 5, children: [] },
+            { id: 504, name: "骑行运动", parentId: 5, children: [] },
+        ],
+    },
+    {
+        id: 6,
+        name: "图书音像",
+        parentId: null,
+        children: [
+            { id: 601, name: "教材教辅", parentId: 6, children: [] },
+            { id: 602, name: "小说文学", parentId: 6, children: [] },
+            { id: 603, name: "艺术收藏", parentId: 6, children: [] },
+            { id: 604, name: "办公文具", parentId: 6, children: [] },
+        ],
+    },
+    {
+        id: 7,
+        name: "美食",
+        parentId: null,
+        children: [
+            { id: 701, name: "休闲零食", parentId: 7, children: [] },
+            { id: 702, name: "粮油调味", parentId: 7, children: [] },
+            { id: 703, name: "生鲜果蔬", parentId: 7, children: [] },
+            { id: 704, name: "冲调饮品", parentId: 7, children: [] },
+            { id: 705, name: "地方特产", parentId: 7, children: [] },
+        ],
+    },
+    {
+        id: 8,
+        name: "其他",
+        parentId: null,
+        children: [
+            { id: 801, name: "未分类", parentId: 8, children: [] },
+        ],
+    },
+];
+
+function cloneCategoryTree(scene) {
+    const excludeFood = String(scene || "NEW").toUpperCase() === "SECONDHAND";
+    return mockCategoryTree
+        .filter((node) => !(excludeFood && Number(node.id) === 7))
+        .map((node) => ({
+            ...node,
+            children: (node.children || []).map((child) => ({ ...child })),
+        }));
+}
+
+function findRootCategoryName(id) {
+    const target = Number(id);
+    if (!target) {
+        return "";
+    }
+    for (const root of mockCategoryTree) {
+        if (Number(root.id) === target || (root.children || []).some((child) => Number(child.id) === target)) {
+            return root.name;
+        }
+    }
+    return "";
+}
+
 function normalizeCategory(value) {
     const raw = asText(value);
     return categoryAliases[raw] || raw;
@@ -105,6 +221,10 @@ function resolveProductCategory(source = {}) {
     if (productCategories.includes(direct)) {
         return direct;
     }
+    const byId = findRootCategoryName(source.subCategoryId || source.categoryId);
+    if (byId) {
+        return byId;
+    }
     return productCategories.find((category) => category !== ALL_CATEGORY && matchProductCategory(source, category)) || "生活百货";
 }
 
@@ -112,6 +232,10 @@ function resolveSecondhandCategory(source = {}) {
     const direct = normalizeCategory(source.categoryName || source.category);
     if (secondhandCategories.includes(direct)) {
         return direct;
+    }
+    const byId = findRootCategoryName(source.subCategoryId || source.categoryId);
+    if (byId) {
+        return byId;
     }
     return secondhandCategories.find((category) => category !== ALL_CATEGORY && matchSecondhandCategory(source, category)) || "宿舍生活";
 }
@@ -189,6 +313,46 @@ function creditLevel(score) {
     if (value < 80) return "良好";
     if (value < 95) return "优秀";
     return "极好";
+}
+
+function shopOwnerById(shopId) {
+    return mockStore.users.find(
+        (user) => Number(user.id) === Number(shopId) && ["OFFICIAL_SELLER", "SELLER"].includes(user.role),
+    );
+}
+
+function sellerShopVO(owner) {
+    if (!owner) {
+        return null;
+    }
+    const products = mockStore.products.filter((item) => Number(item.shopId) === Number(owner.id));
+    const reviews = mockStore.reviews.filter((item) => Number(item.sellerUserId) === Number(owner.id));
+    const goodCount = reviews.filter((item) => Number(item.score || item.rating || 0) >= 4).length;
+    const goodRate = reviews.length ? (goodCount / reviews.length) * 100 : 100;
+    const shopScore = Number(owner.creditScore || 100);
+    return {
+        id: owner.id,
+        ownerUserId: owner.id,
+        name: owner.shopName || owner.nickname || "Kinda 商家",
+        description: owner.shopDesc || "销售学习设备、数码配件和宿舍生活用品。",
+        logo: owner.avatar || "",
+        bannerUrl: owner.bannerUrl || "",
+        region: owner.region || "",
+        category: owner.category || "",
+        businessHours: owner.businessHours || "",
+        returnPolicy: owner.returnPolicy || "",
+        shippingPolicy: owner.shippingPolicy || "",
+        announcement: owner.announcement || "",
+        decorationJson: owner.shopDecorationJson || "",
+        rating: {
+            overallScore: shopScore,
+            overallLevel: creditLevel(shopScore),
+            shopScore,
+            shopLevel: creditLevel(shopScore),
+            shopSoldCount: products.filter((item) => Number(item.status) === 1).length,
+            shopGoodRate: goodRate,
+        },
+    };
 }
 
 function sellerOwnsOrder(order, sellerId) {
@@ -521,6 +685,10 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
     const m = String(method || "get").toLowerCase();
     const p = String(url || "");
 
+    if (m === "get" && p === "/category/tree") {
+        return ok(cloneCategoryTree(params?.scene));
+    }
+
     if (m === "post" && p === "/auth/login") {
         const username = asText(data?.username);
         const password = asText(data?.password);
@@ -678,6 +846,53 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
             fail(404, "商品不存在或已下架");
         }
         return ok(record);
+    }
+
+    const publicShopMatch = p.match(/^\/shop\/public\/(\d+)$/);
+    if (m === "get" && publicShopMatch) {
+        const shop = sellerShopVO(shopOwnerById(publicShopMatch[1]));
+        if (!shop) {
+            fail(404, "店铺不存在或已关闭");
+        }
+        return ok(shop);
+    }
+
+    const publicShopProductsMatch = p.match(/^\/shop\/public\/(\d+)\/products$/);
+    if (m === "get" && publicShopProductsMatch) {
+        const shopId = Number(publicShopProductsMatch[1]);
+        const owner = shopOwnerById(shopId);
+        if (!owner) {
+            fail(404, "店铺不存在或已关闭");
+        }
+        const keyword = asText(params?.keyword);
+        const sortBy = asText(params?.sortBy || "time_desc");
+        const records = filterByKeyword(
+            mockStore.products.filter((item) => Number(item.shopId) === shopId && Number(item.status) === 1),
+            keyword,
+        ).sort((a, b) => {
+            if (sortBy === "price_asc") return Number(a.price || 0) - Number(b.price || 0);
+            if (sortBy === "price_desc") return Number(b.price || 0) - Number(a.price || 0);
+            if (sortBy === "sales_desc") return Number(b.sales || b.id || 0) - Number(a.sales || a.id || 0);
+            return new Date(b.createTime || 0).getTime() - new Date(a.createTime || 0).getTime();
+        });
+        return ok(paginateParams(records, params));
+    }
+
+    if (m === "get" && p === "/shop/seller/current") {
+        const user = requireLogin(headers);
+        requireSeller(user);
+        return ok(sellerShopVO(user));
+    }
+
+    if (m === "put" && p === "/shop/seller/decoration") {
+        const user = requireLogin(headers);
+        requireSeller(user);
+        const decorationJson = asText(data?.decorationJson);
+        if (!decorationJson) {
+            fail(400, "装修内容不能为空");
+        }
+        user.shopDecorationJson = decorationJson;
+        return ok(sellerShopVO(user));
     }
 
     if (m === "get" && p === "/product/seller/list") {
@@ -1926,7 +2141,7 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
     if (m === "get" && p === "/finance/my-wallet/records") {
         requireLogin(headers);
         return ok([
-            { id: 1, tradeType: "RECHARGE", tradeTypeName: "钱包充值", amount: 100, remark: "演示充值记录", createTime: new Date().toISOString() },
+            { id: 1, tradeType: "RECHARGE", tradeTypeName: "钱包充值", amount: 100, remark: "商城币充值", createTime: new Date().toISOString() },
         ]);
     }
 

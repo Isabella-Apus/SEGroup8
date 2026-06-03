@@ -133,6 +133,32 @@ CREATE TABLE IF NOT EXISTS `shop` (
   KEY `idx_shop_owner_user_id` (`owner_user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+SET @shop_logo_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'shop' AND COLUMN_NAME = 'logo'
+);
+SET @sql = IF(@shop_logo_exists = 0,
+  'ALTER TABLE `shop` ADD COLUMN `logo` VARCHAR(255) DEFAULT NULL AFTER `name`',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @shop_description_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'shop' AND COLUMN_NAME = 'description'
+);
+SET @sql = IF(@shop_description_exists = 0,
+  'ALTER TABLE `shop` ADD COLUMN `description` VARCHAR(255) DEFAULT NULL AFTER `logo`',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
 SET @shop_region_exists = (
   SELECT COUNT(*)
   FROM information_schema.COLUMNS

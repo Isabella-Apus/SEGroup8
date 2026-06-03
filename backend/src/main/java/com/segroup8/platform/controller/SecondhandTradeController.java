@@ -47,6 +47,22 @@ public class SecondhandTradeController {
         return Result.success(secondhandTradeService.rejectBargain(negotiationId));
     }
 
+    @Operation(summary = "分页查看我的议价")
+    @GetMapping("/bargain/list")
+    public Result<PageVO<ProductNegotiationVO>> pageMyBargains(
+            @RequestParam(defaultValue = "1") Long pageNum,
+            @RequestParam(defaultValue = "10") Long pageSize,
+            @RequestParam(required = false) Long productId,
+            @RequestParam(required = false) Long counterpartUserId,
+            @RequestParam(required = false) String status) {
+        return Result.success(secondhandTradeService.pageMyBargains(
+                pageNum,
+                pageSize,
+                productId,
+                counterpartUserId,
+                status));
+    }
+
     @Operation(summary = "查询我对某二手商品的有效议价")
     @GetMapping("/bargain/effective")
     public Result<ProductNegotiationVO> getMyEffectiveBargain(@RequestParam Long productId) {

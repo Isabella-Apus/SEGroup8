@@ -416,7 +416,7 @@ function viewStore(item) {
   if (!storeId) {
     return;
   }
-  router.push({ path: `/store/${storeId}`, query: { from: "browse-history" } });
+  router.push({ path: `/shop/${storeId}`, query: { from: "browse-history" } });
 }
 
 function formatTime(time) {

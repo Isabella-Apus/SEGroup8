@@ -128,7 +128,7 @@
             <span>💡 改善建议</span>
           </template>
           <div v-if="suggestions.length === 0" class="empty-tip">
-            🎉 店铺各项指标表现良好，继续保持！
+            当前暂无风险建议。
           </div>
           <div
             v-for="(s, idx) in suggestions"

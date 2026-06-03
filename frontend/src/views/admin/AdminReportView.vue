@@ -94,8 +94,8 @@
       <el-form :model="auditForm" label-width="110px" @submit.prevent>
         <el-form-item label="审核结果" required>
           <el-radio-group v-model="auditForm.decision">
-            <el-radio :label="1">成立（扣分）</el-radio>
-            <el-radio :label="2">不成立（驳回）</el-radio>
+            <el-radio :value="1">成立（扣分）</el-radio>
+            <el-radio :value="2">不成立（驳回）</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item v-if="auditForm.decision === 1" label="自定义扣分">

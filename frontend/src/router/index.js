@@ -324,6 +324,10 @@ const routes = [
             },
         ],
     },
+    {
+        path: "/:pathMatch(.*)*",
+        redirect: "/",
+    },
 ];
 
 const router = createRouter({
@@ -331,26 +335,18 @@ const router = createRouter({
     routes,
 });
 
-const FIRST_VISIT_GUARD_KEY = "segroup8_force_login_checked";
-
 router.beforeEach(async (to, from, next) => {
     const userStore = useUserStore();
-    // Force the app to start from login once per browser session.
-    if (!sessionStorage.getItem(FIRST_VISIT_GUARD_KEY)) {
-        sessionStorage.setItem(FIRST_VISIT_GUARD_KEY, "1");
-        if (to.path !== "/login") {
-            userStore.logout();
-            next("/login");
-            return;
-        }
-    }
     if (to.meta.public) {
         next();
         return;
     }
     if (!userStore.isLoggedIn) {
         ElMessage.warning("请先登录");
-        next("/login");
+        next({
+            path: "/login",
+            query: to.fullPath && to.fullPath !== "/" ? { redirect: to.fullPath } : {},
+        });
         return;
     }
     if (!userStore.userInfo) {

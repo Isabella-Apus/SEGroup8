@@ -111,8 +111,8 @@
 
         <el-form-item label="优惠类型" prop="type">
           <el-radio-group v-model="form.type">
-            <el-radio :label="1">满减券</el-radio>
-            <el-radio :label="2">折扣券</el-radio>
+            <el-radio :value="1">满减券</el-radio>
+            <el-radio :value="2">折扣券</el-radio>
           </el-radio-group>
         </el-form-item>
 
