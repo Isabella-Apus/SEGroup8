@@ -8,6 +8,7 @@
       </div>
       <div class="head-actions">
         <el-button @click="openMessageCenter">{{ pageCopy.messageButton }}</el-button>
+        <el-button v-if="!isMerchantConsole" @click="router.push('/secondhand/sold')">我卖出的</el-button>
         <el-button v-if="!isMerchantConsole" @click="router.push('/secondhand')">返回二手商城</el-button>
         <el-button type="primary" @click="router.push('/secondhand/publish')">发布闲置</el-button>
       </div>

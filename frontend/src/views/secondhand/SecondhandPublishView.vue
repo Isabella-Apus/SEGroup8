@@ -4,13 +4,9 @@
       <div>
         <span class="eyebrow">Secondhand Studio</span>
         <h1>发布二手商品</h1>
-        <p>把闲置整理成清晰的商品卡片，图片、二级分类、成色和价格都会进入 AI 风险审核。</p>
+        <p>上传图片、选择分类、填写成色和价格，让闲置商品更清楚地展示出来。</p>
       </div>
-      <div class="hero-summary">
-        <span>预计展示价</span>
-        <strong>¥{{ Number(form.salePrice || 0).toFixed(2) }}</strong>
-        <small>{{ discountText }}</small>
-      </div>
+
     </div>
 
     <div class="publish-grid">

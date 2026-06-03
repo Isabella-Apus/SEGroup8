@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <section class="credit-page">
     <div class="credit-hero">
       <div>
@@ -6,7 +6,7 @@
         <h1>我的信用</h1>
         <p>查看买家信用、二手卖家信用、举报记录和拉黑名单，用于判断交易风险。</p>
       </div>
-      <el-button type="primary" @click="reportDialogVisible = true">发起举报</el-button>
+      <el-button type="primary" @click="openReportDialog()">发起举报</el-button>
     </div>
 
     <el-skeleton v-if="loading" :rows="10" animated class="page-card" />
@@ -70,7 +70,7 @@
               <div>
                 <strong>{{ reasonTypeLabel(item.reasonType) }}</strong>
                 <p>{{ item.reasonDesc || "暂无补充说明" }}</p>
-                <small>用户 {{ item.reportedId }} · {{ tradeContextLabel(item.tradeContext) }}</small>
+                <small>{{ formatReportedUser(item) }}  {{ tradeContextLabel(item.tradeContext) }}</small>
               </div>
               <el-tag :type="reportStatusType(item.status)" size="small">{{ reportStatusLabel(item.status) }}</el-tag>
             </div>
@@ -87,7 +87,7 @@
         <div v-if="blockList.length" class="block-grid">
           <div v-for="item in blockList" :key="item.id || item.blockedId" class="block-item">
             <div>
-              <strong>用户 {{ item.blockedId }}</strong>
+              <strong>{{ formatBlockedUser(item.blockedId) }}</strong>
               <small>{{ formatTime(item.createTime) }}</small>
             </div>
             <el-button type="danger" plain size="small" @click="handleUnblock(item.blockedId)">取消拉黑</el-button>
@@ -99,8 +99,32 @@
 
     <el-dialog v-model="reportDialogVisible" title="发起举报" width="520px" align-center append-to-body>
       <el-form :model="reportForm" label-width="110px">
-        <el-form-item label="被举报用户ID" required>
-          <el-input-number v-model="reportForm.reportedId" :min="1" style="width: 220px" />
+        <el-form-item label="被举报用户" required>
+          <el-select
+            v-model="reportForm.reportedId"
+            class="reported-user-select"
+            filterable
+            remote
+            reserve-keyword
+            clearable
+            :remote-method="searchReportUsers"
+            :loading="searchingReportUsers"
+            placeholder="输入用户ID或昵称搜索"
+            @change="handleReportedUserChange"
+          >
+            <el-option
+              v-for="user in reportUserOptions"
+              :key="user.id"
+              :label="formatUserOption(user)"
+              :value="user.id"
+            >
+              <div class="reported-user-option">
+                <strong>{{ user.id }} - {{ user.nickname || user.username || "未命名用户" }}</strong>
+                <span>{{ user.username }} · {{ user.role || "USER" }}</span>
+              </div>
+            </el-option>
+          </el-select>
+          <div v-if="reportedUserLabel" class="reported-user-preview">已选择：{{ reportedUserLabel }}</div>
         </el-form-item>
         <el-form-item label="举报对象" required>
           <el-select v-model="reportForm.tradeContext" style="width: 260px">
@@ -122,8 +146,30 @@
         <el-form-item label="补充说明">
           <el-input v-model="reportForm.reasonDesc" type="textarea" :rows="3" maxlength="500" show-word-limit />
         </el-form-item>
-        <el-form-item label="证据图片URL">
-          <el-input v-model="reportForm.evidenceUrls" placeholder="多张用逗号分隔" />
+        <el-form-item label="证据图片">
+          <input
+            ref="evidenceInputRef"
+            class="evidence-input"
+            type="file"
+            accept="image/*"
+            multiple
+            @change="handleEvidenceSelected"
+          />
+          <div class="evidence-uploader">
+            <el-button :loading="evidenceUploading" @click="openEvidencePicker">上传图片</el-button>
+            <span>可上传多张图片，提交时会自动作为证据保存</span>
+          </div>
+          <div v-if="evidenceImageList.length" class="evidence-preview-grid">
+            <div v-for="url in evidenceImageList" :key="url" class="evidence-preview-item">
+              <el-image
+                :src="toAssetUrl(url)"
+                :preview-src-list="evidencePreviewUrls"
+                fit="cover"
+                preview-teleported
+              />
+              <el-button link type="danger" @click="removeEvidenceImage(url)">移除</el-button>
+            </div>
+          </div>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -135,8 +181,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { useRoute } from "vue-router";
 import {
   getMyBlockListApi,
   getMyCreditApi,
@@ -144,7 +191,11 @@ import {
   submitReportApi,
   unblockUserApi,
 } from "@/api/credit";
+import { searchUsersApi } from "@/api/user";
+import { uploadImageApi } from "@/api/upload";
+import { toAssetUrl } from "@/utils/url";
 
+const route = useRoute();
 const loading = ref(false);
 const credit = ref(null);
 const myReports = ref([]);
@@ -152,34 +203,64 @@ const blockList = ref([]);
 const reportDialogVisible = ref(false);
 const reportSubmitting = ref(false);
 const reportForm = ref(defaultReportForm());
+const evidenceInputRef = ref(null);
+const evidenceUploading = ref(false);
+const reportUserOptions = ref([]);
+const searchingReportUsers = ref(false);
+const userNameMap = ref({});
+const REPORT_TARGET_NAMES_KEY = "segroup8_report_target_names";
 
 const buyerLogs = computed(() => credit.value?.buyerLogs || []);
 const sellerLogs = computed(() => credit.value?.shSellerLogs || []);
+const evidenceImageList = computed(() =>
+  String(reportForm.value.evidenceUrls || "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean),
+);
+const evidencePreviewUrls = computed(() => evidenceImageList.value.map((url) => toAssetUrl(url)));
+const reportedUserLabel = computed(() => {
+  const id = reportForm.value.reportedId;
+  if (!id) {
+    return "";
+  }
+  const selected = getSelectedReportUser();
+  const name = selected?.nickname || selected?.username || "";
+  return name ? `${id} - ${name}` : `用户 ${id}`;
+});
 const scoreCards = computed(() => [
   {
     key: "buyer",
     label: "买家信用",
     score: Number(credit.value?.buyerScore ?? 100),
-    level: credit.value?.buyerLevel || "极好",
+    level: credit.value?.buyerLevel || "鏋佸ソ",
     color: "#89c7ff",
   },
   {
     key: "secondhand",
     label: "二手卖家信用",
     score: Number(credit.value?.shSellerScore ?? 100),
-    level: credit.value?.shSellerLevel || "极好",
+    level: credit.value?.shSellerLevel || "鏋佸ソ",
     color: "#5fe6bd",
   },
   {
     key: "shop",
     label: "店铺信用",
     score: Number(credit.value?.shopScore ?? 100),
-    level: credit.value?.shopLevel || "极好",
+    level: credit.value?.shopLevel || "鏋佸ソ",
     color: "#ffb9d6",
   },
 ]);
 
-onMounted(loadAll);
+onMounted(async () => {
+  await applyReportQuery();
+  await loadAll();
+});
+
+watch(
+  () => route.query,
+  () => applyReportQuery(),
+);
 
 async function loadAll() {
   loading.value = true;
@@ -192,6 +273,7 @@ async function loadAll() {
     credit.value = creditRes.data;
     myReports.value = reportRes.data?.records || [];
     blockList.value = blockRes.data || [];
+    await hydrateBlockedUserNames(blockList.value);
   } catch {
     ElMessage.error("加载信用信息失败");
   } finally {
@@ -199,9 +281,125 @@ async function loadAll() {
   }
 }
 
+function openReportDialog(overrides = {}) {
+  reportForm.value = {
+    ...reportForm.value,
+    ...overrides,
+  };
+  reportDialogVisible.value = true;
+}
+
+async function applyReportQuery() {
+  const reportedId = Number(route.query.reportUserId || 0);
+  if (!reportedId) {
+    return;
+  }
+  const reportedName = String(route.query.reportUserName || "").trim();
+  const tradeContext = String(route.query.reportContext || reportForm.value.tradeContext || "SHOP");
+  await fetchReportUserByKeyword(String(reportedId));
+  if (!reportUserOptions.value.some((item) => Number(item.id) === reportedId) && reportedName) {
+    addReportUserOption({
+      id: reportedId,
+      nickname: reportedName,
+      username: "",
+      role: "",
+    });
+  }
+  openReportDialog({
+    reportedId,
+    tradeContext,
+  });
+}
+
+async function searchReportUsers(keyword) {
+  await fetchReportUserByKeyword(keyword);
+}
+
+async function fetchReportUserByKeyword(keyword) {
+  searchingReportUsers.value = true;
+  try {
+    const result = await searchUsersApi(keyword || "");
+    reportUserOptions.value = (result.data || []).map(normalizeReportUser);
+    rememberUserNames(reportUserOptions.value);
+  } finally {
+    searchingReportUsers.value = false;
+  }
+}
+
+async function hydrateBlockedUserNames(records) {
+  const ids = Array.from(new Set((records || [])
+    .map((item) => Number(item.blockedId))
+    .filter(Boolean)));
+  const missingIds = ids.filter((id) => !userNameMap.value[id]);
+  if (!missingIds.length) {
+    return;
+  }
+  const users = [];
+  for (const id of missingIds) {
+    try {
+      const result = await searchUsersApi(String(id));
+      const exact = (result.data || []).find((item) => Number(item.id) === Number(id));
+      if (exact) {
+        users.push(normalizeReportUser(exact));
+      }
+    } catch {
+      // Keep the ID fallback if a user can no longer be resolved.
+    }
+  }
+  rememberUserNames(users);
+}
+
+function handleReportedUserChange(userId) {
+  const user = reportUserOptions.value.find((item) => Number(item.id) === Number(userId));
+  if (user) {
+    rememberReportTargetName(user.id, user.nickname || user.username || "");
+  }
+}
+
+function addReportUserOption(user) {
+  const normalized = normalizeReportUser(user);
+  const index = reportUserOptions.value.findIndex((item) => Number(item.id) === Number(normalized.id));
+  if (index >= 0) {
+    reportUserOptions.value.splice(index, 1, { ...reportUserOptions.value[index], ...normalized });
+    return;
+  }
+  reportUserOptions.value.unshift(normalized);
+}
+
+function normalizeReportUser(user) {
+  return {
+    id: Number(user?.id),
+    username: user?.username || "",
+    nickname: user?.nickname || "",
+    avatar: user?.avatar || "",
+    role: user?.role || "",
+  };
+}
+
+function rememberUserNames(users) {
+  if (!users.length) {
+    return;
+  }
+  const next = { ...userNameMap.value };
+  users.forEach((user) => {
+    if (user?.id) {
+      next[user.id] = user.nickname || user.username || "";
+    }
+  });
+  userNameMap.value = next;
+}
+
+function getSelectedReportUser() {
+  return reportUserOptions.value.find((item) => Number(item.id) === Number(reportForm.value.reportedId)) || null;
+}
+
+function formatUserOption(user) {
+  return `${user.id} - ${user.nickname || user.username || "未命名用户"}`;
+}
+
 async function handleSubmitReport() {
   if (!reportForm.value.reportedId) {
-    ElMessage.warning("请填写被举报用户ID");
+    ElMessage.warning("请选择被举报用户");
     return;
   }
   if (!reportForm.value.reasonType) {
@@ -210,7 +408,16 @@ async function handleSubmitReport() {
   }
   reportSubmitting.value = true;
   try {
-    await submitReportApi(reportForm.value);
+    const payload = {
+      reportedId: reportForm.value.reportedId,
+      tradeContext: reportForm.value.tradeContext,
+      reasonType: reportForm.value.reasonType,
+      reasonDesc: reportForm.value.reasonDesc,
+      evidenceUrls: reportForm.value.evidenceUrls,
+    };
+    await submitReportApi(payload);
+    const selected = getSelectedReportUser();
+    rememberReportTargetName(reportForm.value.reportedId, selected?.nickname || selected?.username || "");
     ElMessage.success("举报已提交");
     reportDialogVisible.value = false;
     reportForm.value = defaultReportForm();
@@ -218,6 +425,46 @@ async function handleSubmitReport() {
   } finally {
     reportSubmitting.value = false;
   }
+}
+
+function openEvidencePicker() {
+  evidenceInputRef.value?.click();
+}
+
+async function handleEvidenceSelected(event) {
+  const files = Array.from(event.target?.files || []);
+  if (event.target) {
+    event.target.value = "";
+  }
+  if (!files.length) {
+    return;
+  }
+  evidenceUploading.value = true;
+  try {
+    const uploadedUrls = [];
+    for (const file of files) {
+      if (!String(file.type || "").startsWith("image/")) {
+        ElMessage.warning(`${file.name} 不是图片文件，已跳过`);
+        continue;
+      }
+      const result = await uploadImageApi(file);
+      if (result.data?.url) {
+        uploadedUrls.push(result.data.url);
+      }
+    }
+    if (uploadedUrls.length) {
+      const next = [...evidenceImageList.value, ...uploadedUrls];
+      reportForm.value.evidenceUrls = Array.from(new Set(next)).join(",");
+    }
+  } finally {
+    evidenceUploading.value = false;
+  }
+}
+
+function removeEvidenceImage(url) {
+  reportForm.value.evidenceUrls = evidenceImageList.value
+    .filter((item) => item !== url)
+    .join(",");
 }
 
 async function handleUnblock(blockedId) {
@@ -230,11 +477,50 @@ async function handleUnblock(blockedId) {
 function defaultReportForm() {
   return {
     reportedId: null,
+    reportedName: "",
     tradeContext: "SH_BUYER",
     reasonType: "",
     reasonDesc: "",
     evidenceUrls: "",
   };
+}
+
+function formatReportedUser(item) {
+  const id = item?.reportedId;
+  if (!id) {
+    return "用户 -";
+  }
+  const name = item.reportedName || getRememberedReportTargetName(id);
+  return name ? `用户 ${id} - ${name}` : `用户 ${id}`;
+}
+
+function formatBlockedUser(blockedId) {
+  const id = Number(blockedId);
+  const name = userNameMap.value[id] || getRememberedReportTargetName(id);
+  return name ? `${id} - ${name}` : `用户 ${id}`;
+}
+
+function getRememberedReportTargetName(userId) {
+  const map = readReportTargetNames();
+  return map[String(userId)] || "";
+}
+
+function rememberReportTargetName(userId, name) {
+  const normalizedName = String(name || "").trim();
+  if (!userId || !normalizedName) {
+    return;
+  }
+  const map = readReportTargetNames();
+  map[String(userId)] = normalizedName;
+  localStorage.setItem(REPORT_TARGET_NAMES_KEY, JSON.stringify(map));
+}
+
+function readReportTargetNames() {
+  try {
+    return JSON.parse(localStorage.getItem(REPORT_TARGET_NAMES_KEY) || "{}") || {};
+  } catch {
+    return {};
+  }
 }
 
 function signedDelta(value) {
@@ -486,6 +772,71 @@ function tradeContextLabel(ctx) {
 
 .report-item small {
   color: var(--text-muted);
+}
+
+.reported-user-select {
+  width: 100%;
+}
+
+.reported-user-option {
+  display: grid;
+  gap: 2px;
+  line-height: 1.35;
+}
+
+.reported-user-option strong {
+  color: var(--text-main);
+}
+
+.reported-user-option span {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.reported-user-preview {
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.evidence-input {
+  display: none;
+}
+
+.evidence-uploader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.evidence-uploader span {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.evidence-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 10px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.evidence-preview-item {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+}
+
+.evidence-preview-item :deep(.el-image) {
+  width: 92px;
+  height: 92px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface-soft);
 }
 
 @media (max-width: 980px) {

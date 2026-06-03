@@ -39,7 +39,8 @@
       </el-form-item>
     </el-form>
 
-    <el-table v-loading="loading" :data="records" border>
+    <div class="table-mobile-wrap">
+      <el-table v-loading="loading" :data="records" border class="kg-table">
       <el-table-column prop="id" label="ID" width="74" />
       <el-table-column label="商品" min-width="220">
         <template #default="{ row }">
@@ -53,7 +54,7 @@
       <el-table-column prop="sellerName" label="卖家" width="120" show-overflow-tooltip />
       <el-table-column label="风险" width="120">
         <template #default="{ row }">
-          <el-tag :type="riskTagType(row.riskLevel)" effect="dark">
+          <el-tag class="tag-soft" :type="riskTagType(row.riskLevel)" effect="plain">
             {{ riskLabel(row.riskLevel) }} · {{ row.riskScore }}
           </el-tag>
         </template>
@@ -61,7 +62,7 @@
       <el-table-column label="风险原因" min-width="260">
         <template #default="{ row }">
           <div v-if="row.riskReasons?.length" class="reason-list">
-            <el-tag v-for="reason in row.riskReasons" :key="reason" size="small">
+            <el-tag v-for="reason in row.riskReasons" :key="reason" class="tag-soft" size="small" effect="plain">
               {{ reason }}
             </el-tag>
           </div>
@@ -73,7 +74,7 @@
       </el-table-column>
       <el-table-column label="状态" width="120">
         <template #default="{ row }">
-          <el-tag :type="statusTagType(row.auditStatus)">
+          <el-tag class="status-tag" :class="auditStatusClass(row.auditStatus)" size="small" effect="plain">
             {{ statusLabel(row.auditStatus) }}
           </el-tag>
         </template>
@@ -81,15 +82,19 @@
       <el-table-column prop="createTime" label="生成时间" width="170" />
       <el-table-column label="操作" width="210" fixed="right">
         <template #default="{ row }">
-          <template v-if="row.auditStatus === 'PENDING'">
+          <div v-if="row.auditStatus === 'PENDING'" class="table-actions">
             <el-button link type="success" size="small" @click="submitDecision(row, 'APPROVED')">通过</el-button>
             <el-button link type="warning" size="small" @click="openRemark(row, 'CHANGE_REQUESTED')">要求修改</el-button>
             <el-button link type="danger" size="small" @click="openRemark(row, 'REJECTED')">驳回</el-button>
-          </template>
-          <span v-else class="muted">已处理</span>
+          </div>
+          <span v-else class="muted-pill">已处理</span>
         </template>
       </el-table-column>
-    </el-table>
+      <template #empty>
+        <div class="empty-state">暂无风险审核记录</div>
+      </template>
+      </el-table>
+    </div>
 
     <div class="pager">
       <el-pagination
@@ -266,8 +271,13 @@ function statusLabel(value) {
   return { PENDING: "待处理", APPROVED: "已通过", REJECTED: "已驳回", CHANGE_REQUESTED: "要求修改" }[value] || value;
 }
 
-function statusTagType(value) {
-  return { PENDING: "warning", APPROVED: "success", REJECTED: "danger", CHANGE_REQUESTED: "info" }[value] || "";
+function auditStatusClass(value) {
+  return {
+    PENDING: "status-pending",
+    APPROVED: "status-success",
+    REJECTED: "status-danger",
+    CHANGE_REQUESTED: "status-info"
+  }[value] || "status-muted";
 }
 </script>
 

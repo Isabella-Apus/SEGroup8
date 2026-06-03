@@ -13,6 +13,8 @@ public interface UserService {
 
     UserVO getCurrentUserProfile();
 
+    List<UserVO> searchUsers(String keyword);
+
     void updateCurrentUserProfile(UserProfileUpdateRequest request);
 
     List<AddressVO> listMyAddresses();

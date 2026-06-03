@@ -12,6 +12,10 @@ export function updateProfileApi(payload) {
     return http.put("/user/profile", payload);
 }
 
+export function searchUsersApi(keyword) {
+    return http.get("/user/search", { params: { keyword } });
+}
+
 export function listAddressesApi() {
     return http.get("/user/addresses");
 }

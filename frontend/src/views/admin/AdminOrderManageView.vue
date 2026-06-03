@@ -2,7 +2,7 @@
   <div class="page-card">
     <h2 class="page-title">订单管理</h2>
 
-    <div class="toolbar">
+    <div class="toolbar table-toolbar">
       <el-input v-model="query.keyword" placeholder="订单号/商品名" clearable style="max-width: 320px" />
       <el-select v-model="query.orderStatus" placeholder="订单状态" clearable style="width: 160px">
         <el-option label="待付款" :value="0" />
@@ -42,24 +42,48 @@
       </el-button>
     </div>
 
-    <el-table :data="records" border @selection-change="handleSelectionChange" @row-click="openDetail">
-      <el-table-column type="selection" width="48" />
-      <el-table-column prop="id" label="ID" width="90" />
-      <el-table-column prop="orderNo" label="订单号" min-width="220" />
-      <el-table-column prop="buyerUserId" label="买家ID" width="110" />
-      <el-table-column prop="orderStatusName" label="状态" width="120" />
-      <el-table-column prop="totalAmount" label="金额" width="120">
-        <template #default="scope">￥{{ Number(scope.row.totalAmount || 0).toFixed(2) }}</template>
-      </el-table-column>
-      <el-table-column prop="createTime" label="下单时间" width="180">
-        <template #default="scope">{{ formatTime(scope.row.createTime) }}</template>
-      </el-table-column>
-      <el-table-column label="操作" width="140">
-        <template #default="scope">
-          <el-button link type="primary" @click.stop="openDetail(scope.row)">查看详情</el-button>
+    <div class="table-mobile-wrap">
+      <el-table :data="records" border class="kg-table" @selection-change="handleSelectionChange" @row-click="openDetail">
+        <el-table-column type="selection" width="48" />
+        <el-table-column prop="id" label="ID" width="90">
+          <template #default="{ row }">
+            <span class="id-text">#{{ row.id }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="orderNo" label="订单号" min-width="220" show-overflow-tooltip />
+        <el-table-column prop="buyerUserId" label="买家ID" width="110" />
+        <el-table-column prop="totalAmount" label="金额" width="120">
+          <template #default="scope"><span class="amount-text">￥{{ Number(scope.row.totalAmount || 0).toFixed(2) }}</span></template>
+        </el-table-column>
+        <el-table-column prop="orderStatusName" label="订单状态" width="120">
+          <template #default="{ row }">
+            <el-tag class="status-tag" :class="orderStatusClass(row)" size="small" effect="plain">
+              {{ row.orderStatusName || statusLabel(row.orderStatus) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="refundStatusName" label="售后状态" width="120">
+          <template #default="{ row }">
+            <el-tag class="status-tag" :class="refundStatusClass(row)" size="small" effect="plain">
+              {{ row.refundStatusName || "无" }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="下单时间" width="180">
+          <template #default="scope">{{ formatTime(scope.row.createTime) }}</template>
+        </el-table-column>
+        <el-table-column label="操作" width="140">
+          <template #default="scope">
+            <div class="table-actions">
+              <el-button link type="primary" @click.stop="openDetail(scope.row)">查看详情</el-button>
+            </div>
+          </template>
+        </el-table-column>
+        <template #empty>
+          <div class="empty-state">暂无符合条件的订单</div>
         </template>
-      </el-table-column>
-    </el-table>
+      </el-table>
+    </div>
 
     <div class="pager-wrap">
       <el-pagination
@@ -291,6 +315,34 @@ function handleSizeChange(pageSize) {
 function formatTime(value) {
   if (!value) return "-";
   return String(value).replace("T", " ");
+}
+
+function statusLabel(status) {
+  const map = {
+    0: "待付款",
+    1: "待发货",
+    2: "待收货",
+    3: "待评价",
+    4: "已完成",
+    9: "已关闭"
+  };
+  return map[Number(status)] || "-";
+}
+
+function orderStatusClass(order) {
+  const status = Number(order?.orderStatus);
+  if (status === 4) return "status-success";
+  if (status === 9) return "status-danger";
+  if ([1, 2, 3].includes(status)) return "status-progress";
+  return "status-pending";
+}
+
+function refundStatusClass(order) {
+  const status = Number(order?.refundStatus);
+  if (status === 2) return "status-success";
+  if (status === 3) return "status-danger";
+  if (status === 1) return "status-progress";
+  return "status-muted";
 }
 
 function handleSelectionChange(rows) {

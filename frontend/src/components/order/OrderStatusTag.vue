@@ -1,7 +1,17 @@
 <template>
   <div class="status-wrap">
-    <el-tag :size="size" :type="statusTagType(status)">{{ statusName || "-" }}</el-tag>
-    <span v-if="showRefund && refundStatus > 0" class="sub-status">售后：{{ refundStatusName || "-" }}</span>
+    <el-tag class="status-tag" :class="statusClass(status)" :size="size" effect="plain">
+      {{ statusName || "-" }}
+    </el-tag>
+    <el-tag
+      v-if="showRefund && refundStatus > 0"
+      class="status-tag sub-status"
+      :class="refundStatusClass(refundStatus)"
+      :size="size"
+      effect="plain"
+    >
+      售后：{{ refundStatusName || "-" }}
+    </el-tag>
   </div>
 </template>
 
@@ -15,12 +25,19 @@ const props = defineProps({
   showRefund: { type: Boolean, default: true }
 });
 
-function statusTagType(status) {
-  if (status === 0) return "warning";
-  if (status === 1) return "info";
-  if (status === 2 || status === 3 || status === 4) return "success";
-  if (status === 9) return "danger";
-  return "";
+function statusClass(status) {
+  if (status === 4) return "status-success";
+  if (status === 9) return "status-danger";
+  if (status === 1 || status === 2 || status === 3) return "status-progress";
+  if (status === 0) return "status-pending";
+  return "status-muted";
+}
+
+function refundStatusClass(status) {
+  if (status === 2) return "status-success";
+  if (status === 3) return "status-danger";
+  if (status === 1) return "status-progress";
+  return "status-muted";
 }
 </script>
 
@@ -28,11 +45,10 @@ function statusTagType(status) {
 .status-wrap {
   display: inline-flex;
   align-items: center;
+  gap: 8px;
 }
 
 .sub-status {
-  margin-left: 8px;
-  color: #b91c1c;
   font-size: 12px;
 }
 </style>

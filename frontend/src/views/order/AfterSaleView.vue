@@ -160,14 +160,14 @@ const pageCopy = computed(() => {
     return {
       eyebrow: "Secondhand After-sale",
       title: "二手售后",
-      desc: "只跟进二手商城订单的退款、凭证和处理进度。",
+      desc: "二手商城订单的退款、凭证和处理进度。",
       statLabel: "二手售后订单",
     };
   }
   return {
     eyebrow: "New Goods After-sale",
     title: "新品售后",
-    desc: "只处理新品商城订单的退款、退货和相关凭证。",
+    desc: "新品商城订单的退款、退货和相关凭证。",
     statLabel: "新品售后订单",
   };
 });

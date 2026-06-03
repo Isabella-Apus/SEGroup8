@@ -57,7 +57,14 @@ export function rejectBargainApi(negotiationId) {
 }
 
 export function listBargainRequestsApi(params = {}) {
-    return http.get("/secondhand/trade/bargain/list", { params });
+    return http.get("/secondhand/trade/bargain/list", { params, silent: true })
+        .catch((error) => {
+            const message = error?.response?.data?.message || error?.message || "";
+            if (error?.response?.status === 404 || message.includes("接口不存在")) {
+                return { data: { records: [], total: 0 } };
+            }
+            return Promise.reject(error);
+        });
 }
 
 export function getMyEffectiveBargainApi(productId) {

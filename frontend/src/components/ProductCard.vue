@@ -15,8 +15,7 @@
       </button>
 
       <div class="coupon-row">
-        <span>{{ couponText }}</span>
-        <span>{{ shippingText }}</span>
+        <span v-for="tag in productTags" :key="tag">{{ tag }}</span>
       </div>
 
       <div class="meta">
@@ -109,22 +108,96 @@ const formattedMainPrice = computed(() => formatPrice(mainPrice.value));
 const priceInteger = computed(() => formattedMainPrice.value.split(".")[0]);
 const priceDecimal = computed(() => formattedMainPrice.value.split(".")[1] || "00");
 
-const couponText = computed(() => {
+const productTags = computed(() => {
   if (isSecondhand.value) {
-    return props.product.conditionLevel || props.product.condition || "成色良好";
+    return uniqueTags([
+      props.product.conditionLevel || props.product.condition || "成色良好",
+      hasMultipleImages(props.product) ? "多图展示" : "",
+      resolveCategoryTag(props.product),
+      "可沟通",
+    ]).slice(0, 3);
   }
-  const price = Number(mainPrice.value || 0);
-  if (price >= 500) {
-    return "高价商品";
-  }
-  return "可领券";
+
+  const tags = [
+    resolveStockTag(props.product.stock),
+    hasMultipleImages(props.product) ? "多图展示" : "",
+    resolveCategoryTag(props.product),
+  ];
+  const supplements = rotateBySeed(["支持下单", "订单追踪", "价格清晰", "现货在售"], props.product.id);
+
+  return uniqueTags([...tags, ...supplements]).slice(0, 3);
 });
 
-const shippingText = computed(() => (isSecondhand.value ? "可沟通" : "售后入口"));
+function resolveStockTag(stockValue) {
+  const stock = Number(stockValue ?? 0);
+  if (stock <= 0) {
+    return "暂时缺货";
+  }
+  if (stock <= 10) {
+    return "少量库存";
+  }
+  if (stock > 50) {
+    return "库存充足";
+  }
+  return "库存可查";
+}
+
+function hasMultipleImages(product) {
+  const images = normalizeImages(product?.images);
+  const cover = product?.cover ? [product.cover] : [];
+  return uniqueTags([...images, ...cover]).length > 1;
+}
+
+function normalizeImages(images) {
+  if (Array.isArray(images)) {
+    return images.filter(Boolean);
+  }
+  if (typeof images !== "string" || !images.trim()) {
+    return [];
+  }
+  try {
+    const parsed = JSON.parse(images);
+    return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+  } catch (error) {
+    return images.split(",").map((item) => item.trim()).filter(Boolean);
+  }
+}
+
+function resolveCategoryTag(product) {
+  const categoryText = [
+    product?.categoryName,
+    product?.category,
+    product?.subCategoryName,
+    product?.name,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const categoryTags = [
+    { keywords: ["电子数码", "数码闲置", "数码"], tag: "数码商品" },
+    { keywords: ["学习办公", "办公", "学习"], tag: "学习办公" },
+    { keywords: ["生活百货", "宿舍生活", "百货", "生活"], tag: "生活百货" },
+    { keywords: ["服装鞋包", "服饰鞋包", "服装", "服饰", "鞋包"], tag: "服装鞋包" },
+    { keywords: ["运动户外", "运动器材", "运动", "户外"], tag: "运动户外" },
+    { keywords: ["教材书籍", "教材", "书籍"], tag: "教材资料" },
+  ];
+
+  return categoryTags.find((item) => item.keywords.some((keyword) => categoryText.includes(keyword)))?.tag || "";
+}
+
+function rotateBySeed(list, seedValue) {
+  const seed = Number(seedValue || 0);
+  const start = Math.abs(seed) % list.length;
+  return list.slice(start).concat(list.slice(0, start));
+}
+
+function uniqueTags(tags) {
+  return [...new Set(tags.filter(Boolean))];
+}
 
 const salesText = computed(() => {
   const seed = Number(props.product.id || 1);
-  return isSecondhand.value ? `${20 + (seed % 76)} 人想要` : `${100 + (seed * 17) % 900} 件热度`;
+  return isSecondhand.value ? `${20 + (seed % 76)} 人想要` : `${100 + (seed * 17) % 900} 热度`;
 });
 
 const sellerInitial = computed(() => sellerText.value.slice(0, 1).toUpperCase());

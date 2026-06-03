@@ -25,7 +25,7 @@
         <span class="tile-icon"><el-icon><ShoppingCart /></el-icon></span>
         <span class="tile-label">购物车</span>
       </button>
-      <button type="button" class="service-tile" @click="router.push('/secondhand/orders')">
+      <button type="button" class="service-tile" @click="router.push({ path: '/order', query: { type: 'SECONDHAND' } })">
         <span class="tile-icon"><el-icon><Document /></el-icon></span>
         <span class="tile-label">订单</span>
       </button>
