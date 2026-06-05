@@ -38,7 +38,8 @@
       <el-table-column label="操作" width="180">
         <template #default="{ row }">
           <div class="table-actions">
-            <el-button v-if="row.status !== 'BANNED'" link type="danger" @click="changeStatus(row, 'ban')">封禁</el-button>
+            <el-button v-if="isCurrentAdmin(row)" link type="info" disabled>当前账号</el-button>
+            <el-button v-else-if="row.status !== 'BANNED'" link type="danger" @click="changeStatus(row, 'ban')">封禁</el-button>
             <el-button v-else link type="success" @click="changeStatus(row, 'unban')">解封</el-button>
           </div>
         </template>
@@ -63,12 +64,15 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { banUserApi, pageUsersApi, unbanUserApi } from '@/api/adminUser';
+import { useUserStore } from '@/stores/user';
 
 const records = ref([]);
 const total = ref(0);
+const userStore = useUserStore();
+const currentUserId = computed(() => userStore.userInfo?.id);
 const query = reactive({
   pageNum: 1,
   pageSize: 10,
@@ -90,6 +94,9 @@ async function loadUsers() {
 }
 
 async function changeStatus(row, action) {
+  if (isCurrentAdmin(row)) {
+    return;
+  }
   if (action === 'ban') {
     await banUserApi(row.id);
     ElMessage.success('封禁成功');
@@ -98,6 +105,10 @@ async function changeStatus(row, action) {
     ElMessage.success('解封成功');
   }
   await loadUsers();
+}
+
+function isCurrentAdmin(row) {
+  return row?.role === 'ADMIN' && Number(row.id) === Number(currentUserId.value);
 }
 
 function roleText(role) {

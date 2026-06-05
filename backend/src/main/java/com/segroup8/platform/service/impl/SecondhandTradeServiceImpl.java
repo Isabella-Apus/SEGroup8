@@ -176,11 +176,29 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         }
 
         LocalDateTime now = LocalDateTime.now();
+        LocalDateTime effectiveUntil = now.plusHours(24);
+        int updated = productNegotiationMapper.update(null, new UpdateWrapper<ProductNegotiation>()
+                .set("confirmed_price", request.getConfirmedPrice())
+                .set("status", NEGOTIATION_CONFIRMED)
+                .set("effective_from", now)
+                .set("effective_until", effectiveUntil)
+                .eq("id", negotiation.getId())
+                .eq("seller_user_id", sellerUserId)
+                .eq("status", NEGOTIATION_APPLIED));
+        if (updated == 0) {
+            throw new BusinessException(409, "议价已被处理，请刷新后查看");
+        }
         negotiation.setConfirmedPrice(request.getConfirmedPrice());
         negotiation.setStatus(NEGOTIATION_CONFIRMED);
         negotiation.setEffectiveFrom(now);
-        negotiation.setEffectiveUntil(now.plusHours(24));
-        productNegotiationMapper.updateById(negotiation);
+        negotiation.setEffectiveUntil(effectiveUntil);
+
+        if (Boolean.TRUE.equals(request.getCreateOrder())) {
+            OrderInfo order = createPendingBargainOrder(negotiation, product, request.getConfirmedPrice());
+            negotiation.setStatus(NEGOTIATION_USED);
+            negotiation.setUsedOrderId(order.getId());
+            productNegotiationMapper.updateById(negotiation);
+        }
 
         if (negotiation.getConversationId() != null) {
             chatService.sendMessage(
@@ -194,7 +212,8 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                 "productId", negotiation.getProductId(),
                 "sellerUserId", sellerUserId,
                 "confirmedPrice", request.getConfirmedPrice(),
-                "effectiveUntil", negotiation.getEffectiveUntil()));
+                "effectiveUntil", negotiation.getEffectiveUntil(),
+                "orderId", negotiation.getUsedOrderId() == null ? 0L : negotiation.getUsedOrderId()));
 
         return toNegotiationVO(negotiation);
     }
@@ -217,8 +236,15 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
             throw new BusinessException(400, "当前议价状态不可驳回");
         }
 
+        int updated = productNegotiationMapper.update(null, new UpdateWrapper<ProductNegotiation>()
+                .set("status", NEGOTIATION_REJECTED)
+                .eq("id", negotiation.getId())
+                .eq("seller_user_id", sellerUserId)
+                .eq("status", NEGOTIATION_APPLIED));
+        if (updated == 0) {
+            throw new BusinessException(409, "议价已被处理，请刷新后查看");
+        }
         negotiation.setStatus(NEGOTIATION_REJECTED);
-        productNegotiationMapper.updateById(negotiation);
 
         SecondhandProduct product = secondhandProductMapper.selectById(negotiation.getProductId());
         if (negotiation.getConversationId() != null && product != null) {
@@ -608,7 +634,46 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         vo.setStatus(negotiation.getStatus());
         vo.setEffectiveFrom(negotiation.getEffectiveFrom());
         vo.setEffectiveUntil(negotiation.getEffectiveUntil());
+        vo.setOrderId(negotiation.getUsedOrderId());
         return vo;
+    }
+
+    private OrderInfo createPendingBargainOrder(ProductNegotiation negotiation, SecondhandProduct product, BigDecimal dealPrice) {
+        int updatedProduct = secondhandProductMapper.update(null, new UpdateWrapper<SecondhandProduct>()
+                .set("status", SECONDHAND_OFF_SHELF)
+                .eq("id", product.getId())
+                .eq("status", SECONDHAND_ON_SHELF));
+        if (updatedProduct == 0) {
+            throw new BusinessException(400, "二手商品已售出");
+        }
+
+        OrderInfo order = new OrderInfo();
+        order.setOrderNo(generateBargainOrderNo(negotiation.getBuyerUserId()));
+        order.setBuyerUserId(negotiation.getBuyerUserId());
+        order.setTotalAmount(dealPrice);
+        order.setVoucherDiscountAmount(BigDecimal.ZERO);
+        order.setSellerBearAmount(BigDecimal.ZERO);
+        order.setPlatformBearAmount(BigDecimal.ZERO);
+        order.setPayableAmount(dealPrice);
+        order.setPayStatus(0);
+        order.setOrderStatus(OrderStatusEnum.PENDING_PAY.getCode());
+        order.setCanRefund(1);
+        order.setLogisticsStatus("PENDING");
+        order.setLogisticsCurrentIndex(0);
+        order.setRemark("议价确认生成二手订单");
+        order.setCreateTime(LocalDateTime.now());
+        orderInfoMapper.insert(order);
+
+        OrderItem orderItem = new OrderItem();
+        orderItem.setOrderId(order.getId());
+        orderItem.setProductType("SECONDHAND");
+        orderItem.setProductId(product.getId());
+        orderItem.setProductName(product.getName());
+        orderItem.setPrice(dealPrice);
+        orderItem.setQuantity(1);
+        orderItem.setStatus(1);
+        orderItemMapper.insert(orderItem);
+        return order;
     }
 
     private ProductAuctionVO toAuctionVO(ProductAuction auction) {
@@ -684,7 +749,9 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                 + ",\"buyerUserId\":" + negotiation.getBuyerUserId()
                 + ",\"sellerUserId\":" + negotiation.getSellerUserId()
                 + ",\"confirmedPrice\":\"" + negotiation.getConfirmedPrice() + "\""
-                + ",\"effectiveUntil\":\"" + negotiation.getEffectiveUntil() + "\"}";
+                + ",\"effectiveUntil\":\"" + negotiation.getEffectiveUntil() + "\""
+                + (negotiation.getUsedOrderId() == null ? "" : ",\"orderId\":" + negotiation.getUsedOrderId())
+                + "}";
     }
 
     private String buildBargainRejectCardMessage(ProductNegotiation negotiation, SecondhandProduct product) {
@@ -743,6 +810,12 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
     private String generateAuctionOrderNo(Long buyerUserId) {
         Long safeUserId = buyerUserId == null ? 0L : buyerUserId;
         return "AUC" + LocalDateTime.now().format(ORDER_NO_FORMATTER)
+                + String.format(Locale.ROOT, "%04d", safeUserId % 10000);
+    }
+
+    private String generateBargainOrderNo(Long buyerUserId) {
+        Long safeUserId = buyerUserId == null ? 0L : buyerUserId;
+        return "BRG" + LocalDateTime.now().format(ORDER_NO_FORMATTER)
                 + String.format(Locale.ROOT, "%04d", safeUserId % 10000);
     }
 }

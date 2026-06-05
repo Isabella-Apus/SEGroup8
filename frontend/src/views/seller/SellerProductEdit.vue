@@ -49,14 +49,28 @@
           <span class="field-unit">件</span>
         </el-form-item>
 
-        <el-form-item label="商品分类" prop="categoryIds">
-          <el-cascader
-            v-model="form.categoryIds"
-            :options="categoryOptions"
-            :props="{ value: 'id', label: 'name', children: 'children', emitPath: true }"
-            placeholder="请选择商品分类"
-            style="width: 280px"
-          />
+        <el-form-item label="商品分类" prop="subCategoryId">
+          <div class="category-picker">
+            <el-input
+              :model-value="sellerMainCategory?.name || ''"
+              disabled
+              placeholder="主营一级类目"
+              style="width: 180px"
+            />
+            <el-select
+              v-model="form.subCategoryId"
+              :disabled="!subCategoryOptions.length"
+              placeholder="请选择二级分类"
+              style="width: 220px"
+            >
+              <el-option
+                v-for="item in subCategoryOptions"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              />
+            </el-select>
+          </div>
         </el-form-item>
 
         <el-form-item label="商品图片" prop="images">
@@ -108,6 +122,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Delete as DeleteIcon, Plus } from '@element-plus/icons-vue'
+import { useUserStore } from '@/stores/user'
 import {
   getProductDetail,
   createProduct,
@@ -121,16 +136,20 @@ const router = useRouter()
 const formRef = ref(null)
 const loading = ref(false)
 const submitting = ref(false)
-const categoryOptions = ref([])
+const categoryTree = ref([])
+const userStore = useUserStore()
 
 const isEdit = computed(() => !!route.params.id)
+const sellerMainCategory = computed(() => categoryTree.value.find((item) => Number(item.id) === Number(form.categoryId)) || null)
+const subCategoryOptions = computed(() => sellerMainCategory.value?.children || [])
 
 const form = reactive({
   name: '',
   description: '',
   price: 0.01,
   stock: 0,
-  categoryIds: [],
+  categoryId: null,
+  subCategoryId: null,
   images: []
 })
 
@@ -139,7 +158,7 @@ const rules = {
   description: [{ required: true, message: '请输入商品描述', trigger: 'blur' }],
   price: [{ required: true, message: '请输入价格', trigger: 'blur' }],
   stock: [{ required: true, message: '请输入库存', trigger: 'blur' }],
-  categoryIds: [{ required: true, message: '请选择分类', trigger: 'change' }],
+  subCategoryId: [{ required: true, message: '请选择二级分类', trigger: 'change' }],
   images: [{
     validator: (_, value, callback) => {
       if (value?.length) callback()
@@ -151,7 +170,14 @@ const rules = {
 
 async function loadCategories() {
   const res = await getCategoryTree('NEW')
-  categoryOptions.value = res.data || []
+  categoryTree.value = res.data || []
+  await userStore.fetchProfile()
+  const mainCategoryId = resolveSellerMainCategoryId(userStore.userInfo || {})
+  if (mainCategoryId) {
+    form.categoryId = mainCategoryId
+  } else {
+    ElMessage.warning('未找到店铺主营一级类目，请确认入驻资料')
+  }
 }
 
 async function loadDetail() {
@@ -164,13 +190,29 @@ async function loadDetail() {
     form.description = d.description
     form.price = d.price
     form.stock = d.stock
-    form.categoryIds = d.categoryId && d.subCategoryId ? [d.categoryId, d.subCategoryId] : []
+    if (!form.categoryId && d.categoryId) {
+      form.categoryId = d.categoryId
+    }
+    form.subCategoryId = isSubCategoryOfCurrentMain(d.subCategoryId) ? d.subCategoryId : null
     form.images = Array.isArray(d.images) && d.images.length ? [...d.images] : (d.cover ? [d.cover] : [])
   } catch (e) {
     ElMessage.error('加载商品信息失败')
   } finally {
     loading.value = false
   }
+}
+
+function resolveSellerMainCategoryId(info) {
+  const directId = Number(info.categoryId ?? info.category)
+  if (Number.isFinite(directId) && directId > 0) {
+    return directId
+  }
+  const categoryName = String(info.category || '').trim()
+  return categoryTree.value.find((item) => item.name === categoryName)?.id || null
+}
+
+function isSubCategoryOfCurrentMain(subCategoryId) {
+  return subCategoryOptions.value.some((item) => Number(item.id) === Number(subCategoryId))
 }
 
 function toFullImageUrl(url) {
@@ -228,8 +270,8 @@ async function handleSubmit() {
         stock: form.stock,
         cover: form.images[0] || '',
         images: [...form.images],
-        categoryId: form.categoryIds?.[0],
-        subCategoryId: form.categoryIds?.[1],
+        categoryId: form.categoryId,
+        subCategoryId: form.subCategoryId,
         status: 1
       }
       if (isEdit.value) {
@@ -270,6 +312,12 @@ onMounted(async () => {
 .field-unit {
   margin-left: 8px;
   color: #999;
+}
+
+.category-picker {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .image-uploader {

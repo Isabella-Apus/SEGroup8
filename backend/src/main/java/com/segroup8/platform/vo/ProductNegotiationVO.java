@@ -14,6 +14,7 @@ public class ProductNegotiationVO {
     private String status;
     private LocalDateTime effectiveFrom;
     private LocalDateTime effectiveUntil;
+    private Long orderId;
 
     public Long getId() {
         return id;
@@ -85,5 +86,13 @@ public class ProductNegotiationVO {
 
     public void setEffectiveUntil(LocalDateTime effectiveUntil) {
         this.effectiveUntil = effectiveUntil;
+    }
+
+    public Long getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Long orderId) {
+        this.orderId = orderId;
     }
 }

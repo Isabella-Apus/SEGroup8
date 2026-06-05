@@ -36,6 +36,7 @@
               size="small"
               type="primary"
               :loading="actionLoadingKey === `confirm-${request.id}`"
+              :disabled="isBargainActionPending(request)"
               @click="handleConfirmBargain(request)"
             >
               同意生成订单
@@ -43,6 +44,7 @@
             <el-button
               size="small"
               :loading="actionLoadingKey === `reject-${request.id}`"
+              :disabled="isBargainActionPending(request)"
               @click="handleRejectBargain(request)"
             >
               拒绝
@@ -549,7 +551,23 @@ async function submitDescriptionUpdate() {
   }
 }
 
+function canHandleBargain(request) {
+  const status = String(request?.status || "").toUpperCase();
+  return status === "PENDING" || status === "APPLIED";
+}
+
+function isBargainActionPending(request) {
+  return actionLoadingKey.value === `confirm-${request?.id}` || actionLoadingKey.value === `reject-${request?.id}`;
+}
+
+function removePendingBargain(id) {
+  pendingBargains.value = pendingBargains.value.filter((item) => Number(item.id) !== Number(id));
+}
+
 async function handleConfirmBargain(request) {
+  if (!canHandleBargain(request) || isBargainActionPending(request) || actionLoadingKey.value) {
+    return;
+  }
   actionLoadingKey.value = `confirm-${request.id}`;
   try {
     await confirmBargainApi({
@@ -558,6 +576,7 @@ async function handleConfirmBargain(request) {
       createOrder: true,
     });
     ElMessage.success("已同意议价，并生成二手订单");
+    removePendingBargain(request.id);
     await Promise.all([fetchPendingBargains(), fetchList(false)]);
   } finally {
     actionLoadingKey.value = "";
@@ -565,10 +584,14 @@ async function handleConfirmBargain(request) {
 }
 
 async function handleRejectBargain(request) {
+  if (!canHandleBargain(request) || isBargainActionPending(request) || actionLoadingKey.value) {
+    return;
+  }
   actionLoadingKey.value = `reject-${request.id}`;
   try {
     await rejectBargainApi(request.id);
     ElMessage.success("已拒绝议价");
+    removePendingBargain(request.id);
     await fetchPendingBargains();
   } finally {
     actionLoadingKey.value = "";

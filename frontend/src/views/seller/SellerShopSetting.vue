@@ -196,13 +196,14 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
-import { uploadImage, updateShopProfile } from '@/api/seller'
+import { getCategoryTree, uploadImage, updateShopProfile } from '@/api/seller'
 
 const userStore = useUserStore()
 const formRef = ref(null)
 const loading = ref(false)
 const submitting = ref(false)
 const activeTab = ref('basic')
+const categoryTree = ref([])
 
 const form = reactive({
   shopName: '',
@@ -248,11 +249,15 @@ function toFullUrl(url) {
 async function loadShopInfo() {
   loading.value = true
   try {
-    await userStore.fetchProfile()
+    const [categoryResult] = await Promise.all([
+      getCategoryTree('NEW'),
+      userStore.fetchProfile()
+    ])
+    categoryTree.value = categoryResult.data || []
     const info = userStore.userInfo || {}
     form.shopName = info.shopName || info.nickname || ''
     form.shopDesc = info.shopDesc || ''
-    form.category = info.category || ''
+    form.category = resolveCategoryName(info)
     form.phone = info.phone || ''
     form.region = info.region || ''
     form.shopContactName = info.shopContactName || ''
@@ -271,6 +276,14 @@ async function loadShopInfo() {
   } finally {
     loading.value = false
   }
+}
+
+function resolveCategoryName(info) {
+  const directId = Number(info.categoryId ?? info.category)
+  if (Number.isFinite(directId) && directId > 0) {
+    return categoryTree.value.find((item) => Number(item.id) === directId)?.name || String(directId)
+  }
+  return info.category || ''
 }
 
 function beforeUpload(file) {

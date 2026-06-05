@@ -14,6 +14,7 @@ public class Notification {
     private Long userId;
     private String title;
     private String content;
+    private String targetPath;
     private Integer isRead;
     private LocalDateTime createTime;
 
@@ -47,6 +48,14 @@ public class Notification {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getTargetPath() {
+        return targetPath;
+    }
+
+    public void setTargetPath(String targetPath) {
+        this.targetPath = targetPath;
     }
 
     public Integer getIsRead() {

@@ -99,11 +99,14 @@ CREATE TABLE `shop` (
   `id` BIGINT PRIMARY KEY,
   `owner_user_id` BIGINT,
   `name` VARCHAR(80),
+  `logo` VARCHAR(255),
+  `description` VARCHAR(255),
   `region` VARCHAR(100),
   `contact_name` VARCHAR(50),
   `contact_phone` VARCHAR(30),
   `id_card_no_masked` VARCHAR(50),
   `warehouse_addr` VARCHAR(255),
+  `decoration_json` TEXT,
   `status` TINYINT,
   `create_time` TIMESTAMP,
   `update_time` TIMESTAMP
@@ -162,6 +165,7 @@ CREATE TABLE `notification` (
   `user_id` BIGINT,
   `title` VARCHAR(100),
   `content` VARCHAR(500),
+  `target_path` VARCHAR(255),
   `is_read` INT DEFAULT 0,
   `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

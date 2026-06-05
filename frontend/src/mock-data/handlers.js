@@ -981,14 +981,14 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
             source: "BARGAIN",
         });
         negotiation.confirmedPrice = confirmedPrice;
-        negotiation.status = "ORDER_CREATED";
-        negotiation.statusName = "卖家已同意，订单已创建";
+        negotiation.status = "USED";
+        negotiation.statusName = "已生成订单";
         negotiation.orderId = order.id;
         negotiation.orderNo = order.orderNo;
         negotiation.updateTime = new Date().toISOString();
         appendNegotiationDecisionMessage(
             negotiation,
-            `我已同意 ¥${confirmedPrice.toFixed(2)} 的议价，系统已生成二手订单，请到我的订单里查看。`,
+            `[BARGAIN_CONFIRM]{"negotiationId":${negotiation.id},"productId":${negotiation.productId},"productName":"${String(item.name || "").replace(/\\/g, "\\\\").replace(/"/g, "\\\"")}","buyerUserId":${negotiation.buyerUserId},"sellerUserId":${negotiation.sellerUserId},"confirmedPrice":"${confirmedPrice.toFixed(2)}","effectiveUntil":"${negotiation.effectiveUntil || new Date(Date.now() + 24 * 3600 * 1000).toISOString()}","orderId":${order.id}}`,
         );
         return ok(negotiationVO(negotiation));
     }
@@ -1717,6 +1717,22 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
         conversation.lastMessageContent = content;
         conversation.lastMessageTime = message.createTime;
         conversation.unreadByUserId = targetId || 0;
+        if (targetId) {
+            const targetUser = mockStore.users.find((item) => Number(item.id) === Number(targetId));
+            const senderName = user.nickname || user.username || `用户${user.id}`;
+            mockStore.notifications.unshift({
+                id: mockStore.next.notificationId++,
+                userId: targetId,
+                title: "新消息",
+                content: `用户${senderName}给你发了一条消息`,
+                targetPath: targetUser?.role === "OFFICIAL_SELLER"
+                    ? `/merchant/messages?conversationId=${conversationId}`
+                    : `/messages?conversationId=${conversationId}`,
+                scope: targetUser?.role === "OFFICIAL_SELLER" ? "seller" : "buyer",
+                isRead: 0,
+                createTime: message.createTime,
+            });
+        }
         return ok(message);
     }
 

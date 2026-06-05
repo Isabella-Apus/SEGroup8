@@ -7,6 +7,7 @@ public class NotificationVO {
     private Long id;
     private String title;
     private String content;
+    private String targetPath;
     private String scope;
     private Integer isRead;
     private LocalDateTime createTime;
@@ -33,6 +34,14 @@ public class NotificationVO {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getTargetPath() {
+        return targetPath;
+    }
+
+    public void setTargetPath(String targetPath) {
+        this.targetPath = targetPath;
     }
 
     public String getScope() {

@@ -19,8 +19,8 @@
                 </el-form-item>
                 <el-form-item label="主营领域" prop="categoryId">
                     <el-select v-model="form.categoryId" placeholder="请选择主营领域" style="width: 100%">
-                        <el-option v-for="item in categoryOptions" :key="item.value" :label="item.label"
-                            :value="item.value" />
+                        <el-option v-for="item in categoryOptions" :key="item.id" :label="item.name"
+                            :value="item.id" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="负责人姓名" prop="contactName">
@@ -80,6 +80,7 @@ import { useRouter } from "vue-router";
 import { getMyMerchantApplicationApi, submitMerchantApplicationApi } from "@/api/merchantApplication";
 import { uploadImageApi } from "@/api/upload";
 import { useUserStore } from "@/stores/user";
+import { getCategoryTree } from "@/api/seller";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -89,13 +90,7 @@ const uploading = ref(false);
 const myApplication = ref(null);
 const isOfficialSeller = ref(false);
 
-const categoryOptions = [
-    { label: "食品", value: 1 },
-    { label: "3C", value: 2 },
-    { label: "美妆", value: 3 },
-    { label: "服装", value: 4 },
-    { label: "运动", value: 5 }
-];
+const categoryOptions = ref([]);
 
 const provinceOptions = [
     "北京市", "天津市", "上海市", "重庆市",
@@ -110,7 +105,7 @@ const provinceOptions = [
 
 const form = reactive({
     storeName: "",
-    categoryId: 1,
+    categoryId: null,
     idCardNo: "",
     bankCardNo: "",
     licenseImg: "",
@@ -138,7 +133,18 @@ const rules = {
     ]
 };
 
-onMounted(loadMyApplication);
+onMounted(async () => {
+    await loadCategories();
+    await loadMyApplication();
+});
+
+async function loadCategories() {
+    const result = await getCategoryTree("NEW");
+    categoryOptions.value = result.data || [];
+    if (!form.categoryId && categoryOptions.value.length) {
+        form.categoryId = categoryOptions.value[0].id;
+    }
+}
 
 async function loadMyApplication() {
     try {
@@ -151,7 +157,7 @@ async function loadMyApplication() {
         if (result.data) {
             Object.assign(form, {
                 storeName: result.data.storeName || "",
-                categoryId: result.data.categoryId || 1,
+                categoryId: result.data.categoryId || categoryOptions.value[0]?.id || null,
                 licenseImg: result.data.licenseImg || "",
                 warehouseAddr: result.data.warehouseAddr || "",
                 warehouseProvince: result.data.warehouseProvince || "",

@@ -1,276 +1,464 @@
 <template>
-    <div class="auth-minimal">
-        <div class="ambient ambient-one"></div>
-        <div class="ambient ambient-two"></div>
-        <div class="ambient ambient-three"></div>
-        
-        <div class="scan-beam" aria-hidden="true"></div>
-        <main class="minimal-card">
-            <div class="trace-ring" aria-hidden="true"></div>
-            <button class="minimal-brand" type="button" @click="router.push('/')">
-                <span>kg</span>
-                <strong>kinda goods</strong>
-            </button>
+  <div class="auth-page">
+    <header class="auth-top">
+      <button class="brand-link" type="button" @click="router.push('/')">
+        <img :src="logoUrl" alt="Kinda Goods" />
+      </button>
+    </header>
 
-            <section class="minimal-form">
-                <p>欢迎回来</p>
-                <h1>登录</h1>
+    <main class="auth-layout fade-in-up">
+      <section class="auth-copy" aria-labelledby="auth-title">
+        <p class="auth-eyebrow">Kinda Goods</p>
+        <h1 id="auth-title">欢迎回来</h1>
+        <p class="auth-lede">Kinda Goods 是面向校园用户的综合交易平台，支持新品选购、闲置转让、卖家入驻与订单售后。</p>
+        <div class="gradient-line" aria-hidden="true"></div>
+      </section>
 
-                <el-form :model="form" label-position="top" @submit.prevent>
-                    <el-form-item label="账号">
-                        <el-input v-model="form.username" placeholder="username" size="large" />
-                    </el-form-item>
-                    <el-form-item label="密码">
-                        <el-input v-model="form.password" type="password" show-password placeholder="password" size="large" />
-                    </el-form-item>
-                    <el-button class="minimal-submit" type="primary" :loading="loading" @click="handleLogin">
-                        继续
-                    </el-button>
-                </el-form>
+      <section class="login-box" aria-labelledby="login-title">
+        <div class="login-head">
+          <img class="brand-mark" :src="logoUrl" alt="Kinda Goods" />
+          <h2 id="login-title">登录 Kinda Goods</h2>
+        </div>
 
-                <div class="minimal-switch">
-                    <span>没有账号？</span>
-                    <button type="button" @click="router.push('/register')">创建一个</button>
-                </div>
-            </section>
-        </main>
-    </div>
+        <el-form class="login-form" :model="form" label-position="top" @submit.prevent @keyup.enter="handleLogin">
+          <el-form-item label="账号">
+            <el-input v-model="form.username" placeholder="请输入账号" size="large">
+              <template #prefix>
+                <el-icon>
+                  <User />
+                </el-icon>
+              </template>
+            </el-input>
+          </el-form-item>
+          <el-form-item label="密码">
+            <el-input v-model="form.password" type="password" show-password placeholder="请输入密码" size="large">
+              <template #prefix>
+                <el-icon>
+                  <Lock />
+                </el-icon>
+              </template>
+            </el-input>
+          </el-form-item>
+
+          <el-button class="login-submit" type="primary" :loading="loading" @click="handleLogin">
+            <span>登录</span>
+            <el-icon>
+              <ArrowRight />
+            </el-icon>
+          </el-button>
+        </el-form>
+
+        <div class="auth-switch">
+          <span>还没有账号？</span>
+          <button type="button" @click="router.push('/register')">创建账号</button>
+        </div>
+      </section>
+    </main>
+  </div>
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
-import { ElMessage } from 'element-plus';
-import { useRouter } from 'vue-router';
-import { useUserStore } from '@/stores/user';
+import { computed, reactive, ref } from "vue";
+import { ElMessage } from "element-plus";
+import { ArrowRight, Lock, User } from "@element-plus/icons-vue";
+import { useRoute, useRouter } from "vue-router";
+import { useUserStore } from "@/stores/user";
+import logoUrl from "@/assets/kinda-goods-logo.svg";
 
 const router = useRouter();
+const route = useRoute();
 const userStore = useUserStore();
 const loading = ref(false);
+
 const form = reactive({
-    username: 'user',
-    password: 'user123'
+  username: "user",
+  password: "user123",
+});
+
+const redirectPath = computed(() => {
+  const value = route.query.redirect;
+  if (typeof value !== "string" || !value.startsWith("/") || value.startsWith("//") || value === "/login") {
+    return "";
+  }
+  return value;
 });
 
 async function handleLogin() {
-    if (!form.username || !form.password) {
-        ElMessage.warning('请填写完整账号密码');
-        return;
+  if (!form.username || !form.password) {
+    ElMessage.warning("请填写完整账号密码");
+    return;
+  }
+  loading.value = true;
+  try {
+    const userInfo = await userStore.login(form);
+    ElMessage.success("登录成功");
+    if (redirectPath.value) {
+      router.push(redirectPath.value);
+      return;
     }
-    loading.value = true;
-    try {
-        const userInfo = await userStore.login(form);
-        ElMessage.success('登录成功');
-        if (userInfo.role === 'ADMIN') {
-            router.push('/admin');
-            return;
-        }
-        if (userInfo.role === 'OFFICIAL_SELLER' || userInfo.role === 'SELLER') {
-            router.push('/merchant');
-            return;
-        }
-        router.push('/');
-    } finally {
-        loading.value = false;
+    if (userInfo.role === "ADMIN") {
+      router.push("/admin");
+      return;
     }
+    if (userInfo.role === "OFFICIAL_SELLER" || userInfo.role === "SELLER") {
+      router.push("/merchant");
+      return;
+    }
+    router.push("/");
+  } finally {
+    loading.value = false;
+  }
 }
 </script>
 
 <style scoped>
-.auth-minimal {
-    min-height: 100vh;
-    position: relative;
-    display: grid;
-    place-items: center;
-    overflow: hidden;
-    padding: 28px;
-    background:
-        radial-gradient(circle at 14% 16%, rgba(255, 225, 0, 0.22), transparent 28%),
-        radial-gradient(circle at 88% 18%, rgba(61, 214, 185, 0.2), transparent 28%),
-        radial-gradient(circle at 76% 86%, rgba(255, 113, 91, 0.16), transparent 32%),
-        linear-gradient(135deg, #fbfaf4 0%, #eef5f2 48%, #f6f1ec 100%);
+.auth-page {
+  min-height: 100vh;
+  padding: 26px;
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(120deg, rgba(95, 230, 189, 0.12), rgba(137, 199, 255, 0.12) 44%, rgba(255, 185, 214, 0.1)),
+    linear-gradient(180deg, #fbfffd 0%, #f6fbff 54%, #fff9fc 100%);
 }
 
-.auth-minimal::before {
-    position: absolute;
-    inset: 0;
-    content: "";
-    background-image:
-        linear-gradient(rgba(21, 29, 43, 0.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(21, 29, 43, 0.045) 1px, transparent 1px);
-    background-size: 54px 54px;
-    mask-image: radial-gradient(circle at center, black, transparent 74%);
+.auth-page::before {
+  content: "";
+  position: absolute;
+  inset: -26%;
+  background: conic-gradient(from 150deg at 50% 48%,
+      rgba(95, 230, 189, 0.16),
+      rgba(137, 199, 255, 0.18),
+      rgba(255, 185, 214, 0.13),
+      rgba(95, 230, 189, 0.16));
+  filter: blur(52px);
+  opacity: 0.75;
+  pointer-events: none;
+  transform: translate3d(0, 0, 0);
 }
 
-.ambient {
-    position: absolute;
-    width: 420px;
-    height: 420px;
-    border-radius: 50%;
-    filter: blur(22px);
-    opacity: 0.5;
-    animation: drift 12s ease-in-out infinite alternate;
+.auth-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(18, 50, 65, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 50, 65, 0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(180deg, transparent, #000 24%, #000 72%, transparent);
+  pointer-events: none;
 }
 
-.ambient-one {
-    left: 14%;
-    top: 14%;
-    background: linear-gradient(135deg, rgba(255, 225, 0, 0.58), rgba(255, 166, 0, 0.24));
+@media (prefers-reduced-motion: no-preference) {
+  .auth-page::before {
+    animation: auth-gradient-drift 18s ease-in-out infinite alternate;
+  }
 }
 
-.ambient-two {
-    right: 12%;
-    bottom: 10%;
-    background: linear-gradient(135deg, rgba(39, 201, 178, 0.38), rgba(44, 65, 94, 0.14));
-    animation-delay: -4s;
+@keyframes auth-gradient-drift {
+  from {
+    transform: translate3d(-1.5%, -1%, 0) rotate(-2deg);
+  }
+
+  to {
+    transform: translate3d(1.5%, 1%, 0) rotate(2deg);
+  }
 }
 
-.ambient-three {
-    width: 300px;
-    height: 300px;
-    right: 24%;
-    top: 18%;
-    background: linear-gradient(135deg, rgba(255, 116, 91, 0.24), rgba(143, 107, 255, 0.16));
-    animation-delay: -8s;
+.auth-top {
+  width: min(1040px, 100%);
+  min-height: 56px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
 }
 
-.minimal-card {
-    position: relative;
-    z-index: 1;
-    width: min(430px, 100%);
-    min-height: 560px;
-    border: 1px solid rgba(255, 255, 255, 0.82);
-    border-radius: 32px;
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.68)),
-        radial-gradient(circle at 50% 0%, rgba(255, 225, 0, 0.16), transparent 40%);
-    backdrop-filter: blur(28px) saturate(1.15);
-    box-shadow:
-        0 34px 90px rgba(27, 34, 44, 0.16),
-        0 1px 0 rgba(255, 255, 255, 0.9) inset;
-    animation: cardIn 0.42s ease both;
+.brand-link {
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
 }
 
-.minimal-brand {
-    align-self: center;
-    border: 0;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: transparent;
-    color: #161a22;
-    cursor: pointer;
+.brand-link {
+  width: 158px;
+  height: 56px;
+  padding: 4px 0;
 }
 
-.minimal-brand span {
-    width: 42px;
-    height: 42px;
-    display: grid;
-    place-items: center;
-    border: 2px solid rgba(22, 26, 34, 0.86);
-    background: linear-gradient(135deg, #ffe100, #ff9d5c);
-    border-radius: 14px;
-    font-weight: 900;
-    font-size: 17px;
-    letter-spacing: 0;
-    text-transform: lowercase;
+.brand-link img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: left center;
 }
 
-.minimal-brand strong {
-    font-size: 18px;
-    font-weight: 900;
+.auth-layout {
+  width: min(980px, 100%);
+  min-height: calc(100vh - 116px);
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 396px;
+  align-items: center;
+  gap: clamp(52px, 9vw, 112px);
 }
 
-.minimal-form {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+.auth-copy {
+  min-width: 0;
+  padding-bottom: 26px;
 }
 
-.minimal-form p {
-    margin: 0 0 6px;
-    color: #697380;
+.auth-eyebrow {
+  margin: 0;
+  color: var(--brand-primary);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.auth-copy h1 {
+  margin: 18px 0 18px;
+  color: var(--text-main);
+  font-size: clamp(48px, 6vw, 70px);
+  line-height: 1.06;
+  letter-spacing: 0;
+}
+
+.auth-lede {
+  max-width: 430px;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 18px;
+  line-height: 1.75;
+  font-weight: 650;
+}
+
+.gradient-line {
+  width: min(360px, 68%);
+  height: 4px;
+  margin-top: 34px;
+  border-radius: 999px;
+  background: var(--brand-gradient);
+  box-shadow: 0 12px 26px rgba(40, 124, 255, 0.16);
+}
+
+.login-box {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(137, 199, 255, 0.34);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.91);
+  padding: 36px 34px 30px;
+  box-shadow:
+    0 28px 70px rgba(40, 124, 255, 0.12),
+    0 2px 0 rgba(255, 255, 255, 0.9) inset;
+  backdrop-filter: blur(18px);
+}
+
+.login-box::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--brand-gradient);
+}
+
+.login-head {
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.brand-mark {
+  width: 96px;
+  height: 52px;
+  margin-bottom: 20px;
+  display: block;
+  object-fit: contain;
+}
+
+.login-head h2 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 26px;
+  line-height: 1.22;
+  letter-spacing: 0;
+}
+
+.login-form {
+  display: grid;
+  gap: 8px;
+}
+
+.login-form :deep(.el-form-item) {
+  margin-bottom: 14px;
+}
+
+.login-form :deep(.el-form-item__label) {
+  color: var(--text-main);
+  font-weight: 800;
+  line-height: 1.2;
+  padding-bottom: 9px;
+}
+
+.login-form :deep(.el-input__wrapper) {
+  min-height: 52px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 0 0 1px var(--line-soft) inset;
+  transition:
+    box-shadow 0.18s ease,
+    background 0.18s ease;
+}
+
+.login-form :deep(.el-input__wrapper:hover) {
+  box-shadow: 0 0 0 1px rgba(60, 146, 255, 0.38) inset;
+}
+
+.login-form :deep(.el-input__wrapper.is-focus) {
+  box-shadow:
+    0 0 0 1px var(--brand-primary) inset,
+    0 10px 22px rgba(137, 199, 255, 0.16);
+}
+
+.login-form :deep(.el-input__prefix) {
+  color: var(--brand-primary);
+}
+
+.login-submit {
+  width: 100%;
+  height: 52px;
+  margin-top: 2px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--brand-gradient-strong);
+  box-shadow: 0 16px 32px rgba(40, 124, 255, 0.2);
+  color: #ffffff;
+  display: inline-flex;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 900;
+  transition:
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+
+.login-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 36px rgba(40, 124, 255, 0.24);
+}
+
+.auth-switch {
+  margin-top: 24px;
+  border-top: 1px solid var(--line-soft);
+  padding-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.auth-switch button {
+  border: 0;
+  border-radius: 6px;
+  padding: 6px 0;
+  background: transparent;
+  color: var(--brand-primary);
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.auth-switch button:hover {
+  color: var(--brand-primary-dark);
+}
+
+@media (max-width: 860px) {
+  .auth-layout {
+    min-height: auto;
+    padding: 42px 0 28px;
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .auth-copy {
+    order: 2;
+    padding-bottom: 0;
     text-align: center;
-    font-weight: 700;
+  }
+
+  .login-box {
+    order: 1;
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  .auth-copy h1 {
+    font-size: 44px;
+  }
+
+  .auth-lede {
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .gradient-line {
+    margin-inline: auto;
+  }
 }
 
-.minimal-form h1 {
-    margin: 0 0 32px;
-    color: #151923;
-    text-align: center;
-    font-size: 34px;
-    letter-spacing: 0;
-}
+@media (max-width: 560px) {
+  .auth-page {
+    padding: 16px;
+  }
 
-.minimal-form :deep(.el-form-item__label) {
-    color: #4a5361;
-    font-weight: 800;
-}
+  .auth-top {
+    min-height: 50px;
+  }
 
-.minimal-form :deep(.el-input__wrapper) {
-    min-height: 48px;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.82);
-    box-shadow: 0 0 0 1px rgba(28, 39, 55, 0.09) inset;
-}
+  .brand-link {
+    width: 142px;
+    height: 50px;
+  }
 
-.minimal-form :deep(.el-input__wrapper.is-focus) {
-    box-shadow:
-        0 0 0 2px rgba(255, 225, 0, 0.86) inset,
-        0 0 0 5px rgba(61, 214, 185, 0.14);
-}
+  .auth-layout {
+    padding-top: 24px;
+  }
 
-.minimal-submit {
-    width: 100%;
-    height: 48px;
-    margin-top: 8px;
-    border-radius: 999px;
-    font-size: 16px;
-    font-weight: 900;
-    border: 0;
-    color: #171b22;
-    background: linear-gradient(135deg, #ffe45c 0%, #ffc83d 58%, #72dfca 100%);
-    box-shadow: 0 14px 28px rgba(255, 189, 35, 0.22);
-}
+  .login-box {
+    padding: 30px 22px 24px;
+  }
 
-.minimal-switch {
-    margin-top: 22px;
-    display: flex;
+  .brand-mark {
+    margin-bottom: 15px;
+  }
+
+  .login-head h2 {
+    font-size: 23px;
+  }
+
+  .auth-copy h1 {
+    font-size: 38px;
+  }
+
+  .auth-lede {
+    font-size: 15px;
+  }
+
+  .auth-switch {
     justify-content: center;
-    gap: 8px;
-    color: #68727f;
-}
-
-.minimal-switch button {
-    border: 0;
-    padding: 0;
-    background: transparent;
-    color: #151923;
-    cursor: pointer;
-    font-weight: 900;
-}
-
-@keyframes drift {
-    from {
-        transform: translate3d(-24px, -18px, 0) scale(0.96);
-    }
-    to {
-        transform: translate3d(24px, 18px, 0) scale(1.05);
-    }
-}
-
-@keyframes cardIn {
-    from {
-        opacity: 0;
-        transform: translateY(14px) scale(0.98);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+    flex-wrap: wrap;
+  }
 }
 </style>

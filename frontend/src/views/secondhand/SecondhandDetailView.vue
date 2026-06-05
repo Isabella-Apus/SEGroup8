@@ -109,9 +109,6 @@
           <el-button type="primary" size="large" @click="handleContactSeller">
             聊一聊
           </el-button>
-          <el-button size="large" :disabled="!canBuy" @click="handleWant">
-            我想要
-          </el-button>
           <el-button type="warning" size="large" :disabled="!canBuyOnePrice" @click="handleBuyNow">
             立即购买
           </el-button>
@@ -464,19 +461,6 @@ async function confirmBuyWithAddress() {
   } finally {
     buySubmitting.value = false;
   }
-}
-
-function handleWant() {
-  if (!canBuyOnePrice.value) {
-    ElMessage.warning("当前商品暂不可加入想买清单");
-    return;
-  }
-  if (!canChatWithSeller.value) {
-    ElMessage.warning("这是你自己的闲置，不能加入想买清单");
-    return;
-  }
-  addSecondhandToCart(item.value);
-  ElMessage.success("已加入想买清单，可在购物车中统一结算");
 }
 
 function handleAddToSecondhandCart() {

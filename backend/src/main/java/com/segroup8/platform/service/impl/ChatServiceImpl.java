@@ -18,6 +18,7 @@ import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserBlockMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.ChatService;
+import com.segroup8.platform.service.NotificationService;
 import com.segroup8.platform.vo.ChatConversationVO;
 import com.segroup8.platform.vo.ChatMessageVO;
 import com.segroup8.platform.vo.ChatParticipantVO;
@@ -44,6 +45,7 @@ public class ChatServiceImpl implements ChatService {
     private final ShopMapper shopMapper;
     private final SecondhandProductMapper secondhandProductMapper;
     private final UserBlockMapper userBlockMapper;
+    private final NotificationService notificationService;
 
     public ChatServiceImpl(ChatConversationMapper chatConversationMapper,
             ChatMessageMapper chatMessageMapper,
@@ -51,7 +53,8 @@ public class ChatServiceImpl implements ChatService {
             ProductMapper productMapper,
             ShopMapper shopMapper,
             SecondhandProductMapper secondhandProductMapper,
-            UserBlockMapper userBlockMapper) {
+            UserBlockMapper userBlockMapper,
+            NotificationService notificationService) {
         this.chatConversationMapper = chatConversationMapper;
         this.chatMessageMapper = chatMessageMapper;
         this.userMapper = userMapper;
@@ -59,6 +62,7 @@ public class ChatServiceImpl implements ChatService {
         this.shopMapper = shopMapper;
         this.secondhandProductMapper = secondhandProductMapper;
         this.userBlockMapper = userBlockMapper;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -170,7 +174,30 @@ public class ChatServiceImpl implements ChatService {
         chatConversationMapper.updateById(conversation);
 
         Map<Long, User> userMap = loadConversationUsers(List.of(conversation));
+        createMessageNotification(senderUserId, receiverUserId, conversationId, userMap.get(senderUserId), userMap.get(receiverUserId));
         return toMessageVO(message, userMap);
+    }
+
+    private void createMessageNotification(Long senderUserId, Long receiverUserId, Long conversationId, User sender, User receiver) {
+        if (receiverUserId == null || Objects.equals(senderUserId, receiverUserId)) {
+            return;
+        }
+        String senderName = sender != null && StringUtils.hasText(sender.getNickname())
+                ? sender.getNickname().trim()
+                : sender != null && StringUtils.hasText(sender.getUsername())
+                        ? sender.getUsername().trim()
+                        : "用户" + senderUserId;
+        notificationService.createNotification(
+                receiverUserId,
+                "新消息",
+                "用户" + senderName + "给你发了一条消息",
+                buildMessageTargetPath(receiver, conversationId));
+    }
+
+    private String buildMessageTargetPath(User receiver, Long conversationId) {
+        String role = receiver != null && StringUtils.hasText(receiver.getRole()) ? receiver.getRole().trim() : "";
+        String basePath = RoleEnum.OFFICIAL_SELLER.name().equals(role) ? "/merchant/messages" : "/messages";
+        return basePath + "?conversationId=" + conversationId;
     }
 
     private ChatConversation requireConversationParticipant(Long currentUserId, Long conversationId) {

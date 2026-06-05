@@ -13,4 +13,6 @@ public interface NotificationService {
     void markAllRead(Long userId, String scope);
 
     NotificationVO createNotification(Long userId, String title, String content);
+
+    NotificationVO createNotification(Long userId, String title, String content, String targetPath);
 }

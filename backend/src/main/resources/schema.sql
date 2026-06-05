@@ -1088,11 +1088,27 @@ CREATE TABLE IF NOT EXISTS `notification` (
   `user_id` BIGINT NOT NULL,
   `title` VARCHAR(100) NOT NULL,
   `content` VARCHAR(500) NOT NULL,
+  `target_path` VARCHAR(255) DEFAULT NULL,
   `is_read` TINYINT NOT NULL DEFAULT 0,
   `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_notification_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @col_exists := (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'notification'
+    AND COLUMN_NAME = 'target_path'
+);
+SET @sql := IF(
+  @col_exists = 0,
+  'ALTER TABLE `notification` ADD COLUMN `target_path` VARCHAR(255) DEFAULT NULL AFTER `content`',
+  'SELECT 1'
+);
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
 
 CREATE TABLE IF NOT EXISTS `admin_audit_log` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,

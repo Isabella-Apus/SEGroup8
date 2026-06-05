@@ -14,6 +14,8 @@ public class BargainConfirmRequest {
     @DecimalMin(value = "0.01", message = "确认价格必须大于0")
     private BigDecimal confirmedPrice;
 
+    private Boolean createOrder;
+
     public Long getNegotiationId() {
         return negotiationId;
     }
@@ -28,5 +30,13 @@ public class BargainConfirmRequest {
 
     public void setConfirmedPrice(BigDecimal confirmedPrice) {
         this.confirmedPrice = confirmedPrice;
+    }
+
+    public Boolean getCreateOrder() {
+        return createOrder;
+    }
+
+    public void setCreateOrder(Boolean createOrder) {
+        this.createOrder = createOrder;
     }
 }

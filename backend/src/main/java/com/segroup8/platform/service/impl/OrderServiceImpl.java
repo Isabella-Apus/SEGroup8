@@ -1261,4 +1261,45 @@ public class OrderServiceImpl implements OrderService {
                 "管理员已同意退款");
         return buildOrderVO(order, items);
     }
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public OrderVO rejectRefundByAdmin(Long orderId, Long adminUserId, String remark) {
+        OrderInfo order = orderInfoMapper.selectById(orderId);
+        if (order == null) {
+            throw new BusinessException(404, "订单不存在");
+        }
+        OrderStateMachine.assertRefundActionAllowed(order, OrderStateMachine.RefundAction.REJECT, "当前无可处理退款申请");
+
+        List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
+                .eq(OrderItem::getOrderId, order.getId())
+                .orderByAsc(OrderItem::getId));
+        LocalDateTime now = LocalDateTime.now();
+        Integer version = normalizeVersion(order);
+        Long operatorId = adminUserId == null ? 0L : adminUserId;
+        String decisionRemark = StringUtils.hasText(remark) ? remark.trim() : "管理员拒绝退款";
+
+        int updated = orderInfoMapper.update(null, new UpdateWrapper<OrderInfo>()
+                .set("refund_status", RefundStatusEnum.REJECTED.getCode())
+                .set("refund_decision_time", now)
+                .set("refund_decision_user_id", operatorId)
+                .set("refund_decision_remark", decisionRemark)
+                .set("refund_decision_source", RefundDecisionSourceEnum.ADMIN.name())
+                .setSql("version = version + 1")
+                .eq("id", orderId)
+                .eq("refund_status", RefundStatusEnum.PROCESSING.getCode())
+                .eq("version", version));
+        if (updated == 0) {
+            throw new BusinessException(400, "当前无可处理退款申请");
+        }
+
+        order.setRefundStatus(RefundStatusEnum.REJECTED.getCode());
+        order.setRefundDecisionTime(now);
+        order.setRefundDecisionUserId(operatorId);
+        order.setRefundDecisionRemark(decisionRemark);
+        order.setRefundDecisionSource(RefundDecisionSourceEnum.ADMIN.name());
+        insertAfterSaleLog(orderId, AfterSaleActionEnum.REJECT, operatorId, OperatorRoleEnum.ADMIN, decisionRemark);
+        pushOrderRealtime(orderId, order.getBuyerUserId(), resolveSellerUserIds(orderId), "AFTER_SALE_UPDATED",
+                "管理员已拒绝退款申请");
+        return buildOrderVO(order, items);
+    }
 }

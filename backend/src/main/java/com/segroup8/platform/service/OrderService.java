@@ -37,6 +37,8 @@ public interface OrderService {
 
     OrderVO rejectRefundBySeller(Long orderId);
 
+    OrderVO rejectRefundByAdmin(Long orderId, Long adminUserId, String remark);
+
     PageVO<OrderVO> pageSellerOrders(OrderPageQueryRequest request);
 
     OrderVO getSellerOrderDetail(Long orderId);

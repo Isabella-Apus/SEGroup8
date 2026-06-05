@@ -55,40 +55,6 @@
           </div>
         </header>
 
-        <div v-if="bargainRequests.length" class="trade-panel">
-          <article v-for="request in bargainRequests" :key="request.id" class="trade-card">
-            <div class="trade-copy">
-              <span>{{ request.statusName || request.status }}</span>
-              <strong>{{ request.buyerName || "买家" }} 出价 ¥{{ Number(request.proposedPrice || 0).toFixed(2) }}</strong>
-              <small>{{ request.productName || activeConversation.sourceTitle }}</small>
-            </div>
-            <div class="trade-actions">
-              <template v-if="request.status === 'PENDING' && isSellerForBargain(request)">
-                <el-button
-                  size="small"
-                  type="primary"
-                  :loading="actionLoadingKey === `confirm-${request.id}`"
-                  @click="handleConfirmBargain(request)"
-                >
-                  同意并生成订单
-                </el-button>
-                <el-button
-                  size="small"
-                  :loading="actionLoadingKey === `reject-${request.id}`"
-                  @click="handleRejectBargain(request)"
-                >
-                  拒绝
-                </el-button>
-              </template>
-              <span v-else-if="request.status === 'PENDING'" class="trade-note">等待卖家处理</span>
-              <el-button v-else-if="request.orderId" size="small" type="success" plain @click="router.push({ path: '/order', query: { type: 'SECONDHAND' } })">
-                查看订单
-              </el-button>
-              <span v-else class="trade-note">{{ request.statusName || "已结束" }}</span>
-            </div>
-          </article>
-        </div>
-
         <div v-loading="loadingMessages" class="message-list">
           <div
             v-for="message in messages"
@@ -99,7 +65,58 @@
             <div class="message-bubble">
               <div class="message-author">{{ message.sender?.nickname || "用户" }}</div>
               <div class="message-content">
-                <template v-if="getMessagePayload(message).type === 'image'">
+                <template v-if="getMessagePayload(message).type === 'bargain'">
+                  <article class="bargain-message-card">
+                    <div class="bargain-card-head">
+                      <span>{{ getMessagePayload(message).bargain.statusLabel }}</span>
+                      <strong>{{ getMessagePayload(message).bargain.title }}</strong>
+                    </div>
+                    <div class="bargain-card-body">
+                      <div class="bargain-info-row product-row">
+                        <small>商品</small>
+                        <b>{{ getMessagePayload(message).bargain.productName || activeConversation.sourceTitle || "二手商品" }}</b>
+                      </div>
+                      <div v-if="getMessagePayload(message).bargain.proposedPrice" class="bargain-info-row price-row">
+                        <small>买家出价</small>
+                        <b>¥{{ Number(getMessagePayload(message).bargain.proposedPrice || 0).toFixed(2) }}</b>
+                      </div>
+                      <div v-if="getMessagePayload(message).bargain.confirmedPrice" class="bargain-info-row price-row">
+                        <small>确认价格</small>
+                        <b>¥{{ Number(getMessagePayload(message).bargain.confirmedPrice || 0).toFixed(2) }}</b>
+                      </div>
+                      <div v-if="getMessagePayload(message).bargain.effectiveUntil" class="bargain-info-row">
+                        <small>有效期至</small>
+                        <b>{{ formatTime(getMessagePayload(message).bargain.effectiveUntil, true) }}</b>
+                      </div>
+                    </div>
+                    <div class="bargain-card-actions">
+                      <template v-if="canHandleBargain(getMessagePayload(message).bargain) && isSellerForBargain(getMessagePayload(message).bargain)">
+                        <el-button
+                          size="small"
+                          type="primary"
+                          :loading="actionLoadingKey === `confirm-${getMessagePayload(message).bargain.id}`"
+                          :disabled="isBargainActionPending(getMessagePayload(message).bargain)"
+                          @click="handleConfirmBargain(getMessagePayload(message).bargain)"
+                        >
+                          同意并生成订单
+                        </el-button>
+                        <el-button
+                          size="small"
+                          :loading="actionLoadingKey === `reject-${getMessagePayload(message).bargain.id}`"
+                          :disabled="isBargainActionPending(getMessagePayload(message).bargain)"
+                          @click="handleRejectBargain(getMessagePayload(message).bargain)"
+                        >
+                          拒绝
+                        </el-button>
+                      </template>
+                      <el-button v-else-if="getMessagePayload(message).bargain.orderId && getMessagePayload(message).bargain.bargainKind !== 'APPLY'" size="small" type="success" plain @click="goBargainOrder(getMessagePayload(message).bargain)">
+                        {{ isBuyerForBargain(getMessagePayload(message).bargain) ? "去支付订单" : "查看订单" }}
+                      </el-button>
+                      <span v-else class="trade-note">{{ getMessagePayload(message).bargain.actionHint }}</span>
+                    </div>
+                  </article>
+                </template>
+                <template v-else-if="getMessagePayload(message).type === 'image'">
                   <el-image
                     class="message-media message-image"
                     :src="getMessagePayload(message).url"
@@ -582,7 +599,32 @@ function isSellerForBargain(request) {
   return Number(request?.sellerUserId) === Number(currentUserId.value);
 }
 
+function isBuyerForBargain(request) {
+  return Number(request?.buyerUserId) === Number(currentUserId.value);
+}
+
+function goBargainOrder(request) {
+  if (request?.orderId) {
+    const query = isSellerForBargain(request) ? { from: "seller", scope: "secondhand" } : {};
+    router.push({ path: `/secondhand/orders/${request.orderId}`, query });
+    return;
+  }
+  router.push({ path: "/order", query: { type: "SECONDHAND", tab: "PENDING_PAY" } });
+}
+
+function canHandleBargain(request) {
+  const status = String(request?.status || "").toUpperCase();
+  return status === "PENDING" || status === "APPLIED";
+}
+
+function isBargainActionPending(request) {
+  return actionLoadingKey.value === `confirm-${request?.id}` || actionLoadingKey.value === `reject-${request?.id}`;
+}
+
 async function handleConfirmBargain(request) {
+  if (!canHandleBargain(request) || isBargainActionPending(request) || actionLoadingKey.value) {
+    return;
+  }
   actionLoadingKey.value = `confirm-${request.id}`;
   try {
     const result = await confirmBargainApi({
@@ -600,12 +642,16 @@ async function handleConfirmBargain(request) {
 }
 
 async function handleRejectBargain(request) {
+  if (!canHandleBargain(request) || isBargainActionPending(request) || actionLoadingKey.value) {
+    return;
+  }
   actionLoadingKey.value = `reject-${request.id}`;
   try {
-    await rejectBargainApi(request.id);
+    const result = await rejectBargainApi(request.id);
     ElMessage.success("已拒绝议价");
     await loadBargainRequests();
     await loadMessages(activeConversation.value.id, { silent: true });
+    updateBargainInList(result.data);
   } finally {
     actionLoadingKey.value = "";
   }
@@ -724,11 +770,21 @@ function formatSource(conversation) {
 }
 
 function getMessagePayload(message) {
-  return parseMessageContent(message?.content);
+  const payload = parseMessageContent(message?.content);
+  if (payload.type === "bargain") {
+    return {
+      ...payload,
+      bargain: decorateBargainPayload(mergeLatestBargain(payload.bargain)),
+    };
+  }
+  return payload;
 }
 
 function formatMessagePreview(content) {
   const payload = parseMessageContent(content);
+  if (payload.type === "bargain") {
+    return payload.bargain?.preview || "[议价消息]";
+  }
   if (payload.type === "image") {
     return "[图片]";
   }
@@ -742,6 +798,10 @@ function parseMessageContent(content) {
   const text = String(content || "");
   if (!text) {
     return { type: "text", text: "" };
+  }
+  const bargainPayload = parseBargainMessage(text);
+  if (bargainPayload) {
+    return { type: "bargain", bargain: decorateBargainPayload(bargainPayload) };
   }
   try {
     const parsed = JSON.parse(text);
@@ -764,6 +824,88 @@ function parseMessageContent(content) {
     return { type, url: toAssetUrl(text), caption: "", filename: "" };
   }
   return { type: "text", text };
+}
+
+function parseBargainMessage(text) {
+  const matched = String(text || "").match(/^\[(BARGAIN_APPLY|BARGAIN_CONFIRM|BARGAIN_REJECT)](\{[\s\S]*})$/);
+  if (!matched) {
+    return null;
+  }
+  try {
+    const data = JSON.parse(matched[2]);
+    const kind = matched[1].replace("BARGAIN_", "");
+    return {
+      ...data,
+      id: data.negotiationId,
+      status: kind === "APPLY" ? "APPLIED" : (kind === "CONFIRM" ? "CONFIRMED" : "REJECTED"),
+      bargainKind: kind,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function mergeLatestBargain(bargain) {
+  if (!bargain?.id) {
+    return bargain;
+  }
+  const latest = bargainRequests.value.find((item) => Number(item.id) === Number(bargain.id));
+  const processed = findProcessedBargainMessage(bargain.id);
+  if (!latest && !processed) {
+    return bargain;
+  }
+  const mergedLatest = processed || latest || {};
+  return {
+    ...bargain,
+    ...mergedLatest,
+    id: mergedLatest.id || bargain.id,
+    negotiationId: mergedLatest.id || bargain.negotiationId,
+    bargainKind: bargain.bargainKind,
+  };
+}
+
+function findProcessedBargainMessage(bargainId) {
+  for (let index = messages.value.length - 1; index >= 0; index -= 1) {
+    const payload = parseBargainMessage(messages.value[index]?.content);
+    if (
+      payload
+      && Number(payload.id) === Number(bargainId)
+      && ["CONFIRM", "REJECT"].includes(payload.bargainKind)
+    ) {
+      return payload;
+    }
+  }
+  return null;
+}
+
+function decorateBargainPayload(bargain) {
+  const status = String(bargain?.status || "").toUpperCase();
+  const proposedPrice = bargain?.proposedPrice;
+  const confirmedPrice = bargain?.confirmedPrice;
+  let statusLabel = bargain?.statusName || bargain?.status || "议价";
+  let title = "买家发起议价";
+  let actionHint = "等待卖家处理";
+  if (status === "CONFIRMED" || status === "USED") {
+    statusLabel = status === "USED" ? "已生成订单" : "已确认";
+    title = "卖家已同意议价";
+    actionHint = "议价已确认";
+  } else if (status === "REJECTED") {
+    statusLabel = "已拒绝";
+    title = "卖家已拒绝议价";
+    actionHint = "议价已拒绝";
+  } else if (status === "PENDING" || status === "APPLIED") {
+    statusLabel = "待处理";
+    title = "买家发起议价";
+    actionHint = "等待卖家处理";
+  }
+  const priceText = confirmedPrice || proposedPrice;
+  return {
+    ...bargain,
+    statusLabel,
+    title,
+    actionHint,
+    preview: priceText ? `${title} ¥${Number(priceText || 0).toFixed(2)}` : title,
+  };
 }
 
 function normalizeMediaType(type, contentType, url) {
@@ -929,61 +1071,123 @@ async function scrollToBottom() {
   flex: 1;
 }
 
-.trade-panel {
-  display: grid;
-  gap: 10px;
-  border-bottom: 1px solid #eef2f7;
-  background: #fbfdff;
-  padding: 12px 18px;
+.bargain-message-card {
+  position: relative;
+  border: 1px solid rgba(95, 176, 210, 0.24);
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 253, 252, 0.96)),
+    linear-gradient(135deg, rgba(95, 230, 189, 0.16), rgba(105, 185, 255, 0.14));
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  min-width: min(390px, 100%);
+  white-space: normal;
 }
 
-.trade-card {
-  border: 1px solid rgba(137, 199, 255, 0.32);
-  border-radius: 12px;
-  background: linear-gradient(135deg, #e9fff8 0%, #eaf4ff 100%);
-  padding: 12px;
+.bargain-message-card::before {
+  content: "";
+  display: block;
+  height: 4px;
+  background: linear-gradient(90deg, #5fe6bd 0%, #69b9ff 54%, #ffc6dc 100%);
+}
+
+.bargain-card-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  padding: 12px 14px 10px;
 }
 
-.trade-copy {
-  min-width: 0;
-  display: grid;
-  gap: 4px;
-}
-
-.trade-copy span {
+.bargain-card-head span {
   width: fit-content;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.78);
-  color: var(--brand-primary);
-  padding: 3px 9px;
+  border: 1px solid rgba(21, 157, 125, 0.16);
+  background: rgba(233, 255, 248, 0.9);
+  color: #159d7d;
+  padding: 4px 10px;
   font-size: 12px;
   font-weight: 900;
+  flex: 0 0 auto;
 }
 
-.trade-copy strong,
-.trade-copy small {
+.bargain-card-head strong {
+  min-width: 0;
+  color: #0f172a;
+  font-size: 16px;
+  line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.trade-copy small,
+.bargain-card-body {
+  margin: 0 14px;
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.bargain-info-row {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 9px 0;
+}
+
+.bargain-info-row + .bargain-info-row {
+  border-top: 1px dashed rgba(148, 163, 184, 0.22);
+}
+
+.bargain-card-body small {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bargain-card-body b {
+  color: #172033;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bargain-info-row.product-row {
+  align-items: flex-start;
+}
+
+.bargain-info-row.product-row b {
+  color: #334155;
+  font-size: 14px;
+}
+
+.bargain-info-row.price-row b {
+  color: #f05a7e;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+
 .trade-note {
   color: var(--text-secondary);
   font-size: 12px;
   font-weight: 700;
 }
 
-.trade-actions {
+.bargain-card-actions {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
-  flex: 0 0 auto;
+  flex-wrap: wrap;
+  padding: 12px 14px 14px;
+}
+
+.bargain-card-actions .el-button {
+  border-radius: 8px;
 }
 
 .message-list {
@@ -1097,9 +1301,20 @@ async function scrollToBottom() {
     grid-template-columns: 1fr;
   }
 
-  .trade-card {
+  .bargain-card-head {
     align-items: flex-start;
     flex-direction: column;
+    gap: 8px;
+  }
+
+  .bargain-info-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .bargain-card-body b {
+    text-align: left;
   }
 
   .message-bubble {

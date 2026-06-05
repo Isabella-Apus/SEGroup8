@@ -116,7 +116,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         Long currentUserId = UserContext.getUserId();
         if (currentUserId != null) {
             List<Long> blockedByMe = userBlockMapper.listBlockedIds(currentUserId);
-            List<Long> blockedMe   = userBlockMapper.listBlockerIds(currentUserId);
+            List<Long> blockedMe = userBlockMapper.listBlockerIds(currentUserId);
             java.util.Set<Long> hiddenSellerIds = new java.util.HashSet<>();
             hiddenSellerIds.addAll(blockedByMe);
             hiddenSellerIds.addAll(blockedMe);
@@ -124,7 +124,6 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
                 wrapper.notIn(SecondhandProduct::getSellerUserId, hiddenSellerIds);
             }
         }
-
         Page<SecondhandProduct> page = secondhandProductMapper.selectPage(
                 Page.of(request.getPageNum(), request.getPageSize()),
                 wrapper);

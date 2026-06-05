@@ -18,17 +18,97 @@
           <img class="brand-logo" :src="logoUrl" alt="Kinda Goods" />
         </button>
 
-        <div class="search-stack">
+        <div ref="searchStackRef" class="search-stack">
           <form class="search-bar" @submit.prevent="submitSearch">
-            <el-segmented v-model="searchMode" :options="searchModes" size="small" @change="handleSearchModeChange" />
             <el-input
               v-model="keyword"
               class="search-input"
-              :placeholder="searchPlaceholder"
+              placeholder="搜索商品、闲置、教材、数码好物"
               clearable
+              @focus="openSearchPanel"
             />
             <el-button type="primary" native-type="submit">搜索</el-button>
           </form>
+          <div v-if="showSearchPanel" class="search-suggest-panel" @mousedown.prevent>
+            <div class="suggest-head">
+              <strong>{{ keyword.trim() ? `搜索“${keyword.trim()}”` : "热门商品" }}</strong>
+              <button type="button" @click="closeSearchPanel">关闭</button>
+            </div>
+
+            <div v-if="searchLoading" class="suggest-loading">正在查找相关商品...</div>
+
+            <template v-else>
+              <div v-if="keyword.trim() && hasSearchResults" class="suggest-sections">
+                <section class="suggest-section">
+                  <div class="section-title">
+                    <span>一手商品</span>
+                    <em>{{ productSuggestions.length }} 件相关</em>
+                  </div>
+                  <button
+                    v-for="item in productSuggestions"
+                    :key="`product-${item.id}`"
+                    class="suggest-item"
+                    type="button"
+                    @click="goProduct(item, 'product')"
+                  >
+                    <img :src="productCover(item)" :alt="item.name" />
+                    <span class="item-copy">
+                      <strong>{{ item.name }}</strong>
+                      <small>{{ item.description || item.categoryName || "官方商城商品" }}</small>
+                    </span>
+                    <span class="item-price">¥{{ formatPrice(item.price) }}</span>
+                  </button>
+                </section>
+
+                <section class="suggest-section">
+                  <div class="section-title">
+                    <span>二手商品</span>
+                    <em>{{ secondhandSuggestions.length }} 件相关</em>
+                  </div>
+                  <button
+                    v-for="item in secondhandSuggestions"
+                    :key="`secondhand-${item.id}`"
+                    class="suggest-item"
+                    type="button"
+                    @click="goProduct(item, 'secondhand')"
+                  >
+                    <img :src="productCover(item)" :alt="item.name" />
+                    <span class="item-copy">
+                      <strong>{{ item.name }}</strong>
+                      <small>{{ item.condition || item.categoryName || "校园闲置商品" }}</small>
+                    </span>
+                    <span class="item-price second">¥{{ formatPrice(item.price) }}</span>
+                  </button>
+                </section>
+              </div>
+
+              <div v-else-if="keyword.trim()" class="empty-suggest">
+                <strong>暂无相关商品</strong>
+                <span>换个关键词试试，或看看下面的热门推荐</span>
+              </div>
+
+              <section v-if="!hasSearchResults && hotSuggestions.length" class="suggest-section hot-section">
+                <div class="section-title">
+                  <span>热门商品</span>
+                  <em>猜你喜欢</em>
+                </div>
+                <button
+                  v-for="item in hotSuggestions"
+                  :key="`hot-${item.type}-${item.id}`"
+                  class="suggest-item"
+                  type="button"
+                  @click="goProduct(item, item.type)"
+                >
+                  <img :src="productCover(item)" :alt="item.name" />
+                  <span class="item-copy">
+                    <strong>{{ item.name }}</strong>
+                    <small>{{ item.type === 'secondhand' ? '二手精选' : '一手热卖' }}</small>
+                  </span>
+                  <span class="item-price">¥{{ formatPrice(item.price) }}</span>
+                </button>
+              </section>
+            </template>
+          </div>
         </div>
 
         <div class="header-actions">
@@ -76,10 +156,12 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import { useUserStore } from "@/stores/user";
+import { getProductListApi } from "@/api/product";
+import { getSecondhandListApi } from "@/api/secondhand";
 import logoUrl from "@/assets/kinda-goods-logo.svg";
 
 const route = useRoute();
@@ -87,11 +169,15 @@ const router = useRouter();
 const userStore = useUserStore();
 
 const keyword = ref("");
-const searchMode = ref("product");
-const searchModes = [
-  { label: "新品", value: "product" },
-  { label: "二手", value: "secondhand" },
-];
+const searchStackRef = ref(null);
+const showSearchPanel = ref(false);
+const searchLoading = ref(false);
+const productSuggestions = ref([]);
+const secondhandSuggestions = ref([]);
+const hotProducts = ref([]);
+const hotSecondhand = ref([]);
+let searchTimer = 0;
+let searchRequestSeq = 0;
 
 const navItems = [
   { label: "首页", path: "/", match: (path) => path === "/" },
@@ -109,19 +195,11 @@ const visibleNavItems = computed(() =>
 );
 
 const avatarText = computed(() => displayName.value.slice(0, 1).toUpperCase());
-const searchPlaceholder = computed(() =>
-  searchMode.value === "secondhand"
-    ? "搜索二手教材、闲置耳机、宿舍收纳"
-    : "搜索新品键盘、耳机、教材、宿舍好物",
-);
-
-watch(
-  () => route.path,
-  () => {
-    searchMode.value = route.path.startsWith("/secondhand") ? "secondhand" : "product";
-  },
-  { immediate: true },
-);
+const hasSearchResults = computed(() => productSuggestions.value.length > 0 || secondhandSuggestions.value.length > 0);
+const hotSuggestions = computed(() => [
+  ...hotProducts.value.map((item) => ({ ...item, type: "product" })),
+  ...hotSecondhand.value.map((item) => ({ ...item, type: "secondhand" })),
+].slice(0, 5));
 
 watch(
   () => route.query.keyword,
@@ -131,26 +209,115 @@ watch(
   { immediate: true },
 );
 
+watch(keyword, () => {
+  if (!showSearchPanel.value) {
+    return;
+  }
+  window.clearTimeout(searchTimer);
+  searchTimer = window.setTimeout(loadSearchSuggestions, 220);
+});
+
 function isNavActive(item) {
   return item.match(route.path);
 }
 
 function submitSearch() {
-  const target = searchMode.value === "secondhand" ? "/secondhand" : "/product";
   const trimmed = keyword.value.trim();
+  closeSearchPanel();
   router.push({
-    path: target,
+    path: "/product",
     query: trimmed ? { keyword: trimmed } : {},
   });
 }
 
-function handleSearchModeChange() {
-  const target = searchMode.value === "secondhand" ? "/secondhand" : "/product";
+function openSearchPanel() {
+  showSearchPanel.value = true;
+  loadSearchSuggestions();
+}
+
+function closeSearchPanel() {
+  showSearchPanel.value = false;
+}
+
+async function loadSearchSuggestions() {
+  const seq = ++searchRequestSeq;
   const trimmed = keyword.value.trim();
-  router.push({
-    path: target,
-    query: trimmed ? { keyword: trimmed } : {},
-  });
+  if (!trimmed) {
+    productSuggestions.value = [];
+    secondhandSuggestions.value = [];
+    searchLoading.value = false;
+    return;
+  }
+  searchLoading.value = true;
+  try {
+    const params = { pageNum: 1, pageSize: 4, ...(trimmed ? { keyword: trimmed } : {}) };
+    const [productResult, secondhandResult] = await Promise.all([
+      getProductListApi(params),
+      getSecondhandListApi(params),
+    ]);
+    if (seq !== searchRequestSeq) {
+      return;
+    }
+    productSuggestions.value = productResult.data?.records || [];
+    secondhandSuggestions.value = secondhandResult.data?.records || [];
+  } catch {
+    if (seq === searchRequestSeq) {
+      productSuggestions.value = [];
+      secondhandSuggestions.value = [];
+    }
+  } finally {
+    if (seq === searchRequestSeq) {
+      searchLoading.value = false;
+    }
+  }
+}
+
+async function loadHotSuggestions() {
+  try {
+    const [productResult, secondhandResult] = await Promise.all([
+      getProductListApi({ pageNum: 1, pageSize: 4 }),
+      getSecondhandListApi({ pageNum: 1, pageSize: 4 }),
+    ]);
+    hotProducts.value = productResult.data?.records || [];
+    hotSecondhand.value = secondhandResult.data?.records || [];
+  } catch {
+    hotProducts.value = [];
+    hotSecondhand.value = [];
+  }
+}
+
+function goProduct(item, type) {
+  if (!item?.id) {
+    return;
+  }
+  closeSearchPanel();
+  router.push(type === "secondhand" ? `/secondhand/${item.id}` : `/product/${item.id}`);
+}
+
+function productCover(item) {
+  const images = Array.isArray(item?.images) ? item.images : [];
+  const url = item?.cover || item?.image || item?.imageUrl || images[0];
+  if (!url) {
+    return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='12' fill='%23eef7fb'/%3E%3Cpath d='M25 63l14-18 11 12 8-9 13 15H25z' fill='%2369c7ef'/%3E%3Ccircle cx='37' cy='34' r='7' fill='%2312d89a'/%3E%3C/svg%3E";
+  }
+  const normalized = String(url).replace(/\\\\/g, "/");
+  if (/^https?:\/\//i.test(normalized) || normalized.startsWith("data:")) {
+    return normalized;
+  }
+  return `http://localhost:8080${normalized.startsWith("/") ? normalized : `/${normalized}`}`;
+}
+
+function formatPrice(value) {
+  return Number(value || 0).toFixed(2);
+}
+
+function handleDocumentPointerDown(event) {
+  if (!showSearchPanel.value) {
+    return;
+  }
+  if (!searchStackRef.value?.contains(event.target)) {
+    closeSearchPanel();
+  }
 }
 
 function handleCommand(command) {
@@ -173,6 +340,16 @@ function handleCommand(command) {
   };
   router.push(map[command] || "/profile");
 }
+
+onMounted(() => {
+  loadHotSuggestions();
+  document.addEventListener("pointerdown", handleDocumentPointerDown);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("pointerdown", handleDocumentPointerDown);
+  window.clearTimeout(searchTimer);
+});
 </script>
 
 <style scoped>
@@ -255,18 +432,19 @@ function handleCommand(command) {
 
 .search-stack {
   min-width: 0;
+  position: relative;
 }
 
 .search-bar {
   height: 44px;
   display: grid;
-  grid-template-columns: auto minmax(150px, 1fr) 82px;
+  grid-template-columns: minmax(150px, 1fr) 82px;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   padding: 4px;
   background: #ffffff;
   border: 2px solid #b9defb;
-  border-radius: 14px;
+  border-radius: 12px;
   box-shadow: 0 12px 24px rgba(137, 199, 255, 0.14);
 }
 
@@ -275,10 +453,170 @@ function handleCommand(command) {
   border-radius: 6px;
 }
 
-.search-bar :deep(.el-segmented) {
-  --el-segmented-item-selected-color: #ffffff;
-  --el-segmented-item-selected-bg-color: #69c7ef;
-  --el-border-radius-base: 6px;
+.search-suggest-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  max-height: min(72vh, 620px);
+  overflow: auto;
+  border: 1px solid rgba(137, 199, 255, 0.42);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow:
+    0 22px 60px rgba(18, 50, 65, 0.16),
+    0 1px 0 rgba(255, 255, 255, 0.95) inset;
+  padding: 12px;
+}
+
+.suggest-head,
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.suggest-head {
+  padding: 4px 4px 10px;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.suggest-head strong {
+  min-width: 0;
+  color: var(--text-main);
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.suggest-head button {
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.suggest-head button:hover {
+  color: var(--brand-primary);
+}
+
+.suggest-loading,
+.empty-suggest {
+  margin: 12px 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(233, 255, 248, 0.9), rgba(234, 244, 255, 0.9));
+  color: var(--text-secondary);
+  padding: 18px;
+  text-align: center;
+}
+
+.empty-suggest {
+  display: grid;
+  gap: 5px;
+}
+
+.empty-suggest strong {
+  color: var(--text-main);
+  font-size: 16px;
+}
+
+.empty-suggest span {
+  font-size: 13px;
+}
+
+.suggest-section {
+  padding: 12px 0 2px;
+}
+
+.suggest-section + .suggest-section {
+  border-top: 1px solid var(--line-soft);
+}
+
+.section-title {
+  margin-bottom: 8px;
+}
+
+.section-title span {
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.section-title em {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.suggest-item {
+  width: 100%;
+  min-height: 68px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.suggest-item:hover {
+  background: rgba(234, 248, 255, 0.9);
+}
+
+.suggest-item img {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #eef7fb;
+}
+
+.item-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.item-copy strong,
+.item-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item-copy strong {
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.item-copy small {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.item-price {
+  color: #1767ff;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.item-price.second {
+  color: #0f9f78;
+}
+
+.hot-section {
+  margin-top: 6px;
+  border-top: 1px solid var(--line-soft);
 }
 
 .header-actions {
@@ -401,10 +739,26 @@ function handleCommand(command) {
   }
 
   .search-bar {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr auto;
     height: auto;
     border-radius: 10px;
     padding: 8px;
+  }
+
+  .search-suggest-panel {
+    position: fixed;
+    top: 118px;
+    left: 10px;
+    right: 10px;
+    max-height: calc(100vh - 136px);
+  }
+
+  .suggest-item {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  .item-price {
+    grid-column: 2;
   }
 
   .header-actions {

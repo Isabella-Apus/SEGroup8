@@ -87,6 +87,11 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Override
     public NotificationVO createNotification(Long userId, String title, String content) {
+        return createNotification(userId, title, content, null);
+    }
+
+    @Override
+    public NotificationVO createNotification(Long userId, String title, String content, String targetPath) {
         requireUserId(userId);
         if (!StringUtils.hasText(title) || !StringUtils.hasText(content)) {
             throw new BusinessException(400, "通知内容不能为空");
@@ -95,6 +100,9 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setUserId(userId);
         notification.setTitle(title.trim());
         notification.setContent(content.trim());
+        if (StringUtils.hasText(targetPath)) {
+            notification.setTargetPath(targetPath.trim());
+        }
         notification.setIsRead(0);
         notification.setCreateTime(java.time.LocalDateTime.now());
         notificationMapper.insert(notification);
@@ -103,6 +111,7 @@ public class NotificationServiceImpl implements NotificationService {
         payload.put("id", vo.getId());
         payload.put("title", vo.getTitle());
         payload.put("content", vo.getContent());
+        payload.put("targetPath", vo.getTargetPath());
         payload.put("scope", vo.getScope());
         payload.put("isRead", vo.getIsRead());
         payload.put("createTime", vo.getCreateTime());
@@ -121,6 +130,7 @@ public class NotificationServiceImpl implements NotificationService {
         vo.setId(notification.getId());
         vo.setTitle(notification.getTitle());
         vo.setContent(notification.getContent());
+        vo.setTargetPath(notification.getTargetPath());
         vo.setScope(inferScope(notification));
         vo.setIsRead(notification.getIsRead());
         vo.setCreateTime(notification.getCreateTime());

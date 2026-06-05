@@ -173,34 +173,9 @@ public class AdminOrderController {
     @PostMapping("/{orderId}/refund/reject")
     public Result<OrderVO> rejectRefund(@PathVariable Long orderId, @Valid @RequestBody(required = false) AdminRefundDecisionRequest request) {
         AccessControl.requireAdmin(userMapper);
-        OrderInfo order = orderInfoMapper.selectById(orderId);
-        if (order == null) {
-            throw new BusinessException(404, "订单不存在");
-        }
-        OrderStateMachine.assertRefundActionAllowed(order, OrderStateMachine.RefundAction.REJECT, "当前无可处理的退款申请");
-        order.setRefundStatus(RefundStatusEnum.REJECTED.getCode());
-        order.setOrderStatus(OrderStatusEnum.CLOSED.getCode());
-        order.setRefundDecisionTime(LocalDateTime.now());
         Long operatorId = AccessControl.requireUserId();
-        order.setRefundDecisionUserId(operatorId);
-        if (request != null && StringUtils.hasText(request.getRemark())) {
-            order.setRefundDecisionRemark(request.getRemark().trim());
-        } else {
-            order.setRefundDecisionRemark("拒绝退货");
-        }
-        order.setRefundDecisionSource(RefundDecisionSourceEnum.ADMIN.name());
-        order.setClosedTime(LocalDateTime.now());
-        orderInfoMapper.updateById(order);
-        insertAfterSaleLog(orderId, AfterSaleActionEnum.REJECT, operatorId, OperatorRoleEnum.ADMIN, order.getRefundDecisionRemark());
-        realtimePushService.pushToUser(order.getBuyerUserId(), "AFTER_SALE_UPDATED", Map.of(
-                "orderId", orderId,
-                "message", "管理员已拒绝退货申请"
-        ));
-
-        List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
-                .eq(OrderItem::getOrderId, order.getId())
-                .orderByAsc(OrderItem::getId));
-        return Result.success(buildOrderVO(order, items));
+        String remark = request != null ? request.getRemark() : null;
+        return Result.success(orderService.rejectRefundByAdmin(orderId, operatorId, remark));
     }
 
     private OrderVO buildOrderVO(OrderInfo order, List<OrderItem> items) {
@@ -320,4 +295,3 @@ public class AdminOrderController {
         return vo;
     }
 }
-

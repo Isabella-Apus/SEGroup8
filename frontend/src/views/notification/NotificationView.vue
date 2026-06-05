@@ -19,7 +19,8 @@
         v-for="item in notifications"
         :key="item.id"
         class="notification-item"
-        :class="{ unread: Number(item.isRead) === 0 }"
+        :class="{ unread: Number(item.isRead) === 0, clickable: Boolean(item.targetPath) }"
+        @click="openNotification(item)"
       >
         <div class="notification-top">
           <div class="notification-title-wrap">
@@ -35,7 +36,7 @@
             size="small"
             text
             type="primary"
-            @click="markRead(item)"
+            @click.stop="markRead(item)"
           >
             标为已读
           </el-button>
@@ -48,6 +49,7 @@
 <script setup>
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
 import {
   listNotificationsApi,
   markAllNotificationsReadApi,
@@ -57,6 +59,7 @@ import { onRealtimeEvent, startRealtimeClient } from "@/realtime/realtimeClient"
 
 const loading = ref(false);
 const notifications = ref([]);
+const router = useRouter();
 let unsubscribeRealtime = null;
 
 const hasUnread = computed(() =>
@@ -88,6 +91,18 @@ async function fetchNotifications() {
 async function markRead(item) {
   await markNotificationReadApi(item.id);
   item.isRead = 1;
+}
+
+async function openNotification(item) {
+  if (!item) {
+    return;
+  }
+  if (Number(item.isRead) === 0) {
+    await markRead(item);
+  }
+  if (typeof item.targetPath === "string" && item.targetPath.startsWith("/")) {
+    router.push(item.targetPath);
+  }
 }
 
 async function markAllRead() {
@@ -177,6 +192,17 @@ function formatTime(value) {
   border-radius: 16px;
   padding: 16px 18px;
   background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.notification-item.clickable {
+  cursor: pointer;
+}
+
+.notification-item.clickable:hover {
+  border-color: #8bc34a;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
 }
 
 .notification-item.unread {
