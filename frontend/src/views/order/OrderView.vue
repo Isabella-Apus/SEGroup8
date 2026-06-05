@@ -128,7 +128,7 @@
         <div class="order-card__footer" @click.stop>
           <div class="amount">
             <span>实付</span>
-            <strong>￥{{ Number(order.totalAmount || 0).toFixed(2) }}</strong>
+            <strong>￥{{ Number(order.payableAmount ?? order.totalAmount ?? 0).toFixed(2) }}</strong>
           </div>
           <el-space wrap class="order-actions">
             <el-button v-if="order.orderStatus === 0" size="small" @click="cancel(order.id)">取消订单</el-button>

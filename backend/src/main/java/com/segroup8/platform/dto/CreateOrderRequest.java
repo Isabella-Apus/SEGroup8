@@ -14,6 +14,8 @@ public class CreateOrderRequest {
 
     private Long addressId;
 
+    private Long voucherId;
+
     @Size(max = 255, message = "备注长度不能超过255")
     private String remark;
 
@@ -39,5 +41,13 @@ public class CreateOrderRequest {
 
     public void setAddressId(Long addressId) {
         this.addressId = addressId;
+    }
+
+    public Long getVoucherId() {
+        return voucherId;
+    }
+
+    public void setVoucherId(Long voucherId) {
+        this.voucherId = voucherId;
     }
 }

@@ -11,3 +11,11 @@ export function listMyCouponsApi(params = {}) {
 export function claimCouponApi(voucherId) {
   return http.post(`/voucher/${voucherId}/claim`);
 }
+
+export function listCheckoutCouponsApi(params = {}) {
+  return http.get("/voucher/my/available", { params });
+}
+
+export function listCheckoutCouponReasonsApi(params = {}) {
+  return http.get("/voucher/my/available/reasons", { params });
+}

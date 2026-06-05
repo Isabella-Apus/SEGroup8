@@ -1190,6 +1190,16 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
             };
         });
         const totalAmount = items.reduce((sum, x) => sum + Number(x.price) * Number(x.quantity), 0);
+        const voucher = data?.voucherId == null ? null : mockStore.vouchers.find((item) =>
+            Number(item.id) === Number(data.voucherId)
+            && (item.claimedUserIds || []).some((userId) => Number(userId) === Number(user.id))
+        );
+        const discountAmount = voucher
+            ? (Number(voucher.type) === 2
+                ? totalAmount * (1 - Number(voucher.discountRate || 1))
+                : Number(voucher.discountAmount || 0))
+            : 0;
+        const appliedDiscount = Math.min(totalAmount, discountAmount);
         const id = mockStore.next.orderId++;
         const order = {
             id,
@@ -1197,6 +1207,9 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
             buyerUserId: user.id,
             orderType: "NEW",
             totalAmount,
+            voucherId: voucher?.id || null,
+            voucherDiscountAmount: appliedDiscount,
+            payableAmount: Math.max(0, totalAmount - appliedDiscount),
             payStatus: 0,
             payMethod: "",
             orderStatus: 0,
@@ -1990,6 +2003,25 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
         return ok(paginateParams(records, params));
     }
 
+    if (m === "get" && p === "/voucher/my/available") {
+        const user = requireLogin(headers);
+        const shopIds = new Set(asText(params.shopIds || "").split(",").map(Number).filter(Boolean));
+        const totalAmount = Number(params.totalAmount || 0);
+        const records = mockStore.vouchers
+            .filter((item) => (item.claimedUserIds || []).some((id) => Number(id) === Number(user.id)))
+            .filter((item) => isVoucherActive(item))
+            .filter((item) => (!item.shopId && !item.sellerUserId)
+                || shopIds.has(Number(item.shopId || item.sellerUserId)))
+            .filter((item) => totalAmount >= Number(item.minAmount || 0))
+            .map((item) => voucherPublicVO(item, user.id));
+        return ok(paginateParams(records, params));
+    }
+
+    if (m === "get" && p === "/voucher/my/available/reasons") {
+        requireLogin(headers);
+        return ok(["当前暂无满足店铺与金额条件的优惠券。"]);
+    }
+
     const claimVoucherMatch = p.match(/^\/voucher\/(\d+)\/claim$/);
     if (m === "post" && claimVoucherMatch) {
         const user = requireLogin(headers);
@@ -2033,6 +2065,8 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
             discountRate: data?.discountRate == null ? null : Number(data.discountRate),
             totalCount: Number(data?.totalCount || 1),
             usedCount: 0,
+            grabStartTime: data?.grabStartTime || data?.startTime || new Date().toISOString(),
+            grabEndTime: data?.grabEndTime || data?.endTime || new Date(Date.now() + 7 * 86400000).toISOString(),
             startTime: data?.startTime || new Date().toISOString(),
             endTime: data?.endTime || new Date(Date.now() + 7 * 86400000).toISOString(),
             status,
@@ -2055,6 +2089,8 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
             discountAmount: data?.discountAmount == null ? null : Number(data.discountAmount),
             discountRate: data?.discountRate == null ? null : Number(data.discountRate),
             totalCount: Number(data?.totalCount ?? voucher.totalCount),
+            grabStartTime: data?.grabStartTime || voucher.grabStartTime,
+            grabEndTime: data?.grabEndTime || voucher.grabEndTime,
             startTime: data?.startTime || voucher.startTime,
             endTime: data?.endTime || voucher.endTime,
         });

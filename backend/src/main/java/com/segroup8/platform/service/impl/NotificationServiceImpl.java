@@ -149,6 +149,16 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     private String inferScope(Notification notification) {
+        if (notification.getTargetPath() != null) {
+            if (notification.getTargetPath().startsWith("/merchant/")) {
+                return "seller";
+            }
+            if (notification.getTargetPath().startsWith("/order/")
+                    || notification.getTargetPath().startsWith("/product/")
+                    || notification.getTargetPath().startsWith("/secondhand/")) {
+                return "buyer";
+            }
+        }
         String text = ((notification.getTitle() == null ? "" : notification.getTitle()) + " "
                 + (notification.getContent() == null ? "" : notification.getContent()));
         if (text.contains("发货")

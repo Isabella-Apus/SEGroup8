@@ -11,11 +11,13 @@ import com.segroup8.platform.entity.Product;
 import com.segroup8.platform.entity.SecondhandProduct;
 import com.segroup8.platform.entity.Shop;
 import com.segroup8.platform.entity.TransactionRecord;
+import com.segroup8.platform.entity.Voucher;
 import com.segroup8.platform.mapper.BalanceMapper;
 import com.segroup8.platform.mapper.ProductMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.TransactionRecordMapper;
+import com.segroup8.platform.mapper.VoucherMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -33,19 +35,22 @@ public class EscrowSettlementService {
     private final SecondhandProductMapper secondhandProductMapper;
     private final BalanceMapper balanceMapper;
     private final TransactionRecordMapper transactionRecordMapper;
+    private final VoucherMapper voucherMapper;
 
     public EscrowSettlementService(List<OrderSettlementStrategy> settlementStrategies,
             ProductMapper productMapper,
             ShopMapper shopMapper,
             SecondhandProductMapper secondhandProductMapper,
             BalanceMapper balanceMapper,
-            TransactionRecordMapper transactionRecordMapper) {
+            TransactionRecordMapper transactionRecordMapper,
+            VoucherMapper voucherMapper) {
         this.settlementStrategies = settlementStrategies;
         this.productMapper = productMapper;
         this.shopMapper = shopMapper;
         this.secondhandProductMapper = secondhandProductMapper;
         this.balanceMapper = balanceMapper;
         this.transactionRecordMapper = transactionRecordMapper;
+        this.voucherMapper = voucherMapper;
     }
 
     public void releaseEscrow(OrderInfo order, List<OrderItem> items) {
@@ -63,6 +68,7 @@ public class EscrowSettlementService {
             groupedAmount.merge(key, itemAmount, BigDecimal::add);
             groupedStrategy.putIfAbsent(key, strategy);
         }
+        applySellerVoucherDiscount(order, groupedAmount);
 
         for (Map.Entry<String, BigDecimal> entry : groupedAmount.entrySet()) {
             String[] split = entry.getKey().split("#");
@@ -82,6 +88,26 @@ public class EscrowSettlementService {
             record.setRemark("担保交易确认收货后释放资金");
             record.setCreateTime(LocalDateTime.now());
             transactionRecordMapper.insert(record);
+        }
+    }
+
+    private void applySellerVoucherDiscount(OrderInfo order, Map<String, BigDecimal> groupedAmount) {
+        if (order == null || order.getVoucherId() == null || order.getSellerBearAmount() == null
+                || order.getSellerBearAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            return;
+        }
+        Voucher voucher = voucherMapper.selectById(order.getVoucherId());
+        if (voucher == null || voucher.getShopId() == null) {
+            return;
+        }
+        Shop shop = shopMapper.selectById(voucher.getShopId());
+        if (shop == null || shop.getOwnerUserId() == null) {
+            return;
+        }
+        String key = shop.getOwnerUserId() + "#" + SettlementAccountType.BUSINESS.name();
+        BigDecimal gross = groupedAmount.get(key);
+        if (gross != null) {
+            groupedAmount.put(key, gross.subtract(order.getSellerBearAmount()).max(BigDecimal.ZERO));
         }
     }
 

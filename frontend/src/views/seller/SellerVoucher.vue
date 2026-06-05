@@ -97,7 +97,10 @@
     <el-dialog
       v-model="dialogVisible"
       :title="editingId ? '编辑优惠券' : '创建优惠券'"
-      width="500px"
+      width="min(560px, calc(100vw - 24px))"
+      align-center
+      append-to-body
+      class="voucher-dialog"
     >
       <el-form
         ref="formRef"
@@ -116,10 +119,14 @@
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item label="最低消费" prop="minAmount">
+        <el-form-item label="使用门槛">
+          <el-switch v-model="form.noThreshold" active-text="无门槛" inactive-text="有门槛" />
+        </el-form-item>
+
+        <el-form-item v-if="!form.noThreshold" label="最低消费" prop="minAmount">
           <el-input-number
             v-model="form.minAmount"
-            :min="0"
+            :min="0.01"
             :precision="2"
             style="width: 180px"
           />
@@ -158,7 +165,20 @@
           <span style="margin-left: 8px">张</span>
         </el-form-item>
 
-        <el-form-item label="有效期" prop="timeRange">
+        <el-form-item label="领取时间" prop="grabRange">
+          <el-date-picker
+            v-model="form.grabRange"
+            type="datetimerange"
+            range-separator="至"
+            start-placeholder="领取开始时间"
+            end-placeholder="领取结束时间"
+            format="YYYY-MM-DD HH:mm"
+            value-format="YYYY-MM-DDTHH:mm:ss"
+            style="width: 100%"
+          />
+        </el-form-item>
+
+        <el-form-item label="使用有效期" prop="timeRange">
           <el-date-picker
             v-model="form.timeRange"
             type="datetimerange"
@@ -206,10 +226,12 @@ const formRef = ref(null)
 const form = reactive({
   name: '',
   type: 1,
+  noThreshold: true,
   minAmount: 0,
   discountAmount: null,
   discountRate: null,
   totalCount: 100,
+  grabRange: null,
   timeRange: null
 })
 
@@ -217,7 +239,10 @@ const rules = {
   name: [{ required: true, message: '请输入优惠券名称', trigger: 'blur' }],
   type: [{ required: true, message: '请选择类型', trigger: 'change' }],
   minAmount: [{ required: true, message: '请输入最低消费', trigger: 'blur' }],
+  discountAmount: [{ required: true, message: '请输入优惠金额', trigger: 'blur' }],
+  discountRate: [{ required: true, message: '请输入折扣率', trigger: 'blur' }],
   totalCount: [{ required: true, message: '请输入发放总量', trigger: 'blur' }],
+  grabRange: [{ required: true, message: '请选择领取时间', trigger: 'change' }],
   timeRange: [{ required: true, message: '请选择有效期', trigger: 'change' }]
 }
 
@@ -239,18 +264,22 @@ function openDialog(row = null) {
   if (row) {
     form.name = row.name
     form.type = row.type
-    form.minAmount = row.minAmount
+    form.noThreshold = Number(row.minAmount || 0) === 0
+    form.minAmount = Number(row.minAmount || 0)
     form.discountAmount = row.discountAmount
     form.discountRate = row.discountRate
     form.totalCount = row.totalCount
+    form.grabRange = [row.grabStartTime || row.startTime, row.grabEndTime || row.endTime]
     form.timeRange = [row.startTime, row.endTime]
   } else {
     form.name = ''
     form.type = 1
+    form.noThreshold = true
     form.minAmount = 0
     form.discountAmount = null
     form.discountRate = null
     form.totalCount = 100
+    form.grabRange = null
     form.timeRange = null
   }
   dialogVisible.value = true
@@ -264,10 +293,13 @@ async function handleSubmit() {
       const payload = {
         name: form.name,
         type: form.type,
-        minAmount: form.minAmount,
+        noThreshold: form.noThreshold,
+        minAmount: form.noThreshold ? 0 : form.minAmount,
         discountAmount: form.type === 1 ? form.discountAmount : null,
         discountRate: form.type === 2 ? form.discountRate : null,
         totalCount: form.totalCount,
+        grabStartTime: form.grabRange[0],
+        grabEndTime: form.grabRange[1],
         startTime: form.timeRange[0],
         endTime: form.timeRange[1]
       }
@@ -328,6 +360,19 @@ onMounted(loadVouchers)
 </script>
 
 <style scoped>
+:global(.voucher-dialog) {
+  max-height: calc(100vh - 24px);
+  display: flex;
+  flex-direction: column;
+  margin: 12px auto;
+}
+
+:global(.voucher-dialog .el-dialog__body) {
+  min-height: 0;
+  overflow-y: auto;
+  padding-top: 12px;
+}
+
 .page-header {
   display: flex;
   justify-content: space-between;

@@ -29,7 +29,6 @@ import com.segroup8.platform.entity.SecondhandProduct;
 import com.segroup8.platform.entity.Shop;
 import com.segroup8.platform.entity.Address;
 import com.segroup8.platform.entity.OrderAfterSaleLog;
-import com.segroup8.platform.entity.Notification;
 import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.OrderItemMapper;
 import com.segroup8.platform.mapper.ProductMapper;
@@ -38,10 +37,11 @@ import com.segroup8.platform.mapper.ReviewMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.AddressMapper;
-import com.segroup8.platform.mapper.NotificationMapper;
 import com.segroup8.platform.realtime.RealtimePushService;
 import com.segroup8.platform.service.OrderService;
 import com.segroup8.platform.service.LogisticsService;
+import com.segroup8.platform.service.NotificationService;
+import com.segroup8.platform.service.VoucherService;
 import com.segroup8.platform.service.settlement.EscrowSettlementService;
 import com.segroup8.platform.vo.OrderItemVO;
 import com.segroup8.platform.vo.OrderVO;
@@ -75,19 +75,21 @@ public class OrderServiceImpl implements OrderService {
     private final SecondhandProductMapper secondhandProductMapper;
     private final ShopMapper shopMapper;
     private final AddressMapper addressMapper;
-    private final NotificationMapper notificationMapper;
     private final OrderAfterSaleLogMapper orderAfterSaleLogMapper;
     private final RealtimePushService realtimePushService;
     private final LogisticsService logisticsService;
+    private final NotificationService notificationService;
     private final EscrowSettlementService escrowSettlementService;
+    private final VoucherService voucherService;
 
     public OrderServiceImpl(OrderInfoMapper orderInfoMapper, OrderItemMapper orderItemMapper,
             ProductMapper productMapper, ReviewMapper reviewMapper, SecondhandProductMapper secondhandProductMapper,
             ShopMapper shopMapper,
-            AddressMapper addressMapper, NotificationMapper notificationMapper,
+            AddressMapper addressMapper,
             OrderAfterSaleLogMapper orderAfterSaleLogMapper,
             RealtimePushService realtimePushService, LogisticsService logisticsService,
-            EscrowSettlementService escrowSettlementService) {
+            EscrowSettlementService escrowSettlementService, VoucherService voucherService,
+            NotificationService notificationService) {
         this.orderInfoMapper = orderInfoMapper;
         this.orderItemMapper = orderItemMapper;
         this.productMapper = productMapper;
@@ -95,11 +97,12 @@ public class OrderServiceImpl implements OrderService {
         this.secondhandProductMapper = secondhandProductMapper;
         this.shopMapper = shopMapper;
         this.addressMapper = addressMapper;
-        this.notificationMapper = notificationMapper;
         this.orderAfterSaleLogMapper = orderAfterSaleLogMapper;
         this.realtimePushService = realtimePushService;
         this.logisticsService = logisticsService;
         this.escrowSettlementService = escrowSettlementService;
+        this.voucherService = voucherService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -112,6 +115,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         BigDecimal totalAmount = BigDecimal.ZERO;
+        Map<Long, BigDecimal> shopAmounts = new LinkedHashMap<>();
         List<OrderItem> orderItems = new ArrayList<>();
 
         for (Map.Entry<Long, Integer> entry : merged.entrySet()) {
@@ -136,6 +140,9 @@ public class OrderServiceImpl implements OrderService {
 
             BigDecimal itemAmount = product.getPrice().multiply(BigDecimal.valueOf(quantity));
             totalAmount = totalAmount.add(itemAmount);
+            if (product.getShopId() != null) {
+                shopAmounts.merge(product.getShopId(), itemAmount, BigDecimal::add);
+            }
 
             OrderItem item = new OrderItem();
             item.setProductType("NEW");
@@ -151,6 +158,10 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderNo(generateOrderNo(userId));
         order.setBuyerUserId(userId);
         order.setTotalAmount(totalAmount);
+        order.setVoucherDiscountAmount(BigDecimal.ZERO);
+        order.setSellerBearAmount(BigDecimal.ZERO);
+        order.setPlatformBearAmount(BigDecimal.ZERO);
+        order.setPayableAmount(totalAmount);
         order.setPayStatus(0);
         order.setOrderStatus(OrderStatusEnum.PENDING_PAY.getCode());
         order.setCanRefund(1);
@@ -182,6 +193,17 @@ public class OrderServiceImpl implements OrderService {
         order.setReceiverCity(addr.getCity());
         order.setReceiverDetailAddress(addr.getDetailAddress());
         orderInfoMapper.insert(order);
+
+        if (request.getVoucherId() != null) {
+            VoucherService.CheckoutDiscount discount = voucherService.occupyForOrder(
+                    request.getVoucherId(), userId, order.getId(), shopAmounts, totalAmount);
+            order.setVoucherId(discount.voucherId());
+            order.setVoucherDiscountAmount(discount.discountAmount());
+            order.setSellerBearAmount(discount.sellerBearAmount());
+            order.setPlatformBearAmount(discount.platformBearAmount());
+            order.setPayableAmount(discount.payableAmount());
+            orderInfoMapper.updateById(order);
+        }
 
         for (OrderItem item : orderItems) {
             item.setOrderId(order.getId());
@@ -279,7 +301,7 @@ public class OrderServiceImpl implements OrderService {
         String payMethod;
         if ("COIN".equals(payMode)) {
             escrowSettlementService.changePersonalBalance(userId,
-                    order.getTotalAmount().negate(),
+                    payableAmount(order).negate(),
                     orderId,
                     "COIN_PAY",
                     TransactionTradeTypeEnum.EXPENSE_PURCHASE,
@@ -302,7 +324,11 @@ public class OrderServiceImpl implements OrderService {
         if (updated == 0) {
             throw new BusinessException(400, "当前状态不可支付");
         }
-        pushOrderRealtime(orderId, userId, resolveSellerUserIds(orderId), "ORDER_STATUS_UPDATED", "订单已支付，等待卖家发货");
+        voucherService.markUsedForPaidOrder(order.getVoucherId(), userId, orderId);
+        List<Long> sellerUserIds = resolveSellerUserIds(orderId);
+        notifySellers(orderId, sellerUserIds, "新订单已支付",
+                "订单号：" + order.getOrderNo() + "，买家已完成支付，请及时发货。");
+        pushOrderRealtime(orderId, userId, sellerUserIds, "ORDER_STATUS_UPDATED", "订单已支付，等待卖家发货");
         return getMyOrderDetail(orderId);
     }
 
@@ -333,8 +359,12 @@ public class OrderServiceImpl implements OrderService {
         boolean isUnpaid = order.getPayStatus() == null || Integer.valueOf(0).equals(order.getPayStatus());
         if (isUnpaid) {
             restoreStockForNewItems(orderId);
+            voucherService.releaseForCanceledOrder(order.getVoucherId(), userId, orderId);
         }
-        pushOrderRealtime(orderId, userId, resolveSellerUserIds(orderId), "ORDER_STATUS_UPDATED", "订单已取消");
+        List<Long> sellerUserIds = resolveSellerUserIds(orderId);
+        notifySellers(orderId, sellerUserIds, "订单已取消",
+                "订单号：" + order.getOrderNo() + "，买家已取消订单。");
+        pushOrderRealtime(orderId, userId, sellerUserIds, "ORDER_STATUS_UPDATED", "订单已取消");
         return getMyOrderDetail(orderId);
     }
 
@@ -359,7 +389,10 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(400, "仅待收货订单可确认收货");
         }
         finalizeReceipt(orderId, order, now);
-        pushOrderRealtime(orderId, userId, resolveSellerUserIds(orderId), "ORDER_STATUS_UPDATED", "买家已确认收货");
+        List<Long> sellerUserIds = resolveSellerUserIds(orderId);
+        notifySellers(orderId, sellerUserIds, "买家已确认收货",
+                "订单号：" + order.getOrderNo() + "，交易资金已按规则结算。");
+        pushOrderRealtime(orderId, userId, sellerUserIds, "ORDER_STATUS_UPDATED", "买家已确认收货");
         return getMyOrderDetail(orderId);
     }
 
@@ -392,7 +425,12 @@ public class OrderServiceImpl implements OrderService {
             return;
         }
         finalizeReceipt(orderId, order, now);
-        pushOrderRealtime(orderId, order.getBuyerUserId(), resolveSellerUserIds(orderId), "ORDER_STATUS_UPDATED",
+        List<Long> sellerUserIds = resolveSellerUserIds(orderId);
+        notifyBuyer(order, "订单已自动确认收货",
+                "订单号：" + order.getOrderNo() + " 已由系统自动确认收货。");
+        notifySellers(orderId, sellerUserIds, "订单已自动确认收货",
+                "订单号：" + order.getOrderNo() + " 已自动确认收货，交易资金已按规则结算。");
+        pushOrderRealtime(orderId, order.getBuyerUserId(), sellerUserIds, "ORDER_STATUS_UPDATED",
                 "系统已自动确认收货");
     }
 
@@ -431,7 +469,11 @@ public class OrderServiceImpl implements OrderService {
         }
         refundMoneyToBuyer(order, orderId, "REFUND_TIMEOUT_AUTO", decisionRemark);
         insertAfterSaleLog(orderId, AfterSaleActionEnum.APPROVE, 0L, OperatorRoleEnum.ADMIN, decisionRemark);
-        pushOrderRealtime(orderId, order.getBuyerUserId(), resolveSellerUserIds(orderId), "AFTER_SALE_UPDATED",
+        List<Long> sellerUserIds = resolveSellerUserIds(orderId);
+        notifyBuyer(order, "退款已完成", "订单号：" + order.getOrderNo() + "，系统已自动退款。");
+        notifySellers(orderId, sellerUserIds, "订单已自动退款",
+                "订单号：" + order.getOrderNo() + "，因超时未处理，系统已自动退款。");
+        pushOrderRealtime(orderId, order.getBuyerUserId(), sellerUserIds, "AFTER_SALE_UPDATED",
                 "系统已自动退款");
     }
 
@@ -467,7 +509,10 @@ public class OrderServiceImpl implements OrderService {
         if (updated == 0) {
             throw new BusinessException(400, "仅待评价订单可完成");
         }
-        pushOrderRealtime(orderId, userId, resolveSellerUserIds(orderId), "ORDER_STATUS_UPDATED", "订单已完成");
+        List<Long> sellerUserIds = resolveSellerUserIds(orderId);
+        notifySellers(orderId, sellerUserIds, "订单已完成",
+                "订单号：" + order.getOrderNo() + "，买家已完成订单。");
+        pushOrderRealtime(orderId, userId, sellerUserIds, "ORDER_STATUS_UPDATED", "订单已完成");
         return getMyOrderDetail(orderId);
     }
 
@@ -511,6 +556,10 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderStatus(OrderStatusEnum.COMPLETED.getCode());
         order.setCompletedTime(LocalDateTime.now());
         orderInfoMapper.updateById(order);
+        List<Long> sellerUserIds = resolveSellerUserIds(orderId);
+        notifySellers(orderId, sellerUserIds, "收到新的订单评价",
+                "订单号：" + order.getOrderNo() + "，买家已提交评价。");
+        pushOrderRealtime(orderId, userId, sellerUserIds, "ORDER_STATUS_UPDATED", "买家已提交评价，订单已完成");
         return buildOrderVO(order, items);
     }
 
@@ -568,6 +617,10 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderStatus(OrderStatusEnum.COMPLETED.getCode());
         order.setCompletedTime(LocalDateTime.now());
         orderInfoMapper.updateById(order);
+        List<Long> sellerUserIds = resolveSellerUserIds(orderId);
+        notifySellers(orderId, sellerUserIds, "收到新的商品评价",
+                "订单号：" + order.getOrderNo() + "，买家已提交商品评价。");
+        pushOrderRealtime(orderId, userId, sellerUserIds, "ORDER_STATUS_UPDATED", "买家已提交评价，订单已完成");
         return buildOrderVO(order, orderItems);
     }
 
@@ -628,11 +681,18 @@ public class OrderServiceImpl implements OrderService {
             restoreStockForNewItems(orderId);
             insertAfterSaleLog(orderId, AfterSaleActionEnum.APPLY, userId, OperatorRoleEnum.BUYER, reason);
             insertAfterSaleLog(orderId, AfterSaleActionEnum.APPROVE, 0L, OperatorRoleEnum.ADMIN, "未发货，仅退款自动通过");
-            pushOrderRealtime(orderId, userId, resolveSellerUserIds(orderId), "AFTER_SALE_UPDATED", "仅退款已自动完成");
+            List<Long> sellerUserIds = resolveSellerUserIds(orderId);
+            notifyBuyer(order, "退款已完成", "订单号：" + order.getOrderNo() + "，未发货订单已自动退款。");
+            notifySellers(orderId, sellerUserIds, "订单已退款",
+                    "订单号：" + order.getOrderNo() + "，买家申请未发货退款，系统已自动处理。");
+            pushOrderRealtime(orderId, userId, sellerUserIds, "AFTER_SALE_UPDATED", "仅退款已自动完成");
             return getMyOrderDetail(orderId);
         }
         insertAfterSaleLog(orderId, AfterSaleActionEnum.APPLY, userId, OperatorRoleEnum.BUYER, reason);
-        pushOrderRealtime(orderId, userId, resolveSellerUserIds(orderId), "AFTER_SALE_UPDATED", "买家发起了退货申请");
+        List<Long> sellerUserIds = resolveSellerUserIds(orderId);
+        notifySellers(orderId, sellerUserIds, "收到退款申请",
+                "订单号：" + order.getOrderNo() + "，买家申请退款，请及时处理。原因：" + reason);
+        pushOrderRealtime(orderId, userId, sellerUserIds, "AFTER_SALE_UPDATED", "买家发起了退货申请");
         return getMyOrderDetail(orderId);
     }
 
@@ -675,7 +735,8 @@ public class OrderServiceImpl implements OrderService {
         if ("ONLY_REFUND".equalsIgnoreCase(order.getRefundMode())
                 && Integer.valueOf(OrderStatusEnum.SHIPPED.getCode()).equals(order.getOrderStatus())
                 && !"ARRIVED".equalsIgnoreCase(order.getLogisticsStatus())) {
-            notifySellers(resolveSellerUserIds(orderId), "快递拦截提醒", "订单号：" + order.getOrderNo() + "，您已同意仅退款，请尽快联系物流拦截快递。");
+            notifySellers(orderId, resolveSellerUserIds(orderId), "快递拦截提醒",
+                    "订单号：" + order.getOrderNo() + "，您已同意仅退款，请尽快联系物流拦截快递。");
         }
         // 条件更新不会回写内存对象，这里同步补齐返回 VO 需要的字段
         order.setRefundStatus(RefundStatusEnum.APPROVED.getCode());
@@ -687,6 +748,8 @@ public class OrderServiceImpl implements OrderService {
         order.setClosedTime(now);
         order.setCanRefund(0);
         insertAfterSaleLog(orderId, AfterSaleActionEnum.APPROVE, sellerUserId, OperatorRoleEnum.SELLER, decisionRemark);
+        notifyBuyer(order, "退款申请已通过",
+                "订单号：" + order.getOrderNo() + "，卖家已同意退款。处理说明：" + decisionRemark);
         pushOrderRealtime(orderId, order.getBuyerUserId(), List.of(sellerUserId), "AFTER_SALE_UPDATED", "卖家已同意退货并退款");
         return buildOrderVO(order, items);
     }
@@ -729,6 +792,8 @@ public class OrderServiceImpl implements OrderService {
         order.setRefundDecisionRemark(decisionRemark);
         order.setRefundDecisionSource(RefundDecisionSourceEnum.SELLER.name());
         insertAfterSaleLog(orderId, AfterSaleActionEnum.REJECT, sellerUserId, OperatorRoleEnum.SELLER, decisionRemark);
+        notifyBuyer(order, "退款申请未通过",
+                "订单号：" + order.getOrderNo() + "，卖家拒绝了退款申请。处理说明：" + decisionRemark);
         pushOrderRealtime(orderId, order.getBuyerUserId(), List.of(sellerUserId), "AFTER_SALE_UPDATED", "卖家已拒绝退货申请");
         return buildOrderVO(order, items);
     }
@@ -820,6 +885,8 @@ public class OrderServiceImpl implements OrderService {
         }
         orderInfoMapper.updateById(order);
         logisticsService.initializeWhenShipped(orderId);
+        notifyBuyer(order, "订单已发货",
+                "订单号：" + order.getOrderNo() + "，卖家已发货，包裹正在运输中。");
         pushOrderRealtime(orderId, order.getBuyerUserId(), List.of(sellerUserId), "ORDER_STATUS_UPDATED", "卖家已发货");
         pushOrderRealtime(orderId, order.getBuyerUserId(), List.of(sellerUserId), "LOGISTICS_UPDATED",
                 "物流状态更新：包裹已揽收，开始运输");
@@ -865,12 +932,8 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(400, "无法定位卖家，提醒失败");
         }
 
-        Notification n = new Notification();
-        n.setUserId(sellerUserId);
-        n.setTitle("买家提醒发货");
-        n.setContent("订单号：" + order.getOrderNo() + "，请尽快发货。");
-        n.setIsRead(0);
-        notificationMapper.insert(n);
+        notifySellers(orderId, List.of(sellerUserId), "买家提醒发货",
+                "订单号：" + order.getOrderNo() + "，请尽快发货。");
         pushOrderRealtime(orderId, order.getBuyerUserId(), List.of(sellerUserId), "ORDER_REMIND_SHIP", "买家已发起提醒发货");
     }
 
@@ -904,6 +967,11 @@ public class OrderServiceImpl implements OrderService {
         vo.setOrderNo(order.getOrderNo());
         vo.setBuyerUserId(order.getBuyerUserId());
         vo.setTotalAmount(order.getTotalAmount());
+        vo.setVoucherId(order.getVoucherId());
+        vo.setVoucherDiscountAmount(defaultMoney(order.getVoucherDiscountAmount()));
+        vo.setSellerBearAmount(defaultMoney(order.getSellerBearAmount()));
+        vo.setPlatformBearAmount(defaultMoney(order.getPlatformBearAmount()));
+        vo.setPayableAmount(payableAmount(order));
         vo.setPayStatus(order.getPayStatus());
         vo.setOrderStatus(order.getOrderStatus());
         OrderStatusEnum statusEnum = OrderStatusEnum.of(order.getOrderStatus());
@@ -1112,7 +1180,7 @@ public class OrderServiceImpl implements OrderService {
 
     private void refundMoneyToBuyer(OrderInfo order, Long orderId, String changeType, String remark) {
         deductSellerBalanceIfSettled(order, orderId, remark);
-        escrowSettlementService.changePersonalBalance(order.getBuyerUserId(), order.getTotalAmount(), orderId,
+        escrowSettlementService.changePersonalBalance(order.getBuyerUserId(), payableAmount(order), orderId,
                 changeType, TransactionTradeTypeEnum.REFUND_BACKFLOW, remark);
     }
 
@@ -1133,6 +1201,7 @@ public class OrderServiceImpl implements OrderService {
             String accountType = "SECONDHAND".equalsIgnoreCase(item.getProductType()) ? "PERSONAL" : "BUSINESS";
             groupedAmount.merge(sellerUserId + "#" + accountType, amount, BigDecimal::add);
         }
+        applySellerVoucherDiscount(order, groupedAmount);
         for (Map.Entry<String, BigDecimal> entry : groupedAmount.entrySet()) {
             String[] split = entry.getKey().split("#");
             Long sellerUserId = Long.valueOf(split[0]);
@@ -1166,27 +1235,62 @@ public class OrderServiceImpl implements OrderService {
         return null;
     }
 
-    private void notifySellers(List<Long> sellerUserIds, String title, String content) {
+    private void applySellerVoucherDiscount(OrderInfo order, Map<String, BigDecimal> groupedAmount) {
+        BigDecimal sellerBearAmount = defaultMoney(order == null ? null : order.getSellerBearAmount());
+        if (sellerBearAmount.compareTo(BigDecimal.ZERO) <= 0 || order.getVoucherId() == null) {
+            return;
+        }
+        Long voucherShopId = voucherService.getSellerBearerShopId(order.getVoucherId());
+        if (voucherShopId == null) {
+            return;
+        }
+        Shop shop = shopMapper.selectById(voucherShopId);
+        if (shop == null || shop.getOwnerUserId() == null) {
+            return;
+        }
+        String key = shop.getOwnerUserId() + "#BUSINESS";
+        BigDecimal gross = groupedAmount.get(key);
+        if (gross != null) {
+            groupedAmount.put(key, gross.subtract(sellerBearAmount).max(BigDecimal.ZERO));
+        }
+    }
+
+    private BigDecimal payableAmount(OrderInfo order) {
+        if (order == null) {
+            return BigDecimal.ZERO;
+        }
+        return order.getPayableAmount() == null ? defaultMoney(order.getTotalAmount()) : defaultMoney(order.getPayableAmount());
+    }
+
+    private BigDecimal defaultMoney(BigDecimal amount) {
+        return amount == null ? BigDecimal.ZERO : amount;
+    }
+
+    private void notifyBuyer(OrderInfo order, String title, String content) {
+        if (order == null || order.getBuyerUserId() == null) {
+            return;
+        }
+        notificationService.createNotification(order.getBuyerUserId(), title, content,
+                "/order/" + order.getId());
+    }
+
+    private void notifySellers(Long orderId, List<Long> sellerUserIds, String title, String content) {
         if (sellerUserIds == null || sellerUserIds.isEmpty()) {
             return;
         }
-        for (Long sellerUserId : sellerUserIds) {
-            Notification notification = new Notification();
-            notification.setUserId(sellerUserId);
-            notification.setTitle(title);
-            notification.setContent(content);
-            notification.setIsRead(0);
-            notification.setCreateTime(LocalDateTime.now());
-            notificationMapper.insert(notification);
-            Map<String, Object> payload = new LinkedHashMap<>();
-            payload.put("id", notification.getId());
-            payload.put("title", notification.getTitle());
-            payload.put("content", notification.getContent());
-            payload.put("scope", "seller");
-            payload.put("isRead", notification.getIsRead());
-            payload.put("createTime", notification.getCreateTime());
-            realtimePushService.pushToUser(sellerUserId, "NOTIFICATION_CREATED", payload);
+        for (Long sellerUserId : sellerUserIds.stream().filter(Objects::nonNull).distinct().toList()) {
+            notificationService.createNotification(sellerUserId, title, content,
+                    resolveSellerOrderTargetPath(orderId, sellerUserId));
         }
+    }
+
+    private String resolveSellerOrderTargetPath(Long orderId, Long sellerUserId) {
+        List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
+                .eq(OrderItem::getOrderId, orderId));
+        boolean ownsSecondhandItem = items.stream()
+                .filter(item -> "SECONDHAND".equalsIgnoreCase(item.getProductType()))
+                .anyMatch(item -> isItemOwnedBySeller(item, sellerUserId));
+        return ownsSecondhandItem ? "/secondhand/orders/" + orderId : "/merchant/orders/" + orderId;
     }
 
     private void restoreStockForNewItems(Long orderId) {
@@ -1257,7 +1361,12 @@ public class OrderServiceImpl implements OrderService {
         order.setClosedTime(now);
         order.setCanRefund(0);
         insertAfterSaleLog(orderId, AfterSaleActionEnum.APPROVE, operatorId, OperatorRoleEnum.ADMIN, decisionRemark);
-        pushOrderRealtime(orderId, order.getBuyerUserId(), resolveSellerUserIds(orderId), "AFTER_SALE_UPDATED",
+        List<Long> sellerUserIds = resolveSellerUserIds(orderId);
+        notifyBuyer(order, "退款申请已通过",
+                "订单号：" + order.getOrderNo() + "，管理员已同意退款。处理说明：" + decisionRemark);
+        notifySellers(orderId, sellerUserIds, "管理员已处理退款",
+                "订单号：" + order.getOrderNo() + "，管理员已同意退款。");
+        pushOrderRealtime(orderId, order.getBuyerUserId(), sellerUserIds, "AFTER_SALE_UPDATED",
                 "管理员已同意退款");
         return buildOrderVO(order, items);
     }
@@ -1298,7 +1407,12 @@ public class OrderServiceImpl implements OrderService {
         order.setRefundDecisionRemark(decisionRemark);
         order.setRefundDecisionSource(RefundDecisionSourceEnum.ADMIN.name());
         insertAfterSaleLog(orderId, AfterSaleActionEnum.REJECT, operatorId, OperatorRoleEnum.ADMIN, decisionRemark);
-        pushOrderRealtime(orderId, order.getBuyerUserId(), resolveSellerUserIds(orderId), "AFTER_SALE_UPDATED",
+        List<Long> sellerUserIds = resolveSellerUserIds(orderId);
+        notifyBuyer(order, "退款申请未通过",
+                "订单号：" + order.getOrderNo() + "，管理员拒绝了退款申请。处理说明：" + decisionRemark);
+        notifySellers(orderId, sellerUserIds, "管理员已处理退款",
+                "订单号：" + order.getOrderNo() + "，管理员已拒绝退款申请。");
+        pushOrderRealtime(orderId, order.getBuyerUserId(), sellerUserIds, "AFTER_SALE_UPDATED",
                 "管理员已拒绝退款申请");
         return buildOrderVO(order, items);
     }

@@ -7,7 +7,6 @@
       <button class="brand-link" type="button" @click="router.push('/')">
         <img :src="logoUrl" alt="Kinda Goods" />
       </button>
-      <button class="home-link" type="button" @click="router.push('/')">返回商城</button>
     </header>
 
     <main class="register-stage fade-in-up">
@@ -248,8 +247,7 @@ async function handleRegister() {
   gap: 16px;
 }
 
-.brand-link,
-.home-link {
+.brand-link {
   border: 1px solid rgba(137, 199, 255, 0.36);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.82);
@@ -270,19 +268,6 @@ async function handleRegister() {
   display: block;
   object-fit: contain;
   object-position: left center;
-}
-
-.home-link {
-  height: 40px;
-  padding: 0 15px;
-  color: var(--text-main);
-  font-weight: 900;
-}
-
-.home-link:hover {
-  border-color: var(--brand-primary);
-  color: var(--brand-primary);
-  background: var(--brand-primary-weak);
 }
 
 .register-stage {

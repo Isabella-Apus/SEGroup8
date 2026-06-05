@@ -254,8 +254,8 @@ public class ChatServiceImpl implements ChatService {
                 throw new BusinessException(404, "商品不存在");
             }
             Shop shop = shopMapper.selectById(product.getShopId());
-            if (shop == null || !Objects.equals(shop.getOwnerUserId(), targetUser.getId())) {
-                throw new BusinessException(400, "目标用户不是该商品卖家");
+            if (shop == null) {
+                throw new BusinessException(404, "店铺不存在");
             }
             return buildConversationTargetBySellerId(
                     currentUser.getId(),
@@ -273,9 +273,6 @@ public class ChatServiceImpl implements ChatService {
             SecondhandProduct product = secondhandProductMapper.selectById(sourceId);
             if (product == null) {
                 throw new BusinessException(404, "二手商品不存在");
-            }
-            if (!Objects.equals(product.getSellerUserId(), targetUser.getId())) {
-                throw new BusinessException(400, "目标用户不是该商品卖家");
             }
             return buildConversationTargetBySellerId(
                     currentUser.getId(),

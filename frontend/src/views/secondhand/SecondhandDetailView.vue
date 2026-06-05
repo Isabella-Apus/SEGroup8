@@ -231,11 +231,47 @@
         <el-button type="primary" :loading="buySubmitting" @click="confirmBuyWithAddress">确认下单</el-button>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="payDialogVisible" title="确认支付" width="520px" align-center append-to-body>
+      <el-form label-width="90px">
+        <el-form-item label="支付金额">
+          <strong class="pay-amount">¥{{ Number(pendingPaymentOrder?.payableAmount ?? pendingPaymentOrder?.totalAmount ?? 0).toFixed(2) }}</strong>
+        </el-form-item>
+        <el-form-item label="支付方式">
+          <el-radio-group v-model="payForm.payMode">
+            <el-radio-button label="THIRD_PARTY">微信/支付宝</el-radio-button>
+            <el-radio-button label="COIN">商城币</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item v-if="payForm.payMode === 'THIRD_PARTY'" label="支付渠道">
+          <el-radio-group v-model="payForm.payChannel">
+            <el-radio-button label="WECHAT">微信</el-radio-button>
+            <el-radio-button label="ALIPAY">支付宝</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <div v-if="payForm.payMode === 'THIRD_PARTY'" class="pay-qr-placeholder">
+          第三方支付二维码占位（模拟）
+        </div>
+        <el-alert
+          v-else
+          type="info"
+          show-icon
+          :closable="false"
+          title="确认后将直接扣减商城币余额。"
+        />
+      </el-form>
+      <template #footer>
+        <el-button @click="payDialogVisible = false">稍后支付</el-button>
+        <el-button type="primary" :loading="paySubmitting" @click="confirmPayment">
+          {{ payForm.payMode === "THIRD_PARTY" ? "我已支付" : "确认支付" }}
+        </el-button>
+      </template>
+    </el-dialog>
   </section>
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { User } from "@element-plus/icons-vue";
 import { useRoute, useRouter } from "vue-router";
@@ -249,6 +285,7 @@ import {
   placeAuctionBidApi,
 } from "@/api/secondhand";
 import { listAddressesApi, recordBrowseHistoryApi } from "@/api/user";
+import { payOrderApi } from "@/api/order";
 import { submitReportApi, blockUserApi, unblockUserApi, isBlockingApi, isBlockedByApi } from "@/api/credit";
 import { getUser } from "@/utils/storage";
 import { addSecondhandToCart } from "@/utils/secondhandCart";
@@ -285,6 +322,13 @@ const addressDialogVisible = ref(false);
 const buySubmitting = ref(false);
 const addresses = ref([]);
 const selectedAddressId = ref(null);
+const pendingPaymentOrder = ref(null);
+const payDialogVisible = ref(false);
+const paySubmitting = ref(false);
+const payForm = reactive({
+  payMode: "THIRD_PARTY",
+  payChannel: "WECHAT",
+});
 const auctionHashHandledFor = ref("");
 
 const imageList = computed(() => {
@@ -454,12 +498,39 @@ async function confirmBuyWithAddress() {
   }
   buySubmitting.value = true;
   try {
-    await buySecondhandApi(item.value.id, { addressId: selectedAddressId.value });
+    const result = await buySecondhandApi(item.value.id, { addressId: selectedAddressId.value });
+    pendingPaymentOrder.value = result?.data || null;
     addressDialogVisible.value = false;
-    ElMessage.success("下单成功");
-    router.push({ path: "/order", query: { type: "SECONDHAND" } });
+    if (item.value) {
+      item.value.status = 0;
+      item.value.statusName = "已售罄";
+    }
+    payForm.payMode = "THIRD_PARTY";
+    payForm.payChannel = "WECHAT";
+    ElMessage.success("下单成功，请完成付款");
+    payDialogVisible.value = true;
   } finally {
     buySubmitting.value = false;
+  }
+}
+
+async function confirmPayment() {
+  const orderId = pendingPaymentOrder.value?.id;
+  if (!orderId) {
+    ElMessage.error("未找到待支付订单");
+    return;
+  }
+  paySubmitting.value = true;
+  try {
+    const result = await payOrderApi(orderId, {
+      payMode: payForm.payMode,
+      payChannel: payForm.payChannel,
+    });
+    pendingPaymentOrder.value = result?.data || pendingPaymentOrder.value;
+    payDialogVisible.value = false;
+    ElMessage.success("支付成功，卖家将尽快发货");
+  } finally {
+    paySubmitting.value = false;
   }
 }
 
@@ -692,6 +763,21 @@ async function handleUnblock() {
 </script>
 
 <style scoped>
+.pay-amount {
+  color: var(--brand-primary);
+  font-size: 24px;
+}
+
+.pay-qr-placeholder {
+  margin: 8px 0 0 90px;
+  border: 1px dashed var(--line-soft);
+  border-radius: 10px;
+  background: #f8fafc;
+  color: var(--text-secondary);
+  padding: 28px 16px;
+  text-align: center;
+}
+
 .detail-page {
   display: flex;
   flex-direction: column;

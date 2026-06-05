@@ -42,7 +42,7 @@
           </div>
           <div>
             <dt>状态</dt>
-            <dd>{{ product.statusName || "在售" }}</dd>
+            <dd>{{ productDisplayStatus }}</dd>
           </div>
           <div>
             <dt>卖家</dt>
@@ -53,6 +53,33 @@
         <div class="quantity-row">
           <span>购买数量</span>
           <el-input-number v-model="quantity" :min="1" :max="maxQuantity || 1" />
+        </div>
+
+        <div class="coupon-select-row">
+          <span>优惠券</span>
+          <el-select
+            v-model="selectedVoucherId"
+            clearable
+            :loading="couponsLoading"
+            placeholder="不使用优惠券"
+          >
+            <el-option
+              v-for="coupon in availableCoupons"
+              :key="coupon.id"
+              :label="formatCouponOption(coupon)"
+              :value="coupon.id"
+            />
+          </el-select>
+          <small v-if="getUser()?.id && !couponsLoading && !availableCoupons.length">当前商品暂无可用优惠券</small>
+          <small v-else-if="!getUser()?.id">登录并领券后可在此选择</small>
+        </div>
+
+        <div class="order-preview">
+          <span>本单应付</span>
+          <div>
+            <small v-if="couponDiscountAmount > 0">已优惠 ¥{{ couponDiscountAmount.toFixed(2) }}</small>
+            <strong>¥{{ payableAmount }}</strong>
+          </div>
         </div>
 
         <div class="actions">
@@ -90,10 +117,12 @@ import { Shop } from "@element-plus/icons-vue";
 import { useRoute, useRouter } from "vue-router";
 import { getProductDetailApi } from "@/api/product";
 import { createOrderApi } from "@/api/order";
+import { listCheckoutCouponsApi } from "@/api/coupon";
 import { listAddressesApi, recordBrowseHistoryApi } from "@/api/user";
 import { addToCart, removeFromCart } from "@/utils/cart";
 import { getUser } from "@/utils/storage";
 import { toAssetUrl } from "@/utils/url";
+import { formatCouponOption, getCouponDiscount } from "@/utils/coupon";
 
 const route = useRoute();
 const router = useRouter();
@@ -102,8 +131,30 @@ const loading = ref(false);
 const product = ref(null);
 const quantity = ref(1);
 const selectedImage = ref("");
+const availableCoupons = ref([]);
+const selectedVoucherId = ref(null);
+const couponsLoading = ref(false);
+let couponRequestId = 0;
 
 const maxQuantity = computed(() => Number(product.value?.stock || 0));
+const productDisplayStatus = computed(() => maxQuantity.value <= 0 ? "已售罄" : (product.value?.statusName || "在售"));
+const subtotalAmount = computed(() => Number(product.value?.price || 0) * Number(quantity.value || 0));
+const shopAmounts = computed(() => {
+  const amounts = new Map();
+  if (product.value?.shopId) {
+    amounts.set(Number(product.value.shopId), subtotalAmount.value);
+  }
+  return amounts;
+});
+const selectedCoupon = computed(() => availableCoupons.value
+  .find((coupon) => Number(coupon.id) === Number(selectedVoucherId.value)) || null);
+const couponDiscountAmount = computed(() => getCouponDiscount(
+  selectedCoupon.value,
+  subtotalAmount.value,
+  shopAmounts.value,
+));
+const payableAmount = computed(() => Math.max(0, subtotalAmount.value - couponDiscountAmount.value).toFixed(2));
+const couponContextKey = computed(() => `${product.value?.shopId || ""}|${subtotalAmount.value.toFixed(2)}`);
 const imageList = computed(() => {
   if (!product.value) {
     return [];
@@ -128,6 +179,8 @@ watch(() => route.params.id, () => {
   fetchDetail();
 }, { immediate: true });
 
+watch(couponContextKey, loadAvailableCoupons);
+
 async function fetchDetail() {
   loading.value = true;
   try {
@@ -138,6 +191,38 @@ async function fetchDetail() {
     recordCurrentProduct();
   } finally {
     loading.value = false;
+  }
+}
+
+async function loadAvailableCoupons() {
+  const requestId = ++couponRequestId;
+  if (!getUser()?.id || !product.value?.shopId || subtotalAmount.value <= 0) {
+    availableCoupons.value = [];
+    selectedVoucherId.value = null;
+    return;
+  }
+  couponsLoading.value = true;
+  try {
+    const result = await listCheckoutCouponsApi({
+      page: 1,
+      pageSize: 100,
+      shopIds: String(product.value.shopId),
+      totalAmount: subtotalAmount.value.toFixed(2),
+    });
+    if (requestId !== couponRequestId) return;
+    availableCoupons.value = (result?.data?.records || []).filter((coupon) => (
+      getCouponDiscount(coupon, subtotalAmount.value, shopAmounts.value) > 0
+    ));
+    if (!availableCoupons.value.some((coupon) => Number(coupon.id) === Number(selectedVoucherId.value))) {
+      selectedVoucherId.value = null;
+    }
+  } catch {
+    if (requestId === couponRequestId) {
+      availableCoupons.value = [];
+      selectedVoucherId.value = null;
+    }
+  } finally {
+    if (requestId === couponRequestId) couponsLoading.value = false;
   }
 }
 
@@ -181,6 +266,7 @@ async function handleBuyNow() {
   }
   const result = await createOrderApi({
     addressId: selectedAddressId,
+    voucherId: selectedVoucherId.value || null,
     items: [{ productId: product.value.id, quantity: Number(quantity.value) }],
   });
   removeFromCart(product.value.id);
@@ -395,6 +481,52 @@ async function confirmAddressAndPickId() {
   align-items: center;
   gap: 12px;
   font-weight: 800;
+}
+
+.coupon-select-row {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px 12px;
+  font-weight: 800;
+}
+
+.coupon-select-row :deep(.el-select) {
+  width: 100%;
+}
+
+.coupon-select-row small {
+  grid-column: 2;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.order-preview {
+  border: 1px solid rgba(255, 185, 214, 0.5);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(255, 185, 214, 0.16), rgba(137, 199, 255, 0.18));
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--text-secondary);
+  font-weight: 800;
+}
+
+.order-preview div {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.order-preview small {
+  color: #e65b5b;
+}
+
+.order-preview strong {
+  color: var(--brand-primary);
+  font-size: 26px;
 }
 
 .actions {

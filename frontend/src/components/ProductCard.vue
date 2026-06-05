@@ -3,7 +3,8 @@
     <button class="cover-wrap" type="button" @click="goDetail">
       <img class="cover" :src="coverUrl" :alt="product.name" loading="lazy" />
       <span class="badge">{{ badgeText }}</span>
-      <span v-if="isLowStock" class="stock-badge">库存紧张</span>
+      <span v-if="isSoldOut" class="stock-badge sold-out-badge">已售罄</span>
+      <span v-else-if="isLowStock" class="stock-badge">库存紧张</span>
       <span class="quick-view">看详情</span>
     </button>
 
@@ -33,7 +34,7 @@
       </div>
 
       <div class="actions">
-        <el-button v-if="!isSecondhand" size="small" @click.stop="handleAddCart">加购</el-button>
+        <el-button v-if="!isSecondhand" size="small" :disabled="isSoldOut" @click.stop="handleAddCart">加购</el-button>
         <el-button size="small" type="primary" @click.stop="goDetail">
           {{ isSecondhand ? "聊一聊" : "去看看" }}
         </el-button>
@@ -76,7 +77,7 @@ const badgeText = computed(() => {
   if (isSecondhand.value) {
     return props.product.conditionLevel || props.product.condition || "二手";
   }
-  return props.product.statusName || "在售";
+  return isSoldOut.value ? "已售罄" : (props.product.statusName || "在售");
 });
 
 const descriptionText = computed(() => {
@@ -103,6 +104,7 @@ const coverUrl = computed(() => {
 });
 
 const isLowStock = computed(() => !isSecondhand.value && Number(props.product.stock || 0) > 0 && Number(props.product.stock || 0) <= 5);
+const isSoldOut = computed(() => !isSecondhand.value && Number(props.product.stock || 0) <= 0);
 
 const formattedMainPrice = computed(() => formatPrice(mainPrice.value));
 const priceInteger = computed(() => formattedMainPrice.value.split(".")[0]);
@@ -293,6 +295,11 @@ function formatPrice(value) {
   right: 8px;
   background: var(--brand-warm);
   color: var(--text-main);
+}
+
+.sold-out-badge {
+  background: rgba(71, 85, 105, 0.9);
+  color: #ffffff;
 }
 
 .quick-view {

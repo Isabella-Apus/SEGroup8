@@ -45,11 +45,12 @@
             v-for="item in items"
             :key="`new-${item.productId}`"
             class="cart-item"
-            :class="{ selected: isOfficialSelected(item) }"
+            :class="{ selected: isOfficialSelected(item), 'sold-out': !isOfficialAvailable(item) }"
           >
             <el-checkbox
               class="item-check"
               :model-value="isOfficialSelected(item)"
+              :disabled="!isOfficialAvailable(item)"
               @change="(checked) => toggleOfficialItem(item, checked)"
             />
 
@@ -62,7 +63,9 @@
               <div class="item-tags">
                 <span>官方商品</span>
                 <span>多件合并</span>
-                <span>库存同步</span>
+                <span :class="{ 'sold-out-tag': !isOfficialAvailable(item) }">
+                  {{ isOfficialAvailable(item) ? `库存 ${Number(item.stock || 0)}` : "已售罄" }}
+                </span>
               </div>
             </div>
 
@@ -76,7 +79,8 @@
               <el-input-number
                 v-model="item.quantity"
                 :min="1"
-                :max="999"
+                :max="Math.max(1, Number(item.stock || 0))"
+                :disabled="!isOfficialAvailable(item)"
                 size="small"
                 @change="handleQtyChange"
               />
@@ -103,11 +107,12 @@
             v-for="item in secondhandItems"
             :key="`secondhand-${item.productId}`"
             class="cart-item secondhand-item"
-            :class="{ selected: isSecondhandSelected(item) }"
+            :class="{ selected: isSecondhandSelected(item), 'sold-out': !isSecondhandAvailable(item) }"
           >
             <el-checkbox
               class="item-check"
               :model-value="isSecondhandSelected(item)"
+              :disabled="!isSecondhandAvailable(item)"
               @change="(checked) => toggleSecondhandItem(item, checked)"
             />
 
@@ -120,7 +125,9 @@
               <div class="item-tags">
                 <span>{{ item.conditionLevel || "成色良好" }}</span>
                 <span>{{ item.sellerName || "个人卖家" }}</span>
-                <span>一件一单</span>
+                <span :class="{ 'sold-out-tag': !isSecondhandAvailable(item) }">
+                  {{ isSecondhandAvailable(item) ? "一件一单" : "已售罄" }}
+                </span>
               </div>
             </div>
 
@@ -161,6 +168,10 @@
               <dt>商品金额</dt>
               <dd>¥{{ selectedTotalAmount }}</dd>
             </div>
+            <div v-if="couponDiscountAmount > 0">
+              <dt>优惠券</dt>
+              <dd class="discount-amount">-¥{{ couponDiscountAmount.toFixed(2) }}</dd>
+            </div>
           </dl>
 
           <div class="checkout-groups">
@@ -171,14 +182,31 @@
             </div>
           </div>
 
-          <div class="coupon-note">
-            <strong>拆单说明</strong>
-            <span>官方商品会合并成一个订单；二手商品会逐件生成个人闲置订单，便于分别沟通、发货和售后。</span>
+          <div v-if="selectedItems.length" class="coupon-picker">
+            <div class="coupon-picker__head">
+              <strong>优惠券</strong>
+            </div>
+            <el-select
+              v-model="selectedVoucherId"
+              clearable
+              :loading="couponsLoading"
+              placeholder="不使用优惠券"
+            >
+              <el-option
+                v-for="coupon in availableCoupons"
+                :key="coupon.id"
+                :label="formatCouponOption(coupon)"
+                :value="coupon.id"
+              />
+            </el-select>
+            <small v-if="selectedItems.length && !couponsLoading && !availableCoupons.length">
+              当前商品暂无可用优惠券
+            </small>
           </div>
 
           <div class="payable">
             <span>应付合计</span>
-            <strong>¥{{ selectedTotalAmount }}</strong>
+            <strong>¥{{ payableTotalAmount }}</strong>
           </div>
 
           <el-button
@@ -198,10 +226,11 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 import { createOrderApi } from "@/api/order";
+import { listCheckoutCouponsApi } from "@/api/coupon";
 import { getProductDetailApi } from "@/api/product";
 import { buySecondhandApi, getSecondhandDetailApi } from "@/api/secondhand";
 import { listAddressesApi } from "@/api/user";
@@ -213,28 +242,69 @@ import {
   saveSecondhandCartItems,
 } from "@/utils/secondhandCart";
 import { toAssetUrl } from "@/utils/url";
+import { formatCouponOption, getCouponDiscount } from "@/utils/coupon";
 
 const router = useRouter();
 const items = ref([]);
 const secondhandItems = ref([]);
 const selectedItems = ref([]);
 const selectedSecondhandItems = ref([]);
+const availableCoupons = ref([]);
+const selectedVoucherId = ref(null);
+const couponsLoading = ref(false);
+let couponRequestId = 0;
 const fallbackCover = "https://images.unsplash.com/photo-1511556820780-d912e42b4980?auto=format&fit=crop&w=900&q=80";
 const secondhandFallbackCover = "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=900&q=80";
 
 const totalCount = computed(() => items.value.length + secondhandItems.value.length);
 const selectedCount = computed(() => selectedItems.value.length + selectedSecondhandItems.value.length);
+const selectableCount = computed(() => (
+  items.value.filter(isOfficialAvailable).length
+  + secondhandItems.value.filter(isSecondhandAvailable).length
+));
+
+const officialTotalValue = computed(() => selectedItems.value
+  .reduce((sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0), 0));
+
+const secondhandTotalValue = computed(() => selectedSecondhandItems.value
+  .reduce((sum, item) => sum + Number(item.price || 0), 0));
 
 const selectedTotalAmount = computed(() => {
-  const officialTotal = selectedItems.value
-    .reduce((sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0), 0);
-  const secondhandTotal = selectedSecondhandItems.value
-    .reduce((sum, item) => sum + Number(item.price || 0), 0);
-  return (officialTotal + secondhandTotal).toFixed(2);
+  return (officialTotalValue.value + secondhandTotalValue.value).toFixed(2);
 });
 
-const allSelected = computed(() => totalCount.value > 0 && selectedCount.value === totalCount.value);
-const isIndeterminate = computed(() => selectedCount.value > 0 && selectedCount.value < totalCount.value);
+const selectedCoupon = computed(() => availableCoupons.value
+  .find((coupon) => Number(coupon.id) === Number(selectedVoucherId.value)) || null);
+
+const officialShopAmounts = computed(() => {
+  const amounts = new Map();
+  selectedItems.value.forEach((item) => {
+    const shopId = Number(item.shopId);
+    if (!shopId) return;
+    const amount = Number(item.price || 0) * Number(item.quantity || 0);
+    amounts.set(shopId, Number(amounts.get(shopId) || 0) + amount);
+  });
+  return amounts;
+});
+
+const couponDiscountAmount = computed(() => getCouponDiscount(
+  selectedCoupon.value,
+  officialTotalValue.value,
+  officialShopAmounts.value,
+));
+
+const payableTotalAmount = computed(() => Math.max(
+  0,
+  officialTotalValue.value + secondhandTotalValue.value - couponDiscountAmount.value,
+).toFixed(2));
+
+const couponContextKey = computed(() => {
+  const shopIds = [...officialShopAmounts.value.keys()].sort((a, b) => a - b).join(",");
+  return `${shopIds}|${officialTotalValue.value.toFixed(2)}`;
+});
+
+const allSelected = computed(() => selectableCount.value > 0 && selectedCount.value === selectableCount.value);
+const isIndeterminate = computed(() => selectedCount.value > 0 && selectedCount.value < selectableCount.value);
 
 const checkoutGroups = computed(() => {
   const groups = [];
@@ -263,25 +333,86 @@ onMounted(async () => {
   await refreshCartItems();
 });
 
+watch(couponContextKey, loadAvailableCoupons, { immediate: true });
+
 async function refreshCartItems() {
   const rawItems = getCartItems();
   const officialChecks = await Promise.allSettled(
     rawItems.map((item) => getProductDetailApi(item.productId)),
   );
-  const validOfficialItems = rawItems.filter((_, index) => officialChecks[index].status === "fulfilled");
+  const refreshedOfficialItems = rawItems.map((item, index) => {
+    const check = officialChecks[index];
+    if (check.status !== "fulfilled") {
+      return { ...item, soldOut: true };
+    }
+    const latest = check.value.data || {};
+    const stock = Number(latest.stock || 0);
+    return {
+      ...item,
+      ...latest,
+      productId: latest.id ?? item.productId,
+      quantity: Math.min(Math.max(1, Number(item.quantity || 1)), Math.max(1, stock)),
+      soldOut: stock <= 0 || Number(latest.status ?? 1) !== 1,
+    };
+  });
 
   const rawSecondhandItems = getSecondhandCartItems();
   const secondhandChecks = await Promise.allSettled(
     rawSecondhandItems.map((item) => getSecondhandDetailApi(item.productId)),
   );
-  const validSecondhandItems = rawSecondhandItems.filter((_, index) => secondhandChecks[index].status === "fulfilled");
+  const refreshedSecondhandItems = rawSecondhandItems.map((item, index) => {
+    const check = secondhandChecks[index];
+    if (check.status !== "fulfilled") {
+      return { ...item, soldOut: true };
+    }
+    const latest = check.value.data || {};
+    return {
+      ...item,
+      ...latest,
+      productId: latest.id ?? item.productId,
+      price: latest.salePrice ?? latest.price ?? item.price,
+      soldOut: Number(latest.status ?? 1) !== 1,
+    };
+  });
 
-  items.value = validOfficialItems;
-  secondhandItems.value = validSecondhandItems;
+  items.value = refreshedOfficialItems;
+  secondhandItems.value = refreshedSecondhandItems;
   selectedItems.value = [];
   selectedSecondhandItems.value = [];
-  saveCartItems(validOfficialItems);
-  saveSecondhandCartItems(validSecondhandItems);
+  saveCartItems(refreshedOfficialItems);
+  saveSecondhandCartItems(refreshedSecondhandItems);
+}
+
+async function loadAvailableCoupons() {
+  const requestId = ++couponRequestId;
+  if (!selectedItems.value.length || officialTotalValue.value <= 0) {
+    availableCoupons.value = [];
+    selectedVoucherId.value = null;
+    return;
+  }
+  couponsLoading.value = true;
+  try {
+    const result = await listCheckoutCouponsApi({
+      page: 1,
+      pageSize: 100,
+      shopIds: [...officialShopAmounts.value.keys()].join(","),
+      totalAmount: officialTotalValue.value.toFixed(2),
+    });
+    if (requestId !== couponRequestId) return;
+    availableCoupons.value = (result?.data?.records || []).filter((coupon) => (
+      getCouponDiscount(coupon, officialTotalValue.value, officialShopAmounts.value) > 0
+    ));
+    if (!availableCoupons.value.some((coupon) => Number(coupon.id) === Number(selectedVoucherId.value))) {
+      selectedVoucherId.value = null;
+    }
+  } catch {
+    if (requestId === couponRequestId) {
+      availableCoupons.value = [];
+      selectedVoucherId.value = null;
+    }
+  } finally {
+    if (requestId === couponRequestId) couponsLoading.value = false;
+  }
 }
 
 function handleQtyChange() {
@@ -296,25 +427,35 @@ function isOfficialSelected(row) {
   return selectedItems.value.some((item) => Number(item.productId) === Number(row.productId));
 }
 
+function isOfficialAvailable(row) {
+  return !row?.soldOut && Number(row?.status ?? 1) === 1 && Number(row?.stock || 0) > 0;
+}
+
+function isSecondhandAvailable(row) {
+  return !row?.soldOut && Number(row?.status ?? 1) === 1;
+}
+
 function isSecondhandSelected(row) {
   return selectedSecondhandItems.value.some((item) => Number(item.productId) === Number(row.productId));
 }
 
 function toggleOfficialItem(row, checked) {
+  if (checked && !isOfficialAvailable(row)) return;
   selectedItems.value = checked
     ? (isOfficialSelected(row) ? selectedItems.value : selectedItems.value.concat(row))
     : selectedItems.value.filter((item) => Number(item.productId) !== Number(row.productId));
 }
 
 function toggleSecondhandItem(row, checked) {
+  if (checked && !isSecondhandAvailable(row)) return;
   selectedSecondhandItems.value = checked
     ? (isSecondhandSelected(row) ? selectedSecondhandItems.value : selectedSecondhandItems.value.concat(row))
     : selectedSecondhandItems.value.filter((item) => Number(item.productId) !== Number(row.productId));
 }
 
 function toggleAll(checked) {
-  selectedItems.value = checked ? [...items.value] : [];
-  selectedSecondhandItems.value = checked ? [...secondhandItems.value] : [];
+  selectedItems.value = checked ? items.value.filter(isOfficialAvailable) : [];
+  selectedSecondhandItems.value = checked ? secondhandItems.value.filter(isSecondhandAvailable) : [];
 }
 
 function removeOfficial(row) {
@@ -362,6 +503,7 @@ async function checkout() {
       if (validOfficialItems.length) {
         const result = await createOrderApi({
           addressId: selectedAddressId,
+          voucherId: selectedVoucherId.value || null,
           items: validOfficialItems.map((item) => ({
             productId: item.productId,
             quantity: Number(item.quantity || 0),
@@ -393,6 +535,7 @@ async function checkout() {
 
     selectedItems.value = [];
     selectedSecondhandItems.value = [];
+    selectedVoucherId.value = null;
 
     const createdOrderCount = (officialOrderId ? 1 : 0) + createdSecondhandIds.size;
     if (!createdOrderCount) {
@@ -635,6 +778,17 @@ async function confirmAddressAndPickId() {
   transform: translateY(-1px);
 }
 
+.cart-item.sold-out {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  opacity: 0.72;
+}
+
+.cart-item.sold-out:hover {
+  box-shadow: none;
+  transform: none;
+}
+
 .item-check {
   width: 22px;
 }
@@ -694,6 +848,13 @@ async function confirmAddressAndPickId() {
   border-color: rgba(60, 146, 255, 0.24);
   background: var(--brand-primary-weak);
   color: var(--brand-primary);
+}
+
+.item-tags .sold-out-tag,
+.official-group .item-tags .sold-out-tag {
+  border-color: rgba(100, 116, 139, 0.3);
+  background: #e2e8f0;
+  color: #475569;
 }
 
 .item-price span,
@@ -832,23 +993,38 @@ async function confirmAddressAndPickId() {
   font-weight: 900;
 }
 
-.coupon-note {
-  border: 1px solid rgba(255, 185, 214, 0.5);
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(255, 185, 214, 0.22), rgba(137, 199, 255, 0.22));
+.discount-amount {
+  color: #e65b5b !important;
+}
+
+.coupon-picker {
+  display: grid;
+  gap: 9px;
+  border: 1px solid rgba(60, 146, 255, 0.18);
+  border-radius: 10px;
+  background: rgba(234, 244, 255, 0.5);
   padding: 12px;
 }
 
-.coupon-note strong,
-.coupon-note span {
-  display: block;
+.coupon-picker__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.coupon-note span {
-  margin-top: 5px;
+.coupon-picker__head strong {
+  color: var(--text-main);
+}
+
+.coupon-picker__head span,
+.coupon-picker small {
   color: var(--text-secondary);
   font-size: 12px;
-  line-height: 1.5;
+}
+
+.coupon-picker :deep(.el-select) {
+  width: 100%;
 }
 
 .payable {

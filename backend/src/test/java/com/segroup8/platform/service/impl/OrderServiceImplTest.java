@@ -11,7 +11,6 @@ import com.segroup8.platform.entity.SecondhandProduct;
 import com.segroup8.platform.entity.Shop;
 import com.segroup8.platform.entity.OrderAfterSaleLog;
 import com.segroup8.platform.mapper.AddressMapper;
-import com.segroup8.platform.mapper.NotificationMapper;
 import com.segroup8.platform.mapper.OrderAfterSaleLogMapper;
 import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.OrderItemMapper;
@@ -21,6 +20,8 @@ import com.segroup8.platform.mapper.SecondhandProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.realtime.RealtimePushService;
 import com.segroup8.platform.service.LogisticsService;
+import com.segroup8.platform.service.NotificationService;
+import com.segroup8.platform.service.VoucherService;
 import com.segroup8.platform.service.settlement.EscrowSettlementService;
 import com.segroup8.platform.vo.OrderVO;
 import org.junit.jupiter.api.AfterEach;
@@ -37,8 +38,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -60,8 +63,6 @@ class OrderServiceImplTest {
     @Mock
     private AddressMapper addressMapper;
     @Mock
-    private NotificationMapper notificationMapper;
-    @Mock
     private OrderAfterSaleLogMapper orderAfterSaleLogMapper;
     @Mock
     private RealtimePushService realtimePushService;
@@ -69,6 +70,10 @@ class OrderServiceImplTest {
     private LogisticsService logisticsService;
     @Mock
     private EscrowSettlementService escrowSettlementService;
+    @Mock
+    private VoucherService voucherService;
+    @Mock
+    private NotificationService notificationService;
 
     private OrderServiceImpl orderService;
 
@@ -82,11 +87,12 @@ class OrderServiceImplTest {
                 secondhandProductMapper,
                 shopMapper,
                 addressMapper,
-                notificationMapper,
                 orderAfterSaleLogMapper,
                 realtimePushService,
                 logisticsService,
-                escrowSettlementService);
+                escrowSettlementService,
+                voucherService,
+                notificationService);
     }
 
     @AfterEach
@@ -230,6 +236,47 @@ class OrderServiceImplTest {
         verify(productMapper).updateById(argThat((Product p) -> p != null
                 && productId.equals(p.getId())
                 && Integer.valueOf(7).equals(p.getStock())
-            && Integer.valueOf(ProductStatusEnum.ON_SHELF.getCode()).equals(p.getStatus())));
+                && Integer.valueOf(ProductStatusEnum.ON_SHELF.getCode()).equals(p.getStatus())));
+    }
+
+    @Test
+    void shipSellerOrder_shouldPersistNotificationForBuyer() {
+        Long sellerUserId = 200L;
+        Long buyerUserId = 100L;
+        Long orderId = 14L;
+        Long productId = 89L;
+        Long shopId = 67L;
+        UserContext.setUserId(sellerUserId);
+
+        OrderInfo order = new OrderInfo();
+        order.setId(orderId);
+        order.setOrderNo("ORDER-14");
+        order.setBuyerUserId(buyerUserId);
+        order.setOrderStatus(OrderStatusEnum.PENDING_SHIP.getCode());
+        when(orderInfoMapper.selectById(orderId)).thenReturn(order);
+
+        OrderItem item = new OrderItem();
+        item.setId(3L);
+        item.setOrderId(orderId);
+        item.setProductType("NEW");
+        item.setProductId(productId);
+        item.setProductName("Test product");
+        item.setQuantity(1);
+        when(orderItemMapper.selectList(any())).thenReturn(List.of(item));
+
+        Product product = new Product();
+        product.setId(productId);
+        product.setShopId(shopId);
+        when(productMapper.selectById(productId)).thenReturn(product);
+
+        Shop shop = new Shop();
+        shop.setId(shopId);
+        shop.setOwnerUserId(sellerUserId);
+        when(shopMapper.selectById(shopId)).thenReturn(shop);
+
+        orderService.shipSellerOrder(orderId);
+
+        verify(notificationService).createNotification(
+                eq(buyerUserId), anyString(), anyString(), eq("/order/" + orderId));
     }
 }

@@ -27,6 +27,7 @@ import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.realtime.RealtimeEventTypes;
 import com.segroup8.platform.realtime.RealtimePushService;
 import com.segroup8.platform.service.ChatService;
+import com.segroup8.platform.service.NotificationService;
 import com.segroup8.platform.service.SecondhandTradeService;
 import com.segroup8.platform.service.settlement.EscrowSettlementService;
 import com.segroup8.platform.vo.AuctionLogVO;
@@ -71,6 +72,7 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
     private final OrderItemMapper orderItemMapper;
     private final ChatService chatService;
     private final RealtimePushService realtimePushService;
+    private final NotificationService notificationService;
     private final EscrowSettlementService escrowSettlementService;
 
     public SecondhandTradeServiceImpl(ProductNegotiationMapper productNegotiationMapper,
@@ -82,6 +84,7 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
             OrderItemMapper orderItemMapper,
             ChatService chatService,
             RealtimePushService realtimePushService,
+            NotificationService notificationService,
             EscrowSettlementService escrowSettlementService) {
         this.productNegotiationMapper = productNegotiationMapper;
         this.productAuctionMapper = productAuctionMapper;
@@ -92,6 +95,7 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         this.orderItemMapper = orderItemMapper;
         this.chatService = chatService;
         this.realtimePushService = realtimePushService;
+        this.notificationService = notificationService;
         this.escrowSettlementService = escrowSettlementService;
     }
 
@@ -145,6 +149,11 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                 "productId", request.getProductId(),
                 "buyerUserId", buyerUserId,
                 "proposedPrice", request.getProposedPrice()));
+        notificationService.createNotification(
+                request.getSellerUserId(),
+                "收到新的议价申请",
+                "买家对商品“" + product.getName() + "”提出价格 " + request.getProposedPrice(),
+                "/messages");
 
         return toNegotiationVO(negotiation);
     }
@@ -214,6 +223,14 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                 "confirmedPrice", request.getConfirmedPrice(),
                 "effectiveUntil", negotiation.getEffectiveUntil(),
                 "orderId", negotiation.getUsedOrderId() == null ? 0L : negotiation.getUsedOrderId()));
+        String targetPath = negotiation.getUsedOrderId() == null
+                ? "/secondhand/" + negotiation.getProductId()
+                : "/secondhand/orders/" + negotiation.getUsedOrderId();
+        notificationService.createNotification(
+                negotiation.getBuyerUserId(),
+                "卖家已确认议价",
+                "商品“" + product.getName() + "”的议价已确认，成交价为 " + request.getConfirmedPrice(),
+                targetPath);
 
         return toNegotiationVO(negotiation);
     }
@@ -259,6 +276,11 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                 "productId", negotiation.getProductId(),
                 "sellerUserId", sellerUserId,
                 "status", NEGOTIATION_REJECTED));
+        notificationService.createNotification(
+                negotiation.getBuyerUserId(),
+                "议价申请未通过",
+                product == null ? "卖家未接受本次议价" : "卖家未接受商品“" + product.getName() + "”的本次议价",
+                "/secondhand/" + negotiation.getProductId());
 
         return toNegotiationVO(negotiation);
     }
@@ -499,6 +521,11 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                         "productId", auction.getProductId(),
                         "bidderUserId", bidderUserId,
                         "bidAmount", request.getBidAmount()));
+        notificationService.createNotification(
+                auction.getSellerUserId(),
+                "竞拍收到新出价",
+                "您的竞拍商品收到新出价 " + request.getBidAmount(),
+                "/secondhand/" + auction.getProductId());
         if (oldBidderUserId != null && !Objects.equals(oldBidderUserId, bidderUserId)) {
             realtimePushService.pushToUser(oldBidderUserId,
                     RealtimeEventTypes.MSG_TYPE_AUCTION_OUTBID,
@@ -507,6 +534,11 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                             "productId", auction.getProductId(),
                             "oldBidAmount", oldBidAmount,
                             "newBidAmount", request.getBidAmount()));
+            notificationService.createNotification(
+                    oldBidderUserId,
+                    "您的竞拍出价已被超过",
+                    "当前最高出价为 " + request.getBidAmount(),
+                    "/secondhand/" + auction.getProductId());
         }
         return getAuctionByProductId(auction.getProductId());
     }
@@ -607,6 +639,16 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                         "winnerUserId", auction.getCurrentBidderUserId(),
                         "amount", auction.getCurrentPrice(),
                         "settleResult", AUCTION_FINISHED));
+        notificationService.createNotification(
+                auction.getCurrentBidderUserId(),
+                "竞拍成功",
+                "您已竞得商品“" + product.getName() + "”，请查看订单并等待卖家发货",
+                "/secondhand/orders/" + order.getId());
+        notificationService.createNotification(
+                auction.getSellerUserId(),
+                "竞拍商品已成交",
+                "商品“" + product.getName() + "”已成交，请及时发货",
+                "/secondhand/orders/" + order.getId());
     }
 
     private ProductNegotiation findEffectiveNegotiation(Long productId, Long buyerUserId) {

@@ -133,6 +133,7 @@ Restart=always
 RestartSec=5
 User=root
 Environment=TZ=Asia/Shanghai
+Environment=REALTIME_ALLOWED_ORIGIN_PATTERNS=http://47.93.51.90,https://your-domain.example
 
 [Install]
 WantedBy=multi-user.target
@@ -265,6 +266,13 @@ http://47.93.51.90/
 http://47.93.51.90/api/...
 http://47.93.51.90/uploads/...
 ws://47.93.51.90/ws/realtime
+```
+
+前端默认通过当前页面同源地址连接 WebSocket，因此不再直接访问公网 `8080` 端口。HTTP 页面使用 `ws://`，HTTPS 页面会自动使用 `wss://`。修改 systemd 环境变量后执行：
+
+```bash
+systemctl daemon-reload
+systemctl restart segroup8-backend
 ```
 
 ### 方案 B：临时改成公网 IP

@@ -1,6 +1,7 @@
 package com.segroup8.platform.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.segroup8.platform.common.BusinessException;
@@ -8,6 +9,8 @@ import com.segroup8.platform.context.UserContext;
 import com.segroup8.platform.dto.VoucherSaveRequest;
 import com.segroup8.platform.entity.Voucher;
 import com.segroup8.platform.entity.UserVoucher;
+import com.segroup8.platform.entity.Shop;
+import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserVoucherMapper;
 import com.segroup8.platform.mapper.VoucherMapper;
 import com.segroup8.platform.vo.VoucherVO;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -54,11 +58,20 @@ public class VoucherService {
 
     private final VoucherMapper voucherMapper;
     private final UserVoucherMapper userVoucherMapper;
+    private final ShopMapper shopMapper;
+
+    public record CheckoutDiscount(
+            Long voucherId,
+            BigDecimal discountAmount,
+            BigDecimal sellerBearAmount,
+            BigDecimal platformBearAmount,
+            BigDecimal payableAmount) {
+    }
 
     public IPage<VoucherVO> listByShop(int page, int pageSize) {
-        Long shopId = UserContext.getUserId();
+        Long sellerUserId = UserContext.getUserId();
         LambdaQueryWrapper<Voucher> wrapper = new LambdaQueryWrapper<Voucher>()
-                .eq(Voucher::getShopId, shopId)
+                .eq(Voucher::getIssuerUserId, sellerUserId)
                 .orderByDesc(Voucher::getCreateTime);
         IPage<Voucher> result = voucherMapper.selectPage(new Page<>(page, pageSize), wrapper);
         refreshStatuses(result.getRecords());
@@ -151,7 +164,7 @@ public class VoucherService {
         List<Voucher> vouchers = voucherMapper.selectBatchIds(voucherIds);
         List<VoucherVO> all = vouchers.stream()
                 .filter(Objects::nonNull)
-                .filter(v -> Integer.valueOf(STATUS_ACTIVE).equals(v.getStatus()))
+                .filter(v -> resolveCurrentStatus(v, now) == STATUS_ACTIVE)
                 .filter(v -> v.getStartTime() == null || !now.isBefore(v.getStartTime()))
                 .filter(v -> v.getEndTime() == null || !now.isAfter(v.getEndTime()))
                 .filter(v -> matchShopScope(v, checkoutShopIds))
@@ -262,14 +275,121 @@ public class VoucherService {
         voucherMapper.updateById(update);
     }
 
+    public CheckoutDiscount occupyForOrder(Long voucherId, Long userId, Long orderId,
+            Map<Long, BigDecimal> shopAmounts, BigDecimal totalAmount) {
+        if (voucherId == null) {
+            BigDecimal payable = money(totalAmount);
+            return new CheckoutDiscount(null, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, payable);
+        }
+
+        Voucher voucher = getVoucherOrThrow(voucherId);
+        LocalDateTime now = LocalDateTime.now();
+        if (resolveCurrentStatus(voucher, now) != STATUS_ACTIVE
+                || (voucher.getStartTime() != null && now.isBefore(voucher.getStartTime()))
+                || (voucher.getEndTime() != null && now.isAfter(voucher.getEndTime()))) {
+            throw new BusinessException(400, "优惠券当前不可使用");
+        }
+
+        UserVoucher userVoucher = userVoucherMapper.selectOne(new LambdaQueryWrapper<UserVoucher>()
+                .eq(UserVoucher::getUserId, userId)
+                .eq(UserVoucher::getVoucherId, voucherId)
+                .last("limit 1"));
+        if (userVoucher == null || !Integer.valueOf(USER_VOUCHER_STATUS_AVAILABLE).equals(userVoucher.getStatus())) {
+            throw new BusinessException(400, "优惠券未领取、已使用或已过期");
+        }
+        if (userVoucher.getUsedOrderId() != null) {
+            throw new BusinessException(400, "优惠券已被其他订单占用");
+        }
+        if (userVoucher.getExpireTime() != null && now.isAfter(userVoucher.getExpireTime())) {
+            throw new BusinessException(400, "优惠券已过期");
+        }
+
+        BigDecimal orderAmount = money(totalAmount);
+        BigDecimal eligibleAmount = resolveEligibleAmount(voucher, shopAmounts, orderAmount);
+        BigDecimal threshold = voucher.getMinAmount() == null ? BigDecimal.ZERO : voucher.getMinAmount();
+        if (eligibleAmount.compareTo(threshold) < 0) {
+            throw new BusinessException(400, "当前商品金额未达到优惠券使用门槛");
+        }
+
+        BigDecimal discount = calculateDiscount(voucher, eligibleAmount).min(orderAmount);
+        if (discount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException(400, "优惠券优惠金额无效");
+        }
+
+        int occupied = userVoucherMapper.update(null, new UpdateWrapper<UserVoucher>()
+                .set("used_order_id", orderId)
+                .set("update_time", now)
+                .eq("id", userVoucher.getId())
+                .eq("status", USER_VOUCHER_STATUS_AVAILABLE)
+                .isNull("used_order_id"));
+        if (occupied == 0) {
+            throw new BusinessException(409, "优惠券已被占用，请刷新后重试");
+        }
+
+        boolean sellerBears = Integer.valueOf(ISSUER_TYPE_SELLER).equals(voucher.getIssuerType())
+                || Integer.valueOf(VOUCHER_TYPE_SELLER).equals(voucher.getVoucherType());
+        BigDecimal sellerBear = sellerBears ? discount : BigDecimal.ZERO;
+        BigDecimal platformBear = sellerBears ? BigDecimal.ZERO : discount;
+        return new CheckoutDiscount(voucherId, discount, sellerBear, platformBear,
+                money(orderAmount.subtract(discount)));
+    }
+
+    public void markUsedForPaidOrder(Long voucherId, Long userId, Long orderId) {
+        if (voucherId == null) {
+            return;
+        }
+        LocalDateTime now = LocalDateTime.now();
+        int updated = userVoucherMapper.update(null, new UpdateWrapper<UserVoucher>()
+                .set("status", USER_VOUCHER_STATUS_USED)
+                .set("used_time", now)
+                .set("update_time", now)
+                .eq("user_id", userId)
+                .eq("voucher_id", voucherId)
+                .eq("status", USER_VOUCHER_STATUS_AVAILABLE)
+                .eq("used_order_id", orderId));
+        if (updated == 0) {
+            throw new BusinessException(409, "优惠券状态异常，请刷新订单后重试");
+        }
+        voucherMapper.update(null, new UpdateWrapper<Voucher>()
+                .setSql("used_count = COALESCE(used_count, 0) + 1")
+                .eq("id", voucherId));
+    }
+
+    public void releaseForCanceledOrder(Long voucherId, Long userId, Long orderId) {
+        if (voucherId == null) {
+            return;
+        }
+        userVoucherMapper.update(null, new UpdateWrapper<UserVoucher>()
+                .set("used_order_id", null)
+                .set("update_time", LocalDateTime.now())
+                .eq("user_id", userId)
+                .eq("voucher_id", voucherId)
+                .eq("status", USER_VOUCHER_STATUS_AVAILABLE)
+                .eq("used_order_id", orderId));
+    }
+
+    public Long getSellerBearerShopId(Long voucherId) {
+        if (voucherId == null) {
+            return null;
+        }
+        Voucher voucher = voucherMapper.selectById(voucherId);
+        if (voucher == null) {
+            return null;
+        }
+        boolean sellerBears = Integer.valueOf(ISSUER_TYPE_SELLER).equals(voucher.getIssuerType())
+                || Integer.valueOf(VOUCHER_TYPE_SELLER).equals(voucher.getVoucherType());
+        return sellerBears ? voucher.getShopId() : null;
+    }
+
     public VoucherVO create(VoucherSaveRequest req) {
         validateRequest(req);
-        Long shopId = UserContext.getUserId();
+        Long sellerUserId = UserContext.getUserId();
+        Long shopId = requireSellerShopId(sellerUserId);
 
         Voucher voucher = new Voucher();
         voucher.setIssuerType(ISSUER_TYPE_SELLER);
         voucher.setVoucherType(VOUCHER_TYPE_SELLER);
-        voucher.setIssuerUserId(shopId);
+        voucher.setIssuerUserId(sellerUserId);
         voucher.setScopeType(SCOPE_TYPE_SHOP);
         voucher.setShopId(shopId);
         voucher.setProductId(null);
@@ -441,7 +561,7 @@ public class VoucherService {
             voucher.setVoucherType(VOUCHER_TYPE_SELLER);
             // 卖家券固定为店铺范围，不允许商品级/全平台级
             voucher.setScopeType(SCOPE_TYPE_SHOP);
-            voucher.setShopId(UserContext.getUserId());
+            voucher.setShopId(requireSellerShopId(UserContext.getUserId()));
             voucher.setProductId(null);
         }
 
@@ -469,12 +589,12 @@ public class VoucherService {
     }
 
     private Voucher getOwnedVoucher(Long id) {
-        Long shopId = UserContext.getUserId();
+        Long sellerUserId = UserContext.getUserId();
         Voucher voucher = voucherMapper.selectById(id);
         if (voucher == null) {
             throw new BusinessException(404, "优惠券不存在");
         }
-        if (voucher.getShopId() != null && !voucher.getShopId().equals(shopId)) {
+        if (!Objects.equals(voucher.getIssuerUserId(), sellerUserId)) {
             throw new BusinessException(403, "无权操作此优惠券");
         }
         return voucher;
@@ -706,6 +826,47 @@ public class VoucherService {
         }
         BigDecimal min = voucher.getMinAmount() == null ? BigDecimal.ZERO : voucher.getMinAmount();
         return totalAmount.compareTo(min) >= 0;
+    }
+
+    private BigDecimal resolveEligibleAmount(Voucher voucher, Map<Long, BigDecimal> shopAmounts,
+            BigDecimal totalAmount) {
+        if (Integer.valueOf(SCOPE_TYPE_PLATFORM).equals(voucher.getScopeType())
+                || Integer.valueOf(VOUCHER_TYPE_PLATFORM).equals(voucher.getVoucherType())) {
+            return money(totalAmount);
+        }
+        if (Integer.valueOf(SCOPE_TYPE_SHOP).equals(voucher.getScopeType()) && voucher.getShopId() != null) {
+            BigDecimal shopAmount = shopAmounts == null ? null : shopAmounts.get(voucher.getShopId());
+            if (shopAmount == null || shopAmount.compareTo(BigDecimal.ZERO) <= 0) {
+                throw new BusinessException(400, "优惠券不适用于当前店铺商品");
+            }
+            return money(shopAmount);
+        }
+        throw new BusinessException(400, "优惠券适用范围不支持当前订单");
+    }
+
+    private BigDecimal calculateDiscount(Voucher voucher, BigDecimal eligibleAmount) {
+        if (Integer.valueOf(TYPE_AMOUNT).equals(voucher.getType())) {
+            return money(voucher.getDiscountAmount()).min(eligibleAmount);
+        }
+        if (Integer.valueOf(TYPE_RATE).equals(voucher.getType()) && voucher.getDiscountRate() != null) {
+            return money(eligibleAmount.multiply(BigDecimal.ONE.subtract(voucher.getDiscountRate())));
+        }
+        return BigDecimal.ZERO;
+    }
+
+    private BigDecimal money(BigDecimal value) {
+        return (value == null ? BigDecimal.ZERO : value).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private Long requireSellerShopId(Long sellerUserId) {
+        Shop shop = shopMapper.selectOne(new LambdaQueryWrapper<Shop>()
+                .eq(Shop::getOwnerUserId, sellerUserId)
+                .orderByDesc(Shop::getId)
+                .last("limit 1"));
+        if (shop == null || shop.getId() == null) {
+            throw new BusinessException(400, "请先创建店铺后再发放优惠券");
+        }
+        return shop.getId();
     }
 
     private Comparator<VoucherVO> checkoutVoucherComparator() {
