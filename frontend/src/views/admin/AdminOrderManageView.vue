@@ -98,7 +98,8 @@
       />
     </div>
 
-    <el-drawer v-model="drawerVisible" title="订单详情" size="50%">
+    <el-drawer v-model="drawerVisible" title="订单详情" size="50%" append-to-body class="order-detail-drawer">
+      <div class="order-detail-scroll">
       <el-skeleton v-if="drawerLoading" :rows="6" animated />
       <template v-else-if="drawerOrder">
         <OrderSummaryCard :stage="orderStageSummary" :next-action="orderNextActionSummary" />
@@ -154,9 +155,22 @@
           <el-descriptions-item v-if="drawerOrder.refundStatus > 0" label="审核意见">{{ drawerOrder.refundDecisionRemark || '-' }}</el-descriptions-item>
         </el-descriptions>
 
-        <OrderTimeline title="订单进度" :steps="orderTimeline" :expanded="timelineExpanded" :default-count="3" @toggle="timelineExpanded = !timelineExpanded" />
+        <OrderTimeline
+          title="订单进度"
+          :steps="orderTimeline"
+          :expanded="orderTimelineExpanded"
+          :default-count="3"
+          @toggle="orderTimelineExpanded = !orderTimelineExpanded"
+        />
         <template v-if="drawerOrder.refundStatus > 0">
-          <OrderTimeline title="售后进度" :steps="refundTimeline" :expanded="timelineExpanded" :default-count="2" active-tag-type="danger" />
+          <OrderTimeline
+            title="售后进度"
+            :steps="refundTimeline"
+            :expanded="refundTimelineExpanded"
+            :default-count="2"
+            active-tag-type="danger"
+            @toggle="refundTimelineExpanded = !refundTimelineExpanded"
+          />
         </template>
         <el-table :data="drawerOrder.items || []" border>
           <el-table-column prop="productName" label="商品" min-width="220" />
@@ -203,6 +217,7 @@
         </div>
       </template>
       <el-empty v-else description="暂无数据" />
+      </div>
     </el-drawer>
 
     <el-dialog v-model="proofPreviewVisible" title="退款凭证" width="720px">
@@ -259,7 +274,8 @@ const proofPreviewVisible = ref(false);
 const proofPreviewUrl = ref("");
 const approveRefundLoading = ref(false);
 const rejectRefundLoading = ref(false);
-const timelineExpanded = ref(false);
+const orderTimelineExpanded = ref(false);
+const refundTimelineExpanded = ref(false);
 const {
   proofList,
   toFullImageUrl,
@@ -356,6 +372,8 @@ async function openDetail(row) {
   afterSaleLogs.value = [];
   afterSaleLogsLoaded.value = false;
   afterSaleLogsVisible.value = false;
+  orderTimelineExpanded.value = false;
+  refundTimelineExpanded.value = false;
   try {
     const res = await getAdminOrderDetailApi(row.id);
     drawerOrder.value = res.data;
@@ -501,6 +519,18 @@ function handleRealtimeEvent(event) {
   justify-content: flex-end;
 }
 
+.order-detail-drawer :deep(.el-drawer__body) {
+  overflow: hidden;
+  padding: 0 20px 20px;
+}
+
+.order-detail-scroll {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
 .proof-thumb {
   width: 62px;
   height: 62px;
@@ -530,4 +560,3 @@ function handleRealtimeEvent(event) {
 }
 
 </style>
-

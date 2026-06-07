@@ -62,9 +62,25 @@
       <el-table-column label="风险原因" min-width="260">
         <template #default="{ row }">
           <div v-if="row.riskReasons?.length" class="reason-list">
-            <el-tag v-for="reason in row.riskReasons" :key="reason" class="tag-soft" size="small" effect="plain">
-              {{ reason }}
+            <el-tag
+              v-for="(reason, index) in visibleRiskReasons(row)"
+              :key="`${index}-${reason}`"
+              class="tag-soft reason-tag"
+              size="small"
+              effect="plain"
+            >
+              {{ reasonPreview(reason) }}
             </el-tag>
+            <el-button
+              v-if="shouldShowReasonExpand(row)"
+              link
+              type="primary"
+              size="small"
+              class="reason-expand"
+              @click="openReasonDialog(row)"
+            >
+              展开
+            </el-button>
           </div>
           <span v-else class="muted">未发现明显风险</span>
         </template>
@@ -120,6 +136,24 @@
         <el-button type="primary" :loading="submitting" @click="confirmRemarkDecision">确认</el-button>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="reasonDialogVisible" title="完整风险原因" width="560px" append-to-body>
+      <div class="reason-dialog">
+        <div class="reason-dialog-meta">
+          {{ reasonDialogRow?.productName || "-" }} · {{ productTypeLabel(reasonDialogRow?.productType) }}
+          #{{ reasonDialogRow?.productId || "-" }}
+        </div>
+        <div class="full-reason-list">
+          <div
+            v-for="(reason, index) in reasonDialogReasons"
+            :key="`${index}-${reason}`"
+            class="full-reason-item"
+          >
+            {{ reason }}
+          </div>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -135,6 +169,9 @@ const loading = ref(false);
 const submitting = ref(false);
 const records = ref([]);
 const total = ref(0);
+const REASON_PREVIEW_LIMIT = 28;
+const REASON_VISIBLE_COUNT = 2;
+const REASON_TOTAL_LIMIT = 64;
 const query = reactive({
   pageNum: 1,
   pageSize: 10,
@@ -144,6 +181,8 @@ const query = reactive({
   keyword: "",
 });
 const remarkVisible = ref(false);
+const reasonDialogVisible = ref(false);
+const reasonDialogRow = ref(null);
 const decisionForm = reactive({
   row: null,
   decision: "",
@@ -153,6 +192,7 @@ const decisionForm = reactive({
 const decisionTitle = computed(() => {
   return decisionForm.decision === "REJECTED" ? "驳回商品" : "要求卖家修改";
 });
+const reasonDialogReasons = computed(() => reasonDialogRow.value?.riskReasons || []);
 
 onMounted(() => load());
 
@@ -251,6 +291,30 @@ function confirmRemarkDecision() {
   submitDecision(decisionForm.row, decisionForm.decision, decisionForm.adminRemark);
 }
 
+function visibleRiskReasons(row) {
+  const reasons = row.riskReasons || [];
+  return shouldShowReasonExpand(row) ? reasons.slice(0, REASON_VISIBLE_COUNT) : reasons;
+}
+
+function shouldShowReasonExpand(row) {
+  const reasons = row.riskReasons || [];
+  return (
+    reasons.length > REASON_VISIBLE_COUNT ||
+    reasons.some((reason) => String(reason).length > REASON_PREVIEW_LIMIT) ||
+    reasons.join("、").length > REASON_TOTAL_LIMIT
+  );
+}
+
+function reasonPreview(reason) {
+  const text = String(reason ?? "");
+  return text.length > REASON_PREVIEW_LIMIT ? `${text.slice(0, REASON_PREVIEW_LIMIT)}...` : text;
+}
+
+function openReasonDialog(row) {
+  reasonDialogRow.value = row;
+  reasonDialogVisible.value = true;
+}
+
 function productTypeLabel(value) {
   return value === "SECONDHAND" ? "二手商品" : "普通商品";
 }
@@ -324,6 +388,53 @@ function auditStatusClass(value) {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  align-items: center;
+  max-width: 100%;
+}
+
+.reason-tag {
+  max-width: 100%;
+}
+
+.reason-tag :deep(.el-tag__content) {
+  display: inline-block;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+  white-space: nowrap;
+}
+
+.reason-expand {
+  padding: 0;
+}
+
+.reason-dialog {
+  display: grid;
+  gap: 12px;
+}
+
+.reason-dialog-meta {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.full-reason-list {
+  display: grid;
+  gap: 10px;
+  max-height: 360px;
+  overflow: auto;
+}
+
+.full-reason-item {
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+  color: #1f2937;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .pager {

@@ -88,7 +88,7 @@
       </aside>
     </div>
 
-    <section class="promo-grid">
+    <section class="promo-grid" :class="{ 'promo-grid--admin': isAdmin }">
       <button type="button" class="promo-card promo-main" @click="router.push('/product')">
         <span>官方商城</span>
         <strong>新品商城</strong>
@@ -103,6 +103,11 @@
         <span>购买二手</span>
         <strong>二手商城</strong>
         <small>发现更多实用二手低价好物</small>
+      </button>
+      <button v-if="isAdmin" type="button" class="promo-card promo-admin" @click="router.push('/admin')">
+        <span>平台治理</span>
+        <strong>管理后台</strong>
+        <small>回到订单、举报和风控管理</small>
       </button>
     </section>
 
@@ -178,6 +183,7 @@ const avatarText = computed(() => {
   const name = userStore.userInfo?.nickname || userStore.userInfo?.username || "U";
   return name.slice(0, 1).toUpperCase();
 });
+const isAdmin = computed(() => userStore.currentRole === "ADMIN");
 
 const categoryCards = [
   { label: "电子数码", short: "数", desc: "键盘、耳机、平板", path: "/product?category=电子数码", color: "#2563eb" },
@@ -648,6 +654,10 @@ function hasText(value) {
   gap: 12px;
 }
 
+.promo-grid--admin {
+  grid-template-columns: 1.1fr repeat(3, 0.9fr);
+}
+
 .promo-card {
   min-height: 116px;
   padding: 18px;
@@ -699,6 +709,14 @@ function hasText(value) {
   background:
     linear-gradient(100deg, rgba(233, 255, 248, 0.92), rgba(137, 199, 255, 0.32)),
     url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=80");
+  background-size: cover;
+  background-position: center;
+}
+
+.promo-admin {
+  background:
+    linear-gradient(100deg, rgba(255, 245, 219, 0.94), rgba(255, 185, 214, 0.38)),
+    url("https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=900&q=80");
   background-size: cover;
   background-position: center;
 }

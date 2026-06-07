@@ -69,7 +69,17 @@
             <div v-for="item in myReports" :key="item.id" class="report-item">
               <div>
                 <strong>{{ reasonTypeLabel(item.reasonType) }}</strong>
-                <p>{{ item.reasonDesc || "暂无补充说明" }}</p>
+                <p class="report-desc">{{ reportDescPreview(item.reasonDesc) }}</p>
+                <el-button
+                  v-if="shouldExpandReportDesc(item.reasonDesc)"
+                  link
+                  type="primary"
+                  size="small"
+                  class="report-desc-expand"
+                  @click="openReportDescDialog(item)"
+                >
+                  展开
+                </el-button>
                 <small>{{ formatReportedUser(item) }}  {{ tradeContextLabel(item.tradeContext) }}</small>
               </div>
               <el-tag :type="reportStatusType(item.status)" size="small">{{ reportStatusLabel(item.status) }}</el-tag>
@@ -177,6 +187,13 @@
         <el-button type="primary" :loading="reportSubmitting" @click="handleSubmitReport">提交举报</el-button>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="reportDescDialogVisible" title="举报补充说明" width="520px" append-to-body>
+      <div class="report-desc-dialog">
+        <div class="report-desc-dialog__meta">{{ reportDescDialogMeta }}</div>
+        <div class="report-desc-dialog__content">{{ reportDescDialogContent }}</div>
+      </div>
+    </el-dialog>
   </section>
 </template>
 
@@ -209,6 +226,10 @@ const reportUserOptions = ref([]);
 const searchingReportUsers = ref(false);
 const userNameMap = ref({});
 const REPORT_TARGET_NAMES_KEY = "segroup8_report_target_names";
+const REPORT_DESC_PREVIEW_LIMIT = 58;
+const reportDescDialogVisible = ref(false);
+const reportDescDialogContent = ref("");
+const reportDescDialogMeta = ref("");
 
 const buyerLogs = computed(() => credit.value?.buyerLogs || []);
 const sellerLogs = computed(() => credit.value?.shSellerLogs || []);
@@ -483,6 +504,21 @@ function defaultReportForm() {
     reasonDesc: "",
     evidenceUrls: "",
   };
+}
+
+function shouldExpandReportDesc(value) {
+  return String(value || "").length > REPORT_DESC_PREVIEW_LIMIT;
+}
+
+function reportDescPreview(value) {
+  const text = String(value || "暂无补充说明");
+  return text.length > REPORT_DESC_PREVIEW_LIMIT ? `${text.slice(0, REPORT_DESC_PREVIEW_LIMIT)}...` : text;
+}
+
+function openReportDescDialog(item) {
+  reportDescDialogContent.value = item?.reasonDesc || "暂无补充说明";
+  reportDescDialogMeta.value = `${reasonTypeLabel(item?.reasonType)} · ${formatReportedUser(item)}`;
+  reportDescDialogVisible.value = true;
 }
 
 function formatReportedUser(item) {
@@ -760,6 +796,10 @@ function tradeContextLabel(ctx) {
   gap: 12px;
 }
 
+.report-item > div {
+  min-width: 0;
+}
+
 .report-item strong {
   display: block;
 }
@@ -768,10 +808,41 @@ function tradeContextLabel(ctx) {
   margin: 6px 0;
   color: var(--text-secondary);
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .report-item small {
+  display: block;
   color: var(--text-muted);
+}
+
+.report-desc-expand {
+  height: 22px;
+  padding: 0;
+  margin: -2px 0 4px;
+}
+
+.report-desc-dialog {
+  display: grid;
+  gap: 12px;
+}
+
+.report-desc-dialog__meta {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.report-desc-dialog__content {
+  max-height: 360px;
+  overflow: auto;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: var(--surface-soft);
+  padding: 12px;
+  color: var(--text-main);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .reported-user-select {

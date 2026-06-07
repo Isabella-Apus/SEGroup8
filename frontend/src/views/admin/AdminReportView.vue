@@ -40,7 +40,23 @@
       <el-table-column prop="reasonType" label="举报类型" min-width="140">
         <template #default="{ row }">{{ reasonTypeLabel(row.reasonType) }}</template>
       </el-table-column>
-      <el-table-column prop="reasonDesc" label="说明" min-width="180" show-overflow-tooltip />
+      <el-table-column label="说明" min-width="220">
+        <template #default="{ row }">
+          <div class="reason-desc-cell">
+            <span>{{ reportDescPreview(row.reasonDesc) }}</span>
+            <el-button
+              v-if="shouldExpandReportDesc(row.reasonDesc)"
+              link
+              type="primary"
+              size="small"
+              class="reason-desc-expand"
+              @click="openReportDescDialog(row)"
+            >
+              展开
+            </el-button>
+          </div>
+        </template>
+      </el-table-column>
       <el-table-column prop="evidenceUrls" label="证据" width="80">
         <template #default="{ row }">
           <el-button
@@ -95,7 +111,21 @@
         <el-descriptions-item label="举报人ID">{{ auditRow.reporterId }}</el-descriptions-item>
         <el-descriptions-item label="被举报ID">{{ auditRow.reportedId }}</el-descriptions-item>
         <el-descriptions-item label="举报类型">{{ reasonTypeLabel(auditRow.reasonType) }}</el-descriptions-item>
-        <el-descriptions-item label="说明">{{ auditRow.reasonDesc || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="说明">
+          <div class="reason-desc-cell">
+            <span>{{ reportDescPreview(auditRow.reasonDesc) }}</span>
+            <el-button
+              v-if="shouldExpandReportDesc(auditRow.reasonDesc)"
+              link
+              type="primary"
+              size="small"
+              class="reason-desc-expand"
+              @click="openReportDescDialog(auditRow)"
+            >
+              展开
+            </el-button>
+          </div>
+        </el-descriptions-item>
       </el-descriptions>
 
       <el-form :model="auditForm" label-width="110px" @submit.prevent>
@@ -147,6 +177,13 @@
       </div>
     </el-dialog>
 
+    <el-dialog v-model="reportDescDialogVisible" title="举报说明" width="560px" append-to-body>
+      <div class="report-desc-dialog">
+        <div class="report-desc-dialog__meta">{{ reportDescDialogMeta }}</div>
+        <div class="report-desc-dialog__content">{{ reportDescDialogContent }}</div>
+      </div>
+    </el-dialog>
+
     <!-- 信用分调整弹窗 -->
     <el-divider />
     <div class="page-card" style="margin-top:0;padding-top:0;box-shadow:none">
@@ -162,7 +199,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="调整值">
-          <el-input-number v-model="adjustForm.delta" :step="1" style="width:130px" />
+          <el-input-number v-model="adjustForm.delta" :step="1" :min="-100" :max="100" style="width:130px" />
         </el-form-item>
         <el-form-item label="原因">
           <el-input v-model="adjustForm.remark" style="width:200px" placeholder="调整原因" />
@@ -185,6 +222,7 @@ import {
   adminListReportsApi,
   adminAuditReportApi,
   adminCreditAdjustApi,
+  getUserCreditApi,
 } from "@/api/credit";
 
 // -------- 列表 --------
@@ -197,6 +235,7 @@ const query = reactive({
   status: null,
   reportedId: null,
 });
+const REPORT_DESC_PREVIEW_LIMIT = 58;
 
 onMounted(() => load());
 
@@ -239,6 +278,9 @@ const auditForm = reactive({
   adminRemark: "",
   customDelta: null,
 });
+const reportDescDialogVisible = ref(false);
+const reportDescDialogContent = ref("");
+const reportDescDialogMeta = ref("");
 
 function openAudit(row) {
   auditRow.value = row;
@@ -283,6 +325,21 @@ function showEvidence(urls) {
   evidenceVisible.value = true;
 }
 
+function shouldExpandReportDesc(value) {
+  return String(value || "").length > REPORT_DESC_PREVIEW_LIMIT;
+}
+
+function reportDescPreview(value) {
+  const text = String(value || "暂无补充说明");
+  return text.length > REPORT_DESC_PREVIEW_LIMIT ? `${text.slice(0, REPORT_DESC_PREVIEW_LIMIT)}...` : text;
+}
+
+function openReportDescDialog(row) {
+  reportDescDialogContent.value = row?.reasonDesc || "暂无补充说明";
+  reportDescDialogMeta.value = `举报 #${row?.id || "-"} · ${reasonTypeLabel(row?.reasonType)} · 被举报用户 ${row?.reportedId || "-"}`;
+  reportDescDialogVisible.value = true;
+}
+
 // -------- 信用分调整 --------
 const adjustForm = reactive({
   userId: "",
@@ -297,12 +354,26 @@ async function handleAdjust() {
     ElMessage.warning("请填写用户ID");
     return;
   }
-  if (adjustForm.delta === 0) {
+  const delta = Number(adjustForm.delta || 0);
+  if (!Number.isInteger(delta)) {
+    ElMessage.warning("调整值必须为整数");
+    return;
+  }
+  if (delta === 0) {
     ElMessage.warning("调整值不能为0");
     return;
   }
+  const currentScore = await loadAdjustCurrentScore();
+  if (currentScore === null) {
+    return;
+  }
+  const nextScore = currentScore + delta;
+  if (nextScore < 0 || nextScore > 100) {
+    ElMessage.warning(`当前${adjustRoleLabel(adjustForm.role)}信用分为 ${currentScore}，调整后为 ${nextScore}，必须介于 0-100 之间`);
+    return;
+  }
   await ElMessageBox.confirm(
-    `确认对用户 ${adjustForm.userId} 的${adjustForm.role === 'BUYER' ? '买家' : '卖家'}信用分调整 ${adjustForm.delta} 分？`,
+    `确认对用户 ${adjustForm.userId} 的${adjustRoleLabel(adjustForm.role)}信用分调整 ${delta} 分？当前 ${currentScore}，调整后 ${nextScore}。`,
     "提示", { type: "warning" }
   );
   adjustSubmitting.value = true;
@@ -310,7 +381,7 @@ async function handleAdjust() {
     await adminCreditAdjustApi(
       adjustForm.userId,
       adjustForm.role,
-      adjustForm.delta,
+      delta,
       adjustForm.remark || "管理员手动调整"
     );
     ElMessage.success("调整成功");
@@ -322,6 +393,32 @@ async function handleAdjust() {
   } finally {
     adjustSubmitting.value = false;
   }
+}
+
+async function loadAdjustCurrentScore() {
+  try {
+    const res = await getUserCreditApi(adjustForm.userId);
+    return scoreByRole(res.data, adjustForm.role);
+  } catch (e) {
+    ElMessage.error(e?.response?.data?.message || e?.message || "获取当前信用分失败");
+    return null;
+  }
+}
+
+function scoreByRole(credit, role) {
+  if (role === "SELLER") {
+    return Number(credit?.shopScore ?? 100);
+  }
+  if (role === "SH_SELLER") {
+    return Number(credit?.shSellerScore ?? 100);
+  }
+  return Number(credit?.buyerScore ?? 100);
+}
+
+function adjustRoleLabel(role) {
+  if (role === "SELLER") return "卖家";
+  if (role === "SH_SELLER") return "二手卖家";
+  return "买家";
 }
 
 // -------- 工具函数 --------
@@ -362,6 +459,42 @@ function reportStatusClass(status) {
 .evidence-wrap {
   display: flex;
   flex-wrap: wrap;
+}
+.reason-desc-cell {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+.reason-desc-cell span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+.reason-desc-expand {
+  flex: 0 0 auto;
+  height: 22px;
+  padding: 0;
+}
+.report-desc-dialog {
+  display: grid;
+  gap: 12px;
+}
+.report-desc-dialog__meta {
+  color: #909399;
+  font-size: 13px;
+}
+.report-desc-dialog__content {
+  max-height: 360px;
+  overflow: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+  padding: 12px;
+  color: #1f2937;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 .form-hint {
   margin-left: 8px;

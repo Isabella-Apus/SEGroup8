@@ -176,6 +176,15 @@ public class CreditServiceImpl implements CreditService {
     @Override
     @Transactional
     public void adminAdjust(Long userId, String role, int delta, String remark, Long adminId) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException(404, "用户不存在");
+        }
+        int current = currentScoreForRole(user, role);
+        int next = current + delta;
+        if (next < 0 || next > 100) {
+            throw new BusinessException(400, "调整后信用分必须介于0-100之间");
+        }
         applyScore(userId, role, delta, "ADMIN_ADJUST", remark, null, adminId);
     }
 
@@ -188,6 +197,19 @@ public class CreditServiceImpl implements CreditService {
     }
 
     // ==================== 私有方法 ====================
+
+    private int currentScoreForRole(User user, String role) {
+        switch (role) {
+            case "SELLER":
+                return user.getSellerCreditScore() == null ? 100 : user.getSellerCreditScore();
+            case "SH_SELLER":
+                return user.getShSellerCreditScore() == null ? 100 : user.getShSellerCreditScore();
+            case "BUYER":
+                return user.getCreditScore() == null ? 100 : user.getCreditScore();
+            default:
+                throw new BusinessException(400, "信用维度不支持");
+        }
+    }
 
     /**
      * 核心：更新user表分数 + 写日志（带上下限0~100保护）

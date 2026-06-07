@@ -74,9 +74,22 @@
         </el-timeline>
       </el-card>
 
-      <OrderTimeline title="订单进度" :steps="orderTimeline" :expanded="timelineExpanded" :default-count="3" @toggle="timelineExpanded = !timelineExpanded" />
+      <OrderTimeline
+        title="订单进度"
+        :steps="orderTimeline"
+        :expanded="orderTimelineExpanded"
+        :default-count="3"
+        @toggle="orderTimelineExpanded = !orderTimelineExpanded"
+      />
       <template v-if="order.refundStatus > 0">
-        <OrderTimeline title="售后进度" :steps="refundTimeline" :expanded="timelineExpanded" :default-count="2" active-tag-type="danger" />
+        <OrderTimeline
+          title="售后进度"
+          :steps="refundTimeline"
+          :expanded="refundTimelineExpanded"
+          :default-count="2"
+          active-tag-type="danger"
+          @toggle="refundTimelineExpanded = !refundTimelineExpanded"
+        />
       </template>
 
       <el-table :data="order.items || []" border>
@@ -368,7 +381,9 @@ const proofList = computed(() => {
 
 const proofPreviewVisible = ref(false);
 const proofPreviewUrl = ref("");
-const timelineExpanded = ref(false);
+const orderTimelineExpanded = ref(false);
+const refundTimelineExpanded = ref(false);
+const expandedStateOrderId = ref("");
 const isSellerView = computed(() => route.meta?.detailMode === "seller" || route.query.from === "seller");
 const canOnlyRefund = computed(() => Number(order.value?.orderStatus) === 1);
 
@@ -582,6 +597,7 @@ onBeforeUnmount(() => {
 let unsubscribeRealtime = null;
 
 async function fetchDetail() {
+  resetTimelineExpandedIfOrderChanged();
   loading.value = true;
   try {
     if (isSellerView.value) {
@@ -600,6 +616,16 @@ async function fetchDetail() {
   } finally {
     loading.value = false;
   }
+}
+
+function resetTimelineExpandedIfOrderChanged() {
+  const currentOrderId = String(route.params.id || "");
+  if (expandedStateOrderId.value === currentOrderId) {
+    return;
+  }
+  expandedStateOrderId.value = currentOrderId;
+  orderTimelineExpanded.value = false;
+  refundTimelineExpanded.value = false;
 }
 
 async function maybeFocusLogistics() {

@@ -141,6 +141,7 @@
                 <el-dropdown-item command="addresses">地址管理</el-dropdown-item>
                 <el-dropdown-item command="credit">信用中心</el-dropdown-item>
                 <el-dropdown-item v-if="isOfficialSeller" command="merchant">卖家工作台</el-dropdown-item>
+                <el-dropdown-item v-if="isAdmin" command="admin">管理后台</el-dropdown-item>
                 <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -183,6 +184,7 @@ const navItems = [
   { label: "首页", path: "/", match: (path) => path === "/" },
   { label: "新品商城", path: "/product", match: (path) => path.startsWith("/product") || path === "/cart" || path.startsWith("/order") },
   { label: "二手商城", path: "/secondhand", match: (path) => path.startsWith("/secondhand") },
+  { label: "管理后台", path: "/admin", match: (path) => path.startsWith("/admin"), adminOnly: true },
   { label: "卖家工作台", path: "/merchant", match: (path) => path.startsWith("/merchant") },
 ];
 
@@ -190,8 +192,14 @@ const displayName = computed(() =>
   userStore.userInfo?.nickname || userStore.userInfo?.username || "普通用户",
 );
 const isOfficialSeller = computed(() => userStore.currentRole === "OFFICIAL_SELLER" || userStore.currentRole === "SELLER");
+const isAdmin = computed(() => userStore.currentRole === "ADMIN");
 const visibleNavItems = computed(() =>
-  navItems.filter((item) => item.path !== "/merchant" || isOfficialSeller.value),
+  navItems.filter((item) => {
+    if (item.adminOnly) {
+      return isAdmin.value;
+    }
+    return item.path !== "/merchant" || isOfficialSeller.value;
+  }),
 );
 
 const avatarText = computed(() => displayName.value.slice(0, 1).toUpperCase());
@@ -337,6 +345,7 @@ function handleCommand(command) {
     addresses: "/addresses",
     credit: "/credit",
     merchant: "/merchant",
+    admin: "/admin",
   };
   router.push(map[command] || "/profile");
 }
