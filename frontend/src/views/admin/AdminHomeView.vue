@@ -167,6 +167,7 @@ import { adminListReportsApi } from "@/api/credit";
 import { pageProductRiskAuditsApi } from "@/api/productRiskAudit";
 import { pageAdminAuditLogsApi } from "@/api/adminAuditLog";
 import { pageMerchantApplicationsApi } from "@/api/merchantApplication";
+import { listAdminCouponsApi } from "@/api/coupon";
 import { onRealtimeEvent } from "@/realtime/realtimeClient";
 
 const router = useRouter();
@@ -177,6 +178,7 @@ const users = ref([]);
 const reports = ref([]);
 const riskAudits = ref([]);
 const merchantApplications = ref([]);
+const coupons = ref([]);
 const latestLogs = ref([]);
 const trendData = ref([]);
 const categoryRank = ref([]);
@@ -195,6 +197,9 @@ const summary = reactive({
   todayOrders: 0,
   todayAmount: 0,
   pendingShip: 0,
+  couponRemain: 0,
+  platformCouponTypes: 0,
+  sellerCouponTypes: 0,
   afterSale: 0,
   highRisk: 0,
   pendingReports: 0,
@@ -223,10 +228,10 @@ const metricItems = computed(() => [
     soft: "rgba(245, 158, 11, 0.14)"
   },
   {
-    label: "待发货订单数",
-    value: summary.pendingShip,
-    desc: "需要卖家尽快处理",
-    path: "/admin/orders",
+    label: "优惠券剩余数量",
+    value: summary.couponRemain,
+    desc: `平台券${summary.platformCouponTypes}种，商家券${summary.sellerCouponTypes}种`,
+    path: "/admin/vouchers",
     color: "#38bdf8",
     soft: "rgba(56, 189, 248, 0.13)"
   },
@@ -323,7 +328,8 @@ async function loadDashboard() {
     { label: "举报", task: adminListReportsApi(1, 100, null, null) },
     { label: "AI 风控", task: pageProductRiskAuditsApi({ pageNum: 1, pageSize: 100 }) },
     { label: "审计日志", task: pageAdminAuditLogsApi({ pageNum: 1, pageSize: 10 }) },
-    { label: "入驻审核", task: pageMerchantApplicationsApi({ pageNum: 1, pageSize: 200 }) }
+    { label: "入驻审核", task: pageMerchantApplicationsApi({ pageNum: 1, pageSize: 200 }) },
+    { label: "优惠券", task: listAdminCouponsApi({ page: 1, pageSize: 1000 }) }
   ];
 
   try {
@@ -334,6 +340,7 @@ async function loadDashboard() {
     riskAudits.value = recordsFromResult(results[3]);
     latestLogs.value = recordsFromResult(results[4]).slice(0, 10);
     merchantApplications.value = recordsFromResult(results[5]);
+    coupons.value = recordsFromResult(results[6]);
 
     const failed = results
       .map((result, index) => (result.status === "rejected" ? jobs[index].label : ""))
@@ -357,12 +364,23 @@ function recordsFromResult(result) {
   return data?.records || [];
 }
 
+function isPlatformCoupon(coupon) {
+  return Number(coupon?.voucherType) === 2 || Number(coupon?.issuerType) === 2 || Number(coupon?.scopeType) === 2;
+}
+
 function rebuildDashboard() {
   const todayKey = dateKey(new Date());
   const todayRows = orders.value.filter((order) => dateKey(toDate(order.createTime)) === todayKey);
   summary.todayOrders = todayRows.length;
   summary.todayAmount = todayRows.filter(isPaidOrder).reduce((sum, order) => sum + Number(order.totalAmount || 0), 0);
   summary.pendingShip = orders.value.filter((order) => Number(order.orderStatus) === 1).length;
+  const activeCoupons = coupons.value.filter((coupon) => Number(coupon.status) === 1);
+  summary.couponRemain = activeCoupons.reduce((sum, coupon) => {
+    const remain = coupon.remainCount ?? Math.max(0, Number(coupon.totalCount || 0) - Number(coupon.receivedCount || 0));
+    return sum + Number(remain || 0);
+  }, 0);
+  summary.platformCouponTypes = activeCoupons.filter(isPlatformCoupon).length;
+  summary.sellerCouponTypes = activeCoupons.filter((coupon) => !isPlatformCoupon(coupon)).length;
   summary.afterSale = orders.value.filter((order) => Number(order.refundStatus || 0) > 0).length;
   summary.highRisk = riskAudits.value.filter(isHighRiskAudit).length;
   summary.pendingReports = reports.value.filter((item) => Number(item.status) === 0 || String(item.status).toUpperCase() === "PENDING").length;

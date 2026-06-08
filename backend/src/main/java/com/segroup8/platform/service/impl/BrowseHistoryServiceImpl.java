@@ -6,9 +6,11 @@ import com.segroup8.platform.context.UserContext;
 import com.segroup8.platform.entity.BrowseHistory;
 import com.segroup8.platform.entity.Product;
 import com.segroup8.platform.entity.SecondhandProduct;
+import com.segroup8.platform.entity.Shop;
 import com.segroup8.platform.mapper.BrowseHistoryMapper;
 import com.segroup8.platform.mapper.ProductMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
+import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
 import com.segroup8.platform.vo.BrowseHistoryVO;
 import org.springframework.stereotype.Service;
@@ -23,19 +25,22 @@ public class BrowseHistoryServiceImpl implements BrowseHistoryService {
     private final BrowseHistoryMapper browseHistoryMapper;
     private final ProductMapper productMapper;
     private final SecondhandProductMapper secondhandProductMapper;
+    private final ShopMapper shopMapper;
 
     public BrowseHistoryServiceImpl(BrowseHistoryMapper browseHistoryMapper,
             ProductMapper productMapper,
-            SecondhandProductMapper secondhandProductMapper) {
+            SecondhandProductMapper secondhandProductMapper,
+            ShopMapper shopMapper) {
         this.browseHistoryMapper = browseHistoryMapper;
         this.productMapper = productMapper;
         this.secondhandProductMapper = secondhandProductMapper;
+        this.shopMapper = shopMapper;
     }
 
     @Override
     public void saveBrowseHistory(Long productId, String productType) {
         Long userId = UserContext.getUserId();
-        if (userId == null) {
+        if (userId == null || productId == null) {
             return;
         }
 
@@ -79,6 +84,23 @@ public class BrowseHistoryServiceImpl implements BrowseHistoryService {
         List<BrowseHistory> historyList = browseHistoryMapper.selectList(query);
 
         return historyList.stream().map(history -> {
+            if ("SHOP".equalsIgnoreCase(history.getProductType())) {
+                Shop shop = shopMapper.selectById(history.getProductId());
+                if (shop == null) {
+                    return null;
+                }
+                BrowseHistoryVO.ProductVO shopVO = new BrowseHistoryVO.ProductVO(
+                        shop.getId(),
+                        shop.getName(),
+                        null,
+                        shop.getLogo());
+                return new BrowseHistoryVO(
+                        history.getId(),
+                        shopVO,
+                        "SHOP",
+                        history.getBrowseTime());
+            }
+
             if ("SECONDHAND".equalsIgnoreCase(history.getProductType())) {
                 SecondhandProduct secondhand = secondhandProductMapper.selectById(history.getProductId());
                 if (secondhand == null) {
@@ -142,6 +164,9 @@ public class BrowseHistoryServiceImpl implements BrowseHistoryService {
     }
 
     private String normalizeProductType(String productType) {
+        if ("SHOP".equalsIgnoreCase(productType) || "STORE".equalsIgnoreCase(productType)) {
+            return "SHOP";
+        }
         if ("SECONDHAND".equalsIgnoreCase(productType)) {
             return "SECONDHAND";
         }

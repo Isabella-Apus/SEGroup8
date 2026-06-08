@@ -68,8 +68,6 @@ public class EscrowSettlementService {
             groupedAmount.merge(key, itemAmount, BigDecimal::add);
             groupedStrategy.putIfAbsent(key, strategy);
         }
-        applySellerVoucherDiscount(order, groupedAmount);
-
         for (Map.Entry<String, BigDecimal> entry : groupedAmount.entrySet()) {
             String[] split = entry.getKey().split("#");
             Long sellerUserId = Long.valueOf(split[0]);

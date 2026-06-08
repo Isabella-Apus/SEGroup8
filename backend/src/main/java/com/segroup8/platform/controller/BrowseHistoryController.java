@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
@@ -28,6 +29,18 @@ public class BrowseHistoryController {
     @GetMapping("/browse-history")
     public Result<List<BrowseHistoryVO>> browseHistory() {
         return Result.success(browseHistoryService.getBrowseHistory());
+    }
+
+    @Operation(summary = "记录当前用户浏览记录")
+    @PostMapping("/browse-history")
+    public Result<Void> recordBrowseHistory(@RequestBody Map<String, Object> payload) {
+        Long productId = toLong(payload == null ? null : payload.get("productId"));
+        if (productId == null) {
+            productId = toLong(payload == null ? null : payload.get("shopId"));
+        }
+        String productType = String.valueOf(payload == null ? "" : payload.getOrDefault("productType", payload.get("type")));
+        browseHistoryService.saveBrowseHistory(productId, productType);
+        return Result.success();
     }
 
     @Operation(summary = "删除单条浏览记录")
@@ -49,5 +62,19 @@ public class BrowseHistoryController {
     public Result<Void> clearAll() {
         browseHistoryService.clearBrowseHistory();
         return Result.success();
+    }
+
+    private Long toLong(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Number number) {
+            return number.longValue();
+        }
+        try {
+            return Long.valueOf(String.valueOf(value));
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 }

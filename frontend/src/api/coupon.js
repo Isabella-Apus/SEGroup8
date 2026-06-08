@@ -19,3 +19,23 @@ export function listCheckoutCouponsApi(params = {}) {
 export function listCheckoutCouponReasonsApi(params = {}) {
   return http.get("/voucher/my/available/reasons", { params });
 }
+
+export function listAdminCouponsApi(params = {}) {
+  return http.get("/voucher/admin/list", { params });
+}
+
+export function createAdminCouponApi(payload) {
+  return http.post("/voucher/admin", payload);
+}
+
+export function updateAdminCouponApi(voucherId, payload) {
+  return http.put(`/voucher/admin/${voucherId}`, payload);
+}
+
+export function closeAdminCouponApi(voucherId) {
+  return http.post(`/voucher/admin/${voucherId}/close`);
+}
+
+export function deleteAdminCouponApi(voucherId) {
+  return http.delete(`/voucher/admin/${voucherId}`);
+}

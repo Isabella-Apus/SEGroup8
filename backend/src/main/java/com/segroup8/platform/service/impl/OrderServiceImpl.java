@@ -1214,7 +1214,6 @@ public class OrderServiceImpl implements OrderService {
             String accountType = "SECONDHAND".equalsIgnoreCase(item.getProductType()) ? "PERSONAL" : "BUSINESS";
             groupedAmount.merge(sellerUserId + "#" + accountType, amount, BigDecimal::add);
         }
-        applySellerVoucherDiscount(order, groupedAmount);
         for (Map.Entry<String, BigDecimal> entry : groupedAmount.entrySet()) {
             String[] split = entry.getKey().split("#");
             Long sellerUserId = Long.valueOf(split[0]);

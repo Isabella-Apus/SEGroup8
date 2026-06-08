@@ -87,9 +87,8 @@ const businessRecords = ref([])
 
 const totalIncome = computed(() => {
   const income = businessRecords.value
-    .filter(r => Number(r.amount) > 0)
     .reduce((sum, r) => sum + Number(r.amount), 0)
-  return income.toFixed(2)
+  return Math.max(0, income).toFixed(2)
 })
 
 const filteredRecords = computed(() => {

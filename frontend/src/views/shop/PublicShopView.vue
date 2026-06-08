@@ -156,6 +156,7 @@ import ProductCard from "@/components/ProductCard.vue";
 import SellerRatingSummary from "@/components/SellerRatingSummary.vue";
 import ComponentRenderer from "@/views/seller/decoration/ComponentRenderer.vue";
 import { getPublicShopApi, getPublicShopProductsApi } from "@/api/shop";
+import { recordBrowseHistoryApi } from "@/api/user";
 import { toAssetUrl } from "@/utils/url";
 
 const route = useRoute();
@@ -225,10 +226,25 @@ async function fetchShop() {
   try {
     const result = await getPublicShopApi(route.params.shopId);
     shop.value = result.data;
+    await recordShopBrowseHistory();
   } catch {
     shop.value = null;
   } finally {
     loadingShop.value = false;
+  }
+}
+
+async function recordShopBrowseHistory() {
+  if (!shop.value?.id) {
+    return;
+  }
+  try {
+    await recordBrowseHistoryApi({
+      productId: shop.value.id,
+      productType: "SHOP",
+    });
+  } catch {
+    // Browse history should never block shop viewing.
   }
 }
 

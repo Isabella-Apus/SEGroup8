@@ -93,7 +93,6 @@ public class VoucherService {
         LocalDateTime now = LocalDateTime.now();
         LambdaQueryWrapper<Voucher> wrapper = new LambdaQueryWrapper<Voucher>()
                 .ne(Voucher::getStatus, STATUS_DISABLED)
-                .le(Voucher::getGrabStartTime, now)
                 .ge(Voucher::getGrabEndTime, now)
                 .apply("(total_count - received_count) > 0")
                 .orderByAsc(Voucher::getGrabStartTime)

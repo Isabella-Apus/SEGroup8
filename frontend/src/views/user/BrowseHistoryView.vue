@@ -303,6 +303,9 @@ function getRecordType(record) {
   if (explicit === "store") {
     return "store";
   }
+  if (String(record?.productType || "").toUpperCase() === "SHOP") {
+    return "store";
+  }
   if (record?.store || record?.storeId) {
     return "store";
   }
@@ -318,11 +321,11 @@ function isProductRecord(record) {
 }
 
 function getStoreId(record) {
-  return record?.store?.id || record?.storeId || null;
+  return record?.store?.id || record?.storeId || (String(record?.productType || "").toUpperCase() === "SHOP" ? record?.product?.id : null);
 }
 
 function getStoreName(record) {
-  return record?.store?.name || record?.storeName || "";
+  return record?.store?.name || record?.storeName || (String(record?.productType || "").toUpperCase() === "SHOP" ? record?.product?.name : "");
 }
 
 function getRecordName(record) {
@@ -417,7 +420,7 @@ function viewStore(item) {
   if (!storeId) {
     return;
   }
-  router.push({ path: `/store/${storeId}`, query: { from: "browse-history" } });
+  router.push({ path: `/shop/${storeId}`, query: { from: "browse-history" } });
 }
 
 function formatTime(time) {

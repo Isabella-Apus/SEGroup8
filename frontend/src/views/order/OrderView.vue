@@ -137,6 +137,7 @@
             <el-button v-if="order.orderStatus === 2" size="small" @click="viewLogistics(order)">查看物流</el-button>
             <el-button v-if="order.orderStatus === 2" size="small" type="primary" @click="confirmReceive(order.id)">确认收货</el-button>
             <el-button v-if="order.orderStatus === 3" size="small" type="primary" @click="goReview(order.id)">去评价</el-button>
+            <el-button v-if="order.orderStatus === 4" size="small" @click="router.push('/my-reviews')">查看评价</el-button>
             <el-button v-if="canRefund(order.orderStatus, order.refundStatus)" size="small" type="danger" plain @click="openRefundDialog(order.id)">申请退货</el-button>
             <el-button size="small" @click="goDetail(order.id)">查看详情</el-button>
             <el-button v-if="getOrderPrimarySeller(order)?.sellerUserId" size="small" type="success" plain @click="contactSeller(order)">联系卖家</el-button>

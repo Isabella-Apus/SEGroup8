@@ -121,6 +121,7 @@
           <el-button v-if="order.orderStatus === 0" @click="cancel">取消订单</el-button>
           <el-button v-if="order.orderStatus === 2" type="primary" @click="confirmReceive">确认收货</el-button>
           <el-button v-if="order.orderStatus === 3" type="primary" @click="openReviewDialog">去评价</el-button>
+          <el-button v-if="order.orderStatus === 4" @click="router.push('/my-reviews')">查看评价</el-button>
           <el-button v-if="canRefund(order.orderStatus, order.refundStatus)" type="danger" plain @click="openRefundDialog">申请退货</el-button>
           <!-- 付款后即可举报/拉黑卖家 -->
           <template v-if="order.orderStatus >= 1 && orderSellerUserId">
@@ -172,7 +173,7 @@
     <el-empty v-else description="订单不存在" />
 
     <el-dialog v-if="!isSellerView" v-model="reviewDialogVisible" title="提交评价（按商品逐条）" width="720px">
-      <el-alert type="info" show-icon title="每个商品都可以单独评价，更像淘宝" style="margin-bottom: 10px" />
+      <el-alert type="info" show-icon title="每个商品都可以单独评价" style="margin-bottom: 10px" />
       <el-table :data="reviewItems" border>
         <el-table-column prop="productName" label="商品" min-width="220" />
         <el-table-column label="评分" width="200">
