@@ -247,8 +247,19 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="payDialogVisible" title="确认支付" width="520px">
+    <el-dialog
+      v-model="payDialogVisible"
+      title="确认支付"
+      width="520px"
+      align-center
+      append-to-body
+      class="order-pay-dialog"
+    >
       <el-form label-width="90px">
+        <div class="pay-summary">
+          <span>本次应付</span>
+          <strong>¥{{ Number(order.payableAmount ?? order.totalAmount ?? 0).toFixed(2) }}</strong>
+        </div>
         <el-form-item label="支付方式">
           <el-radio-group v-model="payForm.payMode">
             <el-radio-button label="THIRD_PARTY">微信/支付宝</el-radio-button>
@@ -261,7 +272,13 @@
             <el-radio-button label="ALIPAY">支付宝</el-radio-button>
           </el-radio-group>
         </el-form-item>
-        <div v-if="payForm.payMode === 'THIRD_PARTY'" class="pay-qr-placeholder">第三方支付二维码占位（模拟）</div>
+        <div v-if="payForm.payMode === 'THIRD_PARTY'" class="pay-mock-panel">
+          <div class="pay-mock-code">{{ payForm.payChannel === "ALIPAY" ? "支付宝" : "微信" }}</div>
+          <div>
+            <strong>模拟扫码支付</strong>
+            <p>演示环境不会调起真实支付，确认已支付后订单会进入待发货。</p>
+          </div>
+        </div>
         <el-alert
           v-else
           type="info"
@@ -321,25 +338,6 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="shipDialogVisible" title="填写发货信息" width="520px" append-to-body align-center>
-      <el-form :model="shipForm" label-width="96px">
-        <el-form-item label="发货省份" required>
-          <el-select v-model="shipForm.originProvince" filterable placeholder="请选择发货省份" style="width: 100%">
-            <el-option v-for="province in provinceOptions" :key="province" :label="province" :value="province" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="发货城市">
-          <el-input v-model="shipForm.originCity" placeholder="请输入城市" />
-        </el-form-item>
-        <el-form-item label="详细地址">
-          <el-input v-model="shipForm.originDetail" type="textarea" :rows="3" maxlength="255" show-word-limit placeholder="请输入发货详细地址" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="shipDialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="shipSubmitting" @click="submitSecondhandShip">确认发货</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
@@ -368,7 +366,6 @@ import OrderTimeline from "@/components/order/OrderTimeline.vue";
 import { onRealtimeEvent } from "@/realtime/realtimeClient";
 import { submitReportApi, blockUserApi, unblockUserApi, isBlockingApi } from "@/api/credit";
 import { toAssetUrl } from "@/utils/url";
-import { provinceOptions } from "@/utils/provinces";
 import { useUserStore } from "@/stores/user";
 import { getUser } from "@/utils/storage";
 
@@ -385,13 +382,6 @@ const paySubmitting = ref(false);
 const reviewItems = ref([]);
 const logisticsTraces = ref([]);
 const logisticsCardRef = ref(null);
-const shipDialogVisible = ref(false);
-const shipSubmitting = ref(false);
-const shipForm = reactive({
-  originProvince: "",
-  originCity: "",
-  originDetail: "",
-});
 const refundForm = reactive({
   mode: "RETURN_REFUND",
   reason: "",
@@ -429,6 +419,9 @@ const isSellerView = computed(() =>
   route.meta?.detailMode === "seller" || route.query.from === "seller" || forceSellerView.value || isCurrentSecondhandSeller.value
 );
 const canOnlyRefund = computed(() => Number(order.value?.orderStatus) === 1);
+const isExplicitSellerDetailRoute = computed(() =>
+  route.meta?.detailMode === "seller" || route.query.from === "seller"
+);
 
 // 取订单中第一个有卖家ID的商品的卖家ID
 const orderSellerUserId = computed(() => {
@@ -643,18 +636,7 @@ async function fetchDetail() {
   resetTimelineExpandedIfOrderChanged();
   loading.value = true;
   try {
-    if (route.meta?.orderScope === "SECONDHAND") {
-      try {
-        const sellerResult = await getSellerOrderDetailApi(route.params.id);
-        order.value = sellerResult.data;
-        forceSellerView.value = true;
-        await fetchLogisticsTrace();
-        return;
-      } catch (_) {
-        forceSellerView.value = false;
-      }
-    }
-    if (isSellerView.value) {
+    if (isExplicitSellerDetailRoute.value) {
       try {
         const sellerResult = await getSellerOrderDetailApi(route.params.id);
         order.value = sellerResult.data;
@@ -666,9 +648,21 @@ async function fetchDetail() {
         forceSellerView.value = false;
       }
     }
-    const result = await getOrderDetailApi(route.params.id);
-    order.value = result.data;
-    await fetchLogisticsTrace();
+    try {
+      const result = await getOrderDetailApi(route.params.id);
+      order.value = result.data;
+      forceSellerView.value = false;
+      await fetchLogisticsTrace();
+      return;
+    } catch (error) {
+      if (route.meta?.orderScope !== "SECONDHAND") {
+        throw error;
+      }
+      const sellerResult = await getSellerOrderDetailApi(route.params.id, { silent: true });
+      order.value = sellerResult.data;
+      forceSellerView.value = true;
+      await fetchLogisticsTrace();
+    }
   } finally {
     loading.value = false;
   }
@@ -728,10 +722,6 @@ function contactSellerByItem(item) {
 
 function getItemType(item) {
   return String(item?.productType || item?.itemType || "NEW").toUpperCase() === "SECONDHAND" ? "SECONDHAND" : "NEW";
-}
-
-function isSecondhandOrder() {
-  return (order.value?.items || []).some((item) => getItemType(item) === "SECONDHAND");
 }
 
 function maybeOpenPayDialog() {
@@ -932,13 +922,6 @@ async function submitRefund() {
 }
 
 async function shipBySeller() {
-  if (isSecondhandOrder()) {
-    shipForm.originProvince = "";
-    shipForm.originCity = "";
-    shipForm.originDetail = "";
-    shipDialogVisible.value = true;
-    return;
-  }
   try {
     await confirmOrderAction({
       title: "确认发货",
@@ -951,28 +934,6 @@ async function shipBySeller() {
   } catch (error) {
     if (String(error?.message || "").includes("cancel")) return;
     showOrderActionError(error, "发货失败");
-  }
-}
-
-async function submitSecondhandShip() {
-  if (!shipForm.originProvince) {
-    showOrderActionError({ message: "请选择发货省份" }, "发货失败");
-    return;
-  }
-  shipSubmitting.value = true;
-  try {
-    await shipOrderApi(order.value.id, {
-      originProvince: shipForm.originProvince,
-      originCity: shipForm.originCity,
-      originDetail: shipForm.originDetail,
-    });
-    shipDialogVisible.value = false;
-    showOrderActionSuccess("发货成功");
-    await fetchDetail();
-  } catch (error) {
-    showOrderActionError(error, "发货失败");
-  } finally {
-    shipSubmitting.value = false;
   }
 }
 
@@ -1196,15 +1157,61 @@ const orderNextActionSummary = computed(() => {
   color: #6b7280;
 }
 
-.pay-qr-placeholder {
-  margin: 8px 0;
-  height: 180px;
-  border: 2px dashed #d1d5db;
-  border-radius: 12px;
+.pay-summary {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border: 1px solid #ebeef5;
+  border-radius: 8px;
+  background: #f8fafc;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 12px;
+}
+
+.pay-summary span {
   color: #6b7280;
+}
+
+.pay-summary strong {
+  color: #ef4444;
+  font-size: 24px;
+}
+
+.pay-mock-panel {
+  margin: 8px 0;
+  min-height: 120px;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  background: #eff6ff;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  color: #1f2937;
+}
+
+.pay-mock-code {
+  width: 88px;
+  height: 88px;
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, #111827 8px, transparent 8px) 0 0 / 18px 18px,
+    linear-gradient(#111827 8px, transparent 8px) 0 0 / 18px 18px,
+    #ffffff;
+  border: 8px solid #ffffff;
+  box-shadow: inset 0 0 0 1px #d1d5db;
+  display: grid;
+  place-items: center;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pay-mock-panel p {
+  margin: 6px 0 0;
+  color: #6b7280;
+  line-height: 1.5;
 }
 
 

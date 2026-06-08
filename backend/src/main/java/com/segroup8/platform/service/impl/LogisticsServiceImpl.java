@@ -11,7 +11,6 @@ import com.segroup8.platform.common.OrderStatusEnum;
 import com.segroup8.platform.dto.OrderShipRequest;
 import com.segroup8.platform.entity.LogisticsPathTemplate;
 import com.segroup8.platform.entity.LogisticsTrace;
-import com.segroup8.platform.entity.MerchantApplication;
 import com.segroup8.platform.entity.OrderInfo;
 import com.segroup8.platform.entity.OrderItem;
 import com.segroup8.platform.entity.Product;
@@ -19,7 +18,6 @@ import com.segroup8.platform.entity.SecondhandProduct;
 import com.segroup8.platform.entity.Shop;
 import com.segroup8.platform.mapper.LogisticsPathTemplateMapper;
 import com.segroup8.platform.mapper.LogisticsTraceMapper;
-import com.segroup8.platform.mapper.MerchantApplicationMapper;
 import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.OrderItemMapper;
 import com.segroup8.platform.mapper.ProductMapper;
@@ -28,9 +26,9 @@ import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.service.LogisticsService;
 import com.segroup8.platform.service.logistics.LogisticsEngine;
 import com.segroup8.platform.vo.LogisticsTraceVO;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,12 +39,13 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 public class LogisticsServiceImpl implements LogisticsService {
 
+    private static final String DEFAULT_ORIGIN_PROVINCE = "北京";
+
     private final OrderInfoMapper orderInfoMapper;
     private final OrderItemMapper orderItemMapper;
     private final ProductMapper productMapper;
     private final ShopMapper shopMapper;
     private final SecondhandProductMapper secondhandProductMapper;
-    private final MerchantApplicationMapper merchantApplicationMapper;
     private final LogisticsPathTemplateMapper logisticsPathTemplateMapper;
     private final LogisticsTraceMapper logisticsTraceMapper;
     private final LogisticsEngine logisticsEngine;
@@ -57,7 +56,6 @@ public class LogisticsServiceImpl implements LogisticsService {
             ProductMapper productMapper,
             ShopMapper shopMapper,
             SecondhandProductMapper secondhandProductMapper,
-            MerchantApplicationMapper merchantApplicationMapper,
             LogisticsPathTemplateMapper logisticsPathTemplateMapper,
             LogisticsTraceMapper logisticsTraceMapper,
             LogisticsEngine logisticsEngine,
@@ -67,7 +65,6 @@ public class LogisticsServiceImpl implements LogisticsService {
         this.productMapper = productMapper;
         this.shopMapper = shopMapper;
         this.secondhandProductMapper = secondhandProductMapper;
-        this.merchantApplicationMapper = merchantApplicationMapper;
         this.logisticsPathTemplateMapper = logisticsPathTemplateMapper;
         this.logisticsTraceMapper = logisticsTraceMapper;
         this.logisticsEngine = logisticsEngine;
@@ -167,7 +164,7 @@ public class LogisticsServiceImpl implements LogisticsService {
             if (items.isEmpty()) {
                 throw new BusinessException(400, "订单商品为空，无法生成物流模板");
             }
-            String originProvince = resolveOriginProvince(items.get(0), request);
+            String originProvince = resolveOriginProvince(request);
             String destProvince = (order.getReceiverProvince() == null || order.getReceiverProvince().isBlank())
                     ? "北京"
                     : order.getReceiverProvince();
@@ -201,7 +198,11 @@ public class LogisticsServiceImpl implements LogisticsService {
             seed.setNodeName(nodes.get(0));
             seed.setStatusDesc("包裹已揽收");
             seed.setCreateTime(LocalDateTime.now());
-            logisticsTraceMapper.insert(seed);
+            try {
+                logisticsTraceMapper.insert(seed);
+            } catch (DataIntegrityViolationException ignored) {
+                // 发货允许幂等：真实库若已有首条轨迹，不再让重复写入打断发货。
+            }
         }
     }
 
@@ -211,56 +212,42 @@ public class LogisticsServiceImpl implements LogisticsService {
                 .selectOne(new LambdaQueryWrapper<LogisticsPathTemplate>()
                         .eq(LogisticsPathTemplate::getOriginRegion, originRegion)
                         .eq(LogisticsPathTemplate::getDestRegion, destRegion)
-                        .eq(LogisticsPathTemplate::getPathNodes, pathNodes)
                         .last("limit 1"));
         if (template != null) {
+            if (!Objects.equals(template.getPathNodes(), pathNodes)) {
+                try {
+                    logisticsPathTemplateMapper.update(null, new UpdateWrapper<LogisticsPathTemplate>()
+                            .set("path_nodes", pathNodes)
+                            .eq("id", template.getId()));
+                    template.setPathNodes(pathNodes);
+                } catch (DataIntegrityViolationException ignored) {
+                    // 旧数据中的模板仍可复用，路径刷新失败不应阻塞卖家发货。
+                }
+            }
             return template;
         }
         LogisticsPathTemplate created = new LogisticsPathTemplate();
         created.setOriginRegion(originRegion);
         created.setDestRegion(destRegion);
         created.setPathNodes(pathNodes);
-        logisticsPathTemplateMapper.insert(created);
-        return created;
+        try {
+            logisticsPathTemplateMapper.insert(created);
+            return created;
+        } catch (DataIntegrityViolationException ignored) {
+            LogisticsPathTemplate existing = logisticsPathTemplateMapper
+                    .selectOne(new LambdaQueryWrapper<LogisticsPathTemplate>()
+                            .eq(LogisticsPathTemplate::getOriginRegion, originRegion)
+                            .eq(LogisticsPathTemplate::getDestRegion, destRegion)
+                            .last("limit 1"));
+            if (existing != null) {
+                return existing;
+            }
+            throw ignored;
+        }
     }
 
-    private String resolveOriginProvince(OrderItem firstItem, OrderShipRequest request) {
-        if (request != null && StringUtils.hasText(request.getOriginProvince())) {
-            return request.getOriginProvince().trim();
-        }
-        Long sellerUserId = null;
-        if ("NEW".equalsIgnoreCase(firstItem.getProductType())) {
-            Product product = productMapper.selectById(firstItem.getProductId());
-            if (product != null) {
-                Shop shop = shopMapper.selectById(product.getShopId());
-                if (shop != null && shop.getOwnerUserId() != null) {
-                    sellerUserId = shop.getOwnerUserId();
-                }
-            }
-        }
-        if ("SECONDHAND".equalsIgnoreCase(firstItem.getProductType())) {
-            SecondhandProduct secondhand = secondhandProductMapper.selectById(firstItem.getProductId());
-            if (secondhand != null && secondhand.getSellerUserId() != null) {
-                sellerUserId = secondhand.getSellerUserId();
-            }
-        }
-        if (sellerUserId == null) {
-            throw new BusinessException(400, "无法定位卖家，无法生成物流起始省份");
-        }
-        MerchantApplication application = merchantApplicationMapper
-                .selectOne(new LambdaQueryWrapper<MerchantApplication>()
-                        .eq(MerchantApplication::getUserId, sellerUserId)
-                        .eq(MerchantApplication::getStatus, 1)
-                        .orderByDesc(MerchantApplication::getId)
-                        .last("limit 1"));
-        if (application == null || application.getWarehouseProvince() == null
-                || application.getWarehouseProvince().isBlank()) {
-            if ("SECONDHAND".equalsIgnoreCase(firstItem.getProductType())) {
-                throw new BusinessException(400, "请先填写发货省份，再确认发货");
-            }
-            throw new BusinessException(400, "卖家未配置有效仓库省份，请先完善并通过商家入驻信息");
-        }
-        return application.getWarehouseProvince().trim();
+    private String resolveOriginProvince(OrderShipRequest request) {
+        return DEFAULT_ORIGIN_PROVINCE;
     }
 
     private LocalDateTime latestTraceTime(Long orderId) {

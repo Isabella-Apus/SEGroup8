@@ -194,7 +194,8 @@ CREATE TABLE `logistics_path_template` (
   `dest_region` VARCHAR(50),
   `path_nodes` TEXT,
   `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `update_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  `update_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY `uk_logistics_template_region` (`origin_region`, `dest_region`)
 );
 
 CREATE TABLE `logistics_trace` (
