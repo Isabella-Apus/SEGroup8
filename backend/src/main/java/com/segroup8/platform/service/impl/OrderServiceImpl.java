@@ -875,14 +875,18 @@ public class OrderServiceImpl implements OrderService {
         if (order == null) {
             throw new BusinessException(404, "订单不存在");
         }
-        if (!Integer.valueOf(OrderStatusEnum.PENDING_SHIP.getCode()).equals(order.getOrderStatus())) {
-            throw new BusinessException(400, "仅待发货订单可发货");
-        }
         List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
                 .eq(OrderItem::getOrderId, order.getId())
                 .orderByAsc(OrderItem::getId));
         AccessControl.requireSellerOwnership(
                 () -> items.stream().anyMatch(item -> isItemOwnedBySeller(item, sellerUserId)), "无权操作该订单");
+        if (Integer.valueOf(OrderStatusEnum.SHIPPED.getCode()).equals(order.getOrderStatus())) {
+            logisticsService.initializeWhenShipped(orderId, request);
+            return buildOrderVO(order, items);
+        }
+        if (!Integer.valueOf(OrderStatusEnum.PENDING_SHIP.getCode()).equals(order.getOrderStatus())) {
+            throw new BusinessException(400, "仅待发货订单可发货");
+        }
         order.setOrderStatus(OrderStatusEnum.SHIPPED.getCode());
         LocalDateTime now = LocalDateTime.now();
         order.setShippedTime(now);

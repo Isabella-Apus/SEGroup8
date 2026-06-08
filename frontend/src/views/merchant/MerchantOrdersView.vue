@@ -126,6 +126,7 @@
         <el-button type="primary" :loading="reportBuyerSubmitting" @click="handleReportBuyerSubmit">提交举报</el-button>
       </template>
     </el-dialog>
+
   </div>
 </template>
 
@@ -259,10 +260,15 @@ function refundStatusClass(order) {
 }
 
 async function ship(order) {
-  await ElMessageBox.confirm('确认该订单已发货吗？', '提示', { type: 'warning' });
-  await shipOrderApi(order.id);
-  ElMessage.success('发货成功');
-  await fetchList();
+  try {
+    await ElMessageBox.confirm('确认该订单已发货吗？', '提示', { type: 'warning' });
+    await shipOrderApi(order.id);
+    ElMessage.success('发货成功');
+    await fetchList();
+  } catch (error) {
+    if (String(error?.message || '').includes('cancel')) return;
+    ElMessage.error(error?.response?.data?.message || error?.message || '发货失败');
+  }
 }
 
 async function approveRefund(order) {

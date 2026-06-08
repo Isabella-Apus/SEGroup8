@@ -12,8 +12,8 @@ export function getOrderListApi(params = {}) {
     return http.get("/order/list", { params: query });
 }
 
-export function getOrderDetailApi(orderId) {
-    return http.get(`/order/detail/${orderId}`);
+export function getOrderDetailApi(orderId, config = {}) {
+    return http.get(`/order/detail/${orderId}`, config);
 }
 
 export function getSellerOrderListApi(params = {}) {
@@ -28,8 +28,8 @@ export function getSoldSecondhandOrderListApi(params = {}) {
     return getSellerOrderListApi({ ...params, productType: "SECONDHAND" });
 }
 
-export function getSellerOrderDetailApi(orderId) {
-    return http.get(`/order/seller/detail/${orderId}`);
+export function getSellerOrderDetailApi(orderId, config = {}) {
+    return http.get(`/order/seller/detail/${orderId}`, config);
 }
 
 export function payOrderApi(orderId, payload = {}) {
@@ -77,7 +77,10 @@ export function remindShipApi(orderId) {
 }
 
 export function shipOrderApi(orderId, payload = {}) {
-    return http.post(`/order/${orderId}/ship`, payload);
+    return http.post(`/order/${orderId}/ship`, {
+        originProvince: "北京",
+        ...payload,
+    }, { silent: true });
 }
 
 export function shipSellerOrderApi(orderId) {

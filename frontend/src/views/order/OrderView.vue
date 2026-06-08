@@ -208,6 +208,10 @@
       class="order-pay-dialog"
     >
       <el-form label-width="90px">
+        <div class="pay-summary">
+          <span>本次应付</span>
+          <strong>¥{{ selectedPayOrderAmount }}</strong>
+        </div>
         <el-form-item label="支付方式">
           <el-radio-group v-model="payForm.payMode">
             <el-radio-button label="THIRD_PARTY">微信/支付宝</el-radio-button>
@@ -220,7 +224,13 @@
             <el-radio-button label="ALIPAY">支付宝</el-radio-button>
           </el-radio-group>
         </el-form-item>
-        <div v-if="payForm.payMode === 'THIRD_PARTY'" class="pay-qr-placeholder">第三方支付二维码占位（模拟）</div>
+        <div v-if="payForm.payMode === 'THIRD_PARTY'" class="pay-mock-panel">
+          <div class="pay-mock-code">{{ payForm.payChannel === 'ALIPAY' ? '支付宝' : '微信' }}</div>
+          <div>
+            <strong>模拟扫码支付</strong>
+            <p>演示环境不会调起真实支付，确认已支付后订单会进入待发货。</p>
+          </div>
+        </div>
         <el-alert
           v-else
           type="info"
@@ -342,6 +352,10 @@ const refundForm = reactive({
 const payForm = reactive({
   payMode: 'THIRD_PARTY',
   payChannel: 'WECHAT'
+});
+const selectedPayOrderAmount = computed(() => {
+  const target = records.value.find((item) => String(item.id) === String(payTargetId.value));
+  return Number(target?.payableAmount ?? target?.totalAmount ?? 0).toFixed(2);
 });
 
 let unsubscribeRealtime = null;
@@ -1000,16 +1014,61 @@ function handleRealtimeEvent(event) {
   margin-top: 6px;
 }
 
-.pay-qr-placeholder {
-  margin: 8px 0;
-  height: 180px;
-  border: 2px dashed rgba(120, 196, 182, 0.45);
-  border-radius: 16px;
+.pay-summary {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(229, 221, 210, 0.92);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 12px;
+}
+
+.pay-summary span {
   color: var(--text-secondary);
+}
+
+.pay-summary strong {
+  color: var(--danger);
+  font-size: 24px;
+}
+
+.pay-mock-panel {
+  margin: 8px 0;
+  min-height: 120px;
+  border: 1px solid rgba(120, 196, 182, 0.45);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  color: var(--text-primary);
   background: rgba(220, 239, 233, 0.28);
+}
+
+.pay-mock-code {
+  width: 88px;
+  height: 88px;
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, #111827 8px, transparent 8px) 0 0 / 18px 18px,
+    linear-gradient(#111827 8px, transparent 8px) 0 0 / 18px 18px,
+    #ffffff;
+  border: 8px solid #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.12);
+  display: grid;
+  place-items: center;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pay-mock-panel p {
+  margin: 6px 0 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
 }
 
 :global(.order-pay-dialog.el-dialog) {

@@ -30,7 +30,8 @@ class SecondhandOrderFlowIntegrationTest {
             "INSERT INTO `order_info` (`id`, `order_no`, `buyer_user_id`, `total_amount`, `pay_status`, `order_status`, `refund_status`, `receiver_name`, `receiver_phone`, `receiver_province`, `receiver_city`, `receiver_detail_address`, `version`, `create_time`, `update_time`) VALUES (151, 'ORD_SECONDHAND_151', 1, 80.00, 1, 1, 0, '买家1', '13800000001', '广东省', '广州市', '天河路1号', 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
             "INSERT INTO `order_item` (`order_id`, `product_type`, `product_id`, `product_name`, `price`, `quantity`) VALUES (151, 'SECONDHAND', 5, 'test secondhand product', 80.00, 1)",
             "INSERT INTO `order_info` (`id`, `order_no`, `buyer_user_id`, `total_amount`, `pay_status`, `order_status`, `refund_status`, `receiver_name`, `receiver_phone`, `receiver_province`, `receiver_city`, `receiver_detail_address`, `version`, `create_time`, `update_time`) VALUES (152, 'ORD_SECONDHAND_152', 1, 80.00, 1, 1, 0, '买家1', '13800000001', '广东省', '广州市', '天河路1号', 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
-            "INSERT INTO `order_item` (`order_id`, `product_type`, `product_id`, `product_name`, `price`, `quantity`) VALUES (152, 'SECONDHAND', 5, 'test secondhand product', 80.00, 1)"
+            "INSERT INTO `order_item` (`order_id`, `product_type`, `product_id`, `product_name`, `price`, `quantity`) VALUES (152, 'SECONDHAND', 5, 'test secondhand product', 80.00, 1)",
+            "INSERT INTO `logistics_path_template` (`id`, `origin_region`, `dest_region`, `path_nodes`) VALUES (900, '华北', '华南', '[\"天津分拨中心\",\"广东省分拨中心\"]')"
     })
     void secondhandSellerCanViewShipAndPushLogistics() throws Exception {
         String buyerToken = jwtUtils.createToken(1L, "buyer1", "USER");
@@ -78,18 +79,22 @@ class SecondhandOrderFlowIntegrationTest {
                         .header("Authorization", "Bearer " + buyerToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data[0].nodeName").value("北京分拨中心"));
+
+        mockMvc.perform(get("/api/logistics/order/151/trace")
+                        .header("Authorization", "Bearer " + buyerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
                 .andExpect(jsonPath("$.data.length()").value(2));
 
         mockMvc.perform(post("/api/order/152/ship")
-                        .header("Authorization", "Bearer " + sellerToken)
-                        .contentType("application/json")
-                        .content("""
-                                {
-                                  "originProvince": "四川省",
-                                  "originCity": "成都市",
-                                  "originDetail": "高新区1号"
-                                }
-                                """))
+                        .header("Authorization", "Bearer " + sellerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.orderStatus").value(2));
+
+        mockMvc.perform(post("/api/order/152/ship")
+                        .header("Authorization", "Bearer " + sellerToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
                 .andExpect(jsonPath("$.data.orderStatus").value(2));
@@ -98,6 +103,6 @@ class SecondhandOrderFlowIntegrationTest {
                         .header("Authorization", "Bearer " + buyerToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
-                .andExpect(jsonPath("$.data[0].nodeName").value("四川省分拨中心"));
+                .andExpect(jsonPath("$.data[0].nodeName").value("北京分拨中心"));
     }
 }

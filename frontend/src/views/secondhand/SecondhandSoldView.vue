@@ -71,7 +71,7 @@
         <div class="card-footer">
           <span class="next-copy">{{ nextCopy(order) }}</span>
           <el-space wrap>
-            <el-button v-if="canShip(order)" size="small" type="primary" @click="ship(order)">填写发货信息</el-button>
+            <el-button v-if="canShip(order)" size="small" type="primary" @click="ship(order)">确认发货</el-button>
             <el-button v-if="canPushLogistics(order)" size="small" @click="pushLogistics(order)">更新物流</el-button>
             <el-button v-if="canViewLogistics(order)" size="small" @click="viewLogistics(order)">查看物流</el-button>
             <el-button size="small" type="success" plain @click="contactBuyer(order)">联系买家</el-button>
@@ -95,25 +95,6 @@
       />
     </div>
 
-    <el-dialog v-model="shipDialogVisible" title="填写发货信息" width="520px" append-to-body align-center>
-      <el-form :model="shipForm" label-width="96px">
-        <el-form-item label="发货省份" required>
-          <el-select v-model="shipForm.originProvince" filterable placeholder="请选择发货省份" style="width: 100%">
-            <el-option v-for="province in provinceOptions" :key="province" :label="province" :value="province" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="发货城市">
-          <el-input v-model="shipForm.originCity" placeholder="请输入城市" />
-        </el-form-item>
-        <el-form-item label="详细地址">
-          <el-input v-model="shipForm.originDetail" type="textarea" :rows="3" maxlength="255" show-word-limit placeholder="请输入发货详细地址" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="shipDialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="shipSubmitting" @click="submitShip">确认发货</el-button>
-      </template>
-    </el-dialog>
   </section>
 </template>
 
@@ -126,21 +107,12 @@ import { pushNextLogisticsApi } from "@/api/logistics";
 import OrderStatusTag from "@/components/order/OrderStatusTag.vue";
 import { showOrderActionError, showOrderActionSuccess } from "@/utils/orderUi";
 import { toAssetUrl } from "@/utils/url";
-import { provinceOptions } from "@/utils/provinces";
 
 const router = useRouter();
 const loading = ref(false);
 const records = ref([]);
 const total = ref(0);
 const activeTab = ref("ALL");
-const shipDialogVisible = ref(false);
-const shipSubmitting = ref(false);
-const shipTargetOrder = ref(null);
-const shipForm = reactive({
-  originProvince: "",
-  originCity: "",
-  originDetail: "",
-});
 const fallbackCover = "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=900&q=80";
 
 const query = reactive({
@@ -252,7 +224,7 @@ function nextCopy(order) {
   if (Number(order?.refundStatus || 0) === 1) return "买家已发起售后，请及时处理。";
   const map = {
     0: "等待买家完成付款。",
-    1: "买家已付款，请填写发货信息。",
+    1: "买家已付款，请确认发货。",
     2: isArrived(order) ? "商品已送达，等待买家确认收货。" : "已发货，物流运输中。",
     3: "买家已确认收货，等待评价。",
     4: "交易完成。",
@@ -277,34 +249,19 @@ function isArrived(order) {
   return String(order?.logisticsStatus || "").toUpperCase() === "ARRIVED";
 }
 
-function ship(order) {
-  shipTargetOrder.value = order;
-  shipForm.originProvince = "";
-  shipForm.originCity = "";
-  shipForm.originDetail = "";
-  shipDialogVisible.value = true;
-}
-
-async function submitShip() {
-  if (!shipForm.originProvince) {
-    showOrderActionError({ message: "请选择发货省份" }, "发货失败");
-    return;
-  }
-  if (!shipTargetOrder.value?.id) return;
-  shipSubmitting.value = true;
+async function ship(order) {
   try {
-    await shipOrderApi(shipTargetOrder.value.id, {
-      originProvince: shipForm.originProvince,
-      originCity: shipForm.originCity,
-      originDetail: shipForm.originDetail,
+    await ElMessageBox.confirm("确认该订单已发货吗？", "确认发货", {
+      type: "warning",
+      confirmButtonText: "确认发货",
+      cancelButtonText: "取消",
     });
-    shipDialogVisible.value = false;
+    await shipOrderApi(order.id);
     showOrderActionSuccess("已发货");
-    fetchList(false);
+    await fetchList(false);
   } catch (error) {
+    if (String(error?.message || "").includes("cancel")) return;
     showOrderActionError(error, "发货失败");
-  } finally {
-    shipSubmitting.value = false;
   }
 }
 
