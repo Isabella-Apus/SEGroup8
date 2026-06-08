@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.segroup8.platform.common.AccessControl;
 import com.segroup8.platform.common.BusinessException;
 import com.segroup8.platform.common.OrderStatusEnum;
+import com.segroup8.platform.dto.OrderShipRequest;
 import com.segroup8.platform.entity.LogisticsPathTemplate;
 import com.segroup8.platform.entity.LogisticsTrace;
 import com.segroup8.platform.entity.MerchantApplication;
@@ -29,6 +30,7 @@ import com.segroup8.platform.service.logistics.LogisticsEngine;
 import com.segroup8.platform.vo.LogisticsTraceVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -144,15 +146,19 @@ public class LogisticsServiceImpl implements LogisticsService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void initializeWhenShipped(Long orderId) {
+    public void initializeWhenShipped(Long orderId, OrderShipRequest request) {
         OrderInfo order = orderInfoMapper.selectById(orderId);
         if (order == null) {
             throw new BusinessException(404, "订单不存在");
         }
-        ensureTemplateAndSeed(order);
+        ensureTemplateAndSeed(order, request);
     }
 
     private void ensureTemplateAndSeed(OrderInfo order) {
+        ensureTemplateAndSeed(order, null);
+    }
+
+    private void ensureTemplateAndSeed(OrderInfo order, OrderShipRequest request) {
         Long templateId = order.getLogisticsTemplateId();
         if (templateId == null) {
             List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
@@ -161,7 +167,7 @@ public class LogisticsServiceImpl implements LogisticsService {
             if (items.isEmpty()) {
                 throw new BusinessException(400, "订单商品为空，无法生成物流模板");
             }
-            String originProvince = resolveOriginProvince(items.get(0));
+            String originProvince = resolveOriginProvince(items.get(0), request);
             String destProvince = (order.getReceiverProvince() == null || order.getReceiverProvince().isBlank())
                     ? "北京"
                     : order.getReceiverProvince();
@@ -200,10 +206,12 @@ public class LogisticsServiceImpl implements LogisticsService {
     }
 
     private LogisticsPathTemplate findOrCreateTemplate(String originRegion, String destRegion, List<String> nodes) {
+        String pathNodes = writePathNodes(nodes);
         LogisticsPathTemplate template = logisticsPathTemplateMapper
                 .selectOne(new LambdaQueryWrapper<LogisticsPathTemplate>()
                         .eq(LogisticsPathTemplate::getOriginRegion, originRegion)
                         .eq(LogisticsPathTemplate::getDestRegion, destRegion)
+                        .eq(LogisticsPathTemplate::getPathNodes, pathNodes)
                         .last("limit 1"));
         if (template != null) {
             return template;
@@ -211,12 +219,15 @@ public class LogisticsServiceImpl implements LogisticsService {
         LogisticsPathTemplate created = new LogisticsPathTemplate();
         created.setOriginRegion(originRegion);
         created.setDestRegion(destRegion);
-        created.setPathNodes(writePathNodes(nodes));
+        created.setPathNodes(pathNodes);
         logisticsPathTemplateMapper.insert(created);
         return created;
     }
 
-    private String resolveOriginProvince(OrderItem firstItem) {
+    private String resolveOriginProvince(OrderItem firstItem, OrderShipRequest request) {
+        if (request != null && StringUtils.hasText(request.getOriginProvince())) {
+            return request.getOriginProvince().trim();
+        }
         Long sellerUserId = null;
         if ("NEW".equalsIgnoreCase(firstItem.getProductType())) {
             Product product = productMapper.selectById(firstItem.getProductId());
@@ -244,6 +255,9 @@ public class LogisticsServiceImpl implements LogisticsService {
                         .last("limit 1"));
         if (application == null || application.getWarehouseProvince() == null
                 || application.getWarehouseProvince().isBlank()) {
+            if ("SECONDHAND".equalsIgnoreCase(firstItem.getProductType())) {
+                throw new BusinessException(400, "请先填写发货省份，再确认发货");
+            }
             throw new BusinessException(400, "卖家未配置有效仓库省份，请先完善并通过商家入驻信息");
         }
         return application.getWarehouseProvince().trim();

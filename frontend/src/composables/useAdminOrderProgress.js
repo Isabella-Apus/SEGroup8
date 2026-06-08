@@ -1,4 +1,5 @@
 import { computed } from "vue";
+import { toAssetUrl } from "@/utils/url";
 
 function formatTime(value) {
   if (!value) return "-";
@@ -16,10 +17,7 @@ export function useAdminOrderProgress(drawerOrderRef) {
   });
 
   function toFullImageUrl(url) {
-    if (!url) return "";
-    if (url.startsWith("http://") || url.startsWith("https://")) return url;
-    const normalized = url.startsWith("/") ? url : `/${url}`;
-    return `http://127.0.0.1:8080${normalized}`;
+    return toAssetUrl(url);
   }
 
   const orderTimeline = computed(() => {
@@ -123,4 +121,3 @@ export function useAdminOrderProgress(drawerOrderRef) {
     orderNextActionSummary
   };
 }
-

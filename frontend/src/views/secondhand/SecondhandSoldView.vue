@@ -94,6 +94,26 @@
         @size-change="handleSizeChange"
       />
     </div>
+
+    <el-dialog v-model="shipDialogVisible" title="填写发货信息" width="520px" append-to-body align-center>
+      <el-form :model="shipForm" label-width="96px">
+        <el-form-item label="发货省份" required>
+          <el-select v-model="shipForm.originProvince" filterable placeholder="请选择发货省份" style="width: 100%">
+            <el-option v-for="province in provinceOptions" :key="province" :label="province" :value="province" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="发货城市">
+          <el-input v-model="shipForm.originCity" placeholder="请输入城市" />
+        </el-form-item>
+        <el-form-item label="详细地址">
+          <el-input v-model="shipForm.originDetail" type="textarea" :rows="3" maxlength="255" show-word-limit placeholder="请输入发货详细地址" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="shipDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="shipSubmitting" @click="submitShip">确认发货</el-button>
+      </template>
+    </el-dialog>
   </section>
 </template>
 
@@ -104,14 +124,23 @@ import { useRouter } from "vue-router";
 import { getSoldSecondhandOrderListApi, shipOrderApi } from "@/api/order";
 import { pushNextLogisticsApi } from "@/api/logistics";
 import OrderStatusTag from "@/components/order/OrderStatusTag.vue";
-import { confirmOrderAction, showOrderActionError, showOrderActionSuccess } from "@/utils/orderUi";
+import { showOrderActionError, showOrderActionSuccess } from "@/utils/orderUi";
 import { toAssetUrl } from "@/utils/url";
+import { provinceOptions } from "@/utils/provinces";
 
 const router = useRouter();
 const loading = ref(false);
 const records = ref([]);
 const total = ref(0);
 const activeTab = ref("ALL");
+const shipDialogVisible = ref(false);
+const shipSubmitting = ref(false);
+const shipTargetOrder = ref(null);
+const shipForm = reactive({
+  originProvince: "",
+  originCity: "",
+  originDetail: "",
+});
 const fallbackCover = "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=900&q=80";
 
 const query = reactive({
@@ -237,7 +266,7 @@ function canShip(order) {
 }
 
 function canPushLogistics(order) {
-  return Number(order?.orderStatus) === 2;
+  return Number(order?.orderStatus) === 2 && !isArrived(order);
 }
 
 function canViewLogistics(order) {
@@ -248,19 +277,34 @@ function isArrived(order) {
   return String(order?.logisticsStatus || "").toUpperCase() === "ARRIVED";
 }
 
-async function ship(order) {
+function ship(order) {
+  shipTargetOrder.value = order;
+  shipForm.originProvince = "";
+  shipForm.originCity = "";
+  shipForm.originDetail = "";
+  shipDialogVisible.value = true;
+}
+
+async function submitShip() {
+  if (!shipForm.originProvince) {
+    showOrderActionError({ message: "请选择发货省份" }, "发货失败");
+    return;
+  }
+  if (!shipTargetOrder.value?.id) return;
+  shipSubmitting.value = true;
   try {
-    await confirmOrderAction({
-      title: "填写发货信息",
-      message: "确认已发货？系统会生成或保留物流单号，并通知买家查看进度。",
-      confirmButtonText: "确认发货",
+    await shipOrderApi(shipTargetOrder.value.id, {
+      originProvince: shipForm.originProvince,
+      originCity: shipForm.originCity,
+      originDetail: shipForm.originDetail,
     });
-    await shipOrderApi(order.id);
+    shipDialogVisible.value = false;
     showOrderActionSuccess("已发货");
     fetchList(false);
   } catch (error) {
-    if (String(error?.message || "").includes("cancel")) return;
     showOrderActionError(error, "发货失败");
+  } finally {
+    shipSubmitting.value = false;
   }
 }
 

@@ -459,6 +459,22 @@ CREATE TABLE IF NOT EXISTS `product_auction` (
   KEY `idx_product_auction_status_end` (`status`, `end_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+SET @product_auction_legacy_unique_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.STATISTICS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'product_auction'
+    AND INDEX_NAME = 'uk_product_auction_product'
+);
+SET @product_auction_drop_legacy_unique_sql = IF(
+  @product_auction_legacy_unique_exists > 0,
+  'ALTER TABLE `product_auction` DROP INDEX `uk_product_auction_product`',
+  'SELECT 1'
+);
+PREPARE stmt_product_auction_drop_legacy_unique FROM @product_auction_drop_legacy_unique_sql;
+EXECUTE stmt_product_auction_drop_legacy_unique;
+DEALLOCATE PREPARE stmt_product_auction_drop_legacy_unique;
+
 CREATE TABLE IF NOT EXISTS `auction_log` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `auction_id` BIGINT NOT NULL,

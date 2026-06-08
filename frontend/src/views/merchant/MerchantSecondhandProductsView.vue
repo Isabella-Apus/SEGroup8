@@ -195,15 +195,17 @@
           >
             流拍
           </el-button>
-          <el-button
-            v-if="Number(row.status) === 1"
-            link
-            type="danger"
-            @click="toggleStatus(row, 2)"
-          >
-            下架
-          </el-button>
-          <el-button v-else link type="success" @click="toggleStatus(row, 1)">上架</el-button>
+          <template v-if="!hasOngoingAuction(row)">
+            <el-button
+              v-if="canTakeOffShelf(row)"
+              link
+              type="danger"
+              @click="toggleStatus(row, 2)"
+            >
+              下架
+            </el-button>
+            <el-button v-else link type="success" @click="toggleStatus(row, 1)">上架</el-button>
+          </template>
           <el-button link type="danger" @click="remove(row)">删除</el-button>
         </template>
       </el-table-column>
@@ -475,6 +477,14 @@ async function fetchAuctions() {
 
 function auctionFor(row) {
   return auctionByProductId.value.get(Number(row?.id));
+}
+
+function hasOngoingAuction(row) {
+  return auctionFor(row)?.status === "ONGOING";
+}
+
+function canTakeOffShelf(row) {
+  return Number(row?.status) === 1 && !hasOngoingAuction(row);
 }
 
 function auctionTagType(auction) {

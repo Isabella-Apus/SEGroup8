@@ -319,6 +319,26 @@
         <el-button type="primary" :loading="sellerReportSubmitting" @click="handleSellerReportSubmit">提交举报</el-button>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="shipDialogVisible" title="填写发货信息" width="520px" append-to-body align-center>
+      <el-form :model="shipForm" label-width="96px">
+        <el-form-item label="发货省份" required>
+          <el-select v-model="shipForm.originProvince" filterable placeholder="请选择发货省份" style="width: 100%">
+            <el-option v-for="province in provinceOptions" :key="province" :label="province" :value="province" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="发货城市">
+          <el-input v-model="shipForm.originCity" placeholder="请输入城市" />
+        </el-form-item>
+        <el-form-item label="详细地址">
+          <el-input v-model="shipForm.originDetail" type="textarea" :rows="3" maxlength="255" show-word-limit placeholder="请输入发货详细地址" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="shipDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="shipSubmitting" @click="submitSecondhandShip">确认发货</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -346,9 +366,14 @@ import OrderSummaryCard from "@/components/order/OrderSummaryCard.vue";
 import OrderTimeline from "@/components/order/OrderTimeline.vue";
 import { onRealtimeEvent } from "@/realtime/realtimeClient";
 import { submitReportApi, blockUserApi, unblockUserApi, isBlockingApi } from "@/api/credit";
+import { toAssetUrl } from "@/utils/url";
+import { provinceOptions } from "@/utils/provinces";
+import { useUserStore } from "@/stores/user";
+import { getUser } from "@/utils/storage";
 
 const route = useRoute();
 const router = useRouter();
+const userStore = useUserStore();
 const loading = ref(false);
 const order = ref(null);
 const reviewDialogVisible = ref(false);
@@ -359,6 +384,13 @@ const paySubmitting = ref(false);
 const reviewItems = ref([]);
 const logisticsTraces = ref([]);
 const logisticsCardRef = ref(null);
+const shipDialogVisible = ref(false);
+const shipSubmitting = ref(false);
+const shipForm = reactive({
+  originProvince: "",
+  originCity: "",
+  originDetail: "",
+});
 const refundForm = reactive({
   mode: "RETURN_REFUND",
   reason: "",
@@ -384,7 +416,17 @@ const proofPreviewUrl = ref("");
 const orderTimelineExpanded = ref(false);
 const refundTimelineExpanded = ref(false);
 const expandedStateOrderId = ref("");
-const isSellerView = computed(() => route.meta?.detailMode === "seller" || route.query.from === "seller");
+const forceSellerView = ref(false);
+const currentUserId = computed(() => userStore.userInfo?.id || getUser()?.id);
+const isCurrentSecondhandSeller = computed(() => {
+  if (route.meta?.orderScope !== "SECONDHAND") return false;
+  const userId = Number(currentUserId.value);
+  if (!userId) return false;
+  return (order.value?.items || []).some((item) => Number(item?.sellerUserId) === userId);
+});
+const isSellerView = computed(() =>
+  route.meta?.detailMode === "seller" || route.query.from === "seller" || forceSellerView.value || isCurrentSecondhandSeller.value
+);
 const canOnlyRefund = computed(() => Number(order.value?.orderStatus) === 1);
 
 // 取订单中第一个有卖家ID的商品的卖家ID
@@ -600,14 +642,27 @@ async function fetchDetail() {
   resetTimelineExpandedIfOrderChanged();
   loading.value = true;
   try {
+    if (route.meta?.orderScope === "SECONDHAND") {
+      try {
+        const sellerResult = await getSellerOrderDetailApi(route.params.id);
+        order.value = sellerResult.data;
+        forceSellerView.value = true;
+        await fetchLogisticsTrace();
+        return;
+      } catch (_) {
+        forceSellerView.value = false;
+      }
+    }
     if (isSellerView.value) {
       try {
         const sellerResult = await getSellerOrderDetailApi(route.params.id);
         order.value = sellerResult.data;
+        forceSellerView.value = true;
         await fetchLogisticsTrace();
         return;
       } catch (_) {
         // 兜底：历史链接可能未带 seller 标记，尝试买家详情避免页面空白。
+        forceSellerView.value = false;
       }
     }
     const result = await getOrderDetailApi(route.params.id);
@@ -674,6 +729,10 @@ function getItemType(item) {
   return String(item?.productType || item?.itemType || "NEW").toUpperCase() === "SECONDHAND" ? "SECONDHAND" : "NEW";
 }
 
+function isSecondhandOrder() {
+  return (order.value?.items || []).some((item) => getItemType(item) === "SECONDHAND");
+}
+
 function maybeOpenPayDialog() {
   if (isSellerView.value) {
     return;
@@ -718,10 +777,7 @@ function formatTime(value) {
 }
 
 function toFullImageUrl(url) {
-  if (!url) return '';
-  if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  const normalized = url.startsWith('/') ? url : `/${url}`;
-  return `http://127.0.0.1:8080${normalized}`;
+  return toAssetUrl(url);
 }
 
 async function pay() {
@@ -875,6 +931,13 @@ async function submitRefund() {
 }
 
 async function shipBySeller() {
+  if (isSecondhandOrder()) {
+    shipForm.originProvince = "";
+    shipForm.originCity = "";
+    shipForm.originDetail = "";
+    shipDialogVisible.value = true;
+    return;
+  }
   try {
     await confirmOrderAction({
       title: "确认发货",
@@ -887,6 +950,28 @@ async function shipBySeller() {
   } catch (error) {
     if (String(error?.message || "").includes("cancel")) return;
     showOrderActionError(error, "发货失败");
+  }
+}
+
+async function submitSecondhandShip() {
+  if (!shipForm.originProvince) {
+    showOrderActionError({ message: "请选择发货省份" }, "发货失败");
+    return;
+  }
+  shipSubmitting.value = true;
+  try {
+    await shipOrderApi(order.value.id, {
+      originProvince: shipForm.originProvince,
+      originCity: shipForm.originCity,
+      originDetail: shipForm.originDetail,
+    });
+    shipDialogVisible.value = false;
+    showOrderActionSuccess("发货成功");
+    await fetchDetail();
+  } catch (error) {
+    showOrderActionError(error, "发货失败");
+  } finally {
+    shipSubmitting.value = false;
   }
 }
 

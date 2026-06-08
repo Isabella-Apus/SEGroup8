@@ -6,6 +6,7 @@ import com.segroup8.platform.dto.OrderItemReviewBatchSubmitRequest;
 import com.segroup8.platform.dto.OrderRefundApplyRequest;
 import com.segroup8.platform.dto.OrderPageQueryRequest;
 import com.segroup8.platform.dto.OrderReviewSubmitRequest;
+import com.segroup8.platform.dto.OrderShipRequest;
 import com.segroup8.platform.vo.OrderVO;
 import com.segroup8.platform.vo.PageVO;
 
@@ -43,7 +44,7 @@ public interface OrderService {
 
     OrderVO getSellerOrderDetail(Long orderId);
 
-    OrderVO shipSellerOrder(Long orderId);
+    OrderVO shipSellerOrder(Long orderId, OrderShipRequest request);
 
     void remindShipMyOrder(Long orderId);
 

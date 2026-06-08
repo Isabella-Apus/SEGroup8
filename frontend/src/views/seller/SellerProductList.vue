@@ -155,6 +155,7 @@ import {
   updateProductStatus,
   deleteProduct
 } from '@/api/seller'
+import { toAssetUrl } from '@/utils/url'
 
 const router = useRouter()
 const loading = ref(false)
@@ -251,10 +252,7 @@ function auditStatusLabel(status) {
 }
 
 function toFullImageUrl(url) {
-  if (!url) {
-    return ''
-  }
-  return url.startsWith('http') ? url : `http://localhost:8080${url}`
+  return toAssetUrl(url)
 }
 
 onMounted(loadProducts)

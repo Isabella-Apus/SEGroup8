@@ -7,6 +7,7 @@ import com.segroup8.platform.dto.OrderItemReviewBatchSubmitRequest;
 import com.segroup8.platform.dto.OrderPageQueryRequest;
 import com.segroup8.platform.dto.OrderRefundApplyRequest;
 import com.segroup8.platform.dto.OrderReviewSubmitRequest;
+import com.segroup8.platform.dto.OrderShipRequest;
 import com.segroup8.platform.service.OrderService;
 import com.segroup8.platform.vo.OrderVO;
 import com.segroup8.platform.vo.PageVO;
@@ -106,8 +107,9 @@ public class OrderController {
 
     @Operation(summary = "卖家发货")
     @PostMapping("/{orderId}/ship")
-    public Result<OrderVO> ship(@PathVariable Long orderId) {
-        return Result.success(orderService.shipSellerOrder(orderId));
+    public Result<OrderVO> ship(@PathVariable Long orderId,
+            @Valid @RequestBody(required = false) OrderShipRequest request) {
+        return Result.success(orderService.shipSellerOrder(orderId, request));
     }
 
     @Operation(summary = "卖家同意退货")

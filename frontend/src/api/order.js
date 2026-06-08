@@ -76,8 +76,8 @@ export function remindShipApi(orderId) {
     return remindShipOrderApi(orderId);
 }
 
-export function shipOrderApi(orderId) {
-    return http.post(`/order/${orderId}/ship`);
+export function shipOrderApi(orderId, payload = {}) {
+    return http.post(`/order/${orderId}/ship`, payload);
 }
 
 export function shipSellerOrderApi(orderId) {

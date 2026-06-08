@@ -85,6 +85,7 @@ import { uploadImageApi } from '@/api/upload';
 import { getFinanceDashboardApi, getMyWalletRecordsApi, rechargeCoinApi } from '@/api/finance';
 import { useUserStore } from '@/stores/user';
 import { resolveTradeTypeLabel } from '@/utils/finance';
+import { toAssetUrl } from '@/utils/url';
 
 const userStore = useUserStore();
 const formRef = ref();
@@ -145,14 +146,11 @@ function toAbsoluteUrl(url) {
         return '';
     }
     const normalizedUrl = String(url).replace(/\\\\/g, '/');
-    if (/^https?:\/\//i.test(normalizedUrl)) {
-        return encodeURI(normalizedUrl);
-    }
     let withPrefix = normalizedUrl;
     if (!withPrefix.startsWith('/')) {
         withPrefix = withPrefix.startsWith('uploads/') ? `/${withPrefix}` : `/uploads/${withPrefix}`;
     }
-    return encodeURI(`http://localhost:8080${withPrefix}`);
+    return encodeURI(toAssetUrl(withPrefix));
 }
 
 async function saveProfile() {

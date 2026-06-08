@@ -130,6 +130,7 @@ import {
   uploadImage,
   getCategoryTree
 } from '@/api/seller'
+import { toAssetUrl } from '@/utils/url'
 
 const route = useRoute()
 const router = useRouter()
@@ -216,8 +217,7 @@ function isSubCategoryOfCurrentMain(subCategoryId) {
 }
 
 function toFullImageUrl(url) {
-  if (!url) return ''
-  return url.startsWith('http') ? url : `http://localhost:8080${url}`
+  return toAssetUrl(url)
 }
 
 function beforeUpload(file) {

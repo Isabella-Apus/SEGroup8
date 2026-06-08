@@ -180,6 +180,7 @@ import {
 } from '@/api/product';
 import { uploadImageApi } from '@/api/upload';
 import { ALL_CATEGORY, productCategories } from '@/utils/categoryRules';
+import { toAssetUrl } from '@/utils/url';
 
 const router = useRouter();
 const loading = ref(false);
@@ -360,14 +361,7 @@ async function uploadCover(option) {
 }
 
 function toFullImageUrl(url) {
-    if (!url) {
-        return '';
-    }
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-        return url;
-    }
-    const normalized = url.startsWith('/') ? url : `/${url}`;
-    return `http://localhost:8080${normalized}`;
+    return toAssetUrl(url);
 }
 </script>
 

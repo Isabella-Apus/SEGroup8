@@ -3,8 +3,13 @@ DROP TABLE IF EXISTS `notification`;
 DROP TABLE IF EXISTS `transaction_record`;
 DROP TABLE IF EXISTS `balance`;
 DROP TABLE IF EXISTS `order_after_sale_log`;
+DROP TABLE IF EXISTS `logistics_trace`;
+DROP TABLE IF EXISTS `logistics_path_template`;
+DROP TABLE IF EXISTS `auction_log`;
+DROP TABLE IF EXISTS `product_auction`;
 DROP TABLE IF EXISTS `order_item`;
 DROP TABLE IF EXISTS `order_info`;
+DROP TABLE IF EXISTS `secondhand_product`;
 DROP TABLE IF EXISTS `product`;
 DROP TABLE IF EXISTS `shop`;
 DROP TABLE IF EXISTS `user`;
@@ -128,6 +133,51 @@ CREATE TABLE `product` (
   `update_time` TIMESTAMP
 );
 
+CREATE TABLE `secondhand_product` (
+  `id` BIGINT PRIMARY KEY,
+  `seller_user_id` BIGINT NOT NULL,
+  `name` VARCHAR(120) NOT NULL,
+  `cover` VARCHAR(255),
+  `images` TEXT,
+  `description` VARCHAR(255),
+  `origin_price` DECIMAL(10,2),
+  `sale_price` DECIMAL(10,2) NOT NULL,
+  `category_id` INT,
+  `sub_category_id` INT,
+  `condition_level` VARCHAR(30),
+  `is_negotiable` TINYINT DEFAULT 1,
+  `status` INT NOT NULL,
+  `create_time` TIMESTAMP,
+  `update_time` TIMESTAMP
+);
+
+CREATE TABLE `product_auction` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `product_id` BIGINT NOT NULL,
+  `seller_user_id` BIGINT NOT NULL,
+  `start_price` DECIMAL(10,2) NOT NULL,
+  `increment_amount` DECIMAL(10,2) NOT NULL,
+  `current_price` DECIMAL(10,2) NOT NULL,
+  `current_bidder_user_id` BIGINT,
+  `start_time` TIMESTAMP NOT NULL,
+  `end_time` TIMESTAMP NOT NULL,
+  `status` VARCHAR(20) NOT NULL,
+  `settled_order_id` BIGINT,
+  `version` INT DEFAULT 0,
+  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `update_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `auction_log` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `auction_id` BIGINT NOT NULL,
+  `product_id` BIGINT NOT NULL,
+  `bidder_user_id` BIGINT NOT NULL,
+  `bid_amount` DECIMAL(10,2) NOT NULL,
+  `status` VARCHAR(20) NOT NULL,
+  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE `order_after_sale_log` (
   `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `order_id` BIGINT NOT NULL,
@@ -135,6 +185,23 @@ CREATE TABLE `order_after_sale_log` (
   `operator_user_id` BIGINT,
   `operator_role` VARCHAR(30),
   `remark` VARCHAR(255),
+  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `logistics_path_template` (
+  `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+  `origin_region` VARCHAR(50),
+  `dest_region` VARCHAR(50),
+  `path_nodes` TEXT,
+  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `update_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `logistics_trace` (
+  `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+  `order_id` BIGINT,
+  `node_name` VARCHAR(100),
+  `status_desc` VARCHAR(255),
   `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

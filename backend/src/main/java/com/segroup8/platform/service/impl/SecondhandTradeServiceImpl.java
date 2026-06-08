@@ -352,7 +352,7 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         auction.setSellerUserId(sellerUserId);
         auction.setStartPrice(request.getStartPrice());
         auction.setIncrementAmount(request.getIncrementAmount());
-        auction.setCurrentPrice(null);
+        auction.setCurrentPrice(request.getStartPrice());
         auction.setCurrentBidderUserId(null);
         auction.setStartTime(now);
         auction.setEndTime(now.plusMinutes(request.getDurationMinutes()));

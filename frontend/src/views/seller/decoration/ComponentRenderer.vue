@@ -84,6 +84,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { toAssetUrl } from '@/utils/url'
 
 const props = defineProps({
   component: { type: Object, required: true },
@@ -94,10 +95,7 @@ const countdown = ref({ hours: '00', minutes: '00', seconds: '00' })
 let timer = null
 
 function toFullImageUrl(url) {
-  if (!url) {
-    return ''
-  }
-  return url.startsWith('http') ? url : `http://localhost:8080${url}`
+  return toAssetUrl(url)
 }
 
 function updateCountdown() {

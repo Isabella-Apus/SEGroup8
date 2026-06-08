@@ -174,7 +174,7 @@ onBeforeUnmount(() => {
 async function fetchList() {
   loading.value = true;
   try {
-    const result = await getSellerOrderListApi(query);
+    const result = await getSellerOrderListApi({ ...query, productType: 'NEW' });
     records.value = result.data?.records || [];
     total.value = result.data?.total || 0;
     // 检查每个买家的拉黑状态
@@ -235,7 +235,7 @@ function canApproveRefund(order) {
 }
 
 function canPushLogistics(order) {
-  return Number(order?.orderStatus) === 2;
+  return Number(order?.orderStatus) === 2 && String(order?.logisticsStatus || "").toUpperCase() !== "ARRIVED";
 }
 
 function canRejectRefund(order) {

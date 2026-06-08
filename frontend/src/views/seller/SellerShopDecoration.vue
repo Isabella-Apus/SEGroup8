@@ -175,6 +175,7 @@ import { getCurrentSellerShopApi, saveShopDecorationApi } from '@/api/shop'
 import ComponentRenderer from './decoration/ComponentRenderer.vue'
 import PropEditor from './decoration/PropEditor.vue'
 import { COMPONENT_TEMPLATES, createComponent } from './decoration/componentConfig.js'
+import { toAssetUrl } from '@/utils/url'
 
 const userStore = useUserStore()
 const DECORATION_STORAGE_KEY = 'shop_decoration_v2'
@@ -256,9 +257,7 @@ async function loadData() {
     const info = userStore.userInfo || {}
     shopInfo.shopName = info.shopName || info.nickname || ''
     shopInfo.shopDesc = info.shopDesc || ''
-    shopInfo.avatarUrl = info.avatar
-      ? (info.avatar.startsWith('http') ? info.avatar : 'http://localhost:8080' + info.avatar)
-      : ''
+    shopInfo.avatarUrl = toAssetUrl(info.avatar)
 
     const shopResult = await getCurrentSellerShopApi()
     const serverDecoration = shopResult.data?.decorationJson

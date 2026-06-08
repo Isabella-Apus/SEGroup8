@@ -197,6 +197,7 @@ import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { useUserStore } from '@/stores/user'
 import { getCategoryTree, uploadImage, updateShopProfile } from '@/api/seller'
+import { toAssetUrl } from '@/utils/url'
 
 const userStore = useUserStore()
 const formRef = ref(null)
@@ -239,11 +240,8 @@ const rules = {
   }]
 }
 
-// 拼接图片完整URL用于预览
 function toFullUrl(url) {
-  if (!url) return ''
-  if (url.startsWith('http')) return url
-  return 'http://localhost:8080' + url
+  return toAssetUrl(url)
 }
 
 async function loadShopInfo() {

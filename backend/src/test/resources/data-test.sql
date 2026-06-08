@@ -24,3 +24,28 @@ VALUES (100, 3, 'test shop', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO `product` (`id`, `shop_id`, `name`, `price`, `stock`, `status`, `create_time`, `update_time`)
 VALUES (1001, 100, 'test product', 99.00, 100, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO `secondhand_product` (
+  `id`, `seller_user_id`, `name`, `origin_price`, `sale_price`, `category_id`, `sub_category_id`,
+  `condition_level`, `is_negotiable`, `status`, `create_time`, `update_time`
+) VALUES (
+  5, 3, 'test secondhand product', 120.00, 80.00, 1, 101,
+  'LIKE_NEW', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+INSERT INTO `secondhand_product` (
+  `id`, `seller_user_id`, `name`, `origin_price`, `sale_price`, `category_id`, `sub_category_id`,
+  `condition_level`, `is_negotiable`, `status`, `create_time`, `update_time`
+) VALUES (
+  6, 3, 'relisted secondhand product', 150.00, 90.00, 1, 101,
+  'LIKE_NEW', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+);
+
+INSERT INTO `product_auction` (
+  `id`, `product_id`, `seller_user_id`, `start_price`, `increment_amount`, `current_price`,
+  `start_time`, `end_time`, `status`, `version`, `create_time`, `update_time`
+) VALUES (
+  10, 6, 3, 50.00, 5.00, 50.00,
+  DATEADD('DAY', -2, CURRENT_TIMESTAMP), DATEADD('DAY', -1, CURRENT_TIMESTAMP), 'FLOW', 0,
+  DATEADD('DAY', -2, CURRENT_TIMESTAMP), DATEADD('DAY', -1, CURRENT_TIMESTAMP)
+);

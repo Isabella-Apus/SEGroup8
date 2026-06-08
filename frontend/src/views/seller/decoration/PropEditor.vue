@@ -241,7 +241,7 @@ function beforeUpload(file) {
 async function handleUpload({ file }, field) {
   try {
     const res = await uploadImage(file)
-    props.component.props[field] = 'http://localhost:8080' + res.data.url
+    props.component.props[field] = res.data.url
     ElMessage.success('上传成功')
   } catch (e) {
     ElMessage.error('上传失败')

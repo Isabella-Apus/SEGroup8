@@ -21,6 +21,7 @@ import com.segroup8.platform.dto.OrderItemReviewBatchSubmitRequest;
 import com.segroup8.platform.dto.OrderItemReviewSubmitRequest;
 import com.segroup8.platform.dto.OrderRefundApplyRequest;
 import com.segroup8.platform.dto.OrderReviewSubmitRequest;
+import com.segroup8.platform.dto.OrderShipRequest;
 import com.segroup8.platform.entity.OrderInfo;
 import com.segroup8.platform.entity.OrderItem;
 import com.segroup8.platform.entity.Product;
@@ -275,12 +276,19 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderVO getMyOrderDetail(Long orderId) {
-        requireUserId();
+        Long userId = requireUserId();
         OrderInfo order = orderInfoMapper.selectById(orderId);
-        AccessControl.requireOrderOwnedByBuyer(order, "无权查看该订单");
+        if (order == null) {
+            throw new BusinessException(404, "订单不存在");
+        }
         List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
                 .eq(OrderItem::getOrderId, order.getId())
                 .orderByAsc(OrderItem::getId));
+        boolean isBuyer = Objects.equals(userId, order.getBuyerUserId());
+        boolean isSeller = items.stream().anyMatch(item -> isItemOwnedBySeller(item, userId));
+        if (!isBuyer && !isSeller) {
+            throw new BusinessException(403, "无权查看该订单");
+        }
         return buildOrderVO(order, items);
     }
 
@@ -861,7 +869,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public OrderVO shipSellerOrder(Long orderId) {
+    public OrderVO shipSellerOrder(Long orderId, OrderShipRequest request) {
         Long sellerUserId = requireUserId();
         OrderInfo order = orderInfoMapper.selectById(orderId);
         if (order == null) {
@@ -884,13 +892,17 @@ public class OrderServiceImpl implements OrderService {
             order.setLogisticsCurrentIndex(0);
         }
         orderInfoMapper.updateById(order);
-        logisticsService.initializeWhenShipped(orderId);
+        logisticsService.initializeWhenShipped(orderId, request);
         notifyBuyer(order, "订单已发货",
                 "订单号：" + order.getOrderNo() + "，卖家已发货，包裹正在运输中。");
         pushOrderRealtime(orderId, order.getBuyerUserId(), List.of(sellerUserId), "ORDER_STATUS_UPDATED", "卖家已发货");
         pushOrderRealtime(orderId, order.getBuyerUserId(), List.of(sellerUserId), "LOGISTICS_UPDATED",
                 "物流状态更新：包裹已揽收，开始运输");
         return buildOrderVO(order, items);
+    }
+
+    public OrderVO shipSellerOrder(Long orderId) {
+        return shipSellerOrder(orderId, null);
     }
 
     @Override
@@ -1116,6 +1128,7 @@ public class OrderServiceImpl implements OrderService {
         if ("SECONDHAND".equalsIgnoreCase(item.getProductType())) {
             SecondhandProduct secondhand = secondhandProductMapper.selectById(item.getProductId());
             if (secondhand != null) {
+                vo.setSellerUserId(secondhand.getSellerUserId());
                 vo.setConditionLevel(secondhand.getConditionLevel());
             }
         }

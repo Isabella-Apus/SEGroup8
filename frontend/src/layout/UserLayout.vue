@@ -163,6 +163,7 @@ import { ElMessage } from "element-plus";
 import { useUserStore } from "@/stores/user";
 import { getProductListApi } from "@/api/product";
 import { getSecondhandListApi } from "@/api/secondhand";
+import { toAssetUrl } from "@/utils/url";
 import logoUrl from "@/assets/kinda-goods-logo.svg";
 
 const route = useRoute();
@@ -308,11 +309,7 @@ function productCover(item) {
   if (!url) {
     return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96' viewBox='0 0 96 96'%3E%3Crect width='96' height='96' rx='12' fill='%23eef7fb'/%3E%3Cpath d='M25 63l14-18 11 12 8-9 13 15H25z' fill='%2369c7ef'/%3E%3Ccircle cx='37' cy='34' r='7' fill='%2312d89a'/%3E%3C/svg%3E";
   }
-  const normalized = String(url).replace(/\\\\/g, "/");
-  if (/^https?:\/\//i.test(normalized) || normalized.startsWith("data:")) {
-    return normalized;
-  }
-  return `http://localhost:8080${normalized.startsWith("/") ? normalized : `/${normalized}`}`;
+  return toAssetUrl(String(url).replace(/\\\\/g, "/"));
 }
 
 function formatPrice(value) {

@@ -156,6 +156,7 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import { deleteBrowseHistoryBatchApi, getBrowseHistoryApi } from "@/api/user";
 import { searchBrowseHistory } from "@/utils/search";
 import { useRouter } from "vue-router";
+import { toAssetUrl } from "@/utils/url";
 
 const router = useRouter();
 const loading = ref(false);
@@ -456,14 +457,7 @@ function dateGroupLabel(key) {
 }
 
 function toFullImageUrl(url) {
-  if (!url) {
-    return "";
-  }
-  if (url.startsWith("http://") || url.startsWith("https://")) {
-    return url;
-  }
-  const normalized = url.startsWith("/") ? url : `/${url}`;
-  return `http://localhost:8080${normalized}`;
+  return toAssetUrl(url);
 }
 
 function onCheckOne(id, checked) {
