@@ -76,10 +76,10 @@ class SecondhandOrderFlowIntegrationTest {
                 .andExpect(jsonPath("$.data.nodeName").exists());
 
         mockMvc.perform(get("/api/logistics/order/151/trace")
-                        .header("Authorization", "Bearer " + buyerToken))
+                .header("Authorization", "Bearer " + buyerToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
-                .andExpect(jsonPath("$.data[0].nodeName").value("北京分拨中心"));
+                .andExpect(jsonPath("$.data[0].nodeName").value("云南省分拨中心"));
 
         mockMvc.perform(get("/api/logistics/order/151/trace")
                         .header("Authorization", "Bearer " + buyerToken))
@@ -88,7 +88,15 @@ class SecondhandOrderFlowIntegrationTest {
                 .andExpect(jsonPath("$.data.length()").value(2));
 
         mockMvc.perform(post("/api/order/152/ship")
-                        .header("Authorization", "Bearer " + sellerToken))
+                        .header("Authorization", "Bearer " + sellerToken)
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "originProvince": "四川省",
+                                  "originCity": "成都市",
+                                  "originDetail": "四川省成都市高新区1号"
+                                }
+                                """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
                 .andExpect(jsonPath("$.data.orderStatus").value(2));
@@ -100,9 +108,9 @@ class SecondhandOrderFlowIntegrationTest {
                 .andExpect(jsonPath("$.data.orderStatus").value(2));
 
         mockMvc.perform(get("/api/logistics/order/152/trace")
-                        .header("Authorization", "Bearer " + buyerToken))
+                .header("Authorization", "Bearer " + buyerToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
-                .andExpect(jsonPath("$.data[0].nodeName").value("北京分拨中心"));
+                .andExpect(jsonPath("$.data[0].nodeName").value("四川省分拨中心"));
     }
 }

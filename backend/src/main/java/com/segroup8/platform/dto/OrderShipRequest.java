@@ -1,16 +1,11 @@
 package com.segroup8.platform.dto;
 
-import jakarta.validation.constraints.Size;
-
 public class OrderShipRequest {
 
-    @Size(max = 50, message = "发货省份长度不能超过50")
     private String originProvince;
 
-    @Size(max = 50, message = "发货城市长度不能超过50")
     private String originCity;
 
-    @Size(max = 255, message = "发货详细地址长度不能超过255")
     private String originDetail;
 
     public String getOriginProvince() {

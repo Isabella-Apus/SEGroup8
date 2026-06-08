@@ -172,7 +172,14 @@
 
     <el-empty v-else description="订单不存在" />
 
-    <el-dialog v-if="!isSellerView" v-model="reviewDialogVisible" title="提交评价（按商品逐条）" width="720px">
+    <el-dialog
+      v-if="!isSellerView"
+      v-model="reviewDialogVisible"
+      title="提交评价（按商品逐条）"
+      width="720px"
+      append-to-body
+      align-center
+    >
       <el-alert type="info" show-icon title="每个商品都可以单独评价" style="margin-bottom: 10px" />
       <el-table :data="reviewItems" border>
         <el-table-column prop="productName" label="商品" min-width="220" />
@@ -244,6 +251,33 @@
       <el-image :src="toFullImageUrl(proofPreviewUrl)" fit="contain" class="proof-preview-image" />
       <template #footer>
         <el-button type="primary" @click="proofPreviewVisible = false">知道了</el-button>
+      </template>
+    </el-dialog>
+
+    <el-dialog
+      v-model="shipDialog.visible"
+      title="确认发货"
+      width="460px"
+      append-to-body
+      align-center
+      destroy-on-close
+    >
+      <el-form label-width="88px">
+        <el-form-item label="发货省份" required>
+          <el-select v-model="shipDialog.form.originProvince" filterable placeholder="请选择省份" style="width: 100%">
+            <el-option v-for="province in provinceOptions" :key="province" :label="province" :value="province" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="发货城市">
+          <el-input v-model="shipDialog.form.originCity" placeholder="请输入城市" />
+        </el-form-item>
+        <el-form-item label="详细地址">
+          <el-input v-model="shipDialog.form.originDetail" type="textarea" :rows="3" placeholder="请输入详细地址" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="shipDialog.visible = false">取消</el-button>
+        <el-button type="primary" :loading="shipDialog.submitting" @click="confirmSecondhandShip">确认发货</el-button>
       </template>
     </el-dialog>
 
@@ -368,6 +402,7 @@ import { submitReportApi, blockUserApi, unblockUserApi, isBlockingApi } from "@/
 import { toAssetUrl } from "@/utils/url";
 import { useUserStore } from "@/stores/user";
 import { getUser } from "@/utils/storage";
+import { provinceOptions } from "@/utils/provinces";
 
 const route = useRoute();
 const router = useRouter();
@@ -391,6 +426,15 @@ const refundForm = reactive({
 const payForm = reactive({
   payMode: "THIRD_PARTY",
   payChannel: "WECHAT"
+});
+const shipDialog = reactive({
+  visible: false,
+  submitting: false,
+  form: {
+    originProvince: "",
+    originCity: "",
+    originDetail: ""
+  }
 });
 
 const proofList = computed(() => {
@@ -922,6 +966,14 @@ async function submitRefund() {
 }
 
 async function shipBySeller() {
+  const hasSecondhandItem = (order.value?.items || []).some((item) => getItemType(item) === "SECONDHAND");
+  if (hasSecondhandItem) {
+    shipDialog.form.originProvince = "";
+    shipDialog.form.originCity = "";
+    shipDialog.form.originDetail = "";
+    shipDialog.visible = true;
+    return;
+  }
   try {
     await confirmOrderAction({
       title: "确认发货",
@@ -934,6 +986,28 @@ async function shipBySeller() {
   } catch (error) {
     if (String(error?.message || "").includes("cancel")) return;
     showOrderActionError(error, "发货失败");
+  }
+}
+
+async function confirmSecondhandShip() {
+  if (!shipDialog.form.originProvince) {
+    showOrderActionError({ message: "请选择发货省份" }, "发货失败");
+    return;
+  }
+  shipDialog.submitting = true;
+  try {
+    await shipOrderApi(order.value.id, {
+      originProvince: shipDialog.form.originProvince,
+      originCity: shipDialog.form.originCity.trim(),
+      originDetail: shipDialog.form.originDetail.trim()
+    });
+    shipDialog.visible = false;
+    showOrderActionSuccess("发货成功");
+    await fetchDetail();
+  } catch (error) {
+    showOrderActionError(error, "发货失败");
+  } finally {
+    shipDialog.submitting = false;
   }
 }
 

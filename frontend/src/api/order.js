@@ -77,10 +77,7 @@ export function remindShipApi(orderId) {
 }
 
 export function shipOrderApi(orderId, payload = {}) {
-    return http.post(`/order/${orderId}/ship`, {
-        originProvince: "北京",
-        ...payload,
-    }, { silent: true });
+    return http.post(`/order/${orderId}/ship`, payload, { silent: true });
 }
 
 export function shipSellerOrderApi(orderId) {

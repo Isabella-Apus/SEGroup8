@@ -95,6 +95,33 @@
       />
     </div>
 
+    <el-dialog
+      v-model="shipDialog.visible"
+      title="确认发货"
+      width="460px"
+      append-to-body
+      align-center
+      destroy-on-close
+    >
+      <el-form label-width="88px">
+        <el-form-item label="发货省份" required>
+          <el-select v-model="shipDialog.form.originProvince" filterable placeholder="请选择省份" style="width: 100%">
+            <el-option v-for="province in provinceOptions" :key="province" :label="province" :value="province" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="发货城市">
+          <el-input v-model="shipDialog.form.originCity" placeholder="请输入城市" />
+        </el-form-item>
+        <el-form-item label="详细地址">
+          <el-input v-model="shipDialog.form.originDetail" type="textarea" :rows="3" placeholder="请输入详细地址" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="shipDialog.visible = false">取消</el-button>
+        <el-button type="primary" :loading="shipDialog.submitting" @click="confirmShip">确认发货</el-button>
+      </template>
+    </el-dialog>
+
   </section>
 </template>
 
@@ -107,6 +134,7 @@ import { pushNextLogisticsApi } from "@/api/logistics";
 import OrderStatusTag from "@/components/order/OrderStatusTag.vue";
 import { showOrderActionError, showOrderActionSuccess } from "@/utils/orderUi";
 import { toAssetUrl } from "@/utils/url";
+import { provinceOptions } from "@/utils/provinces";
 
 const router = useRouter();
 const loading = ref(false);
@@ -121,6 +149,17 @@ const query = reactive({
   keyword: "",
   orderStatus: undefined,
   refundStatus: undefined,
+});
+
+const shipDialog = reactive({
+  visible: false,
+  submitting: false,
+  order: null,
+  form: {
+    originProvince: "",
+    originCity: "",
+    originDetail: "",
+  },
 });
 
 onMounted(() => fetchList(true));
@@ -250,18 +289,32 @@ function isArrived(order) {
 }
 
 async function ship(order) {
+  shipDialog.order = order;
+  shipDialog.form.originProvince = "";
+  shipDialog.form.originCity = "";
+  shipDialog.form.originDetail = "";
+  shipDialog.visible = true;
+}
+
+async function confirmShip() {
+  if (!shipDialog.form.originProvince) {
+    showOrderActionError(new Error("请选择发货省份"), "发货失败");
+    return;
+  }
+  shipDialog.submitting = true;
   try {
-    await ElMessageBox.confirm("确认该订单已发货吗？", "确认发货", {
-      type: "warning",
-      confirmButtonText: "确认发货",
-      cancelButtonText: "取消",
+    await shipOrderApi(shipDialog.order.id, {
+      originProvince: shipDialog.form.originProvince,
+      originCity: shipDialog.form.originCity.trim(),
+      originDetail: shipDialog.form.originDetail.trim(),
     });
-    await shipOrderApi(order.id);
     showOrderActionSuccess("已发货");
+    shipDialog.visible = false;
     await fetchList(false);
   } catch (error) {
-    if (String(error?.message || "").includes("cancel")) return;
     showOrderActionError(error, "发货失败");
+  } finally {
+    shipDialog.submitting = false;
   }
 }
 

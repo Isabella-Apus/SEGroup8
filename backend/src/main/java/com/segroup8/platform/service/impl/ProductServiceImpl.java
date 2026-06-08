@@ -16,6 +16,7 @@ import com.segroup8.platform.entity.Shop;
 import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.ProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
+import com.segroup8.platform.mapper.UserBlockMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
 import com.segroup8.platform.service.CategoryService;
@@ -41,17 +42,20 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final ShopMapper shopMapper;
     private final UserMapper userMapper;
+    private final UserBlockMapper userBlockMapper;
     private final BrowseHistoryService browseHistoryService;
     private final CategoryService categoryService;
     private final ProductRiskAuditService productRiskAuditService;
 
     public ProductServiceImpl(ProductMapper productMapper, ShopMapper shopMapper, UserMapper userMapper,
+            UserBlockMapper userBlockMapper,
             BrowseHistoryService browseHistoryService,
             CategoryService categoryService,
             ProductRiskAuditService productRiskAuditService) {
         this.productMapper = productMapper;
         this.shopMapper = shopMapper;
         this.userMapper = userMapper;
+        this.userBlockMapper = userBlockMapper;
         this.browseHistoryService = browseHistoryService;
         this.categoryService = categoryService;
         this.productRiskAuditService = productRiskAuditService;
@@ -63,6 +67,7 @@ public class ProductServiceImpl implements ProductService {
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<Product>()
             .eq(Product::getStatus, ProductStatusEnum.ON_SHELF.getCode());
         appendCommonFilters(wrapper, request);
+        appendMutualBlockFilter(wrapper);
         applySort(wrapper, request.getSortBy());
         Page<Product> page = productMapper.selectPage(Page.of(request.getPageNum(), request.getPageSize()), wrapper);
         return toPageVO(page);
@@ -79,6 +84,7 @@ public class ProductServiceImpl implements ProductService {
                 .eq(Product::getShopId, shopId)
                 .eq(Product::getStatus, ProductStatusEnum.ON_SHELF.getCode());
         appendCommonFilters(wrapper, request);
+        appendMutualBlockFilter(wrapper);
         applySort(wrapper, request.getSortBy());
         Page<Product> page = productMapper.selectPage(Page.of(request.getPageNum(), request.getPageSize()), wrapper);
         return toPageVO(page);
@@ -93,6 +99,7 @@ public class ProductServiceImpl implements ProductService {
         if (product == null) {
             throw new BusinessException(404, "商品不存在或已下架");
         }
+        assertMutualBlockAllowed(product);
         browseHistoryService.saveBrowseHistory(productId, "NEW");
         return toVO(product);
     }
@@ -212,6 +219,46 @@ public class ProductServiceImpl implements ProductService {
             } else {
                 wrapper.in(Product::getSubCategoryId, leafIds);
             }
+        }
+    }
+
+    private void appendMutualBlockFilter(LambdaQueryWrapper<Product> wrapper) {
+        Long currentUserId = UserContext.getUserId();
+        if (currentUserId == null) {
+            return;
+        }
+        java.util.Set<Long> hiddenSellerIds = new java.util.HashSet<>();
+        hiddenSellerIds.addAll(userBlockMapper.listBlockedIds(currentUserId));
+        hiddenSellerIds.addAll(userBlockMapper.listBlockerIds(currentUserId));
+        if (hiddenSellerIds.isEmpty()) {
+            return;
+        }
+        List<Long> hiddenShopIds = shopMapper.selectList(new LambdaQueryWrapper<Shop>()
+                        .in(Shop::getOwnerUserId, hiddenSellerIds))
+                .stream()
+                .map(Shop::getId)
+                .filter(Objects::nonNull)
+                .toList();
+        if (!hiddenShopIds.isEmpty()) {
+            wrapper.notIn(Product::getShopId, hiddenShopIds);
+        }
+    }
+
+    private void assertMutualBlockAllowed(Product product) {
+        Long currentUserId = UserContext.getUserId();
+        if (currentUserId == null || product == null || product.getShopId() == null) {
+            return;
+        }
+        Shop shop = shopMapper.selectById(product.getShopId());
+        Long sellerUserId = shop == null ? null : shop.getOwnerUserId();
+        if (sellerUserId == null) {
+            return;
+        }
+        if (userBlockMapper.isBlocked(currentUserId, sellerUserId) > 0) {
+            throw new BusinessException(403, "您已拉黑该卖家，无法查看其商品");
+        }
+        if (userBlockMapper.isBlocked(sellerUserId, currentUserId) > 0) {
+            throw new BusinessException(403, "该卖家已拉黑您，无法查看其商品");
         }
     }
 

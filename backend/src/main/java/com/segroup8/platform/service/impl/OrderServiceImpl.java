@@ -38,6 +38,7 @@ import com.segroup8.platform.mapper.ReviewMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.AddressMapper;
+import com.segroup8.platform.mapper.UserBlockMapper;
 import com.segroup8.platform.realtime.RealtimePushService;
 import com.segroup8.platform.service.OrderService;
 import com.segroup8.platform.service.LogisticsService;
@@ -76,6 +77,7 @@ public class OrderServiceImpl implements OrderService {
     private final SecondhandProductMapper secondhandProductMapper;
     private final ShopMapper shopMapper;
     private final AddressMapper addressMapper;
+    private final UserBlockMapper userBlockMapper;
     private final OrderAfterSaleLogMapper orderAfterSaleLogMapper;
     private final RealtimePushService realtimePushService;
     private final LogisticsService logisticsService;
@@ -87,6 +89,7 @@ public class OrderServiceImpl implements OrderService {
             ProductMapper productMapper, ReviewMapper reviewMapper, SecondhandProductMapper secondhandProductMapper,
             ShopMapper shopMapper,
             AddressMapper addressMapper,
+            UserBlockMapper userBlockMapper,
             OrderAfterSaleLogMapper orderAfterSaleLogMapper,
             RealtimePushService realtimePushService, LogisticsService logisticsService,
             EscrowSettlementService escrowSettlementService, VoucherService voucherService,
@@ -98,6 +101,7 @@ public class OrderServiceImpl implements OrderService {
         this.secondhandProductMapper = secondhandProductMapper;
         this.shopMapper = shopMapper;
         this.addressMapper = addressMapper;
+        this.userBlockMapper = userBlockMapper;
         this.orderAfterSaleLogMapper = orderAfterSaleLogMapper;
         this.realtimePushService = realtimePushService;
         this.logisticsService = logisticsService;
@@ -129,6 +133,7 @@ public class OrderServiceImpl implements OrderService {
             if (!ProductStatusEnum.ON_SHELF.equals(ProductStatusEnum.of(product.getStatus()))) {
                 throw new BusinessException(400, "商品已下架: " + product.getName());
             }
+            assertNewProductPurchaseAllowed(userId, product);
 
             if (product.getStock() == null || product.getStock() < quantity) {
                 throw new BusinessException(400, "库存不足: " + product.getName());
@@ -896,7 +901,8 @@ public class OrderServiceImpl implements OrderService {
             order.setLogisticsCurrentIndex(0);
         }
         orderInfoMapper.updateById(order);
-        logisticsService.initializeWhenShipped(orderId, request);
+        OrderShipRequest effectiveRequest = normalizeShipRequest(request, items);
+        logisticsService.initializeWhenShipped(orderId, effectiveRequest);
         notifyBuyer(order, "订单已发货",
                 "订单号：" + order.getOrderNo() + "，卖家已发货，包裹正在运输中。");
         pushOrderRealtime(orderId, order.getBuyerUserId(), List.of(sellerUserId), "ORDER_STATUS_UPDATED", "卖家已发货");
@@ -962,6 +968,35 @@ public class OrderServiceImpl implements OrderService {
             merged.merge(item.getProductId(), item.getQuantity(), (a, b) -> a + b);
         }
         return merged;
+    }
+
+    private void assertNewProductPurchaseAllowed(Long buyerUserId, Product product) {
+        if (buyerUserId == null || product == null || product.getShopId() == null) {
+            return;
+        }
+        Shop shop = shopMapper.selectById(product.getShopId());
+        Long sellerUserId = shop == null ? null : shop.getOwnerUserId();
+        if (sellerUserId == null) {
+            return;
+        }
+        if (userBlockMapper.isBlocked(buyerUserId, sellerUserId) > 0) {
+            throw new BusinessException(403, "您已拉黑该卖家，无法购买其商品");
+        }
+        if (userBlockMapper.isBlocked(sellerUserId, buyerUserId) > 0) {
+            throw new BusinessException(403, "该卖家已拉黑您，无法购买其商品");
+        }
+    }
+
+    private OrderShipRequest normalizeShipRequest(OrderShipRequest request, List<OrderItem> items) {
+        boolean hasSecondhandItem = items != null && items.stream()
+                .anyMatch(item -> "SECONDHAND".equalsIgnoreCase(item.getProductType()));
+        if (!hasSecondhandItem) {
+            return request;
+        }
+        if (request != null && StringUtils.hasText(request.getOriginProvince())) {
+            return request;
+        }
+        throw new BusinessException(400, "二手订单发货前请填写发货省份");
     }
 
     private String generateOrderNo(Long userId) {

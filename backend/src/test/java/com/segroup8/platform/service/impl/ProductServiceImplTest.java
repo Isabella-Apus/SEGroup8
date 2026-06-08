@@ -14,6 +14,7 @@ import com.segroup8.platform.entity.Shop;
 import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.ProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
+import com.segroup8.platform.mapper.UserBlockMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.BrowseHistoryService;
 import com.segroup8.platform.service.CategoryService;
@@ -53,6 +54,9 @@ class ProductServiceImplTest {
     private UserMapper userMapper;
 
     @Mock
+    private UserBlockMapper userBlockMapper;
+
+    @Mock
     private BrowseHistoryService browseHistoryService;
 
     @Mock
@@ -65,7 +69,7 @@ class ProductServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        productService = new ProductServiceImpl(productMapper, shopMapper, userMapper, browseHistoryService,
+        productService = new ProductServiceImpl(productMapper, shopMapper, userMapper, userBlockMapper, browseHistoryService,
                 categoryService, productRiskAuditService);
     }
 

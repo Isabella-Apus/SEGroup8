@@ -40,6 +40,15 @@ import java.util.concurrent.ThreadLocalRandom;
 public class LogisticsServiceImpl implements LogisticsService {
 
     private static final String DEFAULT_ORIGIN_PROVINCE = "北京";
+    private static final List<String> KNOWN_PROVINCES = List.of(
+            "\u5317\u4eac", "\u5929\u6d25", "\u6cb3\u5317", "\u5c71\u897f", "\u5185\u8499\u53e4",
+            "\u8fbd\u5b81", "\u5409\u6797", "\u9ed1\u9f99\u6c5f",
+            "\u4e0a\u6d77", "\u6c5f\u82cf", "\u6d59\u6c5f", "\u5b89\u5fbd", "\u798f\u5efa",
+            "\u6c5f\u897f", "\u5c71\u4e1c",
+            "\u6cb3\u5357", "\u6e56\u5317", "\u6e56\u5357",
+            "\u5e7f\u4e1c", "\u5e7f\u897f", "\u6d77\u5357",
+            "\u91cd\u5e86", "\u56db\u5ddd", "\u8d35\u5dde", "\u4e91\u5357", "\u897f\u85cf",
+            "\u9655\u897f", "\u7518\u8083", "\u9752\u6d77", "\u5b81\u590f", "\u65b0\u7586");
 
     private final OrderInfoMapper orderInfoMapper;
     private final OrderItemMapper orderItemMapper;
@@ -164,17 +173,20 @@ public class LogisticsServiceImpl implements LogisticsService {
             if (items.isEmpty()) {
                 throw new BusinessException(400, "订单商品为空，无法生成物流模板");
             }
-            String originProvince = resolveOriginProvince(request);
+            String originProvince = resolveOriginProvince(request, items);
             String destProvince = (order.getReceiverProvince() == null || order.getReceiverProvince().isBlank())
                     ? "北京"
                     : order.getReceiverProvince();
             String originRegion = logisticsEngine.resolveRegion(originProvince);
             String destRegion = logisticsEngine.resolveRegion(destProvince);
-            if (originRegion == null || destRegion == null) {
+            if (destRegion == null) {
                 throw new BusinessException(400, "省份未映射大区，无法生成物流模板");
             }
-            List<String> nodes = logisticsEngine.generatePathNodes(originProvince, destProvince);
-            LogisticsPathTemplate template = findOrCreateTemplate(originRegion, destRegion, nodes);
+            List<String> nodes = originRegion == null
+                    ? buildCustomOriginNodes(originProvince, destProvince)
+                    : logisticsEngine.generatePathNodes(originProvince, destProvince);
+            LogisticsPathTemplate template = findOrCreateTemplate(
+                    originRegion == null ? "CUSTOM_ORIGIN" : originRegion, destRegion, nodes);
             templateId = template.getId();
             orderInfoMapper.update(null, new UpdateWrapper<OrderInfo>()
                     .set("logistics_template_id", templateId)
@@ -246,8 +258,55 @@ public class LogisticsServiceImpl implements LogisticsService {
         }
     }
 
-    private String resolveOriginProvince(OrderShipRequest request) {
-        return DEFAULT_ORIGIN_PROVINCE;
+    private String resolveOriginProvince(OrderShipRequest request, List<OrderItem> items) {
+        if (request != null && request.getOriginProvince() != null && !request.getOriginProvince().isBlank()) {
+            return request.getOriginProvince().trim();
+        }
+        String warehouseOrigin = resolveWarehouseOrigin(items);
+        return warehouseOrigin == null ? DEFAULT_ORIGIN_PROVINCE : warehouseOrigin;
+    }
+
+    private String resolveWarehouseOrigin(List<OrderItem> items) {
+        if (items == null) {
+            return null;
+        }
+        for (OrderItem item : items) {
+            if (!"NEW".equalsIgnoreCase(item.getProductType())) {
+                continue;
+            }
+            Product product = productMapper.selectById(item.getProductId());
+            if (product == null || product.getShopId() == null) {
+                continue;
+            }
+            Shop shop = shopMapper.selectById(product.getShopId());
+            if (shop == null || shop.getWarehouseAddr() == null || shop.getWarehouseAddr().isBlank()) {
+                continue;
+            }
+            String extracted = extractKnownProvince(shop.getWarehouseAddr());
+            return extracted == null ? shop.getWarehouseAddr().trim() : extracted;
+        }
+        return null;
+    }
+
+    private List<String> buildCustomOriginNodes(String origin, String destProvince) {
+        String originLabel = origin == null || origin.isBlank() ? "\u53d1\u8d27\u5730" : origin.trim();
+        List<String> nodes = new ArrayList<>();
+        nodes.add(originLabel + "\u63fd\u6536\u70b9");
+        nodes.add(destProvince.trim() + "\u5206\u62e8\u4e2d\u5fc3");
+        return nodes;
+    }
+
+    private String extractKnownProvince(String text) {
+        if (text == null || text.isBlank()) {
+            return null;
+        }
+        String normalized = text.trim();
+        for (String province : KNOWN_PROVINCES) {
+            if (normalized.contains(province)) {
+                return province;
+            }
+        }
+        return null;
     }
 
     private LocalDateTime latestTraceTime(Long orderId) {
