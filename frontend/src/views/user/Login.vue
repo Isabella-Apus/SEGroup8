@@ -71,8 +71,8 @@ const userStore = useUserStore();
 const loading = ref(false);
 
 const form = reactive({
-  username: "user",
-  password: "user123",
+  username: "",
+  password: "",
 });
 
 const redirectPath = computed(() => {

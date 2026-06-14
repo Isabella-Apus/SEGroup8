@@ -28,8 +28,8 @@ const authStore = useAuthStore();
 
 const loading = ref(false);
 const form = reactive({
-  username: 'user',
-  password: 'user123'
+  username: '',
+  password: ''
 });
 
 async function handleLogin() {
