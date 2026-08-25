@@ -1,0 +1,10 @@
+﻿{
+    "executedAt":  "2026-08-25T15:46:32+08:00",
+    "services":  3,
+    "result":  "PASS",
+    "tableCount":  31,
+    "backendHealth":  "UP",
+    "userCount":  3,
+    "frontendHealth":  "ok",
+    "issue":  65
+}

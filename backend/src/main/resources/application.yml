@@ -15,9 +15,9 @@ spring:
     import: optional:classpath:application-local.yml
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/segroup8_platform?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
-    username: root
-    password: root
+    url: "${DB_URL:jdbc:mysql://127.0.0.1:3306/segroup8_platform?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true}"
+    username: "${DB_USERNAME:root}"
+    password: "${DB_PASSWORD:root}"
     hikari:
       connection-init-sql: SET NAMES utf8mb4 COLLATE utf8mb4_general_ci
   sql:
@@ -36,7 +36,7 @@ mybatis-plus:
 
 app:
   jwt:
-    secret: SEGROUP8_DEMO_SECRET_KEY_CHANGE_ME_2026
+    secret: "${JWT_SECRET:SEGROUP8_DEMO_SECRET_KEY_CHANGE_ME_2026}"
     expire-hours: 24
   realtime:
     allowed-origin-patterns: "${REALTIME_ALLOWED_ORIGIN_PATTERNS:*}"
@@ -60,3 +60,14 @@ springdoc:
     enabled: true
   swagger-ui:
     path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always

@@ -1,0 +1,3 @@
+﻿REPOSITORY          TAG       IMAGE ID       SIZE
+segroup8/backend    1.0.0     4de5e2f20207   532MB
+segroup8/frontend   1.0.0     e7af0604896d   78.1MB
