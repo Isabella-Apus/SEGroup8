@@ -1,0 +1,31 @@
+name: UC07 tests
+
+on:
+  pull_request:
+    paths:
+      - 'microservices/catalog-service/**'
+      - '01_requirements/UC07-*'
+      - '02_docs/UC07-*'
+      - '04_tests/UC07/**'
+      - '.github/workflows/uc07-tests.yml'
+  push:
+    branches: ['codex/uc07-results']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Run UC07 lifecycle tests
+        run: mvn -B -f microservices/catalog-service/pom.xml -Dtest=CatalogLifecycleApiAndE2ETest clean test
+      - name: Upload raw reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uc07-surefire-reports
+          path: microservices/catalog-service/target/surefire-reports/

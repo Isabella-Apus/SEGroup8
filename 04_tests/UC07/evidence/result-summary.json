@@ -1,0 +1,22 @@
+{
+  "useCase": "UC07",
+  "name": "卖家商品生命周期",
+  "issue": 50,
+  "generatedAt": "2026-08-25T16:57:32+08:00",
+  "command": "mvn -B -f microservices/catalog-service/pom.xml -Dtest=CatalogLifecycleApiAndE2ETest clean test",
+  "tests": 5,
+  "passed": 5,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "buildResult": "BUILD SUCCESS",
+  "regression": {
+    "tests": 7,
+    "passed": 7,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "buildResult": "BUILD SUCCESS"
+  },
+  "rawReport": "raw-reports/TEST-com.segroup8.catalog.CatalogLifecycleApiAndE2ETest.xml"
+}

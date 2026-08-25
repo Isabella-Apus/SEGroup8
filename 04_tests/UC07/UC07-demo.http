@@ -1,0 +1,27 @@
+@catalog = http://localhost:8081
+@sellerId = 7
+
+### T07-01 创建草稿
+POST {{catalog}}/api/catalog/seller/products
+X-Seller-Id: {{sellerId}}
+Content-Type: application/json
+
+{"shopId":8,"name":"演示商品","description":"安全商品","category":"DIGITAL","price":99.00,"stock":3}
+
+### 卖家商品列表
+GET {{catalog}}/api/catalog/seller/products
+X-Seller-Id: {{sellerId}}
+
+### 提交审核（将 1 替换为实际商品 ID）
+POST {{catalog}}/api/catalog/seller/products/1/actions/SUBMIT
+X-Seller-Id: {{sellerId}}
+
+### 审核通过（内部接口）
+POST {{catalog}}/api/catalog/internal/products/1/risk-decision
+Content-Type: application/json
+
+{"approved":true}
+
+### 下架商品
+POST {{catalog}}/api/catalog/seller/products/1/actions/OFF_SHELF
+X-Seller-Id: {{sellerId}}

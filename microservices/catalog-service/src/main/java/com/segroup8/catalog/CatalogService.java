@@ -5,15 +5,29 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 @Service
 public class CatalogService {
     private final JdbcClient db;
+    private final SimpleJdbcInsert productInsert;
+    private final RestClient riskClient;
 
-    public CatalogService(JdbcClient db) {
+    public CatalogService(JdbcClient db, DataSource dataSource, RestClient.Builder builder,
+            @Value("${clients.risk-base-url:http://risk-service:8083}") String riskBaseUrl) {
         this.db = db;
+        this.productInsert = new SimpleJdbcInsert(dataSource)
+                .withTableName("products")
+                .usingGeneratedKeyColumns("id");
+        this.riskClient = builder.baseUrl(riskBaseUrl).build();
     }
 
     public List<Product> search(String keyword, String category, Long shopId, BigDecimal minPrice,
@@ -44,8 +58,144 @@ public class CatalogService {
                 .orElseThrow(() -> new DomainException("PRODUCT_NOT_FOUND", "在售商品不存在"));
     }
 
+    public List<Product> sellerProducts(long sellerId) {
+        return db.sql("select * from products where seller_id=:seller order by updated_at desc")
+                .param("seller", sellerId)
+                .query(Product.class)
+                .list();
+    }
+
+    public Product create(long sellerId, ProductCommand command) {
+        validate(command);
+        long id = productInsert.executeAndReturnKey(Map.of(
+                "seller_id", sellerId,
+                "shop_id", command.shopId(),
+                "name", command.name(),
+                "description", nullToEmpty(command.description()),
+                "category", command.category(),
+                "price", command.price(),
+                "stock", command.stock(),
+                "status", "DRAFT",
+                "updated_at", java.sql.Timestamp.from(Instant.now())))
+                .longValue();
+        return owned(id, sellerId);
+    }
+
+    public Product update(long sellerId, long id, ProductCommand command) {
+        validate(command);
+        Product current = owned(id, sellerId);
+        if (!Set.of("DRAFT", "REJECTED", "OFF_SHELF").contains(current.status())) {
+            throw new DomainException("INVALID_PRODUCT_STATE", "只有草稿、驳回或下架商品可编辑");
+        }
+        db.sql("update products set name=:name,description=:description,category=:category,"
+                        + "price=:price,stock=:stock,updated_at=CURRENT_TIMESTAMP where id=:id")
+                .params(Map.of(
+                        "name", command.name(),
+                        "description", nullToEmpty(command.description()),
+                        "category", command.category(),
+                        "price", command.price(),
+                        "stock", command.stock(),
+                        "id", id))
+                .update();
+        return owned(id, sellerId);
+    }
+
+    public Product transition(long sellerId, long id, String action) {
+        Product current = owned(id, sellerId);
+        String next = LifecyclePolicy.next(current.status(), action);
+        db.sql("update products set status=:status,updated_at=CURRENT_TIMESTAMP where id=:id")
+                .params(Map.of("status", next, "id", id))
+                .update();
+        if ("SUBMIT".equals(action)) {
+            requestRiskAudit(current);
+        }
+        return owned(id, sellerId);
+    }
+
+    public Product applyRiskDecision(long id, boolean approved) {
+        Product current = byId(id);
+        if (!"PENDING_REVIEW".equals(current.status())) {
+            throw new DomainException("INVALID_PRODUCT_STATE", "商品不在待审核状态");
+        }
+        db.sql("update products set status=:status,updated_at=CURRENT_TIMESTAMP where id=:id")
+                .params(Map.of("status", approved ? "ON_SALE" : "REJECTED", "id", id))
+                .update();
+        return byId(id);
+    }
+
+    private void requestRiskAudit(Product product) {
+        try {
+            riskClient.post()
+                    .uri("/internal/risk-audits")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(Map.of(
+                            "productId", product.id(),
+                            "name", product.name(),
+                            "description", nullToEmpty(product.description())))
+                    .retrieve()
+                    .toBodilessEntity();
+        } catch (RuntimeException exception) {
+            db.sql("insert into integration_outbox(event_type,aggregate_id,payload,status,created_at) "
+                            + "values('PRODUCT_RISK_REVIEW_REQUESTED',:id,:payload,'PENDING',CURRENT_TIMESTAMP)")
+                    .params(Map.of(
+                            "id", product.id(),
+                            "payload", "{\"productId\":" + product.id() + "}"))
+                    .update();
+        }
+    }
+
+    private Product owned(long id, long sellerId) {
+        return db.sql("select * from products where id=:id and seller_id=:seller")
+                .params(Map.of("id", id, "seller", sellerId))
+                .query(Product.class)
+                .optional()
+                .orElseThrow(() -> new DomainException("PRODUCT_NOT_FOUND", "商品不存在或不属于当前卖家"));
+    }
+
+    private Product byId(long id) {
+        return db.sql("select * from products where id=:id")
+                .param("id", id)
+                .query(Product.class)
+                .optional()
+                .orElseThrow(() -> new DomainException("PRODUCT_NOT_FOUND", "商品不存在"));
+    }
+
+    private void validate(ProductCommand command) {
+        if (command.price().signum() <= 0) {
+            throw new DomainException("INVALID_PRICE", "价格必须大于 0");
+        }
+        if (command.stock() < 0) {
+            throw new DomainException("INVALID_STOCK", "库存不能小于 0");
+        }
+    }
+
+    private String nullToEmpty(String value) {
+        return value == null ? "" : value;
+    }
+
     public record Product(long id, long sellerId, long shopId, String name, String description,
             String category, BigDecimal price, int stock, String status, Instant updatedAt) {}
+
+    public record ProductCommand(long shopId, String name, String description, String category,
+            BigDecimal price, int stock) {}
+}
+
+final class LifecyclePolicy {
+    private static final Map<String, Map<String, String>> RULES = Map.of(
+            "DRAFT", Map.of("SUBMIT", "PENDING_REVIEW", "ARCHIVE", "ARCHIVED"),
+            "REJECTED", Map.of("SUBMIT", "PENDING_REVIEW", "ARCHIVE", "ARCHIVED"),
+            "ON_SALE", Map.of("OFF_SHELF", "OFF_SHELF"),
+            "OFF_SHELF", Map.of("SUBMIT", "PENDING_REVIEW", "ARCHIVE", "ARCHIVED"));
+
+    static String next(String current, String action) {
+        String next = RULES.getOrDefault(current, Map.of()).get(action);
+        if (next == null) {
+            throw new DomainException("INVALID_PRODUCT_TRANSITION", current + " 不能执行 " + action);
+        }
+        return next;
+    }
+
+    private LifecyclePolicy() {}
 }
 
 class DomainException extends RuntimeException {

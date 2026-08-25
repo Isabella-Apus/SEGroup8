@@ -4,3 +4,4 @@ spring:
     username: sa
     password: ''
   sql.init.mode: always
+clients.risk-base-url: http://127.0.0.1:1
