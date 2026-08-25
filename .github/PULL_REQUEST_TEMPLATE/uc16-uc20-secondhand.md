@@ -5,6 +5,7 @@
 - 新增 UC16-UC20 追溯矩阵、demo.http、测试报告和评审演示证据
 - 新增按组长检查字段整理的 UC16-UC20 用例验收检查表
 - 补充 26 张前端 UI/E2E 截图证据，并修复 UC16 二手分类树 mock 缺失问题
+- 补充 k6 压测脚本框架和 reset-all 数据重置方案，用于后续单体/微服务性能对比
 
 关联 Issue：#请替换为实际 Issue 编号（如无对应 Issue 可删除本行）
 
@@ -15,6 +16,8 @@
 - [x] 前端 Vite mock 环境完成 UC16-UC20 走查
 - [x] `05_management/UC16-UC20-screenshots` 共 26 张截图可打开
 - [x] `04_tests/UC16-UC20-ui-run-result.json` 可解析
+- [x] `04_tests/performance/k6/` 已提供商品搜索、新品下单、二手拍卖出价/购买脚本框架
+- [x] `04_tests/UC16-UC20-k6压测框架与数据重置方案.md` 已说明数据重置流程
 - [x] 未提交真实密码、Token 或云平台密钥
 
 ## 评审重点

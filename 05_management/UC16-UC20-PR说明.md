@@ -10,6 +10,7 @@
 - 修复前端 mock 缺失 `/category/tree?scene=SECONDHAND` 的问题，二手发布页分类树可以正常加载。
 - 新增 `SecondhandTradeServiceImplTest`，覆盖议价同意生成待付款订单、议价拒绝、重复处理拦截、拍卖低价拦截、结束后出价拦截、拍卖结算幂等。
 - 补充 26 张 UC16-UC20 前端 UI/E2E 截图证据，覆盖发布、购买、议价、拍卖、履约闭环。
+- 补充 D 部分第 2 天个人附加任务：k6 压测脚本框架和 reset-all 数据重置方案，用于后续单体/微服务性能对比。
 - 新增 UC16-UC20 专用 Issue 模板、PR 模板和 GitHub Actions 工作流，方便组长按统一格式检查。
 
 ## 验证结果
@@ -20,6 +21,8 @@
 - [x] Playwright 回归打开二手发布页，分类下拉显示“数码闲置”
 - [x] `04_tests/UC16-UC20-ui-run-result.json` 可解析
 - [x] `05_management/UC16-UC20-screenshots` 共 26 张截图
+- [x] `04_tests/performance/k6/` 已提供商品搜索、新品下单、二手拍卖出价/购买脚本框架
+- [x] `04_tests/UC16-UC20-k6压测框架与数据重置方案.md` 已说明 reset-all 数据重置流程
 - [x] 未提交真实密码、Token 或云平台密钥
 
 ## 交付证据
@@ -31,6 +34,8 @@
 - `04_tests/UC16-UC20-用例验收检查表.md`
 - `04_tests/UC16-UC20-UI运行记录.md`
 - `04_tests/UC16-UC20-ui-run-result.json`
+- `04_tests/UC16-UC20-k6压测框架与数据重置方案.md`
+- `04_tests/performance/k6/`
 - `05_management/UC16-UC20-评审与演示证据.md`
 - `05_management/UC16-UC20-screenshots/`
 
