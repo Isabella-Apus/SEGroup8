@@ -1,0 +1,70 @@
+@catalog = http://localhost:8081
+@shop = http://localhost:8082
+@risk = http://localhost:8083
+@behavior = http://localhost:8084
+
+### UC06 搜索筛选
+GET {{catalog}}/api/catalog/products?keyword=Java&category=BOOK&minPrice=10&maxPrice=100&sort=priceAsc
+
+### UC06 商品详情（将 1 替换为实际在售商品 ID）
+GET {{catalog}}/api/catalog/products/1
+
+### UC07 新建草稿
+POST {{catalog}}/api/catalog/seller/products
+X-Seller-Id: 7
+Content-Type: application/json
+
+{"shopId":8,"name":"演示商品","description":"安全描述","category":"DIGITAL","price":99.00,"stock":3}
+
+### UC07 提交审核（替换 ID）
+POST {{catalog}}/api/catalog/seller/products/1/actions/SUBMIT
+X-Seller-Id: 7
+
+### UC08 公开店铺
+GET {{shop}}/api/shops/8
+
+### UC08 修改设置
+PUT {{shop}}/api/shops/seller/current/settings
+X-Seller-Id: 7
+Content-Type: application/json
+
+{"name":"第八组精品店","announcement":"欢迎光临","open":true}
+
+### UC08 发布装修
+PUT {{shop}}/api/shops/seller/current/decoration
+X-Seller-Id: 7
+Content-Type: application/json
+
+{"template":"GRID","contentJson":"{\"hero\":\"summer\"}"}
+
+### UC09 待审核列表
+GET {{risk}}/api/admin/risk-audits?status=PENDING
+X-Admin-Id: 99
+
+### UC09 审核驳回（替换 ID）
+POST {{risk}}/api/admin/risk-audits/1/decision
+X-Admin-Id: 99
+Content-Type: application/json
+
+{"approved":false,"reason":"命中违禁规则"}
+
+### UC10 记录浏览
+POST {{behavior}}/api/behavior/browse-history
+X-User-Id: 3
+Content-Type: application/json
+
+{"productId":1,"productType":"NEW"}
+
+### UC10 记录搜索
+POST {{behavior}}/api/behavior/search-history
+X-User-Id: 3
+Content-Type: application/json
+
+{"keyword":"Java Book"}
+
+### UC10 查询个人历史和热词
+GET {{behavior}}/api/behavior/search-history
+X-User-Id: 3
+
+###
+GET {{behavior}}/api/behavior/hot-keywords

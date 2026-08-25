@@ -1,0 +1,30 @@
+name: UC06-UC10 microservices
+on:
+  pull_request:
+    paths: ["microservices/**", "02_docs/**", "04_tests/**"]
+  push:
+    branches: [main]
+    paths: ["microservices/**"]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: microservices
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - name: Unit, API and E2E tests
+        run: mvn -B clean verify
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uc06-uc10-surefire-reports
+          path: microservices/*/target/surefire-reports/**
+      - name: Validate Kubernetes manifests
+        run: kubectl kustomize k8s > /dev/null

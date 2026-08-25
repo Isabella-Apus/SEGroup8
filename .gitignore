@@ -45,3 +45,7 @@ backend/springboot_run.out.log
 backend/springboot_run.err.log
 backend-out.log
 backend-err.log
+
+# generated verification artifacts
+microservices/**/target/
+tmp/
