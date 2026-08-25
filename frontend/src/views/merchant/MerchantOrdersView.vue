@@ -20,8 +20,8 @@
       <el-table v-loading="loading" :data="records" border class="kg-table">
         <el-table-column prop="orderNo" label="订单号" min-width="200" show-overflow-tooltip />
         <el-table-column prop="buyerUserId" label="买家ID" width="90" />
-        <el-table-column label="金额" width="120">
-          <template #default="scope"><span class="amount-text">￥{{ Number(scope.row.totalAmount || 0).toFixed(2) }}</span></template>
+        <el-table-column label="预计到账" width="120">
+          <template #default="scope"><span class="amount-text">￥{{ sellerReceivable(scope.row).toFixed(2) }}</span></template>
         </el-table-column>
         <el-table-column label="订单状态" width="130">
           <template #default="scope">
@@ -90,6 +90,10 @@
         <el-descriptions-item label="买家ID">{{ detail.buyerUserId }}</el-descriptions-item>
         <el-descriptions-item label="订单状态">{{ detail.orderStatusName || '-' }}</el-descriptions-item>
         <el-descriptions-item label="售后状态">{{ detail.refundStatusName || '-' }}</el-descriptions-item>
+        <el-descriptions-item label="商品总额">￥{{ Number(detail.totalAmount || 0).toFixed(2) }}</el-descriptions-item>
+        <el-descriptions-item label="买家实付">￥{{ Number(detail.payableAmount ?? detail.totalAmount ?? 0).toFixed(2) }}</el-descriptions-item>
+        <el-descriptions-item label="商家承担优惠">-￥{{ Number(detail.sellerBearAmount || 0).toFixed(2) }}</el-descriptions-item>
+        <el-descriptions-item label="预计到账">￥{{ sellerReceivable(detail).toFixed(2) }}</el-descriptions-item>
         <el-descriptions-item label="收货人">{{ detail.receiverName || '-' }}</el-descriptions-item>
         <el-descriptions-item label="联系电话">{{ detail.receiverPhone || '-' }}</el-descriptions-item>
         <el-descriptions-item label="收货地址">{{ fullAddress(detail) }}</el-descriptions-item>
@@ -153,6 +157,13 @@ const detail = ref(null);
 const router = useRouter();
 // 记录已被拉黑的买家ID集合
 const blockedBuyerIds = ref(new Set());
+
+// 商家券从商品总额中扣除；平台券由平台补贴，不减少商家到账。
+function sellerReceivable(order) {
+  const gross = Number(order?.totalAmount || 0);
+  const sellerDiscount = Number(order?.sellerBearAmount || 0);
+  return Math.max(0, gross - sellerDiscount);
+}
 
 const query = reactive({
   pageNum: 1,
