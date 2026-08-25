@@ -16,7 +16,7 @@
         <el-card class="stat-card">
           <div class="stat-icon" style="background:#fff0f0;color:#e4393c">💰</div>
           <div class="stat-value income">¥{{ summary.totalRevenue }}</div>
-          <div class="stat-label">销售额</div>
+          <div class="stat-label">预计收入</div>
           <div class="stat-sub">
             较上期
             <span :class="summary.revenueGrowth >= 0 ? 'up' : 'down'">
@@ -64,9 +64,9 @@
         <el-card v-loading="chartLoading">
           <template #header>
             <div class="card-header">
-              <span>{{ chartType === 'revenue' ? '销售额趋势' : '订单数趋势' }}</span>
+              <span>{{ chartType === 'revenue' ? '预计收入趋势' : '订单数趋势' }}</span>
               <el-radio-group v-model="chartType" size="small" @change="loadCharts">
-                <el-radio-button label="revenue">销售额</el-radio-button>
+                <el-radio-button label="revenue">预计收入</el-radio-button>
                 <el-radio-button label="orders">订单数</el-radio-button>
               </el-radio-group>
             </div>
@@ -124,9 +124,9 @@
           <div v-if="recentOrders.length === 0" class="empty-tip">暂无订单</div>
           <el-table v-else :data="recentOrders" stripe size="small">
             <el-table-column prop="orderNo" label="订单号" width="170" show-overflow-tooltip />
-            <el-table-column label="金额" width="90">
+            <el-table-column label="预计到账" width="100">
               <template #default="{ row }">
-                <span class="price-text">¥{{ row.totalAmount }}</span>
+                <span class="price-text">¥{{ sellerReceivable(row).toFixed(2) }}</span>
               </template>
             </el-table-column>
             <el-table-column label="状态" width="90">
@@ -161,6 +161,13 @@ const chartLoading = ref(false)
 const rankLoading = ref(false)
 const ordersLoading = ref(false)
 const pieEmpty = ref(false)
+
+// 商家券由商家承担，平台券不减少商家收入。
+function sellerReceivable(order) {
+  const gross = Number(order?.totalAmount || 0)
+  const sellerDiscount = Number(order?.sellerBearAmount || 0)
+  return Math.max(0, gross - sellerDiscount)
+}
 
 const summary = reactive({
   totalRevenue: '0.00',
@@ -220,8 +227,8 @@ async function loadSummary() {
   try {
     const days = parseInt(timeRange.value)
     const [curr, prev] = await Promise.all([fetchOrders(days), fetchPrevOrders(days)])
-    const revenue = curr.filter(o => o.payStatus === 1).reduce((s, o) => s + Number(o.totalAmount), 0)
-    const prevRevenue = prev.filter(o => o.payStatus === 1).reduce((s, o) => s + Number(o.totalAmount), 0)
+    const revenue = curr.filter(o => o.payStatus === 1).reduce((s, o) => s + sellerReceivable(o), 0)
+    const prevRevenue = prev.filter(o => o.payStatus === 1).reduce((s, o) => s + sellerReceivable(o), 0)
     summary.totalRevenue = revenue.toFixed(2)
     summary.totalOrders = curr.length
     summary.completedOrders = curr.filter(o => o.orderStatus === 4).length
@@ -256,7 +263,7 @@ async function loadCharts() {
       const key = `${d.getMonth() + 1}/${d.getDate()}`
       if (dateMap[key]) {
         dateMap[key].count++
-        if (o.payStatus === 1) dateMap[key].revenue += Number(o.totalAmount)
+        if (o.payStatus === 1) dateMap[key].revenue += sellerReceivable(o)
       }
     })
     const dates = Object.keys(dateMap)
@@ -274,7 +281,7 @@ async function loadCharts() {
         xAxis: { type: 'category', data: dates, axisLabel: { fontSize: 11 } },
         yAxis: { type: 'value', axisLabel: { fontSize: 11 } },
         series: [{
-          name: chartType.value === 'revenue' ? '销售额' : '订单数',
+          name: chartType.value === 'revenue' ? '预计收入' : '订单数',
           type: 'line',
           smooth: true,
           data: chartType.value === 'revenue' ? revenues : counts,

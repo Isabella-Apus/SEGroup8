@@ -68,6 +68,10 @@ public class EscrowSettlementService {
             groupedAmount.merge(key, itemAmount, BigDecimal::add);
             groupedStrategy.putIfAbsent(key, strategy);
         }
+        // Seller-issued vouchers reduce the amount credited to that seller.
+        // Platform-issued vouchers leave the gross merchandise amount unchanged;
+        // their discount is recorded in platformBearAmount and funded by platform.
+        applySellerVoucherDiscount(order, groupedAmount);
         for (Map.Entry<String, BigDecimal> entry : groupedAmount.entrySet()) {
             String[] split = entry.getKey().split("#");
             Long sellerUserId = Long.valueOf(split[0]);
