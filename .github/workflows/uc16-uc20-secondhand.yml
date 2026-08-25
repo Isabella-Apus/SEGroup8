@@ -1,0 +1,134 @@
+name: UC16-UC20 secondhand
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "02_docs/**"
+      - "04_tests/**"
+      - "05_management/**"
+      - ".github/workflows/uc16-uc20-secondhand.yml"
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "02_docs/**"
+      - "04_tests/**"
+      - "05_management/**"
+      - ".github/workflows/uc16-uc20-secondhand.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: uc16-uc20-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: UC16-UC20 backend tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - name: Run focused tests and package backend
+        run: >-
+          mvn -B --no-transfer-progress
+          "-Dtest=SecondhandProductServiceImplTest,SecondhandTradeServiceImplTest,SecondhandOrderFlowIntegrationTest,SecondhandAuctionIntegrationTest"
+          clean verify
+      - name: Prepare deployable JAR
+        run: cp target/platform-backend-*.jar target/app.jar
+      - name: Upload backend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: uc16-uc20-backend
+          path: backend/target/app.jar
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uc16-uc20-surefire-reports
+          path: backend/target/surefire-reports/**
+          if-no-files-found: warn
+          retention-days: 7
+
+  frontend:
+    name: UC16-UC20 frontend mock build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Audit high-severity frontend vulnerabilities
+        run: npm audit --audit-level=high
+      - name: Build mock frontend
+        run: npm run build:mock
+      - name: Verify UC16-UC20 evidence manifest
+        run: node ../04_tests/verify-uc16-uc20-evidence.mjs
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: uc16-uc20-frontend
+          path: frontend/dist
+          if-no-files-found: error
+          retention-days: 7
+
+  delivery-smoke:
+    name: CD release bundle smoke test
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download backend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: uc16-uc20-backend
+          path: release/backend
+      - name: Download frontend artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: uc16-uc20-frontend
+          path: release/frontend
+      - name: Validate deployable files
+        run: |
+          test -s release/backend/app.jar
+          unzip -t release/backend/app.jar >/dev/null
+          test -s release/frontend/index.html
+      - name: Package and inspect release bundle
+        run: |
+          tar -czf uc16-uc20-release.tar.gz -C release .
+          tar -tzf uc16-uc20-release.tar.gz | grep -q "./backend/app.jar"
+          tar -tzf uc16-uc20-release.tar.gz | grep -q "./frontend/index.html"
+      - name: Upload verified release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: uc16-uc20-release-bundle
+          path: uc16-uc20-release.tar.gz
+          if-no-files-found: error
+          retention-days: 7

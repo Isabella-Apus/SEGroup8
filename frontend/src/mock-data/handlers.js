@@ -116,6 +116,23 @@ function resolveSecondhandCategory(source = {}) {
     return secondhandCategories.find((category) => category !== ALL_CATEGORY && matchSecondhandCategory(source, category)) || "宿舍生活";
 }
 
+function buildCategoryTree(scene) {
+    const normalizedScene = String(scene || "NEW").toUpperCase();
+    const names = normalizedScene === "SECONDHAND" ? secondhandCategories : productCategories;
+    return names
+        .filter((category) => category !== ALL_CATEGORY)
+        .map((category, index) => ({
+            id: index + 1,
+            name: category,
+            children: [
+                {
+                    id: (index + 1) * 100 + 1,
+                    name: category,
+                },
+            ],
+        }));
+}
+
 function normalizeBrowseProductType(value) {
     const type = String(value || "NEW").toUpperCase();
     return ["SECONDHAND", "SH", "IDLE"].includes(type) ? "SECONDHAND" : "NEW";
@@ -556,6 +573,10 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
             creditScore: 100,
         });
         return ok(null);
+    }
+
+    if (m === "get" && p === "/category/tree") {
+        return ok(buildCategoryTree(params?.scene));
     }
 
     if (m === "get" && (p === "/user/me" || p === "/user/profile")) {
