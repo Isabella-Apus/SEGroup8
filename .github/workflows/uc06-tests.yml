@@ -1,0 +1,32 @@
+name: UC06 tests
+
+on:
+  pull_request:
+    paths:
+      - 'microservices/catalog-service/**'
+      - 'microservices/pom.xml'
+      - '01_requirements/UC06-*'
+      - '02_docs/UC06-*'
+      - '04_tests/UC06/**'
+      - '.github/workflows/uc06-tests.yml'
+  push:
+    branches: ['codex/uc06-results']
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Run UC06 tests
+        run: mvn -B -f microservices/pom.xml clean test
+      - name: Upload raw reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uc06-surefire-reports
+          path: microservices/catalog-service/target/surefire-reports/

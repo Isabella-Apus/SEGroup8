@@ -1,0 +1,13 @@
+@catalog = http://localhost:8081
+
+### T06-01 组合搜索
+GET {{catalog}}/api/catalog/products?keyword=Java&category=BOOK&minPrice=50&maxPrice=60
+
+### T06-01 在售商品详情
+GET {{catalog}}/api/catalog/products/1
+
+### T06-02 价格升序
+GET {{catalog}}/api/catalog/products?shopId=8&category=BOOK&sort=priceAsc
+
+### T06-02 空结果
+GET {{catalog}}/api/catalog/products?keyword=不存在
