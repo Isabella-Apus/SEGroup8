@@ -550,12 +550,17 @@ async function confirmPay() {
   if (!payTargetId.value) return;
   paySubmitting.value = true;
   try {
+    const paidItemCount = records.value.find(
+      (item) => String(item.id) === String(payTargetId.value),
+    )?.items?.length || 0;
     await payOrderApi(payTargetId.value, {
       payMode: payForm.payMode,
       payChannel: payForm.payChannel
     });
     payDialogVisible.value = false;
-    showOrderActionSuccess('支付成功');
+    showOrderActionSuccess(
+      paidItemCount > 1 ? `支付成功，已拆分为 ${paidItemCount} 个独立订单` : '支付成功',
+    );
     fetchOrders();
   } catch (error) {
     showOrderActionError(error, '支付失败');

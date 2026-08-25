@@ -53,6 +53,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -64,6 +65,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.UUID;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -304,6 +306,12 @@ public class OrderServiceImpl implements OrderService {
         OrderInfo order = orderInfoMapper.selectById(orderId);
         AccessControl.requireOrderOwnedByBuyer(order, "无权操作该订单");
         OrderStateMachine.assertOrderActionAllowed(order, OrderStateMachine.OrderAction.PAY, "当前状态不可支付");
+        List<OrderItem> orderItems = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
+                .eq(OrderItem::getOrderId, orderId)
+                .orderByAsc(OrderItem::getId));
+        if (orderItems.isEmpty()) {
+            throw new BusinessException(400, "订单商品不能为空");
+        }
         LocalDateTime now = LocalDateTime.now();
         String payMode = request != null && StringUtils.hasText(request.getPayMode())
                 ? request.getPayMode().trim().toUpperCase()
@@ -338,11 +346,22 @@ public class OrderServiceImpl implements OrderService {
             throw new BusinessException(400, "当前状态不可支付");
         }
         voucherService.markUsedForPaidOrder(order.getVoucherId(), userId, orderId);
-        List<Long> sellerUserIds = resolveSellerUserIds(orderId);
-        notifySellers(orderId, sellerUserIds, "新订单已支付",
-                "订单号：" + order.getOrderNo() + "，买家已完成支付，请及时发货。");
-        pushOrderRealtime(orderId, userId, sellerUserIds, "ORDER_STATUS_UPDATED", "订单已支付，等待卖家发货");
-        return getMyOrderDetail(orderId);
+        order.setPayStatus(1);
+        order.setPaidTime(now);
+        order.setPayMethod(payMethod);
+        order.setOrderStatus(OrderStatusEnum.PENDING_SHIP.getCode());
+        order.setVersion(version + 1);
+
+        List<PaidOrderPart> paidOrders = splitPaidOrderByItem(order, orderItems);
+        for (PaidOrderPart part : paidOrders) {
+            List<Long> sellerUserIds = resolveSellerUserIds(part.items());
+            notifySellers(part.order().getId(), sellerUserIds, "新订单已支付",
+                    "订单号：" + part.order().getOrderNo() + "，买家已完成支付，请及时发货。");
+            pushOrderRealtime(part.order().getId(), userId, sellerUserIds,
+                    "ORDER_STATUS_UPDATED", "订单已支付，等待卖家发货");
+        }
+        PaidOrderPart firstPart = paidOrders.get(0);
+        return buildOrderVO(firstPart.order(), firstPart.items());
     }
 
     @Override
@@ -883,6 +902,9 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
                 .eq(OrderItem::getOrderId, order.getId())
                 .orderByAsc(OrderItem::getId));
+        if (items.size() > 1) {
+            throw new BusinessException(409, "合并订单不能直接发货，请先完成订单拆分");
+        }
         AccessControl.requireSellerOwnership(
                 () -> items.stream().anyMatch(item -> isItemOwnedBySeller(item, sellerUserId)), "无权操作该订单");
         if (Integer.valueOf(OrderStatusEnum.SHIPPED.getCode()).equals(order.getOrderStatus())) {
@@ -1001,7 +1023,169 @@ public class OrderServiceImpl implements OrderService {
 
     private String generateOrderNo(Long userId) {
         String timePart = LocalDateTime.now().format(ORDER_NO_FORMATTER);
-        return "ORD" + timePart + String.format("%04d", userId % 10000);
+        String randomPart = UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+        return "ORD" + timePart + String.format("%04d", userId % 10000) + randomPart;
+    }
+
+    /**
+     * A cart checkout is paid once, then converted to one independently fulfillable
+     * order per product line. The original order keeps the first line so existing
+     * payment and voucher references remain valid; the remaining lines receive new
+     * order records and keep their own logistics/after-sale lifecycle.
+     */
+    private List<PaidOrderPart> splitPaidOrderByItem(OrderInfo paidOrder, List<OrderItem> items) {
+        if (items.size() == 1) {
+            return List.of(new PaidOrderPart(paidOrder, List.of(items.get(0))));
+        }
+
+        List<BigDecimal> grossAmounts = items.stream()
+                .map(this::itemAmount)
+                .toList();
+        BigDecimal voucherDiscount = defaultMoney(paidOrder.getVoucherDiscountAmount());
+        BigDecimal sellerBear = defaultMoney(paidOrder.getSellerBearAmount()).min(voucherDiscount);
+        BigDecimal platformBear = voucherDiscount.subtract(sellerBear).max(BigDecimal.ZERO);
+
+        Long sellerVoucherShopId = sellerBear.compareTo(BigDecimal.ZERO) > 0
+                ? voucherService.getSellerBearerShopId(paidOrder.getVoucherId())
+                : null;
+        if (sellerBear.compareTo(BigDecimal.ZERO) > 0 && sellerVoucherShopId == null) {
+            platformBear = platformBear.add(sellerBear);
+            sellerBear = BigDecimal.ZERO;
+        }
+        List<BigDecimal> sellerWeights = new ArrayList<>(items.size());
+        for (int i = 0; i < items.size(); i++) {
+            if (sellerVoucherShopId == null) {
+                sellerWeights.add(BigDecimal.ZERO);
+            } else {
+                Long shopId = resolveNewProductShopId(items.get(i));
+                sellerWeights.add(sellerVoucherShopId.equals(shopId) ? grossAmounts.get(i) : BigDecimal.ZERO);
+            }
+        }
+        List<BigDecimal> sellerAllocations = allocateMoney(sellerBear, sellerWeights);
+        List<BigDecimal> platformAllocations = allocateMoney(platformBear, grossAmounts);
+
+        List<PaidOrderPart> result = new ArrayList<>(items.size());
+        for (int i = 0; i < items.size(); i++) {
+            OrderItem item = items.get(i);
+            BigDecimal gross = grossAmounts.get(i);
+            BigDecimal itemSellerBear = sellerAllocations.get(i);
+            BigDecimal itemPlatformBear = platformAllocations.get(i);
+            BigDecimal itemDiscount = itemSellerBear.add(itemPlatformBear);
+            BigDecimal itemPayable = gross.subtract(itemDiscount).max(BigDecimal.ZERO);
+
+            if (i == 0) {
+                applySplitAmounts(paidOrder, gross, itemDiscount, itemSellerBear, itemPlatformBear, itemPayable);
+                orderInfoMapper.update(null, new UpdateWrapper<OrderInfo>()
+                        .set("total_amount", gross)
+                        .set("voucher_discount_amount", itemDiscount)
+                        .set("seller_bear_amount", itemSellerBear)
+                        .set("platform_bear_amount", itemPlatformBear)
+                        .set("payable_amount", itemPayable)
+                        .eq("id", paidOrder.getId()));
+                result.add(new PaidOrderPart(paidOrder, List.of(item)));
+                continue;
+            }
+
+            OrderInfo childOrder = copyPaidOrderForSplit(paidOrder, gross, itemDiscount,
+                    itemSellerBear, itemPlatformBear, itemPayable);
+            orderInfoMapper.insert(childOrder);
+            if (childOrder.getId() == null) {
+                throw new BusinessException(500, "订单拆分失败：未生成子订单ID");
+            }
+            item.setOrderId(childOrder.getId());
+            if (orderItemMapper.updateById(item) == 0) {
+                throw new BusinessException(500, "订单拆分失败：商品明细迁移失败");
+            }
+            result.add(new PaidOrderPart(childOrder, List.of(item)));
+        }
+        return result;
+    }
+
+    private OrderInfo copyPaidOrderForSplit(OrderInfo source, BigDecimal totalAmount,
+            BigDecimal voucherDiscount, BigDecimal sellerBear, BigDecimal platformBear, BigDecimal payable) {
+        OrderInfo child = new OrderInfo();
+        child.setOrderNo(generateOrderNo(source.getBuyerUserId()));
+        child.setBuyerUserId(source.getBuyerUserId());
+        child.setPayStatus(1);
+        child.setOrderStatus(OrderStatusEnum.PENDING_SHIP.getCode());
+        child.setRefundStatus(0);
+        child.setReceiverName(source.getReceiverName());
+        child.setReceiverPhone(source.getReceiverPhone());
+        child.setReceiverProvince(source.getReceiverProvince());
+        child.setReceiverCity(source.getReceiverCity());
+        child.setReceiverDetailAddress(source.getReceiverDetailAddress());
+        child.setPayMethod(source.getPayMethod());
+        child.setRemark(source.getRemark());
+        child.setCreateTime(source.getCreateTime());
+        child.setPaidTime(source.getPaidTime());
+        child.setCanRefund(source.getCanRefund() == null ? 1 : source.getCanRefund());
+        child.setLogisticsStatus("PENDING");
+        child.setLogisticsCurrentIndex(0);
+        child.setVersion(0);
+        if (voucherDiscount.compareTo(BigDecimal.ZERO) > 0) {
+            child.setVoucherId(source.getVoucherId());
+        }
+        applySplitAmounts(child, totalAmount, voucherDiscount, sellerBear, platformBear, payable);
+        return child;
+    }
+
+    private void applySplitAmounts(OrderInfo order, BigDecimal totalAmount, BigDecimal voucherDiscount,
+            BigDecimal sellerBear, BigDecimal platformBear, BigDecimal payable) {
+        order.setTotalAmount(totalAmount);
+        order.setVoucherDiscountAmount(voucherDiscount);
+        order.setSellerBearAmount(sellerBear);
+        order.setPlatformBearAmount(platformBear);
+        order.setPayableAmount(payable);
+    }
+
+    private List<BigDecimal> allocateMoney(BigDecimal amount, List<BigDecimal> weights) {
+        List<BigDecimal> allocations = new ArrayList<>();
+        for (int i = 0; i < weights.size(); i++) {
+            allocations.add(BigDecimal.ZERO.setScale(2));
+        }
+        BigDecimal normalizedAmount = defaultMoney(amount).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal totalWeight = weights.stream().map(this::defaultMoney)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        if (normalizedAmount.compareTo(BigDecimal.ZERO) <= 0 || totalWeight.compareTo(BigDecimal.ZERO) <= 0) {
+            return allocations;
+        }
+
+        List<Integer> eligibleIndexes = new ArrayList<>();
+        for (int i = 0; i < weights.size(); i++) {
+            if (defaultMoney(weights.get(i)).compareTo(BigDecimal.ZERO) > 0) {
+                eligibleIndexes.add(i);
+            }
+        }
+        BigDecimal remaining = normalizedAmount;
+        for (int position = 0; position < eligibleIndexes.size(); position++) {
+            int index = eligibleIndexes.get(position);
+            BigDecimal allocation = position == eligibleIndexes.size() - 1
+                    ? remaining
+                    : normalizedAmount.multiply(weights.get(index))
+                            .divide(totalWeight, 2, RoundingMode.DOWN);
+            allocations.set(index, allocation);
+            remaining = remaining.subtract(allocation);
+        }
+        return allocations;
+    }
+
+    private BigDecimal itemAmount(OrderItem item) {
+        if (item == null || item.getPrice() == null) {
+            return BigDecimal.ZERO.setScale(2);
+        }
+        return item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity() == null ? 0 : item.getQuantity()))
+                .setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private Long resolveNewProductShopId(OrderItem item) {
+        if (item == null || !"NEW".equalsIgnoreCase(item.getProductType()) || item.getProductId() == null) {
+            return null;
+        }
+        Product product = productMapper.selectById(item.getProductId());
+        return product == null ? null : product.getShopId();
+    }
+
+    private record PaidOrderPart(OrderInfo order, List<OrderItem> items) {
     }
 
     private Long requireUserId() {
@@ -1201,6 +1385,10 @@ public class OrderServiceImpl implements OrderService {
     private List<Long> resolveSellerUserIds(Long orderId) {
         List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
                 .eq(OrderItem::getOrderId, orderId));
+        return resolveSellerUserIds(items);
+    }
+
+    private List<Long> resolveSellerUserIds(List<OrderItem> items) {
         Set<Long> sellerIds = new HashSet<>();
         for (OrderItem item : items) {
             if ("NEW".equalsIgnoreCase(item.getProductType())) {

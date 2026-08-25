@@ -1256,6 +1256,44 @@ export async function handleMockRequest({ method, url, params, data, headers }) 
             order.paidTime = new Date().toISOString();
             order.orderStatus = 1;
             order.orderStatusName = "待发货";
+
+            const paidItems = [...(order.items || [])];
+            if (paidItems.length > 1) {
+                const grossCents = paidItems.map((item) => Math.round(
+                    Number(item.price || 0) * Number(item.quantity || 0) * 100,
+                ));
+                const totalGrossCents = grossCents.reduce((sum, amount) => sum + amount, 0);
+                const totalDiscountCents = Math.min(
+                    totalGrossCents,
+                    Math.round(Number(order.voucherDiscountAmount || 0) * 100),
+                );
+                let remainingDiscountCents = totalDiscountCents;
+                const discountCents = grossCents.map((amount, index) => {
+                    const allocation = index === grossCents.length - 1
+                        ? remainingDiscountCents
+                        : Math.floor(totalDiscountCents * amount / Math.max(1, totalGrossCents));
+                    remainingDiscountCents -= allocation;
+                    return allocation;
+                });
+                const paidOrderSnapshot = { ...order };
+                const splitOrders = paidItems.map((item, index) => {
+                    const splitId = index === 0 ? order.id : mockStore.next.orderId++;
+                    return {
+                        ...paidOrderSnapshot,
+                        id: splitId,
+                        orderNo: index === 0
+                            ? order.orderNo
+                            : `ORDMOCK${String(splitId).padStart(6, "0")}`,
+                        totalAmount: grossCents[index] / 100,
+                        voucherDiscountAmount: discountCents[index] / 100,
+                        payableAmount: Math.max(0, grossCents[index] - discountCents[index]) / 100,
+                        items: [item],
+                    };
+                });
+                Object.assign(order, splitOrders[0]);
+                const orderIndex = mockStore.orders.indexOf(order);
+                mockStore.orders.splice(orderIndex, 0, ...splitOrders.slice(1));
+            }
             return ok(order);
         }
         if (action === "cancel") {

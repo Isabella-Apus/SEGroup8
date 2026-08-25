@@ -4,6 +4,7 @@ import com.segroup8.platform.common.BusinessException;
 import com.segroup8.platform.common.OrderStatusEnum;
 import com.segroup8.platform.common.ProductStatusEnum;
 import com.segroup8.platform.context.UserContext;
+import com.segroup8.platform.dto.PayOrderRequest;
 import com.segroup8.platform.entity.OrderInfo;
 import com.segroup8.platform.entity.OrderItem;
 import com.segroup8.platform.entity.Product;
@@ -29,9 +30,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -44,6 +47,9 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -282,5 +288,121 @@ class OrderServiceImplTest {
 
         verify(notificationService).createNotification(
                 eq(buyerUserId), anyString(), anyString(), eq("/order/" + orderId));
+    }
+
+    @Test
+    void payMyOrder_shouldSplitCartItemsIntoIndependentPaidOrders() {
+        Long buyerUserId = 100L;
+        Long orderId = 20L;
+        UserContext.setUserId(buyerUserId);
+
+        OrderInfo order = new OrderInfo();
+        order.setId(orderId);
+        order.setOrderNo("ORDER-20");
+        order.setBuyerUserId(buyerUserId);
+        order.setTotalAmount(new BigDecimal("300.00"));
+        order.setVoucherId(99L);
+        order.setVoucherDiscountAmount(new BigDecimal("30.00"));
+        order.setSellerBearAmount(BigDecimal.ZERO);
+        order.setPlatformBearAmount(new BigDecimal("30.00"));
+        order.setPayableAmount(new BigDecimal("270.00"));
+        order.setPayStatus(0);
+        order.setOrderStatus(OrderStatusEnum.PENDING_PAY.getCode());
+        order.setVersion(0);
+        order.setCreateTime(LocalDateTime.now());
+        when(orderInfoMapper.selectById(orderId)).thenReturn(order);
+        when(orderInfoMapper.update(any(), any())).thenReturn(1);
+
+        OrderItem firstItem = new OrderItem();
+        firstItem.setId(1L);
+        firstItem.setOrderId(orderId);
+        firstItem.setProductType("NEW");
+        firstItem.setProductId(101L);
+        firstItem.setProductName("Product A");
+        firstItem.setPrice(new BigDecimal("100.00"));
+        firstItem.setQuantity(1);
+
+        OrderItem secondItem = new OrderItem();
+        secondItem.setId(2L);
+        secondItem.setOrderId(orderId);
+        secondItem.setProductType("NEW");
+        secondItem.setProductId(102L);
+        secondItem.setProductName("Product B");
+        secondItem.setPrice(new BigDecimal("200.00"));
+        secondItem.setQuantity(1);
+        when(orderItemMapper.selectList(any())).thenReturn(List.of(firstItem, secondItem));
+        when(orderItemMapper.updateById(any(OrderItem.class))).thenReturn(1);
+
+        Product firstProduct = new Product();
+        firstProduct.setId(101L);
+        firstProduct.setShopId(201L);
+        Product secondProduct = new Product();
+        secondProduct.setId(102L);
+        secondProduct.setShopId(202L);
+        when(productMapper.selectById(101L)).thenReturn(firstProduct);
+        when(productMapper.selectById(102L)).thenReturn(secondProduct);
+
+        Shop firstShop = new Shop();
+        firstShop.setId(201L);
+        firstShop.setOwnerUserId(301L);
+        Shop secondShop = new Shop();
+        secondShop.setId(202L);
+        secondShop.setOwnerUserId(302L);
+        when(shopMapper.selectById(201L)).thenReturn(firstShop);
+        when(shopMapper.selectById(202L)).thenReturn(secondShop);
+
+        doAnswer(invocation -> {
+            OrderInfo child = invocation.getArgument(0);
+            child.setId(21L);
+            return 1;
+        }).when(orderInfoMapper).insert(any(OrderInfo.class));
+
+        PayOrderRequest request = new PayOrderRequest();
+        request.setPayMode("THIRD_PARTY");
+        request.setPayChannel("WECHAT");
+        OrderVO result = orderService.payMyOrder(orderId, request);
+
+        assertEquals(1, result.getItems().size());
+        assertEquals(101L, result.getItems().get(0).getProductId());
+        assertEquals(new BigDecimal("100.00"), result.getTotalAmount());
+        assertEquals(new BigDecimal("90.00"), result.getPayableAmount());
+
+        ArgumentCaptor<OrderInfo> childCaptor = ArgumentCaptor.forClass(OrderInfo.class);
+        verify(orderInfoMapper).insert(childCaptor.capture());
+        OrderInfo child = childCaptor.getValue();
+        assertEquals(21L, child.getId());
+        assertEquals(new BigDecimal("200.00"), child.getTotalAmount());
+        assertEquals(new BigDecimal("20.00"), child.getVoucherDiscountAmount());
+        assertEquals(new BigDecimal("180.00"), child.getPayableAmount());
+        assertEquals(OrderStatusEnum.PENDING_SHIP.getCode(), child.getOrderStatus());
+        assertEquals(21L, secondItem.getOrderId());
+        verify(notificationService, times(2)).createNotification(anyLong(), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void shipSellerOrder_shouldRejectLegacyMergedOrder() {
+        Long sellerUserId = 200L;
+        Long orderId = 22L;
+        UserContext.setUserId(sellerUserId);
+
+        OrderInfo order = new OrderInfo();
+        order.setId(orderId);
+        order.setOrderStatus(OrderStatusEnum.PENDING_SHIP.getCode());
+        when(orderInfoMapper.selectById(orderId)).thenReturn(order);
+
+        OrderItem first = new OrderItem();
+        first.setId(1L);
+        first.setOrderId(orderId);
+        OrderItem second = new OrderItem();
+        second.setId(2L);
+        second.setOrderId(orderId);
+        when(orderItemMapper.selectList(any())).thenReturn(List.of(first, second));
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> orderService.shipSellerOrder(orderId));
+
+        assertEquals(409, ex.getCode());
+        verify(orderInfoMapper, never()).updateById(any(OrderInfo.class));
+        verify(logisticsService, never()).initializeWhenShipped(anyLong(), any());
     }
 }

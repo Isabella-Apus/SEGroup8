@@ -824,11 +824,17 @@ async function pay() {
 async function confirmPay() {
   paySubmitting.value = true;
   try {
+    const paidItemCount = order.value?.items?.length || 0;
     await payOrderApi(order.value.id, {
       payMode: payForm.payMode,
       payChannel: payForm.payChannel
     });
     payDialogVisible.value = false;
+    if (paidItemCount > 1) {
+      showOrderActionSuccess(`支付成功，已拆分为 ${paidItemCount} 个独立订单`);
+      await router.push({ path: "/order", query: { type: "NEW" } });
+      return;
+    }
     showOrderActionSuccess("支付成功");
     await fetchDetail();
   } catch (error) {
