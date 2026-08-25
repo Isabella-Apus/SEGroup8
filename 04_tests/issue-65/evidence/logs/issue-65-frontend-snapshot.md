@@ -1,0 +1,25 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - button [ref=e5] [cursor=pointer]:
+      - img "Kinda Goods" [ref=e6]
+  - main [ref=e7]:
+    - region [ref=e8]:
+      - paragraph [ref=e9]: Kinda Goods
+      - heading "欢迎回来" [level=1] [ref=e10]
+      - paragraph [ref=e11]: Kinda Goods 是面向校园用户的综合交易平台，支持新品选购、闲置转让、卖家入驻与订单售后。
+    - region "登录 Kinda Goods" [ref=e13]:
+      - generic [ref=e14]:
+        - img "Kinda Goods" [ref=e15]
+        - heading "登录 Kinda Goods" [level=2] [ref=e16]
+      - generic [ref=e17]:
+        - generic [ref=e18]:
+          - generic [ref=e19]: 账号
+          - textbox "账号" [ref=e27]:
+            - /placeholder: 请输入账号
+        - generic [ref=e28]:
+          - generic [ref=e29]: 密码
+          - generic [ref=e32]
+        - button "登录" [ref=e44] [cursor=pointer]
+      - generic [ref=e50]:
+        - generic [ref=e51]: 还没有账号？
+        - button "创建账号" [ref=e52] [cursor=pointer]

@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.segroup8.platform.integration.SecondhandOrderFlowIntegrationTest" time="0.712" tests="1" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="17"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="GBK"/>
+    <property name="java.class.path" value="D:\softwhere_homework2026\SEGroup8\backend\target\test-classes;D:\softwhere_homework2026\SEGroup8\backend\target\classes;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.3.4\spring-boot-starter-web-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter\3.3.4\spring-boot-starter-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot\3.3.4\spring-boot-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.3.4\spring-boot-starter-logging-3.3.4.jar;C:\Users\27872\.m2\repository\ch\qos\logback\logback-classic\1.5.8\logback-classic-1.5.8.jar;C:\Users\27872\.m2\repository\ch\qos\logback\logback-core\1.5.8\logback-core-1.5.8.jar;C:\Users\27872\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.23.1\log4j-to-slf4j-2.23.1.jar;C:\Users\27872\.m2\repository\org\apache\logging\log4j\log4j-api\2.23.1\log4j-api-2.23.1.jar;C:\Users\27872\.m2\repository\org\slf4j\jul-to-slf4j\2.0.16\jul-to-slf4j-2.0.16.jar;C:\Users\27872\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\27872\.m2\repository\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.3.4\spring-boot-starter-json-3.3.4.jar;C:\Users\27872\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.17.2\jackson-datatype-jdk8-2.17.2.jar;C:\Users\27872\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.17.2\jackson-datatype-jsr310-2.17.2.jar;C:\Users\27872\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.17.2\jackson-module-parameter-names-2.17.2.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.3.4\spring-boot-starter-tomcat-3.3.4.jar;C:\Users\27872\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.30\tomcat-embed-core-10.1.30.jar;C:\Users\27872\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.30\tomcat-embed-websocket-10.1.30.jar;C:\Users\27872\.m2\repository\org\springframework\spring-web\6.1.13\spring-web-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-beans\6.1.13\spring-beans-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-webmvc\6.1.13\spring-webmvc-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-aop\6.1.13\spring-aop-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-context\6.1.13\spring-context-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-expression\6.1.13\spring-expression-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-validation\3.3.4\spring-boot-starter-validation-3.3.4.jar;C:\Users\27872\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.30\tomcat-embed-el-10.1.30.jar;C:\Users\27872\.m2\repository\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\27872\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\27872\.m2\repository\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;C:\Users\27872\.m2\repository\com\fasterxml\classmate\1.7.0\classmate-1.7.0.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-websocket\3.3.4\spring-boot-starter-websocket-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\spring-messaging\6.1.13\spring-messaging-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-websocket\6.1.13\spring-websocket-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-actuator\3.3.4\spring-boot-starter-actuator-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-actuator-autoconfigure\3.3.4\spring-boot-actuator-autoconfigure-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-actuator\3.3.4\spring-boot-actuator-3.3.4.jar;C:\Users\27872\.m2\repository\io\micrometer\micrometer-observation\1.13.4\micrometer-observation-1.13.4.jar;C:\Users\27872\.m2\repository\io\micrometer\micrometer-commons\1.13.4\micrometer-commons-1.13.4.jar;C:\Users\27872\.m2\repository\io\micrometer\micrometer-jakarta9\1.13.4\micrometer-jakarta9-1.13.4.jar;C:\Users\27872\.m2\repository\io\micrometer\micrometer-core\1.13.4\micrometer-core-1.13.4.jar;C:\Users\27872\.m2\repository\org\hdrhistogram\HdrHistogram\2.2.2\HdrHistogram-2.2.2.jar;C:\Users\27872\.m2\repository\org\latencyutils\LatencyUtils\2.0.3\LatencyUtils-2.0.3.jar;C:\Users\27872\.m2\repository\org\springframework\security\spring-security-crypto\6.3.3\spring-security-crypto-6.3.3.jar;C:\Users\27872\.m2\repository\com\baomidou\mybatis-plus-spring-boot3-starter\3.5.7\mybatis-plus-spring-boot3-starter-3.5.7.jar;C:\Users\27872\.m2\repository\com\baomidou\mybatis-plus\3.5.7\mybatis-plus-3.5.7.jar;C:\Users\27872\.m2\repository\com\baomidou\mybatis-plus-core\3.5.7\mybatis-plus-core-3.5.7.jar;C:\Users\27872\.m2\repository\com\baomidou\mybatis-plus-annotation\3.5.7\mybatis-plus-annotation-3.5.7.jar;C:\Users\27872\.m2\repository\com\baomidou\mybatis-plus-extension\3.5.7\mybatis-plus-extension-3.5.7.jar;C:\Users\27872\.m2\repository\org\mybatis\mybatis\3.5.16\mybatis-3.5.16.jar;C:\Users\27872\.m2\repository\com\github\jsqlparser\jsqlparser\4.9\jsqlparser-4.9.jar;C:\Users\27872\.m2\repository\org\mybatis\mybatis-spring\3.0.3\mybatis-spring-3.0.3.jar;C:\Users\27872\.m2\repository\com\baomidou\mybatis-plus-spring-boot-autoconfigure\3.5.7\mybatis-plus-spring-boot-autoconfigure-3.5.7.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.3.4\spring-boot-autoconfigure-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\3.3.4\spring-boot-starter-jdbc-3.3.4.jar;C:\Users\27872\.m2\repository\com\zaxxer\HikariCP\5.1.0\HikariCP-5.1.0.jar;C:\Users\27872\.m2\repository\org\springframework\spring-jdbc\6.1.13\spring-jdbc-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-tx\6.1.13\spring-tx-6.1.13.jar;C:\Users\27872\.m2\repository\com\mysql\mysql-connector-j\8.3.0\mysql-connector-j-8.3.0.jar;C:\Users\27872\.m2\repository\org\projectlombok\lombok\1.18.34\lombok-1.18.34.jar;C:\Users\27872\.m2\repository\io\jsonwebtoken\jjwt-api\0.12.6\jjwt-api-0.12.6.jar;C:\Users\27872\.m2\repository\io\jsonwebtoken\jjwt-impl\0.12.6\jjwt-impl-0.12.6.jar;C:\Users\27872\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.12.6\jjwt-jackson-0.12.6.jar;C:\Users\27872\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;C:\Users\27872\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;C:\Users\27872\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.17.2\jackson-core-2.17.2.jar;C:\Users\27872\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.6.0\springdoc-openapi-starter-webmvc-ui-2.6.0.jar;C:\Users\27872\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-api\2.6.0\springdoc-openapi-starter-webmvc-api-2.6.0.jar;C:\Users\27872\.m2\repository\org\springdoc\springdoc-openapi-starter-common\2.6.0\springdoc-openapi-starter-common-2.6.0.jar;C:\Users\27872\.m2\repository\io\swagger\core\v3\swagger-core-jakarta\2.2.22\swagger-core-jakarta-2.2.22.jar;C:\Users\27872\.m2\repository\org\apache\commons\commons-lang3\3.14.0\commons-lang3-3.14.0.jar;C:\Users\27872\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.22\swagger-annotations-jakarta-2.2.22.jar;C:\Users\27872\.m2\repository\io\swagger\core\v3\swagger-models-jakarta\2.2.22\swagger-models-jakarta-2.2.22.jar;C:\Users\27872\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.17.2\jackson-dataformat-yaml-2.17.2.jar;C:\Users\27872\.m2\repository\org\webjars\swagger-ui\5.17.14\swagger-ui-5.17.14.jar;C:\Users\27872\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.3.4\spring-boot-starter-test-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-test\3.3.4\spring-boot-test-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.3.4\spring-boot-test-autoconfigure-3.3.4.jar;C:\Users\27872\.m2\repository\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\27872\.m2\repository\org\slf4j\slf4j-api\2.0.16\slf4j-api-2.0.16.jar;C:\Users\27872\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\27872\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\27872\.m2\repository\net\minidev\json-smart\2.5.1\json-smart-2.5.1.jar;C:\Users\27872\.m2\repository\net\minidev\accessors-smart\2.5.1\accessors-smart-2.5.1.jar;C:\Users\27872\.m2\repository\org\ow2\asm\asm\9.6\asm-9.6.jar;C:\Users\27872\.m2\repository\org\assertj\assertj-core\3.25.3\assertj-core-3.25.3.jar;C:\Users\27872\.m2\repository\net\bytebuddy\byte-buddy\1.14.19\byte-buddy-1.14.19.jar;C:\Users\27872\.m2\repository\org\awaitility\awaitility\4.2.2\awaitility-4.2.2.jar;C:\Users\27872\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\27872\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.3\junit-jupiter-5.10.3.jar;C:\Users\27872\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.3\junit-jupiter-api-5.10.3.jar;C:\Users\27872\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\27872\.m2\repository\org\junit\platform\junit-platform-commons\1.10.3\junit-platform-commons-1.10.3.jar;C:\Users\27872\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\27872\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.3\junit-jupiter-params-5.10.3.jar;C:\Users\27872\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.3\junit-jupiter-engine-5.10.3.jar;C:\Users\27872\.m2\repository\org\junit\platform\junit-platform-engine\1.10.3\junit-platform-engine-1.10.3.jar;C:\Users\27872\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\27872\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.19\byte-buddy-agent-1.14.19.jar;C:\Users\27872\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\27872\.m2\repository\org\mockito\mockito-junit-jupiter\5.11.0\mockito-junit-jupiter-5.11.0.jar;C:\Users\27872\.m2\repository\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\27872\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\27872\.m2\repository\org\springframework\spring-core\6.1.13\spring-core-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-jcl\6.1.13\spring-jcl-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-test\6.1.13\spring-test-6.1.13.jar;C:\Users\27872\.m2\repository\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;C:\Users\27872\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;"/>
+    <property name="java.vm.vendor" value="Microsoft"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://www.microsoft.com"/>
+    <property name="user.timezone" value="Asia/Shanghai"/>
+    <property name="org.jboss.logging.provider" value="slf4j"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="17"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="CN"/>
+    <property name="sun.boot.library.path" value="C:\Program Files\Microsoft\jdk-17.0.13.11-hotspot\bin"/>
+    <property name="sun.java.command" value="C:\Users\27872\AppData\Local\Temp\surefire16114350165420609535\surefirebooter-20260825154533365_3.jar C:\Users\27872\AppData\Local\Temp\surefire16114350165420609535 2026-08-25T15-45-32_695-jvmRun1 surefire-20260825154533365_1tmp surefire_0-20260825154533365_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="D:\softwhere_homework2026\SEGroup8\backend\target\test-classes;D:\softwhere_homework2026\SEGroup8\backend\target\classes;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.3.4\spring-boot-starter-web-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter\3.3.4\spring-boot-starter-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot\3.3.4\spring-boot-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.3.4\spring-boot-starter-logging-3.3.4.jar;C:\Users\27872\.m2\repository\ch\qos\logback\logback-classic\1.5.8\logback-classic-1.5.8.jar;C:\Users\27872\.m2\repository\ch\qos\logback\logback-core\1.5.8\logback-core-1.5.8.jar;C:\Users\27872\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.23.1\log4j-to-slf4j-2.23.1.jar;C:\Users\27872\.m2\repository\org\apache\logging\log4j\log4j-api\2.23.1\log4j-api-2.23.1.jar;C:\Users\27872\.m2\repository\org\slf4j\jul-to-slf4j\2.0.16\jul-to-slf4j-2.0.16.jar;C:\Users\27872\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\27872\.m2\repository\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.3.4\spring-boot-starter-json-3.3.4.jar;C:\Users\27872\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.17.2\jackson-datatype-jdk8-2.17.2.jar;C:\Users\27872\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.17.2\jackson-datatype-jsr310-2.17.2.jar;C:\Users\27872\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.17.2\jackson-module-parameter-names-2.17.2.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.3.4\spring-boot-starter-tomcat-3.3.4.jar;C:\Users\27872\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.30\tomcat-embed-core-10.1.30.jar;C:\Users\27872\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.30\tomcat-embed-websocket-10.1.30.jar;C:\Users\27872\.m2\repository\org\springframework\spring-web\6.1.13\spring-web-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-beans\6.1.13\spring-beans-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-webmvc\6.1.13\spring-webmvc-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-aop\6.1.13\spring-aop-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-context\6.1.13\spring-context-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-expression\6.1.13\spring-expression-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-validation\3.3.4\spring-boot-starter-validation-3.3.4.jar;C:\Users\27872\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.30\tomcat-embed-el-10.1.30.jar;C:\Users\27872\.m2\repository\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\27872\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\27872\.m2\repository\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;C:\Users\27872\.m2\repository\com\fasterxml\classmate\1.7.0\classmate-1.7.0.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-websocket\3.3.4\spring-boot-starter-websocket-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\spring-messaging\6.1.13\spring-messaging-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-websocket\6.1.13\spring-websocket-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-actuator\3.3.4\spring-boot-starter-actuator-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-actuator-autoconfigure\3.3.4\spring-boot-actuator-autoconfigure-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-actuator\3.3.4\spring-boot-actuator-3.3.4.jar;C:\Users\27872\.m2\repository\io\micrometer\micrometer-observation\1.13.4\micrometer-observation-1.13.4.jar;C:\Users\27872\.m2\repository\io\micrometer\micrometer-commons\1.13.4\micrometer-commons-1.13.4.jar;C:\Users\27872\.m2\repository\io\micrometer\micrometer-jakarta9\1.13.4\micrometer-jakarta9-1.13.4.jar;C:\Users\27872\.m2\repository\io\micrometer\micrometer-core\1.13.4\micrometer-core-1.13.4.jar;C:\Users\27872\.m2\repository\org\hdrhistogram\HdrHistogram\2.2.2\HdrHistogram-2.2.2.jar;C:\Users\27872\.m2\repository\org\latencyutils\LatencyUtils\2.0.3\LatencyUtils-2.0.3.jar;C:\Users\27872\.m2\repository\org\springframework\security\spring-security-crypto\6.3.3\spring-security-crypto-6.3.3.jar;C:\Users\27872\.m2\repository\com\baomidou\mybatis-plus-spring-boot3-starter\3.5.7\mybatis-plus-spring-boot3-starter-3.5.7.jar;C:\Users\27872\.m2\repository\com\baomidou\mybatis-plus\3.5.7\mybatis-plus-3.5.7.jar;C:\Users\27872\.m2\repository\com\baomidou\mybatis-plus-core\3.5.7\mybatis-plus-core-3.5.7.jar;C:\Users\27872\.m2\repository\com\baomidou\mybatis-plus-annotation\3.5.7\mybatis-plus-annotation-3.5.7.jar;C:\Users\27872\.m2\repository\com\baomidou\mybatis-plus-extension\3.5.7\mybatis-plus-extension-3.5.7.jar;C:\Users\27872\.m2\repository\org\mybatis\mybatis\3.5.16\mybatis-3.5.16.jar;C:\Users\27872\.m2\repository\com\github\jsqlparser\jsqlparser\4.9\jsqlparser-4.9.jar;C:\Users\27872\.m2\repository\org\mybatis\mybatis-spring\3.0.3\mybatis-spring-3.0.3.jar;C:\Users\27872\.m2\repository\com\baomidou\mybatis-plus-spring-boot-autoconfigure\3.5.7\mybatis-plus-spring-boot-autoconfigure-3.5.7.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.3.4\spring-boot-autoconfigure-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\3.3.4\spring-boot-starter-jdbc-3.3.4.jar;C:\Users\27872\.m2\repository\com\zaxxer\HikariCP\5.1.0\HikariCP-5.1.0.jar;C:\Users\27872\.m2\repository\org\springframework\spring-jdbc\6.1.13\spring-jdbc-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-tx\6.1.13\spring-tx-6.1.13.jar;C:\Users\27872\.m2\repository\com\mysql\mysql-connector-j\8.3.0\mysql-connector-j-8.3.0.jar;C:\Users\27872\.m2\repository\org\projectlombok\lombok\1.18.34\lombok-1.18.34.jar;C:\Users\27872\.m2\repository\io\jsonwebtoken\jjwt-api\0.12.6\jjwt-api-0.12.6.jar;C:\Users\27872\.m2\repository\io\jsonwebtoken\jjwt-impl\0.12.6\jjwt-impl-0.12.6.jar;C:\Users\27872\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.12.6\jjwt-jackson-0.12.6.jar;C:\Users\27872\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;C:\Users\27872\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;C:\Users\27872\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.17.2\jackson-core-2.17.2.jar;C:\Users\27872\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.6.0\springdoc-openapi-starter-webmvc-ui-2.6.0.jar;C:\Users\27872\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-api\2.6.0\springdoc-openapi-starter-webmvc-api-2.6.0.jar;C:\Users\27872\.m2\repository\org\springdoc\springdoc-openapi-starter-common\2.6.0\springdoc-openapi-starter-common-2.6.0.jar;C:\Users\27872\.m2\repository\io\swagger\core\v3\swagger-core-jakarta\2.2.22\swagger-core-jakarta-2.2.22.jar;C:\Users\27872\.m2\repository\org\apache\commons\commons-lang3\3.14.0\commons-lang3-3.14.0.jar;C:\Users\27872\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.22\swagger-annotations-jakarta-2.2.22.jar;C:\Users\27872\.m2\repository\io\swagger\core\v3\swagger-models-jakarta\2.2.22\swagger-models-jakarta-2.2.22.jar;C:\Users\27872\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.17.2\jackson-dataformat-yaml-2.17.2.jar;C:\Users\27872\.m2\repository\org\webjars\swagger-ui\5.17.14\swagger-ui-5.17.14.jar;C:\Users\27872\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.3.4\spring-boot-starter-test-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-test\3.3.4\spring-boot-test-3.3.4.jar;C:\Users\27872\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.3.4\spring-boot-test-autoconfigure-3.3.4.jar;C:\Users\27872\.m2\repository\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\27872\.m2\repository\org\slf4j\slf4j-api\2.0.16\slf4j-api-2.0.16.jar;C:\Users\27872\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\27872\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\27872\.m2\repository\net\minidev\json-smart\2.5.1\json-smart-2.5.1.jar;C:\Users\27872\.m2\repository\net\minidev\accessors-smart\2.5.1\accessors-smart-2.5.1.jar;C:\Users\27872\.m2\repository\org\ow2\asm\asm\9.6\asm-9.6.jar;C:\Users\27872\.m2\repository\org\assertj\assertj-core\3.25.3\assertj-core-3.25.3.jar;C:\Users\27872\.m2\repository\net\bytebuddy\byte-buddy\1.14.19\byte-buddy-1.14.19.jar;C:\Users\27872\.m2\repository\org\awaitility\awaitility\4.2.2\awaitility-4.2.2.jar;C:\Users\27872\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\27872\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.3\junit-jupiter-5.10.3.jar;C:\Users\27872\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.3\junit-jupiter-api-5.10.3.jar;C:\Users\27872\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\27872\.m2\repository\org\junit\platform\junit-platform-commons\1.10.3\junit-platform-commons-1.10.3.jar;C:\Users\27872\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\27872\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.3\junit-jupiter-params-5.10.3.jar;C:\Users\27872\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.3\junit-jupiter-engine-5.10.3.jar;C:\Users\27872\.m2\repository\org\junit\platform\junit-platform-engine\1.10.3\junit-platform-engine-1.10.3.jar;C:\Users\27872\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\27872\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.19\byte-buddy-agent-1.14.19.jar;C:\Users\27872\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\27872\.m2\repository\org\mockito\mockito-junit-jupiter\5.11.0\mockito-junit-jupiter-5.11.0.jar;C:\Users\27872\.m2\repository\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\27872\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\27872\.m2\repository\org\springframework\spring-core\6.1.13\spring-core-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-jcl\6.1.13\spring-jcl-6.1.13.jar;C:\Users\27872\.m2\repository\org\springframework\spring-test\6.1.13\spring-test-6.1.13.jar;C:\Users\27872\.m2\repository\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;C:\Users\27872\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\27872"/>
+    <property name="user.language" value="zh"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2024-10-15"/>
+    <property name="java.home" value="C:\Program Files\Microsoft\jdk-17.0.13.11-hotspot"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="D:\softwhere_homework2026\SEGroup8\backend"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="FILE_LOG_CHARSET" value="GBK"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="C:\Users\27872\AppData\Local\Temp\surefire16114350165420609535\surefirebooter-20260825154533365_3.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="17.0.13+11-LTS"/>
+    <property name="user.name" value="27872"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="GBK"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Microsoft-10376486"/>
+    <property name="localRepository" value="C:\Users\27872\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/microsoft/openjdk/issues"/>
+    <property name="java.io.tmpdir" value="C:\Users\27872\AppData\Local\Temp\"/>
+    <property name="com.zaxxer.hikari.pool_number" value="2"/>
+    <property name="java.version" value="17.0.13"/>
+    <property name="user.dir" value="D:\softwhere_homework2026\SEGroup8\backend"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="PID" value="37836"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="CONSOLE_LOG_CHARSET" value="GBK"/>
+    <property name="native.encoding" value="GBK"/>
+    <property name="java.library.path" value="C:\Program Files\Microsoft\jdk-17.0.13.11-hotspot\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Users\27872\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell;C:\Users\27872\.codex\tmp\arg0\codex-arg08MmwPr;C:\Users\27872\.cache\codex-runtimes\codex-primary-runtime\dependencies\bin\override;C:\Program Files\Microsoft\jdk-17.0.13.11-hotspot\bin;C:\Users\27872\tools\apache-maven-3.9.14\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;D:\software\python\Scripts\;D:\software\python\;C:\Program Files\dotnet\;C:\Program Files\Git\cmd\;E:\mingw64\mingw64\bin;D:\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;E:\Program Files\MATLAB\R2023b\runtime\win64;E:\Program Files\MATLAB\R2023b\bin;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\nodejs\;C:\Program Files\NVIDIA Corporation\NVIDIA App\NvDLISR;C:\Users\27872\AppData\Local\Programs\OpenAI\Codex\bin;C:\Users\27872\AppData\Local\Programs\Python\Python311\Scripts\;C:\Users\27872\AppData\Local\Programs\Python\Python311\;C:\Users\27872\scoop\shims;C:\Users\27872\AppData\Local\Programs\Python\Python310\Scripts\;C:\Users\27872\AppData\Local\Programs\Python\Python310\;C:\Program Files\Microsoft\jdk-17.0.13.11-hotspot\\bin;C:\Users\27872\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell;C:\Users\27872\AppData\Local\Microsoft\WindowsApps;D:\software\python\PyCharm Community Edition 2024.3.4\bin;D:\software\vscode\Microsoft VS Code\bin;C:\Users\27872\AppData\Local\Programs\MiKTeX\miktex\bin\x64\;E:\texlive\2025\bin\windows;E:\IDEA\IntelliJ IDEA Community Edition 2025.2.2\bin;C:\Users\27872\AppData\Local\Pandoc\;D:\software\python\PyCharm 2025.3.1.1\bin;C:\Users\27872\AppData\Roaming\npm;E:\CourseFile\2down\OS\oslab\OpenSSH-Win64\OpenSSH-Win64;C:\Users\27872\.dotnet\tools;D:\githubProject\autoRsearch\aris-code-windows-x64;C:\Users\27872\AppData\Local\Microsoft\WinGet\Packages\aria2.aria2_Microsoft.Winget.Source_8wekyb3d8bbwe\aria2-1.37.0-win-64bit-build1;C:\Users\27872\.qoder\bin\qodercli;C:\Users\27872\.qoder\bin\qodercli;C:\Users\27872\.cache\codex-runtimes\codex-primary-runtime\dependencies\bin\fallback;C:\Users\27872\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\cmd;C:\Users\27872\AppData\Local\OpenAI\Codex\bin\54ee14df1f760d5e;C:\Program Files\WindowsApps\OpenAI.Codex_26.818.8289.0_x64__2p2nqsd0c76g0\app\resources;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="java.vendor" value="Microsoft"/>
+    <property name="java.vm.version" value="17.0.13+11-LTS"/>
+    <property name="java.specification.maintenance.version" value="1"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="61.0"/>
+    <property name="LOGGED_APPLICATION_NAME" value="[segroup8-platform] "/>
+  </properties>
+  <testcase name="secondhandSellerCanViewShipAndPushLogistics" classname="com.segroup8.platform.integration.SecondhandOrderFlowIntegrationTest" time="0.696">
+    <system-out><![CDATA[2026-08-25T15:46:14.750+08:00  INFO 37836 --- [segroup8-platform] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.segroup8.platform.integration.SecondhandOrderFlowIntegrationTest]: SecondhandOrderFlowIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-25T15:46:14.756+08:00  INFO 37836 --- [segroup8-platform] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.segroup8.platform.PlatformApplication for test class com.segroup8.platform.integration.SecondhandOrderFlowIntegrationTest
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@496b3cb8] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@65910526 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 151(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 151, ORD_SECONDHAND_151, 1, 80.00, 1, 1, 0, null, null, 买家1, 13800000001, 广东省, 广州市, 天河路1号, null, null, null, 2026-08-25 15:46:14.782002, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 2026-08-25 15:46:14.782002
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@496b3cb8]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2f95f72a] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@496323664 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?) ORDER BY id ASC
+==> Parameters: 151(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 30302, 151, SECONDHAND, 5, test secondhand product, 80.00, 1, null, null, null
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2f95f72a]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@d8b2da6] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1665085615 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,seller_user_id,name,cover,images,description,origin_price,sale_price,category_id,sub_category_id,condition_level,is_negotiable,status,create_time,update_time FROM secondhand_product WHERE id=?
+==> Parameters: 5(Long)
+<==    Columns: id, seller_user_id, name, cover, images, description, origin_price, sale_price, category_id, sub_category_id, condition_level, is_negotiable, status, create_time, update_time
+<==        Row: 5, 3, test secondhand product, null, null, null, 120.00, 80.00, 1, 101, LIKE_NEW, 1, 1, 2026-08-25 15:46:11.490501, 2026-08-25 15:46:11.490501
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@d8b2da6]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6393a745] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1414762667 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,seller_user_id,name,cover,images,description,origin_price,sale_price,category_id,sub_category_id,condition_level,is_negotiable,status,create_time,update_time FROM secondhand_product WHERE id=?
+==> Parameters: 5(Long)
+<==    Columns: id, seller_user_id, name, cover, images, description, origin_price, sale_price, category_id, sub_category_id, condition_level, is_negotiable, status, create_time, update_time
+<==        Row: 5, 3, test secondhand product, null, null, null, 120.00, 80.00, 1, 101, LIKE_NEW, 1, 1, 2026-08-25 15:46:11.490501, 2026-08-25 15:46:11.490501
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6393a745]
+2026-08-25T15:46:14.811+08:00  INFO 37836 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=d1ea63071ec5495aa1d9466879849636 method=GET path=/api/order/detail/151 status=200
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1a419361] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1679210211 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 151(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 151, ORD_SECONDHAND_151, 1, 80.00, 1, 1, 0, null, null, 买家1, 13800000001, 广东省, 广州市, 天河路1号, null, null, null, 2026-08-25 15:46:14.782002, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 2026-08-25 15:46:14.782002
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1a419361]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2c08b402] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@669969832 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?) ORDER BY id ASC
+==> Parameters: 151(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 30302, 151, SECONDHAND, 5, test secondhand product, 80.00, 1, null, null, null
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2c08b402]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3122a8af] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1624416710 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,seller_user_id,name,cover,images,description,origin_price,sale_price,category_id,sub_category_id,condition_level,is_negotiable,status,create_time,update_time FROM secondhand_product WHERE id=?
+==> Parameters: 5(Long)
+<==    Columns: id, seller_user_id, name, cover, images, description, origin_price, sale_price, category_id, sub_category_id, condition_level, is_negotiable, status, create_time, update_time
+<==        Row: 5, 3, test secondhand product, null, null, null, 120.00, 80.00, 1, 101, LIKE_NEW, 1, 1, 2026-08-25 15:46:11.490501, 2026-08-25 15:46:11.490501
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3122a8af]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@913a17a] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1505791581 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,seller_user_id,name,cover,images,description,origin_price,sale_price,category_id,sub_category_id,condition_level,is_negotiable,status,create_time,update_time FROM secondhand_product WHERE id=?
+==> Parameters: 5(Long)
+<==    Columns: id, seller_user_id, name, cover, images, description, origin_price, sale_price, category_id, sub_category_id, condition_level, is_negotiable, status, create_time, update_time
+<==        Row: 5, 3, test secondhand product, null, null, null, 120.00, 80.00, 1, 101, LIKE_NEW, 1, 1, 2026-08-25 15:46:11.490501, 2026-08-25 15:46:11.490501
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@913a17a]
+2026-08-25T15:46:14.833+08:00  INFO 37836 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=083f84aa43c74aefaf152db5744a4f9d method=GET path=/api/order/detail/151 status=200
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+JDBC Connection [HikariProxyConnection@858762286 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 151(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 151, ORD_SECONDHAND_151, 1, 80.00, 1, 1, 0, null, null, 买家1, 13800000001, 广东省, 广州市, 天河路1号, null, null, null, 2026-08-25 15:46:14.782002, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 2026-08-25 15:46:14.782002
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?) ORDER BY id ASC
+==> Parameters: 151(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 30302, 151, SECONDHAND, 5, test secondhand product, 80.00, 1, null, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56] from current transaction
+==>  Preparing: SELECT id,seller_user_id,name,cover,images,description,origin_price,sale_price,category_id,sub_category_id,condition_level,is_negotiable,status,create_time,update_time FROM secondhand_product WHERE id=?
+==> Parameters: 5(Long)
+<==    Columns: id, seller_user_id, name, cover, images, description, origin_price, sale_price, category_id, sub_category_id, condition_level, is_negotiable, status, create_time, update_time
+<==        Row: 5, 3, test secondhand product, null, null, null, 120.00, 80.00, 1, 101, LIKE_NEW, 1, 1, 2026-08-25 15:46:11.490501, 2026-08-25 15:46:11.490501
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56] from current transaction
+==>  Preparing: UPDATE order_info SET order_no=?, buyer_user_id=?, total_amount=?, pay_status=?, order_status=?, refund_status=?, receiver_name=?, receiver_phone=?, receiver_province=?, receiver_city=?, receiver_detail_address=?, create_time=?, shipped_time=?, logistics_status=?, logistics_current_index=?, delivery_time=?, version=?, update_time=? WHERE id=? AND version=?
+==> Parameters: ORD_SECONDHAND_151(String), 1(Long), 80.00(BigDecimal), 1(Integer), 2(Integer), 0(Integer), 买家1(String), 13800000001(String), 广东省(String), 广州市(String), 天河路1号(String), 2026-08-25T15:46:14.782002(LocalDateTime), 2026-08-25T15:46:14.930213200(LocalDateTime), IN_TRANSIT(String), 0(Integer), 2026-08-25T15:46:14.930213200(LocalDateTime), 1(Integer), 2026-08-25T15:46:14.782002(LocalDateTime), 151(Long), 0(Integer)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56] from current transaction
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 151(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 151, ORD_SECONDHAND_151, 1, 80.00, 1, 2, 0, null, null, 买家1, 13800000001, 广东省, 广州市, 天河路1号, null, null, null, 2026-08-25 15:46:14.782002, null, 2026-08-25 15:46:14.930213, null, null, null, null, null, null, null, null, null, IN_TRANSIT, 0, null, null, 2026-08-25 15:46:14.930213, null, null, null, null, null, null, null, null, 1, 2026-08-25 15:46:14.782002
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?) ORDER BY id ASC
+==> Parameters: 151(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 30302, 151, SECONDHAND, 5, test secondhand product, 80.00, 1, null, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56] from current transaction
+==>  Preparing: SELECT id,origin_region,dest_region,path_nodes,create_time,update_time FROM logistics_path_template WHERE (origin_region = ? AND dest_region = ? AND path_nodes = ?) limit 1
+==> Parameters: 西南(String), 华南(String), ["云南省分拨中心","广东省分拨中心"](String)
+<==      Total: 0
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56] from current transaction
+==>  Preparing: INSERT INTO logistics_path_template ( origin_region, dest_region, path_nodes ) VALUES ( ?, ?, ? )
+==> Parameters: 西南(String), 华南(String), ["云南省分拨中心","广东省分拨中心"](String)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56] from current transaction
+==>  Preparing: UPDATE order_info SET logistics_template_id=?,logistics_status=?,logistics_current_index=? WHERE (id = ?)
+==> Parameters: 1(Long), IN_TRANSIT(String), 0(Integer), 151(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56] from current transaction
+==>  Preparing: SELECT COUNT( * ) AS total FROM logistics_trace WHERE (order_id = ?)
+==> Parameters: 151(Long)
+<==    Columns: total
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56] from current transaction
+==>  Preparing: SELECT id,origin_region,dest_region,path_nodes,create_time,update_time FROM logistics_path_template WHERE id=?
+==> Parameters: 1(Long)
+<==    Columns: id, origin_region, dest_region, path_nodes, create_time, update_time
+<==        Row: 1, 西南, 华南, ["云南省分拨中心","广东省分拨中心"], 2026-08-25 15:46:15.193378, 2026-08-25 15:46:15.193378
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56] from current transaction
+==>  Preparing: INSERT INTO logistics_trace ( order_id, node_name, status_desc, create_time ) VALUES ( ?, ?, ?, ? )
+==> Parameters: 151(Long), 云南省分拨中心(String), 包裹已揽收(String), 2026-08-25T15:46:15.240414600(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56] from current transaction
+==>  Preparing: INSERT INTO notification ( user_id, title, content, target_path, is_read, create_time ) VALUES ( ?, ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), 订单已发货(String), 订单号：ORD_SECONDHAND_151，卖家已发货，包裹正在运输中。(String), /order/151(String), 0(Integer), 2026-08-25T15:46:15.245789700(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56] from current transaction
+==>  Preparing: SELECT id,seller_user_id,name,cover,images,description,origin_price,sale_price,category_id,sub_category_id,condition_level,is_negotiable,status,create_time,update_time FROM secondhand_product WHERE id=?
+==> Parameters: 5(Long)
+<==    Columns: id, seller_user_id, name, cover, images, description, origin_price, sale_price, category_id, sub_category_id, condition_level, is_negotiable, status, create_time, update_time
+<==        Row: 5, 3, test secondhand product, null, null, null, 120.00, 80.00, 1, 101, LIKE_NEW, 1, 1, 2026-08-25 15:46:11.490501, 2026-08-25 15:46:11.490501
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d39ef56]
+2026-08-25T15:46:15.252+08:00  INFO 37836 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=8ae936b0cf9e4f95ba0f88532ea2fa98 method=POST path=/api/order/151/ship status=200
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a]
+JDBC Connection [HikariProxyConnection@538246534 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 151(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 151, ORD_SECONDHAND_151, 1, 80.00, 1, 2, 0, null, null, 买家1, 13800000001, 广东省, 广州市, 天河路1号, null, null, null, 2026-08-25 15:46:14.782002, null, 2026-08-25 15:46:14.930213, null, null, null, null, null, null, null, null, 1, IN_TRANSIT, 0, null, null, 2026-08-25 15:46:14.930213, null, null, null, null, null, null, null, null, 1, 2026-08-25 15:46:14.782002
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?)
+==> Parameters: 151(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 30302, 151, SECONDHAND, 5, test secondhand product, 80.00, 1, null, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a] from current transaction
+==>  Preparing: SELECT id,seller_user_id,name,cover,images,description,origin_price,sale_price,category_id,sub_category_id,condition_level,is_negotiable,status,create_time,update_time FROM secondhand_product WHERE id=?
+==> Parameters: 5(Long)
+<==    Columns: id, seller_user_id, name, cover, images, description, origin_price, sale_price, category_id, sub_category_id, condition_level, is_negotiable, status, create_time, update_time
+<==        Row: 5, 3, test secondhand product, null, null, null, 120.00, 80.00, 1, 101, LIKE_NEW, 1, 1, 2026-08-25 15:46:11.490501, 2026-08-25 15:46:11.490501
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a] from current transaction
+==>  Preparing: SELECT COUNT( * ) AS total FROM logistics_trace WHERE (order_id = ?)
+==> Parameters: 151(Long)
+<==    Columns: total
+<==        Row: 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a] from current transaction
+==>  Preparing: SELECT id,origin_region,dest_region,path_nodes,create_time,update_time FROM logistics_path_template WHERE id=?
+==> Parameters: 1(Long)
+<==    Columns: id, origin_region, dest_region, path_nodes, create_time, update_time
+<==        Row: 1, 西南, 华南, ["云南省分拨中心","广东省分拨中心"], 2026-08-25 15:46:15.193378, 2026-08-25 15:46:15.193378
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a] from current transaction
+==>  Preparing: SELECT id,order_id,node_name,status_desc,create_time FROM logistics_trace WHERE (order_id = ?) ORDER BY create_time DESC,id DESC limit 1
+==> Parameters: 151(Long)
+<==    Columns: id, order_id, node_name, status_desc, create_time
+<==        Row: 1, 151, 云南省分拨中心, 包裹已揽收, 2026-08-25 15:46:15.240415
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a] from current transaction
+==>  Preparing: INSERT INTO logistics_trace ( order_id, node_name, status_desc, create_time ) VALUES ( ?, ?, ?, ? )
+==> Parameters: 151(Long), 广东省分拨中心(String), 包裹已送达，进入自动确认倒计时(String), 2026-08-26T11:46:15.240415(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a] from current transaction
+==>  Preparing: UPDATE order_info SET logistics_current_index=?,logistics_status=?,arrival_time=?,auto_confirm_deadline=? WHERE (id = ?)
+==> Parameters: 1(Integer), ARRIVED(String), 2026-08-26T11:46:15.240415(LocalDateTime), 2026-09-02T11:46:15.240415(LocalDateTime), 151(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4b3dea9a]
+2026-08-25T15:46:15.306+08:00  INFO 37836 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=f3ee0addcb4547e5bfd5c783185ca6fd method=POST path=/api/logistics/push-next status=200
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@23031a56] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@307532010 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 151(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 151, ORD_SECONDHAND_151, 1, 80.00, 1, 2, 0, null, null, 买家1, 13800000001, 广东省, 广州市, 天河路1号, null, null, null, 2026-08-25 15:46:14.782002, null, 2026-08-25 15:46:14.930213, null, null, null, null, null, null, null, null, 1, ARRIVED, 1, null, null, 2026-08-25 15:46:14.930213, 2026-08-26 11:46:15.240415, 2026-09-02 11:46:15.240415, null, null, null, null, null, null, 1, 2026-08-25 15:46:14.782002
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@23031a56]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7dda1470] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@685786661 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?)
+==> Parameters: 151(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 30302, 151, SECONDHAND, 5, test secondhand product, 80.00, 1, null, null, null
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7dda1470]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@130a38c5] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@628042126 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,seller_user_id,name,cover,images,description,origin_price,sale_price,category_id,sub_category_id,condition_level,is_negotiable,status,create_time,update_time FROM secondhand_product WHERE id=?
+==> Parameters: 5(Long)
+<==    Columns: id, seller_user_id, name, cover, images, description, origin_price, sale_price, category_id, sub_category_id, condition_level, is_negotiable, status, create_time, update_time
+<==        Row: 5, 3, test secondhand product, null, null, null, 120.00, 80.00, 1, 101, LIKE_NEW, 1, 1, 2026-08-25 15:46:11.490501, 2026-08-25 15:46:11.490501
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@130a38c5]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3c31c0c8] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1792672353 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,order_id,node_name,status_desc,create_time FROM logistics_trace WHERE (order_id = ?) ORDER BY create_time ASC,id ASC
+==> Parameters: 151(Long)
+<==    Columns: id, order_id, node_name, status_desc, create_time
+<==        Row: 1, 151, 云南省分拨中心, 包裹已揽收, 2026-08-25 15:46:15.240415
+<==        Row: 2, 151, 广东省分拨中心, 包裹已送达，进入自动确认倒计时, 2026-08-26 11:46:15.240415
+<==      Total: 2
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3c31c0c8]
+2026-08-25T15:46:15.337+08:00  INFO 37836 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=ed706a1fcada4c3fad3bb5861de09b0f method=GET path=/api/logistics/order/151/trace status=200
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+JDBC Connection [HikariProxyConnection@1167306474 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 152(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 152, ORD_SECONDHAND_152, 1, 80.00, 1, 1, 0, null, null, 买家1, 13800000001, 广东省, 广州市, 天河路1号, null, null, null, 2026-08-25 15:46:14.786004, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0, 2026-08-25 15:46:14.786004
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?) ORDER BY id ASC
+==> Parameters: 152(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 30303, 152, SECONDHAND, 5, test secondhand product, 80.00, 1, null, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1] from current transaction
+==>  Preparing: SELECT id,seller_user_id,name,cover,images,description,origin_price,sale_price,category_id,sub_category_id,condition_level,is_negotiable,status,create_time,update_time FROM secondhand_product WHERE id=?
+==> Parameters: 5(Long)
+<==    Columns: id, seller_user_id, name, cover, images, description, origin_price, sale_price, category_id, sub_category_id, condition_level, is_negotiable, status, create_time, update_time
+<==        Row: 5, 3, test secondhand product, null, null, null, 120.00, 80.00, 1, 101, LIKE_NEW, 1, 1, 2026-08-25 15:46:11.490501, 2026-08-25 15:46:11.490501
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1] from current transaction
+==>  Preparing: UPDATE order_info SET order_no=?, buyer_user_id=?, total_amount=?, pay_status=?, order_status=?, refund_status=?, receiver_name=?, receiver_phone=?, receiver_province=?, receiver_city=?, receiver_detail_address=?, create_time=?, shipped_time=?, logistics_status=?, logistics_current_index=?, delivery_time=?, version=?, update_time=? WHERE id=? AND version=?
+==> Parameters: ORD_SECONDHAND_152(String), 1(Long), 80.00(BigDecimal), 1(Integer), 2(Integer), 0(Integer), 买家1(String), 13800000001(String), 广东省(String), 广州市(String), 天河路1号(String), 2026-08-25T15:46:14.786004(LocalDateTime), 2026-08-25T15:46:15.378763700(LocalDateTime), IN_TRANSIT(String), 0(Integer), 2026-08-25T15:46:15.378763700(LocalDateTime), 1(Integer), 2026-08-25T15:46:14.786004(LocalDateTime), 152(Long), 0(Integer)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1] from current transaction
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 152(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 152, ORD_SECONDHAND_152, 1, 80.00, 1, 2, 0, null, null, 买家1, 13800000001, 广东省, 广州市, 天河路1号, null, null, null, 2026-08-25 15:46:14.786004, null, 2026-08-25 15:46:15.378764, null, null, null, null, null, null, null, null, null, IN_TRANSIT, 0, null, null, 2026-08-25 15:46:15.378764, null, null, null, null, null, null, null, null, 1, 2026-08-25 15:46:14.786004
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?) ORDER BY id ASC
+==> Parameters: 152(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 30303, 152, SECONDHAND, 5, test secondhand product, 80.00, 1, null, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1] from current transaction
+==>  Preparing: SELECT id,origin_region,dest_region,path_nodes,create_time,update_time FROM logistics_path_template WHERE (origin_region = ? AND dest_region = ? AND path_nodes = ?) limit 1
+==> Parameters: 西南(String), 华南(String), ["四川省分拨中心","广东省分拨中心"](String)
+<==      Total: 0
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1] from current transaction
+==>  Preparing: INSERT INTO logistics_path_template ( origin_region, dest_region, path_nodes ) VALUES ( ?, ?, ? )
+==> Parameters: 西南(String), 华南(String), ["四川省分拨中心","广东省分拨中心"](String)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1] from current transaction
+==>  Preparing: UPDATE order_info SET logistics_template_id=?,logistics_status=?,logistics_current_index=? WHERE (id = ?)
+==> Parameters: 2(Long), IN_TRANSIT(String), 0(Integer), 152(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1] from current transaction
+==>  Preparing: SELECT COUNT( * ) AS total FROM logistics_trace WHERE (order_id = ?)
+==> Parameters: 152(Long)
+<==    Columns: total
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1] from current transaction
+==>  Preparing: SELECT id,origin_region,dest_region,path_nodes,create_time,update_time FROM logistics_path_template WHERE id=?
+==> Parameters: 2(Long)
+<==    Columns: id, origin_region, dest_region, path_nodes, create_time, update_time
+<==        Row: 2, 西南, 华南, ["四川省分拨中心","广东省分拨中心"], 2026-08-25 15:46:15.399133, 2026-08-25 15:46:15.399133
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1] from current transaction
+==>  Preparing: INSERT INTO logistics_trace ( order_id, node_name, status_desc, create_time ) VALUES ( ?, ?, ?, ? )
+==> Parameters: 152(Long), 四川省分拨中心(String), 包裹已揽收(String), 2026-08-25T15:46:15.413706200(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1] from current transaction
+==>  Preparing: INSERT INTO notification ( user_id, title, content, target_path, is_read, create_time ) VALUES ( ?, ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), 订单已发货(String), 订单号：ORD_SECONDHAND_152，卖家已发货，包裹正在运输中。(String), /order/152(String), 0(Integer), 2026-08-25T15:46:15.417919600(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1] from current transaction
+==>  Preparing: SELECT id,seller_user_id,name,cover,images,description,origin_price,sale_price,category_id,sub_category_id,condition_level,is_negotiable,status,create_time,update_time FROM secondhand_product WHERE id=?
+==> Parameters: 5(Long)
+<==    Columns: id, seller_user_id, name, cover, images, description, origin_price, sale_price, category_id, sub_category_id, condition_level, is_negotiable, status, create_time, update_time
+<==        Row: 5, 3, test secondhand product, null, null, null, 120.00, 80.00, 1, 101, LIKE_NEW, 1, 1, 2026-08-25 15:46:11.490501, 2026-08-25 15:46:11.490501
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39ed2eb1]
+2026-08-25T15:46:15.426+08:00  INFO 37836 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=d52c10a0c8af463ab04f1315ec9beaf3 method=POST path=/api/order/152/ship status=200
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@40d259d0] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1883605244 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 152(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 152, ORD_SECONDHAND_152, 1, 80.00, 1, 2, 0, null, null, 买家1, 13800000001, 广东省, 广州市, 天河路1号, null, null, null, 2026-08-25 15:46:14.786004, null, 2026-08-25 15:46:15.378764, null, null, null, null, null, null, null, null, 2, IN_TRANSIT, 0, null, null, 2026-08-25 15:46:15.378764, null, null, null, null, null, null, null, null, 1, 2026-08-25 15:46:14.786004
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@40d259d0]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6450bea7] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@238385716 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?)
+==> Parameters: 152(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 30303, 152, SECONDHAND, 5, test secondhand product, 80.00, 1, null, null, null
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6450bea7]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5cfbbefb] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@2478064 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,seller_user_id,name,cover,images,description,origin_price,sale_price,category_id,sub_category_id,condition_level,is_negotiable,status,create_time,update_time FROM secondhand_product WHERE id=?
+==> Parameters: 5(Long)
+<==    Columns: id, seller_user_id, name, cover, images, description, origin_price, sale_price, category_id, sub_category_id, condition_level, is_negotiable, status, create_time, update_time
+<==        Row: 5, 3, test secondhand product, null, null, null, 120.00, 80.00, 1, 101, LIKE_NEW, 1, 1, 2026-08-25 15:46:11.490501, 2026-08-25 15:46:11.490501
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5cfbbefb]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@61e1ecd5] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1151393287 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,order_id,node_name,status_desc,create_time FROM logistics_trace WHERE (order_id = ?) ORDER BY create_time ASC,id ASC
+==> Parameters: 152(Long)
+<==    Columns: id, order_id, node_name, status_desc, create_time
+<==        Row: 3, 152, 四川省分拨中心, 包裹已揽收, 2026-08-25 15:46:15.413706
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@61e1ecd5]
+2026-08-25T15:46:15.449+08:00  INFO 37836 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=1b1da8f076e14e5aad9ee47dda8b994f method=GET path=/api/logistics/order/152/trace status=200
+]]></system-out>
+  </testcase>
+</testsuite>

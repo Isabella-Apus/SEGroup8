@@ -109,6 +109,16 @@ SEGroup8
 
 ## 快速启动
 
+### Docker Compose 一键启动（Issue #65）
+
+已提供前端、后端和 MySQL 的完整容器化编排。Docker Desktop 启动后，在仓库根目录执行：
+
+```powershell
+docker compose -f compose.yml up -d --build
+```
+
+默认前端地址为 `http://127.0.0.1:8088`，后端健康检查为 `http://127.0.0.1:8089/actuator/health`，MySQL 映射端口为 `3307`。完整说明与验收命令见 [DOCKER.md](DOCKER.md)。
+
 ### 1. 克隆项目
 
 ```bash
