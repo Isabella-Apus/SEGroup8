@@ -1,0 +1,13 @@
+{
+  "useCase": "UC06",
+  "name": "商品搜索筛选与详情",
+  "generatedAt": "2026-08-25T16:22:43+08:00",
+  "command": "mvn -B -f microservices/pom.xml clean test",
+  "tests": 2,
+  "passed": 2,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "buildResult": "BUILD SUCCESS",
+  "rawReport": "raw-reports/TEST-com.segroup8.catalog.CatalogApiAndE2ETest.xml"
+}

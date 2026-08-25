@@ -1,0 +1,84 @@
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] commerce-microservices                                             [pom]
+[INFO] catalog-service                                                    [jar]
+[INFO] 
+[INFO] ----------------< com.segroup8:commerce-microservices >-----------------
+[INFO] Building commerce-microservices 1.0.0                              [1/2]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ commerce-microservices ---
+[INFO] 
+[INFO] --------------------< com.segroup8:catalog-service >--------------------
+[INFO] Building catalog-service 1.0.0                                     [2/2]
+[INFO]   from catalog-service\pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.3.2:clean (default-clean) @ catalog-service ---
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ catalog-service ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ catalog-service ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 3 source files with javac [debug parameters release 17] to target\classes
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ catalog-service ---
+[INFO] Copying 1 resource from src\test\resources to target\test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ catalog-service ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug parameters release 17] to target\test-classes
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ catalog-service ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.segroup8.catalog.CatalogApiAndE2ETest
+16:22:37.023 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.segroup8.catalog.CatalogApiAndE2ETest]: CatalogApiAndE2ETest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+16:22:37.192 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.segroup8.catalog.CatalogApplication for test class com.segroup8.catalog.CatalogApiAndE2ETest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-08-25T16:22:37.689+08:00  INFO 34840 --- [           main] c.segroup8.catalog.CatalogApiAndE2ETest  : Starting CatalogApiAndE2ETest using Java 17.0.13 with PID 34840 (started by 27872 in C:\Users\27872\AppData\Local\Temp\segroup8-uc06-main\microservices\catalog-service)
+2026-08-25T16:22:37.691+08:00  INFO 34840 --- [           main] c.segroup8.catalog.CatalogApiAndE2ETest  : No active profile set, falling back to 1 default profile: "default"
+2026-08-25T16:22:39.225+08:00  INFO 34840 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-25T16:22:39.510+08:00  INFO 34840 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:catalog user=SA
+2026-08-25T16:22:39.511+08:00  INFO 34840 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-25T16:22:41.478+08:00  INFO 34840 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-25T16:22:41.478+08:00  INFO 34840 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-25T16:22:41.486+08:00  INFO 34840 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-08-25T16:22:41.504+08:00  INFO 34840 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 23 ms
+2026-08-25T16:22:41.715+08:00  INFO 34840 --- [           main] c.segroup8.catalog.CatalogApiAndE2ETest  : Started CatalogApiAndE2ETest in 4.388 seconds (process running for 5.353)
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-08-25T16:22:42.956+08:00  WARN 34840 --- [           main] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Failed to convert value of type 'java.lang.String' to required type 'java.math.BigDecimal'; Character �� is neither a decimal digit number, decimal point, nor "e" notation exponential mark.]
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.109 s -- in com.segroup8.catalog.CatalogApiAndE2ETest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for commerce-microservices 1.0.0:
+[INFO] 
+[INFO] commerce-microservices ............................. SUCCESS [  0.158 s]
+[INFO] catalog-service .................................... SUCCESS [ 10.742 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  11.319 s
+[INFO] Finished at: 2026-08-25T16:22:43+08:00
+[INFO] ------------------------------------------------------------------------
