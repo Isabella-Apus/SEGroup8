@@ -1,0 +1,11 @@
+{
+  "useCase": "UC10",
+  "suite": "com.segroup8.behavior.BehaviorApiAndE2ETest",
+  "tests": 5,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "result": "PASS",
+  "regression": {"catalog": 2, "behavior": 5, "total": 7, "result": "PASS"},
+  "executedAt": "2026-08-26"
+}
