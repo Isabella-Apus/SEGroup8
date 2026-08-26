@@ -1,0 +1,20 @@
+sequenceDiagram
+    autonumber
+    actor User as 举报人/用户
+    actor Admin as 管理员
+    participant Platform as 交易平台
+    User->>Platform: POST /api/report-block/report
+    Platform-->>User: 举报提交成功
+    User->>Platform: POST /api/report-block/block
+    Platform-->>User: 拉黑成功
+    User->>Platform: GET /block/check/{targetUserId}
+    Platform-->>User: 返回拉黑状态
+    User->>Platform: DELETE /block/{targetUserId}
+    Platform-->>User: 解除拉黑成功
+    Admin->>Platform: GET /api/admin/reports
+    Platform-->>Admin: 返回举报队列
+    Admin->>Platform: POST /api/admin/reports/audit
+    Platform-->>Admin: 返回审核结果
+    Admin->>Platform: POST /api/admin/reports/credit-adjust
+    Platform-->>Admin: 返回信用调整结果
+    Platform-->>Admin: 写入信用和审计日志

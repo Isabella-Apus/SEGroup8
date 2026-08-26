@@ -1,0 +1,14 @@
+sequenceDiagram
+    autonumber
+    actor User as 已登录用户
+    participant Platform as 交易平台
+    User->>Platform: GET /api/user/profile
+    Platform-->>User: 返回本人资料
+    User->>Platform: PUT /api/user/profile
+    Platform-->>User: 返回保存结果
+    User->>Platform: POST /api/user/addresses
+    Platform-->>User: 地址新增成功
+    User->>Platform: GET /api/user/addresses
+    Platform-->>User: 返回本人地址列表
+    User->>Platform: PUT/DELETE /api/user/addresses/{addressId}
+    Platform-->>User: 返回修改/删除结果

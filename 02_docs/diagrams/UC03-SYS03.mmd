@@ -1,0 +1,19 @@
+sequenceDiagram
+    autonumber
+    actor User as 普通用户
+    actor Admin as 管理员
+    participant Platform as 交易平台
+    User->>Platform: POST /api/user/merchant-application
+    Platform-->>User: 返回待审核申请
+    User->>Platform: GET /api/user/merchant-application/me
+    Platform-->>User: 返回申请状态
+    Admin->>Platform: GET /api/admin/merchant-applications
+    Platform-->>Admin: 返回申请队列
+    alt 审核通过
+        Admin->>Platform: POST /{applicationId}/approve
+        Platform-->>User: 角色升级为 OFFICIAL_SELLER
+    else 审核拒绝
+        Admin->>Platform: POST /{applicationId}/reject
+        Platform-->>User: 申请拒绝并保存原因
+    end
+    Platform-->>Admin: 写入管理员审计记录
