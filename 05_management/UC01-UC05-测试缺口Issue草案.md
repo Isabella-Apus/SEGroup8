@@ -40,7 +40,7 @@
 
 - 现有单元测试：`backend/src/test/java/com/segroup8/platform/service/impl/AuthServiceImplTest.java`
 - 需求与验收：`01_requirements/UC01-UC05-用例说明.md` 的 `REQ01 / UC01`
-- 系统级图：`02_docs/diagrams/UC01-SYS01.mmd`
+- 系统级设计：`02_docs/UC01-注册登录与角色鉴权-设计.md`
 - 追溯记录：`02_docs/UC01-UC05-追溯矩阵.md` 的 `AC01-01~AC01-05`
 
 ### 完成时提交
@@ -86,7 +86,7 @@
 
 - 现有单元测试：`backend/src/test/java/com/segroup8/platform/service/impl/UserServiceImplTest.java`
 - 需求与验收：`01_requirements/UC01-UC05-用例说明.md` 的 `REQ02 / UC02`
-- 系统级图：`02_docs/diagrams/UC02-SYS02.mmd`
+- 系统级设计：`02_docs/UC02-用户资料与地址-设计.md`
 - 追溯记录：`02_docs/UC01-UC05-追溯矩阵.md` 的 `AC02-01~AC02-04`
 
 ### 完成时提交
@@ -133,7 +133,7 @@
 
 - 现有单元测试：`backend/src/test/java/com/segroup8/platform/service/impl/MerchantApplicationServiceImplTest.java`
 - 需求与验收：`01_requirements/UC01-UC05-用例说明.md` 的 `REQ03 / UC03`
-- 系统级图：`02_docs/diagrams/UC03-SYS03.mmd`
+- 系统级设计：`02_docs/UC03-商家申请与审核-设计.md`
 - 追溯记录：`02_docs/UC01-UC05-追溯矩阵.md` 的 `AC03-01~AC03-04`
 
 ### 完成时提交
@@ -179,7 +179,7 @@
 
 - 现有单元测试：`backend/src/test/java/com/segroup8/platform/service/impl/AdminUserServiceImplTest.java`、`AdminAuditLogServiceImplTest.java`
 - 需求与验收：`01_requirements/UC01-UC05-用例说明.md` 的 `REQ04 / UC04`
-- 系统级图：`02_docs/diagrams/UC04-SYS04.mmd`
+- 系统级设计：`02_docs/UC04-用户封禁解禁与审计-设计.md`
 - 追溯记录：`02_docs/UC01-UC05-追溯矩阵.md` 的 `AC04-01~AC04-04`
 
 ### 完成时提交
@@ -226,7 +226,7 @@ UC05 包含用户间举报/拉黑和管理员治理两个紧密相连的闭环�
 
 - 相关代码：`ReportBlockController`、`AdminReportController`、`CreditController` 及对应 Service/Mapper。
 - 需求与验收：`01_requirements/UC01-UC05-用例说明.md` 的 `REQ05 / UC05`
-- 系统级图：`02_docs/diagrams/UC05-SYS05.mmd`
+- 系统级设计：`02_docs/UC05-举报拉黑与信用治理-设计.md`
 - 追溯记录：`02_docs/UC01-UC05-追溯矩阵.md` 的 `AC05-01~AC05-04`
 
 ### 完成时提交
