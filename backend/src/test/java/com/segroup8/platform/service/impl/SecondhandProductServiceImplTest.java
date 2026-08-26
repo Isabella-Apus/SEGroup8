@@ -36,9 +36,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -183,5 +185,38 @@ class SecondhandProductServiceImplTest {
         verify(orderInfoMapper).insert(orderCaptor.capture());
         assertEquals(5L, orderCaptor.getValue().getBuyerUserId());
         assertEquals(new BigDecimal("180"), vo.getTotalAmount());
+    }
+
+    @Test
+    void buySecondhandProduct_shouldGenerateUniqueOrderNumbersForRapidPurchases() {
+        UserContext.setUserId(5L);
+
+        SecondhandProduct firstProduct = new SecondhandProduct();
+        firstProduct.setId(2L);
+        firstProduct.setSellerUserId(3L);
+        firstProduct.setName("Spare Headphones");
+        firstProduct.setSalePrice(new BigDecimal("180"));
+        firstProduct.setStatus(1);
+
+        SecondhandProduct secondProduct = new SecondhandProduct();
+        secondProduct.setId(3L);
+        secondProduct.setSellerUserId(3L);
+        secondProduct.setName("Used Keyboard");
+        secondProduct.setSalePrice(new BigDecimal("120"));
+        secondProduct.setStatus(1);
+
+        when(secondhandProductMapper.selectById(2L)).thenReturn(firstProduct);
+        when(secondhandProductMapper.selectById(3L)).thenReturn(secondProduct);
+        when(secondhandProductMapper.update(any(), any(UpdateWrapper.class))).thenReturn(1);
+        when(secondhandTradeService.resolveEffectivePriceForBuyer(2L, 5L)).thenReturn(null);
+        when(secondhandTradeService.resolveEffectivePriceForBuyer(3L, 5L)).thenReturn(null);
+
+        secondhandProductService.buySecondhandProduct(2L, new SecondhandOrderCreateRequest());
+        secondhandProductService.buySecondhandProduct(3L, new SecondhandOrderCreateRequest());
+
+        ArgumentCaptor<OrderInfo> orderCaptor = ArgumentCaptor.forClass(OrderInfo.class);
+        verify(orderInfoMapper, times(2)).insert(orderCaptor.capture());
+        List<OrderInfo> insertedOrders = orderCaptor.getAllValues();
+        assertNotEquals(insertedOrders.get(0).getOrderNo(), insertedOrders.get(1).getOrderNo());
     }
 }
