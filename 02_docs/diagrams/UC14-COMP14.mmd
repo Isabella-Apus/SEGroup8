@@ -1,0 +1,31 @@
+flowchart LR
+  buyer["买家端<br/>AfterSaleView / OrderDetailView"]
+  seller["卖家端<br/>MerchantOrdersView"]
+  admin["管理端<br/>AdminOrderView"]
+  orderctl["OrderController<br/>refund / approve / reject"]
+  adminctl["AdminOrderController<br/>approve / reject / logs"]
+  service["OrderServiceImpl<br/>退款申请与决策事务"]
+  state["OrderStateMachine<br/>订单与退款状态约束"]
+  scheduler["OrderAutoConfirmScheduler<br/>七天超时退款"]
+  settlement["EscrowSettlementService<br/>资金回流与扣回"]
+  notify["NotificationService<br/>RealtimePushService"]
+  aftersale["OrderAfterSaleLogMapper<br/>审计日志"]
+  orderdb[("order_info / order_item")]
+  logdb[("order_after_sale_log")]
+  financedb[("balance / transaction_record")]
+  notifydb[("notification")]
+
+  buyer --> orderctl
+  seller --> orderctl
+  admin --> adminctl
+  orderctl --> service
+  adminctl --> service
+  scheduler --> service
+  service --> state
+  service --> settlement
+  service --> aftersale
+  service --> notify
+  service --> orderdb
+  aftersale --> logdb
+  settlement --> financedb
+  notify --> notifydb
