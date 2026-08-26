@@ -1,0 +1,13 @@
+services:
+  backend:
+    image: segroup8/backend:monolith-start
+  frontend:
+    image: segroup8/frontend:monolith-start
+
+networks:
+  platform:
+    name: segroup8-monolith-start-platform
+
+volumes:
+  mysql_data:
+    name: segroup8-monolith-start-mysql-data
