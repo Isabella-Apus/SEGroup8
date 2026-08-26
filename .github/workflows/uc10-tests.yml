@@ -1,0 +1,14 @@
+name: UC10 tests
+on:
+  pull_request:
+    paths: ['microservices/behavior-service/**', '01_requirements/UC10-*', '02_docs/UC10-*', '04_tests/UC10/**']
+  push:
+    branches: ['codex/uc10-results']
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17', cache: maven}
+      - run: mvn -B -f microservices/behavior-service/pom.xml clean test
