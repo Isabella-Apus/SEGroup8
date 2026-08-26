@@ -1,0 +1,16 @@
+sequenceDiagram
+  autonumber
+  actor Seller as 二手卖家
+  actor Buyer as 二手买家
+  participant Platform as Kinda Goods 平台
+
+  Seller->>Platform: 查看已付款的待发货二手订单
+  Seller->>Platform: 填写发货地并确认发货
+  Platform-->>Seller: 订单进入待收货并生成首条物流
+  Platform-->>Buyer: 通知商品已发货
+  Seller->>Platform: 推进模拟物流节点
+  Buyer->>Platform: 查看物流轨迹
+  Platform-->>Buyer: 返回按时间排序的物流节点
+  Buyer->>Platform: 确认收货
+  Platform-->>Buyer: 订单进入待评价
+  Platform-->>Seller: 通知买家已收货并触发结算

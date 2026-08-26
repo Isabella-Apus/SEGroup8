@@ -1,0 +1,13 @@
+sequenceDiagram
+  autonumber
+  actor Seller as 二手卖家
+  participant Platform as Kinda Goods 平台
+
+  Seller->>Platform: 打开发布闲置页
+  Platform-->>Seller: 返回二手分类树
+  Seller->>Platform: 提交名称、价格、分类、成色和图片
+  Platform-->>Seller: 返回发布成功与商品信息
+  Seller->>Platform: 查看我的闲置
+  Platform-->>Seller: 返回本人商品列表
+  Seller->>Platform: 编辑、上下架或删除本人商品
+  Platform-->>Seller: 返回最新商品状态

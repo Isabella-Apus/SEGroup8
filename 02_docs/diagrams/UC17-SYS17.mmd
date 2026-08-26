@@ -1,0 +1,16 @@
+sequenceDiagram
+  autonumber
+  actor Buyer as 二手买家
+  actor Seller as 二手卖家
+  participant Platform as Kinda Goods 平台
+
+  Buyer->>Platform: 查看在售二手商品详情
+  Buyer->>Platform: 确认地址并直接购买
+  alt 买家就是商品卖家
+    Platform-->>Buyer: 拒绝自购并返回明确错误
+  else 商品可购买
+    Platform-->>Buyer: 创建待付款二手订单
+    Buyer->>Platform: 支付订单
+    Platform-->>Buyer: 订单进入待发货
+    Platform-->>Seller: 卖家可查看待发货订单
+  end

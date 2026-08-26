@@ -1,0 +1,22 @@
+sequenceDiagram
+  autonumber
+  actor Seller as 二手卖家
+  actor Bidder as 竞买人
+  participant Platform as Kinda Goods 平台
+
+  Seller->>Platform: 设置起拍价、加价幅度和时长
+  Platform-->>Seller: 创建进行中拍卖
+  Bidder->>Platform: 查看当前价和剩余时间
+  Bidder->>Platform: 提交出价
+  alt 出价低于最低金额或拍卖已结束
+    Platform-->>Bidder: 拒绝出价并说明原因
+  else 出价有效
+    Platform-->>Bidder: 返回最新当前价和领先状态
+    Platform-->>Seller: 拍卖监控显示当前价与出价次数
+  end
+  Platform->>Platform: 到期执行幂等结算
+  alt 存在最高出价
+    Platform-->>Bidder: 生成待付款成交订单
+  else 无有效出价
+    Platform-->>Seller: 标记流拍
+  end

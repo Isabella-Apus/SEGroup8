@@ -1,0 +1,18 @@
+sequenceDiagram
+  autonumber
+  actor Buyer as 二手买家
+  actor Seller as 二手卖家
+  participant Platform as Kinda Goods 平台
+
+  Buyer->>Platform: 对支持议价的商品提交报价
+  Platform-->>Buyer: 返回待卖家处理
+  Platform-->>Seller: 推送议价申请和聊天卡片
+  alt 卖家同意
+    Seller->>Platform: 确认成交价
+    Platform-->>Buyer: 创建新价格的待付款订单
+    Buyer->>Platform: 支付订单
+    Platform-->>Buyer: 订单进入待发货
+  else 卖家拒绝
+    Seller->>Platform: 拒绝议价
+    Platform-->>Buyer: 通知议价结束且不创建订单
+  end
