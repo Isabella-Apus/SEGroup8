@@ -1,0 +1,22 @@
+{
+  "useCase": "UC08",
+  "name": "店铺查看、设置和装修",
+  "issue": 51,
+  "generatedAt": "2026-08-26T09:12:17+08:00",
+  "command": "mvn -B -f microservices/shop-service/pom.xml clean test",
+  "tests": 4,
+  "passed": 4,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "buildResult": "BUILD SUCCESS",
+  "regression": {
+    "tests": 6,
+    "passed": 6,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "buildResult": "BUILD SUCCESS"
+  },
+  "rawReport": "raw-reports/TEST-com.segroup8.shop.ShopApiAndE2ETest.xml"
+}

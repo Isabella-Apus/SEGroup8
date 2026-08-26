@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,">
+  <title>UC08 测试运行证据</title>
+  <style>*{box-sizing:border-box}body{margin:0;background:#f5f7f2;color:#1c2b24;font-family:"Segoe UI","Microsoft YaHei",sans-serif}.page{max-width:1100px;margin:34px auto;padding:0 24px}.header{background:linear-gradient(135deg,#22543d,#2f855a);color:#fff;border-radius:18px;padding:30px 34px;box-shadow:0 14px 35px #173b5b2a}.eyebrow{font-size:14px;letter-spacing:.14em;opacity:.8}.header h1{font-size:34px;margin:8px 0}.header p{margin:0;opacity:.88}.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:21px 0}.card,.panel{background:#fff;border:1px solid #dce6df;border-radius:14px;box-shadow:0 8px 22px #20354d10}.card{padding:18px}.label{color:#64748b;font-size:13px}.value{font-size:28px;font-weight:700;margin-top:7px}.green{color:#16835b}.panel{padding:23px;margin-top:17px}.panel h2{margin:0 0 15px;font-size:20px}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid #e8eee9}th{color:#526276;font-size:13px}.status{display:inline-block;padding:4px 10px;border-radius:999px;background:#dcfce7;color:#13724f;font-weight:650}.meta{display:grid;grid-template-columns:165px 1fr;gap:9px;font-family:Consolas,monospace;font-size:13px}.footer{color:#65758a;font-size:13px;margin:18px 3px}</style>
+</head><body><main class="page">
+  <section class="header"><div class="eyebrow">ISSUE #51 · RUN EVIDENCE · 2026-08-26 09:12:17 +08:00</div><h1>UC08 店铺查看、设置和装修</h1><p>独立自动化测试与 UC06 回归结果 · shop-service</p></section>
+  <section class="cards"><div class="card"><div class="label">UC08 测试</div><div class="value">4</div></div><div class="card"><div class="label">UC08 通过</div><div class="value green">4</div></div><div class="card"><div class="label">失败 / 错误</div><div class="value">0 / 0</div></div><div class="card"><div class="label">回归测试</div><div class="value green">6 / 6</div></div><div class="card"><div class="label">构建结果</div><div class="value green" style="font-size:19px">SUCCESS</div></div></section>
+  <section class="panel"><h2>UC08 场景执行结果</h2><table><thead><tr><th>编号</th><th>业务场景</th><th>自动化测试</th><th>结果</th></tr></thead><tbody>
+    <tr><td>T08-01</td><td>公开查看、设置、装修与目录降级</td><td>t0801_publicViewSettingsDecorationAndCatalogFallback</td><td><span class="status">通过</span></td></tr>
+    <tr><td>T08-02</td><td>装修模板白名单</td><td>t0802_decorationRuleRejectsUnknownTemplate</td><td><span class="status">通过</span></td></tr>
+    <tr><td>T08-03</td><td>关店与卖家隔离</td><td>t0803_closedShopIsNotPublicAndUnknownSellerCannotMaintainIt</td><td><span class="status">通过</span></td></tr>
+    <tr><td>T08-04</td><td>装修格式与长度边界</td><td>t0804_rejectsMalformedNonObjectAndOversizedDecoration</td><td><span class="status">通过</span></td></tr>
+  </tbody></table></section>
+  <section class="panel"><h2>可复现信息</h2><div class="meta"><div>UC08 COMMAND</div><div>mvn -B -f microservices/shop-service/pom.xml clean test</div><div>REGRESSION</div><div>mvn -B -f microservices/pom.xml clean test · 6/6 passed</div><div>JAVA / SPRING</div><div>17.0.13 / 3.3.4</div><div>RAW REPORT</div><div>TEST-com.segroup8.shop.ShopApiAndE2ETest.xml</div></div></section>
+  <div class="footer">结论：UC08 4/4 通过，UC06+UC08 回归 6/6 通过，Failures 0 · Errors 0 · Skipped 0。</div>
+</main></body></html>
