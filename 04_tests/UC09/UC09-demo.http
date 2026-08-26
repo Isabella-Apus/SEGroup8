@@ -1,0 +1,16 @@
+### 创建高风险审核单
+POST http://localhost:8083/internal/risk-audits
+Content-Type: application/json
+
+{"productId":21,"name":"违禁商品","description":"测试"}
+
+### 查询待审记录
+GET http://localhost:8083/api/admin/risk-audits?status=PENDING
+X-Admin-Id: 99
+
+### 驳回（将 1 替换为实际审核单 id）
+POST http://localhost:8083/api/admin/risk-audits/1/decision
+X-Admin-Id: 99
+Content-Type: application/json
+
+{"approved":false,"reason":"命中违禁词"}
