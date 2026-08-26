@@ -46,6 +46,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.UUID;
 
 @Service
 public class SecondhandProductServiceImpl implements SecondhandProductService {
@@ -560,7 +561,8 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
 
     private String generateOrderNo(Long userId) {
         String timePart = LocalDateTime.now().format(ORDER_NO_FORMATTER);
-        return "SND" + timePart + String.format("%04d", userId % 10000);
+        String randomPart = UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+        return "SND" + timePart + String.format("%04d", userId % 10000) + randomPart;
     }
 
     private OrderVO toOrderVO(OrderInfo order, OrderItem item) {
