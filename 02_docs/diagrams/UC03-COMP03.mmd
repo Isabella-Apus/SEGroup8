@@ -1,0 +1,46 @@
+sequenceDiagram
+  actor Applicant as 普通用户
+  actor Admin as 管理员
+  participant UAPI as UserController
+  participant AAPI as AdminMerchantApplicationController
+  participant Svc as MerchantApplicationServiceImpl
+  participant Apps as MerchantApplicationMapper
+  participant Users as UserMapper
+  participant Shops as ShopMapper
+  participant Notify as NotificationMapper
+  participant Audit as AdminAuditLogService
+  participant DB as merchant_application/user/shop/notification/admin_audit_log
+
+  Applicant->>UAPI: POST /api/user/merchant-application
+  UAPI->>Svc: submit(request)
+  Svc->>Apps: 查询本人最新申请
+  Apps->>DB: SELECT merchant_application
+  alt 无待审/已通过申请
+    Svc->>Apps: insert(status=0)
+    Apps->>DB: INSERT merchant_application
+    UAPI-->>Applicant: success
+  else 已有有效申请
+    UAPI-->>Applicant: 400 重复申请
+  end
+
+  Admin->>AAPI: GET /api/admin/merchant-applications
+  AAPI->>Svc: pageForAdmin(query)
+  Svc->>Apps: selectPage
+  Apps->>DB: SELECT merchant_application
+  AAPI-->>Admin: 申请列表
+
+  Admin->>AAPI: POST /{id}/approve 或 /reject
+  AAPI->>Svc: approve(id) / reject(id, reason)
+  Svc->>Apps: 更新申请状态和原因
+  Apps->>DB: UPDATE merchant_application
+  alt approve
+    Svc->>Users: 升级 OFFICIAL_SELLER
+    Users->>DB: UPDATE user
+    Svc->>Shops: upsert shop
+    Shops->>DB: INSERT/UPDATE shop
+  end
+  Svc->>Notify: insert审核结果通知
+  Notify->>DB: INSERT notification
+  AAPI->>Audit: record审核动作
+  Audit->>DB: INSERT admin_audit_log
+  AAPI-->>Admin: success
