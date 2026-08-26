@@ -1,0 +1,44 @@
+sequenceDiagram
+  actor User as 登录用户
+  participant Guard as JwtAuthInterceptor
+  participant Context as UserContext
+  participant API as UserController
+  participant Svc as UserServiceImpl
+  participant U as UserMapper
+  participant A as AddressMapper
+  participant DB as user/address
+
+  User->>Guard: Bearer JWT 请求资料/地址
+  Guard->>Context: setUserId(uid)
+  Guard->>API: 放行
+
+  User->>API: GET /api/user/profile
+  API->>Svc: getCurrentUserProfile()
+  Svc->>Context: getUserId()
+  Svc->>U: selectById(uid)
+  U->>DB: SELECT user
+  DB-->>U: 当前用户
+  Svc-->>API: UserVO
+  API-->>User: Result<UserVO>
+
+  User->>API: POST /api/user/addresses
+  API->>Svc: createAddress(request)
+  Svc->>Context: getUserId()
+  alt isDefault=1
+    Svc->>A: 清除当前用户其他默认地址
+    A->>DB: UPDATE address SET is_default=0
+  end
+  Svc->>A: insert(address.userId=uid)
+  A->>DB: INSERT address
+  API-->>User: Result.success()
+
+  User->>API: DELETE /api/user/addresses/{id}
+  API->>Svc: deleteAddress(id)
+  Svc->>A: selectById(id)
+  alt 地址属于当前用户
+    Svc->>A: deleteById(id)
+    A->>DB: DELETE address
+    API-->>User: success
+  else 地址不属于当前用户
+    API-->>User: 业务错误
+  end
