@@ -509,3 +509,29 @@ systemctl restart segroup8-backend
 - 后端可以用 `tmux`
 - 前端可以用 `npm run dev:real -- --host 0.0.0.0`
 - 调试完成后切回 systemd + Nginx
+
+## 14. 生产配置、探针和版本信息
+
+真实数据库密码、JWT 密钥和 LLM API Key 不写入仓库。Docker 部署参考 `deploy/docker/.env.secrets.example`，Kubernetes 部署参考 `deploy/k8s/secret.example.yaml` 与 `deploy/k8s/backend-deployment.probes.example.yaml`。
+
+统一探针及版本接口：
+
+```text
+GET /actuator/health/liveness
+GET /actuator/health/readiness
+GET /actuator/health
+GET /actuator/info
+```
+
+- liveness 只判断进程是否需要重启，不依赖数据库等外部服务。
+- readiness 包含数据库检查；非 `UP` 时停止接收新流量。
+- `/actuator/info` 通过 `APP_VERSION`、`APP_COMMIT`、`APP_BUILD_TIME` 注入发布信息。
+- 公网 Nginx 不应代理整个 `/actuator/**`；如需监控，只允许受信网段访问。
+
+发布后验证：
+
+```bash
+curl --fail http://127.0.0.1:8080/actuator/health/liveness
+curl --fail http://127.0.0.1:8080/actuator/health/readiness
+curl --fail http://127.0.0.1:8080/actuator/info
+```
