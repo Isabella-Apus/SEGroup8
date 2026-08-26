@@ -61,4 +61,18 @@ class RealtimeHandshakeInterceptorTest {
         assertFalse(accepted);
         verify(response).setStatusCode(HttpStatus.UNAUTHORIZED);
     }
+
+    @Test
+    void beforeHandshake_shouldRejectTamperedToken() {
+        String token = jwtUtils.createToken(42L, "buyer", "USER") + "tampered";
+        ServerHttpRequest request = mock(ServerHttpRequest.class);
+        ServerHttpResponse response = mock(ServerHttpResponse.class);
+        WebSocketHandler handler = mock(WebSocketHandler.class);
+        when(request.getURI()).thenReturn(URI.create("http://localhost/ws/realtime?token=" + token));
+
+        boolean accepted = interceptor.beforeHandshake(request, response, handler, new HashMap<>());
+
+        assertFalse(accepted);
+        verify(response).setStatusCode(HttpStatus.UNAUTHORIZED);
+    }
 }
