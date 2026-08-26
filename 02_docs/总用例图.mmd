@@ -1,0 +1,46 @@
+flowchart LR
+    Visitor((游客))
+    User((普通用户))
+    Seller((官方卖家))
+    Admin((管理员))
+
+    subgraph A[账户与用户治理]
+        UC01[UC01 注册登录角色鉴权]
+        UC02[UC02 资料和地址]
+        UC03[UC03 商家申请审核]
+        UC04[UC04 封禁解禁审计]
+        UC05[UC05 举报拉黑信用治理]
+    end
+    subgraph B[商品与店铺]
+        UC06[UC06 商品搜索筛选详情]
+        UC07[UC07 卖家商品生命周期]
+        UC08[UC08 店铺查看设置装修]
+        UC09[UC09 商品风险审核]
+        UC10[UC10 浏览搜索历史热词]
+    end
+    subgraph C[订单与履约]
+        UC11[UC11 购物车结算拆单]
+        UC12[UC12 支付取消]
+        UC13[UC13 发货物流收货完成]
+        UC14[UC14 退款退货仲裁]
+        UC15[UC15 评价追评回复]
+    end
+    subgraph D[二手交易]
+        UC16[UC16 二手发布管理]
+        UC17[UC17 二手直接购买]
+        UC18[UC18 二手议价]
+        UC19[UC19 二手拍卖出价]
+        UC20[UC20 二手订单履约]
+    end
+    subgraph E[互动与财务]
+        UC21[UC21 优惠券生命周期]
+        UC22[UC22 领券结算使用]
+        UC23[UC23 钱包账户结算]
+        UC24[UC24 会话消息]
+        UC25[UC25 通知实时推送]
+    end
+
+    Visitor --> UC01
+    User --> UC01 & UC02 & UC03 & UC05 & UC06 & UC10 & UC11 & UC12 & UC14 & UC15 & UC16 & UC17 & UC18 & UC19 & UC20 & UC22 & UC23 & UC24 & UC25
+    Seller --> UC01 & UC03 & UC05 & UC07 & UC08 & UC11 & UC13 & UC14 & UC15 & UC16 & UC18 & UC19 & UC20 & UC21 & UC23 & UC24
+    Admin --> UC01 & UC03 & UC04 & UC05 & UC07 & UC09 & UC14 & UC21 & UC23 & UC25

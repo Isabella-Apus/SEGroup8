@@ -1,0 +1,15 @@
+sequenceDiagram
+    autonumber
+    actor Visitor as 游客/用户
+    participant Platform as 交易平台
+    participant Admin as 管理员
+    Visitor->>Platform: POST /api/auth/register
+    Platform-->>Visitor: code=0，注册成功
+    Visitor->>Platform: POST /api/auth/login
+    Platform-->>Visitor: JWT + USER/SELLER 角色
+    Visitor->>Platform: 携带 JWT 访问受保护接口
+    Platform-->>Visitor: 返回业务数据或鉴权失败
+    Admin->>Platform: POST /api/auth/login
+    Platform-->>Admin: JWT + ADMIN 角色
+    Admin->>Platform: GET /api/admin/users
+    Platform-->>Admin: 返回管理员数据

@@ -1,0 +1,15 @@
+sequenceDiagram
+    autonumber
+    actor Admin as 管理员
+    actor User as 普通用户
+    participant Platform as 交易平台
+    Admin->>Platform: GET /api/admin/users
+    Platform-->>Admin: 返回用户列表
+    Admin->>Platform: PUT /api/admin/users/{userId}/ban
+    Platform-->>Admin: 用户状态变为 BANNED
+    Platform-->>User: 后续登录被拒绝
+    Admin->>Platform: PUT /api/admin/users/{userId}/unban
+    Platform-->>Admin: 用户状态恢复 NORMAL
+    User->>Platform: POST /api/auth/login
+    Platform-->>User: 登录成功
+    Platform-->>Admin: 写入 BAN_USER / UNBAN_USER 审计记录
