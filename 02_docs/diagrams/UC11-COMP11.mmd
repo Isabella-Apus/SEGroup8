@@ -1,0 +1,28 @@
+flowchart LR
+  buyer["买家端<br/>CartView / ProductDetailView"]
+  auth["JwtAuthInterceptor<br/>身份解析"]
+  idem["IdempotencyInterceptor<br/>重复提交保护"]
+  controller["OrderController#create<br/>POST /api/order/create"]
+  service["OrderService<br/>OrderServiceImpl#createOrder"]
+  acl["AccessControl / UserBlockMapper<br/>交易权限校验"]
+  voucher["VoucherService#occupyForOrder<br/>优惠券占用与金额分摊"]
+  mapper["ProductMapper / ShopMapper / AddressMapper<br/>OrderInfoMapper / OrderItemMapper"]
+  orderdb[("order_info / order_item")]
+  productdb[("product / shop / address")]
+  voucherdb[("voucher / user_voucher")]
+  crossdb[("user_block / idempotency_record")]
+
+  buyer -->|"JWT + Idempotency-Key + 创建请求"| auth
+  auth --> idem
+  idem --> controller
+  controller --> service
+  service --> acl
+  service --> voucher
+  service --> mapper
+  mapper --> orderdb
+  mapper --> productdb
+  voucher --> voucherdb
+  acl --> crossdb
+  idem --> crossdb
+  service -->|"OrderVO"| controller
+  controller -->|"Result<OrderVO>"| buyer
