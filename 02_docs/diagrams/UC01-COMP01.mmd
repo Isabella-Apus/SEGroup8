@@ -1,0 +1,34 @@
+sequenceDiagram
+  actor Client as 游客/用户
+  participant API as AuthController
+  participant Auth as AuthServiceImpl
+  participant Users as UserMapper
+  participant JWT as JwtUtils
+  participant Guard as JwtAuthInterceptor
+  participant Context as UserContext
+  participant DB as user
+
+  Client->>API: POST /api/auth/register
+  API->>API: @Valid 校验 RegisterRequest
+  API->>Auth: register(request)
+  Auth->>Users: 查询 username
+  Users->>DB: SELECT user
+  DB-->>Users: 已有/不存在
+  Auth->>Users: insert 加密密码、USER、NORMAL
+  Users->>DB: INSERT user
+  API-->>Client: Result.success()
+
+  Client->>API: POST /api/auth/login
+  API->>Auth: login(request)
+  Auth->>Users: 查询用户并校验密码/状态
+  Users->>DB: SELECT user
+  DB-->>Users: 用户记录
+  Auth->>JWT: createToken(uid, username, role)
+  JWT-->>Auth: signed JWT
+  API-->>Client: token、role、user
+
+  Client->>Guard: 携带 Bearer JWT 访问受保护 API
+  Guard->>JWT: parseToken(token)
+  JWT-->>Guard: uid、role、expiry
+  Guard->>Context: setUserId(uid)
+  Guard-->>Client: 进入业务组件或返回 401
