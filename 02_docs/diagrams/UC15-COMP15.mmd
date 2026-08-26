@@ -1,0 +1,27 @@
+flowchart LR
+  buyer["买家端<br/>OrderDetailView / MyReviewsView"]
+  seller["卖家端<br/>MerchantReviewsView"]
+  orderctl["OrderController<br/>review / reviewItems / complete"]
+  reviewctl["ReviewController<br/>my / seller/list / reply / followup"]
+  ordersvc["OrderServiceImpl<br/>首评与订单完成事务"]
+  reviewmapper["ReviewMapper<br/>评价读写"]
+  ownership["OrderInfoMapper / OrderItemMapper<br/>ProductMapper / ShopMapper<br/>SecondhandProductMapper"]
+  notify["NotificationService<br/>RealtimePushService"]
+  reviewdb[("review")]
+  orderdb[("order_info / order_item")]
+  productdb[("product / shop<br/>secondhand_product")]
+  notifydb[("notification")]
+
+  buyer --> orderctl
+  buyer --> reviewctl
+  seller --> reviewctl
+  orderctl --> ordersvc
+  ordersvc --> reviewmapper
+  ordersvc --> ownership
+  ordersvc --> notify
+  reviewctl --> reviewmapper
+  reviewctl --> ownership
+  reviewmapper --> reviewdb
+  ownership --> orderdb
+  ownership --> productdb
+  notify --> notifydb

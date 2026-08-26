@@ -1,0 +1,30 @@
+@shop = http://localhost:8082
+@sellerId = 7
+
+### T08-01 查看开放店铺
+GET {{shop}}/api/shops/8
+
+### 查询本人店铺
+GET {{shop}}/api/shops/seller/current
+X-Seller-Id: {{sellerId}}
+
+### 修改店铺设置
+PUT {{shop}}/api/shops/seller/current/settings
+X-Seller-Id: {{sellerId}}
+Content-Type: application/json
+
+{"name":"第八组精品店","announcement":"欢迎","open":true}
+
+### 保存店铺装修
+PUT {{shop}}/api/shops/seller/current/decoration
+X-Seller-Id: {{sellerId}}
+Content-Type: application/json
+
+{"template":"GRID","contentJson":"{\"hero\":\"summer\"}"}
+
+### 关闭店铺
+PUT {{shop}}/api/shops/seller/current/settings
+X-Seller-Id: {{sellerId}}
+Content-Type: application/json
+
+{"name":"第八组精品店","announcement":"维护中","open":false}

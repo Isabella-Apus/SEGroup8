@@ -1,0 +1,14 @@
+name: UC09 tests
+on:
+  pull_request:
+    paths: ['microservices/risk-service/**', '01_requirements/UC09-*', '02_docs/UC09-*', '04_tests/UC09/**']
+  push:
+    branches: ['codex/uc09-results']
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17', cache: maven}
+      - run: mvn -B -f microservices/risk-service/pom.xml clean test

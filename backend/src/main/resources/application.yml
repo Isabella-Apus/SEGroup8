@@ -64,10 +64,26 @@ springdoc:
 management:
   endpoints:
     web:
+      base-path: /actuator
       exposure:
         include: health,info
   endpoint:
     health:
       probes:
         enabled: true
-      show-details: always
+      show-details: when-authorized
+      group:
+        liveness:
+          include: livenessState,ping
+        readiness:
+          include: readinessState,db
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: "${spring.application.name}"
+    version: "${APP_VERSION:0.0.1-SNAPSHOT}"
+    commit: "${APP_COMMIT:unknown}"
+    build-time: "${APP_BUILD_TIME:unknown}"

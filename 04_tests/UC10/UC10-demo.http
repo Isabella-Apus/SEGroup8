@@ -1,0 +1,16 @@
+### 记录浏览
+POST http://localhost:8084/api/behavior/browse-history
+X-User-Id: 3
+Content-Type: application/json
+
+{"productId":1,"productType":"NEW"}
+
+### 记录搜索
+POST http://localhost:8084/api/behavior/search-history
+X-User-Id: 3
+Content-Type: application/json
+
+{"keyword":"  Java   Book "}
+
+### 查看热词
+GET http://localhost:8084/api/behavior/hot-keywords

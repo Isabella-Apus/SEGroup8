@@ -1,0 +1,34 @@
+# UC14 订单售后退款 API 测试计划
+
+## 测试目标
+
+验证退款状态机、买卖双方与管理员权限、决定审计、资金回流、库存回补、超时自动同意和并发幂等。
+
+## 当前证据
+
+- `OrderServiceImplTest` 覆盖卖家同意后的决定字段。
+- `OrderControllerWebMvcTest`、`AdminOrderControllerWebMvcTest` 覆盖部分 HTTP 合约。
+- `OrderAfterSaleIntegrationTest`、`OrderSettlementRefundFlowIntegrationTest` 覆盖管理员同意、日志、仅退款和超时自动退款的部分路径。
+
+## 计划用例
+
+| 编号 | 层级 | 场景 | 核心断言 |
+|---|---|---|---|
+| `UT-UC14-001` | 单元 | 退款状态允许/拒绝矩阵 | 拒绝后可再申请，处理中才可决定 |
+| `UT-UC14-002` | 单元 | 仅退款/退货退款边界 | 到货状态与售后期限正确 |
+| `UT-UC14-003` | 单元 | 卖家/管理员拒绝 | 处理人、来源、说明和日志完整 |
+| `API-UC14-001` | API | 申请、拒绝、再申请、管理员同意 | 日志顺序和最终状态正确 |
+| `API-UC14-002` | API | 已结算订单退款 | 买家回流、卖家扣回和流水守恒 |
+| `API-UC14-003` | API | 三类越权调用 | 返回 403 且数据不变 |
+| `API-UC14-004` | API | 卖家/管理员并发同意 | 最多生成一次退款流水 |
+| `API-UC14-005` | API | 待发货仅退款自动通过 | 库存回补且订单关闭 |
+| `E2E-UC14-001/002` | E2E | 买家申请到商家/管理员处理 | 三端页面状态和日志一致 |
+
+## 验证命令
+
+```powershell
+cd backend
+mvn '-Dtest=OrderServiceImplTest,OrderControllerWebMvcTest,AdminOrderControllerWebMvcTest,OrderAfterSaleIntegrationTest,OrderSettlementRefundFlowIntegrationTest' test
+```
+
+现有测试不是完整验收；拒绝后再申请、越权和并发退款仍需按编号补齐。

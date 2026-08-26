@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: segroup8-backend
+  namespace: segroup8
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: segroup8-backend
+  template:
+    metadata:
+      labels:
+        app: segroup8-backend
+    spec:
+      containers:
+        - name: backend
+          image: replace.example/segroup8-backend:replace-tag
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: segroup8-backend-secret
+          env:
+            - name: APP_VERSION
+              value: "replace-version"
+            - name: APP_COMMIT
+              value: "replace-git-sha"
+            - name: APP_BUILD_TIME
+              value: "replace-utc-timestamp"
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: 5
+            failureThreshold: 18
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 2
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 10001
+
