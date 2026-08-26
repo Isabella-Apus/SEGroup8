@@ -1,0 +1,32 @@
+flowchart LR
+  seller["卖家端<br/>MerchantOrdersView"]
+  buyer["买家端<br/>OrderDetailView / OrderTimeline"]
+  orderctl["OrderController<br/>ship / confirmReceive"]
+  logisticsctl["LogisticsController<br/>pushNext / listByOrderId"]
+  ordersvc["OrderServiceImpl<br/>发货、人工/自动确认"]
+  logisticssvc["LogisticsServiceImpl<br/>轨迹初始化、推进、查询"]
+  engine["LogisticsEngine<br/>路径节点生成"]
+  scheduler["OrderAutoConfirmScheduler<br/>超时扫描"]
+  settlement["EscrowSettlementService<br/>托管资金结算"]
+  notify["NotificationService<br/>RealtimePushService"]
+  orderdb[("order_info / order_item")]
+  logisticsdb[("logistics_path_template<br/>logistics_trace")]
+  financedb[("balance / transaction_record")]
+  notifydb[("notification")]
+
+  seller --> orderctl
+  seller --> logisticsctl
+  buyer --> logisticsctl
+  buyer --> orderctl
+  orderctl --> ordersvc
+  logisticsctl --> logisticssvc
+  ordersvc --> logisticssvc
+  logisticssvc --> engine
+  scheduler --> ordersvc
+  ordersvc --> settlement
+  ordersvc --> notify
+  ordersvc --> orderdb
+  logisticssvc --> orderdb
+  logisticssvc --> logisticsdb
+  settlement --> financedb
+  notify --> notifydb
