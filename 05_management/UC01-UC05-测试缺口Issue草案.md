@@ -3,6 +3,8 @@
 > 本文件是成员 A 在 Day 2 整理的 GitHub Issue 草案，不是已经创建的 Issue。提交到 GitHub 后再回填实际 Issue 编号、项目卡片链接和 PR 链接。
 >
 > 范围：`identity-governance-service` 的 UC01-UC05。每个用例只建立一个完整的测试缺口 Issue；接口、异常分支和证据作为同一 Issue 的验收清单，不再拆成零散子任务。
+>
+> Day 3 状态说明：Controller/API、Service 异常规则和 JWT 契约的实际完成情况以 `04_tests/UC01-UC05-公开接口与测试映射.md` 和 `02_docs/UC01-UC05-追溯矩阵.md` 为准。本文件保留 Day 2 的原始缺口清单，清单中涉及真实前端、真实数据库、跨接口状态联动或跨服务链路的项目属于 Day 4/E2E，不作为当前 API 缺口重复创建任务。
 
 ## Issue 1：补齐 UC01 注册、登录与角色鉴权的 API/E2E 测试
 

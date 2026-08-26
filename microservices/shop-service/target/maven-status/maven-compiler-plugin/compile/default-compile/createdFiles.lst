@@ -1,0 +1,13 @@
+com\segroup8\shop\ShopService.class
+com\segroup8\shop\ShopService$1.class
+com\segroup8\shop\ShopApplication.class
+com\segroup8\shop\ShopService$SettingsCommand.class
+com\segroup8\shop\DecorationPolicy.class
+com\segroup8\shop\ShopService$Shop.class
+com\segroup8\shop\ShopService$DecorationCommand.class
+com\segroup8\shop\ShopErrorHandler.class
+com\segroup8\shop\ShopController$SettingsRequest.class
+com\segroup8\shop\ShopController.class
+com\segroup8\shop\ShopException.class
+com\segroup8\shop\ShopService$ShopView.class
+com\segroup8\shop\ShopController$DecorationRequest.class

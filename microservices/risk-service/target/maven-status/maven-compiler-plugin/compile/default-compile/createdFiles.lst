@@ -1,0 +1,12 @@
+com\segroup8\risk\RiskApplication.class
+com\segroup8\risk\RiskService$CreateCommand.class
+com\segroup8\risk\RiskService$Audit.class
+com\segroup8\risk\RiskRule.class
+com\segroup8\risk\RiskController$DecisionRequest.class
+com\segroup8\risk\RiskController$CreateRequest.class
+com\segroup8\risk\RiskService$DecisionCommand.class
+com\segroup8\risk\RuleResult.class
+com\segroup8\risk\RiskService.class
+com\segroup8\risk\RiskErrorHandler.class
+com\segroup8\risk\RiskException.class
+com\segroup8\risk\RiskController.class

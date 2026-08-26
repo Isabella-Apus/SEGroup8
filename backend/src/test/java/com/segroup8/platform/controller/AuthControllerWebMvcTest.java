@@ -89,4 +89,16 @@ class AuthControllerWebMvcTest {
 
         verify(authService).login(any());
     }
+
+    @Test
+    void login_shouldRejectInvalidBody() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"\",\"password\":\"\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.data").doesNotExist());
+
+        verify(authService, never()).login(any());
+    }
 }

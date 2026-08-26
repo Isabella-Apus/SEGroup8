@@ -108,4 +108,39 @@ class AuthServiceImplTest {
         assertEquals(401, ex.getCode());
         verify(userMapper, never()).updateById(any(User.class));
     }
+
+    @Test
+    void register_shouldRejectDuplicateUsername() {
+        RegisterRequest request = new RegisterRequest();
+        request.setUsername("existing-user");
+        request.setPassword("newPass123");
+        User existing = new User();
+        existing.setUsername("existing-user");
+        when(userMapper.selectOne(any())).thenReturn(existing);
+
+        BusinessException ex = assertThrows(BusinessException.class, () -> authService.register(request));
+
+        assertEquals(400, ex.getCode());
+        verify(userMapper, never()).insert(any(User.class));
+    }
+
+    @Test
+    void login_shouldRejectBannedUser() {
+        User dbUser = new User();
+        dbUser.setId(3L);
+        dbUser.setUsername("banned-user");
+        dbUser.setPassword(PasswordUtils.encode("right-pass"));
+        dbUser.setStatus(UserStatusEnum.BANNED.name());
+        dbUser.setRole("USER");
+        when(userMapper.selectOne(any())).thenReturn(dbUser);
+
+        LoginRequest request = new LoginRequest();
+        request.setUsername("banned-user");
+        request.setPassword("right-pass");
+
+        BusinessException ex = assertThrows(BusinessException.class, () -> authService.login(request));
+
+        assertEquals(403, ex.getCode());
+        verify(jwtUtils, never()).createToken(any(), any(), any());
+    }
 }

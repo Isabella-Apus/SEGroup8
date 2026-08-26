@@ -1,0 +1,3 @@
+com\segroup8\security\JwtTokenVerifier.class
+com\segroup8\security\JwtPrincipal.class
+com\segroup8\security\JwtVerificationException.class

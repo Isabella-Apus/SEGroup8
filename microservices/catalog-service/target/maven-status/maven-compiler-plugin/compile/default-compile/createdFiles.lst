@@ -1,0 +1,6 @@
+com\segroup8\catalog\CatalogErrorHandler.class
+com\segroup8\catalog\DomainException.class
+com\segroup8\catalog\CatalogApplication.class
+com\segroup8\catalog\CatalogController.class
+com\segroup8\catalog\CatalogService$Product.class
+com\segroup8\catalog\CatalogService.class
