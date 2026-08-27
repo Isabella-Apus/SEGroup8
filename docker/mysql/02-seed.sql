@@ -53,3 +53,19 @@ ON DUPLICATE KEY UPDATE
   `personal_balance` = VALUES(`personal_balance`),
   `business_balance` = VALUES(`business_balance`),
   `version` = VALUES(`version`);
+
+-- UC13 browser fixture: a real new-product order waiting for seller shipment.
+INSERT INTO `order_info`
+  (`id`, `order_no`, `buyer_user_id`, `total_amount`, `payable_amount`, `pay_status`,
+   `order_status`, `refund_status`, `receiver_name`, `receiver_phone`,
+   `receiver_province`, `receiver_city`, `receiver_detail_address`, `version`)
+VALUES
+  (13001, 'UC13-E2E-NEW-FULFILLMENT', 3, 299.00, 299.00, 1, 1, 0, 'Demo User', '13800000002', NULL, NULL, 'UC13 E2E Address', 0)
+ON DUPLICATE KEY UPDATE
+  `pay_status` = VALUES(`pay_status`), `order_status` = VALUES(`order_status`),
+  `version` = VALUES(`version`), `logistics_template_id` = NULL, `logistics_status` = NULL,
+  `logistics_current_index` = NULL;
+INSERT INTO `order_item`
+  (`id`, `order_id`, `product_type`, `product_id`, `product_name`, `price`, `quantity`, `status`)
+VALUES (13001, 13001, 'NEW', 1, 'Container Demo Keyboard', 299.00, 1, 0)
+ON DUPLICATE KEY UPDATE `status` = VALUES(`status`);
