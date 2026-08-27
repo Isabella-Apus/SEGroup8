@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Tag(DomainCTestTags.DOMAIN_C)
-@Tag(DomainCTestTags.UC14)
+@Tag(DomainCTestTags.PLATFORM)
 class OrderAfterSaleIntegrationTest {
 
     @Autowired
