@@ -25,11 +25,11 @@ run_logged() {
 
 collect_diagnostics() {
   set +e
-  docker compose -f compose.yml ps --all >"${logs_root}/compose-ps.txt" 2>&1
-  docker compose -f compose.yml config >"${logs_root}/compose-config.yml" 2>&1
-  docker compose -f compose.yml logs --no-color --timestamps >"${logs_root}/compose.log" 2>&1
+  docker compose ps --all >"${logs_root}/compose-ps.txt" 2>&1
+  docker compose config >"${logs_root}/compose-config.yml" 2>&1
+  docker compose logs --no-color --timestamps >"${logs_root}/compose.log" 2>&1
   for service in frontend backend database; do
-    docker compose -f compose.yml logs --no-color --timestamps "${service}" >"${logs_root}/${service}.log" 2>&1
+    docker compose logs --no-color --timestamps "${service}" >"${logs_root}/${service}.log" 2>&1
   done
   set -e
 }
@@ -40,7 +40,7 @@ wait_for_container_health() {
   local deadline=$((SECONDS + timeout_seconds))
   while (( SECONDS < deadline )); do
     local container_id
-    container_id="$(docker compose -f compose.yml ps -q "${service}" 2>/dev/null || true)"
+    container_id="$(docker compose ps -q "${service}" 2>/dev/null || true)"
     if [[ -n "${container_id}" ]]; then
       local state
       state="$(docker inspect --format '{{.State.Status}}|{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' "${container_id}" 2>/dev/null || true)"
@@ -83,7 +83,7 @@ on_exit() {
   if [[ "${compose_started}" == "true" ]]; then
     collect_diagnostics
     if [[ "${keep_services}" != "true" ]]; then
-      docker compose -f compose.yml down --remove-orphans >"${logs_root}/compose-down.log" 2>&1 || true
+      docker compose down --remove-orphans >"${logs_root}/compose-down.log" 2>&1 || true
     fi
   fi
   if [[ "${status}" -ne 0 ]]; then
@@ -105,26 +105,26 @@ export E2E_USERNAME E2E_PASSWORD E2E_ROLE E2E_BASE_URL E2E_OUTPUT_DIR="${evidenc
 if [[ "${RESET_DATABASE:-false}" == "true" ]]; then
   current_stage="database-reset"
   echo "RESET_DATABASE=true: removing only the Compose project and its named database volume"
-  run_logged compose-reset.log docker compose -f compose.yml down -v --remove-orphans
+  run_logged compose-reset.log docker compose down -v --remove-orphans
 fi
 
 compose_started="true"
 current_stage="compose-config"
-run_logged compose-config-check.log docker compose -f compose.yml config --quiet
+run_logged compose-config-check.log docker compose config --quiet
 current_stage="compose-build"
-run_logged compose-build.log docker compose -f compose.yml build backend frontend
+run_logged compose-build.log docker compose build backend frontend
 current_stage="database-start"
-run_logged database-start.log docker compose -f compose.yml up -d database
+run_logged database-start.log docker compose up -d database
 current_stage="database-health"
 wait_for_container_health database
 current_stage="backend-start"
-run_logged backend-start.log docker compose -f compose.yml up -d backend
+run_logged backend-start.log docker compose up -d backend
 current_stage="backend-health"
 wait_for_container_health backend
 current_stage="backend-http"
 wait_for_http backend http://127.0.0.1:8089/actuator/health '"status"[[:space:]]*:[[:space:]]*"UP"'
 current_stage="frontend-start"
-run_logged frontend-start.log docker compose -f compose.yml up -d frontend
+run_logged frontend-start.log docker compose up -d frontend
 current_stage="frontend-health"
 wait_for_container_health frontend
 current_stage="frontend-http"

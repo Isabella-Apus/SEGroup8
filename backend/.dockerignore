@@ -1,4 +1,6 @@
 target
+!target/
+!target/app.jar
 .m2repo
 uploads
 *.log

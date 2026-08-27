@@ -92,6 +92,16 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Download tested backend JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-jar
+          path: backend/target
+      - name: Download built frontend
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -99,6 +109,8 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - name: Run real Compose and Playwright smoke
+        env:
+          COMPOSE_FILE: compose.yml:compose.e2e.yml
         run: |
           chmod +x scripts/e2e/run-compose-e2e.sh
           scripts/e2e/run-compose-e2e.sh

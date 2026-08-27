@@ -23,11 +23,11 @@ $currentStage = 'initialization'
 
 function Save-ComposeDiagnostics {
     try {
-        & docker compose -f compose.yml ps --all 2>&1 | Set-Content -Encoding utf8 (Join-Path $logsRoot 'compose-ps.txt')
-        & docker compose -f compose.yml config 2>&1 | Set-Content -Encoding utf8 (Join-Path $logsRoot 'compose-config.yml')
-        & docker compose -f compose.yml logs --no-color --timestamps 2>&1 | Set-Content -Encoding utf8 (Join-Path $logsRoot 'compose.log')
+        & docker compose ps --all 2>&1 | Set-Content -Encoding utf8 (Join-Path $logsRoot 'compose-ps.txt')
+        & docker compose config 2>&1 | Set-Content -Encoding utf8 (Join-Path $logsRoot 'compose-config.yml')
+        & docker compose logs --no-color --timestamps 2>&1 | Set-Content -Encoding utf8 (Join-Path $logsRoot 'compose.log')
         foreach ($service in @('frontend', 'backend', 'database')) {
-            & docker compose -f compose.yml logs --no-color --timestamps $service 2>&1 |
+            & docker compose logs --no-color --timestamps $service 2>&1 |
                 Set-Content -Encoding utf8 (Join-Path $logsRoot "$service.log")
         }
     } catch {
@@ -48,7 +48,7 @@ function Invoke-Logged([string]$LogName, [scriptblock]$Command) {
 function Wait-ContainerHealthy([string]$Service, [int]$TimeoutSeconds = 180) {
     $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
     do {
-        $containerId = (& docker compose -f compose.yml ps -q $Service 2>$null).Trim()
+        $containerId = (& docker compose ps -q $Service 2>$null).Trim()
         if ($containerId) {
             $state = (& docker inspect --format '{{.State.Status}}|{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' $containerId 2>$null).Trim()
             Write-Host "${Service}: $state"
@@ -88,26 +88,26 @@ try {
     if ($ResetDatabase) {
         $currentStage = 'database-reset'
         Write-Warning 'ResetDatabase requested: removing only the Compose project and its named database volume.'
-        Invoke-Logged 'compose-reset.log' { docker compose -f compose.yml down -v --remove-orphans }
+        Invoke-Logged 'compose-reset.log' { docker compose down -v --remove-orphans }
     }
 
     $currentStage = 'compose-config'
-    Invoke-Logged 'compose-config-check.log' { docker compose -f compose.yml config --quiet }
+    Invoke-Logged 'compose-config-check.log' { docker compose config --quiet }
     $currentStage = 'compose-build'
-    Invoke-Logged 'compose-build.log' { docker compose -f compose.yml build backend frontend }
+    Invoke-Logged 'compose-build.log' { docker compose build backend frontend }
     $currentStage = 'database-start'
-    Invoke-Logged 'database-start.log' { docker compose -f compose.yml up -d database }
+    Invoke-Logged 'database-start.log' { docker compose up -d database }
     $composeTouched = $true
     $currentStage = 'database-health'
     Wait-ContainerHealthy 'database'
     $currentStage = 'backend-start'
-    Invoke-Logged 'backend-start.log' { docker compose -f compose.yml up -d backend }
+    Invoke-Logged 'backend-start.log' { docker compose up -d backend }
     $currentStage = 'backend-health'
     Wait-ContainerHealthy 'backend'
     $currentStage = 'backend-http-health'
     Wait-HttpReady 'backend' 'http://127.0.0.1:8089/actuator/health' '"status"\s*:\s*"UP"'
     $currentStage = 'frontend-start'
-    Invoke-Logged 'frontend-start.log' { docker compose -f compose.yml up -d frontend }
+    Invoke-Logged 'frontend-start.log' { docker compose up -d frontend }
     $currentStage = 'frontend-health'
     Wait-ContainerHealthy 'frontend'
     Wait-HttpReady 'frontend' 'http://127.0.0.1:8088/health' '^ok'
@@ -136,7 +136,7 @@ try {
     if ($composeTouched) {
         Save-ComposeDiagnostics
         if (-not $KeepServices) {
-            & docker compose -f compose.yml down --remove-orphans 2>&1 |
+            & docker compose down --remove-orphans 2>&1 |
                 Set-Content -Encoding utf8 (Join-Path $logsRoot 'compose-down.log')
         }
     }
