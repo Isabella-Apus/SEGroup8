@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T10:42:30.0301676+08:00",
+  "generatedAt": "2026-08-27T10:46:30.7181958+08:00",
   "layer": "API_INTEGRATION",
   "command": "mvn -B -f microservices/pom.xml -Pdomain-b clean test",
   "tests": 15.0,

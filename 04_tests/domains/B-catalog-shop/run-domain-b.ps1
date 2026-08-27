@@ -20,8 +20,10 @@ New-Item -ItemType Directory -Force -Path $rawReportsRoot, $logsRoot | Out-Null
 function Invoke-IntegrationTests {
     Push-Location $workspaceRoot
     try {
+        $integrationLog = Join-Path $logsRoot 'api-integration.log'
         & mvn -B --no-transfer-progress -f microservices/pom.xml -Pdomain-b clean test |
-            Tee-Object -FilePath (Join-Path $logsRoot 'api-integration.log')
+            ForEach-Object { $_.TrimEnd() } |
+            Tee-Object -FilePath $integrationLog
         if ($LASTEXITCODE -ne 0) { throw "Domain B integration tests failed with exit code $LASTEXITCODE" }
 
         Get-ChildItem 'microservices/*/target/surefire-reports/*' -File |

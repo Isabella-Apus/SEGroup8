@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.segroup8.behavior.BehaviorApiIntegrationTest
 -------------------------------------------------------------------------------
-Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.262 s -- in com.segroup8.behavior.BehaviorApiIntegrationTest
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.059 s -- in com.segroup8.behavior.BehaviorApiIntegrationTest

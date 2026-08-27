@@ -1,52 +1,52 @@
 [INFO] Scanning for projects...
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Build Order:
-[INFO] 
+[INFO]
 [INFO] commerce-microservices                                             [pom]
 [INFO] catalog-service                                                    [jar]
 [INFO] shop-service                                                       [jar]
 [INFO] risk-service                                                       [jar]
 [INFO] behavior-service                                                   [jar]
-[INFO] 
+[INFO]
 [INFO] ----------------< com.segroup8:commerce-microservices >-----------------
 [INFO] Building commerce-microservices 1.0.0                              [1/5]
 [INFO]   from pom.xml
 [INFO] --------------------------------[ pom ]---------------------------------
-[INFO] 
+[INFO]
 [INFO] --- clean:3.3.2:clean (default-clean) @ commerce-microservices ---
-[INFO] 
+[INFO]
 [INFO] --------------------< com.segroup8:catalog-service >--------------------
 [INFO] Building catalog-service 1.0.0                                     [2/5]
 [INFO]   from catalog-service\pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
-[INFO] 
+[INFO]
 [INFO] --- clean:3.3.2:clean (default-clean) @ catalog-service ---
 [INFO] Deleting D:\softwhere_homework2026\SEGroup8\microservices\catalog-service\target
-[INFO] 
+[INFO]
 [INFO] --- resources:3.3.1:resources (default-resources) @ catalog-service ---
 [INFO] Copying 1 resource from src\main\resources to target\classes
 [INFO] Copying 1 resource from src\main\resources to target\classes
-[INFO] 
+[INFO]
 [INFO] --- compiler:3.13.0:compile (default-compile) @ catalog-service ---
 [INFO] Recompiling the module because of changed source code.
 [INFO] Compiling 3 source files with javac [debug parameters release 17] to target\classes
-[INFO] 
+[INFO]
 [INFO] --- resources:3.3.1:testResources (default-testResources) @ catalog-service ---
 [INFO] Copying 1 resource from src\test\resources to target\test-classes
-[INFO] 
+[INFO]
 [INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ catalog-service ---
 [INFO] Recompiling the module because of changed dependency.
 [INFO] Compiling 1 source file with javac [debug parameters release 17] to target\test-classes
-[INFO] 
+[INFO]
 [INFO] --- surefire:3.2.5:test (default-test) @ catalog-service ---
 [INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
-[INFO] 
+[INFO]
 [INFO] -------------------------------------------------------
 [INFO]  T E S T S
 [INFO] -------------------------------------------------------
 [INFO] Running com.segroup8.catalog.CatalogApiIntegrationTest
-10:42:03.013 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.segroup8.catalog.CatalogApiIntegrationTest]: CatalogApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-10:42:03.127 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.segroup8.catalog.CatalogApplication for test class com.segroup8.catalog.CatalogApiIntegrationTest
+10:45:52.185 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.segroup8.catalog.CatalogApiIntegrationTest]: CatalogApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:45:52.308 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.segroup8.catalog.CatalogApplication for test class com.segroup8.catalog.CatalogApiIntegrationTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -57,56 +57,56 @@
 
  :: Spring Boot ::                (v3.3.4)
 
-2026-08-27T10:42:03.550+08:00  INFO 21956 --- [           main] c.s.catalog.CatalogApiIntegrationTest    : Starting CatalogApiIntegrationTest using Java 17.0.13 with PID 21956 (started by 27872 in D:\softwhere_homework2026\SEGroup8\microservices\catalog-service)
-2026-08-27T10:42:03.552+08:00  INFO 21956 --- [           main] c.s.catalog.CatalogApiIntegrationTest    : No active profile set, falling back to 1 default profile: "default"
-2026-08-27T10:42:04.885+08:00  INFO 21956 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-08-27T10:42:05.136+08:00  INFO 21956 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:catalog user=SA
-2026-08-27T10:42:05.136+08:00  INFO 21956 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-08-27T10:42:06.853+08:00  INFO 21956 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-27T10:42:06.853+08:00  INFO 21956 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-27T10:42:06.863+08:00  INFO 21956 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
-2026-08-27T10:42:06.878+08:00  INFO 21956 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 25 ms
-2026-08-27T10:42:06.998+08:00  INFO 21956 --- [           main] c.s.catalog.CatalogApiIntegrationTest    : Started CatalogApiIntegrationTest in 3.729 seconds (process running for 4.519)
-2026-08-27T10:42:07.977+08:00  WARN 21956 --- [           main] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Failed to convert value of type 'java.lang.String' to required type 'java.math.BigDecimal'; Character �� is neither a decimal digit number, decimal point, nor "e" notation exponential mark.]
-[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.080 s -- in com.segroup8.catalog.CatalogApiIntegrationTest
-[INFO] 
+2026-08-27T10:45:52.667+08:00  INFO 54216 --- [           main] c.s.catalog.CatalogApiIntegrationTest    : Starting CatalogApiIntegrationTest using Java 17.0.13 with PID 54216 (started by 27872 in D:\softwhere_homework2026\SEGroup8\microservices\catalog-service)
+2026-08-27T10:45:52.669+08:00  INFO 54216 --- [           main] c.s.catalog.CatalogApiIntegrationTest    : No active profile set, falling back to 1 default profile: "default"
+2026-08-27T10:45:53.896+08:00  INFO 54216 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-27T10:45:54.114+08:00  INFO 54216 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:catalog user=SA
+2026-08-27T10:45:54.117+08:00  INFO 54216 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-27T10:45:58.809+08:00  INFO 54216 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-27T10:45:58.809+08:00  INFO 54216 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-27T10:45:58.834+08:00  INFO 54216 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-08-27T10:45:58.872+08:00  INFO 54216 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 59 ms
+2026-08-27T10:45:59.146+08:00  INFO 54216 --- [           main] c.s.catalog.CatalogApiIntegrationTest    : Started CatalogApiIntegrationTest in 6.738 seconds (process running for 7.439)
+2026-08-27T10:46:02.469+08:00  WARN 54216 --- [           main] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Failed to convert value of type 'java.lang.String' to required type 'java.math.BigDecimal'; Character �� is neither a decimal digit number, decimal point, nor "e" notation exponential mark.]
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 10.42 s -- in com.segroup8.catalog.CatalogApiIntegrationTest
+[INFO]
 [INFO] Results:
-[INFO] 
+[INFO]
 [INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
-[INFO] 
-[INFO] 
+[INFO]
+[INFO]
 [INFO] ---------------------< com.segroup8:shop-service >----------------------
 [INFO] Building shop-service 1.0.0                                        [3/5]
 [INFO]   from shop-service\pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
-[INFO] 
+[INFO]
 [INFO] --- clean:3.3.2:clean (default-clean) @ shop-service ---
 [INFO] Deleting D:\softwhere_homework2026\SEGroup8\microservices\shop-service\target
-[INFO] 
+[INFO]
 [INFO] --- resources:3.3.1:resources (default-resources) @ shop-service ---
 [INFO] Copying 1 resource from src\main\resources to target\classes
 [INFO] Copying 1 resource from src\main\resources to target\classes
-[INFO] 
+[INFO]
 [INFO] --- compiler:3.13.0:compile (default-compile) @ shop-service ---
 [INFO] Recompiling the module because of changed source code.
 [INFO] Compiling 3 source files with javac [debug parameters release 17] to target\classes
-[INFO] 
+[INFO]
 [INFO] --- resources:3.3.1:testResources (default-testResources) @ shop-service ---
 [INFO] Copying 1 resource from src\test\resources to target\test-classes
-[INFO] 
+[INFO]
 [INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ shop-service ---
 [INFO] Recompiling the module because of changed dependency.
 [INFO] Compiling 1 source file with javac [debug parameters release 17] to target\test-classes
-[INFO] 
+[INFO]
 [INFO] --- surefire:3.2.5:test (default-test) @ shop-service ---
 [INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
-[INFO] 
+[INFO]
 [INFO] -------------------------------------------------------
 [INFO]  T E S T S
 [INFO] -------------------------------------------------------
 [INFO] Running com.segroup8.shop.ShopApiIntegrationTest
-10:42:10.169 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.segroup8.shop.ShopApiIntegrationTest]: ShopApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-10:42:10.288 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.segroup8.shop.ShopApplication for test class com.segroup8.shop.ShopApiIntegrationTest
+10:46:11.087 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.segroup8.shop.ShopApiIntegrationTest]: ShopApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:46:11.210 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.segroup8.shop.ShopApplication for test class com.segroup8.shop.ShopApiIntegrationTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -117,55 +117,55 @@
 
  :: Spring Boot ::                (v3.3.4)
 
-2026-08-27T10:42:10.663+08:00  INFO 46772 --- [           main] c.segroup8.shop.ShopApiIntegrationTest   : Starting ShopApiIntegrationTest using Java 17.0.13 with PID 46772 (started by 27872 in D:\softwhere_homework2026\SEGroup8\microservices\shop-service)
-2026-08-27T10:42:10.664+08:00  INFO 46772 --- [           main] c.segroup8.shop.ShopApiIntegrationTest   : No active profile set, falling back to 1 default profile: "default"
-2026-08-27T10:42:12.008+08:00  INFO 46772 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-08-27T10:42:12.214+08:00  INFO 46772 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:shop user=SA
-2026-08-27T10:42:12.215+08:00  INFO 46772 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-08-27T10:42:13.950+08:00  INFO 46772 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-27T10:42:13.950+08:00  INFO 46772 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-27T10:42:13.959+08:00  INFO 46772 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
-2026-08-27T10:42:13.975+08:00  INFO 46772 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 23 ms
-2026-08-27T10:42:14.060+08:00  INFO 46772 --- [           main] c.segroup8.shop.ShopApiIntegrationTest   : Started ShopApiIntegrationTest in 3.665 seconds (process running for 4.415)
-[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.049 s -- in com.segroup8.shop.ShopApiIntegrationTest
-[INFO] 
+2026-08-27T10:46:11.597+08:00  INFO 47948 --- [           main] c.segroup8.shop.ShopApiIntegrationTest   : Starting ShopApiIntegrationTest using Java 17.0.13 with PID 47948 (started by 27872 in D:\softwhere_homework2026\SEGroup8\microservices\shop-service)
+2026-08-27T10:46:11.598+08:00  INFO 47948 --- [           main] c.segroup8.shop.ShopApiIntegrationTest   : No active profile set, falling back to 1 default profile: "default"
+2026-08-27T10:46:12.842+08:00  INFO 47948 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-27T10:46:13.014+08:00  INFO 47948 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:shop user=SA
+2026-08-27T10:46:13.015+08:00  INFO 47948 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-27T10:46:14.945+08:00  INFO 47948 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-27T10:46:14.945+08:00  INFO 47948 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-27T10:46:14.956+08:00  INFO 47948 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-08-27T10:46:14.969+08:00  INFO 47948 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 21 ms
+2026-08-27T10:46:15.042+08:00  INFO 47948 --- [           main] c.segroup8.shop.ShopApiIntegrationTest   : Started ShopApiIntegrationTest in 3.722 seconds (process running for 4.492)
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.253 s -- in com.segroup8.shop.ShopApiIntegrationTest
+[INFO]
 [INFO] Results:
-[INFO] 
+[INFO]
 [INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
-[INFO] 
-[INFO] 
+[INFO]
+[INFO]
 [INFO] ---------------------< com.segroup8:risk-service >----------------------
 [INFO] Building risk-service 1.0.0                                        [4/5]
 [INFO]   from risk-service\pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
-[INFO] 
+[INFO]
 [INFO] --- clean:3.3.2:clean (default-clean) @ risk-service ---
 [INFO] Deleting D:\softwhere_homework2026\SEGroup8\microservices\risk-service\target
-[INFO] 
+[INFO]
 [INFO] --- resources:3.3.1:resources (default-resources) @ risk-service ---
 [INFO] Copying 1 resource from src\main\resources to target\classes
 [INFO] Copying 1 resource from src\main\resources to target\classes
-[INFO] 
+[INFO]
 [INFO] --- compiler:3.13.0:compile (default-compile) @ risk-service ---
 [INFO] Recompiling the module because of changed source code.
 [INFO] Compiling 3 source files with javac [debug parameters release 17] to target\classes
-[INFO] 
+[INFO]
 [INFO] --- resources:3.3.1:testResources (default-testResources) @ risk-service ---
 [INFO] Copying 1 resource from src\test\resources to target\test-classes
-[INFO] 
+[INFO]
 [INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ risk-service ---
 [INFO] Recompiling the module because of changed dependency.
 [INFO] Compiling 1 source file with javac [debug parameters release 17] to target\test-classes
-[INFO] 
+[INFO]
 [INFO] --- surefire:3.2.5:test (default-test) @ risk-service ---
 [INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
-[INFO] 
+[INFO]
 [INFO] -------------------------------------------------------
 [INFO]  T E S T S
 [INFO] -------------------------------------------------------
 [INFO] Running com.segroup8.risk.RiskApiIntegrationTest
-10:42:17.198 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.segroup8.risk.RiskApiIntegrationTest]: RiskApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-10:42:17.303 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.segroup8.risk.RiskApplication for test class com.segroup8.risk.RiskApiIntegrationTest
+10:46:18.259 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.segroup8.risk.RiskApiIntegrationTest]: RiskApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:46:18.367 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.segroup8.risk.RiskApplication for test class com.segroup8.risk.RiskApiIntegrationTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -176,55 +176,55 @@
 
  :: Spring Boot ::                (v3.3.4)
 
-2026-08-27T10:42:17.716+08:00  INFO 47596 --- [           main] c.segroup8.risk.RiskApiIntegrationTest   : Starting RiskApiIntegrationTest using Java 17.0.13 with PID 47596 (started by 27872 in D:\softwhere_homework2026\SEGroup8\microservices\risk-service)
-2026-08-27T10:42:17.718+08:00  INFO 47596 --- [           main] c.segroup8.risk.RiskApiIntegrationTest   : No active profile set, falling back to 1 default profile: "default"
-2026-08-27T10:42:19.072+08:00  INFO 47596 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-08-27T10:42:19.288+08:00  INFO 47596 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:risk user=SA
-2026-08-27T10:42:19.290+08:00  INFO 47596 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-08-27T10:42:21.123+08:00  INFO 47596 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-27T10:42:21.123+08:00  INFO 47596 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-27T10:42:21.132+08:00  INFO 47596 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
-2026-08-27T10:42:21.145+08:00  INFO 47596 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 21 ms
-2026-08-27T10:42:21.235+08:00  INFO 47596 --- [           main] c.segroup8.risk.RiskApiIntegrationTest   : Started RiskApiIntegrationTest in 3.797 seconds (process running for 4.584)
-[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.315 s -- in com.segroup8.risk.RiskApiIntegrationTest
-[INFO] 
+2026-08-27T10:46:18.725+08:00  INFO 13532 --- [           main] c.segroup8.risk.RiskApiIntegrationTest   : Starting RiskApiIntegrationTest using Java 17.0.13 with PID 13532 (started by 27872 in D:\softwhere_homework2026\SEGroup8\microservices\risk-service)
+2026-08-27T10:46:18.726+08:00  INFO 13532 --- [           main] c.segroup8.risk.RiskApiIntegrationTest   : No active profile set, falling back to 1 default profile: "default"
+2026-08-27T10:46:20.083+08:00  INFO 13532 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-27T10:46:20.303+08:00  INFO 13532 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:risk user=SA
+2026-08-27T10:46:20.303+08:00  INFO 13532 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-27T10:46:22.047+08:00  INFO 13532 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-27T10:46:22.047+08:00  INFO 13532 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-27T10:46:22.057+08:00  INFO 13532 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-08-27T10:46:22.073+08:00  INFO 13532 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 24 ms
+2026-08-27T10:46:22.190+08:00  INFO 13532 --- [           main] c.segroup8.risk.RiskApiIntegrationTest   : Started RiskApiIntegrationTest in 3.703 seconds (process running for 4.459)
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.058 s -- in com.segroup8.risk.RiskApiIntegrationTest
+[INFO]
 [INFO] Results:
-[INFO] 
+[INFO]
 [INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
-[INFO] 
-[INFO] 
+[INFO]
+[INFO]
 [INFO] -------------------< com.segroup8:behavior-service >--------------------
 [INFO] Building behavior-service 1.0.0                                    [5/5]
 [INFO]   from behavior-service\pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
-[INFO] 
+[INFO]
 [INFO] --- clean:3.3.2:clean (default-clean) @ behavior-service ---
 [INFO] Deleting D:\softwhere_homework2026\SEGroup8\microservices\behavior-service\target
-[INFO] 
+[INFO]
 [INFO] --- resources:3.3.1:resources (default-resources) @ behavior-service ---
 [INFO] Copying 1 resource from src\main\resources to target\classes
 [INFO] Copying 1 resource from src\main\resources to target\classes
-[INFO] 
+[INFO]
 [INFO] --- compiler:3.13.0:compile (default-compile) @ behavior-service ---
 [INFO] Recompiling the module because of changed source code.
 [INFO] Compiling 3 source files with javac [debug parameters release 17] to target\classes
-[INFO] 
+[INFO]
 [INFO] --- resources:3.3.1:testResources (default-testResources) @ behavior-service ---
 [INFO] Copying 1 resource from src\test\resources to target\test-classes
-[INFO] 
+[INFO]
 [INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ behavior-service ---
 [INFO] Recompiling the module because of changed dependency.
 [INFO] Compiling 1 source file with javac [debug parameters release 17] to target\test-classes
-[INFO] 
+[INFO]
 [INFO] --- surefire:3.2.5:test (default-test) @ behavior-service ---
 [INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
-[INFO] 
+[INFO]
 [INFO] -------------------------------------------------------
 [INFO]  T E S T S
 [INFO] -------------------------------------------------------
 [INFO] Running com.segroup8.behavior.BehaviorApiIntegrationTest
-10:42:24.361 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.segroup8.behavior.BehaviorApiIntegrationTest]: BehaviorApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-10:42:24.470 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.segroup8.behavior.BehaviorApplication for test class com.segroup8.behavior.BehaviorApiIntegrationTest
+10:46:25.216 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.segroup8.behavior.BehaviorApiIntegrationTest]: BehaviorApiIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+10:46:25.333 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.segroup8.behavior.BehaviorApplication for test class com.segroup8.behavior.BehaviorApiIntegrationTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -235,33 +235,33 @@
 
  :: Spring Boot ::                (v3.3.4)
 
-2026-08-27T10:42:24.890+08:00  INFO 43424 --- [           main] c.s.behavior.BehaviorApiIntegrationTest  : Starting BehaviorApiIntegrationTest using Java 17.0.13 with PID 43424 (started by 27872 in D:\softwhere_homework2026\SEGroup8\microservices\behavior-service)
-2026-08-27T10:42:24.891+08:00  INFO 43424 --- [           main] c.s.behavior.BehaviorApiIntegrationTest  : No active profile set, falling back to 1 default profile: "default"
-2026-08-27T10:42:26.217+08:00  INFO 43424 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-08-27T10:42:26.436+08:00  INFO 43424 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:behavior user=SA
-2026-08-27T10:42:26.437+08:00  INFO 43424 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-08-27T10:42:28.226+08:00  INFO 43424 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-27T10:42:28.226+08:00  INFO 43424 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-27T10:42:28.236+08:00  INFO 43424 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
-2026-08-27T10:42:28.253+08:00  INFO 43424 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 25 ms
-2026-08-27T10:42:28.382+08:00  INFO 43424 --- [           main] c.s.behavior.BehaviorApiIntegrationTest  : Started BehaviorApiIntegrationTest in 3.775 seconds (process running for 4.546)
-[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.262 s -- in com.segroup8.behavior.BehaviorApiIntegrationTest
-[INFO] 
+2026-08-27T10:46:25.719+08:00  INFO 20408 --- [           main] c.s.behavior.BehaviorApiIntegrationTest  : Starting BehaviorApiIntegrationTest using Java 17.0.13 with PID 20408 (started by 27872 in D:\softwhere_homework2026\SEGroup8\microservices\behavior-service)
+2026-08-27T10:46:25.722+08:00  INFO 20408 --- [           main] c.s.behavior.BehaviorApiIntegrationTest  : No active profile set, falling back to 1 default profile: "default"
+2026-08-27T10:46:27.018+08:00  INFO 20408 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-27T10:46:27.236+08:00  INFO 20408 --- [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:behavior user=SA
+2026-08-27T10:46:27.236+08:00  INFO 20408 --- [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-27T10:46:28.786+08:00  INFO 20408 --- [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-27T10:46:28.786+08:00  INFO 20408 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-27T10:46:28.795+08:00  INFO 20408 --- [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-08-27T10:46:28.810+08:00  INFO 20408 --- [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 22 ms
+2026-08-27T10:46:28.966+08:00  INFO 20408 --- [           main] c.s.behavior.BehaviorApiIntegrationTest  : Started BehaviorApiIntegrationTest in 3.528 seconds (process running for 4.269)
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.059 s -- in com.segroup8.behavior.BehaviorApiIntegrationTest
+[INFO]
 [INFO] Results:
-[INFO] 
+[INFO]
 [INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
-[INFO] 
+[INFO]
 [INFO] ------------------------------------------------------------------------
 [INFO] Reactor Summary for commerce-microservices 1.0.0:
-[INFO] 
-[INFO] commerce-microservices ............................. SUCCESS [  0.121 s]
-[INFO] catalog-service .................................... SUCCESS [  9.024 s]
-[INFO] shop-service ....................................... SUCCESS [  7.106 s]
-[INFO] risk-service ....................................... SUCCESS [  7.306 s]
-[INFO] behavior-service ................................... SUCCESS [  7.096 s]
+[INFO]
+[INFO] commerce-microservices ............................. SUCCESS [  0.128 s]
+[INFO] catalog-service .................................... SUCCESS [ 20.211 s]
+[INFO] shop-service ....................................... SUCCESS [ 13.575 s]
+[INFO] risk-service ....................................... SUCCESS [  7.002 s]
+[INFO] behavior-service ................................... SUCCESS [  6.946 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  31.024 s
-[INFO] Finished at: 2026-08-27T10:42:29+08:00
+[INFO] Total time:  48.181 s
+[INFO] Finished at: 2026-08-27T10:46:30+08:00
 [INFO] ------------------------------------------------------------------------
