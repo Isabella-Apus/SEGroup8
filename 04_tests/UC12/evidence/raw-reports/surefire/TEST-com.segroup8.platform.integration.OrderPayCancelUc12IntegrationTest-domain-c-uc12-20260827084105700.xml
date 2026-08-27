@@ -1,0 +1,950 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.segroup8.platform.integration.OrderPayCancelUc12IntegrationTest(domain-c-uc12-20260827084105700)" time="8.347" tests="7" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="17"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="GBK"/>
+    <property name="java.class.path" value="C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\target\test-classes;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\target\classes;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-web\3.3.4\spring-boot-starter-web-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter\3.3.4\spring-boot-starter-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot\3.3.4\spring-boot-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-logging\3.3.4\spring-boot-starter-logging-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\ch\qos\logback\logback-classic\1.5.8\logback-classic-1.5.8.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\ch\qos\logback\logback-core\1.5.8\logback-core-1.5.8.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\apache\logging\log4j\log4j-to-slf4j\2.23.1\log4j-to-slf4j-2.23.1.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\apache\logging\log4j\log4j-api\2.23.1\log4j-api-2.23.1.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\slf4j\jul-to-slf4j\2.0.16\jul-to-slf4j-2.0.16.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-json\3.3.4\spring-boot-starter-json-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.17.2\jackson-datatype-jdk8-2.17.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.17.2\jackson-datatype-jsr310-2.17.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\fasterxml\jackson\module\jackson-module-parameter-names\2.17.2\jackson-module-parameter-names-2.17.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-tomcat\3.3.4\spring-boot-starter-tomcat-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\apache\tomcat\embed\tomcat-embed-core\10.1.30\tomcat-embed-core-10.1.30.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.30\tomcat-embed-websocket-10.1.30.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-web\6.1.13\spring-web-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-beans\6.1.13\spring-beans-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-webmvc\6.1.13\spring-webmvc-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-aop\6.1.13\spring-aop-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-context\6.1.13\spring-context-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-expression\6.1.13\spring-expression-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-validation\3.3.4\spring-boot-starter-validation-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\apache\tomcat\embed\tomcat-embed-el\10.1.30\tomcat-embed-el-10.1.30.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\fasterxml\classmate\1.7.0\classmate-1.7.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-websocket\3.3.4\spring-boot-starter-websocket-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-messaging\6.1.13\spring-messaging-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-websocket\6.1.13\spring-websocket-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-actuator\3.3.4\spring-boot-starter-actuator-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-actuator-autoconfigure\3.3.4\spring-boot-actuator-autoconfigure-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-actuator\3.3.4\spring-boot-actuator-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\micrometer\micrometer-observation\1.13.4\micrometer-observation-1.13.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\micrometer\micrometer-commons\1.13.4\micrometer-commons-1.13.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\micrometer\micrometer-jakarta9\1.13.4\micrometer-jakarta9-1.13.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\micrometer\micrometer-core\1.13.4\micrometer-core-1.13.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\hdrhistogram\HdrHistogram\2.2.2\HdrHistogram-2.2.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\latencyutils\LatencyUtils\2.0.3\LatencyUtils-2.0.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\security\spring-security-crypto\6.3.3\spring-security-crypto-6.3.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\baomidou\mybatis-plus-spring-boot3-starter\3.5.7\mybatis-plus-spring-boot3-starter-3.5.7.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\baomidou\mybatis-plus\3.5.7\mybatis-plus-3.5.7.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\baomidou\mybatis-plus-core\3.5.7\mybatis-plus-core-3.5.7.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\baomidou\mybatis-plus-annotation\3.5.7\mybatis-plus-annotation-3.5.7.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\baomidou\mybatis-plus-extension\3.5.7\mybatis-plus-extension-3.5.7.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\mybatis\mybatis\3.5.16\mybatis-3.5.16.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\github\jsqlparser\jsqlparser\4.9\jsqlparser-4.9.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\mybatis\mybatis-spring\3.0.3\mybatis-spring-3.0.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\baomidou\mybatis-plus-spring-boot-autoconfigure\3.5.7\mybatis-plus-spring-boot-autoconfigure-3.5.7.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-autoconfigure\3.3.4\spring-boot-autoconfigure-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-jdbc\3.3.4\spring-boot-starter-jdbc-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\zaxxer\HikariCP\5.1.0\HikariCP-5.1.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-jdbc\6.1.13\spring-jdbc-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-tx\6.1.13\spring-tx-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\mysql\mysql-connector-j\8.3.0\mysql-connector-j-8.3.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\projectlombok\lombok\1.18.34\lombok-1.18.34.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\jsonwebtoken\jjwt-api\0.12.6\jjwt-api-0.12.6.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\jsonwebtoken\jjwt-impl\0.12.6\jjwt-impl-0.12.6.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\jsonwebtoken\jjwt-jackson\0.12.6\jjwt-jackson-0.12.6.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\fasterxml\jackson\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\fasterxml\jackson\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\fasterxml\jackson\core\jackson-core\2.17.2\jackson-core-2.17.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.6.0\springdoc-openapi-starter-webmvc-ui-2.6.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springdoc\springdoc-openapi-starter-webmvc-api\2.6.0\springdoc-openapi-starter-webmvc-api-2.6.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springdoc\springdoc-openapi-starter-common\2.6.0\springdoc-openapi-starter-common-2.6.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\swagger\core\v3\swagger-core-jakarta\2.2.22\swagger-core-jakarta-2.2.22.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\apache\commons\commons-lang3\3.14.0\commons-lang3-3.14.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\swagger\core\v3\swagger-annotations-jakarta\2.2.22\swagger-annotations-jakarta-2.2.22.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\swagger\core\v3\swagger-models-jakarta\2.2.22\swagger-models-jakarta-2.2.22.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.17.2\jackson-dataformat-yaml-2.17.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\webjars\swagger-ui\5.17.14\swagger-ui-5.17.14.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-test\3.3.4\spring-boot-starter-test-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-test\3.3.4\spring-boot-test-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-test-autoconfigure\3.3.4\spring-boot-test-autoconfigure-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\slf4j\slf4j-api\2.0.16\slf4j-api-2.0.16.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\net\minidev\json-smart\2.5.1\json-smart-2.5.1.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\net\minidev\accessors-smart\2.5.1\accessors-smart-2.5.1.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\ow2\asm\asm\9.6\asm-9.6.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\assertj\assertj-core\3.25.3\assertj-core-3.25.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\net\bytebuddy\byte-buddy\1.14.19\byte-buddy-1.14.19.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\awaitility\awaitility\4.2.2\awaitility-4.2.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\junit\jupiter\junit-jupiter\5.10.3\junit-jupiter-5.10.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\junit\jupiter\junit-jupiter-api\5.10.3\junit-jupiter-api-5.10.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\junit\platform\junit-platform-commons\1.10.3\junit-platform-commons-1.10.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\junit\jupiter\junit-jupiter-params\5.10.3\junit-jupiter-params-5.10.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\junit\jupiter\junit-jupiter-engine\5.10.3\junit-jupiter-engine-5.10.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\junit\platform\junit-platform-engine\1.10.3\junit-platform-engine-1.10.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\net\bytebuddy\byte-buddy-agent\1.14.19\byte-buddy-agent-1.14.19.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\mockito\mockito-junit-jupiter\5.11.0\mockito-junit-jupiter-5.11.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-core\6.1.13\spring-core-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-jcl\6.1.13\spring-jcl-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-test\6.1.13\spring-test-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\h2database\h2\2.2.224\h2-2.2.224.jar;"/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://java.oracle.com/"/>
+    <property name="user.timezone" value="GMT+08:00"/>
+    <property name="org.jboss.logging.provider" value="slf4j"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="17"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="CN"/>
+    <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-17\bin"/>
+    <property name="sun.java.command" value="C:\Users\29382\AppData\Local\Temp\surefire6998203991733448336\surefirebooter-20260827164118679_3.jar C:\Users\29382\AppData\Local\Temp\surefire6998203991733448336 2026-08-27T16-41-18_414-jvmRun1 surefire-20260827164118679_1tmp surefire_0-20260827164118679_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\target\test-classes;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\target\classes;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-web\3.3.4\spring-boot-starter-web-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter\3.3.4\spring-boot-starter-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot\3.3.4\spring-boot-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-logging\3.3.4\spring-boot-starter-logging-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\ch\qos\logback\logback-classic\1.5.8\logback-classic-1.5.8.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\ch\qos\logback\logback-core\1.5.8\logback-core-1.5.8.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\apache\logging\log4j\log4j-to-slf4j\2.23.1\log4j-to-slf4j-2.23.1.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\apache\logging\log4j\log4j-api\2.23.1\log4j-api-2.23.1.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\slf4j\jul-to-slf4j\2.0.16\jul-to-slf4j-2.0.16.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-json\3.3.4\spring-boot-starter-json-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.17.2\jackson-datatype-jdk8-2.17.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.17.2\jackson-datatype-jsr310-2.17.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\fasterxml\jackson\module\jackson-module-parameter-names\2.17.2\jackson-module-parameter-names-2.17.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-tomcat\3.3.4\spring-boot-starter-tomcat-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\apache\tomcat\embed\tomcat-embed-core\10.1.30\tomcat-embed-core-10.1.30.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.30\tomcat-embed-websocket-10.1.30.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-web\6.1.13\spring-web-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-beans\6.1.13\spring-beans-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-webmvc\6.1.13\spring-webmvc-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-aop\6.1.13\spring-aop-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-context\6.1.13\spring-context-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-expression\6.1.13\spring-expression-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-validation\3.3.4\spring-boot-starter-validation-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\apache\tomcat\embed\tomcat-embed-el\10.1.30\tomcat-embed-el-10.1.30.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\fasterxml\classmate\1.7.0\classmate-1.7.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-websocket\3.3.4\spring-boot-starter-websocket-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-messaging\6.1.13\spring-messaging-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-websocket\6.1.13\spring-websocket-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-actuator\3.3.4\spring-boot-starter-actuator-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-actuator-autoconfigure\3.3.4\spring-boot-actuator-autoconfigure-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-actuator\3.3.4\spring-boot-actuator-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\micrometer\micrometer-observation\1.13.4\micrometer-observation-1.13.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\micrometer\micrometer-commons\1.13.4\micrometer-commons-1.13.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\micrometer\micrometer-jakarta9\1.13.4\micrometer-jakarta9-1.13.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\micrometer\micrometer-core\1.13.4\micrometer-core-1.13.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\hdrhistogram\HdrHistogram\2.2.2\HdrHistogram-2.2.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\latencyutils\LatencyUtils\2.0.3\LatencyUtils-2.0.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\security\spring-security-crypto\6.3.3\spring-security-crypto-6.3.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\baomidou\mybatis-plus-spring-boot3-starter\3.5.7\mybatis-plus-spring-boot3-starter-3.5.7.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\baomidou\mybatis-plus\3.5.7\mybatis-plus-3.5.7.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\baomidou\mybatis-plus-core\3.5.7\mybatis-plus-core-3.5.7.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\baomidou\mybatis-plus-annotation\3.5.7\mybatis-plus-annotation-3.5.7.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\baomidou\mybatis-plus-extension\3.5.7\mybatis-plus-extension-3.5.7.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\mybatis\mybatis\3.5.16\mybatis-3.5.16.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\github\jsqlparser\jsqlparser\4.9\jsqlparser-4.9.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\mybatis\mybatis-spring\3.0.3\mybatis-spring-3.0.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\baomidou\mybatis-plus-spring-boot-autoconfigure\3.5.7\mybatis-plus-spring-boot-autoconfigure-3.5.7.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-autoconfigure\3.3.4\spring-boot-autoconfigure-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-jdbc\3.3.4\spring-boot-starter-jdbc-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\zaxxer\HikariCP\5.1.0\HikariCP-5.1.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-jdbc\6.1.13\spring-jdbc-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-tx\6.1.13\spring-tx-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\mysql\mysql-connector-j\8.3.0\mysql-connector-j-8.3.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\projectlombok\lombok\1.18.34\lombok-1.18.34.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\jsonwebtoken\jjwt-api\0.12.6\jjwt-api-0.12.6.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\jsonwebtoken\jjwt-impl\0.12.6\jjwt-impl-0.12.6.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\jsonwebtoken\jjwt-jackson\0.12.6\jjwt-jackson-0.12.6.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\fasterxml\jackson\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\fasterxml\jackson\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\fasterxml\jackson\core\jackson-core\2.17.2\jackson-core-2.17.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.6.0\springdoc-openapi-starter-webmvc-ui-2.6.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springdoc\springdoc-openapi-starter-webmvc-api\2.6.0\springdoc-openapi-starter-webmvc-api-2.6.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springdoc\springdoc-openapi-starter-common\2.6.0\springdoc-openapi-starter-common-2.6.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\swagger\core\v3\swagger-core-jakarta\2.2.22\swagger-core-jakarta-2.2.22.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\apache\commons\commons-lang3\3.14.0\commons-lang3-3.14.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\swagger\core\v3\swagger-annotations-jakarta\2.2.22\swagger-annotations-jakarta-2.2.22.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\io\swagger\core\v3\swagger-models-jakarta\2.2.22\swagger-models-jakarta-2.2.22.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.17.2\jackson-dataformat-yaml-2.17.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\webjars\swagger-ui\5.17.14\swagger-ui-5.17.14.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-starter-test\3.3.4\spring-boot-starter-test-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-test\3.3.4\spring-boot-test-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\boot\spring-boot-test-autoconfigure\3.3.4\spring-boot-test-autoconfigure-3.3.4.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\slf4j\slf4j-api\2.0.16\slf4j-api-2.0.16.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\net\minidev\json-smart\2.5.1\json-smart-2.5.1.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\net\minidev\accessors-smart\2.5.1\accessors-smart-2.5.1.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\ow2\asm\asm\9.6\asm-9.6.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\assertj\assertj-core\3.25.3\assertj-core-3.25.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\net\bytebuddy\byte-buddy\1.14.19\byte-buddy-1.14.19.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\awaitility\awaitility\4.2.2\awaitility-4.2.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\junit\jupiter\junit-jupiter\5.10.3\junit-jupiter-5.10.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\junit\jupiter\junit-jupiter-api\5.10.3\junit-jupiter-api-5.10.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\junit\platform\junit-platform-commons\1.10.3\junit-platform-commons-1.10.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\junit\jupiter\junit-jupiter-params\5.10.3\junit-jupiter-params-5.10.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\junit\jupiter\junit-jupiter-engine\5.10.3\junit-jupiter-engine-5.10.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\junit\platform\junit-platform-engine\1.10.3\junit-platform-engine-1.10.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\net\bytebuddy\byte-buddy-agent\1.14.19\byte-buddy-agent-1.14.19.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\mockito\mockito-junit-jupiter\5.11.0\mockito-junit-jupiter-5.11.0.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-core\6.1.13\spring-core-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-jcl\6.1.13\spring-jcl-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\springframework\spring-test\6.1.13\spring-test-6.1.13.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo\com\h2database\h2\2.2.224\h2-2.2.224.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\29382"/>
+    <property name="user.language" value="zh"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2023-04-18"/>
+    <property name="java.home" value="C:\Program Files\Java\jdk-17"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="FILE_LOG_CHARSET" value="GBK"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.reportNameSuffix" value="domain-c-uc12-20260827084105700"/>
+    <property name="surefire.real.class.path" value="C:\Users\29382\AppData\Local\Temp\surefire6998203991733448336\surefirebooter-20260827164118679_3.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="17.0.7+8-LTS-224"/>
+    <property name="user.name" value="29382"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="file.encoding" value="GBK"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="localRepository" value="C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo"/>
+    <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
+    <property name="java.io.tmpdir" value="C:\Users\29382\AppData\Local\Temp\"/>
+    <property name="com.zaxxer.hikari.pool_number" value="1"/>
+    <property name="java.version" value="17.0.7"/>
+    <property name="user.dir" value="C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend"/>
+    <property name="domain.c.tags" value="DOMAIN_C &amp; UC12"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="PID" value="41948"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="CONSOLE_LOG_CHARSET" value="GBK"/>
+    <property name="native.encoding" value="GBK"/>
+    <property name="java.library.path" value="C:\Program Files\Java\jdk-17\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Users\29382\.codex\tmp\arg0\codex-arg0ohAUs7;OpenSSH-Win64-v10.0.0.0;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\libnvvp;C:\Program Files (x86)\VMware\VMware Workstation\bin\;C:\windows;C:\Program Files\Java\jdk-17\bin;C:\Program Files\Java\jdk-17\jre\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\windows\system32;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;C:\Program Files\HP\OMEN-Broadcast\Common;C:\T\runtime\win64;C:\T\bin;D:\T\runtime\win64;D:\T\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA app\NvDLISR;C:\mingw64\bin;C:\Users\29382\Desktop\neo4j-community-5.15.0-windows (1)\neo4j-community-5.15.0\bin;C:\Program Files\dotnet\;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\Tencent\微信web开发者工具\dll;C:\Program Files\Git\cmd;C:\Program Files\Docker\Docker\resources\bin;C:\Users\29382\apache-maven-3.9.12\bin;C:\Program Files\nodejs\;C:\Program Files\nodejs\node_modules;C:\Users\29382\Desktop\anaconda3;C:\Users\29382\Desktop\anaconda3\Scripts;C:\Users\29382\Desktop\anaconda3\Library\bin;C:\Users\29382\Desktop\anaconda3\mingw-w64\bin;D:\MySQL\MySQL Server 8.0\bin;D:\Apache\apache-maven-3.9.14\bin;C:\Program Files\NVIDIA Corporation\Nsight Compute 2022.3.0\;D:\colmap-x64-windows-cuda\COLMAP.bat;C:\Users\29382\.local\bin;C:\Users\29382\miniconda3;C:\Users\29382\miniconda3\Library\mingw-w64\bin;C:\Users\29382\miniconda3\Library\usr\bin;C:\Users\29382\miniconda3\Library\bin;C:\Users\29382\miniconda3\Scripts;C:\Users\29382\AppData\Local\Programs\Python\Python313\Scripts\;C:\Users\29382\AppData\Local\Programs\Python\Python313\;C:\Users\29382\AppData\Local\Programs\Python\Launcher\;C:\Users\Public\TongYuan\julia-1.9.3\bin;C:\Program Files\MWORKS\Syslab 2024b\Bin\bin;C:\Users\29382\AppData\Local\Microsoft\WindowsApps;C:\Users\29382\AppData\Local\Programs\Microsoft VS Code\bin;C:\Program Files\Java\jdk-17\bin;C:\Program Files\Java\jdk-17\jre\bin;C:\Users\29382\.dotnet\tools;C:\Ollama;C:\Program Files\nodejs\node_global;C:\Users\29382\AppData\Local\Programs\cursor\resources\app\bin;C:\Users\29382\AppData\Local\Microsoft\WinGet\Packages\JohnMacFarlane.Pandoc_Microsoft.Winget.Source_8wekyb3d8bbwe\pandoc-3.9.0.2;;c:\Users\29382\.vscode\extensions\openai.chatgpt-26.818.61809-win32-x64\bin\windows-x86_64;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="java.vm.version" value="17.0.7+8-LTS-224"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="maven.repo.local" value="C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend\.m2repo"/>
+    <property name="java.class.version" value="61.0"/>
+    <property name="LOGGED_APPLICATION_NAME" value="[segroup8-platform] "/>
+  </properties>
+  <testcase name="coinPaymentDebitsExactlyPayableAmount_marksVoucherUsed_andPreservesSellerBalance" classname="com.segroup8.platform.integration.OrderPayCancelUc12IntegrationTest(domain-c-uc12-20260827084105700)" time="1.648">
+    <system-out><![CDATA[16:41:19.824 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.segroup8.platform.integration.OrderPayCancelUc12IntegrationTest]: OrderPayCancelUc12IntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+16:41:19.995 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.segroup8.platform.PlatformApplication for test class com.segroup8.platform.integration.OrderPayCancelUc12IntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-08-27T16:41:20.534+08:00  INFO 41948 --- [segroup8-platform] [           main] .s.p.i.OrderPayCancelUc12IntegrationTest : Starting OrderPayCancelUc12IntegrationTest using Java 17.0.7 with PID 41948 (started by 29382 in C:\Users\29382\Desktop\VSCode\software\SEGroup8\backend)
+2026-08-27T16:41:20.535+08:00  INFO 41948 --- [segroup8-platform] [           main] .s.p.i.OrderPayCancelUc12IntegrationTest : The following 1 profile is active: "test"
+Logging initialized using 'class org.apache.ibatis.logging.stdout.StdOutImpl' adapter.
+Get /172.24.192.1 network interface 
+Get network interface info: name:eth25 (Hyper-V Virtual Ethernet Adapter)
+Initialization Sequence datacenterId:18 workerId:25
+ _ _   |_  _ _|_. ___ _ |    _ 
+| | |\/|_)(_| | |_\  |_)||_|_\ 
+     /               |         
+                        3.5.7 
+2026-08-27T16:41:23.038+08:00  INFO 41948 --- [segroup8-platform] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-27T16:41:23.309+08:00  INFO 41948 --- [segroup8-platform] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:segroup8_test user=SA
+2026-08-27T16:41:23.313+08:00  INFO 41948 --- [segroup8-platform] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-27T16:41:25.774+08:00  INFO 41948 --- [segroup8-platform] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-27T16:41:25.775+08:00  INFO 41948 --- [segroup8-platform] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-27T16:41:25.781+08:00  INFO 41948 --- [segroup8-platform] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoints beneath base path '/actuator'
+2026-08-27T16:41:25.793+08:00  INFO 41948 --- [segroup8-platform] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 18 ms
+2026-08-27T16:41:25.889+08:00  INFO 41948 --- [segroup8-platform] [           main] .s.p.i.OrderPayCancelUc12IntegrationTest : Started OrderPayCancelUc12IntegrationTest in 5.722 seconds (process running for 7.086)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@252ac9b3] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@745028261 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: DELETE FROM idempotency_record WHERE (expire_time < ?)
+==> Parameters: 2026-08-27T16:41:25.903063400(LocalDateTime)
+<==    Updates: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@252ac9b3]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f0f56f5] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@141574460 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1201(Long), POST(String), /api/order/1201/pay(String), uc12-pay(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f0f56f5]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@75ff2b6d] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1652339693 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1201(Long), POST(String), /api/order/1201/pay(String), uc12-pay(String), 0(Integer), 2026-08-27T16:41:37.292032500(LocalDateTime), 2026-08-27T16:41:27.292032500(LocalDateTime), 2026-08-27T16:41:27.292032500(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@75ff2b6d]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76]
+JDBC Connection [HikariProxyConnection@1660570248 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 1201, UC12-PAY-COIN, 1201, 100.00, 0, 0, 0, null, null, Buyer, null, null, null, null, null, null, null, 2026-08-27 16:41:26.054702, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1201, 20.00, 20.00, 0.00, 80.00, 0, 2026-08-27 16:41:26.054702
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?) ORDER BY id ASC
+==> Parameters: 1201(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 2, 1201, NEW, 1201, UC12 Product, 100.00, 1, 0, 2026-08-27 16:41:26.05634, 2026-08-27 16:41:26.05634
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76] from current transaction
+==>  Preparing: SELECT user_id,personal_balance,business_balance,version,create_time,update_time FROM balance WHERE user_id=?
+==> Parameters: 1201(Long)
+<==    Columns: user_id, personal_balance, business_balance, version, create_time, update_time
+<==        Row: 1201, 300.00, 0.00, 0, 2026-08-27 16:41:26.046771, 2026-08-27 16:41:26.046771
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76] from current transaction
+==>  Preparing: UPDATE balance SET personal_balance=?,business_balance=?,version = version + 1 WHERE (user_id = ? AND version = ?)
+==> Parameters: 220.00(BigDecimal), 0.00(BigDecimal), 1201(Long), 0(Integer)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76] from current transaction
+==>  Preparing: INSERT INTO transaction_record ( order_id, user_id, account_type, change_type, trade_type, amount, balance_after, remark, create_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1201(Long), 1201(Long), PERSONAL(String), COIN_PAY(String), EXPENSE_PURCHASE(String), -80.00(BigDecimal), 220.00(BigDecimal), 商城币支付订单(String), 2026-08-27T16:41:27.415781500(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76] from current transaction
+==>  Preparing: UPDATE order_info SET pay_status=?,paid_time=?,pay_method=?,order_status=?,version = version + 1 WHERE (id = ? AND buyer_user_id = ? AND order_status = ? AND version = ?)
+==> Parameters: 1(Integer), 2026-08-27T16:41:27.405580500(LocalDateTime), 商城币支付(String), 1(Integer), 1201(Long), 1201(Long), 0(Integer), 0(Integer)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76] from current transaction
+==>  Preparing: UPDATE user_voucher SET status=?,used_time=?,update_time=? WHERE (user_id = ? AND voucher_id = ? AND status = ? AND used_order_id = ?)
+==> Parameters: 2(Integer), 2026-08-27T16:41:27.420828600(LocalDateTime), 2026-08-27T16:41:27.420828600(LocalDateTime), 1201(Long), 1201(Long), 1(Integer), 1201(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76] from current transaction
+==>  Preparing: UPDATE voucher SET used_count = COALESCE(used_count, 0) + 1 WHERE (id = ?)
+==> Parameters: 1201(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76] from current transaction
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1201, 1201, UC12 Product, null, null, null, 100.00, null, null, 20, 1, 2026-08-27 16:41:26.046188, 2026-08-27 16:41:26.046188
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1201, 1203, UC12 Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?)
+==> Parameters: 1201(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 2, 1201, NEW, 1201, UC12 Product, 100.00, 1, 0, 2026-08-27 16:41:26.05634, 2026-08-27 16:41:26.05634
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76] from current transaction
+==>  Preparing: INSERT INTO notification ( user_id, title, content, target_path, is_read, create_time ) VALUES ( ?, ?, ?, ?, ?, ? )
+==> Parameters: 1203(Long), 新订单已支付(String), 订单号：UC12-PAY-COIN，买家已完成支付，请及时发货。(String), /merchant/orders/1201(String), 0(Integer), 2026-08-27T16:41:27.454204100(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f239a76]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4c682826] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1950815744 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: UPDATE idempotency_record SET status=?,http_status=?,response_body=?,update_time=? WHERE (id = ?)
+==> Parameters: 1(Integer), 200(Integer), {"code":0,"message":"success","data":{"id":1201,"orderNo":"UC12-PAY-COIN","buyerUserId":1201,"totalAmount":100.00,"payStatus":1,"orderStatus":1,"orderStatusName":"待发货","refundStatus":0,"refundStatusName":"无","refundReason":null,"refundProofUrls":null,"receiverName":"Buyer","receiverPhone":null,"receiverProvince":null,"receiverCity":null,"receiverDetailAddress":null,"payMethod":"商城币支付","deliveryNo":null,"remark":null,"tradeMode":"邮寄","createTime":"2026-08-27T16:41:26.054702","paidTime":"2026-08-27T16:41:27.4055805","shippedTime":null,"receivedTime":null,"completedTime":null,"closedTime":null,"refundApplyTime":null,"refundDecisionTime":null,"refundDecisionUserId":null,"refundDecisionUserName":null,"refundDecisionRemark":null,"refundDecisionSource":null,"logisticsTemplateId":null,"logisticsStatus":null,"logisticsCurrentIndex":null,"canRefund":1,"afterSalesDeadline":null,"deliveryTime":null,"arrivalTime":null,"autoConfirmDeadline":null,"refundMode":null,"voucherId":1201,"voucherDiscountAmount":20.00,"sellerBearAmount":20.00,"platformBearAmount":0.00,"payableAmount":80.00,"items":[{"id":2,"productId":1201,"sellerUserId":null,"sellerName":null,"productName":"UC12 Product","productType":"NEW","conditionLevel":null,"price":100.00,"quantity":1}]}}(String), 2026-08-27T16:41:27.486471900(LocalDateTime), 1(Long)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4c682826]
+2026-08-27T16:41:27.493+08:00  INFO 41948 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=8d5eb18be60d48349db3081235696e85 method=POST path=/api/order/1201/pay status=200
+]]></system-out>
+  </testcase>
+  <testcase name="nonBuyerCannotPayOrCancel_andNoStateChanges" classname="com.segroup8.platform.integration.OrderPayCancelUc12IntegrationTest(domain-c-uc12-20260827084105700)" time="0.045">
+    <system-out><![CDATA[Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@797c67c] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@835594012 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1202(Long), POST(String), /api/order/1206/pay(String), uc12-other-pay(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@797c67c]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3f523dae] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@2145651615 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1202(Long), POST(String), /api/order/1206/pay(String), uc12-other-pay(String), 0(Integer), 2026-08-27T16:41:37.666731200(LocalDateTime), 2026-08-27T16:41:27.666731200(LocalDateTime), 2026-08-27T16:41:27.666731200(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3f523dae]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1f41f259]
+JDBC Connection [HikariProxyConnection@1251831481 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 1206(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 1206, UC12-IDEMPOTENT-PAY, 1201, 60.00, 0, 0, 0, null, null, Buyer, null, null, null, null, null, null, null, 2026-08-27 16:41:27.658322, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.00, 0.00, 0.00, 60.00, 0, 2026-08-27 16:41:27.658322
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1f41f259]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1f41f259]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1f41f259]
+2026-08-27T16:41:27.680+08:00  INFO 41948 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=fab62617cf4f4432a6dca375eb484817 method=POST path=/api/order/1206/pay status=200
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36995784] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1490885900 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1202(Long), POST(String), /api/order/1207/cancel(String), uc12-other-cancel(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36995784]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4101e146] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1896132887 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1202(Long), POST(String), /api/order/1207/cancel(String), uc12-other-cancel(String), 0(Integer), 2026-08-27T16:41:37.685992600(LocalDateTime), 2026-08-27T16:41:27.685992600(LocalDateTime), 2026-08-27T16:41:27.685992600(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4101e146]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@421c057a]
+JDBC Connection [HikariProxyConnection@692315676 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 1207(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 1207, UC12-IDEMPOTENT-CANCEL, 1201, 40.00, 0, 0, 0, null, null, Buyer, null, null, null, null, null, null, null, 2026-08-27 16:41:27.658322, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.00, 0.00, 0.00, 40.00, 0, 2026-08-27 16:41:27.658322
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@421c057a]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@421c057a]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@421c057a]
+2026-08-27T16:41:27.693+08:00  INFO 41948 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=31e97e9e6c7d4451a13b56bcdbc5eee2 method=POST path=/api/order/1207/cancel status=200
+]]></system-out>
+  </testcase>
+  <testcase name="duplicatePaymentAndCancellationReplayWithoutDuplicateSideEffects" classname="com.segroup8.platform.integration.OrderPayCancelUc12IntegrationTest(domain-c-uc12-20260827084105700)" time="0.094">
+    <system-out><![CDATA[Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7fecc26f] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1076550812 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1201(Long), POST(String), /api/order/1206/pay(String), uc12-pay-replay(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7fecc26f]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@70313b0b] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1570860758 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1201(Long), POST(String), /api/order/1206/pay(String), uc12-pay-replay(String), 0(Integer), 2026-08-27T16:41:37.715234200(LocalDateTime), 2026-08-27T16:41:27.715234200(LocalDateTime), 2026-08-27T16:41:27.715234200(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@70313b0b]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7]
+JDBC Connection [HikariProxyConnection@730815140 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 1206(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 1206, UC12-IDEMPOTENT-PAY, 1201, 60.00, 0, 0, 0, null, null, Buyer, null, null, null, null, null, null, null, 2026-08-27 16:41:27.705552, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.00, 0.00, 0.00, 60.00, 0, 2026-08-27 16:41:27.705552
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?) ORDER BY id ASC
+==> Parameters: 1206(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 23, 1206, NEW, 1201, UC12 Product, 60.00, 1, 0, 2026-08-27 16:41:27.705552, 2026-08-27 16:41:27.705552
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7] from current transaction
+==>  Preparing: SELECT user_id,personal_balance,business_balance,version,create_time,update_time FROM balance WHERE user_id=?
+==> Parameters: 1201(Long)
+<==    Columns: user_id, personal_balance, business_balance, version, create_time, update_time
+<==        Row: 1201, 300.00, 0.00, 0, 2026-08-27 16:41:27.704553, 2026-08-27 16:41:27.704553
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7] from current transaction
+==>  Preparing: UPDATE balance SET personal_balance=?,business_balance=?,version = version + 1 WHERE (user_id = ? AND version = ?)
+==> Parameters: 240.00(BigDecimal), 0.00(BigDecimal), 1201(Long), 0(Integer)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7] from current transaction
+==>  Preparing: INSERT INTO transaction_record ( order_id, user_id, account_type, change_type, trade_type, amount, balance_after, remark, create_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1206(Long), 1201(Long), PERSONAL(String), COIN_PAY(String), EXPENSE_PURCHASE(String), -60.00(BigDecimal), 240.00(BigDecimal), 商城币支付订单(String), 2026-08-27T16:41:27.725015200(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7] from current transaction
+==>  Preparing: UPDATE order_info SET pay_status=?,paid_time=?,pay_method=?,order_status=?,version = version + 1 WHERE (id = ? AND buyer_user_id = ? AND order_status = ? AND version = ?)
+==> Parameters: 1(Integer), 2026-08-27T16:41:27.723021400(LocalDateTime), 商城币支付(String), 1(Integer), 1206(Long), 1201(Long), 0(Integer), 0(Integer)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7] from current transaction
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1201, 1201, UC12 Product, null, null, null, 100.00, null, null, 20, 1, 2026-08-27 16:41:27.704553, 2026-08-27 16:41:27.704553
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1201, 1203, UC12 Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?)
+==> Parameters: 1206(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 23, 1206, NEW, 1201, UC12 Product, 60.00, 1, 0, 2026-08-27 16:41:27.705552, 2026-08-27 16:41:27.705552
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7] from current transaction
+==>  Preparing: INSERT INTO notification ( user_id, title, content, target_path, is_read, create_time ) VALUES ( ?, ?, ?, ?, ?, ? )
+==> Parameters: 1203(Long), 新订单已支付(String), 订单号：UC12-IDEMPOTENT-PAY，买家已完成支付，请及时发货。(String), /merchant/orders/1206(String), 0(Integer), 2026-08-27T16:41:27.738374300(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@444720b7]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2d0ce8a1] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1721207829 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: UPDATE idempotency_record SET status=?,http_status=?,response_body=?,update_time=? WHERE (id = ?)
+==> Parameters: 1(Integer), 200(Integer), {"code":0,"message":"success","data":{"id":1206,"orderNo":"UC12-IDEMPOTENT-PAY","buyerUserId":1201,"totalAmount":60.00,"payStatus":1,"orderStatus":1,"orderStatusName":"待发货","refundStatus":0,"refundStatusName":"无","refundReason":null,"refundProofUrls":null,"receiverName":"Buyer","receiverPhone":null,"receiverProvince":null,"receiverCity":null,"receiverDetailAddress":null,"payMethod":"商城币支付","deliveryNo":null,"remark":null,"tradeMode":"邮寄","createTime":"2026-08-27T16:41:27.705552","paidTime":"2026-08-27T16:41:27.7230214","shippedTime":null,"receivedTime":null,"completedTime":null,"closedTime":null,"refundApplyTime":null,"refundDecisionTime":null,"refundDecisionUserId":null,"refundDecisionUserName":null,"refundDecisionRemark":null,"refundDecisionSource":null,"logisticsTemplateId":null,"logisticsStatus":null,"logisticsCurrentIndex":null,"canRefund":1,"afterSalesDeadline":null,"deliveryTime":null,"arrivalTime":null,"autoConfirmDeadline":null,"refundMode":null,"voucherId":null,"voucherDiscountAmount":0.00,"sellerBearAmount":0.00,"platformBearAmount":0.00,"payableAmount":60.00,"items":[{"id":23,"productId":1201,"sellerUserId":null,"sellerName":null,"productName":"UC12 Product","productType":"NEW","conditionLevel":null,"price":60.00,"quantity":1}]}}(String), 2026-08-27T16:41:27.742485400(LocalDateTime), 4(Long)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2d0ce8a1]
+2026-08-27T16:41:27.745+08:00  INFO 41948 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=145a8be4bfd24ff1b9cd76683fc99949 method=POST path=/api/order/1206/pay status=200
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6c2a7c73] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@987666875 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1201(Long), POST(String), /api/order/1206/pay(String), uc12-pay-replay(String)
+<==    Columns: id, user_id, request_method, request_path, idempotency_key, status, http_status, response_body, expire_time, create_time, update_time
+<==        Row: 4, 1201, POST, /api/order/1206/pay, uc12-pay-replay, 1, 200, {"code":0,"message":"success","data":{"id":1206,"orderNo":"UC12-IDEMPOTENT-PAY","buyerUserId":1201,"totalAmount":60.00,"payStatus":1,"orderStatus":1,"orderStatusName":"待发货","refundStatus":0,"refundStatusName":"无","refundReason":null,"refundProofUrls":null,"receiverName":"Buyer","receiverPhone":null,"receiverProvince":null,"receiverCity":null,"receiverDetailAddress":null,"payMethod":"商城币支付","deliveryNo":null,"remark":null,"tradeMode":"邮寄","createTime":"2026-08-27T16:41:27.705552","paidTime":"2026-08-27T16:41:27.7230214","shippedTime":null,"receivedTime":null,"completedTime":null,"closedTime":null,"refundApplyTime":null,"refundDecisionTime":null,"refundDecisionUserId":null,"refundDecisionUserName":null,"refundDecisionRemark":null,"refundDecisionSource":null,"logisticsTemplateId":null,"logisticsStatus":null,"logisticsCurrentIndex":null,"canRefund":1,"afterSalesDeadline":null,"deliveryTime":null,"arrivalTime":null,"autoConfirmDeadline":null,"refundMode":null,"voucherId":null,"voucherDiscountAmount":0.00,"sellerBearAmount":0.00,"platformBearAmount":0.00,"payableAmount":60.00,"items":[{"id":23,"productId":1201,"sellerUserId":null,"sellerName":null,"productName":"UC12 Product","productType":"NEW","conditionLevel":null,"price":60.00,"quantity":1}]}}, 2026-08-27 16:41:37.715234, 2026-08-27 16:41:27.715234, 2026-08-27 16:41:27.742485
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6c2a7c73]
+2026-08-27T16:41:27.751+08:00  INFO 41948 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=06c9316502584e109fd7be2b56792c7c method=POST path=/api/order/1206/pay status=200
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7c9b0c16] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@887210557 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1201(Long), POST(String), /api/order/1207/cancel(String), uc12-cancel-replay(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7c9b0c16]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@240fa4ad] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1337181808 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1201(Long), POST(String), /api/order/1207/cancel(String), uc12-cancel-replay(String), 0(Integer), 2026-08-27T16:41:37.759109100(LocalDateTime), 2026-08-27T16:41:27.759109100(LocalDateTime), 2026-08-27T16:41:27.759109100(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@240fa4ad]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+JDBC Connection [HikariProxyConnection@1453763291 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 1207(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 1207, UC12-IDEMPOTENT-CANCEL, 1201, 40.00, 0, 0, 0, null, null, Buyer, null, null, null, null, null, null, null, 2026-08-27 16:41:27.705552, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.00, 0.00, 0.00, 40.00, 0, 2026-08-27 16:41:27.705552
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303] from current transaction
+==>  Preparing: UPDATE order_info SET order_status=?,closed_time=?,version = version + 1 WHERE (id = ? AND buyer_user_id = ? AND order_status IN (?,?,?,?) AND version = ?)
+==> Parameters: 9(Integer), 2026-08-27T16:41:27.762819800(LocalDateTime), 1207(Long), 1201(Long), 0(Integer), 1(Integer), 2(Integer), 3(Integer), 0(Integer)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?)
+==> Parameters: 1207(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 24, 1207, NEW, 1201, UC12 Product, 40.00, 2, 0, 2026-08-27 16:41:27.705552, 2026-08-27 16:41:27.705552
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303] from current transaction
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1201, 1201, UC12 Product, null, null, null, 100.00, null, null, 20, 1, 2026-08-27 16:41:27.704553, 2026-08-27 16:41:27.704553
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303] from current transaction
+==>  Preparing: UPDATE product SET shop_id=?, name=?, price=?, stock=?, status=?, create_time=?, update_time=? WHERE id=?
+==> Parameters: 1201(Long), UC12 Product(String), 100.00(BigDecimal), 22(Integer), 1(Integer), 2026-08-27T16:41:27.704553(LocalDateTime), 2026-08-27T16:41:27.704553(LocalDateTime), 1201(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?)
+==> Parameters: 1207(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 24, 1207, NEW, 1201, UC12 Product, 40.00, 2, 0, 2026-08-27 16:41:27.705552, 2026-08-27 16:41:27.705552
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303] from current transaction
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1201, 1201, UC12 Product, null, null, null, 100.00, null, null, 22, 1, 2026-08-27 16:41:27.704553, 2026-08-27 16:41:27.704553
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1201, 1203, UC12 Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303] from current transaction
+==>  Preparing: INSERT INTO notification ( user_id, title, content, target_path, is_read, create_time ) VALUES ( ?, ?, ?, ?, ?, ? )
+==> Parameters: 1203(Long), 订单已取消(String), 订单号：UC12-IDEMPOTENT-CANCEL，买家已取消订单。(String), /merchant/orders/1207(String), 0(Integer), 2026-08-27T16:41:27.776056700(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303] from current transaction
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 1207(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 1207, UC12-IDEMPOTENT-CANCEL, 1201, 40.00, 0, 9, 0, null, null, Buyer, null, null, null, null, null, null, null, 2026-08-27 16:41:27.705552, null, null, null, null, 2026-08-27 16:41:27.76282, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.00, 0.00, 0.00, 40.00, 1, 2026-08-27 16:41:27.705552
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?) ORDER BY id ASC
+==> Parameters: 1207(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 24, 1207, NEW, 1201, UC12 Product, 40.00, 2, 0, 2026-08-27 16:41:27.705552, 2026-08-27 16:41:27.705552
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303] from current transaction
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1201, 1201, UC12 Product, null, null, null, 100.00, null, null, 22, 1, 2026-08-27 16:41:27.704553, 2026-08-27 16:41:27.704553
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1201, 1203, UC12 Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@8d5b303]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7322013f] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@407404434 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: UPDATE idempotency_record SET status=?,http_status=?,response_body=?,update_time=? WHERE (id = ?)
+==> Parameters: 1(Integer), 200(Integer), {"code":0,"message":"success","data":{"id":1207,"orderNo":"UC12-IDEMPOTENT-CANCEL","buyerUserId":1201,"totalAmount":40.00,"payStatus":0,"orderStatus":9,"orderStatusName":"已关闭","refundStatus":0,"refundStatusName":"无","refundReason":null,"refundProofUrls":null,"receiverName":"Buyer","receiverPhone":null,"receiverProvince":null,"receiverCity":null,"receiverDetailAddress":null,"payMethod":null,"deliveryNo":null,"remark":null,"tradeMode":"邮寄","createTime":"2026-08-27T16:41:27.705552","paidTime":null,"shippedTime":null,"receivedTime":null,"completedTime":null,"closedTime":"2026-08-27T16:41:27.76282","refundApplyTime":null,"refundDecisionTime":null,"refundDecisionUserId":null,"refundDecisionUserName":null,"refundDecisionRemark":null,"refundDecisionSource":null,"logisticsTemplateId":null,"logisticsStatus":null,"logisticsCurrentIndex":null,"canRefund":1,"afterSalesDeadline":null,"deliveryTime":null,"arrivalTime":null,"autoConfirmDeadline":null,"refundMode":null,"voucherId":null,"voucherDiscountAmount":0.00,"sellerBearAmount":0.00,"platformBearAmount":0.00,"payableAmount":40.00,"items":[{"id":24,"productId":1201,"sellerUserId":null,"sellerName":null,"productName":"UC12 Product","productType":"NEW","conditionLevel":null,"price":40.00,"quantity":2}]}}(String), 2026-08-27T16:41:27.783034200(LocalDateTime), 5(Long)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7322013f]
+2026-08-27T16:41:27.785+08:00  INFO 41948 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=cef7136d54bf4f66b74b66dc216e99db method=POST path=/api/order/1207/cancel status=200
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@252f00ba] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1181206233 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1201(Long), POST(String), /api/order/1207/cancel(String), uc12-cancel-replay(String)
+<==    Columns: id, user_id, request_method, request_path, idempotency_key, status, http_status, response_body, expire_time, create_time, update_time
+<==        Row: 5, 1201, POST, /api/order/1207/cancel, uc12-cancel-replay, 1, 200, {"code":0,"message":"success","data":{"id":1207,"orderNo":"UC12-IDEMPOTENT-CANCEL","buyerUserId":1201,"totalAmount":40.00,"payStatus":0,"orderStatus":9,"orderStatusName":"已关闭","refundStatus":0,"refundStatusName":"无","refundReason":null,"refundProofUrls":null,"receiverName":"Buyer","receiverPhone":null,"receiverProvince":null,"receiverCity":null,"receiverDetailAddress":null,"payMethod":null,"deliveryNo":null,"remark":null,"tradeMode":"邮寄","createTime":"2026-08-27T16:41:27.705552","paidTime":null,"shippedTime":null,"receivedTime":null,"completedTime":null,"closedTime":"2026-08-27T16:41:27.76282","refundApplyTime":null,"refundDecisionTime":null,"refundDecisionUserId":null,"refundDecisionUserName":null,"refundDecisionRemark":null,"refundDecisionSource":null,"logisticsTemplateId":null,"logisticsStatus":null,"logisticsCurrentIndex":null,"canRefund":1,"afterSalesDeadline":null,"deliveryTime":null,"arrivalTime":null,"autoConfirmDeadline":null,"refundMode":null,"voucherId":null,"voucherDiscountAmount":0.00,"sellerBearAmount":0.00,"platformBearAmount":0.00,"payableAmount":40.00,"items":[{"id":24,"productId":1201,"sellerUserId":null,"sellerName":null,"productName":"UC12 Product","productType":"NEW","conditionLevel":null,"price":40.00,"quantity":2}]}}, 2026-08-27 16:41:37.759109, 2026-08-27 16:41:27.759109, 2026-08-27 16:41:27.783034
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@252f00ba]
+2026-08-27T16:41:27.788+08:00  INFO 41948 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=e24b3f2f9eba4713b32f9ccbe2070fba method=POST path=/api/order/1207/cancel status=200
+]]></system-out>
+  </testcase>
+  <testcase name="concurrentPayAndCancelAllowsAtMostOneBusinessSideEffect" classname="com.segroup8.platform.integration.OrderPayCancelUc12IntegrationTest(domain-c-uc12-20260827084105700)" time="0.047">
+    <system-out><![CDATA[Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@19d13de4] was not registered for synchronization because synchronization is not active
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@14c9cf5] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1434885014 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+JDBC Connection [HikariProxyConnection@27805109 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1201(Long), POST(String), /api/order/1208/pay(String), uc12-race-pay(String)
+==> Parameters: 1201(Long), POST(String), /api/order/1208/cancel(String), uc12-race-cancel(String)
+<==      Total: 0
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@14c9cf5]
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@19d13de4]
+Creating a new SqlSession
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@30480ee7] was not registered for synchronization because synchronization is not active
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c3c890] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@822508499 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+JDBC Connection [HikariProxyConnection@1439071641 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1201(Long), POST(String), /api/order/1208/cancel(String), uc12-race-cancel(String), 0(Integer), 2026-08-27T16:41:37.818600600(LocalDateTime), 2026-08-27T16:41:27.818600600(LocalDateTime), 2026-08-27T16:41:27.818600600(LocalDateTime)
+==> Parameters: 1201(Long), POST(String), /api/order/1208/pay(String), uc12-race-pay(String), 0(Integer), 2026-08-27T16:41:37.818600600(LocalDateTime), 2026-08-27T16:41:27.818600600(LocalDateTime), 2026-08-27T16:41:27.818600600(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@30480ee7]
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c3c890]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+JDBC Connection [HikariProxyConnection@1897035191 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@740ea33d]
+==> Parameters: 1208(Long)
+JDBC Connection [HikariProxyConnection@1400777184 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+==> Parameters: 1208(Long)
+<==        Row: 1208, UC12-PAY-CANCEL-RACE, 1201, 30.00, 0, 0, 0, null, null, Buyer, null, null, null, null, null, null, null, 2026-08-27 16:41:27.800401, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.00, 0.00, 0.00, 30.00, 0, 2026-08-27 16:41:27.800401
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 1208, UC12-PAY-CANCEL-RACE, 1201, 30.00, 0, 0, 0, null, null, Buyer, null, null, null, null, null, null, null, 2026-08-27 16:41:27.800401, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.00, 0.00, 0.00, 30.00, 0, 2026-08-27 16:41:27.800401
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@740ea33d]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@740ea33d] from current transaction
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?) ORDER BY id ASC
+==>  Preparing: UPDATE order_info SET order_status=?,closed_time=?,version = version + 1 WHERE (id = ? AND buyer_user_id = ? AND order_status IN (?,?,?,?) AND version = ?)
+==> Parameters: 1208(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 33, 1208, NEW, 1201, UC12 Product, 30.00, 1, 0, 2026-08-27 16:41:27.802065, 2026-08-27 16:41:27.802065
+==> Parameters: 9(Integer), 2026-08-27T16:41:27.825094900(LocalDateTime), 1208(Long), 1201(Long), 0(Integer), 1(Integer), 2(Integer), 3(Integer), 0(Integer)
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@740ea33d]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@740ea33d] from current transaction
+==>  Preparing: SELECT user_id,personal_balance,business_balance,version,create_time,update_time FROM balance WHERE user_id=?
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf] from current transaction
+==> Parameters: 1201(Long)
+<==    Columns: user_id, personal_balance, business_balance, version, create_time, update_time
+<==        Row: 1201, 300.00, 0.00, 0, 2026-08-27 16:41:27.799372, 2026-08-27 16:41:27.799372
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?)
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@740ea33d]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@740ea33d] from current transaction
+==> Parameters: 1208(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 33, 1208, NEW, 1201, UC12 Product, 30.00, 1, 0, 2026-08-27 16:41:27.802065, 2026-08-27 16:41:27.802065
+==>  Preparing: UPDATE balance SET personal_balance=?,business_balance=?,version = version + 1 WHERE (user_id = ? AND version = ?)
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf] from current transaction
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 270.00(BigDecimal), 0.00(BigDecimal), 1201(Long), 0(Integer)
+==> Parameters: 1201(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@740ea33d]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@740ea33d] from current transaction
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1201, 1201, UC12 Product, null, null, null, 100.00, null, null, 20, 1, 2026-08-27 16:41:27.798371, 2026-08-27 16:41:27.798371
+<==      Total: 1
+==>  Preparing: INSERT INTO transaction_record ( order_id, user_id, account_type, change_type, trade_type, amount, balance_after, remark, create_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ? )
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf] from current transaction
+==> Parameters: 1208(Long), 1201(Long), PERSONAL(String), COIN_PAY(String), EXPENSE_PURCHASE(String), -30.00(BigDecimal), 270.00(BigDecimal), 商城币支付订单(String), 2026-08-27T16:41:27.827115400(LocalDateTime)
+==>  Preparing: UPDATE product SET shop_id=?, name=?, price=?, stock=?, status=?, create_time=?, update_time=? WHERE id=?
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@740ea33d]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@740ea33d] from current transaction
+==>  Preparing: UPDATE order_info SET pay_status=?,paid_time=?,pay_method=?,order_status=?,version = version + 1 WHERE (id = ? AND buyer_user_id = ? AND order_status = ? AND version = ?)
+==> Parameters: 1201(Long), UC12 Product(String), 100.00(BigDecimal), 21(Integer), 1(Integer), 2026-08-27T16:41:27.798371(LocalDateTime), 2026-08-27T16:41:27.798371(LocalDateTime), 1201(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf] from current transaction
+==> Parameters: 1(Integer), 2026-08-27T16:41:27.826100100(LocalDateTime), 商城币支付(String), 1(Integer), 1208(Long), 1201(Long), 0(Integer), 0(Integer)
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?)
+==> Parameters: 1208(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 33, 1208, NEW, 1201, UC12 Product, 30.00, 1, 0, 2026-08-27 16:41:27.802065, 2026-08-27 16:41:27.802065
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf] from current transaction
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1201, 1201, UC12 Product, null, null, null, 100.00, null, null, 21, 1, 2026-08-27 16:41:27.798371, 2026-08-27 16:41:27.798371
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1201, 1203, UC12 Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf] from current transaction
+==>  Preparing: INSERT INTO notification ( user_id, title, content, target_path, is_read, create_time ) VALUES ( ?, ?, ?, ?, ?, ? )
+==> Parameters: 1203(Long), 订单已取消(String), 订单号：UC12-PAY-CANCEL-RACE，买家已取消订单。(String), /merchant/orders/1208(String), 0(Integer), 2026-08-27T16:41:27.830106500(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf] from current transaction
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 1208(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 1208, UC12-PAY-CANCEL-RACE, 1201, 30.00, 0, 9, 0, null, null, Buyer, null, null, null, null, null, null, null, 2026-08-27 16:41:27.800401, null, null, null, null, 2026-08-27 16:41:27.825095, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.00, 0.00, 0.00, 30.00, 1, 2026-08-27 16:41:27.800401
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?) ORDER BY id ASC
+==> Parameters: 1208(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 33, 1208, NEW, 1201, UC12 Product, 30.00, 1, 0, 2026-08-27 16:41:27.802065, 2026-08-27 16:41:27.802065
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf] from current transaction
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1201, 1201, UC12 Product, null, null, null, 100.00, null, null, 21, 1, 2026-08-27 16:41:27.798371, 2026-08-27 16:41:27.798371
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1201, 1203, UC12 Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@683150bf]
+<==    Updates: 0
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@740ea33d]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@740ea33d]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@740ea33d]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@16b5263e] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@423895318 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: UPDATE idempotency_record SET status=?,http_status=?,response_body=?,update_time=? WHERE (id = ?)
+==> Parameters: 1(Integer), 200(Integer), {"code":0,"message":"success","data":{"id":1208,"orderNo":"UC12-PAY-CANCEL-RACE","buyerUserId":1201,"totalAmount":30.00,"payStatus":0,"orderStatus":9,"orderStatusName":"已关闭","refundStatus":0,"refundStatusName":"无","refundReason":null,"refundProofUrls":null,"receiverName":"Buyer","receiverPhone":null,"receiverProvince":null,"receiverCity":null,"receiverDetailAddress":null,"payMethod":null,"deliveryNo":null,"remark":null,"tradeMode":"邮寄","createTime":"2026-08-27T16:41:27.800401","paidTime":null,"shippedTime":null,"receivedTime":null,"completedTime":null,"closedTime":"2026-08-27T16:41:27.825095","refundApplyTime":null,"refundDecisionTime":null,"refundDecisionUserId":null,"refundDecisionUserName":null,"refundDecisionRemark":null,"refundDecisionSource":null,"logisticsTemplateId":null,"logisticsStatus":null,"logisticsCurrentIndex":null,"canRefund":1,"afterSalesDeadline":null,"deliveryTime":null,"arrivalTime":null,"autoConfirmDeadline":null,"refundMode":null,"voucherId":null,"voucherDiscountAmount":0.00,"sellerBearAmount":0.00,"platformBearAmount":0.00,"payableAmount":30.00,"items":[{"id":33,"productId":1201,"sellerUserId":null,"sellerName":null,"productName":"UC12 Product","productType":"NEW","conditionLevel":null,"price":30.00,"quantity":1}]}}(String), 2026-08-27T16:41:27.832820600(LocalDateTime), 6(Long)
+2026-08-27T16:41:27.834+08:00  INFO 41948 --- [segroup8-platform] [pool-4-thread-1] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=d217c6afae2e41c6ac1e6cdef867c816 method=POST path=/api/order/1208/pay status=200
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@16b5263e]
+2026-08-27T16:41:27.834+08:00  INFO 41948 --- [segroup8-platform] [pool-4-thread-2] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=86e4baac6118496abeb85a6900faf294 method=POST path=/api/order/1208/cancel status=200
+]]></system-out>
+  </testcase>
+  <testcase name="unpaidCancellationRestoresStockAndReleasesVoucher" classname="com.segroup8.platform.integration.OrderPayCancelUc12IntegrationTest(domain-c-uc12-20260827084105700)" time="0.05">
+    <system-out><![CDATA[Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1d3bf0af] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1257287212 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1201(Long), POST(String), /api/order/1202/cancel(String), uc12-cancel(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1d3bf0af]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@13446044] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1965388767 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1201(Long), POST(String), /api/order/1202/cancel(String), uc12-cancel(String), 0(Integer), 2026-08-27T16:41:37.857114400(LocalDateTime), 2026-08-27T16:41:27.857114400(LocalDateTime), 2026-08-27T16:41:27.857114400(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@13446044]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+JDBC Connection [HikariProxyConnection@891612704 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 1202(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 1202, UC12-CANCEL, 1201, 100.00, 0, 0, 0, null, null, Buyer, null, null, null, null, null, null, null, 2026-08-27 16:41:27.847368, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1201, 20.00, 20.00, 0.00, 80.00, 0, 2026-08-27 16:41:27.847368
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26] from current transaction
+==>  Preparing: UPDATE order_info SET order_status=?,closed_time=?,version = version + 1 WHERE (id = ? AND buyer_user_id = ? AND order_status IN (?,?,?,?) AND version = ?)
+==> Parameters: 9(Integer), 2026-08-27T16:41:27.862620(LocalDateTime), 1202(Long), 1201(Long), 0(Integer), 1(Integer), 2(Integer), 3(Integer), 0(Integer)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?)
+==> Parameters: 1202(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 35, 1202, NEW, 1201, UC12 Product, 100.00, 1, 0, 2026-08-27 16:41:27.848411, 2026-08-27 16:41:27.848411
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26] from current transaction
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1201, 1201, UC12 Product, null, null, null, 100.00, null, null, 20, 1, 2026-08-27 16:41:27.846353, 2026-08-27 16:41:27.846353
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26] from current transaction
+==>  Preparing: UPDATE product SET shop_id=?, name=?, price=?, stock=?, status=?, create_time=?, update_time=? WHERE id=?
+==> Parameters: 1201(Long), UC12 Product(String), 100.00(BigDecimal), 21(Integer), 1(Integer), 2026-08-27T16:41:27.846353(LocalDateTime), 2026-08-27T16:41:27.846353(LocalDateTime), 1201(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26] from current transaction
+==>  Preparing: UPDATE user_voucher SET used_order_id=?,update_time=? WHERE (user_id = ? AND voucher_id = ? AND status = ? AND used_order_id = ?)
+==> Parameters: null, 2026-08-27T16:41:27.868629900(LocalDateTime), 1201(Long), 1201(Long), 1(Integer), 1202(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?)
+==> Parameters: 1202(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 35, 1202, NEW, 1201, UC12 Product, 100.00, 1, 0, 2026-08-27 16:41:27.848411, 2026-08-27 16:41:27.848411
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26] from current transaction
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1201, 1201, UC12 Product, null, null, null, 100.00, null, null, 21, 1, 2026-08-27 16:41:27.846353, 2026-08-27 16:41:27.846353
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1201, 1203, UC12 Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26] from current transaction
+==>  Preparing: INSERT INTO notification ( user_id, title, content, target_path, is_read, create_time ) VALUES ( ?, ?, ?, ?, ?, ? )
+==> Parameters: 1203(Long), 订单已取消(String), 订单号：UC12-CANCEL，买家已取消订单。(String), /merchant/orders/1202(String), 0(Integer), 2026-08-27T16:41:27.874648100(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26] from current transaction
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 1202(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 1202, UC12-CANCEL, 1201, 100.00, 0, 9, 0, null, null, Buyer, null, null, null, null, null, null, null, 2026-08-27 16:41:27.847368, null, null, null, null, 2026-08-27 16:41:27.86262, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 1201, 20.00, 20.00, 0.00, 80.00, 1, 2026-08-27 16:41:27.847368
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?) ORDER BY id ASC
+==> Parameters: 1202(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 35, 1202, NEW, 1201, UC12 Product, 100.00, 1, 0, 2026-08-27 16:41:27.848411, 2026-08-27 16:41:27.848411
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26] from current transaction
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1201, 1201, UC12 Product, null, null, null, 100.00, null, null, 21, 1, 2026-08-27 16:41:27.846353, 2026-08-27 16:41:27.846353
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1201, 1203, UC12 Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ebf5f26]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@28f7cca4] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@760487425 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: UPDATE idempotency_record SET status=?,http_status=?,response_body=?,update_time=? WHERE (id = ?)
+==> Parameters: 1(Integer), 200(Integer), {"code":0,"message":"success","data":{"id":1202,"orderNo":"UC12-CANCEL","buyerUserId":1201,"totalAmount":100.00,"payStatus":0,"orderStatus":9,"orderStatusName":"已关闭","refundStatus":0,"refundStatusName":"无","refundReason":null,"refundProofUrls":null,"receiverName":"Buyer","receiverPhone":null,"receiverProvince":null,"receiverCity":null,"receiverDetailAddress":null,"payMethod":null,"deliveryNo":null,"remark":null,"tradeMode":"邮寄","createTime":"2026-08-27T16:41:27.847368","paidTime":null,"shippedTime":null,"receivedTime":null,"completedTime":null,"closedTime":"2026-08-27T16:41:27.86262","refundApplyTime":null,"refundDecisionTime":null,"refundDecisionUserId":null,"refundDecisionUserName":null,"refundDecisionRemark":null,"refundDecisionSource":null,"logisticsTemplateId":null,"logisticsStatus":null,"logisticsCurrentIndex":null,"canRefund":1,"afterSalesDeadline":null,"deliveryTime":null,"arrivalTime":null,"autoConfirmDeadline":null,"refundMode":null,"voucherId":1201,"voucherDiscountAmount":20.00,"sellerBearAmount":20.00,"platformBearAmount":0.00,"payableAmount":80.00,"items":[{"id":35,"productId":1201,"sellerUserId":null,"sellerName":null,"productName":"UC12 Product","productType":"NEW","conditionLevel":null,"price":100.00,"quantity":1}]}}(String), 2026-08-27T16:41:27.883169800(LocalDateTime), 8(Long)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@28f7cca4]
+2026-08-27T16:41:27.887+08:00  INFO 41948 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=c426060319684dcf889ee85bd4ad02d4 method=POST path=/api/order/1202/cancel status=200
+]]></system-out>
+  </testcase>
+  <testcase name="insufficientBalanceRollsBackOrderBalanceVoucherAndLedger" classname="com.segroup8.platform.integration.OrderPayCancelUc12IntegrationTest(domain-c-uc12-20260827084105700)" time="0.022">
+    <system-out><![CDATA[Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4c897417] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1519190990 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1201(Long), POST(String), /api/order/1203/pay(String), uc12-insufficient(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4c897417]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@14ecd835] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@432371903 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1201(Long), POST(String), /api/order/1203/pay(String), uc12-insufficient(String), 0(Integer), 2026-08-27T16:41:37.906759600(LocalDateTime), 2026-08-27T16:41:27.906759600(LocalDateTime), 2026-08-27T16:41:27.906759600(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@14ecd835]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1eeb9e5c]
+JDBC Connection [HikariProxyConnection@1578448352 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 1203(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 1203, UC12-INSUFFICIENT, 1201, 500.00, 0, 0, 0, null, null, Buyer, null, null, null, null, null, null, null, 2026-08-27 16:41:27.898169, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.00, 0.00, 0.00, 500.00, 0, 2026-08-27 16:41:27.898169
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1eeb9e5c]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1eeb9e5c] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?) ORDER BY id ASC
+==> Parameters: 1203(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 44, 1203, NEW, 1201, UC12 Product, 500.00, 1, 0, 2026-08-27 16:41:27.899165, 2026-08-27 16:41:27.899165
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1eeb9e5c]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1eeb9e5c] from current transaction
+==>  Preparing: SELECT user_id,personal_balance,business_balance,version,create_time,update_time FROM balance WHERE user_id=?
+==> Parameters: 1201(Long)
+<==    Columns: user_id, personal_balance, business_balance, version, create_time, update_time
+<==        Row: 1201, 300.00, 0.00, 0, 2026-08-27 16:41:27.897166, 2026-08-27 16:41:27.897166
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1eeb9e5c]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1eeb9e5c]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1eeb9e5c]
+2026-08-27T16:41:27.910+08:00  INFO 41948 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=afeaa646fb224157aab24ddf1a1eb15c method=POST path=/api/order/1203/pay status=200
+]]></system-out>
+  </testcase>
+  <testcase name="paidCancellationNeverUsesUnpaidRestoreRules_andCompletedOrderIsRejected" classname="com.segroup8.platform.integration.OrderPayCancelUc12IntegrationTest(domain-c-uc12-20260827084105700)" time="0.036">
+    <system-out><![CDATA[Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@51a06fd5] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@653130292 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1201(Long), POST(String), /api/order/1204/cancel(String), uc12-paid-cancel(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@51a06fd5]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@776b7fa2] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1065002232 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1201(Long), POST(String), /api/order/1204/cancel(String), uc12-paid-cancel(String), 0(Integer), 2026-08-27T16:41:37.929624600(LocalDateTime), 2026-08-27T16:41:27.929624600(LocalDateTime), 2026-08-27T16:41:27.929624600(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@776b7fa2]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05]
+JDBC Connection [HikariProxyConnection@146357384 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 1204(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 1204, UC12-PAID, 1201, 100.00, 1, 1, 0, null, null, Buyer, null, null, null, null, null, null, null, 2026-08-27 16:41:27.923105, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.00, 0.00, 0.00, 100.00, 0, 2026-08-27 16:41:27.923105
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05] from current transaction
+==>  Preparing: UPDATE order_info SET order_status=?,closed_time=?,version = version + 1 WHERE (id = ? AND buyer_user_id = ? AND order_status IN (?,?,?,?) AND version = ?)
+==> Parameters: 9(Integer), 2026-08-27T16:41:27.932239900(LocalDateTime), 1204(Long), 1201(Long), 0(Integer), 1(Integer), 2(Integer), 3(Integer), 0(Integer)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?)
+==> Parameters: 1204(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 53, 1204, NEW, 1201, UC12 Product, 100.00, 1, 0, 2026-08-27 16:41:27.923105, 2026-08-27 16:41:27.923105
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05] from current transaction
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1201, 1201, UC12 Product, null, null, null, 100.00, null, null, 20, 1, 2026-08-27 16:41:27.922108, 2026-08-27 16:41:27.922108
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1201, 1203, UC12 Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05] from current transaction
+==>  Preparing: INSERT INTO notification ( user_id, title, content, target_path, is_read, create_time ) VALUES ( ?, ?, ?, ?, ?, ? )
+==> Parameters: 1203(Long), 订单已取消(String), 订单号：UC12-PAID，买家已取消订单。(String), /merchant/orders/1204(String), 0(Integer), 2026-08-27T16:41:27.936750300(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05] from current transaction
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 1204(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 1204, UC12-PAID, 1201, 100.00, 1, 9, 0, null, null, Buyer, null, null, null, null, null, null, null, 2026-08-27 16:41:27.923105, null, null, null, null, 2026-08-27 16:41:27.93224, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.00, 0.00, 0.00, 100.00, 1, 2026-08-27 16:41:27.923105
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05] from current transaction
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?) ORDER BY id ASC
+==> Parameters: 1204(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 53, 1204, NEW, 1201, UC12 Product, 100.00, 1, 0, 2026-08-27 16:41:27.923105, 2026-08-27 16:41:27.923105
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05] from current transaction
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1201, 1201, UC12 Product, null, null, null, 100.00, null, null, 20, 1, 2026-08-27 16:41:27.922108, 2026-08-27 16:41:27.922108
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1201(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1201, 1203, UC12 Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6d76aa05]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@65384249] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@562851134 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: UPDATE idempotency_record SET status=?,http_status=?,response_body=?,update_time=? WHERE (id = ?)
+==> Parameters: 1(Integer), 200(Integer), {"code":0,"message":"success","data":{"id":1204,"orderNo":"UC12-PAID","buyerUserId":1201,"totalAmount":100.00,"payStatus":1,"orderStatus":9,"orderStatusName":"已关闭","refundStatus":0,"refundStatusName":"无","refundReason":null,"refundProofUrls":null,"receiverName":"Buyer","receiverPhone":null,"receiverProvince":null,"receiverCity":null,"receiverDetailAddress":null,"payMethod":null,"deliveryNo":null,"remark":null,"tradeMode":"邮寄","createTime":"2026-08-27T16:41:27.923105","paidTime":null,"shippedTime":null,"receivedTime":null,"completedTime":null,"closedTime":"2026-08-27T16:41:27.93224","refundApplyTime":null,"refundDecisionTime":null,"refundDecisionUserId":null,"refundDecisionUserName":null,"refundDecisionRemark":null,"refundDecisionSource":null,"logisticsTemplateId":null,"logisticsStatus":null,"logisticsCurrentIndex":null,"canRefund":1,"afterSalesDeadline":null,"deliveryTime":null,"arrivalTime":null,"autoConfirmDeadline":null,"refundMode":null,"voucherId":null,"voucherDiscountAmount":0.00,"sellerBearAmount":0.00,"platformBearAmount":0.00,"payableAmount":100.00,"items":[{"id":53,"productId":1201,"sellerUserId":null,"sellerName":null,"productName":"UC12 Product","productType":"NEW","conditionLevel":null,"price":100.00,"quantity":1}]}}(String), 2026-08-27T16:41:27.941750800(LocalDateTime), 10(Long)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@65384249]
+2026-08-27T16:41:27.943+08:00  INFO 41948 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=807c892221464f5893fb12ad462cd6db method=POST path=/api/order/1204/cancel status=200
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@34e7a627] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1538784312 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1201(Long), POST(String), /api/order/1205/cancel(String), uc12-completed-cancel(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@34e7a627]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@27ea7c8f] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@400758359 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1201(Long), POST(String), /api/order/1205/cancel(String), uc12-completed-cancel(String), 0(Integer), 2026-08-27T16:41:37.947971600(LocalDateTime), 2026-08-27T16:41:27.947971600(LocalDateTime), 2026-08-27T16:41:27.947971600(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@27ea7c8f]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1e3c4c12]
+JDBC Connection [HikariProxyConnection@242495499 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 1205(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 1205, UC12-COMPLETED, 1201, 100.00, 1, 4, 0, null, null, Buyer, null, null, null, null, null, null, null, 2026-08-27 16:41:27.923105, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, 0.00, 0.00, 0.00, 100.00, 0, 2026-08-27 16:41:27.923105
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1e3c4c12]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1e3c4c12]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1e3c4c12]
+2026-08-27T16:41:27.950+08:00  INFO 41948 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=ec67b10ba43b4d9daa364f0daaf9b91c method=POST path=/api/order/1205/cancel status=200
+]]></system-out>
+  </testcase>
+</testsuite>

@@ -1,0 +1,27 @@
+{
+  "evidenceFormatVersion": 1,
+  "suite": "UC12",
+  "tagExpression": "DOMAIN_C & UC12",
+  "reportSuffix": "domain-c-uc12-20260827084105700",
+  "result": "PASS",
+  "startedAt": "2026-08-27T08:41:05.710Z",
+  "finishedAt": "2026-08-27T08:41:30.144Z",
+  "durationSeconds": 24.434,
+  "command": [
+    "mvn.cmd",
+    "-B",
+    "--no-transfer-progress",
+    "-Dmaven.repo.local=<redacted>",
+    "-Pdomain-c",
+    "-Ddomain.c.tags=DOMAIN_C & UC12",
+    "-Dsurefire.reportNameSuffix=domain-c-uc12-20260827084105700",
+    "clean",
+    "verify"
+  ],
+  "mavenExitCode": 0,
+  "reportFiles": 2,
+  "tests": 7,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0
+}

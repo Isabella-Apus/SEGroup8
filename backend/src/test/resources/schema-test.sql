@@ -241,6 +241,45 @@ CREATE TABLE `product` (
   `update_time` TIMESTAMP
 );
 
+CREATE TABLE `voucher` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `issuer_type` INT,
+  `voucher_type` INT,
+  `issuer_user_id` BIGINT,
+  `scope_type` INT,
+  `shop_id` BIGINT,
+  `product_id` BIGINT,
+  `can_stack` BOOLEAN,
+  `name` VARCHAR(100),
+  `type` INT,
+  `discount_amount` DECIMAL(10,2),
+  `discount_rate` DECIMAL(4,2),
+  `min_amount` DECIMAL(10,2),
+  `total_count` INT,
+  `received_count` INT,
+  `used_count` INT,
+  `grab_start_time` TIMESTAMP,
+  `grab_end_time` TIMESTAMP,
+  `start_time` TIMESTAMP,
+  `end_time` TIMESTAMP,
+  `status` INT,
+  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `update_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `user_voucher` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `voucher_id` BIGINT NOT NULL,
+  `status` INT NOT NULL,
+  `received_time` TIMESTAMP,
+  `used_order_id` BIGINT,
+  `used_time` TIMESTAMP,
+  `expire_time` TIMESTAMP,
+  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `update_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE `secondhand_product` (
   `id` BIGINT PRIMARY KEY,
   `seller_user_id` BIGINT NOT NULL,
@@ -429,5 +468,6 @@ CREATE TABLE `idempotency_record` (
   `response_body` TEXT,
   `expire_time` TIMESTAMP,
   `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `update_time` TIMESTAMP
+  `update_time` TIMESTAMP,
+  UNIQUE (`user_id`, `request_method`, `request_path`, `idempotency_key`)
 );
