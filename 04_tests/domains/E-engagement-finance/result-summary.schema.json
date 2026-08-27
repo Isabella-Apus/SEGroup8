@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Domain-E UC result summary",
+  "type": "object",
+  "required": ["uc", "status", "environment", "executedAt", "counts", "evidence"],
+  "properties": {
+    "uc": { "enum": ["UC21", "UC22", "UC23", "UC24", "UC25"] },
+    "status": { "enum": ["PASS", "FAIL", "PENDING"] },
+    "environment": { "type": "string", "minLength": 1 },
+    "executedAt": { "type": ["string", "null"], "format": "date-time" },
+    "counts": {
+      "type": "object",
+      "required": ["passed", "failed", "skipped"],
+      "properties": {
+        "passed": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "skipped": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  }
+}

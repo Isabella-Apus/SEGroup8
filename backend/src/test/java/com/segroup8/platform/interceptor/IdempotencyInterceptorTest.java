@@ -3,14 +3,18 @@ package com.segroup8.platform.interceptor;
 import com.segroup8.platform.context.UserContext;
 import com.segroup8.platform.entity.IdempotencyRecord;
 import com.segroup8.platform.mapper.IdempotencyRecordMapper;
+import com.segroup8.platform.testsupport.DomainCTestTags;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+@Tag(DomainCTestTags.DOMAIN_C)
+@Tag(DomainCTestTags.PLATFORM)
 class IdempotencyInterceptorTest {
 
     private final IdempotencyRecordMapper mapper = Mockito.mock(IdempotencyRecordMapper.class);
@@ -78,4 +82,3 @@ class IdempotencyInterceptorTest {
         Assertions.assertTrue(interceptor.preHandle(request, response, new Object()));
     }
 }
-

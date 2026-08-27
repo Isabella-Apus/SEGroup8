@@ -12,6 +12,7 @@ import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.TransactionRecordMapper;
 import com.segroup8.platform.mapper.VoucherMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -28,6 +29,8 @@ import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("DOMAIN_E")
+@Tag("UC23")
 class UC23AccountIsolationTest {
 
     @Mock private ProductMapper productMapper;
