@@ -44,6 +44,6 @@ PASS；真实 Compose + MySQL + Chromium UC02 spec 1 test PASS。浏览器运行
 
 ## 已知风险
 
-- 当前 PASS 是 H2/MockMvc 和 Spring 集成证据，不等同于 MySQL/真实浏览器 PASS。
+- H2/MockMvc 与真实 MySQL/Chromium 证据分别保留，不能互相替代；本次两层均已 PASS。
 - Compose E2E 依赖 Docker daemon、数据库初始化和可用的种子账号。
 - 地址默认值和归属断言依赖后端当前状态码/字段契约，跨版本接口变化时需同步。
