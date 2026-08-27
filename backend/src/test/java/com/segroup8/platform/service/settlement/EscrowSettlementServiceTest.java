@@ -14,7 +14,9 @@ import com.segroup8.platform.mapper.SecondhandProductMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.TransactionRecordMapper;
 import com.segroup8.platform.mapper.VoucherMapper;
+import com.segroup8.platform.testsupport.DomainCTestTags;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -32,6 +34,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@Tag(DomainCTestTags.DOMAIN_C)
+@Tag(DomainCTestTags.PLATFORM)
 class EscrowSettlementServiceTest {
 
     @Mock

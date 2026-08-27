@@ -8,7 +8,24 @@ param(
 
 $ErrorActionPreference = 'Continue'
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
-$evidenceRoot = Join-Path $repositoryRoot '04_tests\platform-e2e\evidence'
+$defaultEvidenceRoot = Join-Path $repositoryRoot '04_tests\platform-e2e\evidence'
+
+function Resolve-ConfiguredPath([string]$Value, [string]$Fallback) {
+    if (-not $Value) { return $Fallback }
+    if ([IO.Path]::IsPathRooted($Value)) { return [IO.Path]::GetFullPath($Value) }
+    return [IO.Path]::GetFullPath((Join-Path $repositoryRoot $Value))
+}
+
+$evidenceRoot = if ($env:E2E_EVIDENCE_ROOT) {
+    Resolve-ConfiguredPath $env:E2E_EVIDENCE_ROOT $defaultEvidenceRoot
+} else {
+    $defaultEvidenceRoot
+}
+$playwrightOutputRoot = if ($env:E2E_OUTPUT_DIR) {
+    Resolve-ConfiguredPath $env:E2E_OUTPUT_DIR $evidenceRoot
+} else {
+    $evidenceRoot
+}
 $logsRoot = Join-Path $evidenceRoot 'logs'
 New-Item -ItemType Directory -Force -Path $logsRoot | Out-Null
 $failureStagePath = Join-Path $logsRoot 'failure-stage.txt'
@@ -83,7 +100,7 @@ try {
     if (-not $env:E2E_PASSWORD) { $env:E2E_PASSWORD = 'user123' }
     if (-not $env:E2E_ROLE) { $env:E2E_ROLE = 'USER' }
     if (-not $env:E2E_BASE_URL) { $env:E2E_BASE_URL = 'http://127.0.0.1:8088' }
-    $env:E2E_OUTPUT_DIR = $evidenceRoot
+    $env:E2E_OUTPUT_DIR = $playwrightOutputRoot
 
     if ($ResetDatabase) {
         $currentStage = 'database-reset'

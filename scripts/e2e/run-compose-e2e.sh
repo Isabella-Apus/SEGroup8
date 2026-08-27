@@ -2,7 +2,11 @@
 set -Eeuo pipefail
 
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-evidence_root="${repository_root}/04_tests/platform-e2e/evidence"
+default_evidence_root="${repository_root}/04_tests/platform-e2e/evidence"
+evidence_root="${E2E_EVIDENCE_ROOT:-${default_evidence_root}}"
+playwright_output_root="${E2E_OUTPUT_DIR:-${evidence_root}}"
+[[ "${evidence_root}" = /* ]] || evidence_root="${repository_root}/${evidence_root}"
+[[ "${playwright_output_root}" = /* ]] || playwright_output_root="${repository_root}/${playwright_output_root}"
 logs_root="${evidence_root}/logs"
 mkdir -p "${logs_root}"
 rm -f "${logs_root}/failure-stage.txt"
@@ -100,7 +104,8 @@ trap on_exit EXIT
 : "${E2E_PASSWORD:=user123}"
 : "${E2E_ROLE:=USER}"
 : "${E2E_BASE_URL:=http://127.0.0.1:8088}"
-export E2E_USERNAME E2E_PASSWORD E2E_ROLE E2E_BASE_URL E2E_OUTPUT_DIR="${evidence_root}"
+export E2E_USERNAME E2E_PASSWORD E2E_ROLE E2E_BASE_URL
+export E2E_OUTPUT_DIR="${playwright_output_root}"
 
 if [[ "${RESET_DATABASE:-false}" == "true" ]]; then
   current_stage="database-reset"

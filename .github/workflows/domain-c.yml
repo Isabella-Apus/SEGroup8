@@ -1,0 +1,111 @@
+name: Domain-C order fulfillment
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "01_requirements/UC1[1-5]-*"
+      - "02_docs/UC1[1-5]-*"
+      - "02_docs/UC1[1-5]/**"
+      - "02_docs/domains/C-order-fulfillment/**"
+      - "03_devops/domains/domain-c.md"
+      - "04_tests/UC1[1-5]/**"
+      - "04_tests/domains/C-order-fulfillment/**"
+      - "scripts/e2e/**"
+      - ".github/workflows/domain-c.yml"
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "frontend/**"
+      - "01_requirements/UC1[1-5]-*"
+      - "02_docs/UC1[1-5]-*"
+      - "02_docs/UC1[1-5]/**"
+      - "02_docs/domains/C-order-fulfillment/**"
+      - "03_devops/domains/domain-c.md"
+      - "04_tests/UC1[1-5]/**"
+      - "04_tests/domains/C-order-fulfillment/**"
+      - "scripts/e2e/**"
+      - ".github/workflows/domain-c.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: domain-c-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-domain-c:
+    name: Domain-C tagged backend tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run Domain-C tests and collect evidence
+        run: node 04_tests/domains/C-order-fulfillment/run-domain-c-tests.mjs --suite DOMAIN_C --goal verify
+      - name: Verify backend evidence
+        run: node 04_tests/domains/C-order-fulfillment/verify-evidence.mjs --suite=DOMAIN_C
+      - name: Upload Domain-C backend evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: domain-c-backend-evidence
+          path: |
+            04_tests/domains/C-order-fulfillment/evidence/logs/backend-domain-c.log
+            04_tests/domains/C-order-fulfillment/evidence/raw-reports/surefire/**
+            04_tests/domains/C-order-fulfillment/evidence/result-summary.json
+          if-no-files-found: error
+          retention-days: 14
+
+  browser-domain-c:
+    name: Domain-C real browser smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      E2E_USERNAME: user
+      E2E_PASSWORD: user123
+      E2E_ROLE: USER
+      E2E_BASE_URL: http://127.0.0.1:8088
+      E2E_EVIDENCE_ROOT: ${{ github.workspace }}/04_tests/domains/C-order-fulfillment/evidence
+      E2E_OUTPUT_DIR: ${{ github.workspace }}/04_tests/domains/C-order-fulfillment/evidence/raw-reports/playwright
+      DOMAIN_C_SUITE: domains/C-order-fulfillment
+      COMPOSE_FILE: compose.yml:04_tests/domains/C-order-fulfillment/compose.e2e.yml
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Remove stale browser evidence
+        run: |
+          rm -rf "$E2E_OUTPUT_DIR" "$E2E_EVIDENCE_ROOT/screenshots"
+          mkdir -p "$E2E_OUTPUT_DIR" "$E2E_EVIDENCE_ROOT/screenshots"
+      - name: Run real browser smoke through shared E2E entry point
+        run: |
+          chmod +x scripts/e2e/run-compose-e2e.sh
+          scripts/e2e/run-compose-e2e.sh e2e/domain-c
+      - name: Verify browser evidence
+        run: node 04_tests/domains/C-order-fulfillment/verify-playwright-evidence.mjs --suite=domains/C-order-fulfillment
+      - name: Upload Domain-C browser evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: domain-c-browser-evidence
+          path: |
+            04_tests/domains/C-order-fulfillment/evidence/logs/**
+            04_tests/domains/C-order-fulfillment/evidence/raw-reports/playwright/**
+            04_tests/domains/C-order-fulfillment/evidence/screenshots/**
+          if-no-files-found: error
+          retention-days: 14
