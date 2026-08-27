@@ -1,9 +1,16 @@
 {
   "uc": "UC05",
   "status": "PASS_H2_MOCKMVC_NOT_COMPOSE_RUN",
-  "backendIntegration": "PASS_1_TEST",
-  "mockMvc": "PASS_17_TESTS",
-  "composePlaywright": "NOT_RUN",
+  "backendIntegration": {"status": "PASS", "tests": 1, "failures": 0, "errors": 0},
+  "mockMvc": {"status": "PASS", "tests": 11, "failures": 0, "errors": 0},
+  "serviceApi": {"status": "PASS", "tests": 6, "failures": 0, "errors": 0},
+  "composePlaywright": {"status": "NOT_RUN", "reason": "Docker Linux daemon unavailable"},
+  "ciWorkflow": "https://github.com/Isabella-Apus/SEGroup8/actions/workflows/ci-cd.yml",
+  "evidencePaths": {
+    "rawReports": "04_tests/UC05/evidence/raw-reports/",
+    "logs": "04_tests/UC05/evidence/logs/",
+    "screenshots": "04_tests/UC05/evidence/screenshots/"
+  },
   "evidencePolicy": "H2 and MockMvc are not Docker Compose browser evidence",
   "generatedArtifactsTracked": false
 }
