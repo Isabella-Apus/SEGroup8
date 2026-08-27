@@ -1,5 +1,7 @@
 # UC02 用户资料与地址归属
 
+状态：后端/API/H2 集成与 E2E 脚本已完成；真实 Compose/MySQL 浏览器执行未完成。
+
 - 需求：`REQ02 / UC02`
 - 集成测试：`ProfileAddressUc02IntegrationTest`
 - 浏览器测试：`frontend/e2e/domain-a/uc02-profile-address.spec.ts`

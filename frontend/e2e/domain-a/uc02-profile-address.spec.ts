@@ -62,6 +62,13 @@ test.describe("UC02 real profile and address flow", () => {
         await expect(page.locator("body")).toContainText("Updated Receiver");
         await expect(page.locator("body")).toContainText("Updated Street");
 
+        expect((await apiDelete(request, `/api/user/addresses/${firstId}`, ownerToken)).code).toBe(0);
+        const afterDelete = await apiGet(request, "/api/user/addresses", ownerToken);
+        expect(afterDelete.data.find((item: any) => item.id === firstId)).toBeUndefined();
+        await page.reload();
+        await expect(page.locator("body")).not.toContainText("Updated Receiver");
+        await expect(page.locator("body")).not.toContainText("Updated Street");
+
         const other = await registerAccount(request, uniqueAccount("e2e-uc02-other"));
         const otherLogin = await loginApi(request, other);
         const otherToken = otherLogin.account.token!;
