@@ -9,10 +9,10 @@ DELETE FROM product;
 DELETE FROM shop;
 DELETE FROM user;
 
-INSERT INTO user (id, username, role, status, create_time, update_time) VALUES
-  (1301, 'uc13_buyer', 'USER', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  (1302, 'uc13_seller', 'OFFICIAL_SELLER', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-  (1303, 'uc13_other', 'USER', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO user (id, username, password, role, status, create_time, update_time) VALUES
+  (1301, 'uc13_buyer', 'x', 'USER', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  (1302, 'uc13_seller', 'x', 'OFFICIAL_SELLER', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  (1303, 'uc13_other', 'x', 'USER', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO shop (id, owner_user_id, name, status, create_time, update_time)
 VALUES (1301, 1302, 'UC13 New Product Shop', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO product (id, shop_id, name, price, stock, status, create_time, update_time)

@@ -11,8 +11,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.util.concurrent.CountDownLatch;
@@ -28,10 +33,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Testcontainers
 @Tag(DomainCTestTags.DOMAIN_C)
 @Tag(DomainCTestTags.UC13)
 @Sql(scripts = "/integration/uc13-fulfillment-setup.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class NewProductFulfillmentUc13IntegrationTest {
+
+    @Container
+    private static final MySQLContainer<?> MYSQL = new MySQLContainer<>("mysql:8.4.6")
+            .withDatabaseName("segroup8_uc13")
+            .withUsername("segroup8")
+            .withPassword("segroup8_test")
+            .withInitScript("schema.sql");
+
+    @DynamicPropertySource
+    static void mysqlProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", MYSQL::getJdbcUrl);
+        registry.add("spring.datasource.username", MYSQL::getUsername);
+        registry.add("spring.datasource.password", MYSQL::getPassword);
+        registry.add("spring.datasource.driver-class-name", () -> "com.mysql.cj.jdbc.Driver");
+        registry.add("spring.sql.init.mode", () -> "never");
+    }
 
     @Autowired private MockMvc mockMvc;
     @Autowired private JwtUtils jwtUtils;
@@ -60,10 +82,14 @@ class NewProductFulfillmentUc13IntegrationTest {
                 .andExpect(jsonPath("$.data.orderStatus").value(2))
                 .andExpect(jsonPath("$.data.logisticsStatus").value("IN_TRANSIT"));
         assertThat(count("SELECT COUNT(*) FROM logistics_trace WHERE order_id=1301")).isEqualTo(1);
+        assertThat(text("SELECT node_name FROM logistics_trace WHERE order_id=1301")).isNotBlank();
+        assertThat(text("SELECT status_desc FROM logistics_trace WHERE order_id=1301")).isNotBlank();
 
         mockMvc.perform(get("/api/logistics/order/1301/trace").header("Authorization", "Bearer " + buyerToken))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(0))
-                .andExpect(jsonPath("$.data.length()").value(1));
+                .andExpect(jsonPath("$.data.length()").value(1))
+                .andExpect(jsonPath("$.data[0].nodeName").isNotEmpty())
+                .andExpect(jsonPath("$.data[0].statusDesc").isNotEmpty());
         mockMvc.perform(get("/api/logistics/order/1301/trace").header("Authorization", "Bearer " + sellerToken))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(0));
         mockMvc.perform(get("/api/logistics/order/1301/trace").header("Authorization", "Bearer " + otherToken))
@@ -119,6 +145,8 @@ class NewProductFulfillmentUc13IntegrationTest {
             executor.shutdownNow();
         }
         assertThat(number("SELECT order_status FROM order_info WHERE id=1304")).isEqualTo(3);
+        assertThat(number("SELECT version FROM order_info WHERE id=1304")).isEqualTo(1);
+        assertThat(money("SELECT business_balance FROM balance WHERE user_id=1302")).isEqualByComparingTo("240.00");
         assertThat(count("SELECT COUNT(*) FROM transaction_record WHERE order_id=1304 AND user_id=1302")).isEqualTo(1);
     }
 
@@ -141,4 +169,5 @@ class NewProductFulfillmentUc13IntegrationTest {
     private long count(String sql) { return jdbcTemplate.queryForObject(sql, Long.class); }
     private long number(String sql) { return jdbcTemplate.queryForObject(sql, Long.class); }
     private BigDecimal money(String sql) { return jdbcTemplate.queryForObject(sql, BigDecimal.class); }
+    private String text(String sql) { return jdbcTemplate.queryForObject(sql, String.class); }
 }
