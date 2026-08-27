@@ -3,6 +3,8 @@
 The H2-backed Spring integration gate passed locally on 2026-08-27:
 
 - `IdentityUc01IntegrationTest`: 2 tests, 0 failures, 0 errors.
+- Saved API coverage: `AuthControllerWebMvcTest` 4 tests and
+  `AuthServiceImplTest` 5 tests, all passed.
 - Domain-A baseline after A0: 33 tests, 0 failures, 0 errors.
 - The test asserts persisted BCrypt, JWT uid, USER/ADMIN boundary, ban state,
   failed banned login, duplicate registration and no dirty duplicate row.
