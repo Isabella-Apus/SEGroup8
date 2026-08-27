@@ -1,7 +1,8 @@
 # 自动化测试与交付流水线
 
 流水线定义位于 `.github/workflows/ci-cd.yml`，其中包含一个统一的 Domain A
-定向入口，不为 UC01-UC05 分别创建 workflow。
+  定向入口，不为 UC01-UC05 分别创建 workflow；共享 JWT security-contract
+  也在同一条 PR 流程中执行。
 
 CI 链接：
 `https://github.com/Isabella-Apus/SEGroup8/actions/workflows/ci-cd.yml`
@@ -18,7 +19,8 @@ CI 链接：
 
 建议将 `Frontend build`、`Backend automated tests` 和 `Real full-stack Playwright E2E`
 设置为 `main` 分支的必需检查。Domain A 定向测试在 `Backend automated tests`
-作业中先执行，结果以 `domain-a-surefire-reports` artifact 保存。
+  作业中先执行，结果以 `domain-a-surefire-reports` artifact 保存；全局 JWT
+  契约结果以 `platform-security-contract-surefire-reports` artifact 保存。
 
 生产部署默认关闭。启用时创建 `production` Environment 并配置：
 
