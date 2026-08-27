@@ -13,6 +13,7 @@
         "preview": "vite preview",
         "e2e": "playwright test",
         "e2e:smoke": "playwright test e2e/smoke",
+        "e2e:domain-e": "playwright test e2e/domain-e",
         "e2e:report": "playwright show-report ../04_tests/platform-e2e/evidence/playwright-report"
     },
     "dependencies": {
