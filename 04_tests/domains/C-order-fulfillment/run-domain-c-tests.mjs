@@ -210,6 +210,11 @@ const passed =
   totals.failures === 0 &&
   totals.errors === 0;
 const finishedAt = new Date();
+const commandForSummary = [mavenExecutable, ...mavenArgs].map((argument) =>
+  String(argument).startsWith("-Dmaven.repo.local=")
+    ? "-Dmaven.repo.local=<redacted>"
+    : argument,
+);
 const summary = {
   evidenceFormatVersion: 1,
   suite,
@@ -219,7 +224,7 @@ const summary = {
   startedAt: startedAt.toISOString(),
   finishedAt: finishedAt.toISOString(),
   durationSeconds: Number(((finishedAt - startedAt) / 1000).toFixed(3)),
-  command: [mavenExecutable, ...mavenArgs],
+  command: commandForSummary,
   mavenExitCode,
   reportFiles: reportFiles.length,
   ...totals,
