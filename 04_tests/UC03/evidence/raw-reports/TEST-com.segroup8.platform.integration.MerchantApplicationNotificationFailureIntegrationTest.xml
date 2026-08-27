@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.segroup8.platform.integration.MerchantApplicationNotificationFailureIntegrationTest" time="32.967" tests="1" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.segroup8.platform.integration.MerchantApplicationNotificationFailureIntegrationTest" time="26.162" tests="1" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="17"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -16,7 +16,7 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="CN"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-17\bin"/>
-    <property name="sun.java.command" value="C:\Users\isabe\AppData\Local\Temp\surefire8761346905196812924\surefirebooter-20260827142929742_3.jar C:\Users\isabe\AppData\Local\Temp\surefire8761346905196812924 2026-08-27T14-29-28_762-jvmRun1 surefire-20260827142929742_1tmp surefire_0-20260827142929742_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\isabe\AppData\Local\Temp\surefire11763024955709828648\surefirebooter-20260827145100207_3.jar C:\Users\isabe\AppData\Local\Temp\surefire11763024955709828648 2026-08-27T14-50-59_947-jvmRun1 surefire-20260827145100207_1tmp surefire_0-20260827145100207_2tmp"/>
     <property name="jdk.debug" value="release"/>
     <property name="test" value="MerchantApplicationUc03IntegrationTest,MerchantApplicationNotificationFailureIntegrationTest,MerchantApplicationControllerWebMvcTest,MerchantApplicationServiceImplTest"/>
     <property name="surefire.test.class.path" value="C:\Users\isabe\Desktop\SE\SEGroup8\backend\target\test-classes;C:\Users\isabe\Desktop\SE\SEGroup8\backend\target\classes;C:\Users\isabe\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.3.4\spring-boot-starter-web-3.3.4.jar;C:\Users\isabe\.m2\repository\org\springframework\boot\spring-boot-starter\3.3.4\spring-boot-starter-3.3.4.jar;C:\Users\isabe\.m2\repository\org\springframework\boot\spring-boot\3.3.4\spring-boot-3.3.4.jar;C:\Users\isabe\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.3.4\spring-boot-starter-logging-3.3.4.jar;C:\Users\isabe\.m2\repository\ch\qos\logback\logback-classic\1.5.8\logback-classic-1.5.8.jar;C:\Users\isabe\.m2\repository\ch\qos\logback\logback-core\1.5.8\logback-core-1.5.8.jar;C:\Users\isabe\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.23.1\log4j-to-slf4j-2.23.1.jar;C:\Users\isabe\.m2\repository\org\apache\logging\log4j\log4j-api\2.23.1\log4j-api-2.23.1.jar;C:\Users\isabe\.m2\repository\org\slf4j\jul-to-slf4j\2.0.16\jul-to-slf4j-2.0.16.jar;C:\Users\isabe\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\isabe\.m2\repository\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;C:\Users\isabe\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.3.4\spring-boot-starter-json-3.3.4.jar;C:\Users\isabe\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.17.2\jackson-datatype-jdk8-2.17.2.jar;C:\Users\isabe\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.17.2\jackson-datatype-jsr310-2.17.2.jar;C:\Users\isabe\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.17.2\jackson-module-parameter-names-2.17.2.jar;C:\Users\isabe\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.3.4\spring-boot-starter-tomcat-3.3.4.jar;C:\Users\isabe\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.30\tomcat-embed-core-10.1.30.jar;C:\Users\isabe\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.30\tomcat-embed-websocket-10.1.30.jar;C:\Users\isabe\.m2\repository\org\springframework\spring-web\6.1.13\spring-web-6.1.13.jar;C:\Users\isabe\.m2\repository\org\springframework\spring-beans\6.1.13\spring-beans-6.1.13.jar;C:\Users\isabe\.m2\repository\org\springframework\spring-webmvc\6.1.13\spring-webmvc-6.1.13.jar;C:\Users\isabe\.m2\repository\org\springframework\spring-aop\6.1.13\spring-aop-6.1.13.jar;C:\Users\isabe\.m2\repository\org\springframework\spring-context\6.1.13\spring-context-6.1.13.jar;C:\Users\isabe\.m2\repository\org\springframework\spring-expression\6.1.13\spring-expression-6.1.13.jar;C:\Users\isabe\.m2\repository\org\springframework\boot\spring-boot-starter-validation\3.3.4\spring-boot-starter-validation-3.3.4.jar;C:\Users\isabe\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.30\tomcat-embed-el-10.1.30.jar;C:\Users\isabe\.m2\repository\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\isabe\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\isabe\.m2\repository\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;C:\Users\isabe\.m2\repository\com\fasterxml\classmate\1.7.0\classmate-1.7.0.jar;C:\Users\isabe\.m2\repository\org\springframework\boot\spring-boot-starter-websocket\3.3.4\spring-boot-starter-websocket-3.3.4.jar;C:\Users\isabe\.m2\repository\org\springframework\spring-messaging\6.1.13\spring-messaging-6.1.13.jar;C:\Users\isabe\.m2\repository\org\springframework\spring-websocket\6.1.13\spring-websocket-6.1.13.jar;C:\Users\isabe\.m2\repository\org\springframework\boot\spring-boot-starter-actuator\3.3.4\spring-boot-starter-actuator-3.3.4.jar;C:\Users\isabe\.m2\repository\org\springframework\boot\spring-boot-actuator-autoconfigure\3.3.4\spring-boot-actuator-autoconfigure-3.3.4.jar;C:\Users\isabe\.m2\repository\org\springframework\boot\spring-boot-actuator\3.3.4\spring-boot-actuator-3.3.4.jar;C:\Users\isabe\.m2\repository\io\micrometer\micrometer-observation\1.13.4\micrometer-observation-1.13.4.jar;C:\Users\isabe\.m2\repository\io\micrometer\micrometer-commons\1.13.4\micrometer-commons-1.13.4.jar;C:\Users\isabe\.m2\repository\io\micrometer\micrometer-jakarta9\1.13.4\micrometer-jakarta9-1.13.4.jar;C:\Users\isabe\.m2\repository\io\micrometer\micrometer-core\1.13.4\micrometer-core-1.13.4.jar;C:\Users\isabe\.m2\repository\org\hdrhistogram\HdrHistogram\2.2.2\HdrHistogram-2.2.2.jar;C:\Users\isabe\.m2\repository\org\latencyutils\LatencyUtils\2.0.3\LatencyUtils-2.0.3.jar;C:\Users\isabe\.m2\repository\org\springframework\security\spring-security-crypto\6.3.3\spring-security-crypto-6.3.3.jar;C:\Users\isabe\.m2\repository\com\baomidou\mybatis-plus-spring-boot3-starter\3.5.7\mybatis-plus-spring-boot3-starter-3.5.7.jar;C:\Users\isabe\.m2\repository\com\baomidou\mybatis-plus\3.5.7\mybatis-plus-3.5.7.jar;C:\Users\isabe\.m2\repository\com\baomidou\mybatis-plus-core\3.5.7\mybatis-plus-core-3.5.7.jar;C:\Users\isabe\.m2\repository\com\baomidou\mybatis-plus-annotation\3.5.7\mybatis-plus-annotation-3.5.7.jar;C:\Users\isabe\.m2\repository\com\baomidou\mybatis-plus-extension\3.5.7\mybatis-plus-extension-3.5.7.jar;C:\Users\isabe\.m2\repository\org\mybatis\mybatis\3.5.16\mybatis-3.5.16.jar;C:\Users\isabe\.m2\repository\com\github\jsqlparser\jsqlparser\4.9\jsqlparser-4.9.jar;C:\Users\isabe\.m2\repository\org\mybatis\mybatis-spring\3.0.3\mybatis-spring-3.0.3.jar;C:\Users\isabe\.m2\repository\com\baomidou\mybatis-plus-spring-boot-autoconfigure\3.5.7\mybatis-plus-spring-boot-autoconfigure-3.5.7.jar;C:\Users\isabe\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.3.4\spring-boot-autoconfigure-3.3.4.jar;C:\Users\isabe\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\3.3.4\spring-boot-starter-jdbc-3.3.4.jar;C:\Users\isabe\.m2\repository\com\zaxxer\HikariCP\5.1.0\HikariCP-5.1.0.jar;C:\Users\isabe\.m2\repository\org\springframework\spring-jdbc\6.1.13\spring-jdbc-6.1.13.jar;C:\Users\isabe\.m2\repository\org\springframework\spring-tx\6.1.13\spring-tx-6.1.13.jar;C:\Users\isabe\.m2\repository\com\mysql\mysql-connector-j\8.3.0\mysql-connector-j-8.3.0.jar;C:\Users\isabe\.m2\repository\org\projectlombok\lombok\1.18.34\lombok-1.18.34.jar;C:\Users\isabe\.m2\repository\io\jsonwebtoken\jjwt-api\0.12.6\jjwt-api-0.12.6.jar;C:\Users\isabe\.m2\repository\io\jsonwebtoken\jjwt-impl\0.12.6\jjwt-impl-0.12.6.jar;C:\Users\isabe\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.12.6\jjwt-jackson-0.12.6.jar;C:\Users\isabe\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;C:\Users\isabe\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;C:\Users\isabe\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.17.2\jackson-core-2.17.2.jar;C:\Users\isabe\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.6.0\springdoc-openapi-starter-webmvc-ui-2.6.0.jar;C:\Users\isabe\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-api\2.6.0\springdoc-openapi-starter-webmvc-api-2.6.0.jar;C:\Users\isabe\.m2\repository\org\springdoc\springdoc-openapi-starter-common\2.6.0\springdoc-openapi-starter-common-2.6.0.jar;C:\Users\isabe\.m2\repository\io\swagger\core\v3\swagger-core-jakarta\2.2.22\swagger-core-jakarta-2.2.22.jar;C:\Users\isabe\.m2\repository\org\apache\commons\commons-lang3\3.14.0\commons-lang3-3.14.0.jar;C:\Users\isabe\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.22\swagger-annotations-jakarta-2.2.22.jar;C:\Users\isabe\.m2\repository\io\swagger\core\v3\swagger-models-jakarta\2.2.22\swagger-models-jakarta-2.2.22.jar;C:\Users\isabe\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.17.2\jackson-dataformat-yaml-2.17.2.jar;C:\Users\isabe\.m2\repository\org\webjars\swagger-ui\5.17.14\swagger-ui-5.17.14.jar;C:\Users\isabe\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\isabe\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.3.4\spring-boot-starter-test-3.3.4.jar;C:\Users\isabe\.m2\repository\org\springframework\boot\spring-boot-test\3.3.4\spring-boot-test-3.3.4.jar;C:\Users\isabe\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.3.4\spring-boot-test-autoconfigure-3.3.4.jar;C:\Users\isabe\.m2\repository\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\isabe\.m2\repository\org\slf4j\slf4j-api\2.0.16\slf4j-api-2.0.16.jar;C:\Users\isabe\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\isabe\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\isabe\.m2\repository\net\minidev\json-smart\2.5.1\json-smart-2.5.1.jar;C:\Users\isabe\.m2\repository\net\minidev\accessors-smart\2.5.1\accessors-smart-2.5.1.jar;C:\Users\isabe\.m2\repository\org\ow2\asm\asm\9.6\asm-9.6.jar;C:\Users\isabe\.m2\repository\org\assertj\assertj-core\3.25.3\assertj-core-3.25.3.jar;C:\Users\isabe\.m2\repository\net\bytebuddy\byte-buddy\1.14.19\byte-buddy-1.14.19.jar;C:\Users\isabe\.m2\repository\org\awaitility\awaitility\4.2.2\awaitility-4.2.2.jar;C:\Users\isabe\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\isabe\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.3\junit-jupiter-5.10.3.jar;C:\Users\isabe\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.3\junit-jupiter-api-5.10.3.jar;C:\Users\isabe\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\isabe\.m2\repository\org\junit\platform\junit-platform-commons\1.10.3\junit-platform-commons-1.10.3.jar;C:\Users\isabe\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\isabe\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.3\junit-jupiter-params-5.10.3.jar;C:\Users\isabe\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.3\junit-jupiter-engine-5.10.3.jar;C:\Users\isabe\.m2\repository\org\junit\platform\junit-platform-engine\1.10.3\junit-platform-engine-1.10.3.jar;C:\Users\isabe\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\isabe\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.19\byte-buddy-agent-1.14.19.jar;C:\Users\isabe\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\isabe\.m2\repository\org\mockito\mockito-junit-jupiter\5.11.0\mockito-junit-jupiter-5.11.0.jar;C:\Users\isabe\.m2\repository\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\isabe\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\isabe\.m2\repository\org\springframework\spring-core\6.1.13\spring-core-6.1.13.jar;C:\Users\isabe\.m2\repository\org\springframework\spring-jcl\6.1.13\spring-jcl-6.1.13.jar;C:\Users\isabe\.m2\repository\org\springframework\spring-test\6.1.13\spring-test-6.1.13.jar;C:\Users\isabe\.m2\repository\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;C:\Users\isabe\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;"/>
@@ -34,7 +34,7 @@
     <property name="java.specification.name" value="Java Platform API Specification"/>
     <property name="FILE_LOG_CHARSET" value="GBK"/>
     <property name="java.awt.headless" value="true"/>
-    <property name="surefire.real.class.path" value="C:\Users\isabe\AppData\Local\Temp\surefire8761346905196812924\surefirebooter-20260827142929742_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\isabe\AppData\Local\Temp\surefire11763024955709828648\surefirebooter-20260827145100207_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="17.0.18+8"/>
@@ -53,7 +53,7 @@
     <property name="user.dir" value="C:\Users\isabe\Desktop\SE\SEGroup8\backend"/>
     <property name="os.arch" value="amd64"/>
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
-    <property name="PID" value="10800"/>
+    <property name="PID" value="39052"/>
     <property name="sun.os.patch.level" value=""/>
     <property name="CONSOLE_LOG_CHARSET" value="GBK"/>
     <property name="native.encoding" value="GBK"/>
@@ -66,9 +66,9 @@
     <property name="java.class.version" value="61.0"/>
     <property name="LOGGED_APPLICATION_NAME" value="[segroup8-platform] "/>
   </properties>
-  <testcase name="notificationStorageFailureMustNotRollbackApprovalCoreState" classname="com.segroup8.platform.integration.MerchantApplicationNotificationFailureIntegrationTest" time="2.466">
-    <system-out><![CDATA[14:29:33.220 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.segroup8.platform.integration.MerchantApplicationNotificationFailureIntegrationTest]: MerchantApplicationNotificationFailureIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
-14:29:33.623 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.segroup8.platform.PlatformApplication for test class com.segroup8.platform.integration.MerchantApplicationNotificationFailureIntegrationTest
+  <testcase name="notificationStorageFailureMustNotRollbackApprovalCoreState" classname="com.segroup8.platform.integration.MerchantApplicationNotificationFailureIntegrationTest" time="2.17">
+    <system-out><![CDATA[14:51:02.838 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.segroup8.platform.integration.MerchantApplicationNotificationFailureIntegrationTest]: MerchantApplicationNotificationFailureIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+14:51:02.912 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.segroup8.platform.PlatformApplication for test class com.segroup8.platform.integration.MerchantApplicationNotificationFailureIntegrationTest
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -79,38 +79,38 @@
 
  :: Spring Boot ::                (v3.3.4)
 
-2026-08-27T14:29:35.417+08:00  INFO 10800 --- [segroup8-platform] [           main] cationNotificationFailureIntegrationTest : Starting MerchantApplicationNotificationFailureIntegrationTest using Java 17.0.18 with PID 10800 (started by isabe in C:\Users\isabe\Desktop\SE\SEGroup8\backend)
-2026-08-27T14:29:35.417+08:00  INFO 10800 --- [segroup8-platform] [           main] cationNotificationFailureIntegrationTest : The following 1 profile is active: "test"
-2026-08-27T14:29:35.417+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.boot.SpringApplication               : Loading source class com.segroup8.platform.PlatformApplication
-2026-08-27T14:29:35.521+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.w.c.s.GenericWebApplicationContext   : Refreshing org.springframework.web.context.support.GenericWebApplicationContext@a120b9
+2026-08-27T14:51:03.251+08:00  INFO 39052 --- [segroup8-platform] [           main] cationNotificationFailureIntegrationTest : Starting MerchantApplicationNotificationFailureIntegrationTest using Java 17.0.18 with PID 39052 (started by isabe in C:\Users\isabe\Desktop\SE\SEGroup8\backend)
+2026-08-27T14:51:03.254+08:00  INFO 39052 --- [segroup8-platform] [           main] cationNotificationFailureIntegrationTest : The following 1 profile is active: "test"
+2026-08-27T14:51:03.255+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.boot.SpringApplication               : Loading source class com.segroup8.platform.PlatformApplication
+2026-08-27T14:51:03.266+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.w.c.s.GenericWebApplicationContext   : Refreshing org.springframework.web.context.support.GenericWebApplicationContext@a120b9
 Logging initialized using 'class org.apache.ibatis.logging.stdout.StdOutImpl' adapter.
 Get /172.20.16.1 network interface 
 Get network interface info: name:eth24 (Hyper-V Virtual Ethernet Adapter)
-Initialization Sequence datacenterId:18 workerId:18
+Initialization Sequence datacenterId:18 workerId:0
  _ _   |_  _ _|_. ___ _ |    _ 
 | | |\/|_)(_| | |_\  |_)||_|_\ 
      /               |         
                         3.5.7 
-2026-08-27T14:29:44.569+08:00  INFO 10800 --- [segroup8-platform] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-08-27T14:29:45.620+08:00  INFO 10800 --- [segroup8-platform] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:segroup8_test user=SA
-2026-08-27T14:29:45.627+08:00  INFO 10800 --- [segroup8-platform] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-08-27T14:29:46.378+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.b.a.AutoConfigurationPackages        : @EnableAutoConfiguration was declared on a class in the package 'com.segroup8.platform'. Automatic @Repository and @Entity scanning is enabled.
-2026-08-27T14:29:56.015+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.w.s.s.s.WebSocketHandlerMapping      : Patterns [/ws/realtime] in 'webSocketHandlerMapping'
-2026-08-27T14:29:59.279+08:00 DEBUG 10800 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : 137 mappings in 'requestMappingHandlerMapping'
-2026-08-27T14:29:59.611+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.w.s.handler.SimpleUrlHandlerMapping  : Patterns [/webjars/**, /**, /uploads/**, /swagger-ui*/*swagger-initializer.js, /swagger-ui*/**] in 'resourceHandlerMapping'
-2026-08-27T14:29:59.847+08:00 DEBUG 10800 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerAdapter : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 2 ResponseBodyAdvice
-2026-08-27T14:29:59.906+08:00 DEBUG 10800 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : ControllerAdvice beans: 2 @ExceptionHandler, 2 ResponseBodyAdvice
-2026-08-27T14:30:02.619+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.b.w.s.ServletContextInitializerBeans : Mapping filters: webMvcObservationFilter urls=[/*] order=-2147483647, characterEncodingFilter urls=[/*] order=-2147483648, formContentFilter urls=[/*] order=-9900, requestContextFilter urls=[/*] order=-105
-2026-08-27T14:30:02.621+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.b.w.s.ServletContextInitializerBeans : Mapping servlets: 
-2026-08-27T14:30:02.668+08:00 DEBUG 10800 --- [segroup8-platform] [           main] s.b.w.s.f.OrderedCharacterEncodingFilter : Filter 'characterEncodingFilter' configured for use
-2026-08-27T14:30:02.668+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.w.f.ServerHttpObservationFilter      : Filter 'webMvcObservationFilter' configured for use
-2026-08-27T14:30:02.668+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.b.w.s.f.OrderedFormContentFilter     : Filter 'formContentFilter' configured for use
-2026-08-27T14:30:02.668+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.b.w.s.f.OrderedRequestContextFilter  : Filter 'requestContextFilter' configured for use
-2026-08-27T14:30:02.670+08:00  INFO 10800 --- [segroup8-platform] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
-2026-08-27T14:30:02.671+08:00  INFO 10800 --- [segroup8-platform] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
-2026-08-27T14:30:02.711+08:00  INFO 10800 --- [segroup8-platform] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoints beneath base path '/actuator'
-2026-08-27T14:30:02.758+08:00  INFO 10800 --- [segroup8-platform] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 86 ms
-2026-08-27T14:30:03.233+08:00 DEBUG 10800 --- [segroup8-platform] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+2026-08-27T14:51:09.434+08:00  INFO 39052 --- [segroup8-platform] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-27T14:51:10.308+08:00  INFO 39052 --- [segroup8-platform] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:segroup8_test user=SA
+2026-08-27T14:51:10.315+08:00  INFO 39052 --- [segroup8-platform] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-27T14:51:11.542+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.b.a.AutoConfigurationPackages        : @EnableAutoConfiguration was declared on a class in the package 'com.segroup8.platform'. Automatic @Repository and @Entity scanning is enabled.
+2026-08-27T14:51:20.716+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.w.s.s.s.WebSocketHandlerMapping      : Patterns [/ws/realtime] in 'webSocketHandlerMapping'
+2026-08-27T14:51:24.277+08:00 DEBUG 39052 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : 137 mappings in 'requestMappingHandlerMapping'
+2026-08-27T14:51:24.506+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.w.s.handler.SimpleUrlHandlerMapping  : Patterns [/webjars/**, /**, /uploads/**, /swagger-ui*/*swagger-initializer.js, /swagger-ui*/**] in 'resourceHandlerMapping'
+2026-08-27T14:51:24.578+08:00 DEBUG 39052 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerAdapter : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 2 ResponseBodyAdvice
+2026-08-27T14:51:24.593+08:00 DEBUG 39052 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : ControllerAdvice beans: 2 @ExceptionHandler, 2 ResponseBodyAdvice
+2026-08-27T14:51:26.122+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.b.w.s.ServletContextInitializerBeans : Mapping filters: webMvcObservationFilter urls=[/*] order=-2147483647, characterEncodingFilter urls=[/*] order=-2147483648, formContentFilter urls=[/*] order=-9900, requestContextFilter urls=[/*] order=-105
+2026-08-27T14:51:26.122+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.b.w.s.ServletContextInitializerBeans : Mapping servlets: 
+2026-08-27T14:51:26.146+08:00 DEBUG 39052 --- [segroup8-platform] [           main] s.b.w.s.f.OrderedCharacterEncodingFilter : Filter 'characterEncodingFilter' configured for use
+2026-08-27T14:51:26.147+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.w.f.ServerHttpObservationFilter      : Filter 'webMvcObservationFilter' configured for use
+2026-08-27T14:51:26.148+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.b.w.s.f.OrderedFormContentFilter     : Filter 'formContentFilter' configured for use
+2026-08-27T14:51:26.148+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.b.w.s.f.OrderedRequestContextFilter  : Filter 'requestContextFilter' configured for use
+2026-08-27T14:51:26.148+08:00  INFO 39052 --- [segroup8-platform] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-27T14:51:26.149+08:00  INFO 39052 --- [segroup8-platform] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-27T14:51:26.168+08:00  INFO 39052 --- [segroup8-platform] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoints beneath base path '/actuator'
+2026-08-27T14:51:26.193+08:00  INFO 39052 --- [segroup8-platform] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 44 ms
+2026-08-27T14:51:26.587+08:00 DEBUG 39052 --- [segroup8-platform] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
 
 
 ============================
@@ -2298,115 +2298,115 @@ Unconditional classes:
 
 
 
-2026-08-27T14:30:03.277+08:00  INFO 10800 --- [segroup8-platform] [           main] cationNotificationFailureIntegrationTest : Started MerchantApplicationNotificationFailureIntegrationTest in 29.355 seconds (process running for 33.198)
+2026-08-27T14:51:26.618+08:00  INFO 39052 --- [segroup8-platform] [           main] cationNotificationFailureIntegrationTest : Started MerchantApplicationNotificationFailureIntegrationTest in 23.651 seconds (process running for 26.298)
 Creating a new SqlSession
-SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@70962b43] was not registered for synchronization because synchronization is not active
-2026-08-27T14:30:03.505+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.b.a.ApplicationAvailabilityBean      : Application availability state LivenessState changed to CORRECT
-2026-08-27T14:30:03.533+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.b.a.ApplicationAvailabilityBean      : Application availability state ReadinessState changed to ACCEPTING_TRAFFIC
-2026-08-27T14:30:03.707+08:00 DEBUG 10800 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.AuthController#register(RegisterRequest)
-2026-08-27T14:30:03.731+08:00 DEBUG 10800 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.RegisterRequest@51f91d19]
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a3a98c1] was not registered for synchronization because synchronization is not active
+2026-08-27T14:51:26.759+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.b.a.ApplicationAvailabilityBean      : Application availability state LivenessState changed to CORRECT
+2026-08-27T14:51:26.774+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.b.a.ApplicationAvailabilityBean      : Application availability state ReadinessState changed to ACCEPTING_TRAFFIC
+2026-08-27T14:51:26.919+08:00 DEBUG 39052 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.AuthController#register(RegisterRequest)
+2026-08-27T14:51:26.945+08:00 DEBUG 39052 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.RegisterRequest@10cb1b89]
 Creating a new SqlSession
-SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2eebb07] was not registered for synchronization because synchronization is not active
-JDBC Connection [HikariProxyConnection@2929246 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
-JDBC Connection [HikariProxyConnection@671949051 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3bd552f7] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@379294810 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+JDBC Connection [HikariProxyConnection@1434443833 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
 ==>  Preparing: DELETE FROM idempotency_record WHERE (expire_time < ?)
 ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE (username = ?) limit 1
-==> Parameters: uc03-failure-300aec3362a3(String)
-==> Parameters: 2026-08-27T14:30:03.312966400(LocalDateTime)
+==> Parameters: uc03-failure-9d5d589c7a16(String)
+==> Parameters: 2026-08-27T14:51:26.671678700(LocalDateTime)
 <==    Updates: 0
-Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@70962b43]
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a3a98c1]
 <==      Total: 0
-Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2eebb07]
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3bd552f7]
 Creating a new SqlSession
-SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@333cedbd] was not registered for synchronization because synchronization is not active
-JDBC Connection [HikariProxyConnection@21387540 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7f129873] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@2019896341 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
 ==>  Preparing: INSERT INTO user ( username, password, nickname, avatar, role, status, credit_score, seller_credit_score ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
-==> Parameters: uc03-failure-300aec3362a3(String), $2a$10$5ZDQiRyb3.TGVvbamyeAsePdOa8zicGuVGZyHV2iwydGLXUUeRitG(String), Failure Test(String), (String), USER(String), NORMAL(String), 100(Integer), 100(Integer)
+==> Parameters: uc03-failure-9d5d589c7a16(String), $2a$10$QDvjwe9T/F7QW/IHN.bRuukkxQWHa/Ae9wlijDM83V.ETdEM.8i8e(String), Failure Test(String), (String), USER(String), NORMAL(String), 100(Integer), 100(Integer)
 <==    Updates: 1
-Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@333cedbd]
-2026-08-27T14:30:04.785+08:00 DEBUG 10800 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
-2026-08-27T14:30:04.786+08:00 DEBUG 10800 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@7c3bac88]
-2026-08-27T14:30:04.790+08:00  INFO 10800 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=286f93903cce48949c28ae8f74e2991c method=POST path=/api/auth/register status=200
-2026-08-27T14:30:04.808+08:00 DEBUG 10800 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.AuthController#login(LoginRequest)
-2026-08-27T14:30:04.812+08:00 DEBUG 10800 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.LoginRequest@78652c15]
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7f129873]
+2026-08-27T14:51:27.645+08:00 DEBUG 39052 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-27T14:51:27.647+08:00 DEBUG 39052 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@56540a58]
+2026-08-27T14:51:27.652+08:00  INFO 39052 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=86e157dea1fd4f0f99329e6faf0f2095 method=POST path=/api/auth/register status=200
+2026-08-27T14:51:27.677+08:00 DEBUG 39052 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.AuthController#login(LoginRequest)
+2026-08-27T14:51:27.681+08:00 DEBUG 39052 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.LoginRequest@5dce3e82]
 Creating a new SqlSession
-SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2c3f47ba] was not registered for synchronization because synchronization is not active
-JDBC Connection [HikariProxyConnection@212467648 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3bc82aa3] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@947297132 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
 ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE (username = ?) limit 1
-==> Parameters: uc03-failure-300aec3362a3(String)
+==> Parameters: uc03-failure-9d5d589c7a16(String)
 <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
-<==        Row: 4, uc03-failure-300aec3362a3, $2a$10$5ZDQiRyb3.TGVvbamyeAsePdOa8zicGuVGZyHV2iwydGLXUUeRitG, Failure Test, , null, null, USER, NORMAL, 100, null, null, null, null, null, null, null, null, null, null, null, 100, null
+<==        Row: 4, uc03-failure-9d5d589c7a16, $2a$10$QDvjwe9T/F7QW/IHN.bRuukkxQWHa/Ae9wlijDM83V.ETdEM.8i8e, Failure Test, , null, null, USER, NORMAL, 100, null, null, null, null, null, null, null, null, null, null, null, 100, null
 <==      Total: 1
-Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2c3f47ba]
-2026-08-27T14:30:05.416+08:00 DEBUG 10800 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
-2026-08-27T14:30:05.416+08:00 DEBUG 10800 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@28dae87e]
-2026-08-27T14:30:05.423+08:00  INFO 10800 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=4f352fa59e3045098efdf26d4a433a6e method=POST path=/api/auth/login status=200
-2026-08-27T14:30:05.464+08:00 DEBUG 10800 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.UserController#submitMerchantApplication(MerchantApplicationSubmitRequest)
-2026-08-27T14:30:05.584+08:00 DEBUG 10800 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.MerchantApplicationSubmitRequest@693afcd1]
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3bc82aa3]
+2026-08-27T14:51:28.244+08:00 DEBUG 39052 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-27T14:51:28.245+08:00 DEBUG 39052 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@179367ff]
+2026-08-27T14:51:28.255+08:00  INFO 39052 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=bec2babb53794edfb4b2bee22dcefbeb method=POST path=/api/auth/login status=200
+2026-08-27T14:51:28.278+08:00 DEBUG 39052 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.UserController#submitMerchantApplication(MerchantApplicationSubmitRequest)
+2026-08-27T14:51:28.451+08:00 DEBUG 39052 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.MerchantApplicationSubmitRequest@734d870f]
 Creating a new SqlSession
-SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@46e2a773] was not registered for synchronization because synchronization is not active
-JDBC Connection [HikariProxyConnection@911457121 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4eba3c3f] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1362475171 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
 ==>  Preparing: SELECT id,user_id,store_name,category_id,id_card_no,bank_card_no,license_img,warehouse_addr,warehouse_province,warehouse_city,warehouse_detail,contact_name,contact_phone,status,reject_reason,apply_time FROM merchant_application WHERE (user_id = ?) ORDER BY id DESC limit 1
 ==> Parameters: 4(Long)
 <==      Total: 0
-Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@46e2a773]
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4eba3c3f]
 Creating a new SqlSession
-SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@10c95d9b] was not registered for synchronization because synchronization is not active
-JDBC Connection [HikariProxyConnection@1063303686 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1dfadb7] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1174600239 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
 ==>  Preparing: INSERT INTO merchant_application ( user_id, store_name, category_id, id_card_no, bank_card_no, license_img, warehouse_addr, warehouse_province, warehouse_city, warehouse_detail, contact_name, contact_phone, status, apply_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
-==> Parameters: 4(Long), Failure Shop(String), 1(Integer), 110101199001011234(String), 6222021234567890123(String), /license.png(String), Guangdong Shenzhen Nanshan Road(String), Guangdong(String), Shenzhen(String), Nanshan Road(String), Applicant(String), 13800138000(String), 0(Integer), 2026-08-27T14:30:05.657898100(LocalDateTime)
+==> Parameters: 4(Long), Failure Shop(String), 1(Integer), 110101199001011234(String), 6222021234567890123(String), /license.png(String), Guangdong Shenzhen Nanshan Road(String), Guangdong(String), Shenzhen(String), Nanshan Road(String), Applicant(String), 13800138000(String), 0(Integer), 2026-08-27T14:51:28.499562300(LocalDateTime)
 <==    Updates: 1
-Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@10c95d9b]
-2026-08-27T14:30:05.671+08:00 DEBUG 10800 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
-2026-08-27T14:30:05.672+08:00 DEBUG 10800 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@17e96b3c]
-2026-08-27T14:30:05.674+08:00  INFO 10800 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=2a278e4c19fd4f328080787505b194be method=POST path=/api/user/merchant-application status=200
-2026-08-27T14:30:05.674+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
-2026-08-27T14:30:05.674+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [select max(id) from merchant_application where user_id = (select id from user where username = ?)]
-2026-08-27T14:30:05.722+08:00 DEBUG 10800 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.AdminMerchantApplicationController#approve(Long)
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1dfadb7]
+2026-08-27T14:51:28.525+08:00 DEBUG 39052 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-27T14:51:28.527+08:00 DEBUG 39052 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@7424a39e]
+2026-08-27T14:51:28.528+08:00  INFO 39052 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=3bc1bf3b709f493991186b17ed8a7604 method=POST path=/api/user/merchant-application status=200
+2026-08-27T14:51:28.551+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-27T14:51:28.553+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [select max(id) from merchant_application where user_id = (select id from user where username = ?)]
+2026-08-27T14:51:28.595+08:00 DEBUG 39052 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.AdminMerchantApplicationController#approve(Long)
 Creating a new SqlSession
-Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89]
-JDBC Connection [HikariProxyConnection@1348373832 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3]
+JDBC Connection [HikariProxyConnection@775937840 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
 ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
 ==> Parameters: 2(Long)
 <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
-<==        Row: 2, admin1, x, 管理员1, null, null, null, ADMIN, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-27 14:29:45.779308, 2026-08-27 14:29:45.779308, null, null
+<==        Row: 2, admin1, x, 管理员1, null, null, null, ADMIN, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-27 14:51:10.627639, 2026-08-27 14:51:10.627639, null, null
 <==      Total: 1
-Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89]
-Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3] from current transaction
 ==>  Preparing: SELECT id,user_id,store_name,category_id,id_card_no,bank_card_no,license_img,warehouse_addr,warehouse_province,warehouse_city,warehouse_detail,contact_name,contact_phone,status,reject_reason,apply_time FROM merchant_application WHERE id=?
 ==> Parameters: 1(Long)
 <==    Columns: id, user_id, store_name, category_id, id_card_no, bank_card_no, license_img, warehouse_addr, warehouse_province, warehouse_city, warehouse_detail, contact_name, contact_phone, status, reject_reason, apply_time
-<==        Row: 1, 4, Failure Shop, 1, 110101199001011234, 6222021234567890123, /license.png, Guangdong Shenzhen Nanshan Road, Guangdong, Shenzhen, Nanshan Road, Applicant, 13800138000, 0, null, 2026-08-27 14:30:05.657898
+<==        Row: 1, 4, Failure Shop, 1, 110101199001011234, 6222021234567890123, /license.png, Guangdong Shenzhen Nanshan Road, Guangdong, Shenzhen, Nanshan Road, Applicant, 13800138000, 0, null, 2026-08-27 14:51:28.499562
 <==      Total: 1
-Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89]
-Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3] from current transaction
 ==>  Preparing: UPDATE merchant_application SET user_id=?, store_name=?, category_id=?, id_card_no=?, bank_card_no=?, license_img=?, warehouse_addr=?, warehouse_province=?, warehouse_city=?, warehouse_detail=?, contact_name=?, contact_phone=?, status=?, apply_time=? WHERE id=?
-==> Parameters: 4(Long), Failure Shop(String), 1(Integer), 110101199001011234(String), 6222021234567890123(String), /license.png(String), Guangdong Shenzhen Nanshan Road(String), Guangdong(String), Shenzhen(String), Nanshan Road(String), Applicant(String), 13800138000(String), 1(Integer), 2026-08-27T14:30:05.657898(LocalDateTime), 1(Long)
+==> Parameters: 4(Long), Failure Shop(String), 1(Integer), 110101199001011234(String), 6222021234567890123(String), /license.png(String), Guangdong Shenzhen Nanshan Road(String), Guangdong(String), Shenzhen(String), Nanshan Road(String), Applicant(String), 13800138000(String), 1(Integer), 2026-08-27T14:51:28.499562(LocalDateTime), 1(Long)
 <==    Updates: 1
-Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89]
-Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3] from current transaction
 ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
 ==> Parameters: 4(Long)
 <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
-<==        Row: 4, uc03-failure-300aec3362a3, $2a$10$5ZDQiRyb3.TGVvbamyeAsePdOa8zicGuVGZyHV2iwydGLXUUeRitG, Failure Test, , null, null, USER, NORMAL, 100, null, null, null, null, null, null, null, null, null, null, null, 100, null
+<==        Row: 4, uc03-failure-9d5d589c7a16, $2a$10$QDvjwe9T/F7QW/IHN.bRuukkxQWHa/Ae9wlijDM83V.ETdEM.8i8e, Failure Test, , null, null, USER, NORMAL, 100, null, null, null, null, null, null, null, null, null, null, null, 100, null
 <==      Total: 1
-Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89]
-Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3] from current transaction
 ==>  Preparing: UPDATE user SET username=?, password=?, nickname=?, avatar=?, role=?, status=?, credit_score=?, shop_name=?, category=?, region=?, seller_credit_score=? WHERE id=?
-==> Parameters: uc03-failure-300aec3362a3(String), $2a$10$5ZDQiRyb3.TGVvbamyeAsePdOa8zicGuVGZyHV2iwydGLXUUeRitG(String), Failure Test(String), (String), OFFICIAL_SELLER(String), NORMAL(String), 100(Integer), Failure Shop(String), 1(String), Guangdong Shenzhen(String), 100(Integer), 4(Long)
+==> Parameters: uc03-failure-9d5d589c7a16(String), $2a$10$QDvjwe9T/F7QW/IHN.bRuukkxQWHa/Ae9wlijDM83V.ETdEM.8i8e(String), Failure Test(String), (String), OFFICIAL_SELLER(String), NORMAL(String), 100(Integer), Failure Shop(String), 1(String), Guangdong Shenzhen(String), 100(Integer), 4(Long)
 <==    Updates: 1
-Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89]
-Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3] from current transaction
 ==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE (owner_user_id = ?) ORDER BY id DESC limit 1
 ==> Parameters: 4(Long)
 <==      Total: 0
-Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89]
-Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3] from current transaction
 ==>  Preparing: INSERT INTO shop ( owner_user_id, name, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, status ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
 ==> Parameters: 4(Long), Failure Shop(String), Guangdong Shenzhen(String), Applicant(String), 13800138000(String), 110****234(String), Guangdong Shenzhen Nanshan Road(String), 1(Integer)
 <==    Updates: 1
-Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89]
-2026-08-27T14:30:05.840+08:00  WARN 10800 --- [segroup8-platform] [           main] c.s.p.s.i.MerchantApplicationServiceImpl : Unable to persist or push merchant application notification for user 4
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3]
+2026-08-27T14:51:28.736+08:00  WARN 39052 --- [segroup8-platform] [           main] c.s.p.s.i.MerchantApplicationServiceImpl : Unable to persist or push merchant application notification for user 4
 
 java.lang.RuntimeException: notification store unavailable
 	at com.segroup8.platform.service.impl.MerchantApplicationServiceImpl.persistNotificationSafely(MerchantApplicationServiceImpl.java:191) ~[classes/:na]
@@ -2536,38 +2536,38 @@ java.lang.RuntimeException: notification store unavailable
 	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.2.5.jar:3.2.5]
 	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.2.5.jar:3.2.5]
 
-Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89]
-Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89]
-Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43c25e89]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@36ba9aa3]
 Creating a new SqlSession
-SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5524e471] was not registered for synchronization because synchronization is not active
-JDBC Connection [HikariProxyConnection@997037308 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a89722e] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1953886321 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
 ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
 ==> Parameters: 2(Long)
 <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
-<==        Row: 2, admin1, x, 管理员1, null, null, null, ADMIN, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-27 14:29:45.779308, 2026-08-27 14:29:45.779308, null, null
+<==        Row: 2, admin1, x, 管理员1, null, null, null, ADMIN, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-27 14:51:10.627639, 2026-08-27 14:51:10.627639, null, null
 <==      Total: 1
-Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5524e471]
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a89722e]
 Creating a new SqlSession
-SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@71c77042] was not registered for synchronization because synchronization is not active
-JDBC Connection [HikariProxyConnection@1717547480 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2116e9cf] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@2055792297 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
 ==>  Preparing: INSERT INTO admin_audit_log ( admin_user_id, admin_username, action, target_type, target_id, detail, create_time ) VALUES ( ?, ?, ?, ?, ?, ?, ? )
-==> Parameters: 2(Long), admin1(String), APPROVE_MERCHANT_APPLICATION(String), MERCHANT_APPLICATION(String), 1(Long), 通过入驻申请(String), 2026-08-27T14:30:05.864999200(LocalDateTime)
+==> Parameters: 2(Long), admin1(String), APPROVE_MERCHANT_APPLICATION(String), MERCHANT_APPLICATION(String), 1(Long), 通过入驻申请(String), 2026-08-27T14:51:28.755494900(LocalDateTime)
 <==    Updates: 1
-Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@71c77042]
-2026-08-27T14:30:05.875+08:00 DEBUG 10800 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
-2026-08-27T14:30:05.876+08:00 DEBUG 10800 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@9b84747]
-2026-08-27T14:30:05.877+08:00  INFO 10800 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=edbd990d18634b9eb03fbb484ebbe3b8 method=POST path=/api/admin/merchant-applications/1/approve status=200
-2026-08-27T14:30:05.881+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
-2026-08-27T14:30:05.882+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [select id from user where username = ?]
-2026-08-27T14:30:05.885+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
-2026-08-27T14:30:05.886+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [select status from merchant_application where id = ?]
-2026-08-27T14:30:06.060+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
-2026-08-27T14:30:06.061+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [select role from user where id = ?]
-2026-08-27T14:30:06.069+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
-2026-08-27T14:30:06.069+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [select count(*) from shop where owner_user_id = ?]
-2026-08-27T14:30:06.072+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
-2026-08-27T14:30:06.073+08:00 DEBUG 10800 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [select count(*) from notification where user_id = ?]
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2116e9cf]
+2026-08-27T14:51:28.763+08:00 DEBUG 39052 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-27T14:51:28.764+08:00 DEBUG 39052 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@36f2bfe6]
+2026-08-27T14:51:28.765+08:00  INFO 39052 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=2a8c0acd5f7e4b4e9f692443c295660b method=POST path=/api/admin/merchant-applications/1/approve status=200
+2026-08-27T14:51:28.767+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-27T14:51:28.767+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [select id from user where username = ?]
+2026-08-27T14:51:28.768+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-27T14:51:28.769+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [select status from merchant_application where id = ?]
+2026-08-27T14:51:28.945+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-27T14:51:28.945+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [select role from user where id = ?]
+2026-08-27T14:51:28.953+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-27T14:51:28.953+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [select count(*) from shop where owner_user_id = ?]
+2026-08-27T14:51:28.957+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-27T14:51:28.957+08:00 DEBUG 39052 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [select count(*) from notification where user_id = ?]
 ]]></system-out>
   </testcase>
 </testsuite>
