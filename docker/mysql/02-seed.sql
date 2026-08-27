@@ -3,7 +3,8 @@ INSERT IGNORE INTO `user`
 VALUES
   (1, 'admin', 'admin123', 'Platform Admin', '', '13800000000', 'admin@demo.com', 'ADMIN', 'NORMAL', 100),
   (2, 'seller', 'seller123', 'Demo Seller', '', '13800000001', 'seller@demo.com', 'OFFICIAL_SELLER', 'NORMAL', 100),
-  (3, 'user', 'user123', 'Demo User', '', '13800000002', 'user@demo.com', 'USER', 'NORMAL', 100);
+  (3, 'user', 'user123', 'Demo User', '', '13800000002', 'user@demo.com', 'USER', 'NORMAL', 100),
+  (4, 'third', 'third123', 'Third Party User', '', '13800000003', 'third@demo.com', 'USER', 'NORMAL', 100);
 
 CREATE TABLE IF NOT EXISTS `search_keyword_stat` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
@@ -37,3 +38,18 @@ INSERT IGNORE INTO `product`
   (`id`, `shop_id`, `name`, `cover`, `description`, `price`, `category_id`, `sub_category_id`, `stock`, `status`)
 VALUES
   (1, 1, 'Container Demo Keyboard', '', 'Seed product for Issue #65 acceptance', 299.00, 1, 101, 80, 1);
+
+INSERT IGNORE INTO `address`
+  (`id`, `user_id`, `receiver_name`, `receiver_phone`, `province`, `city`, `detail_address`, `is_default`)
+VALUES
+  (1, 3, 'Demo User', '13800000002', '北京市', '北京市', '测试路1号', 1);
+
+INSERT INTO `balance`
+  (`user_id`, `personal_balance`, `business_balance`, `version`)
+VALUES
+  (2, 0.00, 0.00, 0),
+  (3, 100.00, 0.00, 0)
+ON DUPLICATE KEY UPDATE
+  `personal_balance` = VALUES(`personal_balance`),
+  `business_balance` = VALUES(`business_balance`),
+  `version` = VALUES(`version`);

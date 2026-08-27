@@ -11,6 +11,7 @@ import com.segroup8.platform.service.ReportBlockService;
 import com.segroup8.platform.vo.CreditScoreVO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -32,6 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("DOMAIN_A")
+@Tag("UC05")
 class ReportBlockControllerWebMvcTest {
 
     private MockMvc mockMvc;

@@ -59,6 +59,26 @@ jobs:
           distribution: temurin
           java-version: "17"
           cache: maven
+      - name: Run Domain A tagged tests
+        run: mvn -B --no-transfer-progress -Dgroups=DOMAIN_A test
+      - name: Upload Domain A test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: domain-a-surefire-reports
+          path: backend/target/surefire-reports/**
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Run shared JWT security contract tests
+        run: mvn -B --no-transfer-progress -f ../microservices/pom.xml -pl security-contract -am test
+      - name: Upload shared JWT contract reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: platform-security-contract-surefire-reports
+          path: microservices/security-contract/target/surefire-reports/**
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Run tests and package JAR
         run: mvn -B --no-transfer-progress clean verify
       - name: Prepare deployable JAR
@@ -79,9 +99,36 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  domain-e:
+    name: DOMAIN_E tagged tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+      - name: Run Domain-E tagged tests
+        run: mvn -B --no-transfer-progress -Dgroups=DOMAIN_E test
+      - name: Upload Domain-E Surefire reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: domain-e-surefire-reports
+          path: backend/target/surefire-reports/**
+          if-no-files-found: error
+          retention-days: 14
+
   e2e:
     name: Real full-stack Playwright E2E
-    needs: [frontend, backend]
+    needs: [frontend, backend, domain-e]
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
@@ -89,6 +136,14 @@ jobs:
       E2E_USERNAME: user
       E2E_PASSWORD: user123
       E2E_ROLE: USER
+      E2E_ADMIN_USERNAME: admin
+      E2E_ADMIN_PASSWORD: admin123
+      E2E_OFFICIAL_SELLER_USERNAME: seller
+      E2E_OFFICIAL_SELLER_PASSWORD: seller123
+      E2E_BUYER_USERNAME: user
+      E2E_BUYER_PASSWORD: user123
+      E2E_THIRD_PARTY_USERNAME: third
+      E2E_THIRD_PARTY_PASSWORD: third123
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

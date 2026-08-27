@@ -5,6 +5,7 @@ import com.segroup8.platform.service.AuthService;
 import com.segroup8.platform.vo.LoginVO;
 import com.segroup8.platform.vo.UserVO;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -24,6 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("DOMAIN_A")
+@Tag("UC01")
 class AuthControllerWebMvcTest {
 
     private MockMvc mockMvc;
