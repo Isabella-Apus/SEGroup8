@@ -1,6 +1,7 @@
 {
   "uc": "UC04",
   "integration": {"status": "PASS", "tests": 1, "failures": 0, "errors": 0},
+  "savedApiCoverage": {"status": "PASS", "tests": 4, "failures": 0, "errors": 0},
   "compose_mysql_browser": {"status": "NOT_RUN"},
   "coverage": ["ban/login failure", "unban/login recovery", "non-admin", "self-ban", "repeat unban", "audit query"],
   "evidenceRule": "H2 integration and real Compose browser evidence are reported separately."
