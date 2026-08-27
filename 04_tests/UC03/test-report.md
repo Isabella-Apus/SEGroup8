@@ -6,5 +6,8 @@ notification/audit persistence, repeat approve without duplicate core shop or
 notification, rejection reason/role preservation, and injected notification
 storage failure without rollback of the approval core state.
 
+Saved API coverage passed with 9 tests: `MerchantApplicationControllerWebMvcTest`
+6 and `MerchantApplicationServiceImplTest` 3.
+
 The Compose/MySQL Playwright gate is implemented but `NOT_RUN` until Docker
 produces its raw report and screenshots. H2 is not represented as MySQL.
