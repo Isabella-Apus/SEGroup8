@@ -2,9 +2,11 @@ package com.segroup8.platform.controller;
 
 import com.segroup8.platform.common.GlobalExceptionHandler;
 import com.segroup8.platform.service.OrderService;
+import com.segroup8.platform.testsupport.DomainCTestTags;
 import com.segroup8.platform.vo.OrderVO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -22,6 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
+@Tag(DomainCTestTags.DOMAIN_C)
+@Tag(DomainCTestTags.PLATFORM)
 class OrderControllerWebMvcTest {
 
     private MockMvc mockMvc;
@@ -64,4 +68,3 @@ class OrderControllerWebMvcTest {
         verify(orderService).refundMyOrder(1L, null);
     }
 }
-
