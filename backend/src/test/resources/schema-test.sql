@@ -15,6 +15,7 @@ DROP TABLE IF EXISTS `auction_log`;
 DROP TABLE IF EXISTS `product_auction`;
 DROP TABLE IF EXISTS `order_item`;
 DROP TABLE IF EXISTS `order_info`;
+DROP TABLE IF EXISTS `product_risk_audit`;
 DROP TABLE IF EXISTS `secondhand_product`;
 DROP TABLE IF EXISTS `product`;
 DROP TABLE IF EXISTS `shop`;
@@ -242,7 +243,7 @@ CREATE TABLE `product` (
 );
 
 CREATE TABLE `secondhand_product` (
-  `id` BIGINT PRIMARY KEY,
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `seller_user_id` BIGINT NOT NULL,
   `name` VARCHAR(120) NOT NULL,
   `cover` VARCHAR(255),
@@ -257,6 +258,25 @@ CREATE TABLE `secondhand_product` (
   `status` INT NOT NULL,
   `create_time` TIMESTAMP,
   `update_time` TIMESTAMP
+);
+
+CREATE TABLE `product_risk_audit` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `product_type` VARCHAR(20) NOT NULL,
+  `product_id` BIGINT NOT NULL,
+  `seller_user_id` BIGINT,
+  `product_name` VARCHAR(120),
+  `risk_level` VARCHAR(20) DEFAULT 'LOW',
+  `risk_score` INT DEFAULT 0,
+  `risk_reasons` TEXT,
+  `suggestion` VARCHAR(40) DEFAULT 'AUTO_PASS',
+  `audit_status` VARCHAR(30) DEFAULT 'PENDING',
+  `admin_user_id` BIGINT,
+  `admin_remark` VARCHAR(500),
+  `audit_time` TIMESTAMP,
+  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `update_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT `uk_product_risk_audit_product` UNIQUE (`product_type`, `product_id`)
 );
 
 CREATE TABLE `product_auction` (

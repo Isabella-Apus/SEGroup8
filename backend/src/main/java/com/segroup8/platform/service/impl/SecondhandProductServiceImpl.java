@@ -55,6 +55,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
     private static final TypeReference<List<String>> STRING_LIST_TYPE = new TypeReference<>() {};
     private static final int ON_SHELF = 1;
     private static final int OFF_SHELF = 2;
+    private static final int SOLD = 3;
     private static final int ORDER_PENDING_PAY = 0;
     private static final String AUCTION_ONGOING = "ONGOING";
     private static final DateTimeFormatter ORDER_NO_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
@@ -239,6 +240,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         validatePriceFields(request.getOriginPrice(), request.getSalePrice());
         validateSecondhandCategory(request.getCategoryId(), request.getSubCategoryId());
         SecondhandProduct product = getSellerOwnedProduct(productId);
+        ensureProductMutable(product);
         product.setName(request.getName().trim());
         List<String> images = normalizeImages(request.getImages(), request.getCover());
         product.setCover(firstImage(images));
@@ -261,12 +263,14 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
     @Override
     public void deleteSellerProduct(Long productId) {
         SecondhandProduct product = getSellerOwnedProduct(productId);
+        ensureProductMutable(product);
         secondhandProductMapper.deleteById(product.getId());
     }
 
     @Override
     public SecondhandProductVO changeSellerProductStatus(Long productId, Integer status) {
         SecondhandProduct product = getSellerOwnedProduct(productId);
+        ensureProductMutable(product);
         product.setStatus(normalizeStatus(status, null));
         secondhandProductMapper.updateById(product);
         return toVO(secondhandProductMapper.selectById(productId));
@@ -302,7 +306,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         }
 
         int updated = secondhandProductMapper.update(null, new UpdateWrapper<SecondhandProduct>()
-                .set("status", OFF_SHELF)
+                .set("status", SOLD)
                 .eq("id", productId)
                 .eq("status", ON_SHELF));
         if (updated == 0) {
@@ -481,6 +485,12 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         return product;
     }
 
+    private void ensureProductMutable(SecondhandProduct product) {
+        if (Objects.equals(product.getStatus(), SOLD)) {
+            throw new BusinessException(400, "已售商品不能编辑、上架或删除");
+        }
+    }
+
     private PageVO<SecondhandProductVO> toPageVO(Page<SecondhandProduct> page) {
         PageVO<SecondhandProductVO> vo = new PageVO<>();
         vo.setTotal(page.getTotal());
@@ -512,7 +522,11 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         vo.setConditionLevel(product.getConditionLevel());
         vo.setIsNegotiable(product.getIsNegotiable());
         vo.setStatus(product.getStatus());
-        vo.setStatusName(Objects.equals(product.getStatus(), ON_SHELF) ? "在售" : "下架");
+        vo.setStatusName(switch (product.getStatus() == null ? 0 : product.getStatus()) {
+            case ON_SHELF -> "在售";
+            case SOLD -> "已售";
+            default -> "下架";
+        });
         vo.setRiskAudit(productRiskAuditService.getLatestAudit("SECONDHAND", product.getId()));
         vo.setCreateTime(product.getCreateTime());
         return vo;

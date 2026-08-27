@@ -61,6 +61,7 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
 
     private static final int SECONDHAND_ON_SHELF = 1;
     private static final int SECONDHAND_OFF_SHELF = 2;
+    private static final int SECONDHAND_SOLD = 3;
     private static final DateTimeFormatter ORDER_NO_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     private final ProductNegotiationMapper productNegotiationMapper;
@@ -619,7 +620,7 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         orderItemMapper.insert(orderItem);
 
         secondhandProductMapper.update(null, new UpdateWrapper<SecondhandProduct>()
-                .set("status", SECONDHAND_OFF_SHELF)
+                .set("status", SECONDHAND_SOLD)
                 .eq("id", product.getId())
                 .eq("status", SECONDHAND_ON_SHELF));
 
@@ -682,7 +683,7 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
 
     private OrderInfo createPendingBargainOrder(ProductNegotiation negotiation, SecondhandProduct product, BigDecimal dealPrice) {
         int updatedProduct = secondhandProductMapper.update(null, new UpdateWrapper<SecondhandProduct>()
-                .set("status", SECONDHAND_OFF_SHELF)
+                .set("status", SECONDHAND_SOLD)
                 .eq("id", product.getId())
                 .eq("status", SECONDHAND_ON_SHELF));
         if (updatedProduct == 0) {

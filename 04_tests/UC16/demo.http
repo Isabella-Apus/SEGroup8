@@ -1,0 +1,42 @@
+@baseUrl = http://127.0.0.1:8089/api
+@sellerToken = replace-with-seller-jwt
+@otherToken = replace-with-other-user-jwt
+@productId = 1
+
+### 查询真实二手分类树
+GET {{baseUrl}}/category/tree?scene=SECONDHAND
+Authorization: Bearer {{sellerToken}}
+
+### 发布二手商品
+POST {{baseUrl}}/secondhand/seller
+Authorization: Bearer {{sellerToken}}
+Content-Type: application/json
+
+{
+  "name": "UC16 demo product",
+  "images": ["/uploads/uc16-demo.png"],
+  "description": "UC16 reproducible request",
+  "originPrice": 200.00,
+  "salePrice": 120.00,
+  "categoryId": 1,
+  "subCategoryId": 101,
+  "conditionLevel": "90%",
+  "isNegotiable": 1
+}
+
+### 下架本人商品
+POST {{baseUrl}}/secondhand/seller/{{productId}}/status
+Authorization: Bearer {{sellerToken}}
+Content-Type: application/json
+
+{
+  "status": 2
+}
+
+### 非本人删除应被拒绝
+DELETE {{baseUrl}}/secondhand/seller/{{productId}}
+Authorization: Bearer {{otherToken}}
+
+### 本人删除商品
+DELETE {{baseUrl}}/secondhand/seller/{{productId}}
+Authorization: Bearer {{sellerToken}}
