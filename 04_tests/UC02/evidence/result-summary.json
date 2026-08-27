@@ -1,6 +1,7 @@
 {
   "uc": "UC02",
   "integration": {"status": "PASS", "tests": 2, "failures": 0, "errors": 0},
+  "savedApiCoverage": {"status": "PASS", "tests": 8, "failures": 0, "errors": 0},
   "compose_mysql_browser": {"status": "NOT_RUN"},
   "coverage": ["profile consistency", "address CRUD", "one default", "ownership isolation", "unauthenticated boundary"],
   "evidenceRule": "H2 integration and real Compose browser evidence are reported separately."
