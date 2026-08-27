@@ -8,7 +8,42 @@ param(
 
 $ErrorActionPreference = 'Continue'
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
-$evidenceRoot = Join-Path $repositoryRoot '04_tests\platform-e2e\evidence'
+$defaultEvidenceRoot = Join-Path $repositoryRoot '04_tests\platform-e2e\evidence'
+
+function Resolve-ConfiguredPath([string]$Value, [string]$Fallback) {
+    if ([string]::IsNullOrWhiteSpace($Value)) {
+        return [System.IO.Path]::GetFullPath($Fallback)
+    }
+
+    if ([System.IO.Path]::IsPathRooted($Value)) {
+        return [System.IO.Path]::GetFullPath($Value)
+    }
+
+    return [System.IO.Path]::GetFullPath(
+        (Join-Path $repositoryRoot $Value)
+    )
+}
+
+$configuredOutputRoot = $env:E2E_OUTPUT_DIR
+
+# 优先使用统一脚手架变量。
+# 如果只有 E2E_OUTPUT_DIR，则兼容旧脚本：它同时作为 Evidence 根目录。
+$evidenceRoot = if ($env:E2E_EVIDENCE_ROOT) {
+    Resolve-ConfiguredPath $env:E2E_EVIDENCE_ROOT $defaultEvidenceRoot
+} elseif ($configuredOutputRoot) {
+    Resolve-ConfiguredPath $configuredOutputRoot $defaultEvidenceRoot
+} else {
+    Resolve-ConfiguredPath $null $defaultEvidenceRoot
+}
+
+# 只有同时配置两个变量时，才把 Playwright 输出与日志 Evidence 分开。
+$playwrightOutputRoot = if ($env:E2E_EVIDENCE_ROOT -and $configuredOutputRoot) {
+    Resolve-ConfiguredPath $configuredOutputRoot $evidenceRoot
+} else {
+    $evidenceRoot
+}
+
+$logsRoot = Join-Path $evidenceRoot 'logs'
 $logsRoot = Join-Path $evidenceRoot 'logs'
 New-Item -ItemType Directory -Force -Path $logsRoot | Out-Null
 $failureStagePath = Join-Path $logsRoot 'failure-stage.txt'
@@ -83,7 +118,7 @@ try {
     if (-not $env:E2E_PASSWORD) { $env:E2E_PASSWORD = 'user123' }
     if (-not $env:E2E_ROLE) { $env:E2E_ROLE = 'USER' }
     if (-not $env:E2E_BASE_URL) { $env:E2E_BASE_URL = 'http://127.0.0.1:8088' }
-    $env:E2E_OUTPUT_DIR = $evidenceRoot
+    $env:E2E_OUTPUT_DIR = $playwrightOutputRoot
 
     if ($ResetDatabase) {
         $currentStage = 'database-reset'

@@ -1,0 +1,26 @@
+{
+  "domain": "DOMAIN_A",
+  "status": "PASS_H2_MOCKMVC_NOT_COMPOSE_RUN",
+  "unitApiEvidence": "existing tests retained and tagged",
+  "integrationEvidence": "per-UC branches",
+  "browserE2eEvidence": "per-UC branches",
+  "domainATestCount": 33,
+  "domainAFailures": 0,
+  "domainAErrors": 0,
+  "platformJwtInterceptorTests": 3,
+  "microserviceJwtContractTests": 5,
+  "duplicateTestDeletion": 0,
+  "ciWorkflow": "https://github.com/Isabella-Apus/SEGroup8/actions/workflows/ci-cd.yml",
+  "localVerification": {
+    "domainA": "PASS_33_TESTS_A0_BASELINE",
+    "backendCleanVerify": "PASS_95_TESTS_A0_BASELINE",
+    "finalMergedDomainA": "PASS_65_TESTS",
+    "finalMergedBackendCleanVerify": "PASS_127_TESTS",
+    "microservicesJwtContract": "PASS_5_TESTS",
+    "frontendInstall": "PASS_96_PACKAGES",
+    "frontendBuildReal": "PASS_2421_MODULES",
+    "composeConfig": "PASS",
+    "composeMysqlBrowser": "NOT_RUN_DOCKER_LINUX_DAEMON_UNAVAILABLE"
+  },
+  "note": "Docker Compose browser E2E is not run because the local Docker daemon is unavailable; GitHub Actions must provide the browser gate."
+}

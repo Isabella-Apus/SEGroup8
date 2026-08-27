@@ -4,6 +4,7 @@ import com.segroup8.platform.common.GlobalExceptionHandler;
 import com.segroup8.platform.service.AdminAuditLogService;
 import com.segroup8.platform.service.AdminUserService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -20,6 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("DOMAIN_A")
+@Tag("UC04")
 class AdminUserControllerWebMvcTest {
 
     private MockMvc mockMvc;

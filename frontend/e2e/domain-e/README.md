@@ -14,4 +14,4 @@ import { test, expect } from "../fixtures";
 - `uc24-chat.spec.ts`
 - `uc25-notification.spec.ts`
 
-共享 Playwright/Compose 已由 PR #133 合并。禁止复制新的 config、fixture 或 Compose。每个 spec 必须在真实 Compose 环境实际运行，并将结果写入对应 `04_tests/UCxx/evidence/` 后才能报告 PASS。
+共享 Playwright/Compose 已由 PR #133 合并。禁止复制新的 config、fixture 或 Compose。默认运行结果写入共享目录 `04_tests/platform-e2e/evidence/`；若要为单个 UC 留存独立证据，应显式设置 `E2E_OUTPUT_DIR=../04_tests/UCxx/evidence` 后再运行对应 spec。每个 spec 必须在真实 Compose 环境实际运行并保存证据后，才能报告 PASS。
