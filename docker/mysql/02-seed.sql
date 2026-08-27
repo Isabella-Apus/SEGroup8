@@ -10,6 +10,11 @@ INSERT IGNORE INTO `shop`
 VALUES
   (1, 2, 'Container Demo Store', '', 'Seed shop for Issue #65 acceptance', 1);
 
+INSERT IGNORE INTO `address`
+  (`id`, `user_id`, `receiver_name`, `receiver_phone`, `province`, `city`, `detail_address`, `is_default`)
+VALUES
+  (1, 3, 'Demo User', '13800000002', 'Beijing', 'Beijing', 'Container E2E Address', 1);
+
 INSERT INTO `category` (`id`, `name`, `parent_id`, `sort_order`, `status`)
 VALUES (1, 'Digital Products', 0, 1, 1)
 ON DUPLICATE KEY UPDATE
