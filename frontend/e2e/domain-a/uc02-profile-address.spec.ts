@@ -56,7 +56,8 @@ test.describe("UC02 real profile and address flow", () => {
 
         await page.goto("/profile");
         await page.reload();
-        await expect(page.locator("body")).toContainText("UC02 refreshed");
+        await expect(page.locator(".page-card .el-form-item").nth(1).locator("input"))
+            .toHaveValue("UC02 refreshed");
         await page.goto("/addresses");
         await page.reload();
         await expect(page.locator("body")).toContainText("Updated Receiver");

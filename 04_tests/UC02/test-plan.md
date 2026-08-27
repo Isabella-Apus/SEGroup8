@@ -1,7 +1,7 @@
 # UC02 用户资料与地址测试计划
 
-状态：后端/API/H2 集成、测试脚本、报告与追溯已完成；真实 Compose + MySQL
-浏览器执行未完成（本机 Docker Linux daemon 不可用）。
+状态：后端/API/H2 集成、真实 Compose + MySQL + Chromium 浏览器执行、测试脚本、
+报告、追溯与 Evidence 均已完成。
 
 ## Prompt 验收项
 
@@ -13,7 +13,7 @@
 | 不能操作他人地址 | 已完成 | 集成测试、`uc02-profile-address.spec.ts` |
 | 删除后重新查询不可见 | 已完成 | 集成测试、E2E 删除后刷新断言 |
 | 主成功链、越权链、刷新后回读的 E2E 脚本 | 已完成 | `frontend/e2e/domain-a/uc02-profile-address.spec.ts` |
-| 真实 Compose 前端/后端/MySQL 浏览器执行 | 未完成 | Docker 恢复后运行并回填 Evidence |
+| 真实 Compose 前端/后端/MySQL 浏览器执行 | 已完成 | `evidence/playwright-results.json`、`playwright-report/`、`logs/` |
 
 ```bash
 mvn -B -f backend/pom.xml -Dtest=ProfileAddressUc02IntegrationTest test
@@ -28,8 +28,8 @@ pwsh -File scripts/e2e/run-compose-e2e.ps1
 实际结果：Integration 2 tests PASS；保存的 `UserControllerWebMvcTest` 8 tests
 PASS；Domain-A 定向 65 tests PASS；后端全量 127 tests PASS；frontend `npm ci`
 安装 96 个包、`npm run build:real` 构建 2421 modules 均 PASS；Compose 配置检查
-PASS；最后一条命令因 Docker Linux daemon 不可用为 NOT_RUN。浏览器命令应设置
-`E2E_OUTPUT_DIR=04_tests/UC02/evidence`，实际运行后才可标记 E2E 已完成。
+PASS；真实 Compose + MySQL + Chromium UC02 spec 1 test PASS。浏览器运行命令设置
+`E2E_OUTPUT_DIR=04_tests/UC02/evidence`，结果已回填 Evidence。
 
 ## CI
 
@@ -40,7 +40,7 @@ PASS；最后一条命令因 Docker Linux daemon 不可用为 NOT_RUN。浏览�
 - `04_tests/UC02/evidence/result-summary.json`
 - `04_tests/UC02/evidence/raw-reports/`
 - `04_tests/UC02/evidence/logs/`
-- `04_tests/UC02/evidence/screenshots/`（Compose 未运行前暂无浏览器截图）
+- `04_tests/UC02/evidence/screenshots/`（本次通过，无失败截图）
 
 ## 已知风险
 

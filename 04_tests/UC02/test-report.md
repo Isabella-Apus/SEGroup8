@@ -8,11 +8,17 @@ failures, 0 errors. It verified persisted profile changes, two default
 address writes collapsing to one default, CRUD re-query, cross-user rejection
 and unauthenticated rejection.
 
+The real Compose + MySQL + Chromium gate also passed locally on 2026-08-27:
+
+- `e2e/domain-a/uc02-profile-address.spec.ts`: 1 test passed, 0 failures.
+- Evidence was written to `04_tests/UC02/evidence/`, including Playwright
+  HTML/JSON output and Compose service logs.
+
 Saved API coverage in `UserControllerWebMvcTest` passed with 8 tests, including
 the `/me`, profile update and address update contracts.
 
-The Compose/MySQL Playwright gate is implemented and remains `NOT_RUN` until a
-Docker run produces raw reports and screenshots. H2 is not reported as MySQL.
+H2 evidence remains separately reported; this run is the real MySQL/browser
+evidence for UC02.
 
 ## 完成项
 
