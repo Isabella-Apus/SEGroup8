@@ -1,7 +1,7 @@
 # UC05 举报、拉黑与信用治理测试计划
 
-状态：后端/API/H2 集成、测试脚本、报告与追溯已完成；真实 Compose + MySQL
-浏览器执行未完成（本机 Docker Linux daemon 不可用）。
+状态：后端/API/H2 集成、测试脚本、报告、追溯与真实 Compose + MySQL + Chromium
+浏览器执行均已完成。
 
 ## 分层
 
@@ -19,7 +19,7 @@
 | 信用分、`credit_score_log`、`admin_audit_log` 一致 | 已完成 | UC05 集成测试事务断言 |
 | 重复审核、自己举报/拉黑、非管理员拒绝 | 已完成 | Controller/Service API 与集成测试 |
 | 主成功链、权限/异常链、刷新后回读的 E2E 脚本 | 已完成 | `frontend/e2e/domain-a/uc05-governance.spec.ts` |
-| 真实 Compose 前端/后端/MySQL 浏览器执行 | 未完成 | Docker 恢复后运行并回填 Evidence |
+| 真实 Compose 前端/后端/MySQL 浏览器执行 | 已完成 | `04_tests/UC05/evidence/playwright-report/`、`playwright-results.json` |
 
 ## 命令
 
@@ -38,9 +38,14 @@ pwsh -File scripts/e2e/run-compose-e2e.ps1
 实际结果：`ReportBlockCreditUc05IntegrationTest` 1 test PASS；Controller 11
 tests、Service 6 tests，共 17 个 API/MockMvc 测试 PASS；Domain-A 定向 65 tests
 PASS；后端全量 127 tests PASS；frontend `npm ci` 安装 96 个包、`npm run
-build:real` 构建 2421 modules 均 PASS；Compose 配置检查 PASS；最后一条命令因
-Docker Linux daemon 不可用为 NOT_RUN。浏览器命令应设置
-`E2E_OUTPUT_DIR=04_tests/UC05/evidence`，实际运行后才可标记 E2E 已完成。
+build:real` 构建 2421 modules 均 PASS；Compose 配置检查 PASS；真实浏览器命令
+执行 1 test，`1 passed (3.2s)`，失败数 0；Compose 项目已由 runner 自动清理。
+
+## 最新执行记录（2026-08-27）
+
+- 真实命令：`$env:COMPOSE_FILE='compose.yml;compose.e2e.yml'; $env:E2E_OUTPUT_DIR='04_tests/UC05/evidence'; .\\scripts\\e2e\\run-compose-e2e.ps1 -ResetDatabase e2e/domain-a/uc05-governance.spec.ts`
+- 实际结果：MySQL、backend、frontend 健康检查均 PASS；Chromium 执行 1 test，`1 passed (3.2s)`；Compose 项目已自动清理。
+- 结论：真实 Compose + MySQL + Chromium 浏览器验收已完成；报告位于 `04_tests/UC05/evidence/playwright-report/`，结果位于 `04_tests/UC05/evidence/playwright-results.json`。
 
 ## CI
 
@@ -51,7 +56,7 @@ Docker Linux daemon 不可用为 NOT_RUN。浏览器命令应设置
 - `04_tests/UC05/evidence/result-summary.json`
 - `04_tests/UC05/evidence/raw-reports/`
 - `04_tests/UC05/evidence/logs/`
-- `04_tests/UC05/evidence/screenshots/`（Compose 未运行前暂无浏览器截图）
+- `04_tests/UC05/evidence/screenshots/`（本次通过无失败截图）
 
 ## 已知风险
 
