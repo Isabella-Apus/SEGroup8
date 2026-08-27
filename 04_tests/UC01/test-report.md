@@ -36,7 +36,7 @@ as MySQL or browser evidence.
   `frontend/e2e/domain-a/uc01-auth.spec.ts`、`04_tests/UC01/test-plan.md`、
   `04_tests/UC01/test-report.md`、`04_tests/UC01/evidence/result-summary.json`、
   `02_docs/UC01/traceability.md`。
-- Evidence：`04_tests/UC01/evidence/`；当前 raw/log/screenshot 子目录仅有占位文件，
-  因 E2E 未运行没有伪造浏览器证据。
+- Evidence：`04_tests/UC01/evidence/`；`raw-reports/` 已提交本次 11 个测试的
+  Surefire XML/TXT，`logs/` 和 `screenshots/` 暂无 Compose 运行产物，未伪造浏览器证据。
 - 风险：H2/MockMvc 不能证明 MySQL/Compose 行为；CI 需在 GitHub runner 上实际跑出
   E2E 结果后才能将 `Refs` 改为 `Closes`。
