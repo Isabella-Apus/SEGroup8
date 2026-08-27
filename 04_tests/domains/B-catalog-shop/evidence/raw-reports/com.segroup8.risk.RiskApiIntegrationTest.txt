@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.segroup8.risk.RiskApiIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.315 s -- in com.segroup8.risk.RiskApiIntegrationTest
