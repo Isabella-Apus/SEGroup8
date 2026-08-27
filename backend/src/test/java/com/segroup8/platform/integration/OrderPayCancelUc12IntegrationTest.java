@@ -10,9 +10,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -30,10 +35,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Testcontainers
 @Tag(DomainCTestTags.DOMAIN_C)
 @Tag(DomainCTestTags.UC12)
 @Sql(scripts = "/integration/uc12-pay-cancel-setup.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class OrderPayCancelUc12IntegrationTest {
+
+    @Container
+    private static final MySQLContainer<?> MYSQL = new MySQLContainer<>("mysql:8.4.6")
+            .withDatabaseName("segroup8_uc12")
+            .withUsername("segroup8")
+            .withPassword("segroup8_test")
+            .withInitScript("schema.sql");
+
+    @DynamicPropertySource
+    static void mysqlProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", MYSQL::getJdbcUrl);
+        registry.add("spring.datasource.username", MYSQL::getUsername);
+        registry.add("spring.datasource.password", MYSQL::getPassword);
+        registry.add("spring.datasource.driver-class-name", () -> "com.mysql.cj.jdbc.Driver");
+        registry.add("spring.sql.init.mode", () -> "never");
+    }
 
     @Autowired private MockMvc mockMvc;
     @Autowired private JwtUtils jwtUtils;
@@ -49,20 +71,47 @@ class OrderPayCancelUc12IntegrationTest {
     }
 
     @Test
-    void coinPaymentDebitsExactlyPayableAmount_marksVoucherUsed_andPreservesSellerBalance() throws Exception {
-        pay(1201, buyerToken, "uc12-pay", "COIN")
+    void coinPaymentSplitsDiscountAndPreservesAccountAndLedgerConservation() throws Exception {
+        pay(1209, buyerToken, "uc12-pay-split", "COIN")
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0))
                 .andExpect(jsonPath("$.data.orderStatus").value(1))
                 .andExpect(jsonPath("$.data.payStatus").value(1));
 
-        assertThat(number("SELECT order_status FROM order_info WHERE id=1201")).isEqualTo(1);
-        assertThat(money("SELECT personal_balance FROM balance WHERE user_id=1201")).isEqualByComparingTo("220.00");
+        assertThat(count("SELECT COUNT(*) FROM order_info WHERE voucher_id=1201 AND pay_status=1")).isEqualTo(2);
+        assertThat(money("SELECT SUM(total_amount) FROM order_info WHERE voucher_id=1201 AND pay_status=1"))
+                .isEqualByComparingTo("150.00");
+        assertThat(money("SELECT SUM(voucher_discount_amount) FROM order_info WHERE voucher_id=1201 AND pay_status=1"))
+                .isEqualByComparingTo("30.00");
+        assertThat(money("SELECT SUM(seller_bear_amount) FROM order_info WHERE voucher_id=1201 AND pay_status=1"))
+                .isEqualByComparingTo("20.00");
+        assertThat(money("SELECT SUM(platform_bear_amount) FROM order_info WHERE voucher_id=1201 AND pay_status=1"))
+                .isEqualByComparingTo("10.00");
+        assertThat(money("SELECT SUM(payable_amount) FROM order_info WHERE voucher_id=1201 AND pay_status=1"))
+                .isEqualByComparingTo("120.00");
+        assertThat(count("SELECT COUNT(DISTINCT order_id) FROM order_item WHERE product_id IN (1201,1202) AND order_id >= 1209"))
+                .isEqualTo(2);
+        assertThat(money("SELECT personal_balance FROM balance WHERE user_id=1201")).isEqualByComparingTo("180.00");
         assertThat(money("SELECT business_balance FROM balance WHERE user_id=1203")).isEqualByComparingTo("50.00");
-        assertThat(count("SELECT COUNT(*) FROM transaction_record WHERE order_id=1201 AND user_id=1201 AND amount=-80.00"))
+        assertThat(count("SELECT COUNT(*) FROM transaction_record WHERE order_id=1209 AND user_id=1201 AND amount=-120.00"))
                 .isEqualTo(1);
-        assertThat(number("SELECT status FROM user_voucher WHERE id=1201")).isEqualTo(2);
+        assertThat(number("SELECT status FROM user_voucher WHERE id=1203")).isEqualTo(2);
         assertThat(number("SELECT used_count FROM voucher WHERE id=1201")).isEqualTo(1);
+    }
+
+    @Test
+    void onlyPendingPaymentOrderCanBePaid() throws Exception {
+        pay(1204, buyerToken, "uc12-paid-state", "COIN")
+                .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(400));
+        pay(1205, buyerToken, "uc12-completed-state", "COIN")
+                .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(400));
+
+        assertThat(money("SELECT personal_balance FROM balance WHERE user_id=1201"))
+                .isEqualByComparingTo("300.00");
+        assertThat(count("SELECT COUNT(*) FROM transaction_record WHERE order_id IN (1204,1205)"))
+                .isZero();
+        assertThat(number("SELECT order_status FROM order_info WHERE id=1204")).isEqualTo(1);
+        assertThat(number("SELECT order_status FROM order_info WHERE id=1205")).isEqualTo(4);
     }
 
     @Test
