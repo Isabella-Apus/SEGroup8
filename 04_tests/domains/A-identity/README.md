@@ -21,8 +21,9 @@ mvn -B -f backend/pom.xml -Dgroups=DOMAIN_A test
 共享 CI：
 `https://github.com/Isabella-Apus/SEGroup8/actions/workflows/ci-cd.yml`
 
-该 workflow 在每个 Pull Request 上执行 Domain-A 定向测试、完整后端回归、真实
-前端构建以及统一 Compose + MySQL + Playwright E2E。每个 UC 的业务报告和
+该 workflow 在每个 Pull Request 上执行 Domain-A 定向测试、全局 JWT
+security-contract、完整后端回归、真实前端构建以及统一 Compose + MySQL +
+Playwright E2E。每个 UC 的业务报告和
 Evidence 仍留在各自目录；`PLATFORM` JWT/interceptor 和 security-contract
 放在共享层，不重复计入 UC 业务测试。
 
