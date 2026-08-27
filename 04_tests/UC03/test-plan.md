@@ -33,7 +33,7 @@ pwsh -File scripts/e2e/run-compose-e2e.ps1
 
 ## 最新执行记录（2026-08-27）
 
-- 真实命令：`$env:COMPOSE_FILE='compose.yml;compose.e2e.yml'; $env:E2E_OUTPUT_DIR='04_tests/UC03/evidence'; .\\scripts\\e2e\\run-compose-e2e.ps1 -ResetDatabase e2e/domain-a/uc03-merchant-application.spec.ts`
+- 真实命令：`$env:COMPOSE_FILE='compose.yml;compose.e2e.yml'; $env:E2E_OUTPUT_DIR='04_tests/UC03/evidence'; .\scripts\e2e\run-compose-e2e.ps1 -ResetDatabase e2e/domain-a/uc03-merchant-application.spec.ts`
 - 实际结果：MySQL、backend、frontend 健康检查均 PASS；Chromium 执行 1 test，`1 passed (3.1s)`；Compose 项目已自动清理。
 - 结论：真实 Compose + MySQL + Chromium 浏览器验收已完成；报告位于 `04_tests/UC03/evidence/playwright-report/`，结果位于 `04_tests/UC03/evidence/playwright-results.json`。
 
