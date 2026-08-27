@@ -8,7 +8,15 @@ param(
 
 $ErrorActionPreference = 'Continue'
 $repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
-$evidenceRoot = Join-Path $repositoryRoot '04_tests\platform-e2e\evidence'
+$configuredEvidenceRoot = $env:E2E_OUTPUT_DIR
+if ([string]::IsNullOrWhiteSpace($configuredEvidenceRoot)) {
+    $evidenceRoot = Join-Path $repositoryRoot '04_tests\platform-e2e\evidence'
+} elseif ([System.IO.Path]::IsPathRooted($configuredEvidenceRoot)) {
+    $evidenceRoot = $configuredEvidenceRoot
+} else {
+    $evidenceRoot = Join-Path $repositoryRoot $configuredEvidenceRoot
+}
+$evidenceRoot = [System.IO.Path]::GetFullPath($evidenceRoot)
 $logsRoot = Join-Path $evidenceRoot 'logs'
 New-Item -ItemType Directory -Force -Path $logsRoot | Out-Null
 $failureStagePath = Join-Path $logsRoot 'failure-stage.txt'

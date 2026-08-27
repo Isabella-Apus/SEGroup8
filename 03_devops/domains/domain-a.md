@@ -30,7 +30,9 @@ Real Compose/browser evidence is collected with:
 ```
 
 Set `E2E_OUTPUT_DIR` to route a run to its UC-specific
-`04_tests/UCxx/evidence` directory. Do not call a MockMvc/H2 run E2E.
+`04_tests/UCxx/evidence` directory; the runner now preserves this override.
+Without it, CI writes the combined five-UC result to
+`04_tests/platform-e2e/evidence`. Do not call a MockMvc/H2 run E2E.
 
 ## Evidence rule
 
