@@ -13,6 +13,7 @@ frontend/blob-report/
 
 # backend
 backend/target/
+microservices/**/target/
 backend/src/main/resources/application-local.yml
 
 # uploads

@@ -59,6 +59,26 @@ jobs:
           distribution: temurin
           java-version: "17"
           cache: maven
+      - name: Run Domain A tagged tests
+        run: mvn -B --no-transfer-progress -Dgroups=DOMAIN_A test
+      - name: Upload Domain A test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: domain-a-surefire-reports
+          path: backend/target/surefire-reports/**
+          if-no-files-found: ignore
+          retention-days: 14
+      - name: Run shared JWT security contract tests
+        run: mvn -B --no-transfer-progress -f ../microservices/pom.xml -pl security-contract -am test
+      - name: Upload shared JWT contract reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: platform-security-contract-surefire-reports
+          path: microservices/security-contract/target/surefire-reports/**
+          if-no-files-found: ignore
+          retention-days: 14
       - name: Run tests and package JAR
         run: mvn -B --no-transfer-progress clean verify
       - name: Prepare deployable JAR

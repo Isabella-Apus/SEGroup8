@@ -6,6 +6,7 @@ import com.segroup8.platform.service.MerchantApplicationService;
 import com.segroup8.platform.service.UserService;
 import com.segroup8.platform.vo.MerchantApplicationVO;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -26,6 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("DOMAIN_A")
+@Tag("UC03")
 class MerchantApplicationControllerWebMvcTest {
 
     private MockMvc mockMvc;
