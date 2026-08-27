@@ -46,10 +46,10 @@ function Invoke-IntegrationTests {
             generatedAt = (Get-Date).ToString('o')
             layer = 'API_INTEGRATION'
             command = 'mvn -B -f microservices/pom.xml -Pdomain-b clean test'
-            tests = ($suites | Measure-Object tests -Sum).Sum
-            failures = ($suites | Measure-Object failures -Sum).Sum
-            errors = ($suites | Measure-Object errors -Sum).Sum
-            skipped = ($suites | Measure-Object skipped -Sum).Sum
+            tests = [int] ($suites | Measure-Object tests -Sum).Sum
+            failures = [int] ($suites | Measure-Object failures -Sum).Sum
+            errors = [int] ($suites | Measure-Object errors -Sum).Sum
+            skipped = [int] ($suites | Measure-Object skipped -Sum).Sum
             suites = @($suites)
             browserE2E = [ordered]@{
                 layer = 'BROWSER_E2E'
