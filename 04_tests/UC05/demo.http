@@ -1,0 +1,23 @@
+### UC05: report a user
+POST http://127.0.0.1:8080/api/report-block/report
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{"reportedId":3,"reasonType":"FRAUD","reasonDesc":"Invalid trade evidence","tradeContext":"SH_SELLER"}
+
+### UC05: block and query
+POST http://127.0.0.1:8080/api/report-block/block
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{"targetUserId":3}
+
+GET http://127.0.0.1:8080/api/report-block/block/check/3
+Authorization: Bearer {{userToken}}
+
+### UC05: administrator audit
+POST http://127.0.0.1:8080/api/admin/reports/audit
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"reportId":1,"decision":1,"adminRemark":"confirmed","customDelta":20}

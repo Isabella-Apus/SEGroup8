@@ -1,0 +1,18 @@
+flowchart TB
+  RC[ReportBlockController]
+  AC[AdminReportController]
+  RS[ReportBlockServiceImpl]
+  CS[CreditServiceImpl]
+  RM[UserReportMapper]
+  BM[UserBlockMapper]
+  UM[UserMapper]
+  CL[CreditScoreLogMapper]
+  RC --> RS
+  AC --> RS
+  AC --> CS
+  RS --> RM
+  RS --> BM
+  RS --> UM
+  RS --> CS
+  CS --> UM
+  CS --> CL

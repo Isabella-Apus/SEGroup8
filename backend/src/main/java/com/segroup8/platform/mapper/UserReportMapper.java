@@ -50,6 +50,6 @@ public interface UserReportMapper extends BaseMapper<UserReport> {
     @Select("SELECT COUNT(*) FROM user_report " +
             "WHERE reported_id = #{userId} " +
             "  AND status = 1 " +
-            "  AND audit_time >= DATE_SUB(NOW(), INTERVAL 2 YEAR)")
+            "  AND audit_time >= CURRENT_TIMESTAMP - INTERVAL '2' YEAR")
     int countUpheldReportsIn2Years(@Param("userId") Long userId);
 }

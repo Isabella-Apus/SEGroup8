@@ -1,0 +1,9 @@
+{
+  "uc": "UC05",
+  "status": "PASS_H2_MOCKMVC_NOT_COMPOSE_RUN",
+  "backendIntegration": "PASS_1_TEST",
+  "mockMvc": "PASS_17_TESTS",
+  "composePlaywright": "NOT_RUN",
+  "evidencePolicy": "H2 and MockMvc are not Docker Compose browser evidence",
+  "generatedArtifactsTracked": false
+}
