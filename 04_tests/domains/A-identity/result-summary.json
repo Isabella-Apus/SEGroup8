@@ -10,5 +10,15 @@
   "platformJwtInterceptorTests": 3,
   "microserviceJwtContractTests": 5,
   "duplicateTestDeletion": 0,
-  "note": "Docker Compose browser E2E is not run because the local Docker daemon is unavailable."
+  "ciWorkflow": "https://github.com/Isabella-Apus/SEGroup8/actions/workflows/ci-cd.yml",
+  "localVerification": {
+    "domainA": "PASS_65_TESTS",
+    "backendCleanVerify": "PASS_127_TESTS",
+    "microservicesJwtContract": "PASS_5_TESTS",
+    "frontendInstall": "PASS_96_PACKAGES",
+    "frontendBuildReal": "PASS_2421_MODULES",
+    "composeConfig": "PASS",
+    "composeMysqlBrowser": "NOT_RUN_DOCKER_LINUX_DAEMON_UNAVAILABLE"
+  },
+  "note": "Docker Compose browser E2E is not run because the local Docker daemon is unavailable; GitHub Actions must provide the browser gate."
 }
