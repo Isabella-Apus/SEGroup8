@@ -47,10 +47,10 @@ All pull requests and pushes to `main` use the single workflow:
 
 `https://github.com/Isabella-Apus/SEGroup8/actions/workflows/ci-cd.yml`
 
-The backend job runs `-Dgroups=DOMAIN_A` first and then runs the full
-`clean verify` regression. The same workflow also builds the real frontend and
-runs the shared Compose + MySQL + Playwright job. It is one domain entry, not
-five UC workflows.
+The backend job runs `-Dgroups=DOMAIN_A` first, then the shared JWT
+`security-contract` tests, and then the full `clean verify` regression. The same
+workflow also builds the real frontend and runs the shared Compose + MySQL +
+Playwright job. It is one domain entry, not five UC workflows.
 
 ## Verified locally on 2026-08-27
 
