@@ -109,4 +109,20 @@ class ReviewControllerWebMvcTest {
                 .andExpect(jsonPath("$.code").value(0)).andExpect(jsonPath("$.data.total").value(1));
         verify(reviewMapper).selectPage(any(Page.class), any());
     }
+
+    @Test
+    void sellerReviews_withoutOwnedProducts_returnsEmptyWithoutQueryingUnscopedReviews() throws Exception {
+        UserContext.setUserId(1503L);
+        when(shopMapper.selectList(any())).thenReturn(List.of());
+        when(secondhandProductMapper.selectList(any())).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/review/seller/list")
+                        .param("pageNum", "1").param("pageSize", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.total").value(0))
+                .andExpect(jsonPath("$.data.records").isEmpty());
+
+        verify(reviewMapper, never()).selectPage(any(Page.class), any());
+    }
 }
