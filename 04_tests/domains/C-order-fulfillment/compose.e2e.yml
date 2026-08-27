@@ -1,0 +1,16 @@
+name: segroup8-domain-c-e2e
+
+services:
+  database:
+    volumes:
+      - domain_c_e2e_mysql_data:/var/lib/mysql
+      - ./backend/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./docker/mysql/02-seed.sql:/docker-entrypoint-initdb.d/02-seed.sql:ro
+
+networks:
+  platform:
+    name: segroup8-domain-c-e2e
+
+volumes:
+  domain_c_e2e_mysql_data:
+    name: segroup8-domain-c-e2e-mysql-data
