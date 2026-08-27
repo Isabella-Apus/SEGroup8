@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -15,7 +16,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class CatalogApiAndE2ETest {
+@Tag("DOMAIN_B")
+@Tag("UC06")
+class CatalogApiIntegrationTest {
     @Autowired MockMvc mvc;
     @Autowired JdbcTemplate db;
 
@@ -31,37 +34,26 @@ class CatalogApiAndE2ETest {
     }
 
     @Test
-    void t0601_combinedSearchAndPublicDetail() throws Exception {
-        mvc.perform(get("/api/catalog/products")
-                        .param("keyword", "Java")
-                        .param("category", "BOOK")
-                        .param("minPrice", "50")
-                        .param("maxPrice", "60"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1))
+    void combinedSearchAndPublicDetailUseTheDatabase() throws Exception {
+        mvc.perform(get("/api/catalog/products").param("keyword", "Java").param("category", "BOOK")
+                        .param("minPrice", "50").param("maxPrice", "60"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].status").value("ON_SALE"));
-        mvc.perform(get("/api/catalog/products/1"))
-                .andExpect(status().isOk())
+        mvc.perform(get("/api/catalog/products/1")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Java 图书"));
     }
 
     @Test
-    void t0602_filtersSortsEmptyAndExceptionPaths() throws Exception {
-        mvc.perform(get("/api/catalog/products")
-                        .param("shopId", "8")
-                        .param("category", "BOOK")
+    void filtersSortsEmptyAndExceptionPaths() throws Exception {
+        mvc.perform(get("/api/catalog/products").param("shopId", "8").param("category", "BOOK")
                         .param("sort", "priceAsc"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(2))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(2))
                 .andExpect(jsonPath("$[1].id").value(1));
         mvc.perform(get("/api/catalog/products").param("sort", "priceDesc"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1));
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(1));
         mvc.perform(get("/api/catalog/products").param("keyword", "不存在"))
-                .andExpect(status().isOk())
-                .andExpect(content().json("[]"));
-        mvc.perform(get("/api/catalog/products/3"))
-                .andExpect(status().isConflict())
+                .andExpect(status().isOk()).andExpect(content().json("[]"));
+        mvc.perform(get("/api/catalog/products/3")).andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("PRODUCT_NOT_FOUND"));
         mvc.perform(get("/api/catalog/products").param("minPrice", "非法数字"))
                 .andExpect(status().isBadRequest());

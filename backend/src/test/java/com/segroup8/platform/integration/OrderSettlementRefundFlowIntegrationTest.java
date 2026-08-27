@@ -15,7 +15,9 @@ import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.TransactionRecordMapper;
 import com.segroup8.platform.schedule.OrderAutoConfirmScheduler;
 import com.segroup8.platform.service.OrderService;
+import com.segroup8.platform.testsupport.DomainCTestTags;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringBootTest
 @ActiveProfiles("test")
 @Sql(scripts = "classpath:integration/full-flow-setup.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Tag(DomainCTestTags.DOMAIN_C)
+@Tag(DomainCTestTags.UC14)
 class OrderSettlementRefundFlowIntegrationTest {
 
     @Autowired

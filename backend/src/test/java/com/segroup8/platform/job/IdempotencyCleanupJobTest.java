@@ -1,10 +1,14 @@
 package com.segroup8.platform.job;
 
 import com.segroup8.platform.mapper.IdempotencyRecordMapper;
+import com.segroup8.platform.testsupport.DomainCTestTags;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
+@Tag(DomainCTestTags.DOMAIN_C)
+@Tag(DomainCTestTags.PLATFORM)
 class IdempotencyCleanupJobTest {
 
     @Test
@@ -16,4 +20,3 @@ class IdempotencyCleanupJobTest {
         Mockito.verify(mapper).delete(ArgumentMatchers.any());
     }
 }
-
