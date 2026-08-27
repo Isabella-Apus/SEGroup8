@@ -3,6 +3,7 @@ package com.segroup8.platform.realtime;
 import com.segroup8.platform.config.JwtProperties;
 import com.segroup8.platform.utils.JwtUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.ServerHttpRequest;
@@ -20,6 +21,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@Tag("DOMAIN_E")
+@Tag("UC25")
 class RealtimeHandshakeInterceptorTest {
 
     private JwtUtils jwtUtils;

@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "scope": "DOMAIN_D",
+  "classifications": {
+    "api": "API_PASS",
+    "uiWalkthrough": "UI_WALKTHROUGH_PASS",
+    "e2e": "E2E_PENDING"
+  },
+  "backend": {
+    "command": "mvn -B --no-transfer-progress -Dgroups=DOMAIN_D clean verify",
+    "summary": "04_tests/domains/D-secondhand/evidence/result-summary.json",
+    "log": "04_tests/domains/D-secondhand/evidence/logs/domain-d-maven-test.log",
+    "expectedSuites": [
+      { "class": "com.segroup8.platform.service.impl.SecondhandProductServiceImplTest", "report": "04_tests/domains/D-secondhand/evidence/raw-reports/TEST-com.segroup8.platform.service.impl.SecondhandProductServiceImplTest.xml" },
+      { "class": "com.segroup8.platform.service.impl.SecondhandTradeServiceImplTest", "report": "04_tests/domains/D-secondhand/evidence/raw-reports/TEST-com.segroup8.platform.service.impl.SecondhandTradeServiceImplTest.xml" },
+      { "class": "com.segroup8.platform.integration.SecondhandOrderFlowIntegrationTest", "report": "04_tests/domains/D-secondhand/evidence/raw-reports/TEST-com.segroup8.platform.integration.SecondhandOrderFlowIntegrationTest.xml" },
+      { "class": "com.segroup8.platform.integration.SecondhandAuctionIntegrationTest", "report": "04_tests/domains/D-secondhand/evidence/raw-reports/TEST-com.segroup8.platform.integration.SecondhandAuctionIntegrationTest.xml" },
+      { "class": "com.segroup8.platform.controller.SecondhandProductControllerUc16WebMvcTest", "report": "04_tests/domains/D-secondhand/evidence/raw-reports/TEST-com.segroup8.platform.controller.SecondhandProductControllerUc16WebMvcTest.xml" },
+      { "class": "com.segroup8.platform.controller.SecondhandProductControllerUc17WebMvcTest", "report": "04_tests/domains/D-secondhand/evidence/raw-reports/TEST-com.segroup8.platform.controller.SecondhandProductControllerUc17WebMvcTest.xml" },
+      { "class": "com.segroup8.platform.controller.SecondhandTradeControllerUc18WebMvcTest", "report": "04_tests/domains/D-secondhand/evidence/raw-reports/TEST-com.segroup8.platform.controller.SecondhandTradeControllerUc18WebMvcTest.xml" },
+      { "class": "com.segroup8.platform.controller.SecondhandTradeControllerUc19WebMvcTest", "report": "04_tests/domains/D-secondhand/evidence/raw-reports/TEST-com.segroup8.platform.controller.SecondhandTradeControllerUc19WebMvcTest.xml" },
+      { "class": "com.segroup8.platform.controller.OrderControllerUc20WebMvcTest", "report": "04_tests/domains/D-secondhand/evidence/raw-reports/TEST-com.segroup8.platform.controller.OrderControllerUc20WebMvcTest.xml" }
+    ]
+  },
+  "uiWalkthrough": {
+    "status": "UI_WALKTHROUGH_PASS",
+    "environment": "Vite mock",
+    "records": "04_tests/UC16-UC20-ui-run-result.json",
+    "report": "04_tests/domains/D-secondhand/ui-walkthrough-report.md",
+    "screenshots": "05_management/UC16-UC20-screenshots"
+  },
+  "realE2e": [
+    { "uc": "UC16", "status": "E2E_PENDING", "taskIssue": 148, "expectedSpec": "frontend/e2e/domain-d/uc16-product-management.spec.ts" },
+    { "uc": "UC17", "status": "E2E_PENDING", "taskIssue": 149, "expectedSpec": "frontend/e2e/domain-d/uc17-direct-purchase.spec.ts" },
+    { "uc": "UC18", "status": "E2E_PENDING", "taskIssue": 150, "expectedSpec": "frontend/e2e/domain-d/uc18-bargain.spec.ts" },
+    { "uc": "UC19", "status": "E2E_PENDING", "taskIssue": 151, "expectedSpec": "frontend/e2e/domain-d/uc19-auction.spec.ts" },
+    { "uc": "UC20", "status": "E2E_PENDING", "taskIssue": 152, "expectedSpec": "frontend/e2e/domain-d/uc20-fulfillment.spec.ts" }
+  ],
+  "platform": {
+    "taskIssue": 132,
+    "playwrightConfig": "frontend/playwright.config.ts",
+    "compose": "compose.e2e.yml",
+    "runner": "scripts/e2e/run-compose-e2e.ps1"
+  }
+}
