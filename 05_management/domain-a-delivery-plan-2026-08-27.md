@@ -100,3 +100,16 @@ The pushed independent branch heads before this report/CI refresh were:
 - UC05 `test/uc05-real-flow` → `b3bf285`
 
 报告/CI 更新完成后会在各分支产生新的独立提交并重新推送，PR 以新的远端头为准。
+
+## Current local heads after report refresh
+
+- A0 `test/domain-a-infra` → `a284c06`
+- UC01 `test/uc01-real-flow` → `c2adfa8`
+- UC02 `test/uc02-real-flow` → `38649da`
+- UC03 `test/uc03-real-flow` → `97e3fd2`
+- UC04 `test/uc04-real-flow` → `1857642`
+- UC05 `test/uc05-real-flow` → `614f699`
+
+由于远端认证失败，这些新提交当前只在本地；认证恢复后按上述分支逐一
+`git push origin <branch>`，再按 A0 → UC01 → UC02 → UC03 → UC04 → UC05
+的顺序建立/合并 PR。
