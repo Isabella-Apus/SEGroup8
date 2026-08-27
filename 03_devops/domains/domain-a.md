@@ -39,6 +39,32 @@ Each UC report links the exact command, exit status, raw report/log,
 failure screenshots. Missing Compose/MySQL or browser runs are recorded as
 `NOT_RUN` or `E2E_PENDING`, never as a pass.
 
+## CI entry
+
+All pull requests and pushes to `main` use the single workflow:
+
+`https://github.com/Isabella-Apus/SEGroup8/actions/workflows/ci-cd.yml`
+
+The backend job runs `-Dgroups=DOMAIN_A` first and then runs the full
+`clean verify` regression. The same workflow also builds the real frontend and
+runs the shared Compose + MySQL + Playwright job. It is one domain entry, not
+five UC workflows.
+
+## Verified locally on 2026-08-27
+
+| Command | Result | Evidence boundary |
+|---|---|---|
+| `mvn -B -f backend/pom.xml -Dgroups=DOMAIN_A test` | PASS, 65 tests, 0 failures, 0 errors | H2/MockMvc Domain-A aggregate |
+| `mvn -B -f backend/pom.xml clean verify` | PASS, 127 tests, 0 failures, 0 errors | Full backend regression |
+| `mvn -B -f microservices/pom.xml test` | PASS, security-contract 5 tests | Shared JWT contract, reported as PLATFORM/global |
+| `npm ci` | PASS, 96 packages installed | Locked frontend dependencies |
+| `npm run build:real` | PASS, 2421 modules built | Real frontend production build |
+| `docker compose -f compose.yml -f compose.e2e.yml config --quiet` | PASS | Compose syntax only |
+| `scripts/e2e/run-compose-e2e.ps1` | NOT_RUN: Docker Linux daemon unavailable | No MySQL/browser pass claimed |
+
+The local Maven result above is the authoritative run record; CI must still
+produce a GitHub Actions run before the CI gate itself can be called passed.
+
 ## A0 audit result
 
 The existing Domain-A tests were reviewed for identical methods. No safe
