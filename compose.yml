@@ -37,6 +37,13 @@ services:
       DB_URL: jdbc:mysql://database:3306/segroup8_platform?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
       DB_USERNAME: segroup8
       DB_PASSWORD: ${MYSQL_PASSWORD:-segroup8_dev_password}
+      # Explicit Spring properties keep the Compose stack deterministic even
+      # when a developer has an ignored application-local.yml in the build JAR.
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-segroup8}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-segroup8_dev_password}
+      # Do not load a developer's ignored classpath application-local.yml into
+      # the container; Compose supplies the database settings above.
+      SPRING_CONFIG_IMPORT: optional:file:/run/segroup8-compose-local.yml
       JWT_SECRET: ${JWT_SECRET:-SEGROUP8_DOCKER_DEMO_SECRET_CHANGE_ME_2026}
       APP_RISK_AUDIT_LLM_ENABLED: "false"
       REALTIME_ALLOWED_ORIGIN_PATTERNS: "*"

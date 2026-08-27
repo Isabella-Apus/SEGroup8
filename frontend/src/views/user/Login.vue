@@ -22,7 +22,7 @@
 
         <el-form class="login-form" :model="form" label-position="top" @submit.prevent @keyup.enter="handleLogin">
           <el-form-item label="账号">
-            <el-input v-model="form.username" placeholder="请输入账号" size="large">
+            <el-input data-testid="login-username" v-model="form.username" placeholder="请输入账号" size="large">
               <template #prefix>
                 <el-icon>
                   <User />
@@ -31,7 +31,7 @@
             </el-input>
           </el-form-item>
           <el-form-item label="密码">
-            <el-input v-model="form.password" type="password" show-password placeholder="请输入密码" size="large">
+            <el-input data-testid="login-password" v-model="form.password" type="password" show-password placeholder="请输入密码" size="large">
               <template #prefix>
                 <el-icon>
                   <Lock />
@@ -40,7 +40,7 @@
             </el-input>
           </el-form-item>
 
-          <el-button class="login-submit" type="primary" :loading="loading" @click="handleLogin">
+          <el-button data-testid="login-submit" class="login-submit" type="primary" :loading="loading" @click="handleLogin">
             <span>登录</span>
             <el-icon>
               <ArrowRight />
