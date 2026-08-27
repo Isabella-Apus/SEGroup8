@@ -143,6 +143,14 @@ CREATE TABLE `review` (
   `update_time` TIMESTAMP
 );
 
+CREATE TABLE `category` (
+  `id` INT PRIMARY KEY,
+  `name` VARCHAR(100),
+  `parent_id` INT,
+  `sort_order` INT,
+  `status` INT
+);
+
 CREATE TABLE `order_info` (
   `id` BIGINT PRIMARY KEY,
   `order_no` VARCHAR(64),
@@ -204,7 +212,7 @@ CREATE TABLE `order_item` (
 );
 
 CREATE TABLE `shop` (
-  `id` BIGINT PRIMARY KEY,
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `owner_user_id` BIGINT,
   `name` VARCHAR(80),
   `logo` VARCHAR(255),
