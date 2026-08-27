@@ -9,6 +9,7 @@ frontend/test-results/
 
 # backend
 backend/target/
+microservices/**/target/
 backend/src/main/resources/application-local.yml
 
 # uploads
