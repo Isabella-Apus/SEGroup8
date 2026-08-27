@@ -20,7 +20,6 @@ DROP TABLE IF EXISTS `admin_audit_log`;
 DROP TABLE IF EXISTS `merchant_application`;
 DROP TABLE IF EXISTS `address`;
 DROP TABLE IF EXISTS `review`;
-DROP TABLE IF EXISTS `category`;
 DROP TABLE IF EXISTS `user`;
 
 CREATE TABLE `user` (
