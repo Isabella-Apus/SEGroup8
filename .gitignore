@@ -4,8 +4,12 @@ frontend/node_modules/
 frontend/dist/
 frontend/.npm-cache/
 frontend/test-results/
+04_tests/**/evidence/raw-reports/playwright/test-results/
 04_tests/platform-e2e/evidence/*
 !04_tests/platform-e2e/evidence/.gitkeep
+frontend/playwright-report/
+frontend/blob-report/
+04_tests/reports/
 
 # backend
 backend/target/
@@ -49,3 +53,6 @@ backend/springboot_run.out.log
 backend/springboot_run.err.log
 backend-out.log
 backend-err.log
+
+# Maven build output
+microservices/*/target/

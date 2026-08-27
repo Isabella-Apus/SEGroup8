@@ -27,6 +27,7 @@ import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.vo.SecondhandProductVO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -44,6 +45,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@Tag("DOMAIN_D")
+@Tag("UC16")
+@Tag("UC17")
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings("unchecked")
 class SecondhandProductServiceImplTest {
