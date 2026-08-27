@@ -69,7 +69,8 @@ link:
    and seed credentials must be recorded.
 6. Evidence directory and final PR URL.
 
-当前已完成的本地证据：Domain-A 65 tests、后端 `clean verify` 127 tests、
+当前已完成的本地证据：A0 基线 Domain-A 33 tests、后端 `clean verify` 95 tests，
+五个 UC 合并后的最终本地聚合 Domain-A 65 tests、后端全量 127 tests，均 PASS；
 security-contract 5 tests、frontend `npm ci`/`npm run build:real` 和 Compose
 配置检查均 PASS；`04_tests/UC01` 至 `UC05` 的 `result-summary.json` 已明确
 记录各自 H2/MockMvc PASS 以及 Compose 浏览器 `NOT_RUN`。Docker daemon 恢复后，
