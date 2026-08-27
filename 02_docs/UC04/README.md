@@ -1,5 +1,7 @@
 # UC04 封禁、解禁、登录联动与审计
 
+状态：后端/API/H2 集成与 E2E 脚本已完成；真实 Compose/MySQL 浏览器执行未完成。
+
 - 需求：`REQ04 / UC04`
 - 集成测试：`UserGovernanceUc04IntegrationTest`
 - 浏览器测试：`frontend/e2e/domain-a/uc04-ban-unban.spec.ts`
