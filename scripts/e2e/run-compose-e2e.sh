@@ -2,7 +2,16 @@
 set -Eeuo pipefail
 
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-evidence_root="${repository_root}/04_tests/platform-e2e/evidence"
+configured_evidence_root="${E2E_OUTPUT_DIR:-}"
+if [[ -z "${configured_evidence_root}" ]]; then
+  evidence_root="${repository_root}/04_tests/platform-e2e/evidence"
+elif [[ "${configured_evidence_root}" = /* ]]; then
+  evidence_root="${configured_evidence_root}"
+else
+  evidence_root="${repository_root}/${configured_evidence_root}"
+fi
+mkdir -p "${evidence_root}"
+evidence_root="$(cd "${evidence_root}" && pwd)"
 logs_root="${evidence_root}/logs"
 mkdir -p "${logs_root}"
 rm -f "${logs_root}/failure-stage.txt"
