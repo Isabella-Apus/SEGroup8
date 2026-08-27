@@ -53,3 +53,15 @@ ON DUPLICATE KEY UPDATE
   `personal_balance` = VALUES(`personal_balance`),
   `business_balance` = VALUES(`business_balance`),
   `version` = VALUES(`version`);
+
+-- UC15 browser fixture: a delivered order waiting for its first review.
+INSERT IGNORE INTO `order_info`
+  (`id`, `order_no`, `buyer_user_id`, `total_amount`, `payable_amount`, `pay_status`, `order_status`,
+   `refund_status`, `can_refund`, `version`)
+VALUES
+  (15001, 'UC15-E2E-REVIEW-FLOW', 3, 299.00, 299.00, 1, 3, 0, 1, 0);
+
+INSERT IGNORE INTO `order_item`
+  (`id`, `order_id`, `product_type`, `product_id`, `product_name`, `price`, `quantity`, `status`)
+VALUES
+  (15001, 15001, 'NEW', 1, 'Container Demo Keyboard', 299.00, 1, 1);

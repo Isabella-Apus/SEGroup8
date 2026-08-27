@@ -67,10 +67,11 @@ public class ReviewController {
         if (userId == null) {
             throw new BusinessException(401, "未登录");
         }
+        String keyword = request.getKeyword() == null ? null : request.getKeyword().trim();
         LambdaQueryWrapper<Review> wrapper = new LambdaQueryWrapper<Review>()
                 .eq(Review::getUserId, userId)
                 .eq(request.getScore() != null, Review::getScore, request.getScore())
-                .like(StringUtils.hasText(request.getKeyword()), Review::getContent, request.getKeyword().trim())
+                .like(StringUtils.hasText(keyword), Review::getContent, keyword)
                 .orderByDesc(Review::getCreateTime);
 
         if (request.getStartTime() != null) {
@@ -128,9 +129,10 @@ public class ReviewController {
         if (sellerUserId == null) {
             throw new BusinessException(401, "未登录");
         }
+        String keyword = request.getKeyword() == null ? null : request.getKeyword().trim();
         LambdaQueryWrapper<Review> wrapper = new LambdaQueryWrapper<Review>()
                 .eq(request.getScore() != null, Review::getScore, request.getScore())
-                .like(StringUtils.hasText(request.getKeyword()), Review::getContent, request.getKeyword().trim())
+                .like(StringUtils.hasText(keyword), Review::getContent, keyword)
                 .orderByDesc(Review::getCreateTime);
         if (request.getStartTime() != null) {
             LocalDateTime start = LocalDateTime.ofInstant(Instant.ofEpochMilli(request.getStartTime()), ZoneId.of("Asia/Shanghai"));
@@ -243,4 +245,3 @@ public class ReviewController {
         return Result.success();
     }
 }
-

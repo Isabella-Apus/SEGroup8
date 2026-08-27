@@ -1,0 +1,20 @@
+### UC15 order-level first review
+POST http://localhost:8080/api/order/1501/review/items
+Authorization: Bearer {{buyerToken}}
+Content-Type: application/json
+
+{"items":[{"productType":"NEW","productId":1501,"score":5,"content":"首评内容"},{"productType":"NEW","productId":1502,"score":4,"content":"另一件商品"}]}
+
+### UC15 seller reply
+POST http://localhost:8080/api/review/{{reviewId}}/reply
+Authorization: Bearer {{sellerToken}}
+Content-Type: application/json
+
+{"reply":"感谢反馈"}
+
+### UC15 buyer follow-up
+POST http://localhost:8080/api/review/followup
+Authorization: Bearer {{buyerToken}}
+Content-Type: application/json
+
+{"orderId":1501,"productType":"NEW","productId":1501,"score":5,"content":"追评内容"}
