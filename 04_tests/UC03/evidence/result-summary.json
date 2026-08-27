@@ -1,0 +1,7 @@
+{
+  "uc": "UC03",
+  "integration": {"status": "PASS", "tests": 2, "failures": 0, "errors": 0},
+  "compose_mysql_browser": {"status": "NOT_RUN"},
+  "coverage": ["submit/query", "admin review", "approve upgrade", "reject reason", "repeat approve", "notification failure isolation"],
+  "evidenceRule": "H2 integration and real Compose browser evidence are reported separately."
+}
