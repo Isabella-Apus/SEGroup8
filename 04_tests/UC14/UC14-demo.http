@@ -1,0 +1,21 @@
+### UC14 buyer applies refund
+POST http://localhost:8080/api/order/14001/refund
+Authorization: Bearer {{buyerToken}}
+Content-Type: application/json
+
+{"refundMode":"RETURN_REFUND","reason":"质量问题"}
+
+### UC14 seller approves
+POST http://localhost:8080/api/order/14001/refund/approve
+Authorization: Bearer {{sellerToken}}
+
+### UC14 administrator arbitrates
+POST http://localhost:8080/api/admin/orders/14002/refund/approve
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{"remark":"平台仲裁同意"}
+
+### UC14 audit log
+GET http://localhost:8080/api/admin/orders/14002/after-sale-logs
+Authorization: Bearer {{adminToken}}

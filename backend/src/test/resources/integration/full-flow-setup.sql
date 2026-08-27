@@ -84,6 +84,7 @@ ALTER TABLE `order_info` ADD COLUMN IF NOT EXISTS `auto_confirm_deadline` TIMEST
 ALTER TABLE `order_info` ADD COLUMN IF NOT EXISTS `refund_mode` VARCHAR(30);
 
 DELETE FROM `transaction_record`;
+DELETE FROM `order_after_sale_log`;
 DELETE FROM `balance`;
 DELETE FROM `order_item` WHERE `order_id` IN (301, 302, 303);
 DELETE FROM `order_info` WHERE `id` IN (301, 302, 303);

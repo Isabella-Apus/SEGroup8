@@ -53,3 +53,26 @@ ON DUPLICATE KEY UPDATE
   `personal_balance` = VALUES(`personal_balance`),
   `business_balance` = VALUES(`business_balance`),
   `version` = VALUES(`version`);
+
+-- UC14 browser fixture: a paid, delivered order that can enter the after-sale flow.
+INSERT IGNORE INTO `order_info`
+  (`id`, `order_no`, `buyer_user_id`, `total_amount`, `payable_amount`, `pay_status`, `order_status`,
+   `refund_status`, `logistics_status`, `logistics_current_index`, `can_refund`, `version`)
+VALUES
+  (14001, 'UC14-E2E-AFTER-SALE', 3, 299.00, 299.00, 1, 2, 0, 'ARRIVED', 2, 1, 0);
+
+INSERT IGNORE INTO `order_item`
+  (`id`, `order_id`, `product_type`, `product_id`, `product_name`, `price`, `quantity`, `status`)
+VALUES
+  (14001, 14001, 'NEW', 1, 'Container Demo Keyboard', 299.00, 1, 1);
+
+INSERT IGNORE INTO `order_info`
+  (`id`, `order_no`, `buyer_user_id`, `total_amount`, `payable_amount`, `pay_status`, `order_status`,
+   `refund_status`, `logistics_status`, `logistics_current_index`, `can_refund`, `version`)
+VALUES
+  (14002, 'UC14-E2E-ADMIN-ARBITRATION', 3, 299.00, 299.00, 1, 2, 0, 'ARRIVED', 2, 1, 0);
+
+INSERT IGNORE INTO `order_item`
+  (`id`, `order_id`, `product_type`, `product_id`, `product_name`, `price`, `quantity`, `status`)
+VALUES
+  (14002, 14002, 'NEW', 1, 'Container Demo Keyboard', 299.00, 1, 1);
