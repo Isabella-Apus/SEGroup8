@@ -3,7 +3,13 @@
   "integration": {"status": "PASS", "tests": 2, "failures": 0, "errors": 0},
   "savedApiCoverage": {"status": "PASS", "tests": 9, "failures": 0, "errors": 0},
   "domainA_baseline": {"status": "PASS", "tests": 33, "failures": 0, "errors": 0},
-  "compose_mysql_browser": {"status": "NOT_RUN"},
+  "compose_mysql_browser": {"status": "NOT_RUN", "reason": "Docker Linux daemon unavailable"},
+  "ciWorkflow": "https://github.com/Isabella-Apus/SEGroup8/actions/workflows/ci-cd.yml",
+  "evidencePaths": {
+    "rawReports": "04_tests/UC01/evidence/raw-reports/",
+    "logs": "04_tests/UC01/evidence/logs/",
+    "screenshots": "04_tests/UC01/evidence/screenshots/"
+  },
   "evidenceRule": "H2 integration and real Compose browser evidence are reported separately.",
   "command": "mvn -B -f backend/pom.xml -Dtest=IdentityUc01IntegrationTest test"
 }

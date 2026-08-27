@@ -1,4 +1,7 @@
-# UC01 test report
+# UC01 测试报告
+
+结论：UC01 后端/API/H2 集成、Playwright spec、报告和追溯已完成；真实
+Compose + MySQL + 浏览器验收未完成，不能提前关闭 UC01 Task Issue。
 
 The H2-backed Spring integration gate passed locally on 2026-08-27:
 
@@ -12,3 +15,28 @@ The H2-backed Spring integration gate passed locally on 2026-08-27:
 The Compose/MySQL browser gate is implemented but must be recorded as
 `NOT_RUN` until the Docker runner is executed. H2 evidence is not represented
 as MySQL or browser evidence.
+
+## 完成项
+
+- 已完成注册、密码哈希、JWT uid/role、USER/ADMIN 边界、封禁登录失败、重复注册、
+  非法参数和错误密码无脏数据的真实 H2 集成链。
+- 已完成 save-epicA-changes 中 Auth Controller/Service API 覆盖的分流和回归。
+- 已完成 `frontend/e2e/domain-a/uc01-auth.spec.ts`：注册/登录主链、权限边界、
+  封禁后登录失败、页面刷新回读。
+- 已完成 `02_docs/UC01/traceability.md`、本报告和 `result-summary.json` 更新。
+- 未完成：在真实 Docker Compose frontend/backend/MySQL 上执行浏览器 spec，并提交
+  Playwright raw report、logs 和 screenshots。
+
+## PR 所需信息
+
+- CI：`https://github.com/Isabella-Apus/SEGroup8/actions/workflows/ci-cd.yml`
+- 修改文件：`backend/src/test/java/com/segroup8/platform/controller/AuthControllerWebMvcTest.java`、
+  `backend/src/test/java/com/segroup8/platform/service/impl/AuthServiceImplTest.java`、
+  `backend/src/test/java/com/segroup8/platform/integration/IdentityUc01IntegrationTest.java`、
+  `frontend/e2e/domain-a/uc01-auth.spec.ts`、`04_tests/UC01/test-plan.md`、
+  `04_tests/UC01/test-report.md`、`04_tests/UC01/evidence/result-summary.json`、
+  `02_docs/UC01/traceability.md`。
+- Evidence：`04_tests/UC01/evidence/`；当前 raw/log/screenshot 子目录仅有占位文件，
+  因 E2E 未运行没有伪造浏览器证据。
+- 风险：H2/MockMvc 不能证明 MySQL/Compose 行为；CI 需在 GitHub runner 上实际跑出
+  E2E 结果后才能将 `Refs` 改为 `Closes`。
