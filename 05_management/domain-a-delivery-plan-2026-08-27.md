@@ -103,12 +103,12 @@ The pushed independent branch heads before this report/CI refresh were:
 
 ## Current local heads after report refresh
 
-- A0 `test/domain-a-infra` → `a284c06`
-- UC01 `test/uc01-real-flow` → `c2adfa8`
-- UC02 `test/uc02-real-flow` → `38649da`
-- UC03 `test/uc03-real-flow` → `97e3fd2`
-- UC04 `test/uc04-real-flow` → `1857642`
-- UC05 `test/uc05-real-flow` → `614f699`
+- A0 `test/domain-a-infra` → `776d1f1`
+- UC01 `test/uc01-real-flow` → `06175f3`
+- UC02 `test/uc02-real-flow` → `a210744`
+- UC03 `test/uc03-real-flow` → `f49618d`
+- UC04 `test/uc04-real-flow` → `347e5e5`
+- UC05 `test/uc05-real-flow` → `67d1ab8`
 
 由于远端认证失败，这些新提交当前只在本地；认证恢复后按上述分支逐一
 `git push origin <branch>`，再按 A0 → UC01 → UC02 → UC03 → UC04 → UC05
