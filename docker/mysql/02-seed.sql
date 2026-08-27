@@ -5,6 +5,16 @@ VALUES
   (2, 'seller', 'seller123', 'Demo Seller', '', '13800000001', 'seller@demo.com', 'OFFICIAL_SELLER', 'NORMAL', 100),
   (3, 'user', 'user123', 'Demo User', '', '13800000002', 'user@demo.com', 'USER', 'NORMAL', 100);
 
+CREATE TABLE IF NOT EXISTS `search_keyword_stat` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `keyword` VARCHAR(100) NOT NULL,
+  `stat_date` DATE NOT NULL,
+  `search_count` INT NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_search_keyword_stat_keyword_date` (`keyword`, `stat_date`),
+  KEY `idx_search_keyword_stat_date_count` (`stat_date`, `search_count`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 INSERT IGNORE INTO `shop`
   (`id`, `owner_user_id`, `name`, `logo`, `description`, `status`)
 VALUES
