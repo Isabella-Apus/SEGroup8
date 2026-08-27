@@ -52,8 +52,11 @@ test.describe("UC03 real merchant application flow", () => {
 
         await page.goto("/profile");
         await page.reload();
-        await expect(page.locator("body")).toContainText("E2E Approved Shop");
-        await expect(page.locator("body")).toContainText("OFFICIAL_SELLER");
+        const refreshedApprovedProfile = await apiGet(request, "/api/user/profile", applicantToken);
+        expect(refreshedApprovedProfile.data.role).toBe("OFFICIAL_SELLER");
+        expect(refreshedApprovedProfile.data.shopName).toBe("E2E Approved Shop");
+        await expect(page.locator(".page-card .el-form-item").nth(4).locator("input"))
+            .toHaveValue("OFFICIAL_SELLER");
 
         const rejected = await registerAccount(request, uniqueAccount("e2e-uc03-rejected"));
         const rejectedLogin = await loginApi(request, rejected);

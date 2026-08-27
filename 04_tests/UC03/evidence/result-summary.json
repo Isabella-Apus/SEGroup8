@@ -2,12 +2,23 @@
   "uc": "UC03",
   "integration": {"status": "PASS", "tests": 2, "failures": 0, "errors": 0},
   "savedApiCoverage": {"status": "PASS", "tests": 9, "failures": 0, "errors": 0},
-  "compose_mysql_browser": {"status": "NOT_RUN", "reason": "Docker Linux daemon unavailable"},
+  "compose_mysql_browser": {
+    "status": "PASS",
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "database": "MySQL",
+    "browser": "Chromium",
+    "command": "COMPOSE_FILE=compose.yml;compose.e2e.yml E2E_OUTPUT_DIR=04_tests/UC03/evidence run-compose-e2e.ps1 -ResetDatabase e2e/domain-a/uc03-merchant-application.spec.ts"
+  },
   "ciWorkflow": "https://github.com/Isabella-Apus/SEGroup8/actions/workflows/ci-cd.yml",
   "evidencePaths": {
     "rawReports": "04_tests/UC03/evidence/raw-reports/",
     "logs": "04_tests/UC03/evidence/logs/",
-    "screenshots": "04_tests/UC03/evidence/screenshots/"
+    "screenshots": "04_tests/UC03/evidence/screenshots/",
+    "playwrightReport": "04_tests/UC03/evidence/playwright-report/index.html",
+    "playwrightResults": "04_tests/UC03/evidence/playwright-results.json",
+    "lastRun": "04_tests/UC03/evidence/test-results/.last-run.json"
   },
   "coverage": ["submit/query", "admin review", "approve upgrade", "reject reason", "repeat approve", "notification failure isolation"],
   "evidenceRule": "H2 integration and real Compose browser evidence are reported separately."
