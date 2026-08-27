@@ -9,6 +9,7 @@ import com.segroup8.platform.mapper.OrderItemMapper;
 import com.segroup8.platform.mapper.ReviewMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.mapper.UserReportMapper;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -22,6 +23,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("DOMAIN_A")
+@Tag("UC05")
 class CreditServiceImplTest {
 
     @Mock
