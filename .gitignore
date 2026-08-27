@@ -4,8 +4,10 @@ frontend/node_modules/
 frontend/dist/
 frontend/.npm-cache/
 frontend/test-results/
+04_tests/**/evidence/raw-reports/playwright/test-results/
 04_tests/platform-e2e/evidence/*
 !04_tests/platform-e2e/evidence/.gitkeep
+04_tests/reports/
 
 # backend
 backend/target/

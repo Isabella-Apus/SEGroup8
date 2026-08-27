@@ -10,8 +10,10 @@ import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.OrderItemMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.realtime.RealtimePushService;
+import com.segroup8.platform.testsupport.DomainCTestTags;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -36,6 +38,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
+@Tag(DomainCTestTags.DOMAIN_C)
+@Tag(DomainCTestTags.UC14)
 class AdminOrderControllerWebMvcTest {
 
     private MockMvc mockMvc;
