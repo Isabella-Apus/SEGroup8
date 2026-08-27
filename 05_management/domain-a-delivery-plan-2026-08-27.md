@@ -3,7 +3,8 @@
 This file is the execution checklist for the six PRs required by
 `day3MAprompt.md`. The remote GitHub CLI is not installed in this workspace, so
 Task Issue creation, Project card placement, and PR creation remain manual
-GitHub operations. All six code branches have been pushed.
+GitHub operations. All six code branches are prepared locally; remote push and
+GitHub operations are pending authentication.
 
 本轮不按 prompt 中的 Day3/Day4/Day5 时间段拆分；目标是一次完成 prompt
 规定的完整交付集。当前分支按一个 A0 加五个 UC 独立 PR 维护，save-epicA-changes
@@ -34,7 +35,7 @@ the only issue closed by its PR.
 | `[UC02] 用户资料、地址归属和默认地址真实集成/E2E` | #40 | `test/uc02-real-flow` | `test(UC02): complete real profile and address flow` | `04_tests/UC02` |
 | `[UC03] 商家申请、审核、角色升级和审计真实集成/E2E` | #41 | `test/uc03-real-flow` | `test(UC03): complete real merchant application flow` | `04_tests/UC03` |
 | `[UC04] 封禁、登录失败、解禁和审计真实集成/E2E` | #42 | `test/uc04-real-flow` | `test(UC04): complete real ban unban governance flow` | `04_tests/UC04` |
-| `[UC05] 举报、拉黑、信用治理和审计事务 E2E` | #43 | `test/uc05-real-flow` | `test(UC05): complete report block credit governance flow` | `04_tests/UC05` |
+| `[UC05] 举报、拉黑、信用治理和审计事务 E2E` | #43 | `test/uc05-real-flow` | `test(UC05): complete report block credit transaction flow` | `04_tests/UC05` |
 
 ## save-epicA-changes 测试分流记录
 
