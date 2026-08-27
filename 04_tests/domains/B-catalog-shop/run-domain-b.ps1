@@ -14,6 +14,8 @@ $workspaceRoot = Resolve-Path (Join-Path $scriptRoot '..\..\..')
 $evidenceRoot = Join-Path $scriptRoot 'evidence'
 $rawReportsRoot = Join-Path $evidenceRoot 'raw-reports'
 $logsRoot = Join-Path $evidenceRoot 'logs'
+$schemaPath = Join-Path $workspaceRoot 'backend\src\main\resources\schema.sql'
+$seedPath = Join-Path $workspaceRoot 'docker\mysql\02-seed.sql'
 
 New-Item -ItemType Directory -Force -Path $rawReportsRoot, $logsRoot | Out-Null
 
@@ -78,6 +80,14 @@ function Invoke-BrowserTests {
 
         & docker compose up --build --wait --wait-timeout 180
         if ($LASTEXITCODE -ne 0) { throw "Compose startup failed with exit code $LASTEXITCODE" }
+
+        # MySQL only runs docker-entrypoint-initdb.d on a new volume. Reapply the
+        # idempotent schema and stable E2E fixtures so an existing local volume
+        # exercises the same contract as CI's fresh database.
+        Get-Content -Raw $schemaPath | & docker compose exec -T database sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"'
+        if ($LASTEXITCODE -ne 0) { throw "Compose schema refresh failed with exit code $LASTEXITCODE" }
+        Get-Content -Raw $seedPath | & docker compose exec -T database sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" "$MYSQL_DATABASE"'
+        if ($LASTEXITCODE -ne 0) { throw "Compose E2E fixture refresh failed with exit code $LASTEXITCODE" }
 
         Push-Location frontend
         try {

@@ -11,13 +11,19 @@ VALUES
   (1, 2, 'Container Demo Store', '', 'Seed shop for Issue #65 acceptance', 1);
 
 INSERT INTO `category` (`id`, `name`, `parent_id`, `sort_order`, `status`)
-VALUES (1, 'Digital Products', 0, 1, 1)
+VALUES
+  (1, 'Digital Products', NULL, 1, 1),
+  (101, 'Mobile Devices', 1, 1, 1)
 ON DUPLICATE KEY UPDATE
   `name` = VALUES(`name`),
+  `parent_id` = VALUES(`parent_id`),
   `sort_order` = VALUES(`sort_order`),
   `status` = VALUES(`status`);
 
+-- The seller fixture must be able to exercise the real product editor.
+UPDATE `user` SET `category` = '1' WHERE `id` = 2;
+
 INSERT IGNORE INTO `product`
-  (`id`, `shop_id`, `name`, `cover`, `description`, `price`, `category_id`, `stock`, `status`)
+  (`id`, `shop_id`, `name`, `cover`, `description`, `price`, `category_id`, `sub_category_id`, `stock`, `status`)
 VALUES
-  (1, 1, 'Container Demo Keyboard', '', 'Seed product for Issue #65 acceptance', 299.00, 1, 80, 1);
+  (1, 1, 'Container Demo Keyboard', '', 'Seed product for Issue #65 acceptance', 299.00, 1, 101, 80, 1);
