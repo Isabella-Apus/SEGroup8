@@ -1,0 +1,19 @@
+classDiagram
+  class User {
+    Long id
+    String username
+    String password
+    String role
+    String status
+  }
+  class LoginVO {
+    String token
+    String role
+    UserVO user
+  }
+  class AdminAuditLog {
+    Long targetId
+    String action
+  }
+  User --> LoginVO
+  User --> AdminAuditLog

@@ -1,0 +1,7 @@
+flowchart LR
+  Browser[真实浏览器] --> Auth[AuthController]
+  Auth --> Service[AuthService]
+  Service --> User[(MySQL/H2 user)]
+  Admin[AdminUserController] --> Audit[(admin_audit_log)]
+  Admin --> User
+  Service --> JWT[JWT]

@@ -1,0 +1,8 @@
+{
+  "uc": "UC01",
+  "integration": {"status": "PASS", "tests": 2, "failures": 0, "errors": 0},
+  "domainA_baseline": {"status": "PASS", "tests": 33, "failures": 0, "errors": 0},
+  "compose_mysql_browser": {"status": "NOT_RUN"},
+  "evidenceRule": "H2 integration and real Compose browser evidence are reported separately.",
+  "command": "mvn -B -f backend/pom.xml -Dtest=IdentityUc01IntegrationTest test"
+}
