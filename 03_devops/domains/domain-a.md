@@ -54,8 +54,8 @@ five UC workflows.
 
 | Command | Result | Evidence boundary |
 |---|---|---|
-| `mvn -B -f backend/pom.xml -Dgroups=DOMAIN_A test` | PASS, 65 tests, 0 failures, 0 errors | H2/MockMvc Domain-A aggregate |
-| `mvn -B -f backend/pom.xml clean verify` | PASS, 127 tests, 0 failures, 0 errors | Full backend regression |
+| `mvn -B -f backend/pom.xml -Dgroups=DOMAIN_A test` | A0 baseline PASS, 33 tests, 0 failures, 0 errors；五个 UC 合并后的最终本地聚合 PASS, 65 tests | H2/MockMvc Domain-A aggregate |
+| `mvn -B -f backend/pom.xml clean verify` | A0 baseline PASS, 95 tests, 0 failures, 0 errors；五个 UC 合并后的最终本地回归 PASS, 127 tests | Full backend regression |
 | `mvn -B -f microservices/pom.xml test` | PASS, security-contract 5 tests | Shared JWT contract, reported as PLATFORM/global |
 | `npm ci` | PASS, 96 packages installed | Locked frontend dependencies |
 | `npm run build:real` | PASS, 2421 modules built | Real frontend production build |

@@ -26,6 +26,8 @@ mvn -B -f backend/pom.xml -Dgroups=DOMAIN_A test
 Evidence 仍留在各自目录；`PLATFORM` JWT/interceptor 和 security-contract
 放在共享层，不重复计入 UC 业务测试。
 
-本地记录（2026-08-27）：Domain-A 65 tests PASS；后端 `clean verify` 127 tests
-PASS；microservices JWT contract 5 tests PASS；前端 `npm ci` 和 `npm run
-build:real` PASS；Compose 配置检查 PASS；Docker Compose 浏览器运行 NOT_RUN。
+本地记录（2026-08-27）：A0 基线 Domain-A 33 tests、后端 `clean verify` 95 tests
+均 PASS；五个 UC 合并后的最终本地聚合为 Domain-A 65 tests、后端全量 127 tests，
+均 PASS；microservices JWT contract 5 tests PASS；前端 `npm ci` 和
+`npm run build:real` PASS；Compose 配置检查 PASS；Docker Compose 浏览器运行
+NOT_RUN。
