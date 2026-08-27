@@ -116,6 +116,14 @@ jobs:
       E2E_USERNAME: user
       E2E_PASSWORD: user123
       E2E_ROLE: USER
+      E2E_ADMIN_USERNAME: admin
+      E2E_ADMIN_PASSWORD: admin123
+      E2E_OFFICIAL_SELLER_USERNAME: seller
+      E2E_OFFICIAL_SELLER_PASSWORD: seller123
+      E2E_BUYER_USERNAME: user
+      E2E_BUYER_PASSWORD: user123
+      E2E_THIRD_PARTY_USERNAME: third
+      E2E_THIRD_PARTY_PASSWORD: third123
     steps:
       - name: Check out repository
         uses: actions/checkout@v4

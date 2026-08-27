@@ -58,6 +58,8 @@ COMPOSE_FILE=compose.yml:compose.e2e.yml scripts/e2e/run-compose-e2e.sh
 
 各 UC spec 放在 `frontend/e2e/domain-e/`，并从 `../fixtures` 导入共享 `test/expect`。
 
+Compose seed 提供 `admin`、`seller`、`user`、`third` 四个非生产测试账号；CI 通过 `E2E_ADMIN_*`、`E2E_OFFICIAL_SELLER_*`、`E2E_BUYER_*` 和 `E2E_THIRD_PARTY_*` 传入凭据。测试代码必须通过共享 `loginAs` fixture 获取账号，不得硬编码生产凭据。
+
 ## Evidence 输出
 
 - 平台级 Playwright 原始输出：`04_tests/platform-e2e/evidence/`

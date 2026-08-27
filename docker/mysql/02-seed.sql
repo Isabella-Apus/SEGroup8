@@ -3,7 +3,8 @@ INSERT IGNORE INTO `user`
 VALUES
   (1, 'admin', 'admin123', 'Platform Admin', '', '13800000000', 'admin@demo.com', 'ADMIN', 'NORMAL', 100),
   (2, 'seller', 'seller123', 'Demo Seller', '', '13800000001', 'seller@demo.com', 'OFFICIAL_SELLER', 'NORMAL', 100),
-  (3, 'user', 'user123', 'Demo User', '', '13800000002', 'user@demo.com', 'USER', 'NORMAL', 100);
+  (3, 'user', 'user123', 'Demo User', '', '13800000002', 'user@demo.com', 'USER', 'NORMAL', 100),
+  (4, 'third', 'third123', 'Third Party User', '', '13800000003', 'third@demo.com', 'USER', 'NORMAL', 100);
 
 INSERT IGNORE INTO `shop`
   (`id`, `owner_user_id`, `name`, `logo`, `description`, `status`)
