@@ -12,3 +12,8 @@ documents remain the source of component-level detail:
 Per-UC README, system/component/object model, and traceability files are
 maintained with the independently reviewable UC changes; this index does not
 duplicate them.
+
+The shared security boundary is covered by the tagged `PLATFORM` test
+`JwtAuthInterceptorTest` and the reusable `microservices/security-contract`
+module. The contract exposes `JwtPrincipal(uid, username, role)` and rejects
+missing, malformed, tampered, expired, or weak-secret JWT configurations.

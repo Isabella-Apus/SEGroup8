@@ -1,9 +1,14 @@
 {
   "domain": "DOMAIN_A",
-  "status": "IMPLEMENTED_NOT_RUN",
+  "status": "PASS_H2_MOCKMVC_NOT_COMPOSE_RUN",
   "unitApiEvidence": "existing tests retained and tagged",
   "integrationEvidence": "per-UC branches",
   "browserE2eEvidence": "per-UC branches",
+  "domainATestCount": 65,
+  "domainAFailures": 0,
+  "domainAErrors": 0,
+  "platformJwtInterceptorTests": 3,
+  "microserviceJwtContractTests": 5,
   "duplicateTestDeletion": 0,
-  "note": "Replace this summary with the actual command results after the full Domain-A gate."
+  "note": "Docker Compose browser E2E is not run because the local Docker daemon is unavailable."
 }
