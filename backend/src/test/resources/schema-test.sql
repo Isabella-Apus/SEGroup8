@@ -429,5 +429,6 @@ CREATE TABLE `idempotency_record` (
   `response_body` TEXT,
   `expire_time` TIMESTAMP,
   `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `update_time` TIMESTAMP
+  `update_time` TIMESTAMP,
+  UNIQUE (`user_id`, `request_method`, `request_path`, `idempotency_key`)
 );
