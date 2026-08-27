@@ -1,0 +1,4 @@
+classDiagram
+  class User { Long id; String username; String nickname; String email }
+  class Address { Long id; Long userId; String detailAddress; Integer isDefault }
+  User "1" --> "0..*" Address : owns
