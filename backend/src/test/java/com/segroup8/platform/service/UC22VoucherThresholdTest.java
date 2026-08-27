@@ -4,6 +4,7 @@ import com.segroup8.platform.common.BusinessException;
 import com.segroup8.platform.entity.UserVoucher;
 import com.segroup8.platform.entity.Voucher;
 import com.segroup8.platform.mapper.ShopMapper;
+import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.mapper.UserVoucherMapper;
 import com.segroup8.platform.mapper.VoucherMapper;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,8 @@ class UC22VoucherThresholdTest {
     private UserVoucherMapper userVoucherMapper;
     @Mock
     private ShopMapper shopMapper;
+    @Mock
+    private UserMapper userMapper;
 
     @Test
     void unitUc22001_shopSubtotalBelowThresholdMustNotOccupyVoucher() {
@@ -56,7 +59,7 @@ class UC22VoucherThresholdTest {
         userVoucher.setStatus(1);
         when(userVoucherMapper.selectOne(any())).thenReturn(userVoucher);
 
-        VoucherService service = new VoucherService(voucherMapper, userVoucherMapper, shopMapper);
+        VoucherService service = new VoucherService(voucherMapper, userVoucherMapper, shopMapper, userMapper);
         BusinessException error = assertThrows(BusinessException.class,
                 () -> service.occupyForOrder(
                         22L,

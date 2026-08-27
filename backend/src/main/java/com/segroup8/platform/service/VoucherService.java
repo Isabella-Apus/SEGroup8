@@ -5,12 +5,16 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.segroup8.platform.common.BusinessException;
+import com.segroup8.platform.common.AccessControl;
+import com.segroup8.platform.common.RoleEnum;
 import com.segroup8.platform.context.UserContext;
 import com.segroup8.platform.dto.VoucherSaveRequest;
 import com.segroup8.platform.entity.Voucher;
 import com.segroup8.platform.entity.UserVoucher;
 import com.segroup8.platform.entity.Shop;
+import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.ShopMapper;
+import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.mapper.UserVoucherMapper;
 import com.segroup8.platform.mapper.VoucherMapper;
 import com.segroup8.platform.vo.VoucherVO;
@@ -59,6 +63,7 @@ public class VoucherService {
     private final VoucherMapper voucherMapper;
     private final UserVoucherMapper userVoucherMapper;
     private final ShopMapper shopMapper;
+    private final UserMapper userMapper;
 
     public record CheckoutDiscount(
             Long voucherId,
@@ -69,6 +74,7 @@ public class VoucherService {
     }
 
     public IPage<VoucherVO> listByShop(int page, int pageSize) {
+        requireSeller();
         Long sellerUserId = UserContext.getUserId();
         LambdaQueryWrapper<Voucher> wrapper = new LambdaQueryWrapper<Voucher>()
                 .eq(Voucher::getIssuerUserId, sellerUserId)
@@ -79,6 +85,7 @@ public class VoucherService {
     }
 
     public IPage<VoucherVO> listForAdmin(int page, int pageSize, String name, Integer status, Integer scopeType) {
+        requireAdmin();
         LambdaQueryWrapper<Voucher> wrapper = new LambdaQueryWrapper<Voucher>()
                 .like(StringUtils.hasText(name), Voucher::getName, name)
                 .eq(status != null, Voucher::getStatus, status)
@@ -381,6 +388,7 @@ public class VoucherService {
     }
 
     public VoucherVO create(VoucherSaveRequest req) {
+        requireSeller();
         validateRequest(req);
         Long sellerUserId = UserContext.getUserId();
         Long shopId = requireSellerShopId(sellerUserId);
@@ -406,6 +414,7 @@ public class VoucherService {
     }
 
     public VoucherVO createForAdmin(VoucherSaveRequest req) {
+        requireAdmin();
         validateRequest(req);
 
         Voucher voucher = new Voucher();
@@ -431,6 +440,7 @@ public class VoucherService {
     }
 
     public VoucherVO update(Long id, VoucherSaveRequest req) {
+        requireSeller();
         validateRequest(req);
         Voucher voucher = getOwnedVoucher(id);
 
@@ -443,6 +453,7 @@ public class VoucherService {
     }
 
     public VoucherVO updateForAdmin(Long id, VoucherSaveRequest req) {
+        requireAdmin();
         validateRequest(req);
         Voucher voucher = getVoucherOrThrow(id);
 
@@ -454,18 +465,21 @@ public class VoucherService {
     }
 
     public void close(Long id) {
+        requireSeller();
         Voucher voucher = getOwnedVoucher(id);
         voucher.setStatus(STATUS_DISABLED);
         voucherMapper.updateById(voucher);
     }
 
     public void closeForAdmin(Long id) {
+        requireAdmin();
         Voucher voucher = getVoucherOrThrow(id);
         voucher.setStatus(STATUS_DISABLED);
         voucherMapper.updateById(voucher);
     }
 
     public void delete(Long id) {
+        requireSeller();
         Voucher voucher = getOwnedVoucher(id);
         if (voucher.getUsedCount() != null && voucher.getUsedCount() > 0) {
             throw new BusinessException(400, "已有用户使用，不能删除");
@@ -474,6 +488,7 @@ public class VoucherService {
     }
 
     public void deleteForAdmin(Long id) {
+        requireAdmin();
         Voucher voucher = getVoucherOrThrow(id);
         if (voucher.getUsedCount() != null && voucher.getUsedCount() > 0) {
             throw new BusinessException(400, "已有用户使用，不能删除");
@@ -539,6 +554,18 @@ public class VoucherService {
         if (req.getTotalCount() == null || req.getTotalCount() <= 0) {
             throw new BusinessException(400, "发放总量至少为1");
         }
+    }
+
+    private void requireSeller() {
+        Long userId = AccessControl.requireUserId();
+        User user = userMapper.selectById(userId);
+        if (user == null || !RoleEnum.OFFICIAL_SELLER.name().equals(user.getRole())) {
+            throw new BusinessException(403, "仅官方卖家可管理店铺优惠券");
+        }
+    }
+
+    private void requireAdmin() {
+        AccessControl.requireAdmin(userMapper);
     }
 
     private void fillFromRequest(Voucher voucher, VoucherSaveRequest req) {

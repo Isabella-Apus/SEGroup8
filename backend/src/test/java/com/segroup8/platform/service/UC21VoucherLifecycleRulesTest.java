@@ -3,7 +3,9 @@ package com.segroup8.platform.service;
 import com.segroup8.platform.common.BusinessException;
 import com.segroup8.platform.context.UserContext;
 import com.segroup8.platform.dto.VoucherSaveRequest;
+import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.ShopMapper;
+import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.mapper.UserVoucherMapper;
 import com.segroup8.platform.mapper.VoucherMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -19,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UC21VoucherLifecycleRulesTest {
@@ -29,6 +32,8 @@ class UC21VoucherLifecycleRulesTest {
     private UserVoucherMapper userVoucherMapper;
     @Mock
     private ShopMapper shopMapper;
+    @Mock
+    private UserMapper userMapper;
 
     @AfterEach
     void clearUserContext() {
@@ -41,9 +46,13 @@ class UC21VoucherLifecycleRulesTest {
         VoucherSaveRequest request = validRequest();
         request.setDiscountAmount(new BigDecimal("20.00"));
         request.setMinAmount(new BigDecimal("10.00"));
+        User seller = new User();
+        seller.setId(7L);
+        seller.setRole("OFFICIAL_SELLER");
+        when(userMapper.selectById(7L)).thenReturn(seller);
 
         BusinessException error = assertThrows(BusinessException.class,
-                () -> new VoucherService(voucherMapper, userVoucherMapper, shopMapper).create(request));
+                () -> new VoucherService(voucherMapper, userVoucherMapper, shopMapper, userMapper).create(request));
 
         assertEquals("优惠金额不能超过门槛金额", error.getMessage());
         verify(voucherMapper, never()).insert(org.mockito.ArgumentMatchers.any(com.segroup8.platform.entity.Voucher.class));

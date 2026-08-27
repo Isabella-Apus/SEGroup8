@@ -3,10 +3,12 @@ package com.segroup8.platform.service;
 import com.segroup8.platform.context.UserContext;
 import com.segroup8.platform.dto.VoucherSaveRequest;
 import com.segroup8.platform.entity.Shop;
+import com.segroup8.platform.entity.User;
 import com.segroup8.platform.entity.UserVoucher;
 import com.segroup8.platform.entity.Voucher;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserVoucherMapper;
+import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.mapper.VoucherMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,8 @@ class VoucherServiceTest {
     private UserVoucherMapper userVoucherMapper;
     @Mock
     private ShopMapper shopMapper;
+    @Mock
+    private UserMapper userMapper;
 
     @AfterEach
     void tearDown() {
@@ -46,6 +50,10 @@ class VoucherServiceTest {
         shop.setId(99L);
         shop.setOwnerUserId(7L);
         when(shopMapper.selectOne(any())).thenReturn(shop);
+        User seller = new User();
+        seller.setId(7L);
+        seller.setRole("OFFICIAL_SELLER");
+        when(userMapper.selectById(7L)).thenReturn(seller);
 
         AtomicReference<Voucher> saved = new AtomicReference<>();
         when(voucherMapper.insert(any(Voucher.class))).thenAnswer(invocation -> {
@@ -67,7 +75,7 @@ class VoucherServiceTest {
         request.setStartTime(LocalDateTime.now().minusHours(1));
         request.setEndTime(LocalDateTime.now().plusDays(7));
 
-        new VoucherService(voucherMapper, userVoucherMapper, shopMapper).create(request);
+        new VoucherService(voucherMapper, userVoucherMapper, shopMapper, userMapper).create(request);
 
         assertEquals(99L, saved.get().getShopId());
         assertEquals(7L, saved.get().getIssuerUserId());
@@ -101,7 +109,7 @@ class VoucherServiceTest {
         when(userVoucherMapper.update(any(), any())).thenReturn(1);
 
         VoucherService.CheckoutDiscount result = new VoucherService(
-                voucherMapper, userVoucherMapper, shopMapper).occupyForOrder(
+                voucherMapper, userVoucherMapper, shopMapper, userMapper).occupyForOrder(
                         5L,
                         3L,
                         10L,
