@@ -5,6 +5,11 @@
 
 ## Scope
 
+## 2026-08-27 real E2E refresh
+
+真实 Compose + MySQL + Chromium 已执行并通过：UC01 spec 1 test passed。运行产物已写入
+`04_tests/UC01/evidence/`，包括 Playwright HTML/JSON、Compose 服务日志和运行结果。
+
 Register, login, password hashing, JWT claims, role authorization, ban/login
 linkage, duplicate registration, invalid parameters and wrong passwords.
 

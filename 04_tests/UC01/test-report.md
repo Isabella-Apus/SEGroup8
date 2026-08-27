@@ -12,9 +12,14 @@ The H2-backed Spring integration gate passed locally on 2026-08-27:
 - The test asserts persisted BCrypt, JWT uid, USER/ADMIN boundary, ban state,
   failed banned login, duplicate registration and no dirty duplicate row.
 
-The Compose/MySQL browser gate is implemented but must be recorded as
-`NOT_RUN` until the Docker runner is executed. H2 evidence is not represented
-as MySQL or browser evidence.
+The real Compose + MySQL + Chromium gate also passed locally on 2026-08-27:
+
+- `e2e/domain-a/uc01-auth.spec.ts`: 1 test passed, 0 failures.
+- Evidence was written to `04_tests/UC01/evidence/`, including Playwright
+  HTML/JSON output and Compose service logs.
+
+H2 evidence remains separately reported; this run is the real MySQL/browser
+evidence for UC01.
 
 ## 完成项
 
