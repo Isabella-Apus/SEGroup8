@@ -1,0 +1,27 @@
+{
+  "evidenceFormatVersion": 1,
+  "suite": "DOMAIN_C",
+  "tagExpression": "DOMAIN_C",
+  "reportSuffix": "domain-c-domain_c-20260827063759766",
+  "result": "PASS",
+  "startedAt": "2026-08-27T06:37:59.778Z",
+  "finishedAt": "2026-08-27T06:38:33.338Z",
+  "durationSeconds": 33.56,
+  "command": [
+    "mvn.cmd",
+    "-B",
+    "--no-transfer-progress",
+    "-Dmaven.repo.local=<redacted>",
+    "-Pdomain-c",
+    "-Ddomain.c.tags=DOMAIN_C",
+    "-Dsurefire.reportNameSuffix=domain-c-domain_c-20260827063759766",
+    "clean",
+    "verify"
+  ],
+  "mavenExitCode": 0,
+  "reportFiles": 16,
+  "tests": 19,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0
+}

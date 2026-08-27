@@ -216,6 +216,7 @@ async function fetchPage(reset = false) {
     const res = await getProductListApi({
       pageNum: queryPageNum.value,
       pageSize,
+      ...(query.keyword.trim() ? { keyword: query.keyword.trim() } : {}),
       ...(query.category !== ALL_CATEGORY ? { category: query.category } : {}),
       ...priceParams(),
     });
