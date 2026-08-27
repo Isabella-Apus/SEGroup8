@@ -2,7 +2,10 @@
 # frontend
 frontend/node_modules/
 frontend/dist/
+frontend/.npm-cache/
 frontend/test-results/
+04_tests/platform-e2e/evidence/*
+!04_tests/platform-e2e/evidence/.gitkeep
 
 # backend
 backend/target/
