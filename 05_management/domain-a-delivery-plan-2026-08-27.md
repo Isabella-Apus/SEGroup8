@@ -5,6 +5,13 @@ This file is the execution checklist for the six PRs required by
 Task Issue creation, Project card placement, and PR creation remain manual
 GitHub operations. All six code branches have been pushed.
 
+本轮不按 prompt 中的 Day3/Day4/Day5 时间段拆分；目标是一次完成 prompt
+规定的完整交付集。当前分支按一个 A0 加五个 UC 独立 PR 维护，save-epicA-changes
+保持不改动。
+
+CI workflow：
+`https://github.com/Isabella-Apus/SEGroup8/actions/workflows/ci-cd.yml`
+
 ## Parent issues
 
 - Epic A: `#34`
@@ -29,6 +36,21 @@ the only issue closed by its PR.
 | `[UC04] 封禁、登录失败、解禁和审计真实集成/E2E` | #42 | `test/uc04-real-flow` | `test(UC04): complete real ban unban governance flow` | `04_tests/UC04` |
 | `[UC05] 举报、拉黑、信用治理和审计事务 E2E` | #43 | `test/uc05-real-flow` | `test(UC05): complete report block credit governance flow` | `04_tests/UC05` |
 
+## save-epicA-changes 测试分流记录
+
+| save 分支内容 | 归属 | 落点 |
+|---|---|---|
+| `JwtAuthInterceptorTest`；`JwtUtilsTest` 的 PLATFORM 边界；`security-contract`（`JwtPrincipal`、`JwtTokenVerifier`、异常类及 5 个契约测试） | 共享 A0 / 全局安全 | `backend/src/test/.../interceptor`、`microservices/security-contract`、`02_docs/domains/A-identity`、`03_devops/domains/domain-a.md` |
+| Auth Controller/Service 新增的非法请求、重复用户名、错误密码、封禁登录覆盖 | UC01 | `test/uc01-real-flow` 的 `AuthControllerWebMvcTest.java`、`AuthServiceImplTest.java`，并与 `IdentityUc01IntegrationTest`、`uc01-auth.spec.ts` 同分支 |
+| User Controller 的当前用户、资料和地址 API 覆盖 | UC02 | `test/uc02-real-flow` 的 `UserControllerWebMvcTest.java`，并与 `ProfileAddressUc02IntegrationTest`、`uc02-profile-address.spec.ts` 同分支 |
+| Merchant Application Controller/Service 的待审队列、重复申请、驳回原因/通知覆盖 | UC03 | `test/uc03-real-flow` 的 `MerchantApplicationControllerWebMvcTest.java`、`MerchantApplicationServiceImplTest.java`，并与两个 UC03 集成测试、E2E 同分支 |
+| Admin User Controller/Service 的列表、审计、解禁和自封禁拒绝覆盖 | UC04 | `test/uc04-real-flow` 的 `AdminUserControllerWebMvcTest.java`、`AdminUserServiceImplTest.java`，并与 `UserGovernanceUc04IntegrationTest`、E2E 同分支 |
+| Report/Block Controller/Service 的举报、拉黑、解除、信用、管理员、重复/自操作/越权覆盖 | UC05 | `test/uc05-real-flow` 的 `ReportBlockControllerWebMvcTest.java`、`ReportBlockServiceImplTest.java`，并与 `ReportBlockCreditUc05IntegrationTest`、E2E 同分支 |
+
+save 分支中 frontend 旧的 mock/fixture 删除改动没有复用；因为当前 Playwright
+脚手架的真实登录选择器和 helper 需要保留。生成的 `target` 及非 Domain-A
+微服务目录/风险/店铺测试也没有带入这六个 PR。
+
 ## Issue body checklist
 
 Copy the following sections into each Task issue and fill in the branch/PR
@@ -47,6 +69,12 @@ link:
    and seed credentials must be recorded.
 6. Evidence directory and final PR URL.
 
+当前已完成的本地证据：Domain-A 65 tests、后端 `clean verify` 127 tests、
+security-contract 5 tests、frontend `npm ci`/`npm run build:real` 和 Compose
+配置检查均 PASS；`04_tests/UC01` 至 `UC05` 的 `result-summary.json` 已明确
+记录各自 H2/MockMvc PASS 以及 Compose 浏览器 `NOT_RUN`。Docker daemon 恢复后，
+必须把 Playwright raw report、logs 和 screenshots 写回对应 UC evidence 目录。
+
 ## PR rules
 
 - Create the PR from the listed branch after confirming it is up to date with
@@ -58,3 +86,16 @@ link:
   the UC parent in the issue hierarchy.
 - The current evidence deliberately records Compose browser E2E as `NOT_RUN`
   because Docker Desktop's Linux daemon was unavailable during this run.
+
+## Current branch heads before report refresh
+
+The pushed independent branch heads before this report/CI refresh were:
+
+- A0 `test/domain-a-infra` → `800c3d1`
+- UC01 `test/uc01-real-flow` → `f5fd8d4`
+- UC02 `test/uc02-real-flow` → `85ac3ea`
+- UC03 `test/uc03-real-flow` → `d19e0f9`
+- UC04 `test/uc04-real-flow` → `6973b9e`
+- UC05 `test/uc05-real-flow` → `b3bf285`
+
+报告/CI 更新完成后会在各分支产生新的独立提交并重新推送，PR 以新的远端头为准。
