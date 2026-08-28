@@ -1,0 +1,14 @@
+### Seller ships a new-product order
+POST http://localhost:8088/api/order/13001/ship
+Authorization: Bearer {{sellerToken}}
+Content-Type: application/json
+
+{}
+
+### Buyer reads logistics
+GET http://localhost:8088/api/logistics/order/13001/trace
+Authorization: Bearer {{buyerToken}}
+
+### Buyer confirms receipt
+POST http://localhost:8088/api/order/13001/confirm-receive
+Authorization: Bearer {{buyerToken}}

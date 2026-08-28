@@ -1,0 +1,7 @@
+flowchart TB
+  Spec[uc02-profile-address.spec.ts] --> HTTP[真实 HTTP]
+  HTTP --> Profile[GET/PUT profile]
+  HTTP --> Address[GET/POST/PUT/DELETE addresses]
+  Profile --> UserService[UserServiceImpl]
+  Address --> UserService
+  UserService --> DB[(MySQL/H2 tables)]

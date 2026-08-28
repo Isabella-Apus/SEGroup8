@@ -20,6 +20,8 @@ import com.segroup8.platform.realtime.RealtimePushService;
 import com.segroup8.platform.service.MerchantApplicationService;
 import com.segroup8.platform.vo.MerchantApplicationVO;
 import com.segroup8.platform.vo.PageVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -32,6 +34,8 @@ import java.util.Objects;
 
 @Service
 public class MerchantApplicationServiceImpl implements MerchantApplicationService {
+
+    private static final Logger log = LoggerFactory.getLogger(MerchantApplicationServiceImpl.class);
 
     private final MerchantApplicationMapper merchantApplicationMapper;
     private final UserMapper userMapper;
@@ -154,8 +158,7 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
         notification.setContent("恭喜，您的入驻申请已通过，现可进入卖家工作台。");
         notification.setIsRead(0);
         notification.setCreateTime(LocalDateTime.now());
-        notificationMapper.insert(notification);
-        pushNotification(notification, "seller");
+        persistNotificationSafely(notification, "seller");
     }
 
     @Override
@@ -175,8 +178,22 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
         notification.setContent("您的入驻申请被驳回，原因：" + request.getRejectReason());
         notification.setIsRead(0);
         notification.setCreateTime(LocalDateTime.now());
-        notificationMapper.insert(notification);
-        pushNotification(notification, "buyer");
+        persistNotificationSafely(notification, "buyer");
+    }
+
+    /**
+     * Approval/rejection is the source-of-truth business action. Notification
+     * storage and realtime delivery are best-effort side effects and must not
+     * undo the application, role, shop, or audit state when they fail.
+     */
+    private void persistNotificationSafely(Notification notification, String scope) {
+        try {
+            notificationMapper.insert(notification);
+            pushNotification(notification, scope);
+        } catch (RuntimeException ex) {
+            log.warn("Unable to persist or push merchant application notification for user {}",
+                    notification == null ? null : notification.getUserId(), ex);
+        }
     }
 
     private void pushNotification(Notification notification, String scope) {

@@ -1,0 +1,7 @@
+flowchart LR
+  Admin[管理员] --> Controller[AdminUserController]
+  Controller --> Service[AdminUserService]
+  Service --> User[(user status)]
+  Controller --> Audit[AdminAuditLogService]
+  Audit --> Log[(admin_audit_log)]
+  Login[AuthController] --> User

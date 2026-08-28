@@ -1,0 +1,867 @@
+﻿frontend-1  | 2026-08-27T07:25:27.558518916Z /docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
+frontend-1  | 2026-08-27T07:25:27.558534404Z /docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/
+frontend-1  | 2026-08-27T07:25:27.559944725Z /docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
+frontend-1  | 2026-08-27T07:25:27.564672499Z 10-listen-on-ipv6-by-default.sh: info: Getting the checksum of /etc/nginx/conf.d/default.conf
+frontend-1  | 2026-08-27T07:25:27.582820610Z 10-listen-on-ipv6-by-default.sh: info: /etc/nginx/conf.d/default.conf differs from the packaged version
+frontend-1  | 2026-08-27T07:25:27.582924469Z /docker-entrypoint.sh: Sourcing /docker-entrypoint.d/15-local-resolvers.envsh
+frontend-1  | 2026-08-27T07:25:27.583133012Z /docker-entrypoint.sh: Launching /docker-entrypoint.d/20-envsubst-on-templates.sh
+frontend-1  | 2026-08-27T07:25:27.584902022Z /docker-entrypoint.sh: Launching /docker-entrypoint.d/30-tune-worker-processes.sh
+frontend-1  | 2026-08-27T07:25:27.585923961Z /docker-entrypoint.sh: Configuration complete; ready for start up
+frontend-1  | 2026-08-27T07:25:27.593752781Z 2026/08/27 07:25:27 [notice] 1#1: using the "epoll" event method
+frontend-1  | 2026-08-27T07:25:27.593766875Z 2026/08/27 07:25:27 [notice] 1#1: nginx/1.27.5
+frontend-1  | 2026-08-27T07:25:27.593768072Z 2026/08/27 07:25:27 [notice] 1#1: built by gcc 14.2.0 (Alpine 14.2.0) 
+frontend-1  | 2026-08-27T07:25:27.593768948Z 2026/08/27 07:25:27 [notice] 1#1: OS: Linux 6.6.87.2-microsoft-standard-WSL2
+database-1  | 2026-08-27T07:25:05.939068562Z 2026-08-27 15:25:05+08:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.4.6-1.el9 started.
+backend-1   | 2026-08-27T07:25:18.524414645Z 
+backend-1   | 2026-08-27T07:25:18.524445907Z   .   ____          _            __ _ _
+backend-1   | 2026-08-27T07:25:18.524447633Z  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+backend-1   | 2026-08-27T07:25:18.524448745Z ( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+database-1  | 2026-08-27T07:25:06.165717904Z 2026-08-27 15:25:06+08:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+backend-1   | 2026-08-27T07:25:18.524449723Z  \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+backend-1   | 2026-08-27T07:25:18.524450612Z   '  |____| .__|_| |_|_| |_\__, | / / / /
+backend-1   | 2026-08-27T07:25:18.524451580Z  =========|_|==============|___/=/_/_/_/
+database-1  | 2026-08-27T07:25:06.174417903Z 2026-08-27 15:25:06+08:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.4.6-1.el9 started.
+database-1  | 2026-08-27T07:25:06.291811619Z 2026-08-27 15:25:06+08:00 [Note] [Entrypoint]: Initializing database files
+frontend-1  | 2026-08-27T07:25:27.593769890Z 2026/08/27 07:25:27 [notice] 1#1: getrlimit(RLIMIT_NOFILE): 1048576:1048576
+frontend-1  | 2026-08-27T07:25:27.594094067Z 2026/08/27 07:25:27 [notice] 1#1: start worker processes
+backend-1   | 2026-08-27T07:25:18.524452450Z 
+database-1  | 2026-08-27T07:25:06.301157282Z 2026-08-27T07:25:06.299067Z 0 [System] [MY-015017] [Server] MySQL Server Initialization - start.
+backend-1   | 2026-08-27T07:25:18.524955533Z  :: Spring Boot ::                (v3.3.4)
+frontend-1  | 2026-08-27T07:25:27.594298097Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 29
+database-1  | 2026-08-27T07:25:06.301167085Z 2026-08-27T07:25:06.300059Z 0 [System] [MY-013169] [Server] /usr/sbin/mysqld (mysqld 8.4.6) initializing of server in progress as process 79
+backend-1   | 2026-08-27T07:25:18.524963431Z 
+backend-1   | 2026-08-27T07:25:18.576800538Z 2026-08-27T15:25:18.575+08:00  INFO 1 --- [segroup8-platform] [           main] c.segroup8.platform.PlatformApplication  : Starting PlatformApplication v0.0.1-SNAPSHOT using Java 17.0.17 with PID 1 (/app/app.jar started by appuser in /app)
+database-1  | 2026-08-27T07:25:06.307788155Z 2026-08-27T07:25:06.307633Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+database-1  | 2026-08-27T07:25:06.479302916Z 2026-08-27T07:25:06.479173Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+backend-1   | 2026-08-27T07:25:18.577804076Z 2026-08-27T15:25:18.577+08:00  INFO 1 --- [segroup8-platform] [           main] c.segroup8.platform.PlatformApplication  : No active profile set, falling back to 1 default profile: "default"
+frontend-1  | 2026-08-27T07:25:27.594423182Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 30
+backend-1   | 2026-08-27T07:25:19.756063863Z 2026-08-27T15:25:19.755+08:00  INFO 1 --- [segroup8-platform] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+backend-1   | 2026-08-27T07:25:19.766077354Z 2026-08-27T15:25:19.765+08:00  INFO 1 --- [segroup8-platform] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+backend-1   | 2026-08-27T07:25:19.766209276Z 2026-08-27T15:25:19.766+08:00  INFO 1 --- [segroup8-platform] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.30]
+database-1  | 2026-08-27T07:25:07.168241936Z 2026-08-27T07:25:07.168106Z 6 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+frontend-1  | 2026-08-27T07:25:27.594522814Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 31
+database-1  | 2026-08-27T07:25:09.180583353Z 2026-08-27T07:25:09.180377Z 0 [System] [MY-015018] [Server] MySQL Server Initialization - end.
+database-1  | 2026-08-27T07:25:09.222370528Z 2026-08-27 15:25:09+08:00 [Note] [Entrypoint]: Database files initialized
+frontend-1  | 2026-08-27T07:25:27.594687489Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 32
+database-1  | 2026-08-27T07:25:09.224518645Z 2026-08-27 15:25:09+08:00 [Note] [Entrypoint]: Starting temporary server
+frontend-1  | 2026-08-27T07:25:27.594708518Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 33
+frontend-1  | 2026-08-27T07:25:27.594866035Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 34
+frontend-1  | 2026-08-27T07:25:27.595032806Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 35
+backend-1   | 2026-08-27T07:25:19.793239969Z 2026-08-27T15:25:19.792+08:00  INFO 1 --- [segroup8-platform] [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+database-1  | 2026-08-27T07:25:09.441232339Z 2026-08-27T07:25:09.235837Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+frontend-1  | 2026-08-27T07:25:27.595126848Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 36
+database-1  | 2026-08-27T07:25:09.441591796Z 2026-08-27T07:25:09.434321Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.4.6) starting as process 135
+backend-1   | 2026-08-27T07:25:19.794307663Z 2026-08-27T15:25:19.793+08:00  INFO 1 --- [segroup8-platform] [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1171 ms
+backend-1   | 2026-08-27T07:25:20.095541155Z Logging initialized using 'class org.apache.ibatis.logging.stdout.StdOutImpl' adapter.
+backend-1   | 2026-08-27T07:25:20.112094335Z Get /172.19.0.3 network interface 
+database-1  | 2026-08-27T07:25:09.445252920Z 2026-08-27T07:25:09.445166Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+backend-1   | 2026-08-27T07:25:20.112294211Z Get network interface info: name:eth0 (eth0)
+backend-1   | 2026-08-27T07:25:20.146517473Z Initialization Sequence datacenterId:8 workerId:25
+backend-1   | 2026-08-27T07:25:20.149232139Z  _ _   |_  _ _|_. ___ _ |    _ 
+backend-1   | 2026-08-27T07:25:20.149253181Z | | |\/|_)(_| | |_\  |_)||_|_\ 
+backend-1   | 2026-08-27T07:25:20.149257108Z      /               |         
+frontend-1  | 2026-08-27T07:25:27.595375417Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 37
+backend-1   | 2026-08-27T07:25:20.149633879Z                         3.5.7 
+frontend-1  | 2026-08-27T07:25:27.595634494Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 38
+backend-1   | 2026-08-27T07:25:21.875459740Z 2026-08-27T15:25:21.875+08:00  INFO 1 --- [segroup8-platform] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoints beneath base path '/actuator'
+backend-1   | 2026-08-27T07:25:21.927304385Z 2026-08-27T15:25:21.926+08:00  INFO 1 --- [segroup8-platform] [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+backend-1   | 2026-08-27T07:25:21.944198372Z 2026-08-27T15:25:21.943+08:00  INFO 1 --- [segroup8-platform] [           main] c.segroup8.platform.PlatformApplication  : Started PlatformApplication in 3.725 seconds (process running for 4.133)
+backend-1   | 2026-08-27T07:25:21.959027149Z Creating a new SqlSession
+frontend-1  | 2026-08-27T07:25:27.595787919Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 39
+backend-1   | 2026-08-27T07:25:21.963556884Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@478d0e1f] was not registered for synchronization because synchronization is not active
+database-1  | 2026-08-27T07:25:09.625221985Z 2026-08-27T07:25:09.625055Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+database-1  | 2026-08-27T07:25:09.767097516Z 2026-08-27T07:25:09.766878Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+database-1  | 2026-08-27T07:25:09.767111424Z 2026-08-27T07:25:09.766905Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+database-1  | 2026-08-27T07:25:09.768683538Z 2026-08-27T07:25:09.768584Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+frontend-1  | 2026-08-27T07:25:27.596011375Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 40
+backend-1   | 2026-08-27T07:25:22.009073350Z 2026-08-27T15:25:22.008+08:00  INFO 1 --- [segroup8-platform] [   scheduling-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+frontend-1  | 2026-08-27T07:25:27.596232763Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 41
+backend-1   | 2026-08-27T07:25:22.125815499Z 2026-08-27T15:25:22.125+08:00  INFO 1 --- [segroup8-platform] [   scheduling-1] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@62e785b8
+backend-1   | 2026-08-27T07:25:22.128467588Z 2026-08-27T15:25:22.128+08:00  INFO 1 --- [segroup8-platform] [   scheduling-1] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+backend-1   | 2026-08-27T07:25:22.131275024Z JDBC Connection [HikariProxyConnection@576744925 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+frontend-1  | 2026-08-27T07:25:27.596478456Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 42
+backend-1   | 2026-08-27T07:25:22.133563374Z ==>  Preparing: DELETE FROM idempotency_record WHERE (expire_time < ?)
+database-1  | 2026-08-27T07:25:09.784415255Z 2026-08-27T07:25:09.784274Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Socket: /var/run/mysqld/mysqlx.sock
+frontend-1  | 2026-08-27T07:25:27.596692811Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 43
+database-1  | 2026-08-27T07:25:09.784439721Z 2026-08-27T07:25:09.784362Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.4.6'  socket: '/var/run/mysqld/mysqld.sock'  port: 0  MySQL Community Server - GPL.
+frontend-1  | 2026-08-27T07:25:27.596962206Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 44
+frontend-1  | 2026-08-27T07:25:27.597255275Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 45
+backend-1   | 2026-08-27T07:25:22.144301769Z ==> Parameters: 2026-08-27T15:25:21.952912320(LocalDateTime)
+frontend-1  | 2026-08-27T07:25:27.597495998Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 46
+database-1  | 2026-08-27T07:25:09.791615510Z 2026-08-27 15:25:09+08:00 [Note] [Entrypoint]: Temporary server started.
+frontend-1  | 2026-08-27T07:25:27.597776518Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 47
+database-1  | 2026-08-27T07:25:09.805442693Z '/var/lib/mysql/mysql.sock' -> '/var/run/mysqld/mysqld.sock'
+database-1  | 2026-08-27T07:25:10.226102074Z Warning: Unable to load '/usr/share/zoneinfo/iso3166.tab' as time zone. Skipping it.
+frontend-1  | 2026-08-27T07:25:27.598061741Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 48
+database-1  | 2026-08-27T07:25:10.226291359Z Warning: Unable to load '/usr/share/zoneinfo/leap-seconds.list' as time zone. Skipping it.
+frontend-1  | 2026-08-27T07:25:27.598375117Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 49
+database-1  | 2026-08-27T07:25:10.226446193Z Warning: Unable to load '/usr/share/zoneinfo/leapseconds' as time zone. Skipping it.
+database-1  | 2026-08-27T07:25:11.083942832Z Warning: Unable to load '/usr/share/zoneinfo/tzdata.zi' as time zone. Skipping it.
+frontend-1  | 2026-08-27T07:25:27.598711206Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 50
+backend-1   | 2026-08-27T07:25:22.156456721Z <==    Updates: 0
+backend-1   | 2026-08-27T07:25:22.156842055Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@478d0e1f]
+frontend-1  | 2026-08-27T07:25:27.598984964Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 51
+backend-1   | 2026-08-27T07:25:22.895885815Z 2026-08-27T15:25:22.895+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+frontend-1  | 2026-08-27T07:25:27.599300663Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 52
+frontend-1  | 2026-08-27T07:25:27.599634489Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 53
+frontend-1  | 2026-08-27T07:25:27.599948817Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 54
+backend-1   | 2026-08-27T07:25:22.895917438Z 2026-08-27T15:25:22.895+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+frontend-1  | 2026-08-27T07:25:27.600271987Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 55
+backend-1   | 2026-08-27T07:25:22.896669426Z 2026-08-27T15:25:22.896+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+database-1  | 2026-08-27T07:25:11.084292852Z Warning: Unable to load '/usr/share/zoneinfo/zone.tab' as time zone. Skipping it.
+frontend-1  | 2026-08-27T07:25:27.600643378Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 56
+database-1  | 2026-08-27T07:25:11.084435147Z Warning: Unable to load '/usr/share/zoneinfo/zone1970.tab' as time zone. Skipping it.
+frontend-1  | 2026-08-27T07:25:27.601028955Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 57
+frontend-1  | 2026-08-27T07:25:27.601438113Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 58
+backend-1   | 2026-08-27T07:26:02.344585434Z Creating a new SqlSession
+frontend-1  | 2026-08-27T07:25:27.601904661Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 59
+frontend-1  | 2026-08-27T07:25:27.602502909Z 2026/08/27 07:25:27 [notice] 1#1: start worker process 60
+backend-1   | 2026-08-27T07:26:02.344862101Z Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a0518a]
+database-1  | 2026-08-27T07:25:11.155639082Z 2026-08-27 15:25:11+08:00 [Note] [Entrypoint]: Creating database segroup8_platform
+backend-1   | 2026-08-27T07:26:02.347341528Z JDBC Connection [HikariProxyConnection@1215221831 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will be managed by Spring
+frontend-1  | 2026-08-27T07:26:08.973677377Z 172.19.0.1 - - [27/Aug/2026:07:26:08 +0000] "POST /api/auth/register HTTP/1.1" 200 53 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+backend-1   | 2026-08-27T07:26:02.347353648Z ==>  Preparing: SELECT id,product_id,seller_user_id,start_price,increment_amount,current_price,current_bidder_user_id,start_time,end_time,status,settled_order_id,version,create_time,update_time FROM product_auction WHERE (status = ? AND end_time <= ?) ORDER BY end_time ASC limit 200
+frontend-1  | 2026-08-27T07:26:09.088511348Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "POST /api/auth/login HTTP/1.1" 200 783 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+backend-1   | 2026-08-27T07:26:02.347638100Z ==> Parameters: ONGOING(String), 2026-08-27T15:26:02.342013320(LocalDateTime)
+frontend-1  | 2026-08-27T07:26:09.106064010Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /login HTTP/1.1" 200 479 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+backend-1   | 2026-08-27T07:26:02.377584514Z <==      Total: 0
+frontend-1  | 2026-08-27T07:26:09.111470277Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/index-BrLyb8Jw.js HTTP/1.1" 200 1239184 "http://127.0.0.1:8088/login" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+frontend-1  | 2026-08-27T07:26:09.114068118Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/index-BjkXEDxC.css HTTP/1.1" 200 358868 "http://127.0.0.1:8088/login" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+frontend-1  | 2026-08-27T07:26:09.199719470Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/Login-N1Fpb1M9.js HTTP/1.1" 200 3082 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+backend-1   | 2026-08-27T07:26:02.378868293Z Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a0518a]
+frontend-1  | 2026-08-27T07:26:09.200161207Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/kinda-goods-logo-NTyMe_aT.js HTTP/1.1" 200 4917 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+backend-1   | 2026-08-27T07:26:02.379059730Z Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a0518a]
+backend-1   | 2026-08-27T07:26:02.379169880Z Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a0518a]
+frontend-1  | 2026-08-27T07:26:09.200739284Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/Login-Crw3dk5s.css HTTP/1.1" 200 5748 "http://127.0.0.1:8088/login" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+backend-1   | 2026-08-27T07:26:02.379286741Z Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a0518a]
+frontend-1  | 2026-08-27T07:26:09.607859780Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "POST /api/auth/login HTTP/1.1" 200 783 "http://127.0.0.1:8088/login" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:11.163845897Z 2026-08-27 15:25:11+08:00 [Note] [Entrypoint]: Creating user segroup8
+frontend-1  | 2026-08-27T07:26:09.612210672Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/UserLayout-C_9TdrCf.js HTTP/1.1" 200 9359 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+frontend-1  | 2026-08-27T07:26:09.612336246Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/product-BOL6SOtX.js HTTP/1.1" 200 173 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:11.172771664Z 2026-08-27 15:25:11+08:00 [Note] [Entrypoint]: Giving user segroup8 access to schema segroup8_platform
+backend-1   | 2026-08-27T07:26:08.899010533Z Creating a new SqlSession
+database-1  | 2026-08-27T07:25:11.178293143Z 
+backend-1   | 2026-08-27T07:26:08.899036026Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@438e9409] was not registered for synchronization because synchronization is not active
+database-1  | 2026-08-27T07:25:11.179285376Z 2026-08-27 15:25:11+08:00 [Note] [Entrypoint]: /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/01-schema.sql
+frontend-1  | 2026-08-27T07:26:09.614266293Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/secondhand-DcCqszNR.js HTTP/1.1" 200 1995 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+backend-1   | 2026-08-27T07:26:08.899976934Z JDBC Connection [HikariProxyConnection@77499626 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+frontend-1  | 2026-08-27T07:26:09.615148721Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/UserLayout-hENVTNW2.css HTTP/1.1" 200 6803 "http://127.0.0.1:8088/login" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+frontend-1  | 2026-08-27T07:26:09.615165193Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/HomeView-CQMlyCee.css HTTP/1.1" 200 7882 "http://127.0.0.1:8088/login" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651819266Z 1
+frontend-1  | 2026-08-27T07:26:09.615168183Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/ProductCard-D5NQm2UE.css HTTP/1.1" 200 3935 "http://127.0.0.1:8088/login" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651835045Z 1
+frontend-1  | 2026-08-27T07:26:09.616417917Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/notification-DIDGMnwK.js HTTP/1.1" 200 266 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+frontend-1  | 2026-08-27T07:26:09.616424507Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/order-C-5dUXE5.js HTTP/1.1" 200 1155 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+backend-1   | 2026-08-27T07:26:08.899987632Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE (username = ?) limit 1
+frontend-1  | 2026-08-27T07:26:09.616426070Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/HomeView-D2UEF5mM.js HTTP/1.1" 200 10348 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+frontend-1  | 2026-08-27T07:26:09.616427304Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/ProductCard-BVM3Vq5C.js HTTP/1.1" 200 4981 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651836320Z 1
+backend-1   | 2026-08-27T07:26:08.900510667Z ==> Parameters: e2e-uc01-1787815568299-5f7a7c(String)
+database-1  | 2026-08-27T07:25:12.651837227Z 1
+backend-1   | 2026-08-27T07:26:08.902240522Z <==      Total: 0
+database-1  | 2026-08-27T07:25:12.651837974Z 1
+backend-1   | 2026-08-27T07:26:08.902274235Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@438e9409]
+frontend-1  | 2026-08-27T07:26:09.616562567Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/cart-BwpsATXK.js HTTP/1.1" 200 581 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651838803Z 1
+frontend-1  | 2026-08-27T07:26:09.674628356Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /profile HTTP/1.1" 200 479 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651839523Z 1
+frontend-1  | 2026-08-27T07:26:09.678700676Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /api/user/me HTTP/1.1" 499 0 "http://127.0.0.1:8088/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+frontend-1  | 2026-08-27T07:26:09.678794646Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /api/product/list?pageNum=1&pageSize=4 HTTP/1.1" 499 0 "http://127.0.0.1:8088/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+frontend-1  | 2026-08-27T07:26:09.679017928Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /api/secondhand/list?pageNum=1&pageSize=4 HTTP/1.1" 499 0 "http://127.0.0.1:8088/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651840208Z 1
+frontend-1  | 2026-08-27T07:26:09.679844464Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /ws/realtime?token=eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjQsInVzZXJuYW1lIjoiZTJlLXVjMDEtMTc4NzgxNTU2ODI5OS01ZjdhN2MiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc4NzgxNTU2OSwiZXhwIjoxNzg3OTAxOTY5fQ.NteTN_3Nybl8f3gkHCc4RPCDuPdj-DO_IGD1sf4l8Ts HTTP/1.1" 101 51 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651840914Z 1
+database-1  | 2026-08-27T07:25:12.651841593Z 1
+frontend-1  | 2026-08-27T07:26:09.695248062Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/Profile-eOEr36jH.js HTTP/1.1" 200 5805 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651842277Z 1
+frontend-1  | 2026-08-27T07:26:09.695948195Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/finance-tyObG1Bl.js HTTP/1.1" 200 711 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+backend-1   | 2026-08-27T07:26:08.960288472Z Creating a new SqlSession
+database-1  | 2026-08-27T07:25:12.651842974Z 1
+frontend-1  | 2026-08-27T07:26:09.695955920Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/upload-DoBt49Rl.js HTTP/1.1" 200 336 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651843659Z 1
+database-1  | 2026-08-27T07:25:12.651844386Z 1
+frontend-1  | 2026-08-27T07:26:09.697256880Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /assets/Profile-YAYjOPve.css HTTP/1.1" 200 646 "http://127.0.0.1:8088/profile" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651845087Z 1
+frontend-1  | 2026-08-27T07:26:09.776877923Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /api/user/me HTTP/1.1" 200 550 "http://127.0.0.1:8088/profile" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651845788Z 1
+backend-1   | 2026-08-27T07:26:08.960309440Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@53f586b4] was not registered for synchronization because synchronization is not active
+database-1  | 2026-08-27T07:25:12.651846484Z 1
+database-1  | 2026-08-27T07:25:12.651847268Z 1
+database-1  | 2026-08-27T07:25:12.651847977Z 1
+backend-1   | 2026-08-27T07:26:08.963038281Z JDBC Connection [HikariProxyConnection@951348784 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+database-1  | 2026-08-27T07:25:12.651848678Z 1
+backend-1   | 2026-08-27T07:26:08.963067581Z ==>  Preparing: INSERT INTO user ( username, password, nickname, avatar, phone, email, role, status, credit_score, seller_credit_score ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+database-1  | 2026-08-27T07:25:12.651849365Z 1
+backend-1   | 2026-08-27T07:26:08.963376912Z ==> Parameters: e2e-uc01-1787815568299-5f7a7c(String), $2a$10$i2LCBKkuwysCSBWtK6kkEuKTBsQjRWQVstIiYLVAkrltph.csoDCK(String), e2e-uc01-1787815568299-5f7a7c(String), (String), 13800138000(String), e2e-uc01-1787815568299-5f7a7c@example.com(String), USER(String), NORMAL(String), 100(Integer), 100(Integer)
+database-1  | 2026-08-27T07:25:12.651850099Z 1
+backend-1   | 2026-08-27T07:26:08.967675397Z <==    Updates: 1
+database-1  | 2026-08-27T07:25:12.651850795Z 1
+backend-1   | 2026-08-27T07:26:08.968962274Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@53f586b4]
+backend-1   | 2026-08-27T07:26:08.973270852Z 2026-08-27T15:26:08.972+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-8] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=87f7092f874141eaacff0e9c905251f3 method=POST path=/api/auth/register status=200
+backend-1   | 2026-08-27T07:26:08.984692830Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:08.984715180Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2b84f240] was not registered for synchronization because synchronization is not active
+frontend-1  | 2026-08-27T07:26:09.779254362Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /api/secondhand/list?pageNum=1&pageSize=4 HTTP/1.1" 200 98 "http://127.0.0.1:8088/profile" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+backend-1   | 2026-08-27T07:26:08.985152359Z JDBC Connection [HikariProxyConnection@1191854274 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:08.985160640Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE (username = ?) limit 1
+backend-1   | 2026-08-27T07:26:08.985330695Z ==> Parameters: e2e-uc01-1787815568299-5f7a7c(String)
+frontend-1  | 2026-08-27T07:26:09.787381916Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /api/product/list?pageNum=1&pageSize=4 HTTP/1.1" 200 480 "http://127.0.0.1:8088/profile" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+backend-1   | 2026-08-27T07:26:08.986240515Z <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+backend-1   | 2026-08-27T07:26:08.987447004Z <==        Row: 4, e2e-uc01-1787815568299-5f7a7c, $2a$10$i2LCBKkuwysCSBWtK6kkEuKTBsQjRWQVstIiYLVAkrltph.csoDCK, e2e-uc01-1787815568299-5f7a7c, , 13800138000, e2e-uc01-1787815568299-5f7a7c@example.com, USER, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:26:08, 2026-08-27 15:26:08, 100, 100
+frontend-1  | 2026-08-27T07:26:09.798955554Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /api/finance/dashboard HTTP/1.1" 200 96 "http://127.0.0.1:8088/profile" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+backend-1   | 2026-08-27T07:26:08.989850827Z <==      Total: 1
+database-1  | 2026-08-27T07:25:12.651851499Z 1
+backend-1   | 2026-08-27T07:26:08.989951460Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2b84f240]
+backend-1   | 2026-08-27T07:26:09.088119372Z 2026-08-27T15:26:09.087+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-9] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=4294496a7d1d45c6b672706563910650 method=POST path=/api/auth/login status=200
+backend-1   | 2026-08-27T07:26:09.554620825Z Creating a new SqlSession
+frontend-1  | 2026-08-27T07:26:09.810973848Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /api/finance/my-wallet/records HTTP/1.1" 200 51 "http://127.0.0.1:8088/profile" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651852194Z 1
+frontend-1  | 2026-08-27T07:26:09.811148130Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /profile HTTP/1.1" 304 0 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651852884Z 1
+frontend-1  | 2026-08-27T07:26:09.820573754Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /ws/realtime?token=eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjQsInVzZXJuYW1lIjoiZTJlLXVjMDEtMTc4NzgxNTU2ODI5OS01ZjdhN2MiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc4NzgxNTU2OSwiZXhwIjoxNzg3OTAxOTY5fQ.NteTN_3Nybl8f3gkHCc4RPCDuPdj-DO_IGD1sf4l8Ts HTTP/1.1" 101 51 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+frontend-1  | 2026-08-27T07:26:09.883990063Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /api/secondhand/list?pageNum=1&pageSize=4 HTTP/1.1" 200 98 "http://127.0.0.1:8088/profile" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+backend-1   | 2026-08-27T07:26:09.554700962Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44120f3a] was not registered for synchronization because synchronization is not active
+database-1  | 2026-08-27T07:25:12.651853568Z 1
+database-1  | 2026-08-27T07:25:12.651854251Z 1
+frontend-1  | 2026-08-27T07:26:09.888023245Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /api/user/me HTTP/1.1" 200 550 "http://127.0.0.1:8088/profile" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+backend-1   | 2026-08-27T07:26:09.555461159Z JDBC Connection [HikariProxyConnection@1578641271 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+frontend-1  | 2026-08-27T07:26:09.890659846Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /api/product/list?pageNum=1&pageSize=4 HTTP/1.1" 200 480 "http://127.0.0.1:8088/profile" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+frontend-1  | 2026-08-27T07:26:09.897689867Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /api/finance/dashboard HTTP/1.1" 200 96 "http://127.0.0.1:8088/profile" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+backend-1   | 2026-08-27T07:26:09.555466553Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE (username = ?) limit 1
+frontend-1  | 2026-08-27T07:26:09.906064394Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "GET /api/finance/my-wallet/records HTTP/1.1" 200 51 "http://127.0.0.1:8088/profile" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+frontend-1  | 2026-08-27T07:26:09.984993683Z 172.19.0.1 - - [27/Aug/2026:07:26:09 +0000] "POST /api/auth/login HTTP/1.1" 200 688 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651854941Z 1
+backend-1   | 2026-08-27T07:26:09.555532124Z ==> Parameters: e2e-uc01-1787815568299-5f7a7c(String)
+frontend-1  | 2026-08-27T07:26:10.001604682Z 172.19.0.1 - - [27/Aug/2026:07:26:10 +0000] "GET /api/admin/users HTTP/1.1" 200 66 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651855679Z 1
+frontend-1  | 2026-08-27T07:26:10.015777280Z 172.19.0.1 - - [27/Aug/2026:07:26:10 +0000] "GET /api/admin/users HTTP/1.1" 200 1909 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651856374Z 1
+frontend-1  | 2026-08-27T07:26:10.043964659Z 172.19.0.1 - - [27/Aug/2026:07:26:10 +0000] "PUT /api/admin/users/4/ban HTTP/1.1" 200 53 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651857060Z 1
+frontend-1  | 2026-08-27T07:26:10.104998820Z 172.19.0.1 - - [27/Aug/2026:07:26:10 +0000] "POST /api/auth/login HTTP/1.1" 200 63 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651857776Z 1
+backend-1   | 2026-08-27T07:26:09.556363899Z <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+frontend-1  | 2026-08-27T07:26:10.200192200Z 172.19.0.1 - - [27/Aug/2026:07:26:10 +0000] "GET /ws/realtime?token=eyJhbGciOiJIUzI1NiJ9.eyJ1aWQiOjQsInVzZXJuYW1lIjoiZTJlLXVjMDEtMTc4NzgxNTU2ODI5OS01ZjdhN2MiLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc4NzgxNTU2OSwiZXhwIjoxNzg3OTAxOTY5fQ.NteTN_3Nybl8f3gkHCc4RPCDuPdj-DO_IGD1sf4l8Ts HTTP/1.1" 101 51 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.7339.186 Safari/537.36" "-"
+database-1  | 2026-08-27T07:25:12.651858506Z 1
+database-1  | 2026-08-27T07:25:12.651866147Z 1
+database-1  | 2026-08-27T07:25:12.651866933Z 1
+database-1  | 2026-08-27T07:25:12.651867641Z 1
+database-1  | 2026-08-27T07:25:12.651868372Z 1
+backend-1   | 2026-08-27T07:26:09.556511304Z <==        Row: 4, e2e-uc01-1787815568299-5f7a7c, $2a$10$i2LCBKkuwysCSBWtK6kkEuKTBsQjRWQVstIiYLVAkrltph.csoDCK, e2e-uc01-1787815568299-5f7a7c, , 13800138000, e2e-uc01-1787815568299-5f7a7c@example.com, USER, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:26:08, 2026-08-27 15:26:08, 100, 100
+database-1  | 2026-08-27T07:25:12.651869072Z 1
+backend-1   | 2026-08-27T07:26:09.556919127Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.556927306Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44120f3a]
+backend-1   | 2026-08-27T07:26:09.607503768Z 2026-08-27T15:26:09.607+08:00  INFO 1 --- [segroup8-platform] [io-8080-exec-10] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=6388638380ba492bb310daaf14d25470 method=POST path=/api/auth/login status=200
+database-1  | 2026-08-27T07:25:12.651869777Z 1
+backend-1   | 2026-08-27T07:26:09.661328097Z Creating a new SqlSession
+database-1  | 2026-08-27T07:25:12.651870488Z 1
+backend-1   | 2026-08-27T07:26:09.661359986Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4fc938be] was not registered for synchronization because synchronization is not active
+database-1  | 2026-08-27T07:25:12.651871184Z 1
+backend-1   | 2026-08-27T07:26:09.661375032Z JDBC Connection [HikariProxyConnection@856106121 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.661385630Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+database-1  | 2026-08-27T07:25:12.651871875Z 1
+backend-1   | 2026-08-27T07:26:09.661661329Z ==> Parameters: 4(Long)
+database-1  | 2026-08-27T07:25:12.651872606Z 1
+backend-1   | 2026-08-27T07:26:09.662789812Z <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+database-1  | 2026-08-27T07:25:12.651873302Z 1
+database-1  | 2026-08-27T07:25:12.651874036Z 1
+backend-1   | 2026-08-27T07:26:09.663274502Z <==        Row: 4, e2e-uc01-1787815568299-5f7a7c, $2a$10$i2LCBKkuwysCSBWtK6kkEuKTBsQjRWQVstIiYLVAkrltph.csoDCK, e2e-uc01-1787815568299-5f7a7c, , 13800138000, e2e-uc01-1787815568299-5f7a7c@example.com, USER, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:26:08, 2026-08-27 15:26:08, 100, 100
+database-1  | 2026-08-27T07:25:12.651874742Z 1
+backend-1   | 2026-08-27T07:26:09.663972161Z <==      Total: 1
+database-1  | 2026-08-27T07:25:12.651875437Z 1
+database-1  | 2026-08-27T07:25:12.651876140Z 1
+backend-1   | 2026-08-27T07:26:09.663979534Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4fc938be]
+database-1  | 2026-08-27T07:25:12.651876839Z 1
+backend-1   | 2026-08-27T07:26:09.664750218Z Creating a new SqlSession
+database-1  | 2026-08-27T07:25:12.651877534Z 1
+backend-1   | 2026-08-27T07:26:09.664762733Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@9333296] was not registered for synchronization because synchronization is not active
+database-1  | 2026-08-27T07:25:12.651878221Z 1
+backend-1   | 2026-08-27T07:26:09.665420435Z JDBC Connection [HikariProxyConnection@653355806 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+database-1  | 2026-08-27T07:25:12.651878935Z 1
+backend-1   | 2026-08-27T07:26:09.665428196Z ==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE (owner_user_id = ?) ORDER BY id DESC limit 1
+backend-1   | 2026-08-27T07:26:09.665778181Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.669476136Z <==      Total: 0
+database-1  | 2026-08-27T07:25:12.651879644Z 1
+backend-1   | 2026-08-27T07:26:09.669611210Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@9333296]
+database-1  | 2026-08-27T07:25:12.651880340Z 1
+database-1  | 2026-08-27T07:25:12.651881052Z 1
+backend-1   | 2026-08-27T07:26:09.671019946Z Creating a new SqlSession
+database-1  | 2026-08-27T07:25:12.651881750Z 1
+backend-1   | 2026-08-27T07:26:09.671160358Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.671164219Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6db22b9b] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.671368688Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2f47c654] was not registered for synchronization because synchronization is not active
+database-1  | 2026-08-27T07:25:12.651882469Z 1
+backend-1   | 2026-08-27T07:26:09.671563921Z Creating a new SqlSession
+database-1  | 2026-08-27T07:25:12.651883183Z 1
+backend-1   | 2026-08-27T07:26:09.671684662Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7d671cb8] was not registered for synchronization because synchronization is not active
+database-1  | 2026-08-27T07:25:12.651883881Z 1
+backend-1   | 2026-08-27T07:26:09.671992718Z JDBC Connection [HikariProxyConnection@1215793252 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.671998975Z ==>  Preparing: SELECT blocked_id FROM user_block WHERE blocker_id = ?
+database-1  | 2026-08-27T07:25:12.651884579Z 1
+backend-1   | 2026-08-27T07:26:09.672523709Z ==> Parameters: 4(Long)
+database-1  | 2026-08-27T07:25:12.651885298Z 1
+backend-1   | 2026-08-27T07:26:09.673187242Z JDBC Connection [HikariProxyConnection@245436872 wrapping com.mysql.cj.jdbc.ConnectionImpl@5960f0ea] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.673195060Z JDBC Connection [HikariProxyConnection@1705871599 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+database-1  | 2026-08-27T07:25:12.651885993Z 1
+backend-1   | 2026-08-27T07:26:09.673280124Z ==>  Preparing: SELECT id,user_id,store_name,category_id,id_card_no,bank_card_no,license_img,warehouse_addr,warehouse_province,warehouse_city,warehouse_detail,contact_name,contact_phone,status,reject_reason,apply_time FROM merchant_application WHERE (user_id = ? AND status = ?) ORDER BY id DESC limit 1
+database-1  | 2026-08-27T07:25:12.651886695Z 1
+backend-1   | 2026-08-27T07:26:09.673288090Z ==>  Preparing: SELECT id,product_id,seller_user_id,start_price,increment_amount,current_price,current_bidder_user_id,start_time,end_time,status,settled_order_id,version,create_time,update_time FROM product_auction WHERE (status = ? AND end_time > ?)
+database-1  | 2026-08-27T07:25:12.651887393Z 1
+backend-1   | 2026-08-27T07:26:09.673852043Z ==> Parameters: 4(Long), 1(Integer)
+backend-1   | 2026-08-27T07:26:09.673858730Z ==> Parameters: ONGOING(String), 2026-08-27T15:26:09.670801909(LocalDateTime)
+database-1  | 2026-08-27T07:25:12.651888082Z 1
+backend-1   | 2026-08-27T07:26:09.674910207Z <==      Total: 0
+database-1  | 2026-08-27T07:25:12.651888775Z 1
+backend-1   | 2026-08-27T07:26:09.674922162Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.674923800Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7d671cb8]
+database-1  | 2026-08-27T07:25:12.651889476Z 1
+backend-1   | 2026-08-27T07:26:09.675005650Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2f47c654]
+database-1  | 2026-08-27T07:25:12.651890185Z 1
+backend-1   | 2026-08-27T07:26:09.675573723Z Creating a new SqlSession
+database-1  | 2026-08-27T07:25:12.651890901Z 1
+database-1  | 2026-08-27T07:25:12.651891600Z 1
+backend-1   | 2026-08-27T07:26:09.675581215Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@68e3c7ed] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.675582951Z JDBC Connection [HikariProxyConnection@472077885 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.675657083Z ==>  Preparing: SELECT blocker_id FROM user_block WHERE blocked_id = ?
+backend-1   | 2026-08-27T07:26:09.675664833Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.675827864Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3d163cc] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.675839528Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.675938122Z JDBC Connection [HikariProxyConnection@1523796290 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.676018524Z ==>  Preparing: SELECT blocked_id FROM user_block WHERE blocker_id = ?
+database-1  | 2026-08-27T07:25:12.651892314Z 1
+backend-1   | 2026-08-27T07:26:09.676197351Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.676884526Z <==      Total: 0
+database-1  | 2026-08-27T07:25:12.651893006Z 1
+backend-1   | 2026-08-27T07:26:09.676905937Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@68e3c7ed]
+database-1  | 2026-08-27T07:25:12.651893720Z 1
+backend-1   | 2026-08-27T07:26:09.677214063Z <==      Total: 0
+database-1  | 2026-08-27T07:25:12.651894468Z 1
+backend-1   | 2026-08-27T07:26:09.677221419Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3d163cc]
+database-1  | 2026-08-27T07:25:12.651895269Z 1
+backend-1   | 2026-08-27T07:26:09.677316426Z Creating a new SqlSession
+database-1  | 2026-08-27T07:25:12.651895957Z 1
+backend-1   | 2026-08-27T07:26:09.677318765Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7984358c] was not registered for synchronization because synchronization is not active
+database-1  | 2026-08-27T07:25:12.651896673Z 1
+backend-1   | 2026-08-27T07:26:09.677599430Z JDBC Connection [HikariProxyConnection@1908668019 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+database-1  | 2026-08-27T07:25:12.651897365Z 1
+backend-1   | 2026-08-27T07:26:09.677611243Z ==>  Preparing: SELECT blocker_id FROM user_block WHERE blocked_id = ?
+database-1  | 2026-08-27T07:25:12.651898044Z 1
+backend-1   | 2026-08-27T07:26:09.677872981Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.678022310Z Creating a new SqlSession
+database-1  | 2026-08-27T07:25:12.651898743Z 1
+backend-1   | 2026-08-27T07:26:09.678030012Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@195eec0b] was not registered for synchronization because synchronization is not active
+database-1  | 2026-08-27T07:25:12.651899432Z 1
+backend-1   | 2026-08-27T07:26:09.678761192Z JDBC Connection [HikariProxyConnection@232377340 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+database-1  | 2026-08-27T07:25:12.651900128Z 1
+backend-1   | 2026-08-27T07:26:09.678775554Z <==      Total: 0
+database-1  | 2026-08-27T07:25:12.651900818Z 1
+backend-1   | 2026-08-27T07:26:09.678965723Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7984358c]
+database-1  | 2026-08-27T07:25:12.651901507Z 1
+backend-1   | 2026-08-27T07:26:09.678970900Z ==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE (status = ?) ORDER BY create_time DESC
+database-1  | 2026-08-27T07:25:12.651902228Z 1
+database-1  | 2026-08-27T07:25:12.651902918Z 1
+backend-1   | 2026-08-27T07:26:09.679149523Z ==> Parameters: 1(Integer)
+database-1  | 2026-08-27T07:25:12.651903616Z 1
+backend-1   | 2026-08-27T07:26:09.679155536Z <==      Total: 0
+database-1  | 2026-08-27T07:25:12.651904303Z 1
+database-1  | 2026-08-27T07:25:12.651904996Z 1
+database-1  | 2026-08-27T07:25:12.651905701Z 1
+database-1  | 2026-08-27T07:25:12.651907701Z 1
+database-1  | 2026-08-27T07:25:12.651908432Z 1
+database-1  | 2026-08-27T07:25:12.651909173Z 1
+database-1  | 2026-08-27T07:25:12.651909864Z 1
+database-1  | 2026-08-27T07:25:12.651910558Z 1
+database-1  | 2026-08-27T07:25:12.651911261Z 1
+database-1  | 2026-08-27T07:25:12.651911972Z 1
+database-1  | 2026-08-27T07:25:12.651912675Z 1
+database-1  | 2026-08-27T07:25:12.651913371Z 1
+database-1  | 2026-08-27T07:25:12.651914068Z 1
+database-1  | 2026-08-27T07:25:12.651914794Z 1
+database-1  | 2026-08-27T07:25:12.651915491Z 1
+database-1  | 2026-08-27T07:25:12.651916194Z 1
+database-1  | 2026-08-27T07:25:12.651916878Z 1
+backend-1   | 2026-08-27T07:26:09.679395507Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6db22b9b]
+database-1  | 2026-08-27T07:25:12.651917588Z 1
+database-1  | 2026-08-27T07:25:12.651918286Z 1
+database-1  | 2026-08-27T07:25:12.651918984Z 1
+database-1  | 2026-08-27T07:25:12.651919679Z 1
+backend-1   | 2026-08-27T07:26:09.679609827Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.679960538Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@28083874] was not registered for synchronization because synchronization is not active
+database-1  | 2026-08-27T07:25:12.651920399Z 1
+backend-1   | 2026-08-27T07:26:09.680858833Z JDBC Connection [HikariProxyConnection@334175831 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+database-1  | 2026-08-27T07:25:12.651921151Z 1
+database-1  | 2026-08-27T07:25:12.651921911Z 1
+database-1  | 2026-08-27T07:25:12.651922626Z 1
+database-1  | 2026-08-27T07:25:12.651923318Z 1
+backend-1   | 2026-08-27T07:26:09.680934068Z ==>  Preparing: SELECT id,seller_user_id,name,cover,images,description,origin_price,sale_price,category_id,sub_category_id,condition_level,is_negotiable,status,create_time,update_time FROM secondhand_product WHERE (status = ?) ORDER BY create_time DESC
+database-1  | 2026-08-27T07:25:12.651924002Z 1
+backend-1   | 2026-08-27T07:26:09.680953528Z 2026-08-27T15:26:09.680+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-2] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=2846d29ea7894b5e9b003d0614e8842b method=GET path=/api/user/me status=200
+backend-1   | 2026-08-27T07:26:09.681808541Z ==> Parameters: 1(Integer)
+database-1  | 2026-08-27T07:25:12.651924684Z 1
+backend-1   | 2026-08-27T07:26:09.684939569Z <==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+database-1  | 2026-08-27T07:25:12.651925373Z 1
+database-1  | 2026-08-27T07:25:12.651926095Z 1
+backend-1   | 2026-08-27T07:26:09.685397491Z <==      Total: 0
+database-1  | 2026-08-27T07:25:12.651926804Z 1
+backend-1   | 2026-08-27T07:26:09.685422953Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@28083874]
+database-1  | 2026-08-27T07:25:12.651927512Z 1
+database-1  | 2026-08-27T07:25:12.651928207Z 1
+backend-1   | 2026-08-27T07:26:09.686047053Z <==        Row: 1, 1, Container Demo Keyboard, , <<BLOB>>, <<BLOB>>, 299.00, 1, 801, 80, 1, 2026-08-27 15:25:12, 2026-08-27 15:25:12
+database-1  | 2026-08-27T07:25:12.651928894Z 1
+backend-1   | 2026-08-27T07:26:09.686578612Z <==      Total: 1
+database-1  | 2026-08-27T07:25:12.651929577Z 1
+database-1  | 2026-08-27T07:25:12.651930260Z 1
+backend-1   | 2026-08-27T07:26:09.687465866Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@195eec0b]
+database-1  | 2026-08-27T07:25:12.651930963Z 1
+backend-1   | 2026-08-27T07:26:09.688235307Z Creating a new SqlSession
+database-1  | 2026-08-27T07:25:12.651931682Z 1
+backend-1   | 2026-08-27T07:26:09.688246000Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4abf0fac] was not registered for synchronization because synchronization is not active
+database-1  | 2026-08-27T07:25:12.652218596Z 
+backend-1   | 2026-08-27T07:26:09.688407796Z JDBC Connection [HikariProxyConnection@1131070931 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.688410878Z ==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+database-1  | 2026-08-27T07:25:12.652225414Z 
+backend-1   | 2026-08-27T07:26:09.688861021Z ==> Parameters: 1(Long)
+backend-1   | 2026-08-27T07:26:09.689174159Z 2026-08-27T15:26:09.688+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-4] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=b140f796a0d8476b9e03c5fa3d25348f method=GET path=/api/secondhand/list status=200
+database-1  | 2026-08-27T07:25:12.653367676Z 2026-08-27 15:25:12+08:00 [Note] [Entrypoint]: /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/02-seed.sql
+backend-1   | 2026-08-27T07:26:09.690016063Z <==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+backend-1   | 2026-08-27T07:26:09.690024542Z <==        Row: 1, 2, Container Demo Store, , Seed shop for Issue #65 acceptance, null, null, null, null, null, <<BLOB>>, 1
+backend-1   | 2026-08-27T07:26:09.690365284Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.690491025Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4abf0fac]
+database-1  | 2026-08-27T07:25:12.669537233Z 
+backend-1   | 2026-08-27T07:26:09.690504019Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.690603334Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@77d83629] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.690819964Z JDBC Connection [HikariProxyConnection@1995734141 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+database-1  | 2026-08-27T07:25:12.669552080Z 
+backend-1   | 2026-08-27T07:26:09.690827887Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+database-1  | 2026-08-27T07:25:12.670983831Z 2026-08-27 15:25:12+08:00 [Note] [Entrypoint]: Stopping temporary server
+backend-1   | 2026-08-27T07:26:09.691234419Z ==> Parameters: 2(Long)
+database-1  | 2026-08-27T07:25:12.675804588Z 2026-08-27T07:25:12.675670Z 15 [System] [MY-013172] [Server] Received SHUTDOWN from user root. Shutting down mysqld (Version: 8.4.6).
+backend-1   | 2026-08-27T07:26:09.692390878Z <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+database-1  | 2026-08-27T07:25:13.233189623Z 2026-08-27T07:25:13.232923Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.4.6)  MySQL Community Server - GPL.
+backend-1   | 2026-08-27T07:26:09.692806753Z <==        Row: 2, seller, seller123, Demo Seller, , 13800000001, seller@demo.com, OFFICIAL_SELLER, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:25:12, 2026-08-27 15:25:12, 100, 100
+database-1  | 2026-08-27T07:25:13.233212915Z 2026-08-27T07:25:13.232948Z 0 [System] [MY-015016] [Server] MySQL Server - end.
+backend-1   | 2026-08-27T07:26:09.693586149Z <==      Total: 1
+database-1  | 2026-08-27T07:25:13.679354225Z 2026-08-27 15:25:13+08:00 [Note] [Entrypoint]: Temporary server stopped
+backend-1   | 2026-08-27T07:26:09.693910879Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@77d83629]
+database-1  | 2026-08-27T07:25:13.679380179Z 
+backend-1   | 2026-08-27T07:26:09.694231853Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.694281384Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@752fcfdf] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.694676751Z JDBC Connection [HikariProxyConnection@1470944077 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.694692364Z ==>  Preparing: SELECT id,name,parent_id,sort_order,status FROM category WHERE id=?
+backend-1   | 2026-08-27T07:26:09.694852780Z ==> Parameters: 1(Integer)
+backend-1   | 2026-08-27T07:26:09.697288782Z <==    Columns: id, name, parent_id, sort_order, status
+backend-1   | 2026-08-27T07:26:09.697424532Z <==        Row: 1, Digital Products, 0, 1, 1
+backend-1   | 2026-08-27T07:26:09.697622304Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.697799058Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@752fcfdf]
+backend-1   | 2026-08-27T07:26:09.697807431Z Creating a new SqlSession
+database-1  | 2026-08-27T07:25:13.681263802Z 2026-08-27 15:25:13+08:00 [Note] [Entrypoint]: MySQL init process done. Ready for start up.
+database-1  | 2026-08-27T07:25:13.681286786Z 
+database-1  | 2026-08-27T07:25:13.900137198Z 2026-08-27T07:25:13.691507Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+backend-1   | 2026-08-27T07:26:09.697935136Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6178f84c] was not registered for synchronization because synchronization is not active
+database-1  | 2026-08-27T07:25:13.900152865Z 2026-08-27T07:25:13.898750Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.4.6) starting as process 1
+backend-1   | 2026-08-27T07:26:09.698120059Z JDBC Connection [HikariProxyConnection@1789035147 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.698127207Z ==>  Preparing: SELECT id,name,parent_id,sort_order,status FROM category WHERE id=?
+database-1  | 2026-08-27T07:25:13.903107039Z 2026-08-27T07:25:13.902972Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+backend-1   | 2026-08-27T07:26:09.698359040Z ==> Parameters: 801(Integer)
+database-1  | 2026-08-27T07:25:14.077580595Z 2026-08-27T07:25:14.077428Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+backend-1   | 2026-08-27T07:26:09.698881985Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.699165111Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6178f84c]
+backend-1   | 2026-08-27T07:26:09.700781136Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.700790330Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6c25fba9] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.701396209Z JDBC Connection [HikariProxyConnection@419819281 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.701404143Z ==>  Preparing: SELECT id,product_type,product_id,seller_user_id,product_name,risk_level,risk_score,risk_reasons,suggestion,audit_status,admin_user_id,admin_remark,audit_time,create_time,update_time FROM product_risk_audit WHERE (product_type = ? AND product_id = ?) ORDER BY id DESC limit 1
+backend-1   | 2026-08-27T07:26:09.701638341Z ==> Parameters: NEW(String), 1(Long)
+backend-1   | 2026-08-27T07:26:09.704280815Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.704314637Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6c25fba9]
+database-1  | 2026-08-27T07:25:14.252438687Z 2026-08-27T07:25:14.252278Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+backend-1   | 2026-08-27T07:26:09.717955111Z 2026-08-27T15:26:09.717+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-3] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=36e552634b1c4c449609c9e79ce7c1a4 method=GET path=/api/product/list status=200
+database-1  | 2026-08-27T07:25:14.252454676Z 2026-08-27T07:25:14.252311Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+database-1  | 2026-08-27T07:25:14.254350822Z 2026-08-27T07:25:14.254252Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+backend-1   | 2026-08-27T07:26:09.767742618Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.767776943Z Creating a new SqlSession
+database-1  | 2026-08-27T07:25:14.275019662Z 2026-08-27T07:25:14.274886Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock
+backend-1   | 2026-08-27T07:26:09.767779619Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3d76cdd2] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.767781734Z Creating a new SqlSession
+database-1  | 2026-08-27T07:25:14.275041374Z 2026-08-27T07:25:14.274916Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.4.6'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+backend-1   | 2026-08-27T07:26:09.767783445Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6991d2fb] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.767785315Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1d9d5bee] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.767787127Z JDBC Connection [HikariProxyConnection@395063884 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.767788826Z JDBC Connection [HikariProxyConnection@430099589 wrapping com.mysql.cj.jdbc.ConnectionImpl@5960f0ea] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.767790667Z ==>  Preparing: SELECT blocked_id FROM user_block WHERE blocker_id = ?
+backend-1   | 2026-08-27T07:26:09.767792658Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+backend-1   | 2026-08-27T07:26:09.768144455Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.768288857Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.768558791Z JDBC Connection [HikariProxyConnection@1624452978 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.768564504Z ==>  Preparing: SELECT id,product_id,seller_user_id,start_price,increment_amount,current_price,current_bidder_user_id,start_time,end_time,status,settled_order_id,version,create_time,update_time FROM product_auction WHERE (status = ? AND end_time > ?)
+backend-1   | 2026-08-27T07:26:09.768754121Z ==> Parameters: ONGOING(String), 2026-08-27T15:26:09.767414322(LocalDateTime)
+backend-1   | 2026-08-27T07:26:09.769001346Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.769231115Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3d76cdd2]
+backend-1   | 2026-08-27T07:26:09.769240805Z <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+backend-1   | 2026-08-27T07:26:09.769244115Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.769246122Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@575c7cca] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.769387949Z JDBC Connection [HikariProxyConnection@1557078958 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.769406391Z ==>  Preparing: SELECT blocker_id FROM user_block WHERE blocked_id = ?
+backend-1   | 2026-08-27T07:26:09.769462612Z <==        Row: 4, e2e-uc01-1787815568299-5f7a7c, $2a$10$i2LCBKkuwysCSBWtK6kkEuKTBsQjRWQVstIiYLVAkrltph.csoDCK, e2e-uc01-1787815568299-5f7a7c, , 13800138000, e2e-uc01-1787815568299-5f7a7c@example.com, USER, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:26:08, 2026-08-27 15:26:08, 100, 100
+backend-1   | 2026-08-27T07:26:09.769469512Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.769715072Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.769915384Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6991d2fb]
+backend-1   | 2026-08-27T07:26:09.770037731Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.770048042Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.770210465Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1d9d5bee]
+backend-1   | 2026-08-27T07:26:09.770220317Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@575c7cca]
+backend-1   | 2026-08-27T07:26:09.770223008Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.770364776Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2d43a2f6] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.770372064Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.770374591Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.770376342Z JDBC Connection [HikariProxyConnection@2138202839 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.770378340Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1a0320bb] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.770499278Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5f919543] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.770513844Z ==>  Preparing: SELECT blocked_id FROM user_block WHERE blocker_id = ?
+backend-1   | 2026-08-27T07:26:09.770936391Z JDBC Connection [HikariProxyConnection@1832274494 wrapping com.mysql.cj.jdbc.ConnectionImpl@5960f0ea] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.770950789Z JDBC Connection [HikariProxyConnection@1797199959 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.770952187Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.770953470Z ==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE (owner_user_id = ?) ORDER BY id DESC limit 1
+backend-1   | 2026-08-27T07:26:09.771048177Z ==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE (status = ?) ORDER BY create_time DESC
+backend-1   | 2026-08-27T07:26:09.771179527Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.771186715Z ==> Parameters: 1(Integer)
+backend-1   | 2026-08-27T07:26:09.771838406Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.771949916Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.771968524Z <==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+backend-1   | 2026-08-27T07:26:09.771971788Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2d43a2f6]
+backend-1   | 2026-08-27T07:26:09.772268248Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1a0320bb]
+backend-1   | 2026-08-27T07:26:09.772274650Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.772397273Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@107b434e] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.772454351Z JDBC Connection [HikariProxyConnection@538904485 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.772460669Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.772461997Z ==>  Preparing: SELECT blocker_id FROM user_block WHERE blocked_id = ?
+backend-1   | 2026-08-27T07:26:09.772563672Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3c8fae9a] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.772784697Z <==        Row: 1, 1, Container Demo Keyboard, , <<BLOB>>, <<BLOB>>, 299.00, 1, 801, 80, 1, 2026-08-27 15:25:12, 2026-08-27 15:25:12
+backend-1   | 2026-08-27T07:26:09.772964069Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.772972159Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.773041899Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5f919543]
+backend-1   | 2026-08-27T07:26:09.773147332Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.773154522Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5f7fb711] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.773269882Z JDBC Connection [HikariProxyConnection@202836528 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.773278058Z ==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+backend-1   | 2026-08-27T07:26:09.773660470Z ==> Parameters: 1(Long)
+backend-1   | 2026-08-27T07:26:09.773669023Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.773809152Z JDBC Connection [HikariProxyConnection@1066030920 wrapping com.mysql.cj.jdbc.ConnectionImpl@5960f0ea] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.773934307Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@107b434e]
+backend-1   | 2026-08-27T07:26:09.773940911Z ==>  Preparing: SELECT id,user_id,store_name,category_id,id_card_no,bank_card_no,license_img,warehouse_addr,warehouse_province,warehouse_city,warehouse_detail,contact_name,contact_phone,status,reject_reason,apply_time FROM merchant_application WHERE (user_id = ? AND status = ?) ORDER BY id DESC limit 1
+backend-1   | 2026-08-27T07:26:09.774147387Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.774325480Z ==> Parameters: 4(Long), 1(Integer)
+backend-1   | 2026-08-27T07:26:09.774335626Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43afccb5] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.774509260Z <==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+backend-1   | 2026-08-27T07:26:09.774524477Z <==        Row: 1, 2, Container Demo Store, , Seed shop for Issue #65 acceptance, null, null, null, null, null, <<BLOB>>, 1
+backend-1   | 2026-08-27T07:26:09.775121253Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.775128709Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.775173710Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3c8fae9a]
+backend-1   | 2026-08-27T07:26:09.775175464Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5f7fb711]
+backend-1   | 2026-08-27T07:26:09.775316820Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.775386271Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@159d77bb] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.775593058Z JDBC Connection [HikariProxyConnection@939040038 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.775603251Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+backend-1   | 2026-08-27T07:26:09.775807924Z ==> Parameters: 2(Long)
+backend-1   | 2026-08-27T07:26:09.776209437Z JDBC Connection [HikariProxyConnection@2111228363 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.776216201Z ==>  Preparing: SELECT id,seller_user_id,name,cover,images,description,origin_price,sale_price,category_id,sub_category_id,condition_level,is_negotiable,status,create_time,update_time FROM secondhand_product WHERE (status = ?) ORDER BY create_time DESC
+backend-1   | 2026-08-27T07:26:09.776370963Z 2026-08-27T15:26:09.776+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-7] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=f0a09c50c7004349858c4bc48a1dd968 method=GET path=/api/user/me status=200
+backend-1   | 2026-08-27T07:26:09.776377566Z <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+backend-1   | 2026-08-27T07:26:09.776731031Z ==> Parameters: 1(Integer)
+backend-1   | 2026-08-27T07:26:09.776741333Z <==        Row: 2, seller, seller123, Demo Seller, , 13800000001, seller@demo.com, OFFICIAL_SELLER, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:25:12, 2026-08-27 15:25:12, 100, 100
+backend-1   | 2026-08-27T07:26:09.777334934Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.777566508Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@43afccb5]
+backend-1   | 2026-08-27T07:26:09.777786410Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.777961181Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@159d77bb]
+backend-1   | 2026-08-27T07:26:09.777968196Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.778174545Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5a094e4d] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.778382917Z JDBC Connection [HikariProxyConnection@191474464 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.778393647Z ==>  Preparing: SELECT id,name,parent_id,sort_order,status FROM category WHERE id=?
+backend-1   | 2026-08-27T07:26:09.778663715Z ==> Parameters: 1(Integer)
+backend-1   | 2026-08-27T07:26:09.778683362Z 2026-08-27T15:26:09.778+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-9] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=7e5863a3fbc742df83973c31fbb1ea36 method=GET path=/api/secondhand/list status=200
+backend-1   | 2026-08-27T07:26:09.779584846Z <==    Columns: id, name, parent_id, sort_order, status
+backend-1   | 2026-08-27T07:26:09.779593890Z <==        Row: 1, Digital Products, 0, 1, 1
+backend-1   | 2026-08-27T07:26:09.780092204Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.780262880Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5a094e4d]
+backend-1   | 2026-08-27T07:26:09.780458575Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.780468716Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@19250cc] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.780734022Z JDBC Connection [HikariProxyConnection@293150101 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.780748757Z ==>  Preparing: SELECT id,name,parent_id,sort_order,status FROM category WHERE id=?
+backend-1   | 2026-08-27T07:26:09.781085548Z ==> Parameters: 801(Integer)
+backend-1   | 2026-08-27T07:26:09.781920424Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.782046856Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@19250cc]
+backend-1   | 2026-08-27T07:26:09.782406233Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.782416564Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2166d47b] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.783351244Z JDBC Connection [HikariProxyConnection@1778601493 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.783377940Z ==>  Preparing: SELECT id,product_type,product_id,seller_user_id,product_name,risk_level,risk_score,risk_reasons,suggestion,audit_status,admin_user_id,admin_remark,audit_time,create_time,update_time FROM product_risk_audit WHERE (product_type = ? AND product_id = ?) ORDER BY id DESC limit 1
+backend-1   | 2026-08-27T07:26:09.783938571Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.783951215Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ea203ba] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.783973251Z ==> Parameters: NEW(String), 1(Long)
+backend-1   | 2026-08-27T07:26:09.784534915Z JDBC Connection [HikariProxyConnection@1037252661 wrapping com.mysql.cj.jdbc.ConnectionImpl@5960f0ea] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.784548973Z ==>  Preparing: SELECT user_id,personal_balance,business_balance,version,create_time,update_time FROM balance WHERE (user_id = ?) limit 1
+backend-1   | 2026-08-27T07:26:09.784701031Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.785213240Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.785453341Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2166d47b]
+backend-1   | 2026-08-27T07:26:09.786781555Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.786799557Z 2026-08-27T15:26:09.786+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-8] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=1e033a7cef8f4edcafa22f77ee6a7a5d method=GET path=/api/product/list status=200
+backend-1   | 2026-08-27T07:26:09.786933779Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6ea203ba]
+backend-1   | 2026-08-27T07:26:09.787157646Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.787256953Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@13cddc8c] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.787931866Z JDBC Connection [HikariProxyConnection@1829544604 wrapping com.mysql.cj.jdbc.ConnectionImpl@5960f0ea] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.787948016Z ==>  Preparing: INSERT INTO balance ( user_id, personal_balance, business_balance, version ) VALUES ( ?, ?, ?, ? )
+backend-1   | 2026-08-27T07:26:09.788458308Z ==> Parameters: 4(Long), 0(BigDecimal), 0(BigDecimal), 0(Integer)
+backend-1   | 2026-08-27T07:26:09.793638883Z <==    Updates: 1
+backend-1   | 2026-08-27T07:26:09.793662426Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@13cddc8c]
+backend-1   | 2026-08-27T07:26:09.793928611Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.794023240Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@65c5d31d] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.794114372Z JDBC Connection [HikariProxyConnection@403790485 wrapping com.mysql.cj.jdbc.ConnectionImpl@5960f0ea] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.794292822Z ==>  Preparing: SELECT user_id,personal_balance,business_balance,version,create_time,update_time FROM balance WHERE user_id=?
+backend-1   | 2026-08-27T07:26:09.794546441Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.795312276Z <==    Columns: user_id, personal_balance, business_balance, version, create_time, update_time
+backend-1   | 2026-08-27T07:26:09.795621867Z <==        Row: 4, 0.00, 0.00, 0, 2026-08-27 15:26:09, 2026-08-27 15:26:09
+backend-1   | 2026-08-27T07:26:09.795913049Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.796034753Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@65c5d31d]
+backend-1   | 2026-08-27T07:26:09.798517381Z 2026-08-27T15:26:09.798+08:00  INFO 1 --- [segroup8-platform] [io-8080-exec-10] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=c2505f72f5064da08f0209ca26e5ffa7 method=GET path=/api/finance/dashboard status=200
+backend-1   | 2026-08-27T07:26:09.805118607Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.805140232Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@64074c5f] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.805953113Z JDBC Connection [HikariProxyConnection@1507681638 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.805964993Z ==>  Preparing: SELECT id,order_id,user_id,account_type,change_type,trade_type,amount,balance_after,remark,create_time FROM transaction_record WHERE (user_id = ? AND account_type IN (?,?)) ORDER BY create_time DESC limit 100
+backend-1   | 2026-08-27T07:26:09.806278542Z ==> Parameters: 4(Long), PERSONAL(String), 1(String)
+backend-1   | 2026-08-27T07:26:09.808674468Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.808844377Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@64074c5f]
+backend-1   | 2026-08-27T07:26:09.810507897Z 2026-08-27T15:26:09.810+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-1] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=02f3852e80954f04af8d6aa66c7e6583 method=GET path=/api/finance/my-wallet/records status=200
+backend-1   | 2026-08-27T07:26:09.876934527Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.876958410Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1a017533] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.877088969Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.877092009Z JDBC Connection [HikariProxyConnection@1918738512 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.877093165Z ==>  Preparing: SELECT blocked_id FROM user_block WHERE blocker_id = ?
+backend-1   | 2026-08-27T07:26:09.877094358Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3f024a58] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.877214165Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.877470007Z JDBC Connection [HikariProxyConnection@310868339 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.877476662Z ==>  Preparing: SELECT id,product_id,seller_user_id,start_price,increment_amount,current_price,current_bidder_user_id,start_time,end_time,status,settled_order_id,version,create_time,update_time FROM product_auction WHERE (status = ? AND end_time > ?)
+backend-1   | 2026-08-27T07:26:09.877818479Z ==> Parameters: ONGOING(String), 2026-08-27T15:26:09.876902401(LocalDateTime)
+backend-1   | 2026-08-27T07:26:09.877932167Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.877994057Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1a017533]
+backend-1   | 2026-08-27T07:26:09.878000372Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.878058148Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b4b35f] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.878133980Z JDBC Connection [HikariProxyConnection@370009719 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.878147412Z ==>  Preparing: SELECT blocker_id FROM user_block WHERE blocked_id = ?
+backend-1   | 2026-08-27T07:26:09.878253153Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.878601218Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.878615388Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.878616808Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.878657860Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3f024a58]
+backend-1   | 2026-08-27T07:26:09.878829107Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3b0edf53] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.878838988Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b4b35f]
+backend-1   | 2026-08-27T07:26:09.878841783Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.878843686Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@d4c8d95] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.878845525Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.878847099Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1328b9fe] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.879102583Z JDBC Connection [HikariProxyConnection@1249528740 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.879113121Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+backend-1   | 2026-08-27T07:26:09.879116763Z JDBC Connection [HikariProxyConnection@540104430 wrapping com.mysql.cj.jdbc.ConnectionImpl@5960f0ea] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.879299554Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.879308026Z ==>  Preparing: SELECT blocked_id FROM user_block WHERE blocker_id = ?
+backend-1   | 2026-08-27T07:26:09.879311112Z JDBC Connection [HikariProxyConnection@824495759 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.879313308Z ==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE (status = ?) ORDER BY create_time DESC
+backend-1   | 2026-08-27T07:26:09.879315590Z ==> Parameters: 1(Integer)
+backend-1   | 2026-08-27T07:26:09.879441540Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.879688430Z <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+backend-1   | 2026-08-27T07:26:09.879813835Z <==        Row: 4, e2e-uc01-1787815568299-5f7a7c, $2a$10$i2LCBKkuwysCSBWtK6kkEuKTBsQjRWQVstIiYLVAkrltph.csoDCK, e2e-uc01-1787815568299-5f7a7c, , 13800138000, e2e-uc01-1787815568299-5f7a7c@example.com, USER, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:26:08, 2026-08-27 15:26:08, 100, 100
+backend-1   | 2026-08-27T07:26:09.880079743Z <==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+backend-1   | 2026-08-27T07:26:09.880090452Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.880182974Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@d4c8d95]
+backend-1   | 2026-08-27T07:26:09.880191302Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.880192760Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@325cc915] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.880329811Z <==        Row: 1, 1, Container Demo Keyboard, , <<BLOB>>, <<BLOB>>, 299.00, 1, 801, 80, 1, 2026-08-27 15:25:12, 2026-08-27 15:25:12
+backend-1   | 2026-08-27T07:26:09.880337421Z JDBC Connection [HikariProxyConnection@1528158958 wrapping com.mysql.cj.jdbc.ConnectionImpl@5960f0ea] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.880340012Z ==>  Preparing: SELECT blocker_id FROM user_block WHERE blocked_id = ?
+backend-1   | 2026-08-27T07:26:09.880536704Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.880664677Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.880832683Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.880880266Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1328b9fe]
+backend-1   | 2026-08-27T07:26:09.881079622Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.881090600Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.881093625Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@325cc915]
+backend-1   | 2026-08-27T07:26:09.881435063Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3b0edf53]
+backend-1   | 2026-08-27T07:26:09.881444592Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2d1599e3] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.881447487Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.881449286Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5f386f36] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.881451218Z JDBC Connection [HikariProxyConnection@2065969910 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.881453015Z ==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+backend-1   | 2026-08-27T07:26:09.881454980Z ==> Parameters: 1(Long)
+backend-1   | 2026-08-27T07:26:09.881492596Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.881549726Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@329e3496] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.881556227Z JDBC Connection [HikariProxyConnection@192418213 wrapping com.mysql.cj.jdbc.ConnectionImpl@5960f0ea] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.881570159Z ==>  Preparing: SELECT id,seller_user_id,name,cover,images,description,origin_price,sale_price,category_id,sub_category_id,condition_level,is_negotiable,status,create_time,update_time FROM secondhand_product WHERE (status = ?) ORDER BY create_time DESC
+backend-1   | 2026-08-27T07:26:09.881748503Z ==> Parameters: 1(Integer)
+backend-1   | 2026-08-27T07:26:09.882208554Z <==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+backend-1   | 2026-08-27T07:26:09.882301175Z <==        Row: 1, 2, Container Demo Store, , Seed shop for Issue #65 acceptance, null, null, null, null, null, <<BLOB>>, 1
+backend-1   | 2026-08-27T07:26:09.882583957Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.882607319Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.882610069Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2d1599e3]
+backend-1   | 2026-08-27T07:26:09.882612069Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5f386f36]
+backend-1   | 2026-08-27T07:26:09.882643196Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.882713665Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3991491d] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.882720391Z JDBC Connection [HikariProxyConnection@952767821 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.882721964Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+backend-1   | 2026-08-27T07:26:09.882921840Z ==> Parameters: 2(Long)
+backend-1   | 2026-08-27T07:26:09.882925513Z JDBC Connection [HikariProxyConnection@1579392640 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.882927068Z ==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE (owner_user_id = ?) ORDER BY id DESC limit 1
+backend-1   | 2026-08-27T07:26:09.883128072Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.883549356Z <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+backend-1   | 2026-08-27T07:26:09.883556770Z 2026-08-27T15:26:09.883+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-6] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=5fcc70c08e3344f7bb02ec0135b129ab method=GET path=/api/secondhand/list status=200
+backend-1   | 2026-08-27T07:26:09.883770276Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.883782131Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@329e3496]
+backend-1   | 2026-08-27T07:26:09.883906354Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.883920887Z <==        Row: 2, seller, seller123, Demo Seller, , 13800000001, seller@demo.com, OFFICIAL_SELLER, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:25:12, 2026-08-27 15:25:12, 100, 100
+backend-1   | 2026-08-27T07:26:09.883922343Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5ee54bc5] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.884315136Z JDBC Connection [HikariProxyConnection@496823819 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.884322614Z ==>  Preparing: SELECT id,user_id,store_name,category_id,id_card_no,bank_card_no,license_img,warehouse_addr,warehouse_province,warehouse_city,warehouse_detail,contact_name,contact_phone,status,reject_reason,apply_time FROM merchant_application WHERE (user_id = ? AND status = ?) ORDER BY id DESC limit 1
+backend-1   | 2026-08-27T07:26:09.884324592Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.884446925Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3991491d]
+backend-1   | 2026-08-27T07:26:09.884449400Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.884450513Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@106f124c] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.884528831Z JDBC Connection [HikariProxyConnection@587557117 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.884534853Z ==>  Preparing: SELECT id,name,parent_id,sort_order,status FROM category WHERE id=?
+backend-1   | 2026-08-27T07:26:09.884737319Z ==> Parameters: 1(Integer)
+backend-1   | 2026-08-27T07:26:09.884939384Z ==> Parameters: 4(Long), 1(Integer)
+backend-1   | 2026-08-27T07:26:09.885396419Z <==    Columns: id, name, parent_id, sort_order, status
+backend-1   | 2026-08-27T07:26:09.885403247Z <==        Row: 1, Digital Products, 0, 1, 1
+backend-1   | 2026-08-27T07:26:09.885534662Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.885745147Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@106f124c]
+backend-1   | 2026-08-27T07:26:09.885752010Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.885754668Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@30cc61cf] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.886020024Z JDBC Connection [HikariProxyConnection@1882436136 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.886030200Z ==>  Preparing: SELECT id,name,parent_id,sort_order,status FROM category WHERE id=?
+backend-1   | 2026-08-27T07:26:09.886033364Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.886035258Z ==> Parameters: 801(Integer)
+backend-1   | 2026-08-27T07:26:09.886037038Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5ee54bc5]
+backend-1   | 2026-08-27T07:26:09.886672648Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.886841094Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@30cc61cf]
+backend-1   | 2026-08-27T07:26:09.886989681Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.886996592Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@342bd5cc] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.887580928Z JDBC Connection [HikariProxyConnection@2113772806 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.887592821Z 2026-08-27T15:26:09.887+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-3] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=c8f4262056d74f24816d0528c07e526d method=GET path=/api/user/me status=200
+backend-1   | 2026-08-27T07:26:09.887595893Z ==>  Preparing: SELECT id,product_type,product_id,seller_user_id,product_name,risk_level,risk_score,risk_reasons,suggestion,audit_status,admin_user_id,admin_remark,audit_time,create_time,update_time FROM product_risk_audit WHERE (product_type = ? AND product_id = ?) ORDER BY id DESC limit 1
+backend-1   | 2026-08-27T07:26:09.887723591Z ==> Parameters: NEW(String), 1(Long)
+backend-1   | 2026-08-27T07:26:09.888537411Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.888545602Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@342bd5cc]
+backend-1   | 2026-08-27T07:26:09.890261633Z 2026-08-27T15:26:09.889+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-4] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=915f5a8a21914740b07975f5863d34ec method=GET path=/api/product/list status=200
+backend-1   | 2026-08-27T07:26:09.893792322Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.893824621Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@797b6c6f] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.894240183Z JDBC Connection [HikariProxyConnection@952235684 wrapping com.mysql.cj.jdbc.ConnectionImpl@5960f0ea] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.894258882Z ==>  Preparing: SELECT user_id,personal_balance,business_balance,version,create_time,update_time FROM balance WHERE (user_id = ?) limit 1
+backend-1   | 2026-08-27T07:26:09.894408884Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.895320060Z <==    Columns: user_id, personal_balance, business_balance, version, create_time, update_time
+backend-1   | 2026-08-27T07:26:09.895382682Z <==        Row: 4, 0.00, 0.00, 0, 2026-08-27 15:26:09, 2026-08-27 15:26:09
+backend-1   | 2026-08-27T07:26:09.895651554Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.895739572Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@797b6c6f]
+backend-1   | 2026-08-27T07:26:09.897274213Z 2026-08-27T15:26:09.897+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-7] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=d17fe90408a54f66aee7b14f85df8374 method=GET path=/api/finance/dashboard status=200
+backend-1   | 2026-08-27T07:26:09.902612657Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.902644324Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1fe46845] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.903077389Z JDBC Connection [HikariProxyConnection@998807424 wrapping com.mysql.cj.jdbc.ConnectionImpl@74498768] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.903110543Z ==>  Preparing: SELECT id,order_id,user_id,account_type,change_type,trade_type,amount,balance_after,remark,create_time FROM transaction_record WHERE (user_id = ? AND account_type IN (?,?)) ORDER BY create_time DESC limit 100
+backend-1   | 2026-08-27T07:26:09.903292909Z ==> Parameters: 4(Long), PERSONAL(String), 1(String)
+backend-1   | 2026-08-27T07:26:09.904292356Z <==      Total: 0
+backend-1   | 2026-08-27T07:26:09.904296308Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1fe46845]
+backend-1   | 2026-08-27T07:26:09.905715436Z 2026-08-27T15:26:09.905+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-9] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=688dd2499cda4f57849124442f4a0afc method=GET path=/api/finance/my-wallet/records status=200
+backend-1   | 2026-08-27T07:26:09.915491428Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.915512948Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1e66829c] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.916028154Z JDBC Connection [HikariProxyConnection@433024490 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.916038345Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE (username = ?) limit 1
+backend-1   | 2026-08-27T07:26:09.916274103Z ==> Parameters: admin(String)
+backend-1   | 2026-08-27T07:26:09.917036690Z <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+backend-1   | 2026-08-27T07:26:09.917189537Z <==        Row: 1, admin, admin123, Platform Admin, , 13800000000, admin@demo.com, ADMIN, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:25:12, 2026-08-27 15:25:12, 100, 100
+backend-1   | 2026-08-27T07:26:09.917513696Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.917546480Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1e66829c]
+backend-1   | 2026-08-27T07:26:09.973905031Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.973929604Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@45adb46a] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.977157922Z JDBC Connection [HikariProxyConnection@2049192262 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.977178110Z ==>  Preparing: UPDATE user SET password=? WHERE id=?
+backend-1   | 2026-08-27T07:26:09.977339705Z ==> Parameters: $2a$10$BaZLI/BdVcZh1dcq0W8DoOVwNuoAWCqyhWFyUSjv1UishaCnKWMwe(String), 1(Long)
+backend-1   | 2026-08-27T07:26:09.983179006Z <==    Updates: 1
+backend-1   | 2026-08-27T07:26:09.983195893Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@45adb46a]
+backend-1   | 2026-08-27T07:26:09.984644143Z 2026-08-27T15:26:09.984+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-8] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=c46efef680414b2b85ac1e6856c9e9c8 method=POST path=/api/auth/login status=200
+backend-1   | 2026-08-27T07:26:09.997058204Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:09.997079798Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6e5e8aa3] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:09.997179782Z JDBC Connection [HikariProxyConnection@914827203 wrapping com.mysql.cj.jdbc.ConnectionImpl@5960f0ea] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:09.997242707Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+backend-1   | 2026-08-27T07:26:09.997391893Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:09.998220472Z <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+backend-1   | 2026-08-27T07:26:09.998359802Z <==        Row: 4, e2e-uc01-1787815568299-5f7a7c, $2a$10$i2LCBKkuwysCSBWtK6kkEuKTBsQjRWQVstIiYLVAkrltph.csoDCK, e2e-uc01-1787815568299-5f7a7c, , 13800138000, e2e-uc01-1787815568299-5f7a7c@example.com, USER, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:26:08, 2026-08-27 15:26:08, 100, 100
+backend-1   | 2026-08-27T07:26:09.998645277Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:09.998714325Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6e5e8aa3]
+backend-1   | 2026-08-27T07:26:10.001169776Z 2026-08-27T15:26:10.000+08:00  INFO 1 --- [segroup8-platform] [io-8080-exec-10] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=12ad9dc5868b43699fc38d58b5f81a97 method=GET path=/api/admin/users status=200
+backend-1   | 2026-08-27T07:26:10.008117077Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:10.008141500Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@48066138] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:10.008204220Z JDBC Connection [HikariProxyConnection@867570949 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:10.008206535Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+backend-1   | 2026-08-27T07:26:10.008420497Z ==> Parameters: 1(Long)
+backend-1   | 2026-08-27T07:26:10.009256230Z <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+backend-1   | 2026-08-27T07:26:10.009376198Z <==        Row: 1, admin, $2a$10$BaZLI/BdVcZh1dcq0W8DoOVwNuoAWCqyhWFyUSjv1UishaCnKWMwe, Platform Admin, , 13800000000, admin@demo.com, ADMIN, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:25:12, 2026-08-27 15:26:09, 100, 100
+backend-1   | 2026-08-27T07:26:10.009721447Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:10.009846945Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@48066138]
+backend-1   | 2026-08-27T07:26:10.010570165Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:10.010613578Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@334ab89a] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:10.010926756Z JDBC Connection [HikariProxyConnection@819432907 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:10.010932713Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user ORDER BY id DESC
+backend-1   | 2026-08-27T07:26:10.011095033Z ==> Parameters: 
+backend-1   | 2026-08-27T07:26:10.011673537Z <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+backend-1   | 2026-08-27T07:26:10.011965031Z <==        Row: 4, e2e-uc01-1787815568299-5f7a7c, $2a$10$i2LCBKkuwysCSBWtK6kkEuKTBsQjRWQVstIiYLVAkrltph.csoDCK, e2e-uc01-1787815568299-5f7a7c, , 13800138000, e2e-uc01-1787815568299-5f7a7c@example.com, USER, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:26:08, 2026-08-27 15:26:08, 100, 100
+backend-1   | 2026-08-27T07:26:10.012307856Z <==        Row: 3, user, user123, Demo User, , 13800000002, user@demo.com, USER, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:25:12, 2026-08-27 15:25:12, 100, 100
+backend-1   | 2026-08-27T07:26:10.012538364Z <==        Row: 2, seller, seller123, Demo Seller, , 13800000001, seller@demo.com, OFFICIAL_SELLER, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:25:12, 2026-08-27 15:25:12, 100, 100
+backend-1   | 2026-08-27T07:26:10.012875839Z <==        Row: 1, admin, $2a$10$BaZLI/BdVcZh1dcq0W8DoOVwNuoAWCqyhWFyUSjv1UishaCnKWMwe, Platform Admin, , 13800000000, admin@demo.com, ADMIN, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:25:12, 2026-08-27 15:26:09, 100, 100
+backend-1   | 2026-08-27T07:26:10.013243314Z <==      Total: 4
+backend-1   | 2026-08-27T07:26:10.013252646Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@334ab89a]
+backend-1   | 2026-08-27T07:26:10.015301689Z 2026-08-27T15:26:10.014+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-1] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=5aa692ca6b414c548324c6c58d3a33e6 method=GET path=/api/admin/users status=200
+backend-1   | 2026-08-27T07:26:10.022712463Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:10.022734686Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58fa46c1] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:10.022810400Z JDBC Connection [HikariProxyConnection@939542799 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:10.022822601Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+backend-1   | 2026-08-27T07:26:10.022984959Z ==> Parameters: 1(Long)
+backend-1   | 2026-08-27T07:26:10.023719651Z <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+backend-1   | 2026-08-27T07:26:10.024037014Z <==        Row: 1, admin, $2a$10$BaZLI/BdVcZh1dcq0W8DoOVwNuoAWCqyhWFyUSjv1UishaCnKWMwe, Platform Admin, , 13800000000, admin@demo.com, ADMIN, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:25:12, 2026-08-27 15:26:09, 100, 100
+backend-1   | 2026-08-27T07:26:10.025924108Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:10.025935057Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58fa46c1]
+backend-1   | 2026-08-27T07:26:10.025986379Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:10.025988623Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a67c230] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:10.026150568Z JDBC Connection [HikariProxyConnection@366328641 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:10.026158336Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+backend-1   | 2026-08-27T07:26:10.026301904Z ==> Parameters: 4(Long)
+backend-1   | 2026-08-27T07:26:10.027166288Z <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+backend-1   | 2026-08-27T07:26:10.027415392Z <==        Row: 4, e2e-uc01-1787815568299-5f7a7c, $2a$10$i2LCBKkuwysCSBWtK6kkEuKTBsQjRWQVstIiYLVAkrltph.csoDCK, e2e-uc01-1787815568299-5f7a7c, , 13800138000, e2e-uc01-1787815568299-5f7a7c@example.com, USER, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:26:08, 2026-08-27 15:26:08, 100, 100
+backend-1   | 2026-08-27T07:26:10.027705106Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:10.027804913Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a67c230]
+backend-1   | 2026-08-27T07:26:10.027814611Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:10.027994686Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4939dd6c] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:10.028507802Z JDBC Connection [HikariProxyConnection@93084524 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:10.028514309Z ==>  Preparing: UPDATE user SET username=?, password=?, nickname=?, avatar=?, phone=?, email=?, role=?, status=?, credit_score=?, create_time=?, update_time=?, seller_credit_score=?, buyer_credit_score=? WHERE id=?
+backend-1   | 2026-08-27T07:26:10.028839474Z ==> Parameters: e2e-uc01-1787815568299-5f7a7c(String), $2a$10$i2LCBKkuwysCSBWtK6kkEuKTBsQjRWQVstIiYLVAkrltph.csoDCK(String), e2e-uc01-1787815568299-5f7a7c(String), (String), 13800138000(String), e2e-uc01-1787815568299-5f7a7c@example.com(String), USER(String), BANNED(String), 100(Integer), 2026-08-27T15:26:08(LocalDateTime), 2026-08-27T15:26:08(LocalDateTime), 100(Integer), 100(Integer), 4(Long)
+backend-1   | 2026-08-27T07:26:10.032747965Z <==    Updates: 1
+backend-1   | 2026-08-27T07:26:10.032769649Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4939dd6c]
+backend-1   | 2026-08-27T07:26:10.032772390Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:10.032878614Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@9bd00d5] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:10.032902756Z JDBC Connection [HikariProxyConnection@1801815011 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:10.032906432Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+backend-1   | 2026-08-27T07:26:10.033112421Z ==> Parameters: 1(Long)
+backend-1   | 2026-08-27T07:26:10.033708342Z <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+backend-1   | 2026-08-27T07:26:10.033838912Z <==        Row: 1, admin, $2a$10$BaZLI/BdVcZh1dcq0W8DoOVwNuoAWCqyhWFyUSjv1UishaCnKWMwe, Platform Admin, , 13800000000, admin@demo.com, ADMIN, NORMAL, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:25:12, 2026-08-27 15:26:09, 100, 100
+backend-1   | 2026-08-27T07:26:10.034129113Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:10.034138586Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@9bd00d5]
+backend-1   | 2026-08-27T07:26:10.034443712Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:10.034466587Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4106dbbd] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:10.035887497Z JDBC Connection [HikariProxyConnection@542949600 wrapping com.mysql.cj.jdbc.ConnectionImpl@62e785b8] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:10.035895902Z ==>  Preparing: INSERT INTO admin_audit_log ( admin_user_id, admin_username, action, target_type, target_id, detail, create_time ) VALUES ( ?, ?, ?, ?, ?, ?, ? )
+backend-1   | 2026-08-27T07:26:10.036411574Z ==> Parameters: 1(Long), admin(String), BAN_USER(String), USER(String), 4(Long), 管理员封禁用户(String), 2026-08-27T15:26:10.034119444(LocalDateTime)
+backend-1   | 2026-08-27T07:26:10.042106575Z <==    Updates: 1
+backend-1   | 2026-08-27T07:26:10.042360137Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4106dbbd]
+backend-1   | 2026-08-27T07:26:10.043518213Z 2026-08-27T15:26:10.043+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-5] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=34fda141a97c4a7fb343d62ce71fcc34 method=PUT path=/api/admin/users/4/ban status=200
+backend-1   | 2026-08-27T07:26:10.049292205Z Creating a new SqlSession
+backend-1   | 2026-08-27T07:26:10.049314838Z SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@289aa52f] was not registered for synchronization because synchronization is not active
+backend-1   | 2026-08-27T07:26:10.049877385Z JDBC Connection [HikariProxyConnection@111996529 wrapping com.mysql.cj.jdbc.ConnectionImpl@5960f0ea] will not be managed by Spring
+backend-1   | 2026-08-27T07:26:10.049881052Z ==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE (username = ?) limit 1
+backend-1   | 2026-08-27T07:26:10.050130264Z ==> Parameters: e2e-uc01-1787815568299-5f7a7c(String)
+backend-1   | 2026-08-27T07:26:10.050882842Z <==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+backend-1   | 2026-08-27T07:26:10.050987364Z <==        Row: 4, e2e-uc01-1787815568299-5f7a7c, $2a$10$i2LCBKkuwysCSBWtK6kkEuKTBsQjRWQVstIiYLVAkrltph.csoDCK, e2e-uc01-1787815568299-5f7a7c, , 13800138000, e2e-uc01-1787815568299-5f7a7c@example.com, USER, BANNED, 100, null, null, null, null, null, null, null, null, null, 2026-08-27 15:26:08, 2026-08-27 15:26:08, 100, 100
+backend-1   | 2026-08-27T07:26:10.051196925Z <==      Total: 1
+backend-1   | 2026-08-27T07:26:10.051250386Z Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@289aa52f]
+backend-1   | 2026-08-27T07:26:10.104666503Z 2026-08-27T15:26:10.104+08:00  INFO 1 --- [segroup8-platform] [nio-8080-exec-2] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=34aaf15360a14e098e5c7b57e87250d3 method=POST path=/api/auth/login status=200

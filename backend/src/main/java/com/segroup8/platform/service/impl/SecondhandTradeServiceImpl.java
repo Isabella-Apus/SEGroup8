@@ -35,8 +35,12 @@ import com.segroup8.platform.vo.ChatConversationVO;
 import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.vo.ProductAuctionVO;
 import com.segroup8.platform.vo.ProductNegotiationVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -50,6 +54,8 @@ import java.util.Objects;
 @Service
 public class SecondhandTradeServiceImpl implements SecondhandTradeService {
 
+    private static final Logger log = LoggerFactory.getLogger(SecondhandTradeServiceImpl.class);
+
     private static final String NEGOTIATION_APPLIED = "APPLIED";
     private static final String NEGOTIATION_CONFIRMED = "CONFIRMED";
     private static final String NEGOTIATION_REJECTED = "REJECTED";
@@ -61,6 +67,7 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
 
     private static final int SECONDHAND_ON_SHELF = 1;
     private static final int SECONDHAND_OFF_SHELF = 2;
+    private static final int SECONDHAND_SOLD = 3;
     private static final DateTimeFormatter ORDER_NO_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     private final ProductNegotiationMapper productNegotiationMapper;
@@ -123,37 +130,31 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         if (!Objects.equals(product.getIsNegotiable(), 1)) {
             throw new BusinessException(400, "该商品不支持议价");
         }
-
-        ChatConversationVO conversation = chatService.createOrGetConversation(
-                buyerUserId,
-                request.getSellerUserId(),
-                "SECONDHAND",
-                request.getProductId());
+        if (request.getProposedPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException(400, "议价金额必须大于0");
+        }
+        if (request.getProposedPrice().compareTo(product.getSalePrice()) > 0) {
+            throw new BusinessException(400, "议价金额不能高于商品当前售价");
+        }
+        long activeCount = productNegotiationMapper.selectCount(new LambdaQueryWrapper<ProductNegotiation>()
+                .eq(ProductNegotiation::getProductId, request.getProductId())
+                .eq(ProductNegotiation::getBuyerUserId, buyerUserId)
+                .and(wrapper -> wrapper.eq(ProductNegotiation::getStatus, NEGOTIATION_APPLIED)
+                        .or(confirmed -> confirmed.eq(ProductNegotiation::getStatus, NEGOTIATION_CONFIRMED)
+                                .isNull(ProductNegotiation::getUsedOrderId)
+                                .ge(ProductNegotiation::getEffectiveUntil, LocalDateTime.now()))));
+        if (activeCount > 0) {
+            throw new BusinessException(409, "已有待处理或生效中的议价，请勿重复申请");
+        }
 
         ProductNegotiation negotiation = new ProductNegotiation();
         negotiation.setProductId(request.getProductId());
         negotiation.setBuyerUserId(buyerUserId);
         negotiation.setSellerUserId(request.getSellerUserId());
-        negotiation.setConversationId(conversation.getId());
         negotiation.setProposedPrice(request.getProposedPrice());
         negotiation.setStatus(NEGOTIATION_APPLIED);
         productNegotiationMapper.insert(negotiation);
-
-        chatService.sendMessage(
-                buyerUserId,
-                conversation.getId(),
-                buildBargainApplyCardMessage(negotiation, product));
-
-        realtimePushService.pushToUser(request.getSellerUserId(), RealtimeEventTypes.MSG_TYPE_BARGAIN_APPLY, Map.of(
-                "negotiationId", negotiation.getId(),
-                "productId", request.getProductId(),
-                "buyerUserId", buyerUserId,
-                "proposedPrice", request.getProposedPrice()));
-        notificationService.createNotification(
-                request.getSellerUserId(),
-                "收到新的议价申请",
-                "买家对商品“" + product.getName() + "”提出价格 " + request.getProposedPrice(),
-                "/messages");
+        runAfterCommit(() -> publishBargainApply(negotiation, product));
 
         return toNegotiationVO(negotiation);
     }
@@ -179,6 +180,9 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         SecondhandProduct product = secondhandProductMapper.selectById(negotiation.getProductId());
         if (product == null || !Objects.equals(product.getStatus(), SECONDHAND_ON_SHELF)) {
             throw new BusinessException(400, "商品不可交易，无法确认议价");
+        }
+        if (request.getConfirmedPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException(400, "确认价格必须大于0");
         }
         if (request.getConfirmedPrice().compareTo(product.getSalePrice()) > 0) {
             throw new BusinessException(400, "确认价格不能高于商品当前售价");
@@ -209,28 +213,7 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
             productNegotiationMapper.updateById(negotiation);
         }
 
-        if (negotiation.getConversationId() != null) {
-            chatService.sendMessage(
-                    sellerUserId,
-                    negotiation.getConversationId(),
-                    buildBargainConfirmCardMessage(negotiation, product));
-        }
-
-        realtimePushService.pushToUser(negotiation.getBuyerUserId(), RealtimeEventTypes.MSG_TYPE_BARGAIN_CONFIRM, Map.of(
-                "negotiationId", negotiation.getId(),
-                "productId", negotiation.getProductId(),
-                "sellerUserId", sellerUserId,
-                "confirmedPrice", request.getConfirmedPrice(),
-                "effectiveUntil", negotiation.getEffectiveUntil(),
-                "orderId", negotiation.getUsedOrderId() == null ? 0L : negotiation.getUsedOrderId()));
-        String targetPath = negotiation.getUsedOrderId() == null
-                ? "/secondhand/" + negotiation.getProductId()
-                : "/secondhand/orders/" + negotiation.getUsedOrderId();
-        notificationService.createNotification(
-                negotiation.getBuyerUserId(),
-                "卖家已确认议价",
-                "商品“" + product.getName() + "”的议价已确认，成交价为 " + request.getConfirmedPrice(),
-                targetPath);
+        runAfterCommit(() -> publishBargainConfirmation(negotiation, product, sellerUserId));
 
         return toNegotiationVO(negotiation);
     }
@@ -264,25 +247,43 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         negotiation.setStatus(NEGOTIATION_REJECTED);
 
         SecondhandProduct product = secondhandProductMapper.selectById(negotiation.getProductId());
-        if (negotiation.getConversationId() != null && product != null) {
-            chatService.sendMessage(
-                    sellerUserId,
-                    negotiation.getConversationId(),
-                    buildBargainRejectCardMessage(negotiation, product));
-        }
-
-        realtimePushService.pushToUser(negotiation.getBuyerUserId(), RealtimeEventTypes.MSG_TYPE_BARGAIN_CONFIRM, Map.of(
-                "negotiationId", negotiation.getId(),
-                "productId", negotiation.getProductId(),
-                "sellerUserId", sellerUserId,
-                "status", NEGOTIATION_REJECTED));
-        notificationService.createNotification(
-                negotiation.getBuyerUserId(),
-                "议价申请未通过",
-                product == null ? "卖家未接受本次议价" : "卖家未接受商品“" + product.getName() + "”的本次议价",
-                "/secondhand/" + negotiation.getProductId());
+        runAfterCommit(() -> publishBargainRejection(negotiation, product, sellerUserId));
 
         return toNegotiationVO(negotiation);
+    }
+
+    @Override
+    public PageVO<ProductNegotiationVO> pageMyBargains(Long pageNum, Long pageSize, Long productId,
+            Long counterpartUserId, String status) {
+        Long currentUserId = requireUserId();
+        long safePageNum = pageNum == null || pageNum < 1 ? 1L : pageNum;
+        long safePageSize = pageSize == null || pageSize < 1 ? 20L : Math.min(pageSize, 50L);
+        LambdaQueryWrapper<ProductNegotiation> wrapper = new LambdaQueryWrapper<ProductNegotiation>()
+                .and(participant -> participant.eq(ProductNegotiation::getBuyerUserId, currentUserId)
+                        .or()
+                        .eq(ProductNegotiation::getSellerUserId, currentUserId))
+                .eq(productId != null, ProductNegotiation::getProductId, productId)
+                .and(counterpartUserId != null,
+                        counterpart -> counterpart.eq(ProductNegotiation::getBuyerUserId, counterpartUserId)
+                                .or()
+                                .eq(ProductNegotiation::getSellerUserId, counterpartUserId))
+                .eq(status != null && !status.isBlank(), ProductNegotiation::getStatus,
+                        status == null ? null : status.trim().toUpperCase(Locale.ROOT))
+                .orderByDesc(ProductNegotiation::getCreateTime)
+                .orderByDesc(ProductNegotiation::getId);
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<ProductNegotiation> page =
+                productNegotiationMapper.selectPage(
+                        com.baomidou.mybatisplus.extension.plugins.pagination.Page.of(safePageNum, safePageSize),
+                        wrapper);
+        if (page.getTotal() == 0 && !page.getRecords().isEmpty()) {
+            page.setTotal(productNegotiationMapper.selectCount(wrapper));
+        }
+        PageVO<ProductNegotiationVO> vo = new PageVO<>();
+        vo.setTotal(page.getTotal());
+        vo.setPageNum(page.getCurrent());
+        vo.setPageSize(page.getSize());
+        vo.setRecords(page.getRecords().stream().map(this::toNegotiationVO).toList());
+        return vo;
     }
 
     @Override
@@ -619,7 +620,7 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         orderItemMapper.insert(orderItem);
 
         secondhandProductMapper.update(null, new UpdateWrapper<SecondhandProduct>()
-                .set("status", SECONDHAND_OFF_SHELF)
+                .set("status", SECONDHAND_SOLD)
                 .eq("id", product.getId())
                 .eq("status", SECONDHAND_ON_SHELF));
 
@@ -655,12 +656,14 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         if (productId == null || buyerUserId == null) {
             return null;
         }
+        LocalDateTime now = LocalDateTime.now();
         return productNegotiationMapper.selectOne(new LambdaQueryWrapper<ProductNegotiation>()
                 .eq(ProductNegotiation::getProductId, productId)
                 .eq(ProductNegotiation::getBuyerUserId, buyerUserId)
                 .eq(ProductNegotiation::getStatus, NEGOTIATION_CONFIRMED)
                 .isNull(ProductNegotiation::getUsedOrderId)
-                .ge(ProductNegotiation::getEffectiveUntil, LocalDateTime.now())
+                .le(ProductNegotiation::getEffectiveFrom, now)
+                .ge(ProductNegotiation::getEffectiveUntil, now)
                 .orderByDesc(ProductNegotiation::getEffectiveUntil)
                 .last("limit 1"));
     }
@@ -682,7 +685,7 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
 
     private OrderInfo createPendingBargainOrder(ProductNegotiation negotiation, SecondhandProduct product, BigDecimal dealPrice) {
         int updatedProduct = secondhandProductMapper.update(null, new UpdateWrapper<SecondhandProduct>()
-                .set("status", SECONDHAND_OFF_SHELF)
+                .set("status", SECONDHAND_SOLD)
                 .eq("id", product.getId())
                 .eq("status", SECONDHAND_ON_SHELF));
         if (updatedProduct == 0) {
@@ -716,6 +719,105 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         orderItem.setStatus(1);
         orderItemMapper.insert(orderItem);
         return order;
+    }
+
+    private void publishBargainApply(ProductNegotiation negotiation, SecondhandProduct product) {
+        final Long[] conversationId = {null};
+        runBestEffort("create bargain conversation", () -> {
+            ChatConversationVO conversation = chatService.createOrGetConversation(
+                    negotiation.getBuyerUserId(), negotiation.getSellerUserId(), "SECONDHAND",
+                    negotiation.getProductId());
+            if (conversation != null && conversation.getId() != null) {
+                conversationId[0] = conversation.getId();
+                negotiation.setConversationId(conversation.getId());
+                productNegotiationMapper.update(null, new UpdateWrapper<ProductNegotiation>()
+                        .set("conversation_id", conversation.getId())
+                        .eq("id", negotiation.getId()));
+            }
+        });
+        if (conversationId[0] != null) {
+            runBestEffort("send bargain application chat card", () -> chatService.sendMessage(
+                    negotiation.getBuyerUserId(), conversationId[0],
+                    buildBargainApplyCardMessage(negotiation, product)));
+        }
+        runBestEffort("push bargain application", () -> realtimePushService.pushToUser(
+                negotiation.getSellerUserId(), RealtimeEventTypes.MSG_TYPE_BARGAIN_APPLY, Map.of(
+                        "negotiationId", negotiation.getId(),
+                        "productId", negotiation.getProductId(),
+                        "buyerUserId", negotiation.getBuyerUserId(),
+                        "proposedPrice", negotiation.getProposedPrice())));
+        runBestEffort("notify bargain application", () -> notificationService.createNotification(
+                negotiation.getSellerUserId(),
+                "收到新的议价申请",
+                "买家对商品“" + product.getName() + "”提出价格 " + negotiation.getProposedPrice(),
+                "/merchant/messages"));
+    }
+
+    private void publishBargainConfirmation(ProductNegotiation negotiation, SecondhandProduct product,
+            Long sellerUserId) {
+        if (negotiation.getConversationId() != null) {
+            runBestEffort("send bargain confirmation chat card", () -> chatService.sendMessage(
+                    sellerUserId, negotiation.getConversationId(),
+                    buildBargainConfirmCardMessage(negotiation, product)));
+        }
+        runBestEffort("push bargain confirmation", () -> realtimePushService.pushToUser(
+                negotiation.getBuyerUserId(), RealtimeEventTypes.MSG_TYPE_BARGAIN_CONFIRM, Map.of(
+                        "negotiationId", negotiation.getId(),
+                        "productId", negotiation.getProductId(),
+                        "sellerUserId", sellerUserId,
+                        "confirmedPrice", negotiation.getConfirmedPrice(),
+                        "effectiveUntil", negotiation.getEffectiveUntil(),
+                        "orderId", negotiation.getUsedOrderId() == null ? 0L : negotiation.getUsedOrderId())));
+        String targetPath = negotiation.getUsedOrderId() == null
+                ? "/secondhand/" + negotiation.getProductId()
+                : "/secondhand/orders/" + negotiation.getUsedOrderId();
+        runBestEffort("notify bargain confirmation", () -> notificationService.createNotification(
+                negotiation.getBuyerUserId(),
+                "卖家已确认议价",
+                "商品“" + product.getName() + "”的议价已确认，成交价为 " + negotiation.getConfirmedPrice(),
+                targetPath));
+    }
+
+    private void publishBargainRejection(ProductNegotiation negotiation, SecondhandProduct product,
+            Long sellerUserId) {
+        if (negotiation.getConversationId() != null && product != null) {
+            runBestEffort("send bargain rejection chat card", () -> chatService.sendMessage(
+                    sellerUserId, negotiation.getConversationId(),
+                    buildBargainRejectCardMessage(negotiation, product)));
+        }
+        runBestEffort("push bargain rejection", () -> realtimePushService.pushToUser(
+                negotiation.getBuyerUserId(), RealtimeEventTypes.MSG_TYPE_BARGAIN_CONFIRM, Map.of(
+                        "negotiationId", negotiation.getId(),
+                        "productId", negotiation.getProductId(),
+                        "sellerUserId", sellerUserId,
+                        "status", NEGOTIATION_REJECTED)));
+        runBestEffort("notify bargain rejection", () -> notificationService.createNotification(
+                negotiation.getBuyerUserId(),
+                "议价申请未通过",
+                product == null ? "卖家未接受本次议价" : "卖家未接受商品“" + product.getName() + "”的本次议价",
+                "/secondhand/" + negotiation.getProductId()));
+    }
+
+    private void runAfterCommit(Runnable action) {
+        if (TransactionSynchronizationManager.isActualTransactionActive()
+                && TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    action.run();
+                }
+            });
+            return;
+        }
+        action.run();
+    }
+
+    private void runBestEffort(String actionName, Runnable action) {
+        try {
+            action.run();
+        } catch (RuntimeException exception) {
+            log.warn("UC18 side effect failed after core decision: {}", actionName, exception);
+        }
     }
 
     private ProductAuctionVO toAuctionVO(ProductAuction auction) {

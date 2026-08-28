@@ -1,0 +1,36 @@
+{
+  "uc": "UC17",
+  "generatedAt": "2026-08-28T05:43:44+08:00",
+  "status": {
+    "integration": "API_PASS",
+    "e2e": "PASS"
+  },
+  "integration": {
+    "database": "MySQL 8.4.6 via Testcontainers",
+    "testClass": "SecondhandDirectPurchaseIntegrationTest",
+    "tests": 7,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "exitCode": 0
+  },
+  "regression": {
+    "testClasses": [
+      "SecondhandProductControllerUc17WebMvcTest",
+      "SecondhandProductServiceImplTest"
+    ],
+    "tests": 7,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "exitCode": 0
+  },
+  "e2e": {
+    "spec": "frontend/e2e/domain-d/uc17-direct-purchase.spec.ts",
+    "stack": "Docker Compose: MySQL 8.4.6 + Spring Boot + Nginx + Chromium",
+    "tests": 1,
+    "passed": 1,
+    "failed": 0,
+    "exitCode": 0
+  }
+}

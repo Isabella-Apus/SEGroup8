@@ -1,0 +1,15 @@
+<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="35.729305000000004">
+<testsuite name="domain-d\uc18-bargain.spec.ts" timestamp="2026-08-27T22:16:52.819Z" hostname="" tests="1" failures="0" skipped="0" time="26.394" errors="0">
+<testcase name="@DOMAIN_D @UC18 secondhand bargain › buyer applies, seller confirms in chat, and buyer receives a pending-payment order" classname="domain-d\uc18-bargain.spec.ts" time="26.394">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\attachments\uc18-buyer-application-pending-89831bd9d01f79e1c368ff34c7a89bb5ecbc17cb.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\attachments\uc18-seller-confirmed-order-57c8913dfb64879ea61451d33864faa666bb049c.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\attachments\uc18-buyer-confirmed-pending-payment-dfcdbde0616f5d1c3638e895ada13f28b97c6800.png]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

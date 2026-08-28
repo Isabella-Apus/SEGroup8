@@ -60,6 +60,12 @@ INSERT IGNORE INTO `order_info`
    `refund_status`, `logistics_status`, `logistics_current_index`, `can_refund`, `version`)
 VALUES
   (14001, 'UC14-E2E-AFTER-SALE', 3, 299.00, 299.00, 1, 2, 0, 'ARRIVED', 2, 1, 0);
+-- UC15 browser fixture: a delivered order waiting for its first review.
+INSERT IGNORE INTO `order_info`
+  (`id`, `order_no`, `buyer_user_id`, `total_amount`, `payable_amount`, `pay_status`, `order_status`,
+   `refund_status`, `can_refund`, `version`)
+VALUES
+  (15001, 'UC15-E2E-REVIEW-FLOW', 3, 299.00, 299.00, 1, 3, 0, 1, 0);
 
 INSERT IGNORE INTO `order_item`
   (`id`, `order_id`, `product_type`, `product_id`, `product_name`, `price`, `quantity`, `status`)
@@ -76,6 +82,7 @@ INSERT IGNORE INTO `order_item`
   (`id`, `order_id`, `product_type`, `product_id`, `product_name`, `price`, `quantity`, `status`)
 VALUES
   (14002, 14002, 'NEW', 1, 'Container Demo Keyboard', 299.00, 1, 1);
+  (15001, 15001, 'NEW', 1, 'Container Demo Keyboard', 299.00, 1, 1);
 -- UC12 browser fixtures: one order for payment and one for unpaid cancellation.
 INSERT INTO `order_info`
   (`id`, `order_no`, `buyer_user_id`, `total_amount`, `payable_amount`, `pay_status`,
@@ -96,4 +103,25 @@ INSERT INTO `order_item`
 VALUES
   (12001, 12001, 'NEW', 1, 'Container Demo Keyboard', 299.00, 1, 0),
   (12002, 12002, 'NEW', 1, 'Container Demo Keyboard', 299.00, 1, 0)
+ON DUPLICATE KEY UPDATE `status` = VALUES(`status`);
+
+-- UC13 browser fixture: a real new-product order waiting for seller shipment.
+INSERT INTO `order_info`
+  (`id`, `order_no`, `buyer_user_id`, `total_amount`, `payable_amount`, `pay_status`,
+   `order_status`, `refund_status`, `receiver_name`, `receiver_phone`,
+   `receiver_province`, `receiver_city`, `receiver_detail_address`, `version`)
+VALUES
+  (13001, 'UC13-E2E-NEW-FULFILLMENT', 3, 299.00, 299.00, 1, 1, 0, 'Demo User', '13800000002', NULL, NULL, 'UC13 E2E Address', 0)
+ON DUPLICATE KEY UPDATE
+  `pay_status` = VALUES(`pay_status`),
+  `order_status` = VALUES(`order_status`),
+  `version` = VALUES(`version`),
+  `logistics_template_id` = NULL,
+  `logistics_status` = NULL,
+  `logistics_current_index` = NULL;
+
+INSERT INTO `order_item`
+  (`id`, `order_id`, `product_type`, `product_id`, `product_name`, `price`, `quantity`, `status`)
+VALUES
+  (13001, 13001, 'NEW', 1, 'Container Demo Keyboard', 299.00, 1, 0)
 ON DUPLICATE KEY UPDATE `status` = VALUES(`status`);

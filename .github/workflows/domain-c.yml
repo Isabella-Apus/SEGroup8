@@ -76,6 +76,8 @@ jobs:
       E2E_USERNAME: user
       E2E_PASSWORD: user123
       E2E_ROLE: USER
+      E2E_OFFICIAL_SELLER_USERNAME: seller
+      E2E_OFFICIAL_SELLER_PASSWORD: seller123
       E2E_BASE_URL: http://127.0.0.1:8088
       E2E_EVIDENCE_ROOT: ${{ github.workspace }}/04_tests/domains/C-order-fulfillment/evidence
       E2E_OUTPUT_DIR: ${{ github.workspace }}/04_tests/domains/C-order-fulfillment/evidence/raw-reports/playwright
