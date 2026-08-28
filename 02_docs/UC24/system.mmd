@@ -1,0 +1,54 @@
+sequenceDiagram
+    autonumber
+    actor Buyer as 买家
+    actor Seller as 卖家
+    actor Outsider as 第三方
+    participant UI as ChatView
+    participant API as ChatController
+    participant Service as ChatServiceImpl
+    participant DB as MySQL
+    participant Notify as NotificationService
+    participant Push as RealtimePushService
+
+    Buyer->>UI: 从商品进入消息页
+    UI->>API: POST /api/chat/conversations
+    API->>Service: createOrGetConversation
+    Service->>DB: 按买家、卖家、来源查找或创建
+    DB-->>Service: conversation
+    Service-->>UI: 会话 ID
+
+    Seller->>API: 对相同来源再次创建
+    API->>Service: createOrGetConversation
+    Service->>DB: 查询已有会话
+    DB-->>Seller: 返回相同会话 ID
+
+    Buyer->>UI: 发送消息
+    UI->>API: POST /conversations/{id}/messages
+    API->>Service: sendMessage
+    Service->>DB: 校验参与者与双向拉黑
+    Service->>DB: 写消息并更新会话
+    Service->>Notify: 创建接收方通知
+    Service-->>API: 已持久化消息
+    API->>Push: 向双方推送 CHAT_MESSAGE
+    alt 推送成功
+        Push-->>Buyer: 实时事件
+        Push-->>Seller: 实时事件
+    else 推送异常
+        API->>API: 记录告警
+        API-->>Buyer: 仍返回持久化成功
+    end
+
+    Seller->>API: GET /conversations/{id}/messages
+    API->>Service: listConversationMessages
+    Service->>DB: 标记接收消息已读并查询历史
+    DB-->>Seller: 有序消息历史
+
+    alt 第三方访问
+        Outsider->>API: 读取或发送
+        API->>Service: 校验会话参与者
+        Service-->>Outsider: 业务码 403
+    else 任一方向拉黑
+        Seller->>API: 发送消息
+        Service->>DB: 检查 user_block
+        Service-->>Seller: 业务码 403，不写消息
+    end

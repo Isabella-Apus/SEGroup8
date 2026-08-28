@@ -9,6 +9,8 @@ import com.segroup8.platform.service.ChatService;
 import com.segroup8.platform.vo.ChatConversationVO;
 import com.segroup8.platform.vo.ChatMessageVO;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +23,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/chat")
 public class ChatController {
+
+    private static final Logger log = LoggerFactory.getLogger(ChatController.class);
 
     private final ChatService chatService;
     private final RealtimePushService realtimePushService;
@@ -53,10 +57,15 @@ public class ChatController {
     public Result<ChatMessageVO> sendMessage(@PathVariable Long conversationId,
             @Valid @RequestBody ChatMessageSendRequest request) {
         ChatMessageVO message = chatService.sendMessage(UserContext.getUserId(), conversationId, request.getContent());
-        realtimePushService.pushToUsers(
-                List.of(message.getSenderUserId(), message.getReceiverUserId()),
-                "CHAT_MESSAGE",
-                message);
+        try {
+            realtimePushService.pushToUsers(
+                    List.of(message.getSenderUserId(), message.getReceiverUserId()),
+                    "CHAT_MESSAGE",
+                    message);
+        } catch (RuntimeException exception) {
+            log.warn("Chat message {} persisted but realtime delivery failed: {}",
+                    message.getId(), exception.getMessage());
+        }
         return Result.success(message);
     }
 }

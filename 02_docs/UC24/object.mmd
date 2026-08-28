@@ -1,0 +1,49 @@
+classDiagram
+    class ChatController {
+        +listConversations()
+        +createConversation(request)
+        +listMessages(conversationId)
+        +sendMessage(conversationId, request)
+    }
+    class ChatServiceImpl {
+        +createOrGetConversation(currentUserId, targetUserId, sourceType, sourceId)
+        +listMyConversations(currentUserId)
+        +listConversationMessages(currentUserId, conversationId)
+        +sendMessage(senderUserId, conversationId, content)
+    }
+    class ChatConversation {
+        +Long id
+        +Long buyerUserId
+        +Long sellerUserId
+        +String sourceType
+        +Long sourceId
+        +String lastMessageContent
+        +LocalDateTime lastMessageTime
+    }
+    class ChatMessage {
+        +Long conversationId
+        +Long senderUserId
+        +Long receiverUserId
+        +String content
+        +Integer isRead
+    }
+    class UserBlock {
+        +Long blockerId
+        +Long blockedId
+    }
+    class Notification {
+        +Long userId
+        +String title
+        +String targetPath
+    }
+    class RealtimePushService {
+        +pushToUsers(userIds, event, payload)
+    }
+
+    ChatController --> ChatServiceImpl
+    ChatController --> RealtimePushService
+    ChatServiceImpl --> ChatConversation
+    ChatServiceImpl --> ChatMessage
+    ChatServiceImpl --> UserBlock
+    ChatServiceImpl --> Notification
+    ChatConversation "1" --> "*" ChatMessage
