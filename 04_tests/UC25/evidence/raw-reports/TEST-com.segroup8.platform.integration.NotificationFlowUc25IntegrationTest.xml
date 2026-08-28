@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.segroup8.platform.integration.NotificationFlowUc25IntegrationTest" time="12.307" tests="4" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="GBK"/>
+    <property name="java.class.path" value="C:\Users\Jerry\Desktop\SEGroup8\.codex-worktrees\uc25-real-76cd39e3\backend\target\test-classes;C:\Users\Jerry\Desktop\SEGroup8\.codex-worktrees\uc25-real-76cd39e3\backend\target\classes;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.3.4\spring-boot-starter-web-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter\3.3.4\spring-boot-starter-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot\3.3.4\spring-boot-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.3.4\spring-boot-starter-logging-3.3.4.jar;C:\Users\Jerry\.m2\repository\ch\qos\logback\logback-classic\1.5.8\logback-classic-1.5.8.jar;C:\Users\Jerry\.m2\repository\ch\qos\logback\logback-core\1.5.8\logback-core-1.5.8.jar;C:\Users\Jerry\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.23.1\log4j-to-slf4j-2.23.1.jar;C:\Users\Jerry\.m2\repository\org\apache\logging\log4j\log4j-api\2.23.1\log4j-api-2.23.1.jar;C:\Users\Jerry\.m2\repository\org\slf4j\jul-to-slf4j\2.0.16\jul-to-slf4j-2.0.16.jar;C:\Users\Jerry\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\Jerry\.m2\repository\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.3.4\spring-boot-starter-json-3.3.4.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.17.2\jackson-datatype-jdk8-2.17.2.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.17.2\jackson-datatype-jsr310-2.17.2.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.17.2\jackson-module-parameter-names-2.17.2.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.3.4\spring-boot-starter-tomcat-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.30\tomcat-embed-core-10.1.30.jar;C:\Users\Jerry\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.30\tomcat-embed-websocket-10.1.30.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-web\6.1.13\spring-web-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-beans\6.1.13\spring-beans-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-webmvc\6.1.13\spring-webmvc-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-aop\6.1.13\spring-aop-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-context\6.1.13\spring-context-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-expression\6.1.13\spring-expression-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-validation\3.3.4\spring-boot-starter-validation-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.30\tomcat-embed-el-10.1.30.jar;C:\Users\Jerry\.m2\repository\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\Jerry\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\Jerry\.m2\repository\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\classmate\1.7.0\classmate-1.7.0.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-websocket\3.3.4\spring-boot-starter-websocket-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-messaging\6.1.13\spring-messaging-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-websocket\6.1.13\spring-websocket-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-actuator\3.3.4\spring-boot-starter-actuator-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-actuator-autoconfigure\3.3.4\spring-boot-actuator-autoconfigure-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-actuator\3.3.4\spring-boot-actuator-3.3.4.jar;C:\Users\Jerry\.m2\repository\io\micrometer\micrometer-observation\1.13.4\micrometer-observation-1.13.4.jar;C:\Users\Jerry\.m2\repository\io\micrometer\micrometer-commons\1.13.4\micrometer-commons-1.13.4.jar;C:\Users\Jerry\.m2\repository\io\micrometer\micrometer-jakarta9\1.13.4\micrometer-jakarta9-1.13.4.jar;C:\Users\Jerry\.m2\repository\io\micrometer\micrometer-core\1.13.4\micrometer-core-1.13.4.jar;C:\Users\Jerry\.m2\repository\org\hdrhistogram\HdrHistogram\2.2.2\HdrHistogram-2.2.2.jar;C:\Users\Jerry\.m2\repository\org\latencyutils\LatencyUtils\2.0.3\LatencyUtils-2.0.3.jar;C:\Users\Jerry\.m2\repository\org\springframework\security\spring-security-crypto\6.3.3\spring-security-crypto-6.3.3.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-spring-boot3-starter\3.5.7\mybatis-plus-spring-boot3-starter-3.5.7.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus\3.5.7\mybatis-plus-3.5.7.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-core\3.5.7\mybatis-plus-core-3.5.7.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-annotation\3.5.7\mybatis-plus-annotation-3.5.7.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-extension\3.5.7\mybatis-plus-extension-3.5.7.jar;C:\Users\Jerry\.m2\repository\org\mybatis\mybatis\3.5.16\mybatis-3.5.16.jar;C:\Users\Jerry\.m2\repository\com\github\jsqlparser\jsqlparser\4.9\jsqlparser-4.9.jar;C:\Users\Jerry\.m2\repository\org\mybatis\mybatis-spring\3.0.3\mybatis-spring-3.0.3.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-spring-boot-autoconfigure\3.5.7\mybatis-plus-spring-boot-autoconfigure-3.5.7.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.3.4\spring-boot-autoconfigure-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\3.3.4\spring-boot-starter-jdbc-3.3.4.jar;C:\Users\Jerry\.m2\repository\com\zaxxer\HikariCP\5.1.0\HikariCP-5.1.0.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-jdbc\6.1.13\spring-jdbc-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-tx\6.1.13\spring-tx-6.1.13.jar;C:\Users\Jerry\.m2\repository\com\mysql\mysql-connector-j\8.3.0\mysql-connector-j-8.3.0.jar;C:\Users\Jerry\.m2\repository\org\projectlombok\lombok\1.18.34\lombok-1.18.34.jar;C:\Users\Jerry\.m2\repository\io\jsonwebtoken\jjwt-api\0.12.6\jjwt-api-0.12.6.jar;C:\Users\Jerry\.m2\repository\io\jsonwebtoken\jjwt-impl\0.12.6\jjwt-impl-0.12.6.jar;C:\Users\Jerry\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.12.6\jjwt-jackson-0.12.6.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.17.2\jackson-core-2.17.2.jar;C:\Users\Jerry\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.6.0\springdoc-openapi-starter-webmvc-ui-2.6.0.jar;C:\Users\Jerry\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-api\2.6.0\springdoc-openapi-starter-webmvc-api-2.6.0.jar;C:\Users\Jerry\.m2\repository\org\springdoc\springdoc-openapi-starter-common\2.6.0\springdoc-openapi-starter-common-2.6.0.jar;C:\Users\Jerry\.m2\repository\io\swagger\core\v3\swagger-core-jakarta\2.2.22\swagger-core-jakarta-2.2.22.jar;C:\Users\Jerry\.m2\repository\org\apache\commons\commons-lang3\3.14.0\commons-lang3-3.14.0.jar;C:\Users\Jerry\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.22\swagger-annotations-jakarta-2.2.22.jar;C:\Users\Jerry\.m2\repository\io\swagger\core\v3\swagger-models-jakarta\2.2.22\swagger-models-jakarta-2.2.22.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.17.2\jackson-dataformat-yaml-2.17.2.jar;C:\Users\Jerry\.m2\repository\org\webjars\swagger-ui\5.17.14\swagger-ui-5.17.14.jar;C:\Users\Jerry\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.3.4\spring-boot-starter-test-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-test\3.3.4\spring-boot-test-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.3.4\spring-boot-test-autoconfigure-3.3.4.jar;C:\Users\Jerry\.m2\repository\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\Jerry\.m2\repository\org\slf4j\slf4j-api\2.0.16\slf4j-api-2.0.16.jar;C:\Users\Jerry\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\Jerry\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\Jerry\.m2\repository\net\minidev\json-smart\2.5.1\json-smart-2.5.1.jar;C:\Users\Jerry\.m2\repository\net\minidev\accessors-smart\2.5.1\accessors-smart-2.5.1.jar;C:\Users\Jerry\.m2\repository\org\ow2\asm\asm\9.6\asm-9.6.jar;C:\Users\Jerry\.m2\repository\org\assertj\assertj-core\3.25.3\assertj-core-3.25.3.jar;C:\Users\Jerry\.m2\repository\net\bytebuddy\byte-buddy\1.14.19\byte-buddy-1.14.19.jar;C:\Users\Jerry\.m2\repository\org\awaitility\awaitility\4.2.2\awaitility-4.2.2.jar;C:\Users\Jerry\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\Jerry\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.3\junit-jupiter-5.10.3.jar;C:\Users\Jerry\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.3\junit-jupiter-api-5.10.3.jar;C:\Users\Jerry\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\Jerry\.m2\repository\org\junit\platform\junit-platform-commons\1.10.3\junit-platform-commons-1.10.3.jar;C:\Users\Jerry\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\Jerry\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.3\junit-jupiter-params-5.10.3.jar;C:\Users\Jerry\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.3\junit-jupiter-engine-5.10.3.jar;C:\Users\Jerry\.m2\repository\org\junit\platform\junit-platform-engine\1.10.3\junit-platform-engine-1.10.3.jar;C:\Users\Jerry\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\Jerry\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.19\byte-buddy-agent-1.14.19.jar;C:\Users\Jerry\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\Jerry\.m2\repository\org\mockito\mockito-junit-jupiter\5.11.0\mockito-junit-jupiter-5.11.0.jar;C:\Users\Jerry\.m2\repository\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\Jerry\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-core\6.1.13\spring-core-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-jcl\6.1.13\spring-jcl-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-test\6.1.13\spring-test-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;C:\Users\Jerry\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\mysql\1.21.4\mysql-1.21.4.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\jdbc\1.21.4\jdbc-1.21.4.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\database-commons\1.21.4\database-commons-1.21.4.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\junit-jupiter\1.21.4\junit-jupiter-1.21.4.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\testcontainers\1.21.4\testcontainers-1.21.4.jar;C:\Users\Jerry\.m2\repository\junit\junit\4.13.2\junit-4.13.2.jar;C:\Users\Jerry\.m2\repository\org\hamcrest\hamcrest-core\2.2\hamcrest-core-2.2.jar;C:\Users\Jerry\.m2\repository\org\apache\commons\commons-compress\1.24.0\commons-compress-1.24.0.jar;C:\Users\Jerry\.m2\repository\org\rnorth\duct-tape\duct-tape\1.0.8\duct-tape-1.0.8.jar;C:\Users\Jerry\.m2\repository\org\jetbrains\annotations\17.0.0\annotations-17.0.0.jar;C:\Users\Jerry\.m2\repository\com\github\docker-java\docker-java-api\3.4.2\docker-java-api-3.4.2.jar;C:\Users\Jerry\.m2\repository\com\github\docker-java\docker-java-transport-zerodep\3.4.2\docker-java-transport-zerodep-3.4.2.jar;C:\Users\Jerry\.m2\repository\com\github\docker-java\docker-java-transport\3.4.2\docker-java-transport-3.4.2.jar;C:\Users\Jerry\.m2\repository\net\java\dev\jna\jna\5.13.0\jna-5.13.0.jar;"/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://java.oracle.com/"/>
+    <property name="user.timezone" value="Asia/Shanghai"/>
+    <property name="org.jboss.logging.provider" value="slf4j"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="CN"/>
+    <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-21\bin"/>
+    <property name="sun.java.command" value="C:\Users\Jerry\AppData\Local\Temp\surefire10347658884150378094\surefirebooter-20260828221240683_3.jar C:\Users\Jerry\AppData\Local\Temp\surefire10347658884150378094 2026-08-28T22-12-40_484-jvmRun1 surefire-20260828221240683_1tmp surefire_0-20260828221240683_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="C:\Users\Jerry\Desktop\SEGroup8\.codex-worktrees\uc25-real-76cd39e3\backend\target\test-classes;C:\Users\Jerry\Desktop\SEGroup8\.codex-worktrees\uc25-real-76cd39e3\backend\target\classes;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.3.4\spring-boot-starter-web-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter\3.3.4\spring-boot-starter-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot\3.3.4\spring-boot-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.3.4\spring-boot-starter-logging-3.3.4.jar;C:\Users\Jerry\.m2\repository\ch\qos\logback\logback-classic\1.5.8\logback-classic-1.5.8.jar;C:\Users\Jerry\.m2\repository\ch\qos\logback\logback-core\1.5.8\logback-core-1.5.8.jar;C:\Users\Jerry\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.23.1\log4j-to-slf4j-2.23.1.jar;C:\Users\Jerry\.m2\repository\org\apache\logging\log4j\log4j-api\2.23.1\log4j-api-2.23.1.jar;C:\Users\Jerry\.m2\repository\org\slf4j\jul-to-slf4j\2.0.16\jul-to-slf4j-2.0.16.jar;C:\Users\Jerry\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\Jerry\.m2\repository\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.3.4\spring-boot-starter-json-3.3.4.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.17.2\jackson-datatype-jdk8-2.17.2.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.17.2\jackson-datatype-jsr310-2.17.2.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.17.2\jackson-module-parameter-names-2.17.2.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.3.4\spring-boot-starter-tomcat-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.30\tomcat-embed-core-10.1.30.jar;C:\Users\Jerry\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.30\tomcat-embed-websocket-10.1.30.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-web\6.1.13\spring-web-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-beans\6.1.13\spring-beans-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-webmvc\6.1.13\spring-webmvc-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-aop\6.1.13\spring-aop-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-context\6.1.13\spring-context-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-expression\6.1.13\spring-expression-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-validation\3.3.4\spring-boot-starter-validation-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.30\tomcat-embed-el-10.1.30.jar;C:\Users\Jerry\.m2\repository\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\Jerry\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\Jerry\.m2\repository\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\classmate\1.7.0\classmate-1.7.0.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-websocket\3.3.4\spring-boot-starter-websocket-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-messaging\6.1.13\spring-messaging-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-websocket\6.1.13\spring-websocket-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-actuator\3.3.4\spring-boot-starter-actuator-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-actuator-autoconfigure\3.3.4\spring-boot-actuator-autoconfigure-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-actuator\3.3.4\spring-boot-actuator-3.3.4.jar;C:\Users\Jerry\.m2\repository\io\micrometer\micrometer-observation\1.13.4\micrometer-observation-1.13.4.jar;C:\Users\Jerry\.m2\repository\io\micrometer\micrometer-commons\1.13.4\micrometer-commons-1.13.4.jar;C:\Users\Jerry\.m2\repository\io\micrometer\micrometer-jakarta9\1.13.4\micrometer-jakarta9-1.13.4.jar;C:\Users\Jerry\.m2\repository\io\micrometer\micrometer-core\1.13.4\micrometer-core-1.13.4.jar;C:\Users\Jerry\.m2\repository\org\hdrhistogram\HdrHistogram\2.2.2\HdrHistogram-2.2.2.jar;C:\Users\Jerry\.m2\repository\org\latencyutils\LatencyUtils\2.0.3\LatencyUtils-2.0.3.jar;C:\Users\Jerry\.m2\repository\org\springframework\security\spring-security-crypto\6.3.3\spring-security-crypto-6.3.3.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-spring-boot3-starter\3.5.7\mybatis-plus-spring-boot3-starter-3.5.7.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus\3.5.7\mybatis-plus-3.5.7.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-core\3.5.7\mybatis-plus-core-3.5.7.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-annotation\3.5.7\mybatis-plus-annotation-3.5.7.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-extension\3.5.7\mybatis-plus-extension-3.5.7.jar;C:\Users\Jerry\.m2\repository\org\mybatis\mybatis\3.5.16\mybatis-3.5.16.jar;C:\Users\Jerry\.m2\repository\com\github\jsqlparser\jsqlparser\4.9\jsqlparser-4.9.jar;C:\Users\Jerry\.m2\repository\org\mybatis\mybatis-spring\3.0.3\mybatis-spring-3.0.3.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-spring-boot-autoconfigure\3.5.7\mybatis-plus-spring-boot-autoconfigure-3.5.7.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.3.4\spring-boot-autoconfigure-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\3.3.4\spring-boot-starter-jdbc-3.3.4.jar;C:\Users\Jerry\.m2\repository\com\zaxxer\HikariCP\5.1.0\HikariCP-5.1.0.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-jdbc\6.1.13\spring-jdbc-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-tx\6.1.13\spring-tx-6.1.13.jar;C:\Users\Jerry\.m2\repository\com\mysql\mysql-connector-j\8.3.0\mysql-connector-j-8.3.0.jar;C:\Users\Jerry\.m2\repository\org\projectlombok\lombok\1.18.34\lombok-1.18.34.jar;C:\Users\Jerry\.m2\repository\io\jsonwebtoken\jjwt-api\0.12.6\jjwt-api-0.12.6.jar;C:\Users\Jerry\.m2\repository\io\jsonwebtoken\jjwt-impl\0.12.6\jjwt-impl-0.12.6.jar;C:\Users\Jerry\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.12.6\jjwt-jackson-0.12.6.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.17.2\jackson-core-2.17.2.jar;C:\Users\Jerry\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.6.0\springdoc-openapi-starter-webmvc-ui-2.6.0.jar;C:\Users\Jerry\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-api\2.6.0\springdoc-openapi-starter-webmvc-api-2.6.0.jar;C:\Users\Jerry\.m2\repository\org\springdoc\springdoc-openapi-starter-common\2.6.0\springdoc-openapi-starter-common-2.6.0.jar;C:\Users\Jerry\.m2\repository\io\swagger\core\v3\swagger-core-jakarta\2.2.22\swagger-core-jakarta-2.2.22.jar;C:\Users\Jerry\.m2\repository\org\apache\commons\commons-lang3\3.14.0\commons-lang3-3.14.0.jar;C:\Users\Jerry\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.22\swagger-annotations-jakarta-2.2.22.jar;C:\Users\Jerry\.m2\repository\io\swagger\core\v3\swagger-models-jakarta\2.2.22\swagger-models-jakarta-2.2.22.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.17.2\jackson-dataformat-yaml-2.17.2.jar;C:\Users\Jerry\.m2\repository\org\webjars\swagger-ui\5.17.14\swagger-ui-5.17.14.jar;C:\Users\Jerry\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.3.4\spring-boot-starter-test-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-test\3.3.4\spring-boot-test-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.3.4\spring-boot-test-autoconfigure-3.3.4.jar;C:\Users\Jerry\.m2\repository\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\Jerry\.m2\repository\org\slf4j\slf4j-api\2.0.16\slf4j-api-2.0.16.jar;C:\Users\Jerry\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\Jerry\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\Jerry\.m2\repository\net\minidev\json-smart\2.5.1\json-smart-2.5.1.jar;C:\Users\Jerry\.m2\repository\net\minidev\accessors-smart\2.5.1\accessors-smart-2.5.1.jar;C:\Users\Jerry\.m2\repository\org\ow2\asm\asm\9.6\asm-9.6.jar;C:\Users\Jerry\.m2\repository\org\assertj\assertj-core\3.25.3\assertj-core-3.25.3.jar;C:\Users\Jerry\.m2\repository\net\bytebuddy\byte-buddy\1.14.19\byte-buddy-1.14.19.jar;C:\Users\Jerry\.m2\repository\org\awaitility\awaitility\4.2.2\awaitility-4.2.2.jar;C:\Users\Jerry\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\Jerry\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.3\junit-jupiter-5.10.3.jar;C:\Users\Jerry\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.3\junit-jupiter-api-5.10.3.jar;C:\Users\Jerry\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\Jerry\.m2\repository\org\junit\platform\junit-platform-commons\1.10.3\junit-platform-commons-1.10.3.jar;C:\Users\Jerry\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\Jerry\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.3\junit-jupiter-params-5.10.3.jar;C:\Users\Jerry\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.3\junit-jupiter-engine-5.10.3.jar;C:\Users\Jerry\.m2\repository\org\junit\platform\junit-platform-engine\1.10.3\junit-platform-engine-1.10.3.jar;C:\Users\Jerry\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\Jerry\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.19\byte-buddy-agent-1.14.19.jar;C:\Users\Jerry\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\Jerry\.m2\repository\org\mockito\mockito-junit-jupiter\5.11.0\mockito-junit-jupiter-5.11.0.jar;C:\Users\Jerry\.m2\repository\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\Jerry\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-core\6.1.13\spring-core-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-jcl\6.1.13\spring-jcl-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-test\6.1.13\spring-test-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;C:\Users\Jerry\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\mysql\1.21.4\mysql-1.21.4.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\jdbc\1.21.4\jdbc-1.21.4.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\database-commons\1.21.4\database-commons-1.21.4.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\junit-jupiter\1.21.4\junit-jupiter-1.21.4.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\testcontainers\1.21.4\testcontainers-1.21.4.jar;C:\Users\Jerry\.m2\repository\junit\junit\4.13.2\junit-4.13.2.jar;C:\Users\Jerry\.m2\repository\org\hamcrest\hamcrest-core\2.2\hamcrest-core-2.2.jar;C:\Users\Jerry\.m2\repository\org\apache\commons\commons-compress\1.24.0\commons-compress-1.24.0.jar;C:\Users\Jerry\.m2\repository\org\rnorth\duct-tape\duct-tape\1.0.8\duct-tape-1.0.8.jar;C:\Users\Jerry\.m2\repository\org\jetbrains\annotations\17.0.0\annotations-17.0.0.jar;C:\Users\Jerry\.m2\repository\com\github\docker-java\docker-java-api\3.4.2\docker-java-api-3.4.2.jar;C:\Users\Jerry\.m2\repository\com\github\docker-java\docker-java-transport-zerodep\3.4.2\docker-java-transport-zerodep-3.4.2.jar;C:\Users\Jerry\.m2\repository\com\github\docker-java\docker-java-transport\3.4.2\docker-java-transport-3.4.2.jar;C:\Users\Jerry\.m2\repository\net\java\dev\jna\jna\5.13.0\jna-5.13.0.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\Jerry"/>
+    <property name="user.language" value="zh"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2025-07-15"/>
+    <property name="java.home" value="C:\Program Files\Java\jdk-21"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="C:\Users\Jerry\Desktop\SEGroup8\.codex-worktrees\uc25-real-76cd39e3\backend"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="FILE_LOG_CHARSET" value="UTF-8"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="C:\Users\Jerry\AppData\Local\Temp\surefire10347658884150378094\surefirebooter-20260828221240683_3.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.8+12-LTS-250"/>
+    <property name="user.name" value="Jerry"/>
+    <property name="stdout.encoding" value="GBK"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="localRepository" value="C:\Users\Jerry\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
+    <property name="java.io.tmpdir" value="C:\Users\Jerry\AppData\Local\Temp\"/>
+    <property name="com.zaxxer.hikari.pool_number" value="1"/>
+    <property name="java.version" value="21.0.8"/>
+    <property name="user.dir" value="C:\Users\Jerry\Desktop\SEGroup8\.codex-worktrees\uc25-real-76cd39e3\backend"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="groups" value="UC25"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="PID" value="57052"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
+    <property name="native.encoding" value="GBK"/>
+    <property name="java.library.path" value="C:\Program Files\Java\jdk-21\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Users\Jerry\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell;C:\Users\Jerry\.codex\tmp\arg0\codex-arg0ey7Uaw;C:\Users\Jerry\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\libheif\libheif\bin;C:\Users\Jerry\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\jxrlib\jxrlib\bin;C:\Users\Jerry\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\poppler\Library\bin;C:\Users\Jerry\.cache\codex-runtimes\codex-primary-runtime\dependencies\bin\override;C:\Program Files\Microsoft\jdk-21.0.11.10-hotspot\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.0\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.0\libnvvp;C:\MinGW\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\dotnet\;C:\Program Files\Git\cmd;E:\cursor\resources\app\bin;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\nodejs\;C:\Program Files\GitHub CLI\;C:\Program Files\NVIDIA Corporation\Nsight Compute 2022.4.0\;C:\Program Files\NVIDIA Corporation\NVIDIA App\NvDLISR;C:\Users\Jerry\AppData\Local\Programs\Python\Python311\Scripts\;C:\Users\Jerry\AppData\Local\Programs\Python\Python311\;C:\Users\Jerry\AppData\Local\Programs\Python\Launcher\;C:\Users\Jerry\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell;C:\Users\Jerry\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Java\bin;C:\Users\Jerry\AppData\Local\Programs\cursor\resources\app\bin;E:\TDM-GCC-64\bin;C:\Users\Jerry\AppData\Local\Programs\Microsoft VS Code\bin;C:\tools\apache-maven-3.9.9\bin;C:\Program Files\Java\jdk-21\bin;C:\Users\Jerry\AppData\Roaming\npm;C:\Users\Jerry\AppData\Local\Programs\JMeter\bin;C:\Users\Jerry\.cache\codex-runtimes\codex-primary-runtime\dependencies\bin\fallback;C:\Users\Jerry\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\cmd;C:\Users\Jerry\AppData\Local\OpenAI\Codex\bin\532be593bfdc077b;C:\Users\Jerry\AppData\Local\OpenAI\Codex\bin\fac60c5e9a2ae3df;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="GBK"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="java.vm.version" value="21.0.8+12-LTS-250"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+    <property name="LOGGED_APPLICATION_NAME" value="[segroup8-platform] "/>
+  </properties>
+  <testcase name="create_shouldPushOnlyOwnerAndKeepRecordWhenPushFails" classname="com.segroup8.platform.integration.NotificationFlowUc25IntegrationTest" time="0.295">
+    <system-out><![CDATA[22:12:43.711 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.segroup8.platform.integration.NotificationFlowUc25IntegrationTest]: NotificationFlowUc25IntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+22:12:44.764 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.segroup8.platform.PlatformApplication for test class com.segroup8.platform.integration.NotificationFlowUc25IntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-08-28T22:12:45.212+08:00  INFO 57052 --- [segroup8-platform] [           main] .p.i.NotificationFlowUc25IntegrationTest : Starting NotificationFlowUc25IntegrationTest using Java 21.0.8 with PID 57052 (started by Jerry in C:\Users\Jerry\Desktop\SEGroup8\.codex-worktrees\uc25-real-76cd39e3\backend)
+2026-08-28T22:12:45.214+08:00  INFO 57052 --- [segroup8-platform] [           main] .p.i.NotificationFlowUc25IntegrationTest : The following 1 profile is active: "test"
+Logging initialized using 'class org.apache.ibatis.logging.stdout.StdOutImpl' adapter.
+Get /10.135.46.96 network interface 
+Get network interface info: name:wireless_32768 (Intel(R) Wi-Fi 6E AX211 160MHz)
+Initialization Sequence datacenterId:1 workerId:26
+ _ _   |_  _ _|_. ___ _ |    _ 
+| | |\/|_)(_| | |_\  |_)||_|_\ 
+     /               |         
+                        3.5.7 
+2026-08-28T22:12:52.133+08:00  INFO 57052 --- [segroup8-platform] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-28T22:12:52.347+08:00  INFO 57052 --- [segroup8-platform] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:segroup8_test user=SA
+2026-08-28T22:12:52.349+08:00  INFO 57052 --- [segroup8-platform] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-28T22:12:55.159+08:00  INFO 57052 --- [segroup8-platform] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-28T22:12:55.159+08:00  INFO 57052 --- [segroup8-platform] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-28T22:12:55.170+08:00  INFO 57052 --- [segroup8-platform] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoints beneath base path '/actuator'
+2026-08-28T22:12:55.181+08:00  INFO 57052 --- [segroup8-platform] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 21 ms
+2026-08-28T22:12:55.304+08:00  INFO 57052 --- [segroup8-platform] [           main] .p.i.NotificationFlowUc25IntegrationTest : Started NotificationFlowUc25IntegrationTest in 10.466 seconds (process running for 14.439)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4da010bc] was not registered for synchronization because synchronization is not active
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4d13b552]
+JDBC Connection [HikariProxyConnection@1304904209 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+JDBC Connection [HikariProxyConnection@1901599826 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: DELETE FROM idempotency_record WHERE (expire_time < ?)
+==>  Preparing: INSERT INTO notification ( user_id, title, content, target_path, is_read, create_time ) VALUES ( ?, ?, ?, ?, ?, ? )
+==> Parameters: 2026-08-28T22:12:55.333261600(LocalDateTime)
+==> Parameters: 1(Long), 实时通知(String), 第一次推送(String), /order/1(String), 0(Integer), 2026-08-28T22:12:55.466545700(LocalDateTime)
+<==    Updates: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4da010bc]
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4d13b552]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4d13b552] from current transaction
+==>  Preparing: SELECT COUNT( * ) AS total FROM notification
+==> Parameters: 
+<==    Columns: total
+<==        Row: 5
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4d13b552]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4d13b552] from current transaction
+==>  Preparing: INSERT INTO notification ( user_id, title, content, target_path, is_read, create_time ) VALUES ( ?, ?, ?, ?, ?, ? )
+==> Parameters: 1(Long), 补偿通知(String), 断线期间仍需持久化(String), /order/2(String), 0(Integer), 2026-08-28T22:12:55.670841600(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4d13b552]
+2026-08-28T22:12:55.672+08:00  WARN 57052 --- [segroup8-platform] [           main] c.s.p.s.impl.NotificationServiceImpl     : Notification 25006 persisted but realtime delivery failed: socket unavailable
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4d13b552] from current transaction
+==>  Preparing: SELECT COUNT( * ) AS total FROM notification
+==> Parameters: 
+<==    Columns: total
+<==        Row: 6
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4d13b552]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4d13b552] from current transaction
+==>  Preparing: SELECT id,user_id,title,content,target_path,is_read,create_time FROM notification
+==> Parameters: 
+<==    Columns: id, user_id, title, content, target_path, is_read, create_time
+<==        Row: 25001, 1, 买家未读通知, 订单状态已更新, /order/25001, 0, 2026-08-28 22:12:55.46054
+<==        Row: 25002, 1, 卖家未读通知, 店铺有新的待处理订单, /merchant/orders, 0, 2026-08-28 22:12:55.46054
+<==        Row: 25003, 1, 买家已读通知, 商品已收藏, /product/1001, 1, 2026-08-28 22:12:55.46054
+<==        Row: 25004, 3, 其他用户通知, 不能泄露给当前用户, /merchant/orders, 0, 2026-08-28 22:12:55.46054
+<==        Row: 25005, 1, 实时通知, 第一次推送, /order/1, 0, 2026-08-28 22:12:55.466546
+<==        Row: 25006, 1, 补偿通知, 断线期间仍需持久化, /order/2, 0, 2026-08-28 22:12:55.670842
+<==      Total: 6
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4d13b552]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4d13b552]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4d13b552]
+]]></system-out>
+  </testcase>
+  <testcase name="markAllRead_shouldSupportScopedAndUnscopedUpdates" classname="com.segroup8.platform.integration.NotificationFlowUc25IntegrationTest" time="0.193">
+    <system-out><![CDATA[Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1197cd8]
+JDBC Connection [HikariProxyConnection@320106510 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,user_id,title,content,target_path,is_read,create_time FROM notification WHERE (user_id = ? AND is_read = ?)
+==> Parameters: 1(Long), 0(Integer)
+<==    Columns: id, user_id, title, content, target_path, is_read, create_time
+<==        Row: 25001, 1, 买家未读通知, 订单状态已更新, /order/25001, 0, 2026-08-28 22:12:55.717431
+<==        Row: 25002, 1, 卖家未读通知, 店铺有新的待处理订单, /merchant/orders, 0, 2026-08-28 22:12:55.717431
+<==      Total: 2
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1197cd8]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1197cd8] from current transaction
+==>  Preparing: UPDATE notification SET is_read=? WHERE (user_id = ? AND id IN (?))
+==> Parameters: 1(Integer), 1(Long), 25001(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1197cd8]
+2026-08-28T22:12:55.897+08:00  INFO 57052 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=a47ac5ccbcd444f8871792ff384722dc method=POST path=/api/notifications/read-all status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1197cd8] from current transaction
+==>  Preparing: SELECT id,user_id,title,content,target_path,is_read,create_time FROM notification WHERE id=?
+==> Parameters: 25001(Long)
+<==    Columns: id, user_id, title, content, target_path, is_read, create_time
+<==        Row: 25001, 1, 买家未读通知, 订单状态已更新, /order/25001, 1, 2026-08-28 22:12:55.717431
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1197cd8]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1197cd8] from current transaction
+==>  Preparing: SELECT id,user_id,title,content,target_path,is_read,create_time FROM notification WHERE id=?
+==> Parameters: 25002(Long)
+<==    Columns: id, user_id, title, content, target_path, is_read, create_time
+<==        Row: 25002, 1, 卖家未读通知, 店铺有新的待处理订单, /merchant/orders, 0, 2026-08-28 22:12:55.717431
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1197cd8]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1197cd8] from current transaction
+==>  Preparing: UPDATE notification SET is_read=? WHERE (user_id = ? AND is_read = ?)
+==> Parameters: 1(Integer), 1(Long), 0(Integer)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1197cd8]
+2026-08-28T22:12:55.906+08:00  INFO 57052 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=b6cc11fc4be149ae988c6d6466ac2d7e method=POST path=/api/notifications/read-all status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1197cd8] from current transaction
+==>  Preparing: SELECT id,user_id,title,content,target_path,is_read,create_time FROM notification WHERE id=?
+==> Parameters: 25002(Long)
+<==    Columns: id, user_id, title, content, target_path, is_read, create_time
+<==        Row: 25002, 1, 卖家未读通知, 店铺有新的待处理订单, /merchant/orders, 1, 2026-08-28 22:12:55.717431
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1197cd8]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1197cd8] from current transaction
+==>  Preparing: SELECT id,user_id,title,content,target_path,is_read,create_time FROM notification WHERE id=?
+==> Parameters: 25004(Long)
+<==    Columns: id, user_id, title, content, target_path, is_read, create_time
+<==        Row: 25004, 3, 其他用户通知, 不能泄露给当前用户, /merchant/orders, 0, 2026-08-28 22:12:55.717431
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1197cd8]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1197cd8]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1197cd8]
+]]></system-out>
+  </testcase>
+  <testcase name="list_shouldIsolateCurrentUserAndApplyBuyerOrSellerScope" classname="com.segroup8.platform.integration.NotificationFlowUc25IntegrationTest" time="0.027">
+    <system-out><![CDATA[Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@ef21eba]
+JDBC Connection [HikariProxyConnection@1529897911 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,user_id,title,content,target_path,is_read,create_time FROM notification WHERE (user_id = ?) ORDER BY is_read ASC,create_time DESC,id DESC
+==> Parameters: 1(Long)
+<==    Columns: id, user_id, title, content, target_path, is_read, create_time
+<==        Row: 25002, 1, 卖家未读通知, 店铺有新的待处理订单, /merchant/orders, 0, 2026-08-28 22:12:55.913354
+<==        Row: 25001, 1, 买家未读通知, 订单状态已更新, /order/25001, 0, 2026-08-28 22:12:55.913354
+<==        Row: 25003, 1, 买家已读通知, 商品已收藏, /product/1001, 1, 2026-08-28 22:12:55.913354
+<==      Total: 3
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@ef21eba]
+2026-08-28T22:12:55.922+08:00  INFO 57052 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=63702411a9944c4d86f1a803930e60de method=GET path=/api/notifications status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@ef21eba] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@ef21eba]
+2026-08-28T22:12:55.932+08:00  INFO 57052 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=09254af4640048bdbc69b45a01600c5f method=GET path=/api/notifications status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@ef21eba] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@ef21eba]
+2026-08-28T22:12:55.935+08:00  INFO 57052 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=8f9414cf4e024e4ba607b734dc2b208c method=GET path=/api/notifications status=200
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@ef21eba]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@ef21eba]
+]]></system-out>
+  </testcase>
+  <testcase name="markRead_shouldUpdateOwnedNotificationAndHideForeignOrMissingOnes" classname="com.segroup8.platform.integration.NotificationFlowUc25IntegrationTest" time="0.017">
+    <system-out><![CDATA[Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6f286e1d]
+JDBC Connection [HikariProxyConnection@1831418689 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,user_id,title,content,target_path,is_read,create_time FROM notification WHERE id=?
+==> Parameters: 25001(Long)
+<==    Columns: id, user_id, title, content, target_path, is_read, create_time
+<==        Row: 25001, 1, 买家未读通知, 订单状态已更新, /order/25001, 0, 2026-08-28 22:12:55.940353
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6f286e1d]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6f286e1d] from current transaction
+==>  Preparing: UPDATE notification SET is_read=? WHERE (id = ? AND user_id = ?)
+==> Parameters: 1(Integer), 25001(Long), 1(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6f286e1d]
+2026-08-28T22:12:55.946+08:00  INFO 57052 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=863f1684e3b342a69a4a92bdd1846cc8 method=POST path=/api/notifications/25001/read status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6f286e1d] from current transaction
+==>  Preparing: SELECT id,user_id,title,content,target_path,is_read,create_time FROM notification WHERE id=?
+==> Parameters: 25004(Long)
+<==    Columns: id, user_id, title, content, target_path, is_read, create_time
+<==        Row: 25004, 3, 其他用户通知, 不能泄露给当前用户, /merchant/orders, 0, 2026-08-28 22:12:55.940353
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6f286e1d]
+2026-08-28T22:12:55.950+08:00  INFO 57052 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=30d64642080d42e990bedf2712698872 method=POST path=/api/notifications/25004/read status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6f286e1d] from current transaction
+==>  Preparing: SELECT id,user_id,title,content,target_path,is_read,create_time FROM notification WHERE id=?
+==> Parameters: 25999(Long)
+<==      Total: 0
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6f286e1d]
+2026-08-28T22:12:55.952+08:00  INFO 57052 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=464643134784472a8336b1794bb68d64 method=POST path=/api/notifications/25999/read status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6f286e1d] from current transaction
+==>  Preparing: SELECT id,user_id,title,content,target_path,is_read,create_time FROM notification WHERE id=?
+==> Parameters: 25001(Long)
+<==    Columns: id, user_id, title, content, target_path, is_read, create_time
+<==        Row: 25001, 1, 买家未读通知, 订单状态已更新, /order/25001, 1, 2026-08-28 22:12:55.940353
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6f286e1d]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6f286e1d] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6f286e1d]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6f286e1d]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6f286e1d]
+]]></system-out>
+  </testcase>
+</testsuite>

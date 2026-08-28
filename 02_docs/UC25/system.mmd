@@ -1,0 +1,8 @@
+flowchart LR
+    User[登录用户] -->|HTTPS| Nginx[Nginx 前端入口 :8088]
+    Nginx --> SPA[Vue 通知页面]
+    SPA -->|通知查询与已读 API| Backend[Spring Boot :8089]
+    SPA <-->|JWT WebSocket /ws/realtime| Backend
+    Backend --> MySQL[(MySQL notification)]
+    Backend -->|NOTIFICATION_CREATED| SPA
+    SPA -->|重连后补拉| Backend

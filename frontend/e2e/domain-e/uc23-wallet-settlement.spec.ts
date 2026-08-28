@@ -58,7 +58,15 @@ test.describe("@DOMAIN_E @UC23 wallet and settlement", () => {
         await page.getByRole("button", { name: "充值商城币", exact: true }).click();
         const rechargeDialog = page.getByRole("dialog", { name: "充值商城币（模拟）" });
         await rechargeDialog.getByRole("spinbutton").fill(String(rechargeAmount));
-        await rechargeDialog.getByRole("radio", { name: "支付宝" }).check({ force: true });
+        // Element Plus renders the radio input as a hidden control. Click the
+        // visible radio-button wrapper so the group model is updated reliably
+        // in Chromium and the selected channel is sent with the recharge.
+        await rechargeDialog.locator(".el-radio-button")
+            .filter({ hasText: "支付宝" })
+            .click();
+        await expect(
+            rechargeDialog.locator("input.el-radio-button__original-radio[value='ALIPAY']"),
+        ).toBeChecked();
         const rechargeResponse = page.waitForResponse(
             isFinanceResponse("/api/finance/recharge", "POST"),
             { timeout: responseTimeout },

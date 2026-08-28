@@ -1,0 +1,23 @@
+{
+  "uc": "UC25",
+  "status": "PASS",
+  "environment": "Windows 11, Java 21, H2 backend tests; real Compose Nginx + Spring Boot + MySQL; Playwright with local Edge",
+  "executedAt": "2026-08-28T22:14:00+08:00",
+  "counts": {
+    "passed": 15,
+    "failed": 0,
+    "skipped": 0
+  },
+  "evidence": [
+    "raw-reports/TEST-com.segroup8.platform.controller.NotificationControllerUc25WebMvcTest.xml",
+    "raw-reports/TEST-com.segroup8.platform.integration.NotificationFlowUc25IntegrationTest.xml",
+    "raw-reports/TEST-com.segroup8.platform.realtime.RealtimeHandshakeInterceptorTest.xml",
+    "raw-reports/TEST-com.segroup8.platform.service.impl.UC25NotificationOwnershipAndPushTest.xml",
+    "raw-reports/playwright/playwright-results.json",
+    "raw-reports/playwright/playwright-results.xml",
+    "raw-reports/playwright/playwright-report/index.html",
+    "screenshots/uc25-realtime-reconnect-and-read.png",
+    "logs/runtime-health.txt",
+    "../test-report.md"
+  ]
+}
