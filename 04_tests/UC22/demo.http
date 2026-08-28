@@ -1,0 +1,15 @@
+@base = http://127.0.0.1:8088/api
+@buyerToken = REPLACE_WITH_BUYER_JWT
+@voucherId = REPLACE_WITH_VOUCHER_ID
+
+### 领取优惠券
+POST {{base}}/voucher/{{voucherId}}/claim
+Authorization: Bearer {{buyerToken}}
+
+### 查询结算可用券
+GET {{base}}/voucher/my/available?shopIds=1&totalAmount=299.00
+Authorization: Bearer {{buyerToken}}
+
+### 查询门槛不足原因
+GET {{base}}/voucher/my/available/reasons?shopIds=1&totalAmount=50.00
+Authorization: Bearer {{buyerToken}}

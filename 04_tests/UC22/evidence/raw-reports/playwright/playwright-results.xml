@@ -1,0 +1,11 @@
+<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="6.7109250000000005">
+<testsuite name="domain-e\uc22-claim-checkout.spec.ts" timestamp="2026-08-28T09:25:10.215Z" hostname="" tests="1" failures="0" skipped="0" time="5.257" errors="0">
+<testcase name="@DOMAIN_E @UC22 voucher claim and checkout › buyer claims and uses a voucher in a paid order through the real UI" classname="domain-e\uc22-claim-checkout.spec.ts" time="5.257">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-e-uc22-claim-checko-77076-d-order-through-the-real-UI\attachments\uc22-voucher-used-after-paid-order-refresh-f4f0738ce84c476a3cbfcfbaa5aba3814645c9b5.png]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>
