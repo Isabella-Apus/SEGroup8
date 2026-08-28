@@ -18,6 +18,8 @@ spec:
         {{- include "segroup8.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: database
     spec:
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
       containers:
         - name: mysql
           image: "{{ .Values.mysql.image.repository }}:{{ .Values.mysql.image.tag }}"
