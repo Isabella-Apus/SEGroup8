@@ -155,7 +155,8 @@ jobs:
   # Level 3: prove the tested artifacts boot together before the full UC run.
   playwright:
     name: Playwright full-stack smoke
-    needs: [domain-a, domain-b, domain-c, domain-d, domain-e, uc-e2e-coverage]
+    # needs: [domain-a, domain-b, domain-c, domain-d, domain-e, uc-e2e-coverage]
+    needs: [domain-a, domain-b, domain-c, domain-d, domain-e]
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:
