@@ -59,6 +59,16 @@ logs_root="${evidence_root}/logs"
 mkdir -p "${logs_root}"
 rm -f "${logs_root}/failure-stage.txt"
 
+smoke_path=""
+if [[ "${1:-}" == "--smoke-first" ]]; then
+  if [[ $# -lt 4 || "${3:-}" != "--" ]]; then
+    echo "Usage: $0 --smoke-first <smoke-path> -- <full-suite-paths...>" >&2
+    exit 2
+  fi
+  smoke_path="$2"
+  shift 3
+fi
+
 cd "${repository_root}"
 
 keep_services="${KEEP_COMPOSE:-false}"
@@ -188,9 +198,27 @@ current_stage="npm-install"
 run_logged npm-ci.log npm ci
 current_stage="browser-install"
 run_logged playwright-install.log npx playwright install --with-deps chromium
-current_stage="playwright"
+
+if [[ -n "${smoke_path}" ]]; then
+  current_stage="playwright-smoke"
+  set +e
+  E2E_OUTPUT_DIR="${playwright_output_root}/smoke" \
+    npx playwright test "${smoke_path}" --workers=1 2>&1 | tee "${logs_root}/playwright-smoke.log"
+  smoke_exit_code=${PIPESTATUS[0]}
+  set -e
+  if [[ "${smoke_exit_code}" -ne 0 ]]; then
+    exit "${smoke_exit_code}"
+  fi
+fi
+
+current_stage="playwright-full"
 set +e
-npx playwright test "$@" 2>&1 | tee "${logs_root}/playwright.log"
+if [[ -n "${smoke_path}" ]]; then
+  E2E_OUTPUT_DIR="${playwright_output_root}/full" \
+    npx playwright test "$@" 2>&1 | tee "${logs_root}/playwright.log"
+else
+  npx playwright test "$@" 2>&1 | tee "${logs_root}/playwright.log"
+fi
 test_exit_code=${PIPESTATUS[0]}
 set -e
 exit "${test_exit_code}"

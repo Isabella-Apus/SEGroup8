@@ -1,7 +1,7 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures";
 import { accounts, apiToken, bearer, expectBusinessSuccess, login, uniqueName } from "./support";
 
-test.describe("UC09 real administrator risk audit flow", () => {
+test.describe("@DOMAIN_B @UC09 real administrator risk audit flow", () => {
   test("lists and rejects a deterministic high-risk product, then persists the decision", async ({ page, request }) => {
     const sellerToken = await apiToken(request, accounts.seller);
     const sellerProfile = await expectBusinessSuccess(await request.get("/api/user/profile", { headers: bearer(sellerToken) }));

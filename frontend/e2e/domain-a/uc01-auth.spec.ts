@@ -9,7 +9,7 @@ import {
     uniqueAccount,
 } from "../helpers/domain-a";
 
-test.describe("UC01 real auth and identity flow", () => {
+test.describe("@DOMAIN_A @UC01 real auth and identity flow", () => {
     test("register, login, role boundary, ban and refresh persistence", async ({ page, request }) => {
         const user = await registerAccount(request, uniqueAccount("e2e-uc01"));
         const loggedIn = await loginApi(request, user);

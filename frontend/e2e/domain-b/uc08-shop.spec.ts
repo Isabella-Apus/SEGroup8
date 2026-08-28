@@ -1,7 +1,7 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures";
 import { accounts, apiToken, bearer, expectBusinessSuccess, login } from "./support";
 
-test.describe("UC08 real shop persistence and authorization flow", () => {
+test.describe("@DOMAIN_B @UC08 real shop persistence and authorization flow", () => {
   test("publishes decoration, reloads it and confirms the persisted JSON", async ({ page, request }) => {
     const token = await apiToken(request, accounts.seller);
     await expectBusinessSuccess(await request.put("/api/shop/seller/decoration", {

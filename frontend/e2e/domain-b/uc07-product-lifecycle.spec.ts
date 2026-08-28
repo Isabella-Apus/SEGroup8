@@ -1,8 +1,8 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures";
 import path from "node:path";
 import { accounts, apiToken, bearer, expectBusinessSuccess, login, uniqueName } from "./support";
 
-test.describe("UC07 real seller product lifecycle", () => {
+test.describe("@DOMAIN_B @UC07 real seller product lifecycle", () => {
   test("creates, edits, shelves, adjusts stock and deletes a product with persistence checks", async ({ page, request }) => {
     const productName = uniqueName("E2E商品");
     await login(page, accounts.seller);

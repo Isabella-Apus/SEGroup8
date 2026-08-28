@@ -8,6 +8,7 @@ import com.segroup8.platform.service.NotificationService;
 import com.segroup8.platform.utils.JwtUtils;
 import com.segroup8.platform.vo.NotificationVO;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -55,6 +56,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
+@Tag("DOMAIN_E")
+@Tag("UC21")
+@Tag("UC22")
+@Tag("UC23")
+@Tag("UC24")
+@Tag("UC25")
 class EngagementFinanceApiAndE2ETest {
 
     @Autowired
