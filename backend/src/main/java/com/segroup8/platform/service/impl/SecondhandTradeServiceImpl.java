@@ -62,6 +62,7 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
     private static final String NEGOTIATION_USED = "USED";
 
     private static final String AUCTION_ONGOING = "ONGOING";
+    private static final String AUCTION_SETTLING = "SETTLING";
     private static final String AUCTION_FINISHED = "FINISHED";
     private static final String AUCTION_FLOW = "FLOW";
 
@@ -404,10 +405,13 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
     @Transactional(rollbackFor = Exception.class)
     public ProductAuctionVO closeAuctionEarly(Long auctionId) {
         ProductAuction auction = getOwnedOngoingAuction(auctionId);
-        productAuctionMapper.update(null, new UpdateWrapper<ProductAuction>()
-                .set("end_time", LocalDateTime.now())
+        int updated = productAuctionMapper.update(null, new UpdateWrapper<ProductAuction>()
+                .set("end_time", LocalDateTime.now().minusSeconds(1))
                 .eq("id", auction.getId())
                 .eq("status", AUCTION_ONGOING));
+        if (updated == 0) {
+            throw new BusinessException(409, "拍卖状态已变化，请刷新后重试");
+        }
         settleOneAuction(auction.getId());
         return getAuctionByProductId(auction.getProductId());
     }
@@ -449,9 +453,14 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         if (auction == null) {
             throw new BusinessException(404, "拍卖不存在");
         }
-        if (!AUCTION_ONGOING.equalsIgnoreCase(auction.getStatus())
-                || auction.getEndTime() == null
-                || !auction.getEndTime().isAfter(LocalDateTime.now())) {
+        LocalDateTime now = LocalDateTime.now();
+        if (!AUCTION_ONGOING.equalsIgnoreCase(auction.getStatus())) {
+            throw new BusinessException(400, "拍卖已结束，无法出价");
+        }
+        if (auction.getStartTime() == null || auction.getStartTime().isAfter(now)) {
+            throw new BusinessException(400, "拍卖尚未开始，无法出价");
+        }
+        if (auction.getEndTime() == null || !auction.getEndTime().isAfter(now)) {
             throw new BusinessException(400, "拍卖已结束，无法出价");
         }
         if (Objects.equals(auction.getSellerUserId(), bidderUserId)) {
@@ -566,20 +575,36 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         if (auction.getEndTime() == null || auction.getEndTime().isAfter(LocalDateTime.now())) {
             return;
         }
+        int claimed = productAuctionMapper.update(null, new UpdateWrapper<ProductAuction>()
+                .set("status", AUCTION_SETTLING)
+                .setSql("version = version + 1")
+                .eq("id", auctionId)
+                .eq("status", AUCTION_ONGOING)
+                .le("end_time", LocalDateTime.now()));
+        if (claimed == 0) {
+            return;
+        }
+
         SecondhandProduct product = secondhandProductMapper.selectById(auction.getProductId());
         if (product == null) {
-            productAuctionMapper.update(null, new UpdateWrapper<ProductAuction>()
+            int flowed = productAuctionMapper.update(null, new UpdateWrapper<ProductAuction>()
                     .set("status", AUCTION_FLOW)
                     .eq("id", auctionId)
-                    .eq("status", AUCTION_ONGOING));
+                    .eq("status", AUCTION_SETTLING));
+            if (flowed == 0) {
+                throw new BusinessException(409, "拍卖结算状态冲突，请稍后重试");
+            }
             return;
         }
 
         if (auction.getCurrentBidderUserId() == null || auction.getCurrentPrice() == null) {
-            productAuctionMapper.update(null, new UpdateWrapper<ProductAuction>()
+            int flowed = productAuctionMapper.update(null, new UpdateWrapper<ProductAuction>()
                     .set("status", AUCTION_FLOW)
                     .eq("id", auctionId)
-                    .eq("status", AUCTION_ONGOING));
+                    .eq("status", AUCTION_SETTLING));
+            if (flowed == 0) {
+                throw new BusinessException(409, "拍卖结算状态冲突，请稍后重试");
+            }
             secondhandProductMapper.update(null, new UpdateWrapper<SecondhandProduct>()
                     .set("status", SECONDHAND_OFF_SHELF)
                     .eq("id", product.getId())
@@ -619,16 +644,22 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         orderItem.setStatus(1);
         orderItemMapper.insert(orderItem);
 
-        secondhandProductMapper.update(null, new UpdateWrapper<SecondhandProduct>()
+        int sold = secondhandProductMapper.update(null, new UpdateWrapper<SecondhandProduct>()
                 .set("status", SECONDHAND_SOLD)
                 .eq("id", product.getId())
                 .eq("status", SECONDHAND_ON_SHELF));
+        if (sold == 0) {
+            throw new BusinessException(409, "商品状态已变化，拍卖结算失败");
+        }
 
-        productAuctionMapper.update(null, new UpdateWrapper<ProductAuction>()
+        int finished = productAuctionMapper.update(null, new UpdateWrapper<ProductAuction>()
                 .set("status", AUCTION_FINISHED)
                 .set("settled_order_id", order.getId())
                 .eq("id", auction.getId())
-                .eq("status", AUCTION_ONGOING));
+                .eq("status", AUCTION_SETTLING));
+        if (finished == 0) {
+            throw new BusinessException(409, "拍卖结算状态冲突，请稍后重试");
+        }
 
         realtimePushService.pushToUsers(
                 List.of(auction.getSellerUserId(), auction.getCurrentBidderUserId()),
@@ -832,7 +863,13 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         vo.setStartTime(auction.getStartTime());
         vo.setEndTime(auction.getEndTime());
         vo.setStatus(auction.getStatus());
+        vo.setStatusName(resolveAuctionStatusName(auction.getStatus()));
         vo.setSettledOrderId(auction.getSettledOrderId());
+
+        SecondhandProduct product = secondhandProductMapper.selectById(auction.getProductId());
+        if (product != null) {
+            vo.setProductName(product.getName());
+        }
 
         if (auction.getCurrentBidderUserId() != null) {
             User user = userMapper.selectById(auction.getCurrentBidderUserId());
@@ -845,6 +882,8 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                 .eq(AuctionLog::getAuctionId, auction.getId())
                 .orderByDesc(AuctionLog::getCreateTime)
                 .last("limit 20"));
+        vo.setBidCount(auctionLogMapper.selectCount(new LambdaQueryWrapper<AuctionLog>()
+                .eq(AuctionLog::getAuctionId, auction.getId())));
         Map<Long, User> userMap = new HashMap<>();
         for (AuctionLog log : logs) {
             if (log.getBidderUserId() != null && !userMap.containsKey(log.getBidderUserId())) {
@@ -868,6 +907,9 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
     }
 
     private BigDecimal resolveMinBid(ProductAuction auction) {
+        if (auction.getCurrentBidderUserId() == null) {
+            return auction.getStartPrice() == null ? BigDecimal.ZERO : auction.getStartPrice();
+        }
         if (auction.getCurrentPrice() == null) {
             return auction.getStartPrice();
         }
@@ -875,6 +917,19 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                 ? BigDecimal.ONE
                 : auction.getIncrementAmount();
         return auction.getCurrentPrice().add(increment);
+    }
+
+    private String resolveAuctionStatusName(String status) {
+        if (status == null) {
+            return "未知";
+        }
+        return switch (status.toUpperCase(Locale.ROOT)) {
+            case AUCTION_ONGOING -> "进行中";
+            case AUCTION_SETTLING -> "结算中";
+            case AUCTION_FINISHED -> "已成交";
+            case AUCTION_FLOW -> "已流拍";
+            default -> status;
+        };
     }
 
     private String buildBargainApplyCardMessage(ProductNegotiation negotiation, SecondhandProduct product) {

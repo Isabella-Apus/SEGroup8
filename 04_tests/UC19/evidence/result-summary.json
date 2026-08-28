@@ -1,0 +1,39 @@
+{
+  "uc": "UC19",
+  "status": "PASS",
+  "executedAt": "2026-08-28T15:54:49+08:00",
+  "targetedBackend": {
+    "classes": [
+      "SecondhandTradeControllerUc19WebMvcTest",
+      "SecondhandAuctionLifecycleIntegrationTest",
+      "SecondhandTradeServiceImplTest"
+    ],
+    "tests": 14,
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0
+  },
+  "integration": {
+    "class": "SecondhandAuctionLifecycleIntegrationTest",
+    "tests": 7,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "database": "Testcontainers MySQL 8.4.6"
+  },
+  "fullBackendVerify": {
+    "command": "mvn clean verify",
+    "tests": 161,
+    "passed": 161,
+    "failed": 0,
+    "skipped": 0,
+    "build": "SUCCESS"
+  },
+  "e2e": {
+    "spec": "frontend/e2e/domain-d/uc19-auction.spec.ts",
+    "tests": 1,
+    "passed": 1,
+    "failed": 0,
+    "stack": "Docker Compose: MySQL + Spring Boot + Nginx + Chromium"
+  }
+}
