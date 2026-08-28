@@ -67,10 +67,11 @@ public class ReviewController {
         if (userId == null) {
             throw new BusinessException(401, "未登录");
         }
+        String keyword = request.getKeyword() == null ? null : request.getKeyword().trim();
         LambdaQueryWrapper<Review> wrapper = new LambdaQueryWrapper<Review>()
                 .eq(Review::getUserId, userId)
                 .eq(request.getScore() != null, Review::getScore, request.getScore())
-                .like(StringUtils.hasText(request.getKeyword()), Review::getContent, request.getKeyword().trim())
+                .like(StringUtils.hasText(keyword), Review::getContent, keyword)
                 .orderByDesc(Review::getCreateTime);
 
         if (request.getStartTime() != null) {
@@ -128,10 +129,43 @@ public class ReviewController {
         if (sellerUserId == null) {
             throw new BusinessException(401, "未登录");
         }
+        String keyword = request.getKeyword() == null ? null : request.getKeyword().trim();
+        List<Long> shopIds = shopMapper.selectList(new LambdaQueryWrapper<Shop>()
+                        .eq(Shop::getOwnerUserId, sellerUserId))
+                .stream().map(Shop::getId).toList();
+        List<Long> newProductIds = shopIds.isEmpty()
+                ? List.of()
+                : productMapper.selectList(new LambdaQueryWrapper<Product>()
+                                .in(Product::getShopId, shopIds))
+                        .stream().map(Product::getId).toList();
+        List<Long> secondhandProductIds = secondhandProductMapper.selectList(
+                        new LambdaQueryWrapper<SecondhandProduct>()
+                                .eq(SecondhandProduct::getSellerUserId, sellerUserId))
+                .stream().map(SecondhandProduct::getId).toList();
+
+        PageVO<ReviewVO> empty = emptyPage(request);
+        if (newProductIds.isEmpty() && secondhandProductIds.isEmpty()) {
+            return Result.success(empty);
+        }
+
         LambdaQueryWrapper<Review> wrapper = new LambdaQueryWrapper<Review>()
                 .eq(request.getScore() != null, Review::getScore, request.getScore())
-                .like(StringUtils.hasText(request.getKeyword()), Review::getContent, request.getKeyword().trim())
-                .orderByDesc(Review::getCreateTime);
+                .like(StringUtils.hasText(keyword), Review::getContent, keyword)
+                .orderByDesc(Review::getCreateTime)
+                .orderByDesc(Review::getId);
+        wrapper.and(owned -> {
+            if (!newProductIds.isEmpty()) {
+                owned.and(item -> item.eq(Review::getProductType, "NEW")
+                        .in(Review::getProductId, newProductIds));
+            }
+            if (!secondhandProductIds.isEmpty()) {
+                if (!newProductIds.isEmpty()) {
+                    owned.or();
+                }
+                owned.and(item -> item.eq(Review::getProductType, "SECONDHAND")
+                        .in(Review::getProductId, secondhandProductIds));
+            }
+        });
         if (request.getStartTime() != null) {
             LocalDateTime start = LocalDateTime.ofInstant(Instant.ofEpochMilli(request.getStartTime()), ZoneId.of("Asia/Shanghai"));
             wrapper.ge(Review::getCreateTime, start);
@@ -142,17 +176,23 @@ public class ReviewController {
         }
 
         Page<Review> page = reviewMapper.selectPage(Page.of(request.getPageNum(), request.getPageSize()), wrapper);
-        List<ReviewVO> records = page.getRecords().stream()
-                .filter(r -> isOwnedBySeller(r, sellerUserId))
-                .map(this::toVO)
-                .toList();
+        List<ReviewVO> records = page.getRecords().stream().map(this::toVO).toList();
 
         PageVO<ReviewVO> vo = new PageVO<>();
-        vo.setTotal((long) records.size());
+        vo.setTotal(page.getTotal());
         vo.setPageNum(page.getCurrent());
         vo.setPageSize(page.getSize());
         vo.setRecords(records);
         return Result.success(vo);
+    }
+
+    private PageVO<ReviewVO> emptyPage(ReviewPageQueryRequest request) {
+        PageVO<ReviewVO> vo = new PageVO<>();
+        vo.setTotal(0L);
+        vo.setPageNum(request.getPageNum());
+        vo.setPageSize(request.getPageSize());
+        vo.setRecords(List.of());
+        return vo;
     }
 
     @Operation(summary = "卖家回复评价")
@@ -243,4 +283,3 @@ public class ReviewController {
         return Result.success();
     }
 }
-
