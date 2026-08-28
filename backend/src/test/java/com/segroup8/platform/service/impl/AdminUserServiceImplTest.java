@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -73,5 +74,41 @@ class AdminUserServiceImplTest {
         BusinessException ex = assertThrows(BusinessException.class, () -> adminUserService.banUser(2L));
 
         assertEquals(403, ex.getCode());
+    }
+
+    @Test
+    void unbanUser_shouldRestoreNormalStatus() {
+        UserContext.setUserId(1L);
+        User admin = new User();
+        admin.setId(1L);
+        admin.setRole(RoleEnum.ADMIN.name());
+
+        User target = new User();
+        target.setId(2L);
+        target.setStatus(UserStatusEnum.BANNED.name());
+
+        when(userMapper.selectById(1L)).thenReturn(admin);
+        when(userMapper.selectById(2L)).thenReturn(target);
+
+        adminUserService.unbanUser(2L);
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        verify(userMapper).updateById(captor.capture());
+        assertEquals(UserStatusEnum.NORMAL.name(), captor.getValue().getStatus());
+    }
+
+    @Test
+    void banUser_shouldRejectSelfBan() {
+        UserContext.setUserId(1L);
+        User admin = new User();
+        admin.setId(1L);
+        admin.setRole(RoleEnum.ADMIN.name());
+        when(userMapper.selectById(1L)).thenReturn(admin);
+
+        BusinessException ex = assertThrows(BusinessException.class,
+                () -> adminUserService.banUser(1L));
+
+        assertEquals(400, ex.getCode());
+        verify(userMapper, never()).updateById(org.mockito.ArgumentMatchers.any(User.class));
     }
 }
