@@ -1,0 +1,6 @@
+classDiagram
+  class MerchantApplication { Long id; Long userId; Integer status; String rejectReason }
+  class User { Long id; String role; String shopName }
+  class Shop { Long id; Long ownerUserId; Integer status }
+  MerchantApplication "1" --> "1" User
+  User "1" --> "0..1" Shop
