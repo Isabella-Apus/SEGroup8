@@ -1,0 +1,37 @@
+classDiagram
+    class SecondhandProduct {
+      Long id
+      Long sellerUserId
+      BigDecimal salePrice
+      Integer status
+    }
+    class Address {
+      Long id
+      Long userId
+      String detailAddress
+    }
+    class ProductNegotiation {
+      Long productId
+      Long buyerUserId
+      BigDecimal confirmedPrice
+      LocalDateTime effectiveFrom
+      LocalDateTime effectiveUntil
+      String status
+    }
+    class OrderInfo {
+      Long id
+      Long buyerUserId
+      BigDecimal payableAmount
+      Integer payStatus
+      Integer orderStatus
+    }
+    class OrderItem {
+      Long orderId
+      String productType
+      Long productId
+      BigDecimal price
+    }
+    SecondhandProduct "1" --> "0..1" ProductNegotiation
+    Address --> OrderInfo : 快照
+    SecondhandProduct --> OrderItem
+    OrderInfo "1" --> "1" OrderItem

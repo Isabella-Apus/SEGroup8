@@ -655,12 +655,14 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         if (productId == null || buyerUserId == null) {
             return null;
         }
+        LocalDateTime now = LocalDateTime.now();
         return productNegotiationMapper.selectOne(new LambdaQueryWrapper<ProductNegotiation>()
                 .eq(ProductNegotiation::getProductId, productId)
                 .eq(ProductNegotiation::getBuyerUserId, buyerUserId)
                 .eq(ProductNegotiation::getStatus, NEGOTIATION_CONFIRMED)
                 .isNull(ProductNegotiation::getUsedOrderId)
-                .ge(ProductNegotiation::getEffectiveUntil, LocalDateTime.now())
+                .le(ProductNegotiation::getEffectiveFrom, now)
+                .ge(ProductNegotiation::getEffectiveUntil, now)
                 .orderByDesc(ProductNegotiation::getEffectiveUntil)
                 .last("limit 1"));
     }

@@ -390,7 +390,7 @@ public class OrderServiceImpl implements OrderService {
         }
         boolean isUnpaid = order.getPayStatus() == null || Integer.valueOf(0).equals(order.getPayStatus());
         if (isUnpaid) {
-            restoreStockForNewItems(orderId);
+            restoreItemsForUnpaidCancellation(orderId);
             voucherService.releaseForCanceledOrder(order.getVoucherId(), userId, orderId);
         }
         List<Long> sellerUserIds = resolveSellerUserIds(orderId);
@@ -1553,6 +1553,20 @@ public class OrderServiceImpl implements OrderService {
             }
             productMapper.updateById(product);
         }
+    }
+
+    private void restoreItemsForUnpaidCancellation(Long orderId) {
+        List<OrderItem> items = orderItemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
+                .eq(OrderItem::getOrderId, orderId));
+        for (OrderItem item : items) {
+            if ("SECONDHAND".equalsIgnoreCase(item.getProductType())) {
+                secondhandProductMapper.update(null, new UpdateWrapper<SecondhandProduct>()
+                        .set("status", 1)
+                        .eq("id", item.getProductId())
+                        .eq("status", 3));
+            }
+        }
+        restoreStockForNewItems(orderId);
     }
 
     @Override

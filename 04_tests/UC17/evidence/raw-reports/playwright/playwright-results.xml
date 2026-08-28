@@ -1,0 +1,11 @@
+<testsuites id="" name="" tests="1" failures="0" skipped="0" errors="0" time="27.279508999999997">
+<testsuite name="domain-d\uc17-direct-purchase.spec.ts" timestamp="2026-08-27T17:50:51.556Z" hostname="" tests="1" failures="0" skipped="0" time="22.297" errors="0">
+<testcase name="@DOMAIN_D @UC17 direct secondhand purchase › creates one pending order through the real UI and rejects a repeated purchase" classname="domain-d\uc17-direct-purchase.spec.ts" time="22.297">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-d-uc17-direct-purch-71cb6-rejects-a-repeated-purchase\attachments\uc17-pending-order-and-sold-product-4dfd9075fd8d098b50c0c9c5e5ff3647cf41368b.png]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>
