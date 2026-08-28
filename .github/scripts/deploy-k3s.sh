@@ -65,6 +65,7 @@ helm upgrade --install segroup8 "$chart_dir" \
   --set-string "backend.image.tag=$image_tag" \
   --set-string "frontend.image.repository=$registry/$registry_namespace/frontend" \
   --set-string "frontend.image.tag=$image_tag" \
+  --set-string "mysql.image.repository=$registry/$registry_namespace/mysql" \
   --set-string "deployment.version=$image_tag" \
   --set-string "deployment.commit=$release_id" \
   --set-string "deployment.buildTime=$build_time" \
