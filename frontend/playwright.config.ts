@@ -49,5 +49,8 @@ export default defineConfig({
         screenshot: "only-on-failure",
         video: "retain-on-failure",
         ...devices["Desktop Chrome"],
+        ...(process.env.E2E_BROWSER_CHANNEL
+            ? { channel: process.env.E2E_BROWSER_CHANNEL }
+            : {}),
     },
 });

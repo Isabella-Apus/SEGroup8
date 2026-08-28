@@ -1,0 +1,16 @@
+@base = http://127.0.0.1:8088/api
+@sellerToken = REPLACE_WITH_SELLER_JWT
+@buyerToken = REPLACE_WITH_BUYER_JWT
+@voucherId = 1
+
+### 卖家券列表
+GET {{base}}/voucher/seller/list
+Authorization: Bearer {{sellerToken}}
+
+### 关闭本人优惠券
+POST {{base}}/voucher/seller/{{voucherId}}/close
+Authorization: Bearer {{sellerToken}}
+
+### 普通用户访问管理员入口，应返回业务码 403
+GET {{base}}/voucher/admin/list
+Authorization: Bearer {{buyerToken}}

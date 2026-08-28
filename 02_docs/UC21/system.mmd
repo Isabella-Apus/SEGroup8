@@ -1,0 +1,10 @@
+flowchart LR
+    Seller[官方卖家] --> UI[SellerVoucher]
+    Admin[管理员] --> AUI[AdminVoucherView]
+    UI --> VC[VoucherController]
+    AUI --> VC
+    VC --> VS[VoucherService]
+    VS --> UM[UserMapper]
+    VS --> SM[ShopMapper]
+    VS --> VM[VoucherMapper]
+    VM --> V[(voucher)]

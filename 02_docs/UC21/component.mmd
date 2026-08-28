@@ -1,0 +1,19 @@
+flowchart LR
+  subgraph Browser[前端]
+    Seller[SellerVoucher.vue]
+    Admin[AdminVoucherView.vue]
+    Api[voucher.js]
+  end
+  subgraph Backend[后端应用]
+    Auth[认证与角色校验]
+    Controller[VoucherController]
+    Service[VoucherService]
+    Mapper[VoucherMapper]
+  end
+  DB[(voucher)]
+  Seller --> Api
+  Admin --> Api
+  Api -->|/api/voucher/seller/**\n/api/voucher/admin/**| Auth
+  Auth --> Controller --> Service
+  Service -->|规则、所有权、状态校验| Service
+  Service --> Mapper --> DB
