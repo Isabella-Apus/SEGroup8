@@ -1,0 +1,56 @@
+{
+  "uc": "UC20",
+  "status": "PASS",
+  "executedAt": "2026-08-28T19:34:07+08:00",
+  "targetedBackend": {
+    "classes": [
+      "OrderControllerUc20WebMvcTest",
+      "SecondhandFulfillmentLifecycleIntegrationTest",
+      "SecondhandOrderFlowIntegrationTest",
+      "OrderServiceImplTest"
+    ],
+    "tests": 15,
+    "passed": 15,
+    "failed": 0,
+    "skipped": 0
+  },
+  "compatibilityRegression": {
+    "classes": [
+      "OrderControllerUc20WebMvcTest",
+      "SecondhandFulfillmentLifecycleIntegrationTest",
+      "SecondhandOrderFlowIntegrationTest",
+      "OrderServiceImplTest",
+      "NewProductFulfillmentUc13IntegrationTest",
+      "EngagementFinanceApiAndE2ETest"
+    ],
+    "tests": 24,
+    "passed": 24,
+    "failed": 0,
+    "skipped": 0
+  },
+  "integration": {
+    "class": "SecondhandFulfillmentLifecycleIntegrationTest",
+    "tests": 6,
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0,
+    "database": "Testcontainers MySQL 8.4.6"
+  },
+  "fullBackendVerify": {
+    "command": "mvn clean verify",
+    "reportFiles": 60,
+    "tests": 203,
+    "passed": 203,
+    "failed": 0,
+    "skipped": 0,
+    "build": "SUCCESS"
+  },
+  "e2e": {
+    "spec": "frontend/e2e/domain-d/uc20-fulfillment.spec.ts",
+    "tests": 1,
+    "passed": 1,
+    "failed": 0,
+    "durationMs": 51635,
+    "stack": "Docker Compose: MySQL + Spring Boot + Nginx + Chromium"
+  }
+}

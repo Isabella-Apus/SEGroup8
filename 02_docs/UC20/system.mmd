@@ -1,0 +1,33 @@
+sequenceDiagram
+    actor Seller as 二手卖家
+    actor Buyer as 买家
+    participant UI as Vue/Nginx
+    participant OrderAPI as OrderController
+    participant OrderService as OrderServiceImpl
+    participant Logistics as LogisticsService
+    participant Settlement as EscrowSettlementService
+    participant DB as MySQL
+    participant Notify as Notification/Realtime
+
+    Buyer->>OrderAPI: 支付成交订单
+    OrderService->>DB: order_status=待发货, pay_status=已支付
+    Seller->>UI: 打开我卖出的闲置
+    Seller->>OrderAPI: POST /order/{id}/ship
+    OrderService->>DB: 校验卖家、付款、状态和 version
+    OrderService->>DB: 原子更新为已发货
+    OrderService->>Logistics: 初始化唯一物流模板与首节点
+    OrderService-->>Notify: 事务提交后通知买家
+    Buyer->>UI: 打开二手订单详情
+    UI->>OrderAPI: 查询订单详情和物流轨迹
+    OrderAPI-->>Buyer: 待收货、包裹已揽收
+    Buyer->>OrderAPI: POST /order/{id}/confirm-receive
+    OrderService->>DB: 校验买家、状态和 version
+    OrderService->>DB: 原子更新为待评价
+    OrderService->>Settlement: 释放担保资金
+    Settlement->>DB: 卖家个人钱包入账并写资金流水
+    alt 结算失败
+        DB-->>OrderService: 回滚订单状态、余额和流水
+    else 提交成功
+        OrderService-->>Notify: 提交后通知卖家并推送状态
+        OrderService-->>Buyer: 待评价订单
+    end

@@ -1,0 +1,23 @@
+flowchart LR
+    SoldView[SecondhandSoldView] --> OrderAPI[OrderController]
+    DetailView[SecondhandOrderDetailView] --> OrderAPI
+    DetailView --> LogisticsAPI[LogisticsController]
+    OrderAPI --> OrderService[OrderServiceImpl]
+    LogisticsAPI --> LogisticsService[LogisticsServiceImpl]
+    OrderService --> OrderMapper[OrderInfoMapper]
+    OrderService --> ItemMapper[OrderItemMapper]
+    OrderService --> LogisticsService
+    OrderService --> Settlement[EscrowSettlementService]
+    Settlement --> Strategy[SecondhandSettlementStrategy]
+    Settlement --> BalanceMapper[BalanceMapper]
+    Settlement --> RecordMapper[TransactionRecordMapper]
+    LogisticsService --> TemplateMapper[LogisticsPathTemplateMapper]
+    LogisticsService --> TraceMapper[LogisticsTraceMapper]
+    OrderService -. 提交后 best-effort .-> Notify[NotificationService]
+    OrderService -. 提交后 best-effort .-> Realtime[RealtimePushService]
+    OrderMapper --> DB[(MySQL)]
+    ItemMapper --> DB
+    BalanceMapper --> DB
+    RecordMapper --> DB
+    TemplateMapper --> DB
+    TraceMapper --> DB

@@ -273,7 +273,7 @@ function nextCopy(order) {
 }
 
 function canShip(order) {
-  return Number(order?.orderStatus) === 1;
+  return Number(order?.orderStatus) === 1 && Number(order?.payStatus) === 1;
 }
 
 function canPushLogistics(order) {
