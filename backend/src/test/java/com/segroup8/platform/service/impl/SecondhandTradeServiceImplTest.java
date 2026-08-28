@@ -169,7 +169,6 @@ class SecondhandTradeServiceImplTest {
     void placeBid_shouldRejectBidLowerThanMinimumIncrement() {
         UserContext.setUserId(5L);
         ProductAuction auction = ongoingAuction();
-        auction.setCurrentBidderUserId(4L);
         AuctionBidRequest request = new AuctionBidRequest();
         request.setBidAmount(new BigDecimal("105.00"));
         when(productAuctionMapper.selectById(11L)).thenReturn(auction);
