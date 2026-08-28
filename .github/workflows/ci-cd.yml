@@ -92,35 +92,35 @@ jobs:
 
   # Level 2: every domain uses the same reusable workflow and Maven cache.
   domain-a:
-    name: DomainA(UC01-05)
+    name: Domain A (UC01-05)
     needs: [frontend, backend-platform]
     uses: ./.github/workflows/_domain-tests.yml
     with:
       domain: A
 
   domain-b:
-    name: DomainB(UC06-10)
+    name: Domain B (UC06-10)
     needs: [frontend, backend-platform]
     uses: ./.github/workflows/_domain-tests.yml
     with:
       domain: B
 
   domain-c:
-    name: DomainC(UC11-15)
+    name: Domain C (UC11-15)
     needs: [frontend, backend-platform]
     uses: ./.github/workflows/_domain-tests.yml
     with:
       domain: C
 
   domain-d:
-    name: DomainD(UC16-20)
+    name: Domain D (UC16-20)
     needs: [frontend, backend-platform]
     uses: ./.github/workflows/_domain-tests.yml
     with:
       domain: D
 
   domain-e:
-    name: DomainE(UC21-25)
+    name: Domain E (UC21-25)
     needs: [frontend, backend-platform]
     uses: ./.github/workflows/_domain-tests.yml
     with:
@@ -152,63 +152,10 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-  # Level 3: prove the tested artifacts boot together before the full UC run.
+  # Levels 3 and 4: one full-stack lifecycle runs smoke and every UC E2E suite.
   playwright:
-    name: Playwright full-stack smoke
-    # needs: [domain-a, domain-b, domain-c, domain-d, domain-e, uc-e2e-coverage]
+    name: Playwright smoke and all UC E2E tests
     needs: [domain-a, domain-b, domain-c, domain-d, domain-e]
-    runs-on: ubuntu-latest
-    timeout-minutes: 35
-    env:
-      CI: "true"
-      E2E_USERNAME: user
-      E2E_PASSWORD: user123
-      E2E_ROLE: USER
-      E2E_ADMIN_USERNAME: admin
-      E2E_ADMIN_PASSWORD: admin123
-      E2E_OFFICIAL_SELLER_USERNAME: seller
-      E2E_OFFICIAL_SELLER_PASSWORD: seller123
-      E2E_BUYER_USERNAME: user
-      E2E_BUYER_PASSWORD: user123
-      E2E_THIRD_PARTY_USERNAME: third
-      E2E_THIRD_PARTY_PASSWORD: third123
-      COMPOSE_FILE: compose.yml:compose.e2e.yml
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-      - name: Download tested backend JAR
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-jar
-          path: backend/target
-      - name: Download built frontend
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-dist
-          path: frontend/dist
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
-      - name: Start MySQL, backend JAR, and frontend; run Playwright smoke
-        run: |
-          chmod +x scripts/e2e/run-compose-e2e.sh
-          scripts/e2e/run-compose-e2e.sh e2e/smoke --workers=1
-      - name: Upload Playwright smoke evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-smoke-evidence
-          path: 04_tests/platform-e2e/evidence/**
-          if-no-files-found: warn
-          retention-days: 14
-
-  # Level 4: a fresh full stack runs every checked-in UC E2E suite.
-  all-e2e-tests:
-    name: All UC E2E tests
-    needs: [playwright]
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -244,22 +191,44 @@ jobs:
           node-version: "20"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
-      - name: Start full stack and run all Domain A-E E2E suites
+      - name: Start full stack once and run smoke plus all Domain A-E E2E suites
+        id: e2e
         run: |
           chmod +x scripts/e2e/run-compose-e2e.sh
           scripts/e2e/run-compose-e2e.sh \
+            --smoke-first e2e/smoke -- \
             e2e/domain-a \
             e2e/domain-b \
             e2e/domain-c \
             e2e/domain-d \
             e2e/domain-e \
             --workers=1
-      - name: Upload all UC E2E evidence
+      - name: Download Domain A-E structured summaries
+        if: always()
+        uses: actions/download-artifact@v4
+        with:
+          pattern: domain-*-test-evidence
+          path: .ci/domain-test-evidence
+      - name: Generate final test summary
+        if: always()
+        shell: pwsh
+        env:
+          E2E_STEP_OUTCOME: ${{ steps.e2e.outcome }}
+        run: >-
+          ./scripts/test/summarize-ci-tests.ps1
+          -DomainEvidenceRoot .ci/domain-test-evidence
+          -PlaywrightEvidenceRoot 04_tests/platform-e2e/evidence
+          -OutputDirectory 04_tests/pipeline-summary
+          -E2EOutcome $env:E2E_STEP_OUTCOME
+      - name: Upload combined E2E evidence and final summary
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: all-uc-e2e-evidence
-          path: 04_tests/platform-e2e/evidence/**
+          path: |
+            04_tests/platform-e2e/evidence/**
+            04_tests/pipeline-summary/final-test-summary.json
+            04_tests/pipeline-summary/final-test-summary.md
           if-no-files-found: warn
           retention-days: 14
 
@@ -294,7 +263,7 @@ jobs:
     if: >-
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main' 
-    needs: [all-e2e-tests, delivery-config]
+    needs: [playwright, delivery-config]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
@@ -410,7 +379,7 @@ jobs:
   release:
     name: Create GitHub release
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    needs: [all-e2e-tests]
+    needs: [playwright]
     runs-on: ubuntu-latest
     permissions:
       contents: write
