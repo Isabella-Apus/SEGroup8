@@ -32,6 +32,7 @@ test.describe("@DOMAIN_D @UC17 direct secondhand purchase", () => {
                 data: {
                     name: productName,
                     description: "UC17 real Compose direct-purchase fixture",
+                    images: ["/uploads/e2e-secondhand-product.svg"],
                     originPrice: 199,
                     salePrice: 88,
                     categoryId: 1,
