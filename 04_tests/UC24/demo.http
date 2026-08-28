@@ -1,0 +1,72 @@
+@base = http://127.0.0.1:8088/api
+@buyerToken = REPLACE_WITH_BUYER_JWT
+@sellerToken = REPLACE_WITH_SELLER_JWT
+@outsiderToken = REPLACE_WITH_THIRD_PARTY_JWT
+@sellerUserId = 2
+@buyerUserId = 3
+@conversationId = REPLACE_WITH_CONVERSATION_ID
+
+### 买家按商品创建或取得会话
+POST {{base}}/chat/conversations
+Authorization: Bearer {{buyerToken}}
+Content-Type: application/json
+
+{
+  "targetUserId": {{sellerUserId}},
+  "sourceType": "PRODUCT",
+  "sourceId": 1
+}
+
+### 卖家重复创建，应返回同一 conversationId
+POST {{base}}/chat/conversations
+Authorization: Bearer {{sellerToken}}
+Content-Type: application/json
+
+{
+  "targetUserId": {{buyerUserId}},
+  "sourceType": "PRODUCT",
+  "sourceId": 1
+}
+
+### 当前用户会话列表
+GET {{base}}/chat/conversations
+Authorization: Bearer {{buyerToken}}
+
+### 买家发送消息
+POST {{base}}/chat/conversations/{{conversationId}}/messages
+Authorization: Bearer {{buyerToken}}
+Content-Type: application/json
+
+{
+  "content": "UC24 demo message"
+}
+
+### 卖家读取历史并把收到的消息标为已读
+GET {{base}}/chat/conversations/{{conversationId}}/messages
+Authorization: Bearer {{sellerToken}}
+
+### 第三方读取，应返回业务码 403
+GET {{base}}/chat/conversations/{{conversationId}}/messages
+Authorization: Bearer {{outsiderToken}}
+
+### 第三方发送，应返回业务码 403
+POST {{base}}/chat/conversations/{{conversationId}}/messages
+Authorization: Bearer {{outsiderToken}}
+Content-Type: application/json
+
+{
+  "content": "must be rejected"
+}
+
+### 买家拉黑卖家，之后双方均不能向该会话发送
+POST {{base}}/report-block/block
+Authorization: Bearer {{buyerToken}}
+Content-Type: application/json
+
+{
+  "targetUserId": {{sellerUserId}}
+}
+
+### 清理演示拉黑关系
+DELETE {{base}}/report-block/block/{{sellerUserId}}
+Authorization: Bearer {{buyerToken}}

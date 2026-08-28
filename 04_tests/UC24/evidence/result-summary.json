@@ -1,0 +1,23 @@
+{
+  "uc": "UC24",
+  "status": "PASS",
+  "environment": "Windows 11, Java 21, H2 backend tests; real Compose Nginx + Spring Boot + MySQL; Playwright with Microsoft Edge",
+  "executedAt": "2026-08-28T19:06:54+08:00",
+  "counts": {
+    "passed": 12,
+    "failed": 0,
+    "skipped": 0
+  },
+  "evidence": [
+    "raw-reports/TEST-com.segroup8.platform.controller.ChatControllerUc24WebMvcTest.xml",
+    "raw-reports/TEST-com.segroup8.platform.integration.ChatFlowUc24IntegrationTest.xml",
+    "raw-reports/TEST-com.segroup8.platform.service.impl.ChatServiceImplTest.xml",
+    "raw-reports/TEST-com.segroup8.platform.service.impl.UC24ChatAuthorizationTest.xml",
+    "raw-reports/playwright/playwright-results.json",
+    "raw-reports/playwright/playwright-results.xml",
+    "raw-reports/playwright/playwright-report/index.html",
+    "screenshots/uc24-chat-history-and-block.png",
+    "logs/runtime-health.txt",
+    "../test-report.md"
+  ]
+}
