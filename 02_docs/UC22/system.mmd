@@ -1,0 +1,25 @@
+sequenceDiagram
+    actor Buyer as 买家
+    participant UI as Vue 前端
+    participant Voucher as VoucherController
+    participant Order as OrderController
+    participant Service as VoucherService / OrderServiceImpl
+    participant DB as MySQL
+
+    Buyer->>UI: 点击立即领取
+    UI->>Voucher: POST /api/voucher/{id}/claim
+    Voucher->>Service: 校验领取期、状态和余量
+    Service->>DB: INSERT user_voucher
+    DB-->>UI: 待使用
+
+    Buyer->>UI: 选择优惠券并提交订单
+    UI->>Order: POST /api/order/create
+    Order->>Service: 校验店铺小计和金额门槛
+    Service->>DB: 保存订单金额并占用用户券
+    DB-->>UI: 待付款订单
+
+    Buyer->>UI: 确认支付
+    UI->>Order: POST /api/order/{id}/pay
+    Order->>Service: 更新订单并核销用户券
+    Service->>DB: user_voucher.status=2
+    DB-->>UI: 待发货 / 已使用

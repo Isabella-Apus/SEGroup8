@@ -1,0 +1,31 @@
+classDiagram
+    class Voucher {
+        +Long id
+        +Long shopId
+        +BigDecimal minAmount
+        +BigDecimal discountAmount
+        +Integer usedCount
+    }
+    class UserVoucher {
+        +Long userId
+        +Long voucherId
+        +Integer status
+        +Long usedOrderId
+    }
+    class OrderInfo {
+        +Long id
+        +Long voucherId
+        +BigDecimal totalAmount
+        +BigDecimal voucherDiscountAmount
+        +BigDecimal payableAmount
+        +Integer orderStatus
+    }
+    class VoucherService
+    class OrderServiceImpl
+
+    Voucher "1" --> "0..*" UserVoucher
+    UserVoucher "0..1" --> "1" OrderInfo : usedOrderId
+    OrderServiceImpl --> VoucherService
+    VoucherService --> Voucher
+    VoucherService --> UserVoucher
+    OrderServiceImpl --> OrderInfo
