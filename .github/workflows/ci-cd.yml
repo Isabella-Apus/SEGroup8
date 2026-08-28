@@ -365,7 +365,7 @@ jobs:
     name: Deploy images to production K3s
     needs: publish-images
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 45
     environment: production
     steps:
       - name: Check out deployment configuration
