@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ActiveProfiles("test")
 @Sql(scripts = "classpath:integration/full-flow-setup.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Tag(DomainCTestTags.DOMAIN_C)
-@Tag(DomainCTestTags.UC14)
+@Tag(DomainCTestTags.PLATFORM)
 class OrderSettlementRefundFlowIntegrationTest {
 
     @Autowired
