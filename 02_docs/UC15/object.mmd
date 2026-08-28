@@ -1,0 +1,21 @@
+classDiagram
+    class OrderInfo {
+      Long id
+      Long buyerUserId
+      Integer orderStatus
+    }
+    class Review {
+      Long id
+      Long orderId
+      Long buyerUserId
+      Integer rating
+      String content
+      String followUpContent
+    }
+    class ReviewReply {
+      Long reviewId
+      Long sellerUserId
+      String content
+    }
+    OrderInfo "1" --> "0..1" Review
+    Review "1" o-- "0..1" ReviewReply

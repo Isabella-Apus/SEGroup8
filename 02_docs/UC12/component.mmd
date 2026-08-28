@@ -1,0 +1,10 @@
+flowchart LR
+    Buyer[买家] --> UI[订单页面]
+    UI --> C[OrderController]
+    C --> S[OrderServiceImpl]
+    S --> V[归属/状态/金额校验]
+    V --> O[(order_info)]
+    V --> I[(order_item)]
+    S --> P[支付/取消结果]
+    P --> C
+    C --> UI

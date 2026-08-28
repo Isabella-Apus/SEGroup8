@@ -1,0 +1,19 @@
+sequenceDiagram
+    actor Buyer as 买家
+    actor Seller as 卖家
+    actor Admin as 管理员
+    participant API as OrderController
+    participant S as OrderServiceImpl
+    participant F as 退款/钱包服务
+    participant DB as 订单与退款表
+    Buyer->>API: 提交售后/退款申请
+    API->>S: 校验买家归属和可退款状态
+    S->>DB: 保存申请
+    Seller->>API: 同意或驳回
+    API->>S: 校验卖家归属和审核状态
+    S->>DB: 更新审核结果
+    Admin->>API: 管理员复核/执行退款
+    API->>S: 校验管理员权限
+    S->>F: 返还或冻结资金
+    F->>DB: 写入退款结果
+    API-->>Buyer: 返回最终状态

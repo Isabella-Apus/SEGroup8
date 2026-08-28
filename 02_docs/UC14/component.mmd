@@ -1,0 +1,10 @@
+flowchart LR
+    Buyer[买家] --> C[OrderController]
+    Seller[卖家] --> C
+    Admin[管理员] --> C
+    C --> S[OrderServiceImpl]
+    S --> R[退款模式/归属/状态校验]
+    R --> O[(order_info)]
+    R --> RF[(refund record)]
+    S --> F[钱包/退款服务]
+    F --> W[(wallet/ledger)]
