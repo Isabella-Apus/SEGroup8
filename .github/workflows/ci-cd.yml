@@ -126,10 +126,35 @@ jobs:
     with:
       domain: E
 
+  uc-e2e-coverage:
+    name: 2 / UC01-UC25 browser coverage manifest
+    needs: [frontend]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Require one correctly placed Playwright spec per UC
+        env:
+          UC_E2E_COVERAGE_REPORT: .ci/uc-e2e-coverage.json
+        run: node scripts/ci/verify-uc-e2e-coverage.mjs
+      - name: Upload UC coverage manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uc01-uc25-e2e-coverage
+          path: .ci/uc-e2e-coverage.json
+          if-no-files-found: error
+          retention-days: 14
+
   # Level 3: prove the tested artifacts boot together before the full UC run.
   playwright:
     name: 3 / Playwright full-stack smoke
-    needs: [domain-a, domain-b, domain-c, domain-d, domain-e]
+    needs: [domain-a, domain-b, domain-c, domain-d, domain-e, uc-e2e-coverage]
     runs-on: ubuntu-latest
     timeout-minutes: 35
     env:

@@ -17,3 +17,16 @@ The shared security boundary is covered by the tagged `PLATFORM` test
 `JwtAuthInterceptorTest` and the reusable `microservices/security-contract`
 module. The contract exposes `JwtPrincipal(uid, username, role)` and rejects
 missing, malformed, tampered, expired, or weak-secret JWT configurations.
+
+The A-E labels are delivery/test domains, not a requirement to deploy exactly
+five services. The reviewed runtime boundary, offline JWT dependency model,
+complete API ownership, and table ownership are maintained in:
+
+- [Microservice boundaries](../../architecture/microservice-boundaries.md)
+- [Service API catalog](../../architecture/service-api-catalog.md)
+- [Database ownership](../../architecture/database-ownership.md)
+
+Login is a business prerequisite for protected use cases, but other services
+must validate a signed token locally instead of calling Domain A on every
+request. Ban/role changes propagate through short-lived tokens and versioned
+access-change events as described in the architecture source above.
