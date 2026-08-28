@@ -12,7 +12,7 @@
 | UC21 | #142 | PENDING：由独立 PR 提供 |
 | UC22 | #143 | PENDING：由独立 PR 提供 |
 | UC23 | #144 | PENDING：由独立 PR 提供 |
-| UC24 | #145 | PENDING：由独立 PR 提供 |
+| UC24 | #145 | PASS：独立 PR 提供需求、设计、后端测试、真实 Edge E2E 与证据 |
 | UC25 | #146 | PENDING：由独立 PR 提供 |
 
 ## 输出要求
