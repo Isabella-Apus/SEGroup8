@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "generatedAtUtc": "2026-08-27T17:06:05.6300081Z",
+  "useCase": "UC16",
+  "scope": "secondhand-product-management",
+  "result": "PASS",
+  "classifications": {
+    "integration": "PASS",
+    "composeE2E": "PASS"
+  },
+  "totals": {
+    "tests": 11,
+    "passed": 11,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "runs": [
+    {
+      "environment": "Spring Boot + H2",
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "durationSeconds": 23.57,
+      "report": "raw-reports/surefire/TEST-com.segroup8.platform.integration.SecondhandProductManagementIntegrationTest-uc16-h2.xml"
+    },
+    {
+      "environment": "Spring Boot + Compose MySQL 8",
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "durationSeconds": 22.873,
+      "report": "raw-reports/mysql/TEST-com.segroup8.platform.integration.SecondhandProductManagementIntegrationTest-uc16-mysql.xml"
+    },
+    {
+      "environment": "Compose Nginx + Spring Boot + MySQL + Chromium",
+      "tests": 1,
+      "passed": 1,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "durationSeconds": 47.718469,
+      "report": "raw-reports/playwright/playwright-results.xml",
+      "json": "raw-reports/playwright/playwright-results.json"
+    }
+  ],
+  "screenshots": [
+    "screenshots/uc16-product-persisted-off-shelf.png",
+    "screenshots/uc16-product-deleted-after-refresh.png"
+  ],
+  "regression": {
+    "domainD": {
+      "tests": 25,
+      "passed": 25,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "log": "logs/domain-d-targeted.log"
+    },
+    "backendCleanVerify": {
+      "tests": 100,
+      "passed": 100,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "log": "logs/backend-clean-verify.log"
+    },
+    "frontendBuildReal": {
+      "result": "PASS",
+      "modulesTransformed": 2421,
+      "log": "logs/frontend-build-real.log"
+    }
+  }
+}

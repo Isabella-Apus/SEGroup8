@@ -240,6 +240,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         validatePriceFields(request.getOriginPrice(), request.getSalePrice());
         validateSecondhandCategory(request.getCategoryId(), request.getSubCategoryId());
         SecondhandProduct product = getSellerOwnedProduct(productId);
+        ensureProductMutable(product);
         product.setName(request.getName().trim());
         List<String> images = normalizeImages(request.getImages(), request.getCover());
         product.setCover(firstImage(images));
@@ -262,12 +263,14 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
     @Override
     public void deleteSellerProduct(Long productId) {
         SecondhandProduct product = getSellerOwnedProduct(productId);
+        ensureProductMutable(product);
         secondhandProductMapper.deleteById(product.getId());
     }
 
     @Override
     public SecondhandProductVO changeSellerProductStatus(Long productId, Integer status) {
         SecondhandProduct product = getSellerOwnedProduct(productId);
+        ensureProductMutable(product);
         product.setStatus(normalizeStatus(status, null));
         secondhandProductMapper.updateById(product);
         return toVO(secondhandProductMapper.selectById(productId));
@@ -473,6 +476,12 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
             throw new BusinessException(403, "无权操作该二手商品");
         }
         return product;
+    }
+
+    private void ensureProductMutable(SecondhandProduct product) {
+        if (Objects.equals(product.getStatus(), SOLD)) {
+            throw new BusinessException(400, "已售商品不能编辑、上架或删除");
+        }
     }
 
     private PageVO<SecondhandProductVO> toPageVO(Page<SecondhandProduct> page) {

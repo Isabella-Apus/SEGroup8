@@ -69,6 +69,7 @@ class SecondhandProductControllerUc16WebMvcTest {
                         .content("""
                                 {
                                   "name": "二手教材",
+                                  "images": ["/uploads/uc16-book.png"],
                                   "originPrice": 120.00,
                                   "salePrice": 68.00,
                                   "categoryId": 1,
