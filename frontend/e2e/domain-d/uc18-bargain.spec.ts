@@ -33,6 +33,7 @@ test.describe("@DOMAIN_D @UC18 secondhand bargain", () => {
                 data: {
                     name: productName,
                     description: "UC18 real Compose bargain fixture",
+                    images: ["/uploads/e2e-secondhand-product.svg"],
                     originPrice: 188,
                     salePrice: 98,
                     categoryId: 1,
