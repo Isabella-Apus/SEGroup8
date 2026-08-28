@@ -18,6 +18,7 @@
       <article
         v-for="item in notifications"
         :key="item.id"
+        :data-notification-id="item.id"
         class="notification-item"
         :class="{ unread: Number(item.isRead) === 0, clickable: Boolean(item.targetPath) }"
         @click="openNotification(item)"
@@ -114,6 +115,10 @@ async function markAllRead() {
 function handleRealtimeEvent(event) {
   const detail = event?.detail;
   if (!detail) {
+    return;
+  }
+  if (detail.eventType === "REALTIME_RECONNECTED") {
+    fetchNotifications();
     return;
   }
   if (detail.eventType === "NOTIFICATION_CREATED" && detail.payload) {

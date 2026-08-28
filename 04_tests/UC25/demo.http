@@ -1,0 +1,22 @@
+@base = http://127.0.0.1:8088/api
+@buyerToken = REPLACE_WITH_BUYER_JWT
+@notificationId = REPLACE_WITH_NOTIFICATION_ID
+
+### 当前用户全部通知
+GET {{base}}/notifications
+Authorization: Bearer {{buyerToken}}
+
+### 当前用户买家范围通知
+GET {{base}}/notifications?scope=buyer
+Authorization: Bearer {{buyerToken}}
+
+### 标记本人单条通知已读
+POST {{base}}/notifications/{{notificationId}}/read
+Authorization: Bearer {{buyerToken}}
+
+### 标记本人卖家范围通知已读
+POST {{base}}/notifications/read-all?scope=seller
+Authorization: Bearer {{buyerToken}}
+
+### WebSocket 地址，有效 JWT 应握手成功
+# ws://127.0.0.1:8088/ws/realtime?token={{buyerToken}}

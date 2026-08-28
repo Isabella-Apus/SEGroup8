@@ -60,11 +60,15 @@ function connect() {
     clearHeartbeat();
     socket = new WebSocket(`${url}?token=${encodeURIComponent(token)}`);
     socket.onopen = () => {
+        const reconnected = reconnectAttempts > 0;
         reconnectAttempts = 0;
         clearHeartbeat();
         heartbeatTimer = setInterval(() => {
             sendRealtimeMessage({ eventType: "PING", payload: { ts: Date.now() } });
         }, 20000);
+        if (reconnected) {
+            emitRealtimeEvent({ eventType: "REALTIME_RECONNECTED", payload: { ok: true } });
+        }
     };
     socket.onerror = () => {
         if (socket && socket.readyState === WebSocket.OPEN) {

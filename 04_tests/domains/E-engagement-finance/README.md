@@ -13,7 +13,7 @@
 | UC22 | #143 | PASS：后端 7/7、真实 Playwright 1/1，证据在 `04_tests/UC22/` |
 | UC23 | #144 | PENDING：由独立 PR 提供 |
 | UC24 | #145 | PASS：独立 PR 提供需求、设计、后端测试、真实 Edge E2E 与证据 |
-| UC25 | #146 | PENDING：由独立 PR 提供 |
+| UC25 | #146 | PASS：14 个后端测试、1 个真实 Edge E2E，含 WebSocket 断线重连补偿 |
 
 ## 输出要求
 

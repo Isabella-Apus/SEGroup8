@@ -1,0 +1,37 @@
+classDiagram
+    class Notification {
+      +Long id
+      +Long userId
+      +String title
+      +String content
+      +String targetPath
+      +Integer isRead
+      +LocalDateTime createTime
+    }
+    class NotificationVO {
+      +Long id
+      +String scope
+      +Integer isRead
+    }
+    class NotificationController {
+      +listMyNotifications(scope)
+      +markRead(notificationId)
+      +markAllRead(scope)
+    }
+    class NotificationService {
+      +listMyNotifications(userId, scope)
+      +markRead(userId, id)
+      +markAllRead(userId, scope)
+      +createNotification(userId, title, content, targetPath)
+    }
+    class RealtimePushService {
+      +pushToUser(userId, eventType, payload)
+    }
+    class RealtimeHandshakeInterceptor {
+      +beforeHandshake(request, response, handler, attributes)
+    }
+    NotificationController --> NotificationService
+    NotificationService --> Notification
+    NotificationService --> NotificationVO
+    NotificationService --> RealtimePushService
+    RealtimeHandshakeInterceptor ..> RealtimePushService : 认证后登记会话

@@ -8,6 +8,8 @@ import com.segroup8.platform.mapper.NotificationMapper;
 import com.segroup8.platform.realtime.RealtimePushService;
 import com.segroup8.platform.service.NotificationService;
 import com.segroup8.platform.vo.NotificationVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -17,6 +19,8 @@ import java.util.Map;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
+
+    private static final Logger log = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
     private final NotificationMapper notificationMapper;
     private final RealtimePushService realtimePushService;
@@ -115,7 +119,11 @@ public class NotificationServiceImpl implements NotificationService {
         payload.put("scope", vo.getScope());
         payload.put("isRead", vo.getIsRead());
         payload.put("createTime", vo.getCreateTime());
-        realtimePushService.pushToUser(userId, "NOTIFICATION_CREATED", payload);
+        try {
+            realtimePushService.pushToUser(userId, "NOTIFICATION_CREATED", payload);
+        } catch (RuntimeException ex) {
+            log.warn("Notification {} persisted but realtime delivery failed: {}", vo.getId(), ex.getMessage());
+        }
         return vo;
     }
 

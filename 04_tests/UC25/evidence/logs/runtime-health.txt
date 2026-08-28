@@ -1,0 +1,17 @@
+UC25 runtime health
+Rechecked: 2026-08-28 22:12 Asia/Shanghai
+
+docker info:
+- Docker Server 29.3.1, linux/amd64
+- Running containers: 3
+
+docker compose ps:
+- database: healthy, localhost:3307
+- backend: healthy, localhost:8089
+- frontend: healthy, localhost:8088
+
+HTTP checks:
+- GET http://127.0.0.1:8089/actuator/health => {"status":"UP","groups":["liveness","readiness"]}
+- HEAD http://127.0.0.1:8088 => HTTP/1.1 200 OK, nginx/1.27.4
+
+The stack was rebuilt from the UC25 worktree with docker compose up -d --build. Docker Desktop was not restarted, wsl --shutdown was not used, and base images were not pulled explicitly.

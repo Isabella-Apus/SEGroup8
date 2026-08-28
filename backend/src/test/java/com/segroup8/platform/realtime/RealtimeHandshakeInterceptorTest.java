@@ -78,4 +78,21 @@ class RealtimeHandshakeInterceptorTest {
         assertFalse(accepted);
         verify(response).setStatusCode(HttpStatus.UNAUTHORIZED);
     }
+
+    @Test
+    void beforeHandshake_shouldRejectExpiredToken() {
+        JwtProperties expiredProperties = new JwtProperties();
+        expiredProperties.setSecret("test-secret-key-must-be-at-least-32-bytes-long");
+        expiredProperties.setExpireHours(-1L);
+        String token = new JwtUtils(expiredProperties).createToken(42L, "buyer", "USER");
+        ServerHttpRequest request = mock(ServerHttpRequest.class);
+        ServerHttpResponse response = mock(ServerHttpResponse.class);
+        WebSocketHandler handler = mock(WebSocketHandler.class);
+        when(request.getURI()).thenReturn(URI.create("http://localhost/ws/realtime?token=" + token));
+
+        boolean accepted = interceptor.beforeHandshake(request, response, handler, new HashMap<>());
+
+        assertFalse(accepted);
+        verify(response).setStatusCode(HttpStatus.UNAUTHORIZED);
+    }
 }
