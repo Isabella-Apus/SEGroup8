@@ -1,13 +1,17 @@
-# C-order-fulfillment 领域索引
+# Domain C：订单履约
 
-Domain-C 对应 EPIC-C 与 UC11-UC15，当前仍是单体后端中的订单履约边界。此处只提供共享索引，避免复制现有需求和设计形成两份真相。
+Domain C 对应 UC11–UC15。每个用例现在都有独立需求入口；UC11–UC15 的设计、三层图和追溯矩阵统一从 `02_docs/UCxx/` 进入。
 
-| UC | 需求 | 设计 | 追溯 |
-|---|---|---|---|
-| UC11 | [购物车结算与创建订单](../../../01_requirements/UC11-购物车结算与创建订单.md) | [设计](../../UC11/README.md) | [追溯](../../UC11/traceability.md) |
-| UC12 | [订单支付与取消](../../../01_requirements/UC12-订单支付与取消.md) | [设计](../../UC12-订单支付与取消-设计.md) | [追溯](../../UC12-订单支付与取消-追溯矩阵.md) |
-| UC13 | [订单发货物流与收货](../../../01_requirements/UC13-订单发货物流与收货.md) | [设计](../../UC13-订单发货物流与收货-设计.md) | [追溯](../../UC13-追溯矩阵.md) |
-| UC14 | [订单售后退款](../../../01_requirements/UC14-订单售后退款.md) | [设计](../../UC14-订单售后退款-设计.md) | [追溯](../../UC14-订单售后退款-追溯矩阵.md) |
-| UC15 | [订单评价追评与回复](../../../01_requirements/UC15-订单评价追评与回复.md) | [设计](../../UC15-订单评价追评与回复-设计.md) | [追溯](../../UC15-追溯矩阵.md) |
+| 用例 | 需求 | 标准设计目录 | 追溯 |
+| --- | --- | --- | --- |
+| UC11 | [购物车结算与创建订单](../../../01_requirements/UC11-购物车结算与创建订单.md) | [UC11](../../UC11/README.md) | [追溯](../../UC11/traceability.md) |
+| UC12 | [订单支付与取消](../../../01_requirements/UC12-订单支付与取消.md) | [UC12](../../UC12/README.md) | [追溯](../../UC12/traceability.md) |
+| UC13 | [订单发货物流与收货](../../../01_requirements/UC13-订单发货物流与收货.md) | [UC13](../../UC13/README.md) | [追溯](../../UC13/traceability.md) |
+| UC14 | [订单售后退款](../../../01_requirements/UC14-订单售后退款.md) | [UC14](../../UC14/README.md) | [追溯](../../UC14/traceability.md) |
+| UC15 | [订单评价追评与回复](../../../01_requirements/UC15-订单评价追评与回复.md) | [UC15](../../UC15/README.md) | [追溯](../../UC15/traceability.md) |
 
-UC11 组件图已迁移到 `02_docs/UC11/component.mmd`；UC12-UC15 暂沿用 `02_docs/diagrams/UC12-COMP12.mmd` 至 `UC15-COMP15.mmd`。Day6-Day8 的微服务迁移与恢复仍由父 UC Issue 持续追踪，不因本阶段测试完成而关闭。
+## 结果口径
+
+UC12、UC13、UC14、UC15 的结构化后端结果分别为 8、4、9、9 条通过；Domain-C 标签汇总为 19/19 通过。已有浏览器报告与当前后端结果分开保存，本轮不重跑或补充 Playwright E2E。
+
+具体证据见 [`04_tests/domains/C-order-fulfillment/evidence/result-summary.json`](../../../04_tests/domains/C-order-fulfillment/evidence/result-summary.json) 和各 UC 测试目录。

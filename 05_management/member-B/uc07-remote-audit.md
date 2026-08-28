@@ -1,50 +1,26 @@
-# UC07 Remote Recovery Audit
+# UC07 远程材料审计
 
-Audit date: 2026-08-27
+审计日期：2026-08-28
 
-## Source of truth
+## 结论
 
-- Remote: `origin` (`github.com:Isabella-Apus/SEGroup8`)
-- Historical delivery commit: `4b99af197d247c948ea2b609d06e3dfda0367a89`
-- Commit subject: `feat: deliver UC07 seller product lifecycle (#50)`
-- Historical remote branch still available: `origin/codex/uc07-results`
+当前 `documents` 分支需要以现有单体实现补齐 UC07 的需求、设计和追溯材料。历史提交 `4b99af1` 的独立 CatalogLifecycle 微服务文件与当前 `ProductController`/`ProductServiceImpl` 边界不一致，因此只作为差异参考，不整体恢复为当前文档或证据。
 
-## Confirmed historical assets
+## 当前事实
 
-Commit `4b99af1` contains all of the following and must be used as the recovery
-source instead of recreating UC07 from memory:
+- 当前实现入口为 `backend/src/main/java/com/segroup8/platform/controller/ProductController.java` 和 `.../service/impl/ProductServiceImpl.java`。
+- 当前状态模型使用 `ON_SHELF/OFF_SHELF`，所有权通过当前用户对应的店铺校验。
+- 当前后端单元基线为 `ProductServiceImplTest`，本轮文档矩阵引用其中 5 条测试。
+- 浏览器流程文件 `frontend/e2e/domain-b/uc07-product-lifecycle.spec.ts` 仍需独立的 Compose/MySQL Playwright 验证；本轮不将其标记为新的 E2E 通过。
 
-- `.github/workflows/uc07-tests.yml`
-- `01_requirements/UC07-卖家商品生命周期.md`
-- UC07 design and traceability documents under `02_docs/`
-- `04_tests/UC07/UC07-demo.http`
-- UC07 test report and evidence index
-- Maven logs and Surefire XML/TXT raw reports
-- `CatalogLifecycleApiAndE2ETest.java`
-- catalog controller/service/schema changes for the seller lifecycle
+## 当前材料入口
 
-## Current main assessment
+- [UC07 需求](../../01_requirements/UC07-卖家商品生命周期.md)
+- [UC07 设计](../../02_docs/UC07-卖家商品生命周期-设计.md)
+- [UC07 追溯矩阵](../../02_docs/UC07-卖家商品生命周期-追溯矩阵.md)
+- [UC07 测试计划](../../04_tests/UC07/test-plan.md)
+- [UC07 测试报告](../../04_tests/UC07/test-report.md)
 
-The current `origin/main` contains the UC06 catalog-query baseline only. It does
-not contain the historical UC07 seller lifecycle controller/service/schema,
-requirements, design, report, or evidence paths listed above. The existing
-`ProductServiceImplTest` in the monolith is only a unit-test baseline and is
-not UC07 completion evidence.
+## 历史材料处理规则
 
-## Recovery rule
-
-UC07 recovery must be performed on `test/uc07-real-flow` created from the then
-latest `main`, after PR-B0 is merged. Recover applicable files by comparing or
-selectively restoring from `4b99af1`; do not restore its obsolete standalone
-workflow because PR-B0 replaces per-UC workflows with the unified Domain B
-workflow. Rename restored MockMvc tests to `*ApiIntegrationTest`, retain
-`DOMAIN_B` and `UC07` tags, then add the real Compose/MySQL Playwright flow and
-fresh evidence before closing the UC07 D3-D5 Task.
-
-## GitHub access
-
-GitHub CLI is not installed in the current environment. The available browser
-session is also signed out and exposes only read-only repository pages, so
-reopening parent issues, creating Task Issues, and creating PRs require an
-authenticated GitHub session. No parent UC issue was closed or otherwise
-modified during this audit.
+`origin/codex/uc07-results` 和提交 `4b99af1` 保留为历史审计来源。不得恢复旧工作流、旧微服务接口或与当前单体代码不匹配的测试作为当前完成证据。后续若补浏览器 E2E，应在统一 Domain-B Compose 工作流中单独产生新证据。

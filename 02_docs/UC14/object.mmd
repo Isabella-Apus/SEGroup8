@@ -1,0 +1,22 @@
+classDiagram
+    class OrderInfo {
+      Long id
+      Long buyerUserId
+      Integer payStatus
+      Integer refundStatus
+      Integer orderStatus
+    }
+    class RefundRequest {
+      Long orderId
+      Long applicantId
+      String reason
+      String status
+    }
+    class RefundRecord {
+      Long orderId
+      BigDecimal amount
+      String result
+      Date processedAt
+    }
+    OrderInfo "1" o-- "0..*" RefundRequest
+    RefundRequest "1" --> "0..1" RefundRecord

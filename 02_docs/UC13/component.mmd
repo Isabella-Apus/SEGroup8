@@ -1,0 +1,10 @@
+flowchart LR
+    Seller[卖家] --> OC[OrderController]
+    Buyer[买家] --> OC
+    OC --> OS[OrderServiceImpl]
+    OC --> LC[LogisticsController]
+    LC --> LS[LogisticsServiceImpl]
+    OS --> O[(order_info)]
+    LS --> T[(logistics_trace)]
+    LS --> O
+    OS --> Auth[订单归属/状态校验]

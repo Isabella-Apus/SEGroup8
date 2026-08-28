@@ -1,0 +1,19 @@
+classDiagram
+    class OrderInfo {
+      Long id
+      Long buyerUserId
+      Integer orderStatus
+      String receiverDetailAddress
+    }
+    class LogisticsTrace {
+      Long orderId
+      String nodeName
+      String status
+      Date eventTime
+    }
+    class User {
+      Long id
+      String role
+    }
+    User "1" --> "0..*" OrderInfo : buyer/seller scope
+    OrderInfo "1" o-- "0..*" LogisticsTrace

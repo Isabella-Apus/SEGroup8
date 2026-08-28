@@ -1,0 +1,9 @@
+flowchart LR
+    Buyer[买家] --> UI[评价页面]
+    Seller[卖家] --> UI
+    UI --> C[ReviewController]
+    C --> S[Review service]
+    S --> V[订单完成/归属/时限校验]
+    V --> O[(order_info)]
+    V --> R[(review)]
+    R --> Reply[卖家回复/追评]

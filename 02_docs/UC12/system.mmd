@@ -1,0 +1,22 @@
+sequenceDiagram
+    actor Buyer as 买家
+    participant UI as 订单页面
+    participant API as OrderController
+    participant S as OrderServiceImpl
+    participant DB as order_info/order_item
+    Buyer->>UI: 查看待付款订单
+    UI->>API: 查询订单/发起支付
+    API->>S: 校验归属、状态和金额
+    S->>DB: 读取并更新订单状态
+    DB-->>S: 持久化结果
+    S-->>API: 订单状态与金额
+    API-->>UI: 支付结果
+    alt 允许取消
+        Buyer->>UI: 取消订单
+        UI->>API: 提交取消
+        API->>S: 校验未支付和归属
+        S->>DB: 更新取消状态
+        API-->>UI: 取消成功
+    else 已支付或非本人订单
+        API-->>UI: 拒绝并保持原状态
+    end

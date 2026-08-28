@@ -1,14 +1,23 @@
 {
   "domain": "DOMAIN_A",
-  "status": "PASS_H2_MOCKMVC_NOT_COMPOSE_RUN",
+  "status": "PER_UC_COMPOSE_PASS_AGGREGATE_NOT_RUN",
+  "scope": "five independent UC evidence plus Domain-A aggregate baseline",
   "unitApiEvidence": "existing tests retained and tagged",
-  "integrationEvidence": "per-UC branches",
-  "browserE2eEvidence": "per-UC branches",
+  "integrationEvidence": "per-UC evidence directories",
+  "browserE2eEvidence": "UC01-UC05 individual Compose/MySQL/Chromium runs pass; aggregate browser gate not run",
   "domainATestCount": 33,
   "domainAFailures": 0,
   "domainAErrors": 0,
   "platformJwtInterceptorTests": 3,
   "microserviceJwtContractTests": 5,
+  "perUcBrowser": {
+    "UC01": "PASS",
+    "UC02": "PASS",
+    "UC03": "PASS",
+    "UC04": "PASS",
+    "UC05": "PASS"
+  },
+  "aggregateBrowser": "NOT_RUN",
   "duplicateTestDeletion": 0,
   "ciWorkflow": "https://github.com/Isabella-Apus/SEGroup8/actions/workflows/ci-cd.yml",
   "localVerification": {
@@ -22,5 +31,5 @@
     "composeConfig": "PASS",
     "composeMysqlBrowser": "NOT_RUN_DOCKER_LINUX_DAEMON_UNAVAILABLE"
   },
-  "note": "Docker Compose browser E2E is not run because the local Docker daemon is unavailable; GitHub Actions must provide the browser gate."
+  "note": "Individual UC01-UC05 reports contain real Compose browser evidence. The aggregate Domain-A browser run was not executed, so this file does not claim an aggregate browser PASS."
 }
