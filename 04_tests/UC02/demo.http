@@ -1,0 +1,17 @@
+### Profile
+GET http://127.0.0.1:8089/api/user/profile
+Authorization: Bearer <jwt>
+
+### Update profile
+PUT http://127.0.0.1:8089/api/user/profile
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{"nickname":"UC02 refreshed","email":"uc02@example.com"}
+
+### Create default address
+POST http://127.0.0.1:8089/api/user/addresses
+Authorization: Bearer <jwt>
+Content-Type: application/json
+
+{"receiverName":"Demo Receiver","receiverPhone":"13800138000","province":"Guangdong","city":"Shenzhen","detailAddress":"Demo Street","isDefault":1}

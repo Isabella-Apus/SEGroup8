@@ -1,0 +1,4 @@
+classDiagram
+  class User { Long id; String role; String status }
+  class AdminAuditLog { Long targetId; String action; Long adminUserId }
+  User "1" --> "0..*" AdminAuditLog : state changes recorded

@@ -1,0 +1,23 @@
+@baseUrl = http://127.0.0.1:8088/api
+@buyerToken = replace-with-buyer-token
+@productId = 1
+@addressId = 1
+
+### 二手直接购买（初始订单必须待付款）
+POST {{baseUrl}}/secondhand/{{productId}}/buy
+Authorization: Bearer {{buyerToken}}
+Content-Type: application/json
+
+{
+  "addressId": {{addressId}},
+  "remark": "UC17 direct purchase"
+}
+
+### 重复购买必须失败
+POST {{baseUrl}}/secondhand/{{productId}}/buy
+Authorization: Bearer {{buyerToken}}
+Content-Type: application/json
+
+{
+  "addressId": {{addressId}}
+}

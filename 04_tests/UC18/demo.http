@@ -1,0 +1,36 @@
+@baseUrl = http://127.0.0.1:8089/api
+@buyerToken = REPLACE_WITH_BUYER_TOKEN
+@sellerToken = REPLACE_WITH_SELLER_TOKEN
+@productId = 1
+@sellerUserId = 2
+@negotiationId = 1
+
+### 买家发起议价
+POST {{baseUrl}}/secondhand/trade/bargain/apply
+Authorization: Bearer {{buyerToken}}
+Content-Type: application/json
+
+{
+  "productId": {{productId}},
+  "sellerUserId": {{sellerUserId}},
+  "proposedPrice": 76.00
+}
+
+### 卖家查看与该买家、商品有关的议价
+GET {{baseUrl}}/secondhand/trade/bargain/list?productId={{productId}}&counterpartUserId=3
+Authorization: Bearer {{sellerToken}}
+
+### 卖家确认并创建待付款订单
+POST {{baseUrl}}/secondhand/trade/bargain/confirm
+Authorization: Bearer {{sellerToken}}
+Content-Type: application/json
+
+{
+  "negotiationId": {{negotiationId}},
+  "confirmedPrice": 76.00,
+  "createOrder": true
+}
+
+### 或者卖家拒绝
+POST {{baseUrl}}/secondhand/trade/bargain/{{negotiationId}}/reject
+Authorization: Bearer {{sellerToken}}

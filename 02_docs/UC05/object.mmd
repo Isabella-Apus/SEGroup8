@@ -1,0 +1,26 @@
+classDiagram
+  class UserReport {
+    +id
+    +reporterId
+    +reportedId
+    +status
+    +tradeContext
+  }
+  class UserBlock {
+    +blockerId
+    +blockedId
+  }
+  class CreditScoreLog {
+    +userId
+    +role
+    +delta
+    +reasonCode
+    +refId
+  }
+  class AdminAuditLog {
+    +adminUserId
+    +action
+    +targetId
+  }
+  UserReport --> CreditScoreLog : upheld report
+  UserReport --> AdminAuditLog : audit record

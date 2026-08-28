@@ -1,0 +1,6 @@
+flowchart LR
+  Browser[真实浏览器] --> UserController[UserController]
+  UserController --> UserService[UserServiceImpl]
+  UserService --> User[(user)]
+  UserService --> Address[(address)]
+  UserService --> Merchant[MerchantApplicationService]
