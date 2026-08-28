@@ -1,0 +1,16 @@
+%% OBJ-SEQ07
+sequenceDiagram
+  autonumber
+  participant C as ProductController
+  participant S as ProductServiceImpl
+  participant Req as ProductSaveRequest/ProductStockAdjustRequest
+  participant Shop as Shop
+  participant P as Product
+  participant M as ProductMapper
+  C->>S: create/update/status/adjustStock(userId, Req)
+  S->>Shop: 解析当前卖家店铺
+  S->>Req: 校验分类、价格、库存和状态转换
+  S->>P: 应用字段和版本号
+  S->>M: insert/updateById/conditionalUpdate
+  M-->>S: 受影响行数
+  S-->>C: ProductVO

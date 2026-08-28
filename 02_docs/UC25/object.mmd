@@ -1,37 +1,32 @@
+%% DESIGN-CLASS25
 classDiagram
-    class Notification {
-      +Long id
-      +Long userId
-      +String title
-      +String content
-      +String targetPath
-      +Integer isRead
-      +LocalDateTime createTime
-    }
-    class NotificationVO {
-      +Long id
-      +String scope
-      +Integer isRead
-    }
-    class NotificationController {
-      +listMyNotifications(scope)
-      +markRead(notificationId)
-      +markAllRead(scope)
-    }
-    class NotificationService {
-      +listMyNotifications(userId, scope)
-      +markRead(userId, id)
-      +markAllRead(userId, scope)
-      +createNotification(userId, title, content, targetPath)
-    }
-    class RealtimePushService {
-      +pushToUser(userId, eventType, payload)
-    }
-    class RealtimeHandshakeInterceptor {
-      +beforeHandshake(request, response, handler, attributes)
-    }
-    NotificationController --> NotificationService
-    NotificationService --> Notification
-    NotificationService --> NotificationVO
-    NotificationService --> RealtimePushService
-    RealtimeHandshakeInterceptor ..> RealtimePushService : 认证后登记会话
+  class C["NotificationController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class S["NotificationServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class N["Notification"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class M["NotificationMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  class P["RealtimePushService"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class W["RealtimeWebSocketHandler"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  C --> S : list/read/readAll
+  S --> M : query/update by userId
+  S --> N : 创建业务通知并先持久化
+  S --> P : pushToUser
+  P --> W : sendMessage

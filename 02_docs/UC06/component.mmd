@@ -1,0 +1,11 @@
+%% COMP-STRUCT06
+flowchart LR
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«repository»<br/>商品列表/详情页"]
+    API["«controller»<br/>CatalogController"]
+    Svc["«service»<br/>CatalogService"]
+    DB["«collaborator»<br/>products"]
+  end
+  UI -->|"GET /api/catalog/product"| API
+  API -->|"publicDetail"| Svc
+  Svc -->|"查询在售详情"| DB

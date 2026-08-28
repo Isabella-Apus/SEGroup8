@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS16
+classDiagram
+  class SecondhandProduct {
+    +identifier: String
+    +state: String
+  }
+  class Category {
+    +identifier: String
+    +state: String
+  }
+  class RiskAudit {
+    +identifier: String
+    +state: String
+  }
+  SecondhandProduct "1" --> "0..*" Category : 关联
+  Category "0..*" --> "1" RiskAudit : 产生/归属

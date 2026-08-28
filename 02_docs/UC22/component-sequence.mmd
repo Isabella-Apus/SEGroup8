@@ -1,0 +1,15 @@
+%% COMP-SEQ22
+sequenceDiagram
+  autonumber
+  participant UI as CouponCenter/ProductDetail.vue
+  participant API as VoucherController
+  participant Voucher as VoucherService
+  participant Order as OrderServiceImpl
+  participant DB as voucher/user_voucher/order_info
+  UI->>API: 领取优惠券
+  API->>Voucher: claim(userId, voucherId)
+  Voucher->>DB: 写 user_voucher
+  UI->>Order: 提交订单(voucherId)
+  Order->>Voucher: occupyForOrder(orderContext)
+  Voucher->>DB: 校验并核销
+  Order->>DB: 保存优惠金额和应付金额

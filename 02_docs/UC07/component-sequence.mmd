@@ -1,0 +1,17 @@
+%% COMP-SEQ07
+sequenceDiagram
+  autonumber
+  participant SellerProductEdit
+  participant ProductController
+  participant ProductService
+  participant ProductMapper
+  participant Outbox
+  participant RiskService
+  participant SellerProductList
+  SellerProductEdit->>ProductController: 提交保存/审核/上下架/库存
+  ProductController->>ProductService: DTO 与身份
+  ProductService->>ProductMapper: 条件更新商品
+  ProductMapper->>Outbox: 记录状态变更事件
+  Outbox->>RiskService: 待审核事件
+  RiskService->>ProductService: 审核决定回调
+  ProductService->>SellerProductList: 返回最新状态

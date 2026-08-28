@@ -1,7 +1,13 @@
-flowchart TB
-  Spec[uc02-profile-address.spec.ts] --> HTTP[真实 HTTP]
-  HTTP --> Profile[GET/PUT profile]
-  HTTP --> Address[GET/POST/PUT/DELETE addresses]
-  Profile --> UserService[UserServiceImpl]
-  Address --> UserService
-  UserService --> DB[(MySQL/H2 tables)]
+%% COMP-STRUCT02
+flowchart LR
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«boundary»<br/>Profile/AddressManager.vue"]
+    API["«controller»<br/>UserController"]
+    Svc["«service»<br/>UserServiceImpl"]
+    UserDB["«repository»<br/>UserMapper"]
+    AddrDB["«repository»<br/>AddressMapper"]
+  end
+  UI -->|"查询或保存资料/地址"| API
+  API -->|"当前用户操作"| Svc
+  Svc -->|"读写本人资料"| UserDB
+  Svc -->|"校验归属并维护默认地址"| AddrDB

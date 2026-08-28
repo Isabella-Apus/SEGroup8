@@ -1,0 +1,15 @@
+%% COMP-SEQ09
+sequenceDiagram
+  autonumber
+  participant UI as AdminProductRiskAuditView.vue
+  participant API as AdminProductRiskAuditController
+  participant Svc as ProductRiskAuditServiceImpl
+  participant Rule as 风险规则/LLM适配器
+  participant DB as ProductRiskAuditMapper
+  participant Catalog as 商品服务回调
+  UI->>API: 查询待审/提交决定
+  API->>Svc: audit(productId, decision)
+  Svc->>Rule: 计算或读取风险结果
+  Svc->>DB: 保存审核和理由
+  Svc->>Catalog: 回写商品状态
+  Catalog-->>UI: 返回审核结果

@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS23
+classDiagram
+  class WalletAccount {
+    +identifier: String
+    +state: String
+  }
+  class FundTransaction {
+    +identifier: String
+    +state: String
+  }
+  class SettlementRecord {
+    +identifier: String
+    +state: String
+  }
+  WalletAccount "1" --> "0..*" FundTransaction : 关联
+  FundTransaction "0..*" --> "1" SettlementRecord : 产生/归属

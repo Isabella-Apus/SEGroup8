@@ -1,0 +1,14 @@
+%% COMP-SEQ10
+sequenceDiagram
+  autonumber
+  participant UI as Product/BrowseHistory.vue
+  participant API as SearchController/BrowseHistoryController
+  participant Svc as SearchBehaviorService/BrowseHistoryService
+  participant DB as history/keyword tables
+  UI->>API: 浏览商品或搜索
+  API->>Svc: record(userId, event)
+  Svc->>DB: 去重写入并累计关键词
+  UI->>API: 查询/删除历史和热词
+  API->>Svc: list/delete/currentUser
+  Svc->>DB: 按用户与时间过滤
+  DB-->>UI: 历史与热词

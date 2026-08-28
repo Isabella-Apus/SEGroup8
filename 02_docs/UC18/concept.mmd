@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS18
+classDiagram
+  class Negotiation {
+    +identifier: String
+    +state: String
+  }
+  class SecondhandProduct {
+    +identifier: String
+    +state: String
+  }
+  class OrderInfo {
+    +identifier: String
+    +state: String
+  }
+  Negotiation "1" --> "0..*" SecondhandProduct : 关联
+  SecondhandProduct "0..*" --> "1" OrderInfo : 产生/归属

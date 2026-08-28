@@ -1,14 +1,19 @@
-# UC02 traceability
+# UC02 追溯矩阵
 
-2026-08-27 refresh: 后端集成与真实 Compose + MySQL + Chromium Playwright
-执行均已完成；本次 UC02 spec 通过 1 个测试。对应 raw report、HTML/JSON
-结果和 Compose 日志位于 `04_tests/UC02/evidence/`。
-
-状态：后端集成与 API 证据已完成；真实 Compose + MySQL + Chromium 执行已完成。
-
-| Requirement / acceptance | Implementation | Integration | E2E | 状态 |
+| 需求 / 用例 | 六类图模型 | 主要代码模块 | 测试编号与现有测试 | 结果 / 证据 |
 |---|---|---|---|---|
-| REQ02 profile update and re-query | `UserServiceImpl.updateCurrentUserProfile` | profile assertions in `ProfileAddressUc02IntegrationTest` | profile reload | 后端与浏览器已完成 |
-| REQ02 address create/update/delete | `UserServiceImpl` address methods | same test | address page reload and delete refresh | 后端与浏览器已完成 |
-| REQ02 max one default per owner | `clearDefaultAddress` | database count assertion | response assertion | 后端与浏览器已完成 |
-| REQ02 cross-user isolation and unauthenticated rejection | `getOwnedAddress`, JWT interceptor | ownership test | API-assisted E2E | 已完成 |
+| REQ02 / UC02 资料和地址 | SYS-BEH02 / CONCEPT-CLASS02 / COMP-STRUCT02 / COMP-SEQ02 / DESIGN-CLASS02 / OBJ-SEQ02 | `Profile.vue`、`AddressManager.vue`；`UserController`、`UserServiceImpl`、`AddressMapper` | UNIT-TC02-001 `UserServiceImplTest` 3 项，含默认地址和越权删除；E2E-TC02-001 `frontend/e2e/domain-a/uc02-profile-address.spec.ts` | **LOCAL_E2E_PASS**：已归档 Playwright JSON，1/1 通过、unexpected 0；路径 `../../04_tests/UC02/evidence/playwright-results.json`。最新 main 全量 E2E CI 同时通过：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611 |
+
+## 权威材料
+
+- 需求：[requirement.md](requirement.md)
+- 系统行为模型：[system.mmd](system.mmd)
+- 概念类图：[concept.mmd](concept.mmd)
+- 组件结构图：[component.mmd](component.mmd)
+- 组件顺序图：[component-sequence.mmd](component-sequence.mmd)
+- 详细设计类图：[object.mmd](object.mmd)
+- 对象顺序图：[object-sequence.mmd](object-sequence.mmd)
+- 测试计划：[test-plan.md](test-plan.md)
+- 测试报告：[test-report.md](test-report.md)
+- 浏览器测试：`frontend/e2e/domain-a/uc02-profile-address.spec.ts`
+- 原始证据：`../../04_tests/UC02/evidence/`

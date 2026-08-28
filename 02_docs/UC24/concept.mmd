@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS24
+classDiagram
+  class Conversation {
+    +identifier: String
+    +state: String
+  }
+  class Message {
+    +identifier: String
+    +state: String
+  }
+  class ConversationMember {
+    +identifier: String
+    +state: String
+  }
+  Conversation "1" --> "0..*" Message : 关联
+  Message "0..*" --> "1" ConversationMember : 产生/归属

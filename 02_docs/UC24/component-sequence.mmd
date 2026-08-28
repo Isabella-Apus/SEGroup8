@@ -1,0 +1,16 @@
+%% COMP-SEQ24
+sequenceDiagram
+  autonumber
+  participant UI as ChatView.vue
+  participant API as ChatController
+  participant Svc as ChatServiceImpl
+  participant Conv as ChatConversationMapper
+  participant Msg as ChatMessageMapper
+  participant RT as RealtimePushService
+  UI->>API: 创建/查询会话
+  API->>Svc: 校验参与者和来源
+  Svc->>Conv: 查询或插入会话
+  UI->>API: 发送消息
+  API->>Svc: sendMessage(currentUser, request)
+  Svc->>Msg: 持久化消息
+  Svc->>RT: 推送接收者

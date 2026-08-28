@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS20
+classDiagram
+  class OrderInfo {
+    +identifier: String
+    +state: String
+  }
+  class Shipment {
+    +identifier: String
+    +state: String
+  }
+  class ReceiptRecord {
+    +identifier: String
+    +state: String
+  }
+  OrderInfo "1" --> "0..*" Shipment : 关联
+  Shipment "0..*" --> "1" ReceiptRecord : 产生/归属

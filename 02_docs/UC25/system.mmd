@@ -1,8 +1,12 @@
-flowchart LR
-    User[登录用户] -->|HTTPS| Nginx[Nginx 前端入口 :8088]
-    Nginx --> SPA[Vue 通知页面]
-    SPA -->|通知查询与已读 API| Backend[Spring Boot :8089]
-    SPA <-->|JWT WebSocket /ws/realtime| Backend
-    Backend --> MySQL[(MySQL notification)]
-    Backend -->|NOTIFICATION_CREATED| SPA
-    SPA -->|重连后补拉| Backend
+%% SYS-BEH25
+stateDiagram-v2
+  [*] --> 业务事件完成
+  业务事件完成 --> 已持久化: 创建 notification
+  已持久化 --> 已实时送达: 用户在线且推送成功
+  已持久化 --> 离线待查: 用户离线/推送失败
+  已实时送达 --> 未读
+  离线待查 --> 未读: 用户查询列表
+  未读 --> 已读: 单条已读
+  未读 --> 已读: 全部已读
+  已读 --> 已读: 重复已读（幂等）
+  已读 --> [*]

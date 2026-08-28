@@ -1,0 +1,16 @@
+%% OBJ-SEQ10
+sequenceDiagram
+  autonumber
+  participant C as SearchController/BrowseHistoryController
+  participant SS as SearchBehaviorServiceImpl
+  participant BS as BrowseHistoryServiceImpl
+  participant H as UserSearchHistory/SearchKeywordStat
+  participant B as BrowseHistory
+  participant HM as History/KeywordMapper
+  C->>SS: recordSearch(userId, keyword)
+  SS->>H: normalize/deduplicate/count
+  SS->>HM: deleteOldAndInsert/latestStats
+  C->>BS: record/list/delete(userId, product)
+  BS->>B: 构造唯一浏览键
+  BS->>HM: upsert/queryByUser
+  HM-->>C: 历史与热词结果

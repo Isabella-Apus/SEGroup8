@@ -1,21 +1,16 @@
+%% SYS-BEH15
 sequenceDiagram
-    actor Buyer as 买家
-    actor Seller as 卖家
-    participant UI as 评价页面
-    participant API as ReviewController
-    participant S as ReviewService
-    participant DB as order/review tables
-    Buyer->>UI: 查看可评价订单
-    UI->>API: 提交评价
-    API->>S: 校验完成订单和买家归属
-    S->>DB: 保存评分和内容
-    API-->>Buyer: 评价成功
-    opt 允许追评
-        Buyer->>API: 提交追评
-        API->>S: 校验评价归属和时间
-        S->>DB: 更新追评
-    end
-    Seller->>API: 回复评价
-    API->>S: 校验商品/卖家归属
-    S->>DB: 保存回复
-    API-->>Seller: 回复成功
+  autonumber
+  actor Buyer as 买家
+  actor Seller as 卖家
+  participant System as 交易平台
+  Buyer->>System: 对已完成订单提交评分和评价
+  System-->>Buyer: 返回评价记录
+  Buyer->>System: 在期限内提交追评
+  System-->>Buyer: 返回追评结果
+  Seller->>System: 回复本人商品评价
+  alt 角色和归属有效
+    System-->>Seller: 保存回复并更新评价
+  else 无权或重复操作
+    System-->>Seller: 返回业务错误
+  end

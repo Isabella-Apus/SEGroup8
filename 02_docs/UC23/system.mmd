@@ -1,13 +1,11 @@
-flowchart LR
-    Buyer[买家] --> Profile[个人资料 / 钱包]
-    Seller[官方卖家] --> Finance[财务看板]
-    Profile --> FC[FinanceController]
-    Finance --> FC
-    Buyer --> OC[OrderController]
-    OC --> OS[OrderService]
-    FC --> ES[EscrowSettlementService]
-    OS --> ES
-    ES --> BM[BalanceMapper]
-    ES --> TM[TransactionRecordMapper]
-    BM --> B[(balance)]
-    TM --> T[(transaction_record)]
+%% SYS-BEH23
+flowchart TD
+  A[充值或订单结算触发] --> B{身份/金额/订单合法?}
+  B -- 否 --> Z[拒绝且余额不变]
+  B -- 是 --> C[FinanceController/结算服务]
+  C --> D[开启数据库事务]
+  D --> E[更新个人或经营余额]
+  E --> F[写 transaction_record]
+  F --> G{两步均成功?}
+  G -- 否 --> H[回滚]
+  G -- 是 --> I[提交并返回余额/流水]

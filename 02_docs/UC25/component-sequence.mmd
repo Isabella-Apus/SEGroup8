@@ -1,0 +1,16 @@
+%% COMP-SEQ25
+sequenceDiagram
+  autonumber
+  participant Biz as 订单/议价/审核模块
+  participant Svc as NotificationServiceImpl
+  participant DB as NotificationMapper
+  participant RT as RealtimePushService
+  participant WS as RealtimeWebSocketHandler
+  participant UI as NotificationView.vue
+  Biz->>Svc: create(userId, event)
+  Svc->>DB: INSERT notification
+  Svc->>RT: pushToUser(userId)
+  RT->>WS: 发送实时事件
+  UI->>Svc: 查询/单条已读/全部已读
+  Svc->>DB: 按当前用户更新
+  DB-->>UI: 最新通知列表

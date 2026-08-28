@@ -1,0 +1,13 @@
+%% COMP-STRUCT08
+flowchart LR
+  subgraph Boundary["Kinda Goods 组件边界"]
+    PublicUI["«boundary»<br/>PublicShopView.vue"]
+    SellerUI["«boundary»<br/>ShopSetting/Decoration.vue"]
+    API["«controller»<br/>ShopController"]
+    Svc["«service»<br/>ShopServiceImpl"]
+    DB["«repository»<br/>ShopMapper"]
+  end
+  PublicUI -->|"GET 公开店铺"| API
+  API -->|"校验店主和配置"| Svc
+  Svc -->|"更新店铺"| DB
+  SellerUI -->|"PUT 设置/装修"| API

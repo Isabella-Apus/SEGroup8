@@ -1,0 +1,14 @@
+%% OBJ-SEQ16
+sequenceDiagram
+  autonumber
+  participant C as SecondhandProductController
+  participant S as SecondhandProductServiceImpl
+  participant Req as SecondhandProductSaveRequest
+  participant P as SecondhandProduct
+  participant M as SecondhandProductMapper
+  C->>S: createSellerProduct(userId, Req)
+  S->>Req: 校验名称、价格、成色、分类
+  S->>P: 构造 sellerUserId/status/isNegotiable
+  S->>M: insert(P)
+  M-->>S: id
+  S-->>C: SecondhandProductVO

@@ -1,19 +1,36 @@
+%% DESIGN-CLASS01
 classDiagram
-  class User {
-    Long id
-    String username
-    String password
-    String role
-    String status
+  class C["AuthController"] {
+    <<controller>>
+    +handleRequest()
   }
-  class LoginVO {
-    String token
-    String role
-    UserVO user
+  class S["AuthServiceImpl"] {
+    <<service>>
+    +executeUseCase()
   }
-  class AdminAuditLog {
-    Long targetId
-    String action
+  class Req["RegisterRequest/LoginRequest"] {
+    <<collaborator>>
+    +applyBusinessRule()
   }
-  User --> LoginVO
-  User --> AdminAuditLog
+  class U["User"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class M["UserMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  class P["PasswordUtils"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class J["JwtUtils"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  C --> S : register/login
+  S --> M : selectByUsername
+  S --> P : encode 或 matches
+  S --> U : 构造用户与默认角色
+  S --> J : generateToken

@@ -1,24 +1,15 @@
+%% COMP-STRUCT22
 flowchart LR
-    subgraph Browser[浏览器]
-        Coupon[CouponCenterView.vue]
-        Product[ProductDetailView.vue]
-        Detail[OrderDetailView.vue]
-        Client[coupon.js / order.js]
-    end
-
-    subgraph Backend[Spring Boot]
-        VC[VoucherController]
-        OC[OrderController]
-        VS[VoucherService]
-        OS[OrderServiceImpl]
-        Mapper[MyBatis Mappers]
-    end
-
-    DB[(MySQL: voucher / user_voucher / order_info)]
-
-    Coupon --> Client
-    Product --> Client
-    Detail --> Client
-    Client --> VC --> VS --> Mapper
-    Client --> OC --> OS --> VS
-    OS --> Mapper --> DB
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«boundary»<br/>CouponCenter/ProductDetail.vue"]
+    API["«controller»<br/>VoucherController"]
+    Voucher["«service»<br/>VoucherService"]
+    Order["«service»<br/>OrderServiceImpl"]
+    DB["«collaborator»<br/>voucher/user_voucher/order_info"]
+  end
+  UI -->|"领取优惠券"| API
+  API -->|"claim"| Voucher
+  Voucher -->|"校验并核销"| DB
+  UI -->|"提交订单"| Order
+  Order -->|"occupyForOrder"| Voucher
+  Order -->|"保存优惠金额和应付金额"| DB

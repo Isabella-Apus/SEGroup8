@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS09
+classDiagram
+  class ProductRiskAudit {
+    +identifier: String
+    +state: String
+  }
+  class Product {
+    +identifier: String
+    +state: String
+  }
+  class AdminAuditLog {
+    +identifier: String
+    +state: String
+  }
+  ProductRiskAudit "1" --> "0..*" Product : 关联
+  Product "0..*" --> "1" AdminAuditLog : 产生/归属

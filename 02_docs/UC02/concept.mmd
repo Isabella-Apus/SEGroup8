@@ -1,0 +1,11 @@
+%% CONCEPT-CLASS02
+classDiagram
+  class UserProfile {
+    +identifier: String
+    +state: String
+  }
+  class Address {
+    +identifier: String
+    +state: String
+  }
+  UserProfile "1" --> "0..*" Address : 关联

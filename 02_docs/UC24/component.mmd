@@ -1,35 +1,15 @@
+%% COMP-STRUCT24
 flowchart LR
-  subgraph Browser[Microsoft Edge / Vue]
-    Buyer[ChatView.vue /messages]
-    Seller[ChatView.vue /merchant/messages]
-    Api[chat.js]
-    Client[realtimeClient.js]
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«boundary»<br/>ChatView.vue"]
+    API["«controller»<br/>ChatController"]
+    Svc["«service»<br/>ChatServiceImpl"]
+    Conv["«repository»<br/>ChatConversationMapper"]
+    Msg["«repository»<br/>ChatMessageMapper"]
+    RT["«service»<br/>RealtimePushService"]
   end
-
-  subgraph Backend[Spring Boot]
-    Auth[JWT 与 UserContext]
-    Controller[ChatController]
-    Service[ChatServiceImpl]
-    ACL[参与者、来源和双向拉黑校验]
-    ConversationMapper[ChatConversationMapper]
-    MessageMapper[ChatMessageMapper]
-    BlockMapper[UserBlockMapper]
-    Notification[NotificationService]
-    Push[RealtimePushService]
-  end
-
-  Conversation[(chat_conversation)]
-  Message[(chat_message)]
-  Block[(user_block)]
-  Notice[(notification)]
-
-  Buyer --> Api
-  Seller --> Api
-  Api -->|/api/chat/**| Auth --> Controller --> Service --> ACL
-  ACL --> ConversationMapper --> Conversation
-  ACL --> MessageMapper --> Message
-  ACL --> BlockMapper --> Block
-  Service --> Notification --> Notice
-  Controller -->|持久化成功后尽力推送| Push --> Client
-  Client --> Buyer
-  Client --> Seller
+  UI -->|"发送消息"| API
+  API -->|"sendMessage"| Svc
+  Svc -->|"查询或插入会话"| Conv
+  Svc -->|"持久化消息"| Msg
+  Svc -->|"推送接收者"| RT

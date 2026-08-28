@@ -1,0 +1,22 @@
+%% OBJ-SEQ12
+sequenceDiagram
+  autonumber
+  participant Idem as IdempotencyInterceptor
+  participant C as OrderController
+  participant S as OrderServiceImpl
+  participant O as OrderInfo
+  participant F as EscrowSettlementService
+  participant B as Balance
+  participant T as TransactionRecord
+  Idem->>C: pay/cancel + X-Idempotency-Key
+  C->>S: payMyOrder/cancelMyOrder
+  S->>O: 校验 owner/status/version
+  alt 支付
+    S->>F: debitBuyer(orderAmount)
+    F->>B: optimistic update
+    F->>T: insert payment record
+    S->>O: update PENDING_SHIP
+  else 取消
+    S->>O: update CLOSED 并恢复库存
+  end
+  S-->>Idem: 保存并返回可回放结果

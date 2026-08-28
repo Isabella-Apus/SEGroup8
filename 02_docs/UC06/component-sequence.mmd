@@ -1,0 +1,16 @@
+%% COMP-SEQ06
+sequenceDiagram
+  autonumber
+  participant UI as 商品列表/详情页
+  participant API as CatalogController
+  participant Svc as CatalogService
+  participant DB as products
+  UI->>API: GET /api/catalog/products
+  API->>Svc: search(filters)
+  Svc->>DB: 查询 ON_SALE 商品
+  DB-->>Svc: 商品集合
+  Svc-->>UI: 过滤并排序的结果
+  UI->>API: GET /api/catalog/products/{id}
+  API->>Svc: publicDetail(id)
+  Svc->>DB: 查询在售详情
+  DB-->>UI: 商品详情/不存在

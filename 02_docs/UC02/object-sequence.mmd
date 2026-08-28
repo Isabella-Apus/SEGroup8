@@ -1,0 +1,18 @@
+%% OBJ-SEQ02
+sequenceDiagram
+  autonumber
+  participant C as UserController
+  participant S as UserServiceImpl
+  participant Req as UserProfileUpdateRequest/AddressSaveRequest
+  participant U as User
+  participant A as Address
+  participant UM as UserMapper
+  participant AM as AddressMapper
+  C->>S: updateProfile/saveAddress(userId, Req)
+  S->>UM: selectById(userId)
+  S->>AM: 校验 address.userId
+  opt 新默认地址
+    S->>AM: clearDefaultByUserId(userId)
+  end
+  S->>AM: insertOrUpdate(A)
+  S-->>C: UserVO/AddressVO

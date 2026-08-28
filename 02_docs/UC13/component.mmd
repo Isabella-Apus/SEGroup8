@@ -1,10 +1,15 @@
+%% COMP-STRUCT13
 flowchart LR
-    Seller[卖家] --> OC[OrderController]
-    Buyer[买家] --> OC
-    OC --> OS[OrderServiceImpl]
-    OC --> LC[LogisticsController]
-    LC --> LS[LogisticsServiceImpl]
-    OS --> O[(order_info)]
-    LS --> T[(logistics_trace)]
-    LS --> O
-    OS --> Auth[订单归属/状态校验]
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«boundary»<br/>MerchantOrders/OrderDetail.vue"]
+    API["«controller»<br/>OrderController"]
+    Order["«service»<br/>OrderServiceImpl"]
+    Logistics["«service»<br/>LogisticsServiceImpl"]
+    Scheduler["«service»<br/>OrderAutoConfirmScheduler"]
+    Finance["«service»<br/>EscrowSettlementService"]
+  end
+  UI -->|"发货/确认收货"| API
+  API -->|"ship/confirmReceive"| Order
+  Order -->|"初始化或读取轨迹"| Logistics
+  Scheduler -->|"autoConfirm"| Order
+  Order -->|"释放担保资金"| Finance

@@ -1,0 +1,18 @@
+%% OBJ-SEQ06
+sequenceDiagram
+  autonumber
+  participant C as CatalogController/ProductController
+  participant S as CatalogService/ProductServiceImpl
+  participant Q as ProductPageQueryRequest
+  participant P as Product
+  participant M as ProductMapper
+  participant H as CatalogErrorHandler
+  C->>S: search(Q)/publicDetail(id)
+  S->>Q: 规范关键词、价格和排序
+  S->>M: select ON_SALE products
+  M-->>S: Product 集合或空
+  alt 参数或详情无效
+    S->>H: mapException(errorCode)
+  else 有效
+    S-->>C: PageVO<ProductVO>/ProductVO
+  end

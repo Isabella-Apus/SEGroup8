@@ -1,0 +1,20 @@
+%% OBJ-SEQ03
+sequenceDiagram
+  autonumber
+  participant C as AdminMerchantApplicationController
+  participant S as MerchantApplicationServiceImpl
+  participant A as MerchantApplication
+  participant U as User
+  participant Shop as Shop
+  participant N as NotificationService
+  participant Audit as AdminAuditLogService
+  C->>S: approve/reject(adminId, applicationId)
+  S->>A: 检查 status=PENDING
+  alt 通过
+    S->>U: role=OFFICIAL_SELLER
+    S->>Shop: createOrEnable
+  else 拒绝
+    S->>A: 保存 rejectReason
+  end
+  S->>N: 通知申请人
+  S->>Audit: 记录审核动作

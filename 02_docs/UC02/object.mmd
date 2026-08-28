@@ -1,4 +1,35 @@
+%% DESIGN-CLASS02
 classDiagram
-  class User { Long id; String username; String nickname; String email }
-  class Address { Long id; Long userId; String detailAddress; Integer isDefault }
-  User "1" --> "0..*" Address : owns
+  class C["UserController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class S["UserServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class Req["UserProfileUpdateRequest/AddressSaveRequest"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class U["User"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class A["Address"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class UM["UserMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  class AM["AddressMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  C --> S : updateProfile/saveAddres
+  S --> UM : selectById
+  S --> AM : 校验 address.userId

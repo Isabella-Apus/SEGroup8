@@ -1,12 +1,24 @@
-# UC03 商家申请、审核与角色升级
+# UC03 商家申请、通过和拒绝
 
-状态：后端/API/H2 集成与真实 Compose + MySQL + Chromium 浏览器执行均已完成。
+状态：**LOCAL_E2E_PASS**。
 
-- 需求：`REQ03 / UC03`
-- 集成测试：`MerchantApplicationUc03IntegrationTest`、
-  `MerchantApplicationNotificationFailureIntegrationTest`
+本目录是 UC03 需求、六类图模型、追溯和测试文档的唯一事实来源。
+
+- [需求说明](requirement.md)
+- [追溯矩阵](traceability.md)
+- [测试计划](test-plan.md)
+- [测试报告](test-report.md)
 - 浏览器测试：`frontend/e2e/domain-a/uc03-merchant-application.spec.ts`
-- 证据：`04_tests/UC03/evidence/`
+- 原始证据：`../../04_tests/UC03/evidence/`
+- Domain：`A-identity`
 
-通过审核必须同时更新申请、用户角色和店铺，并留下管理员审计；驳回只
-更新申请状态与原因。通知是 best-effort side effect，故障不回滚核心审核结果。
+最新 main 全 UC Playwright Job：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611
+
+## 图模型（按参考文档分层）
+
+- [系统行为模型](system.mmd)
+- [概念类图](concept.mmd)
+- [组件结构图](component.mmd)
+- [组件顺序图](component-sequence.mmd)
+- [详细设计类图](object.mmd)
+- [对象顺序图](object-sequence.mmd)

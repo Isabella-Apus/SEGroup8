@@ -1,20 +1,12 @@
+%% SYS-BEH17
 sequenceDiagram
-    actor Buyer as 买家
-    participant UI as Vue/Nginx
-    participant API as SecondhandProductController
-    participant Service as SecondhandProductService
-    participant DB as MySQL
-
-    Buyer->>UI: 选择本人地址并确认购买
-    UI->>API: POST /api/secondhand/{id}/buy
-    API->>Service: buySecondhandProduct
-    Service->>DB: 校验商品、拍卖、拉黑、地址和议价
-    Service->>DB: 条件更新商品 1 -> 3
-    alt 抢占成功
-        Service->>DB: 同一事务写订单和订单明细
-        DB-->>Service: commit
-        Service-->>UI: 待付款订单
-    else 商品已被抢占或写入失败
-        DB-->>Service: rollback
-        Service-->>UI: 拒绝购买
-    end
+  autonumber
+  actor Buyer as 买家
+  participant System as 交易平台
+  actor Seller as 二手卖家
+  Buyer->>System: 查看二手商品详情
+  Buyer->>System: 确认地址并立即购买
+  System-->>Buyer: 生成待付款订单
+  Buyer->>System: 模拟支付
+  System-->>Buyer: 订单待发货
+  System-->>Seller: 卖家可查看待发货订单

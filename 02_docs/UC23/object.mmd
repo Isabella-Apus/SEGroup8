@@ -1,28 +1,38 @@
+%% DESIGN-CLASS23
 classDiagram
-    class FinanceController
-    class FinanceRechargeRequest
-    class FinanceDashboardVO
-    class FinanceRecordVO
-    class EscrowSettlementService
-    class NewProductSettlementStrategy
-    class Balance {
-      Long userId
-      BigDecimal personalBalance
-      BigDecimal businessBalance
-      Integer version
-    }
-    class TransactionRecord {
-      Long orderId
-      Long userId
-      String accountType
-      String tradeType
-      BigDecimal amount
-      BigDecimal balanceAfter
-    }
-    FinanceController --> FinanceRechargeRequest
-    FinanceController --> FinanceDashboardVO
-    FinanceController --> FinanceRecordVO
-    FinanceController --> EscrowSettlementService
-    NewProductSettlementStrategy --> EscrowSettlementService
-    EscrowSettlementService --> Balance
-    EscrowSettlementService --> TransactionRecord
+  class C["FinanceController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class S["EscrowSettlementService"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class Req["FinanceRechargeRequest"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class B["Balance"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class BM["BalanceMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  class T["TransactionRecord"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class TM["TransactionRecordMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  C --> S : recharge/dashboard/settl
+  S --> Req : 校验金额精度和范围
+  S --> B : 选择 personal 或 business 字
+  S --> BM : optimisticUpdate
+  S --> T : 构造 tradeType/relatedOrde
+  S --> TM : insert

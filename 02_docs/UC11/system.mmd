@@ -1,27 +1,15 @@
+%% SYS-BEH11
 sequenceDiagram
-  actor Buyer as Buyer
-  participant Cart as CartView
-  participant API as OrderController
-  participant Service as OrderServiceImpl
-  participant Voucher as VoucherService
-  participant DB as MySQL
-
-  Buyer->>Cart: Select items and checkout
-  Cart->>API: POST /api/order/create
-  API->>Service: createOrder(request)
-  Service->>DB: Read products, shop, address and block relation
-  Service->>DB: Deduct inventory and insert order aggregate
-  opt Voucher selected
-    Service->>Voucher: occupyForOrder(...)
-    Voucher->>DB: Validate and occupy user_voucher
+  autonumber
+  actor Buyer as 买家
+  participant System as 交易平台
+  Buyer->>System: 提交购物车和地址
+  System->>System: 重查价格、状态和库存
+  alt 全部有效
+    System->>System: 按新品店铺和二手单件拆分
+    System->>System: 扣减库存并保存订单
+    System-->>Buyer: 返回多个待付款订单
+  else 任一商品或地址无效
+    System->>System: 回滚本次结算
+    System-->>Buyer: 返回明确失败原因
   end
-  alt All checks succeed
-    Service-->>API: OrderVO
-    API-->>Cart: Result<OrderVO>
-    Cart->>API: GET /api/order/detail/{id}
-    API-->>Cart: Persisted order detail
-  else Any check fails
-    Service->>DB: Roll back transaction
-    API-->>Cart: Business error
-  end
-

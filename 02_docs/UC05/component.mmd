@@ -1,18 +1,14 @@
-flowchart TB
-  RC[ReportBlockController]
-  AC[AdminReportController]
-  RS[ReportBlockServiceImpl]
-  CS[CreditServiceImpl]
-  RM[UserReportMapper]
-  BM[UserBlockMapper]
-  UM[UserMapper]
-  CL[CreditScoreLogMapper]
-  RC --> RS
-  AC --> RS
-  AC --> CS
-  RS --> RM
-  RS --> BM
-  RS --> UM
-  RS --> CS
-  CS --> UM
-  CS --> CL
+%% COMP-STRUCT05
+flowchart LR
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«boundary»<br/>Credit/AdminReport.vue"]
+    API["«controller»<br/>ReportBlockController/AdminReportController"]
+    Svc["«service»<br/>ReportBlockServiceImpl"]
+    Credit["«service»<br/>CreditServiceImpl"]
+    DB["«collaborator»<br/>user_report/user_block/credit_score_log"]
+  end
+  UI -->|"举报、拉黑或审核"| API
+  API -->|"校验身份和目标"| Svc
+  Svc -->|"保存关系或审核状态"| DB
+  Svc -->|"adjustScore"| Credit
+  Credit -->|"写信用分日志"| DB

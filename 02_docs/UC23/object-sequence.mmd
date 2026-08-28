@@ -1,0 +1,17 @@
+%% OBJ-SEQ23
+sequenceDiagram
+  autonumber
+  participant C as FinanceController
+  participant S as EscrowSettlementService
+  participant Req as FinanceRechargeRequest
+  participant B as Balance
+  participant BM as BalanceMapper
+  participant T as TransactionRecord
+  participant TM as TransactionRecordMapper
+  C->>S: recharge/dashboard/settle(userId, Req/order)
+  S->>Req: 校验金额精度和范围
+  S->>B: 选择 personal 或 business 字段
+  S->>BM: optimisticUpdate(balance, version)
+  S->>T: 构造 tradeType/relatedOrderId
+  S->>TM: insert(T)
+  S-->>C: FinanceDashboardVO/FinanceRecordVO

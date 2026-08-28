@@ -1,10 +1,19 @@
 # UC12 追溯矩阵
 
-| 需求/验收标准 | 设计 | 代码入口 | 已有后端证据 | 浏览器状态 |
-| --- | --- | --- | --- | --- |
-| `REQ12`, `AC12-01` 支付待付款订单 | [system.mmd](system.mmd), [component.mmd](component.mmd) | `OrderController`, `OrderServiceImpl` | `04_tests/UC12/evidence/result-summary.json`：8 条后端测试通过 | `E2E_PENDING`，本轮不处理 |
-| `AC12-02` 支付后状态和金额一致 | [object.mmd](object.mmd) | `order_info`, `order_item`、支付服务 | `04_tests/UC12/` MySQL/集成报告 | `E2E_PENDING` |
-| `AC12-03` 合法取消并保持幂等 | [system.mmd](system.mmd) | `OrderServiceImpl` 取消分支 | `UC12-订单支付与取消-测试报告.md` | `E2E_PENDING` |
-| `AC12-04` 越权/非法状态拒绝且不改库 | [component.mmd](component.mmd) | 归属和状态校验 | `04_tests/domains/C-order-fulfillment/evidence/result-summary.json` | `E2E_PENDING` |
+| 需求 / 用例 | 六类图模型 | 主要代码模块 | 测试编号与现有测试 | 结果 / 证据 |
+|---|---|---|---|---|
+| REQ12 / UC12 支付取消 | SYS-BEH12 / CONCEPT-CLASS12 / COMP-STRUCT12 / COMP-SEQ12 / DESIGN-CLASS12 / OBJ-SEQ12 | `OrderView.vue`；`OrderServiceImpl`、`IdempotencyInterceptor` | UNIT-TC12-001 `cancelMyOrder_shouldRestoreStock...`；UNIT-TC12-002 `IdempotencyInterceptorTest` 3 项；E2E-TC12-001 `frontend/e2e/domain-c/uc12-pay-cancel.spec.ts` | **LOCAL_E2E_PASS**：已归档 Playwright JSON，1/1 通过、unexpected 0；路径 `../../04_tests/UC12/evidence/raw-reports/playwright/playwright-results.json`。最新 main 全量 E2E CI 同时通过：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611 |
 
-完整需求见 [UC12 需求](../../01_requirements/UC12-订单支付与取消.md)，完整测试说明见 [UC12 测试报告](../../04_tests/UC12/UC12-订单支付与取消-测试报告.md)。
+## 权威材料
+
+- 需求：[requirement.md](requirement.md)
+- 系统行为模型：[system.mmd](system.mmd)
+- 概念类图：[concept.mmd](concept.mmd)
+- 组件结构图：[component.mmd](component.mmd)
+- 组件顺序图：[component-sequence.mmd](component-sequence.mmd)
+- 详细设计类图：[object.mmd](object.mmd)
+- 对象顺序图：[object-sequence.mmd](object-sequence.mmd)
+- 测试计划：[test-plan.md](test-plan.md)
+- 测试报告：[test-report.md](test-report.md)
+- 浏览器测试：`frontend/e2e/domain-c/uc12-pay-cancel.spec.ts`
+- 原始证据：`../../04_tests/UC12/evidence/`

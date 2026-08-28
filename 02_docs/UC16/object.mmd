@@ -1,41 +1,27 @@
+%% DESIGN-CLASS16
 classDiagram
-  class SecondhandProductSaveRequest {
-    +String name
-    +List~String~ images
-    +BigDecimal originPrice
-    +BigDecimal salePrice
-    +Integer categoryId
-    +Integer subCategoryId
-    +String conditionLevel
-    +Integer isNegotiable
+  class C["SecondhandProductController"] {
+    <<controller>>
+    +handleRequest()
   }
-  class SecondhandProductController {
-    +sellerCreate(request)
-    +sellerUpdate(productId, request)
-    +sellerChangeStatus(productId, request)
-    +sellerDelete(productId)
+  class S["SecondhandProductServiceImpl"] {
+    <<service>>
+    +executeUseCase()
   }
-  class SecondhandProductServiceImpl {
-    +createSellerProduct(request)
-    +updateSellerProduct(productId, request)
-    +changeSellerProductStatus(productId, status)
-    +deleteSellerProduct(productId)
-    -validateSecondhandCategory(categoryId, subCategoryId)
-    -ensureProductMutable(product)
+  class Req["SecondhandProductSaveRequest"] {
+    <<collaborator>>
+    +applyBusinessRule()
   }
-  class SecondhandProduct {
-    +Long id
-    +Long sellerUserId
-    +String images
-    +BigDecimal originPrice
-    +BigDecimal salePrice
-    +Integer status
+  class P["SecondhandProduct"] {
+    <<collaborator>>
+    +applyBusinessRule()
   }
-  class Category
-  class ProductRiskAudit
-
-  SecondhandProductController --> SecondhandProductSaveRequest
-  SecondhandProductController --> SecondhandProductServiceImpl
-  SecondhandProductServiceImpl --> SecondhandProduct
-  SecondhandProductServiceImpl --> Category
-  SecondhandProductServiceImpl --> ProductRiskAudit
+  class M["SecondhandProductMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  C --> S : createSellerProduct
+  S --> Req : 校验名称、价格、成色、分类
+  S --> P : 构造 sellerUserId/status/i
+  S --> M : insert

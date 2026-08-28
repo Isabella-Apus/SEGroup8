@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS14
+classDiagram
+  class AfterSaleRequest {
+    +identifier: String
+    +state: String
+  }
+  class OrderInfo {
+    +identifier: String
+    +state: String
+  }
+  class RefundRecord {
+    +identifier: String
+    +state: String
+  }
+  AfterSaleRequest "1" --> "0..*" OrderInfo : 关联
+  OrderInfo "0..*" --> "1" RefundRecord : 产生/归属

@@ -1,0 +1,13 @@
+%% COMP-SEQ21
+sequenceDiagram
+  autonumber
+  participant UI as SellerVoucher/AdminVoucher.vue
+  participant API as VoucherController
+  participant Svc as VoucherService
+  participant Shop as ShopMapper
+  participant DB as VoucherMapper
+  UI->>API: 创建/编辑/关闭/删除
+  API->>Svc: 传入当前用户和请求
+  Svc->>Shop: 解析卖家真实店铺
+  Svc->>DB: 校验所有权并写入 voucher
+  DB-->>UI: 最新优惠券状态

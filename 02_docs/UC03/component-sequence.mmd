@@ -1,0 +1,15 @@
+%% COMP-SEQ03
+sequenceDiagram
+  autonumber
+  participant UserUI as MerchantApplyView.vue
+  participant AdminUI as AdminMerchantReviewView.vue
+  participant API as AdminMerchantApplicationController
+  participant Svc as MerchantApplicationServiceImpl
+  participant DB as merchant_application/user/shop
+  participant Audit as AdminAuditLogService
+  UserUI->>Svc: 提交申请
+  Svc->>DB: 保存 PENDING
+  AdminUI->>API: 通过或拒绝
+  API->>Svc: review(applicationId, decision)
+  Svc->>DB: 更新申请、角色和店铺
+  Svc->>Audit: 写审核记录

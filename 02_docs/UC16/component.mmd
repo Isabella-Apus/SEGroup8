@@ -1,27 +1,13 @@
+%% COMP-STRUCT16
 flowchart LR
-  Seller[Seller browser]
-  Publish[SecondhandPublishView]
-  Manage[MerchantSecondhandProductsView]
-  Upload[UploadController]
-  ProductApi[SecondhandProductController]
-  CategoryApi[CategoryController]
-  ProductService[SecondhandProductServiceImpl]
-  RiskService[ProductRiskAuditServiceImpl]
-  ProductMapper[SecondhandProductMapper]
-  CategoryMapper[CategoryMapper]
-  DB[(MySQL)]
-
-  Seller --> Publish
-  Seller --> Manage
-  Publish --> Upload
-  Publish --> CategoryApi
-  Publish --> ProductApi
-  Manage --> ProductApi
-  ProductApi --> ProductService
-  CategoryApi --> CategoryMapper
-  ProductService --> CategoryMapper
-  ProductService --> ProductMapper
-  ProductService --> RiskService
-  RiskService --> DB
-  ProductMapper --> DB
-  CategoryMapper --> DB
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«collaborator»<br/>发布闲置/二手管理页"]
+    API["«controller»<br/>SecondhandProductController"]
+    Svc["«service»<br/>SecondhandProductService"]
+    Mapper["«repository»<br/>SecondhandProductMapper"]
+    DB["«collaborator»<br/>secondhand_product"]
+  end
+  UI -->|"GET /api/secondhand/sell"| API
+  API -->|"pageSellerProducts"| Svc
+  Svc -->|"insert"| Mapper
+  Mapper -->|"写入商品"| DB

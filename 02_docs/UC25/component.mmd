@@ -1,33 +1,15 @@
-sequenceDiagram
-    actor User as 用户
-    participant View as NotificationView
-    participant Client as realtimeClient
-    participant API as NotificationController
-    participant Service as NotificationService
-    participant DB as notification
-    participant Push as RealtimePushService
-
-    User->>Client: 登录后建立 JWT WebSocket
-    User->>View: 打开通知页
-    View->>API: GET /api/notifications?scope=
-    API->>Service: listMyNotifications(currentUserId, scope)
-    Service->>DB: 按 user_id 查询并过滤 scope
-    DB-->>View: 当前用户通知
-
-    Service->>DB: INSERT 未读通知
-    Service->>Push: pushToUser(ownerId, NOTIFICATION_CREATED)
-    Push-->>Client: 通知事件
-    Client-->>View: 页面内事件
-    View->>View: 去重并置顶显示
-
-    User->>View: 标记已读
-    View->>API: POST /api/notifications/{id}/read
-    API->>Service: markRead(currentUserId, id)
-    Service->>DB: 校验归属后 UPDATE
-
-    Client--xPush: 网络中断
-    Service->>DB: 断线期间继续 INSERT
-    Client->>Push: 退避重连
-    Client-->>View: REALTIME_RECONNECTED
-    View->>API: GET /api/notifications
-    API-->>View: 补回遗漏通知
+%% COMP-STRUCT25
+flowchart LR
+  subgraph Boundary["Kinda Goods 组件边界"]
+    Biz["«collaborator»<br/>订单/议价/审核模块"]
+    Svc["«service»<br/>NotificationServiceImpl"]
+    DB["«repository»<br/>NotificationMapper"]
+    RT["«service»<br/>RealtimePushService"]
+    WS["«collaborator»<br/>RealtimeWebSocketHandler"]
+    UI["«boundary»<br/>NotificationView.vue"]
+  end
+  Biz -->|"create"| Svc
+  Svc -->|"按当前用户更新"| DB
+  Svc -->|"pushToUser"| RT
+  RT -->|"发送实时事件"| WS
+  UI -->|"查询/单条已读/全部已读"| Svc

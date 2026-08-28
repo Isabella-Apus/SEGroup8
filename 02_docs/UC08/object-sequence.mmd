@@ -1,0 +1,14 @@
+%% OBJ-SEQ08
+sequenceDiagram
+  autonumber
+  participant C as ShopController
+  participant S as ShopServiceImpl
+  participant Req as ShopDecorationSaveRequest
+  participant Shop as Shop
+  participant M as ShopMapper
+  C->>S: getPublic/updateSetting/saveDecoration
+  S->>Shop: 校验 OPEN 或 ownerUserId
+  S->>Req: 校验模板、组件和 JSON 大小
+  S->>M: select/update Shop
+  M-->>S: 持久化结果
+  S-->>C: ShopPublicVO/ShopVO

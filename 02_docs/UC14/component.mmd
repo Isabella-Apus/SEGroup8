@@ -1,10 +1,15 @@
+%% COMP-STRUCT14
 flowchart LR
-    Buyer[买家] --> C[OrderController]
-    Seller[卖家] --> C
-    Admin[管理员] --> C
-    C --> S[OrderServiceImpl]
-    S --> R[退款模式/归属/状态校验]
-    R --> O[(order_info)]
-    R --> RF[(refund record)]
-    S --> F[钱包/退款服务]
-    F --> W[(wallet/ledger)]
+  subgraph Boundary["Kinda Goods 组件边界"]
+    BuyerUI["«boundary»<br/>AfterSaleView.vue"]
+    AdminUI["«boundary»<br/>AdminOrderView.vue"]
+    API["«controller»<br/>OrderController/AdminOrderController"]
+    Order["«service»<br/>OrderServiceImpl"]
+    Finance["«service»<br/>EscrowSettlementService"]
+    DB["«collaborator»<br/>order_info/order_after_sale_log"]
+  end
+  BuyerUI -->|"提交退款/退货申请"| API
+  API -->|"approve/reject"| Order
+  Order -->|"保存最终状态和处理人"| DB
+  AdminUI -->|"审核或仲裁"| API
+  Order -->|"refund"| Finance

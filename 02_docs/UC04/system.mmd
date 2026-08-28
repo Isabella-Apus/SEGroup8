@@ -1,7 +1,14 @@
-flowchart LR
-  Admin[管理员] --> Controller[AdminUserController]
-  Controller --> Service[AdminUserService]
-  Service --> User[(user status)]
-  Controller --> Audit[AdminAuditLogService]
-  Audit --> Log[(admin_audit_log)]
-  Login[AuthController] --> User
+%% SYS-BEH04
+sequenceDiagram
+  autonumber
+  actor Admin as 管理员
+  actor User as 目标用户
+  participant System as 交易平台
+  Admin->>System: 封禁用户并填写原因
+  System-->>Admin: 返回封禁结果和审计编号
+  User->>System: 尝试登录
+  System-->>User: 拒绝登录
+  Admin->>System: 解禁用户
+  System-->>Admin: 返回解禁结果
+  User->>System: 再次登录
+  System-->>User: 登录成功

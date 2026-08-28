@@ -1,0 +1,15 @@
+%% COMP-SEQ19
+sequenceDiagram
+  autonumber
+  participant UI as 二手详情/二手管理
+  participant API as SecondhandTradeController
+  participant Svc as SecondhandTradeService
+  participant Auction as ProductAuctionMapper
+  participant Log as AuctionLogMapper
+  UI->>API: POST /api/secondhand/trade/auction
+  API->>Svc: createAuction(sellerId, request)
+  Svc->>Auction: insert(ONGOING)
+  UI->>API: POST /api/secondhand/trade/auction/{auctionId}/bid
+  API->>Svc: placeBid(buyerId, request)
+  Svc->>Auction: update currentPrice/leader
+  Svc->>Log: insert bid log

@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS19
+classDiagram
+  class Auction {
+    +identifier: String
+    +state: String
+  }
+  class BidRecord {
+    +identifier: String
+    +state: String
+  }
+  class OrderInfo {
+    +identifier: String
+    +state: String
+  }
+  Auction "1" --> "0..*" BidRecord : 关联
+  BidRecord "0..*" --> "1" OrderInfo : 产生/归属

@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS04
+classDiagram
+  class User {
+    +identifier: String
+    +state: String
+  }
+  class BanRecord {
+    +identifier: String
+    +state: String
+  }
+  class AdminAuditLog {
+    +identifier: String
+    +state: String
+  }
+  User "1" --> "0..*" BanRecord : 关联
+  BanRecord "0..*" --> "1" AdminAuditLog : 产生/归属

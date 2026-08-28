@@ -1,0 +1,17 @@
+%% OBJ-SEQ05
+sequenceDiagram
+  autonumber
+  participant C as ReportBlockController/AdminReportController
+  participant S as ReportBlockServiceImpl
+  participant R as UserReport
+  participant B as UserBlock
+  participant Credit as CreditServiceImpl
+  participant Log as CreditScoreLog
+  C->>S: report/block/review(currentUser, request)
+  S->>R: 新建或流转举报状态
+  S->>B: insert/delete 拉黑关系
+  opt 举报成立
+    S->>Credit: adjustScore(targetId, delta)
+    Credit->>Log: insert change record
+  end
+  S-->>C: 处理结果

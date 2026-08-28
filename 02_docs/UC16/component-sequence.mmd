@@ -1,0 +1,15 @@
+%% COMP-SEQ16
+sequenceDiagram
+  autonumber
+  participant UI as 发布闲置/二手管理页
+  participant API as SecondhandProductController
+  participant Svc as SecondhandProductService
+  participant Mapper as SecondhandProductMapper
+  participant DB as secondhand_product
+  UI->>API: POST /api/secondhand/seller
+  API->>Svc: createSellerProduct(userId, request)
+  Svc->>Mapper: insert(SecondhandProduct)
+  Mapper->>DB: 写入商品
+  UI->>API: GET /api/secondhand/seller/list
+  API->>Svc: pageSellerProducts(query)
+  Svc-->>UI: PageVO<SecondhandProductVO>

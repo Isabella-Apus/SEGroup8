@@ -1,31 +1,24 @@
-# UC12 订单支付与取消
+# UC12 支付和取消
 
-- 需求：`REQ12 / UC12`
-- 所属领域：Domain C（Order Fulfillment）
-- 本目录是 UC12 的标准嵌套文档入口；系统级、组件级、对象级图和追溯矩阵均以本目录文件为准。
+状态：**LOCAL_E2E_PASS**。
 
-## 文档导航
+本目录是 UC12 需求、六类图模型、追溯和测试文档的唯一事实来源。
 
-- [需求](../../01_requirements/UC12-订单支付与取消.md)
-- [系统级图](system.mmd)
-- [组件级图](component.mmd)
-- [对象级图](object.mmd)
+- [需求说明](requirement.md)
 - [追溯矩阵](traceability.md)
-- [后端测试报告](../../04_tests/UC12/UC12-订单支付与取消-测试报告.md)
+- [测试计划](test-plan.md)
+- [测试报告](test-report.md)
+- 浏览器测试：`frontend/e2e/domain-c/uc12-pay-cancel.spec.ts`
+- 原始证据：`../../04_tests/UC12/evidence/`
+- Domain：`C-order-fulfillment`
 
-## 业务与设计边界
+最新 main 全 UC Playwright Job：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611
 
-买家对待付款订单发起支付，系统校验订单归属、支付状态和金额后更新订单；买家在允许取消的状态下取消订单，系统保持支付、退款和订单状态的一致性。查询和写操作必须按当前用户隔离。
+## 图模型（按参考文档分层）
 
-| 组件 | 责任 |
-| --- | --- |
-| `OrderController` | 暴露支付、取消和订单查询接口，统一响应。 |
-| `OrderServiceImpl` | 校验订单归属、状态和金额，执行状态迁移及幂等处理。 |
-| `Payment/Refund` 相关服务 | 记录支付或取消后的资金结果，失败时不产生错误状态。 |
-| `OrderMapper` | 持久化订单主表、明细及状态字段。 |
-
-关键数据为 `order_info`、`order_item` 及支付/退款记录。支付成功进入已支付状态；取消只对允许取消的未支付订单生效。具体字段和接口以现有代码及需求文档为准。
-
-## 验证口径
-
-`04_tests/UC12/evidence/result-summary.json` 记录的后端 MySQL/集成证据为 8 条通过。已有 Playwright 产物只作为历史记录保留；本轮不重新执行浏览器 E2E，因此不能据此更新为新的浏览器通过。
+- [系统行为模型](system.mmd)
+- [概念类图](concept.mmd)
+- [组件结构图](component.mmd)
+- [组件顺序图](component-sequence.mmd)
+- [详细设计类图](object.mmd)
+- [对象顺序图](object-sequence.mmd)

@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS08
+classDiagram
+  class Shop {
+    +identifier: String
+    +state: String
+  }
+  class ShopDecoration {
+    +identifier: String
+    +state: String
+  }
+  class Product {
+    +identifier: String
+    +state: String
+  }
+  Shop "1" --> "0..*" ShopDecoration : 关联
+  ShopDecoration "0..*" --> "1" Product : 产生/归属

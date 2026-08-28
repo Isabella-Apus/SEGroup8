@@ -1,0 +1,15 @@
+%% COMP-SEQ11
+sequenceDiagram
+  autonumber
+  participant UI as CartView.vue
+  participant API as OrderController
+  participant Order as OrderServiceImpl
+  participant Catalog as 商品目录接口
+  participant DB as order_info/order_item
+  UI->>API: POST /api/order/create(items,addressId)
+  API->>Order: createMyOrders(request)
+  Order->>Catalog: 批量校验价格、状态和库存
+  Catalog-->>Order: 商品快照/失败
+  Order->>Order: 按新品店铺和二手单件拆分
+  Order->>DB: 事务写入订单和明细
+  DB-->>UI: 待付款订单列表

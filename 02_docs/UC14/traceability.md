@@ -1,10 +1,19 @@
 # UC14 追溯矩阵
 
-| 需求/验收标准 | 设计 | 代码入口 | 已有后端证据 | 浏览器状态 |
-| --- | --- | --- | --- | --- |
-| `REQ14`, `AC14-01` 买家申请退款 | [system.mmd](system.mmd), [component.mmd](component.mmd) | `OrderController`, `OrderServiceImpl` | `04_tests/UC14/evidence/result-summary.json`：9 条后端测试通过 | `E2E_PENDING`，本轮不处理 |
-| `AC14-02` 卖家/管理员审核 | [object.mmd](object.mmd) | `OrderServiceImpl` 审核分支 | `AdminOrderControllerWebMvcTest`、集成测试 | `E2E_PENDING` |
-| `AC14-03` 退款金额与订单状态一致 | [component.mmd](component.mmd) | 退款/钱包服务 | UC14 MySQL evidence | `E2E_PENDING` |
-| `AC14-04` 越权、重复和非法模式拒绝 | [system.mmd](system.mmd) | `validateRefundMode` 等校验 | Domain-C 结构化汇总 | `E2E_PENDING` |
+| 需求 / 用例 | 六类图模型 | 主要代码模块 | 测试编号与现有测试 | 结果 / 证据 |
+|---|---|---|---|---|
+| REQ14 / UC14 退款退货仲裁 | SYS-BEH14 / CONCEPT-CLASS14 / COMP-STRUCT14 / COMP-SEQ14 / DESIGN-CLASS14 / OBJ-SEQ14 | `AfterSaleView.vue`、`AdminOrderView.vue`；`OrderServiceImpl`、`AdminOrderController` | INT-TC14-001 `buyerApply_thenAdminApprove_thenLogsShouldExist`；INT-TC14-002 `refundSplitShouldHandleOnlyRefundAndTimeoutAutoRefund`；WebMvc 3 项；E2E-TC14-001 `frontend/e2e/domain-c/uc14-after-sale.spec.ts` | **LOCAL_E2E_PASS**：已归档 Playwright JSON，1/1 通过、unexpected 0；路径 `../../04_tests/UC14/evidence/raw-reports/playwright/playwright-results.json`。最新 main 全量 E2E CI 同时通过：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611 |
 
-完整需求见 [UC14 需求](../../01_requirements/UC14-订单售后退款.md)，完整测试说明见 [UC14 测试报告](../../04_tests/UC14/UC14-订单售后退款-测试报告.md)。
+## 权威材料
+
+- 需求：[requirement.md](requirement.md)
+- 系统行为模型：[system.mmd](system.mmd)
+- 概念类图：[concept.mmd](concept.mmd)
+- 组件结构图：[component.mmd](component.mmd)
+- 组件顺序图：[component-sequence.mmd](component-sequence.mmd)
+- 详细设计类图：[object.mmd](object.mmd)
+- 对象顺序图：[object-sequence.mmd](object-sequence.mmd)
+- 测试计划：[test-plan.md](test-plan.md)
+- 测试报告：[test-report.md](test-report.md)
+- 浏览器测试：`frontend/e2e/domain-c/uc14-after-sale.spec.ts`
+- 原始证据：`../../04_tests/UC14/evidence/`

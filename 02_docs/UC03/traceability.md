@@ -1,11 +1,19 @@
-# UC03 traceability
+# UC03 追溯矩阵
 
-状态：后端集成与 API 证据已完成；真实 Compose + MySQL + Chromium 执行已完成。
-
-| Requirement / acceptance | Implementation | Integration | E2E | 状态 |
+| 需求 / 用例 | 六类图模型 | 主要代码模块 | 测试编号与现有测试 | 结果 / 证据 |
 |---|---|---|---|---|
-| REQ03 submit and query own application | `MerchantApplicationServiceImpl.submit/getMyApplication` | main UC03 test | submit and query | 后端与浏览器已完成 |
-| REQ03 admin-only review | `pageForAdmin/approve/reject` | admin token + page assertions | API-assisted full-stack | 后端与浏览器已完成 |
-| REQ03 approve role/shop/audit linkage | `approve`, `AdminAuditLogService` | persisted app/user/shop/notification/audit checks | profile reload | 后端与浏览器已完成 |
-| REQ03 reject reason and unchanged role | `reject` | rejected branch assertions | rejected API path | 后端与浏览器已完成 |
-| REQ03 notification failure isolation | `persistNotificationSafely` | fault-injection integration test | documented as backend gate | 已完成 |
+| REQ03 / UC03 商家申请 | SYS-BEH03 / CONCEPT-CLASS03 / COMP-STRUCT03 / COMP-SEQ03 / DESIGN-CLASS03 / OBJ-SEQ03 | `MerchantApplyView.vue`、`AdminMerchantReviewView.vue`；`MerchantApplicationServiceImpl` | UNIT-TC03-001 `MerchantApplicationServiceImplTest.approve_shouldUpgradeRoleAndInsertNotification`；E2E-TC03-001 `frontend/e2e/domain-a/uc03-merchant-application.spec.ts` | **LOCAL_E2E_PASS**：已归档 Playwright JSON，1/1 通过、unexpected 0；路径 `../../04_tests/UC03/evidence/playwright-results.json`。最新 main 全量 E2E CI 同时通过：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611 |
+
+## 权威材料
+
+- 需求：[requirement.md](requirement.md)
+- 系统行为模型：[system.mmd](system.mmd)
+- 概念类图：[concept.mmd](concept.mmd)
+- 组件结构图：[component.mmd](component.mmd)
+- 组件顺序图：[component-sequence.mmd](component-sequence.mmd)
+- 详细设计类图：[object.mmd](object.mmd)
+- 对象顺序图：[object-sequence.mmd](object-sequence.mmd)
+- 测试计划：[test-plan.md](test-plan.md)
+- 测试报告：[test-report.md](test-report.md)
+- 浏览器测试：`frontend/e2e/domain-a/uc03-merchant-application.spec.ts`
+- 原始证据：`../../04_tests/UC03/evidence/`

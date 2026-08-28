@@ -1,9 +1,24 @@
-# UC05 领域文档
+# UC05 举报、拉黑、信用分和审计
 
-状态：后端/API/H2 集成与真实 Compose + MySQL + Chromium 浏览器执行均已完成。
+状态：**LOCAL_E2E_PASS**。
 
-UC05 的核心链路是：用户举报目标用户 → 管理员审核 → 目标用户信用分和信用流水更新，同时保留管理员审计；拉黑关系只对发起方生效，并支持双向查询和取消拉黑。
+本目录是 UC05 需求、六类图模型、追溯和测试文档的唯一事实来源。
 
-实现入口：`ReportBlockController`、`AdminReportController`、`ReportBlockServiceImpl`、`CreditServiceImpl`。
+- [需求说明](requirement.md)
+- [追溯矩阵](traceability.md)
+- [测试计划](test-plan.md)
+- [测试报告](test-report.md)
+- 浏览器测试：`frontend/e2e/domain-a/uc05-governance.spec.ts`
+- 原始证据：`../../04_tests/UC05/evidence/`
+- Domain：`A-identity`
 
-验证入口：`ReportBlockCreditUc05IntegrationTest`、`ReportBlockControllerWebMvcTest`、`ReportBlockServiceImplTest`，以及 `frontend/e2e/domain-a/uc05-governance.spec.ts`。
+最新 main 全 UC Playwright Job：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611
+
+## 图模型（按参考文档分层）
+
+- [系统行为模型](system.mmd)
+- [概念类图](concept.mmd)
+- [组件结构图](component.mmd)
+- [组件顺序图](component-sequence.mmd)
+- [详细设计类图](object.mmd)
+- [对象顺序图](object-sequence.mmd)

@@ -1,10 +1,16 @@
+%% COMP-STRUCT12
 flowchart LR
-    Buyer[买家] --> UI[订单页面]
-    UI --> C[OrderController]
-    C --> S[OrderServiceImpl]
-    S --> V[归属/状态/金额校验]
-    V --> O[(order_info)]
-    V --> I[(order_item)]
-    S --> P[支付/取消结果]
-    P --> C
-    C --> UI
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«boundary»<br/>OrderView.vue"]
+    API["«controller»<br/>OrderController"]
+    Order["«service»<br/>OrderServiceImpl"]
+    Finance["«service»<br/>EscrowSettlementService"]
+    Idem["«collaborator»<br/>IdempotencyInterceptor"]
+    DB["«collaborator»<br/>order/balance/transaction"]
+  end
+  UI -->|"支付或取消请求 + 幂等键"| Idem
+  Idem -->|"首次请求"| API
+  API -->|"payMyOrder/cancelMyOrder"| Order
+  Order -->|"扣款或释放预留"| Finance
+  Finance -->|"更新余额并写流水"| DB
+  Order -->|"更新状态/恢复库存"| DB

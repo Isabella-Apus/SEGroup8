@@ -1,45 +1,37 @@
+%% DESIGN-CLASS11
 classDiagram
-  class OrderInfo {
-    +Long id
-    +Long buyerUserId
-    +BigDecimal totalAmount
-    +BigDecimal payableAmount
-    +Integer orderStatus
-    +Long voucherId
+  class C["OrderController"] {
+    <<controller>>
+    +handleRequest()
   }
-  class OrderItem {
-    +Long orderId
-    +Long productId
-    +BigDecimal price
-    +Integer quantity
+  class S["OrderServiceImpl"] {
+    <<service>>
+    +executeUseCase()
   }
-  class Product {
-    +Long shopId
-    +BigDecimal price
-    +Integer stock
-    +Integer status
+  class Req["CreateOrderRequest"] {
+    <<collaborator>>
+    +applyBusinessRule()
   }
-  class Address {
-    +Long userId
-    +String receiverName
-    +String detailAddress
+  class P["Product/SecondhandProduct"] {
+    <<collaborator>>
+    +applyBusinessRule()
   }
-  class UserVoucher {
-    +Long userId
-    +Long voucherId
-    +Long usedOrderId
-    +Integer status
+  class O["OrderInfo"] {
+    <<collaborator>>
+    +applyBusinessRule()
   }
-  class IdempotencyRecord {
-    +Long userId
-    +String idempotencyKey
-    +Integer status
-    +String responseBody
+  class I["OrderItem"] {
+    <<collaborator>>
+    +applyBusinessRule()
   }
-
-  OrderInfo "1" *-- "1..*" OrderItem
-  OrderItem "*" --> "1" Product
-  OrderInfo --> Address : stores snapshot
-  OrderInfo --> UserVoucher : occupies
-  IdempotencyRecord --> OrderInfo : replays creation result
-
+  class OM["OrderInfoMapper/OrderItemMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  C --> S : createMyOrders
+  S --> Req : 合并商品项并校验地址
+  S --> P : 读取价格、状态、库存和卖家
+  S --> O : 构造 PENDING_PAY
+  S --> I : 构造订单项快照
+  S --> OM : insert order and items

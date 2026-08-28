@@ -1,0 +1,17 @@
+%% OBJ-SEQ24
+sequenceDiagram
+  autonumber
+  participant C as ChatController
+  participant S as ChatServiceImpl
+  participant Req as ChatConversationCreateRequest/ChatMessageSendRequest
+  participant Conv as ChatConversation
+  participant Msg as ChatMessage
+  participant CM as ChatConversationMapper
+  participant MM as ChatMessageMapper
+  C->>S: createConversation/sendMessage(userId, Req)
+  S->>Conv: 校验 user1/user2/source 和参与关系
+  S->>CM: selectUnique 或 insert
+  S->>Msg: 校验非空内容和接收者
+  S->>MM: insert(Msg)
+  S->>CM: update lastMessage/time
+  S-->>C: ChatConversationVO/ChatMessageVO

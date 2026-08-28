@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS25
+classDiagram
+  class Notification {
+    +identifier: String
+    +state: String
+  }
+  class NotificationRead {
+    +identifier: String
+    +state: String
+  }
+  class RealtimeDelivery {
+    +identifier: String
+    +state: String
+  }
+  Notification "1" --> "0..*" NotificationRead : 关联
+  NotificationRead "0..*" --> "1" RealtimeDelivery : 产生/归属

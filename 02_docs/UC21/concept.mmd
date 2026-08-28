@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS21
+classDiagram
+  class VoucherTemplate {
+    +identifier: String
+    +state: String
+  }
+  class VoucherRule {
+    +identifier: String
+    +state: String
+  }
+  class Merchant {
+    +identifier: String
+    +state: String
+  }
+  VoucherTemplate "1" --> "0..*" VoucherRule : 关联
+  VoucherRule "0..*" --> "1" Merchant : 产生/归属

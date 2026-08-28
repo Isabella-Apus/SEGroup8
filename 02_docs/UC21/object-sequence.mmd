@@ -1,0 +1,15 @@
+%% OBJ-SEQ21
+sequenceDiagram
+  autonumber
+  participant C as VoucherController
+  participant S as VoucherService
+  participant Req as VoucherSaveRequest
+  participant Shop as Shop
+  participant V as Voucher
+  participant M as VoucherMapper
+  C->>S: create/update/close/delete(userId, role, Req)
+  S->>Shop: 解析 sellerUserId 对应 shopId
+  S->>Req: 校验面额、门槛、数量和时间
+  S->>V: 校验 issuer/scope/owner/status
+  S->>M: insert/update/deleteById
+  S-->>C: VoucherVO

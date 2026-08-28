@@ -1,0 +1,18 @@
+%% COMP-SEQ14
+sequenceDiagram
+  autonumber
+  participant BuyerUI as AfterSaleView.vue
+  participant AdminUI as AdminOrderView.vue
+  participant API as OrderController/AdminOrderController
+  participant Order as OrderServiceImpl
+  participant Finance as EscrowSettlementService
+  participant DB as order_info/order_after_sale_log
+  BuyerUI->>API: 提交退款/退货申请
+  API->>Order: applyRefund(request)
+  Order->>DB: 保存 PROCESSING 和日志
+  AdminUI->>API: 审核或仲裁
+  API->>Order: approve/reject
+  opt 审核通过
+    Order->>Finance: refund(order, amount)
+  end
+  Order->>DB: 保存最终状态和处理人

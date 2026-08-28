@@ -1,0 +1,14 @@
+%% OBJ-SEQ18
+sequenceDiagram
+  autonumber
+  participant C as SecondhandTradeController
+  participant S as SecondhandTradeServiceImpl
+  participant N as ProductNegotiation
+  participant P as SecondhandProduct
+  participant O as OrderInfo
+  C->>S: confirmBargain(sellerId, request)
+  S->>N: 检查 PENDING
+  S->>P: 检查 sellerUserId 和在售状态
+  S->>O: create PENDING_PAY with negotiatedPrice
+  S->>N: update ACCEPTED/orderId
+  S-->>C: OrderVO 或 ProductNegotiationVO

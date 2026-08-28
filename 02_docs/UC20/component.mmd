@@ -1,23 +1,13 @@
+%% COMP-STRUCT20
 flowchart LR
-    SoldView[SecondhandSoldView] --> OrderAPI[OrderController]
-    DetailView[SecondhandOrderDetailView] --> OrderAPI
-    DetailView --> LogisticsAPI[LogisticsController]
-    OrderAPI --> OrderService[OrderServiceImpl]
-    LogisticsAPI --> LogisticsService[LogisticsServiceImpl]
-    OrderService --> OrderMapper[OrderInfoMapper]
-    OrderService --> ItemMapper[OrderItemMapper]
-    OrderService --> LogisticsService
-    OrderService --> Settlement[EscrowSettlementService]
-    Settlement --> Strategy[SecondhandSettlementStrategy]
-    Settlement --> BalanceMapper[BalanceMapper]
-    Settlement --> RecordMapper[TransactionRecordMapper]
-    LogisticsService --> TemplateMapper[LogisticsPathTemplateMapper]
-    LogisticsService --> TraceMapper[LogisticsTraceMapper]
-    OrderService -. 提交后 best-effort .-> Notify[NotificationService]
-    OrderService -. 提交后 best-effort .-> Realtime[RealtimePushService]
-    OrderMapper --> DB[(MySQL)]
-    ItemMapper --> DB
-    BalanceMapper --> DB
-    RecordMapper --> DB
-    TemplateMapper --> DB
-    TraceMapper --> DB
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«collaborator»<br/>二手卖出/订单页"]
+    OrderAPI["«controller»<br/>OrderController"]
+    OrderSvc["«service»<br/>OrderService"]
+    Logistics["«service»<br/>LogisticsService"]
+    DB["«collaborator»<br/>order_info/logistics_trace"]
+  end
+  UI -->|"POST /api/order/{orderId"| OrderAPI
+  OrderAPI -->|"shipSellerOrder"| OrderSvc
+  OrderSvc -->|"create first trace"| Logistics
+  OrderSvc -->|"orderStatus=RECEIVED"| DB

@@ -1,0 +1,18 @@
+%% OBJ-SEQ25
+sequenceDiagram
+  autonumber
+  participant C as NotificationController
+  participant S as NotificationServiceImpl
+  participant N as Notification
+  participant M as NotificationMapper
+  participant P as RealtimePushService
+  participant W as RealtimeWebSocketHandler
+  C->>S: list/read/readAll(currentUser)
+  S->>M: query/update by userId
+  S->>N: 创建业务通知并先持久化
+  S->>P: pushToUser(userId, event)
+  P->>W: sendMessage(sessionSet)
+  alt 推送失败
+    P-->>S: 记录失败，不回滚 N
+  end
+  S-->>C: NotificationVO/成功结果

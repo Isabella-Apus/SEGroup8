@@ -1,0 +1,11 @@
+%% COMP-STRUCT10
+flowchart LR
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«boundary»<br/>Product/BrowseHistory.vue"]
+    API["«controller»<br/>SearchController/BrowseHistoryController"]
+    Svc["«service»<br/>SearchBehaviorService/BrowseHistoryService"]
+    DB["«collaborator»<br/>history/keyword tables"]
+  end
+  UI -->|"查询/删除历史和热词"| API
+  API -->|"list/delete/currentUser"| Svc
+  Svc -->|"按用户与时间过滤"| DB

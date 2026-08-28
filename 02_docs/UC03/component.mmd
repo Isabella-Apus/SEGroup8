@@ -1,7 +1,15 @@
-flowchart TB
-  Spec[uc03-merchant-application.spec.ts] --> API[真实 HTTP]
-  API --> Submit[submit/get mine]
-  API --> Review[list/approve/reject]
-  Review --> Service[MerchantApplicationServiceImpl]
-  Service --> Core[(application + user + shop)]
-  Service --> Notice[notification and realtime best effort]
+%% COMP-STRUCT03
+flowchart LR
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UserUI["«boundary»<br/>MerchantApplyView.vue"]
+    AdminUI["«boundary»<br/>AdminMerchantReviewView.vue"]
+    API["«controller»<br/>AdminMerchantApplicationController"]
+    Svc["«service»<br/>MerchantApplicationServiceImpl"]
+    DB["«collaborator»<br/>merchant_application/user/shop"]
+    Audit["«service»<br/>AdminAuditLogService"]
+  end
+  UserUI -->|"提交申请"| Svc
+  Svc -->|"更新申请、角色和店铺"| DB
+  AdminUI -->|"通过或拒绝"| API
+  API -->|"review"| Svc
+  Svc -->|"写审核记录"| Audit

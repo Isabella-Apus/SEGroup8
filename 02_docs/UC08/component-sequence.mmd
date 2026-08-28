@@ -1,0 +1,15 @@
+%% COMP-SEQ08
+sequenceDiagram
+  autonumber
+  participant PublicUI as PublicShopView.vue
+  participant SellerUI as ShopSetting/Decoration.vue
+  participant API as ShopController
+  participant Svc as ShopServiceImpl
+  participant DB as ShopMapper
+  PublicUI->>API: GET 公开店铺
+  API->>Svc: getPublicShop(shopId)
+  Svc->>DB: 查询 OPEN 店铺
+  SellerUI->>API: PUT 设置/装修
+  API->>Svc: 校验店主和配置
+  Svc->>DB: 更新店铺
+  DB-->>SellerUI: 最新配置

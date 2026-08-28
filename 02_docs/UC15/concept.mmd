@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS15
+classDiagram
+  class Review {
+    +identifier: String
+    +state: String
+  }
+  class ReviewAppend {
+    +identifier: String
+    +state: String
+  }
+  class SellerReply {
+    +identifier: String
+    +state: String
+  }
+  Review "1" --> "0..*" ReviewAppend : 关联
+  ReviewAppend "0..*" --> "1" SellerReply : 产生/归属

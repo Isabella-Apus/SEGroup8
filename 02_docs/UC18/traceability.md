@@ -1,13 +1,19 @@
 # UC18 追溯矩阵
 
-| 需求/风险 | 实现 | Integration | E2E |
-| --- | --- | --- | --- |
-| 发起议价真实写库 | `applyBargain` 写 `APPLIED` | `applicationPersistsAndBothParticipantsCanListIt` | 买家从商品详情提交 ¥76 |
-| 商品议价资格、自购和价格边界 | 商品/身份/金额前置校验 | `invalidNonNegotiableSelfAndRepeatedApplicationsAreRejected` | 使用真实可议价商品 |
-| 重复有效议价拒绝 | 查询 `APPLIED`/有效 `CONFIRMED` | 同上 | 单次申请后状态为待处理 |
-| 非商品卖家无权处理 | sellerUserId 所有权校验 | `unrelatedSellerCannotConfirmOrReject` | 卖家账号查看本人商品会话 |
-| 确认/拒绝并发只有一个结果 | `UPDATE ... WHERE status = APPLIED` | `concurrentConfirmAndRejectProduceExactlyOneDecision` | 卖家按钮处理一次后不可重复操作 |
-| 确认后建单一致性 | 同一事务更新议价、商品、订单和明细 | `confirmationCreatesOnePendingPaymentOrderAtConfirmedPrice` | 买家刷新看到“去支付订单” |
-| 拒绝结束本次议价 | 原子更新为 `REJECTED` | `rejectionEndsApplicationWithoutCreatingOrder` | 确认分支之外由 Integration 覆盖 |
-| 聊天/通知失败不回滚核心决定 | `afterCommit` + `runBestEffort` | `chatAndNotificationFailuresDoNotRollbackCoreDecision` | 真实聊天卡片双端同步 |
-| 卖家聊天页可查询议价 | 新增参与者隔离的 `/bargain/list` | 双方列表断言 | 卖家聊天页显示申请并确认 |
+| 需求 / 用例 | 六类图模型 | 主要代码模块 | 测试编号与现有测试 | 结果 / 证据 |
+|---|---|---|---|---|
+| REQ18 / UC18 二手议价 | SYS-BEH18 / CONCEPT-CLASS18 / COMP-STRUCT18 / COMP-SEQ18 / DESIGN-CLASS18 / OBJ-SEQ18 | `SecondhandDetailView.vue`、`ChatView.vue`；`SecondhandTradeServiceImpl` | UNIT-TC18-001 同意建单；UNIT-TC18-002 拒绝；UNIT-TC18-003 重复处理；UI-TC18-01；E2E-TC18-001 `frontend/e2e/domain-d/uc18-bargain.spec.ts` | **LOCAL_E2E_PASS**：已归档 Playwright JSON，1/1 通过、unexpected 0；路径 `../../04_tests/UC18/evidence/raw-reports/playwright/playwright-results.json`。最新 main 全量 E2E CI 同时通过：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611 |
+
+## 权威材料
+
+- 需求：[requirement.md](requirement.md)
+- 系统行为模型：[system.mmd](system.mmd)
+- 概念类图：[concept.mmd](concept.mmd)
+- 组件结构图：[component.mmd](component.mmd)
+- 组件顺序图：[component-sequence.mmd](component-sequence.mmd)
+- 详细设计类图：[object.mmd](object.mmd)
+- 对象顺序图：[object-sequence.mmd](object-sequence.mmd)
+- 测试计划：[test-plan.md](test-plan.md)
+- 测试报告：[test-report.md](test-report.md)
+- 浏览器测试：`frontend/e2e/domain-d/uc18-bargain.spec.ts`
+- 原始证据：`../../04_tests/UC18/evidence/`

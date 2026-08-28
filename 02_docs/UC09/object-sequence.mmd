@@ -1,0 +1,15 @@
+%% OBJ-SEQ09
+sequenceDiagram
+  autonumber
+  participant C as AdminProductRiskAuditController
+  participant S as ProductRiskAuditServiceImpl
+  participant PB as ProductRiskAuditPromptBuilder
+  participant R as ProductRiskAudit
+  participant RM as ProductRiskAuditMapper
+  participant PM as ProductMapper
+  C->>S: audit(productId, decisionRequest)
+  S->>PB: build(productContent)
+  S->>R: 合并规则/LLM风险和管理员决定
+  S->>RM: insert/update audit
+  S->>PM: update product review status
+  S-->>C: ProductRiskAuditVO

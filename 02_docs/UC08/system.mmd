@@ -1,0 +1,15 @@
+%% SYS-BEH08
+sequenceDiagram
+  autonumber
+  actor Visitor as 访客/买家
+  actor Seller as 店主
+  participant System as 交易平台
+  Visitor->>System: 查看公开店铺
+  System-->>Visitor: 返回店铺信息或关闭提示
+  Seller->>System: 保存店铺设置和装修
+  System->>System: 校验店主、模板和数据大小
+  alt 校验通过
+    System-->>Seller: 返回最新店铺配置
+  else 校验失败
+    System-->>Seller: 返回权限或格式错误
+  end

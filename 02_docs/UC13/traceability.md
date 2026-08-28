@@ -1,10 +1,19 @@
 # UC13 追溯矩阵
 
-| 需求/验收标准 | 设计 | 代码入口 | 已有后端证据 | 浏览器状态 |
-| --- | --- | --- | --- | --- |
-| `REQ13`, `AC13-01` 卖家发货 | [system.mmd](system.mmd), [component.mmd](component.mmd) | `OrderController`, `OrderServiceImpl` | `04_tests/UC13/evidence/result-summary.json`：4 条后端测试通过 | `E2E_PENDING`，本轮不处理 |
-| `AC13-02` 生成/查询物流轨迹 | [object.mmd](object.mmd) | `LogisticsServiceImpl` | `UC13-订单发货物流与收货-测试报告.md` | `E2E_PENDING` |
-| `AC13-03` 买家确认收货 | [system.mmd](system.mmd) | `OrderServiceImpl` | Domain-C Surefire 证据 | `E2E_PENDING` |
-| `AC13-04` 越权和重复履约被拒绝/幂等 | [component.mmd](component.mmd) | 归属、状态与物流校验 | `04_tests/domains/C-order-fulfillment/evidence/result-summary.json` | `E2E_PENDING` |
+| 需求 / 用例 | 六类图模型 | 主要代码模块 | 测试编号与现有测试 | 结果 / 证据 |
+|---|---|---|---|---|
+| REQ13 / UC13 发货物流收货 | SYS-BEH13 / CONCEPT-CLASS13 / COMP-STRUCT13 / COMP-SEQ13 / DESIGN-CLASS13 / OBJ-SEQ13 | `MerchantOrdersView.vue`、`OrderDetailView.vue`；`LogisticsServiceImpl`、`OrderServiceImpl` | UNIT-TC13-001 `shipSellerOrder_shouldPersistNotificationForBuyer`；INT-TC13-001 `deliveredToAutoConfirmShouldSettle...`；E2E-TC13-001 `frontend/e2e/domain-c/uc13-fulfillment.spec.ts` | **LOCAL_E2E_PASS**：已归档 Playwright JSON，1/1 通过、unexpected 0；路径 `../../04_tests/UC13/evidence/raw-reports/playwright/playwright-results.json`。最新 main 全量 E2E CI 同时通过：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611 |
 
-完整需求见 [UC13 需求](../../01_requirements/UC13-订单发货物流与收货.md)，完整测试说明见 [UC13 测试报告](../../04_tests/UC13/UC13-订单发货物流与收货-测试报告.md)。
+## 权威材料
+
+- 需求：[requirement.md](requirement.md)
+- 系统行为模型：[system.mmd](system.mmd)
+- 概念类图：[concept.mmd](concept.mmd)
+- 组件结构图：[component.mmd](component.mmd)
+- 组件顺序图：[component-sequence.mmd](component-sequence.mmd)
+- 详细设计类图：[object.mmd](object.mmd)
+- 对象顺序图：[object-sequence.mmd](object-sequence.mmd)
+- 测试计划：[test-plan.md](test-plan.md)
+- 测试报告：[test-report.md](test-report.md)
+- 浏览器测试：`frontend/e2e/domain-c/uc13-fulfillment.spec.ts`
+- 原始证据：`../../04_tests/UC13/evidence/`

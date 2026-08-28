@@ -1,0 +1,18 @@
+%% OBJ-SEQ13
+sequenceDiagram
+  autonumber
+  participant C as OrderController
+  participant S as OrderServiceImpl
+  participant O as OrderInfo
+  participant L as LogisticsServiceImpl
+  participant T as LogisticsTrace
+  participant F as EscrowSettlementService
+  C->>S: shipSellerOrder/confirmReceive
+  S->>O: 校验卖家/买家和状态版本
+  S->>L: initializeOrAdvance(order)
+  L->>T: insert trace nodes
+  S->>O: update SHIPPED/RECEIVED
+  opt 确认收货
+    S->>F: settle(orderItems)
+  end
+  S-->>C: OrderVO

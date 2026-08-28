@@ -1,0 +1,9 @@
+%% SYS-BEH06
+sequenceDiagram
+  autonumber
+  actor Buyer as 访客/买家
+  participant System as 交易平台
+  Buyer->>System: 输入关键词、筛选和排序条件
+  System-->>Buyer: 返回匹配的在售商品
+  Buyer->>System: 选择商品
+  System-->>Buyer: 返回详情或下架提示

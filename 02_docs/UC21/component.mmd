@@ -1,19 +1,13 @@
+%% COMP-STRUCT21
 flowchart LR
-  subgraph Browser[前端]
-    Seller[SellerVoucher.vue]
-    Admin[AdminVoucherView.vue]
-    Api[voucher.js]
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«boundary»<br/>SellerVoucher/AdminVoucher.vue"]
+    API["«controller»<br/>VoucherController"]
+    Svc["«service»<br/>VoucherService"]
+    Shop["«repository»<br/>ShopMapper"]
+    DB["«repository»<br/>VoucherMapper"]
   end
-  subgraph Backend[后端应用]
-    Auth[认证与角色校验]
-    Controller[VoucherController]
-    Service[VoucherService]
-    Mapper[VoucherMapper]
-  end
-  DB[(voucher)]
-  Seller --> Api
-  Admin --> Api
-  Api -->|/api/voucher/seller/**\n/api/voucher/admin/**| Auth
-  Auth --> Controller --> Service
-  Service -->|规则、所有权、状态校验| Service
-  Service --> Mapper --> DB
+  UI -->|"创建/编辑/关闭/删除"| API
+  API -->|"传入当前用户和请求"| Svc
+  Svc -->|"解析卖家真实店铺"| Shop
+  Svc -->|"校验所有权并写入 voucher"| DB

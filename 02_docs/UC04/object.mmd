@@ -1,4 +1,27 @@
+%% DESIGN-CLASS04
 classDiagram
-  class User { Long id; String role; String status }
-  class AdminAuditLog { Long targetId; String action; Long adminUserId }
-  User "1" --> "0..*" AdminAuditLog : state changes recorded
+  class C["AdminUserController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class S["AdminUserServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class U["User"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class M["UserMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  class A["AdminAuditLogServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  C --> S : ban/unban
+  S --> U : 校验目标存在且可管理
+  S --> M : updateStatus
+  S --> A : record

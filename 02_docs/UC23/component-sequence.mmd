@@ -1,0 +1,16 @@
+%% COMP-SEQ23
+sequenceDiagram
+  autonumber
+  participant UI as Wallet/MerchantFinance.vue
+  participant API as FinanceController
+  participant Svc as EscrowSettlementService
+  participant Balance as BalanceMapper
+  participant Tx as TransactionRecordMapper
+  participant Order as OrderServiceImpl
+  UI->>API: 充值或查询账户
+  API->>Svc: recharge/dashboard/records
+  Svc->>Balance: 乐观锁更新个人余额
+  Svc->>Tx: 写充值流水
+  Order->>Svc: 订单完成后结算
+  Svc->>Balance: 更新个人或经营余额
+  Svc->>Tx: 写关联订单流水

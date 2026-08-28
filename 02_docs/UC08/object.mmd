@@ -1,0 +1,27 @@
+%% DESIGN-CLASS08
+classDiagram
+  class C["ShopController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class S["ShopServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class Req["ShopDecorationSaveRequest"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class Shop["Shop"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class M["ShopMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  C --> S : getPublic/updateSetting/
+  S --> Shop : 校验 OPEN 或 ownerUserId
+  S --> Req : 校验模板、组件和 JSON 大小
+  S --> M : select/update Shop

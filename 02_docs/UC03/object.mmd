@@ -1,6 +1,36 @@
+%% DESIGN-CLASS03
 classDiagram
-  class MerchantApplication { Long id; Long userId; Integer status; String rejectReason }
-  class User { Long id; String role; String shopName }
-  class Shop { Long id; Long ownerUserId; Integer status }
-  MerchantApplication "1" --> "1" User
-  User "1" --> "0..1" Shop
+  class C["AdminMerchantApplicationController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class S["MerchantApplicationServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class A["MerchantApplication"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class U["User"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class Shop["Shop"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class N["NotificationService"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class Audit["AdminAuditLogService"] {
+    <<service>>
+    +executeUseCase()
+  }
+  C --> S : approve/reject
+  S --> A : 检查 status=PENDING
+  S --> U : role=OFFICIAL_SELLER
+  S --> Shop : createOrEnable
+  S --> N : 通知申请人
+  S --> Audit : 记录审核动作

@@ -1,29 +1,24 @@
-# UC14 订单售后退款
+# UC14 退款、退货及仲裁
 
-- 需求：`REQ14 / UC14`
-- 所属领域：Domain C（Order Fulfillment）
-- 本目录是 UC14 的标准嵌套文档入口。
+状态：**LOCAL_E2E_PASS**。
 
-## 文档导航
+本目录是 UC14 需求、六类图模型、追溯和测试文档的唯一事实来源。
 
-- [需求](../../01_requirements/UC14-订单售后退款.md)
-- [系统级图](system.mmd)
-- [组件级图](component.mmd)
-- [对象级图](object.mmd)
+- [需求说明](requirement.md)
 - [追溯矩阵](traceability.md)
-- [后端测试报告](../../04_tests/UC14/UC14-订单售后退款-测试报告.md)
+- [测试计划](test-plan.md)
+- [测试报告](test-report.md)
+- 浏览器测试：`frontend/e2e/domain-c/uc14-after-sale.spec.ts`
+- 原始证据：`../../04_tests/UC14/evidence/`
+- Domain：`C-order-fulfillment`
 
-## 业务与设计边界
+最新 main 全 UC Playwright Job：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611
 
-买家在符合条件的订单上发起退款/售后申请，卖家和管理员按权限审核；系统根据审核结果更新退款状态并执行资金返还。申请、审核、驳回、重复操作和状态迁移都必须按订单归属校验。
+## 图模型（按参考文档分层）
 
-| 组件 | 责任 |
-| --- | --- |
-| `OrderController` | 买家申请、卖家审核和管理员审核接口。 |
-| `OrderServiceImpl` | 校验订单、退款模式、角色和状态迁移。 |
-| 退款/钱包服务 | 按审核结果记录或返还资金，保证幂等。 |
-| 订单与退款表 | 保存申请理由、审核结果、退款状态和时间。 |
-
-## 验证口径
-
-`04_tests/UC14/evidence/result-summary.json` 记录 9 条后端 MySQL/集成测试通过；全量报告和前端构建证据另有记录。已有浏览器产物不作为本轮新执行，Playwright E2E 仍待补。
+- [系统行为模型](system.mmd)
+- [概念类图](concept.mmd)
+- [组件结构图](component.mmd)
+- [组件顺序图](component-sequence.mmd)
+- [详细设计类图](object.mmd)
+- [对象顺序图](object-sequence.mmd)

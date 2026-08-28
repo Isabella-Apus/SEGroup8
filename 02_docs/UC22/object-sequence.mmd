@@ -1,0 +1,16 @@
+%% OBJ-SEQ22
+sequenceDiagram
+  autonumber
+  participant C as VoucherController
+  participant VS as VoucherService
+  participant V as Voucher
+  participant UV as UserVoucher
+  participant OS as OrderServiceImpl
+  participant O as OrderInfo
+  C->>VS: claim(userId, voucherId)
+  VS->>V: 校验状态、时间、库存和范围
+  VS->>UV: insert unique user-voucher
+  OS->>VS: occupyForOrder(userId, voucherId, items)
+  VS->>UV: 条件更新为已使用/占用
+  VS-->>OS: discountAmount
+  OS->>O: 保存优惠额和应付额

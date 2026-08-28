@@ -1,15 +1,14 @@
+%% COMP-STRUCT17
 flowchart LR
-    Detail[SecondhandDetailView] --> ProductAPI[SecondhandProductController]
-    ProductAPI --> ProductService[SecondhandProductServiceImpl]
-    ProductService --> ProductMapper[SecondhandProductMapper]
-    ProductService --> AddressMapper[AddressMapper]
-    ProductService --> TradeService[SecondhandTradeServiceImpl]
-    ProductService --> OrderMapper[OrderInfoMapper]
-    ProductService --> ItemMapper[OrderItemMapper]
-    Orders[OrderView] --> OrderAPI[OrderController]
-    OrderAPI --> OrderService[OrderServiceImpl]
-    OrderService --> ProductMapper
-    ProductMapper --> DB[(MySQL)]
-    AddressMapper --> DB
-    OrderMapper --> DB
-    ItemMapper --> DB
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«collaborator»<br/>二手详情/订单页"]
+    API["«controller»<br/>SecondhandProductController"]
+    Svc["«service»<br/>SecondhandProductService"]
+    Order["«service»<br/>OrderService"]
+    DB["«collaborator»<br/>order_info/order_item"]
+  end
+  UI -->|"POST /api/secondhand/{pr"| API
+  API -->|"buySecondhandProduct"| Svc
+  Svc -->|"createSecondhandOrder"| Order
+  Order -->|"更新为 PENDING_SHIP"| DB
+  UI -->|"POST /api/order/{orderId"| Order

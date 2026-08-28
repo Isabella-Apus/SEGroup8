@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS07
+classDiagram
+  class Product {
+    +identifier: String
+    +state: String
+  }
+  class Inventory {
+    +identifier: String
+    +state: String
+  }
+  class RiskAudit {
+    +identifier: String
+    +state: String
+  }
+  Product "1" --> "0..*" Inventory : 关联
+  Inventory "0..*" --> "1" RiskAudit : 产生/归属

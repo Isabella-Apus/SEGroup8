@@ -1,0 +1,14 @@
+%% OBJ-SEQ19
+sequenceDiagram
+  autonumber
+  participant C as SecondhandTradeController
+  participant S as SecondhandTradeServiceImpl
+  participant P as SecondhandProduct
+  participant A as ProductAuction
+  participant L as AuctionLog
+  C->>S: placeBid(auctionId, bidRequest)
+  S->>A: 检查 ONGOING 和最低出价
+  S->>P: 检查 bidder != seller
+  S->>A: 更新 currentPrice/currentBuyerId/bidCount
+  S->>L: 写出价记录
+  S-->>C: ProductAuctionVO

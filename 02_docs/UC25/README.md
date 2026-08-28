@@ -1,10 +1,24 @@
-# UC25 设计索引
+# UC25 通知、已读和实时推送
 
-- 需求：`01_requirements/UC25-通知与实时推送.md`
-- 系统上下文：`system.mmd`
-- 组件模型：`component.mmd`
-- 对象模型：`object.mmd`
-- 需求到实现追溯：`traceability.md`
-- 测试计划、报告与证据：`04_tests/UC25/`
+状态：**LOCAL_E2E_PASS**。
 
-历史文件 `02_docs/UC25-通知与实时推送-组件级图.md` 已改为迁移说明，组件模型以本目录为准。
+本目录是 UC25 需求、六类图模型、追溯和测试文档的唯一事实来源。
+
+- [需求说明](requirement.md)
+- [追溯矩阵](traceability.md)
+- [测试计划](test-plan.md)
+- [测试报告](test-report.md)
+- 浏览器测试：`frontend/e2e/domain-e/uc25-notification.spec.ts`
+- 原始证据：`../../04_tests/UC25/evidence/`
+- Domain：`E-engagement-finance`
+
+最新 main 全 UC Playwright Job：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611
+
+## 图模型（按参考文档分层）
+
+- [系统行为模型](system.mmd)
+- [概念类图](concept.mmd)
+- [组件结构图](component.mmd)
+- [组件顺序图](component-sequence.mmd)
+- [详细设计类图](object.mmd)
+- [对象顺序图](object-sequence.mmd)

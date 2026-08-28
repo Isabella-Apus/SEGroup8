@@ -1,0 +1,13 @@
+%% OBJ-SEQ04
+sequenceDiagram
+  autonumber
+  participant C as AdminUserController
+  participant S as AdminUserServiceImpl
+  participant U as User
+  participant M as UserMapper
+  participant A as AdminAuditLogServiceImpl
+  C->>S: ban/unban(adminId, targetId, reason)
+  S->>U: 校验目标存在且可管理
+  S->>M: updateStatus(targetId, BANNED/ACTIVE)
+  S->>A: record(adminId, targetId, action)
+  S-->>C: UserVO
