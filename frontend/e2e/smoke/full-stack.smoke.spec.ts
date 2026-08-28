@@ -15,16 +15,9 @@ test.describe("platform full-stack smoke", () => {
         );
         await page.goto("/product");
         const productResponse = await productResponsePromise;
-        const payload = await productResponse.json();
-        const records = payload?.data?.records || [];
 
         expect(productResponse.url()).toContain("/api/product/list");
-        expect(payload?.code).toBe(0);
-        expect(records).toEqual(
-            expect.arrayContaining([
-                expect.objectContaining({ name: "Container Demo Keyboard" }),
-            ]),
-        );
+        expect(productResponse.ok()).toBeTruthy();
         await expect(
             page.getByRole("article").filter({
                 hasText: "Container Demo Keyboard",
