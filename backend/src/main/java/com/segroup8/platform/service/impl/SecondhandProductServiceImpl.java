@@ -55,6 +55,7 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
     private static final TypeReference<List<String>> STRING_LIST_TYPE = new TypeReference<>() {};
     private static final int ON_SHELF = 1;
     private static final int OFF_SHELF = 2;
+    private static final int SOLD = 3;
     private static final int ORDER_PENDING_PAY = 0;
     private static final String AUCTION_ONGOING = "ONGOING";
     private static final DateTimeFormatter ORDER_NO_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
@@ -292,7 +293,8 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
                 .last("limit 1"));
         if (ongoingAuction != null) {
             throw new BusinessException(400, "该商品正在拍卖中，暂不支持一口价购买");
-        }        // 拉黑拦截：任意一方拉黑对方都不能交易
+        }
+        // 拉黑拦截：任意一方拉黑对方都不能交易
         Long sellerUserId = product.getSellerUserId();
         if (userBlockMapper.isBlocked(buyerUserId, sellerUserId) > 0) {
             throw new BusinessException(403, "您已拉黑该卖家，无法购买其商品");
@@ -301,16 +303,25 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
             throw new BusinessException(403, "该卖家已拉黑您，无法购买其商品");
         }
 
+        Address addr = addressMapper.selectById(request.getAddressId());
+        if (addr == null || !Objects.equals(addr.getUserId(), buyerUserId)) {
+            throw new BusinessException(400, "收货地址不存在或不属于当前用户");
+        }
+
+        BigDecimal effectivePrice = secondhandTradeService.resolveEffectivePriceForBuyer(productId, buyerUserId);
+        BigDecimal dealPrice = effectivePrice == null ? product.getSalePrice() : effectivePrice;
+        if (dealPrice == null || dealPrice.compareTo(BigDecimal.ZERO) <= 0
+                || dealPrice.compareTo(product.getSalePrice()) > 0) {
+            throw new BusinessException(400, "议价成交价无效，请重新议价或按当前售价购买");
+        }
+
         int updated = secondhandProductMapper.update(null, new UpdateWrapper<SecondhandProduct>()
-                .set("status", OFF_SHELF)
+                .set("status", SOLD)
                 .eq("id", productId)
                 .eq("status", ON_SHELF));
         if (updated == 0) {
             throw new BusinessException(400, "二手商品已售出");
         }
-
-        BigDecimal effectivePrice = secondhandTradeService.resolveEffectivePriceForBuyer(productId, buyerUserId);
-        BigDecimal dealPrice = effectivePrice == null ? product.getSalePrice() : effectivePrice;
 
         OrderInfo order = new OrderInfo();
         order.setOrderNo(generateOrderNo(buyerUserId));
@@ -326,30 +337,13 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         order.setCanRefund(1);
         order.setLogisticsStatus("PENDING");
         order.setLogisticsCurrentIndex(0);
-        order.setRemark(request == null ? null : request.getRemark());
+        order.setRemark(request.getRemark());
         order.setCreateTime(LocalDateTime.now());
-
-        Address addr;
-        if (request != null && request.getAddressId() != null) {
-            addr = addressMapper.selectById(request.getAddressId());
-            if (addr == null || !Objects.equals(addr.getUserId(), buyerUserId)) {
-                throw new BusinessException(400, "收货地址不存在或不属于当前用户");
-            }
-        } else {
-            // 二手下单默认带入买家常用收货地址，保证订单详情信息完整。
-            addr = addressMapper.selectOne(new LambdaQueryWrapper<Address>()
-                    .eq(Address::getUserId, buyerUserId)
-                    .orderByDesc(Address::getIsDefault)
-                    .orderByDesc(Address::getId)
-                    .last("limit 1"));
-        }
-        if (addr != null) {
-            order.setReceiverName(addr.getReceiverName());
-            order.setReceiverPhone(addr.getReceiverPhone());
-            order.setReceiverProvince(addr.getProvince());
-            order.setReceiverCity(addr.getCity());
-            order.setReceiverDetailAddress(addr.getDetailAddress());
-        }
+        order.setReceiverName(addr.getReceiverName());
+        order.setReceiverPhone(addr.getReceiverPhone());
+        order.setReceiverProvince(addr.getProvince());
+        order.setReceiverCity(addr.getCity());
+        order.setReceiverDetailAddress(addr.getDetailAddress());
         orderInfoMapper.insert(order);
 
         OrderItem orderItem = new OrderItem();
@@ -512,7 +506,11 @@ public class SecondhandProductServiceImpl implements SecondhandProductService {
         vo.setConditionLevel(product.getConditionLevel());
         vo.setIsNegotiable(product.getIsNegotiable());
         vo.setStatus(product.getStatus());
-        vo.setStatusName(Objects.equals(product.getStatus(), ON_SHELF) ? "在售" : "下架");
+        vo.setStatusName(switch (product.getStatus() == null ? 0 : product.getStatus()) {
+            case ON_SHELF -> "在售";
+            case SOLD -> "已售";
+            default -> "下架";
+        });
         vo.setRiskAudit(productRiskAuditService.getLatestAudit("SECONDHAND", product.getId()));
         vo.setCreateTime(product.getCreateTime());
         return vo;

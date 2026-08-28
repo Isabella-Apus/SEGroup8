@@ -53,6 +53,11 @@ The script returns the real Playwright/Compose exit code. On failure it records
 the failing stage and collects frontend, backend, database, and Compose logs.
 CI uploads this directory and blocks deploy/release through the E2E job.
 
+For an independently reviewed UC run, set `E2E_OUTPUT_DIR` before invoking the
+same runner, for example
+`$env:E2E_OUTPUT_DIR='04_tests/UC01/evidence'`. The runner preserves that
+directory; when the variable is absent it uses the shared platform directory.
+
 ## Test data and credentials
 
 Compose initializes MySQL from `backend/src/main/resources/schema.sql` and

@@ -36,6 +36,9 @@ export default defineConfig({
         ["json", {
             outputFile: resolve(evidenceRoot, "playwright-results.json"),
         }],
+        ["junit", {
+            outputFile: resolve(evidenceRoot, "playwright-results.xml"),
+        }],
     ],
     use: {
         baseURL: process.env.E2E_BASE_URL || "http://127.0.0.1:8088",

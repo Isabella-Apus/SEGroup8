@@ -9,17 +9,18 @@
 - 完成成员 D 负责的 UC16-UC20 二手商城交付材料：用例说明、三层模型、接口与数据归属、追溯矩阵、验收检查表、测试报告和评审证据。
 - 修复前端 mock 缺失 `/category/tree?scene=SECONDHAND` 的问题，二手发布页分类树可以正常加载。
 - 新增 `SecondhandTradeServiceImplTest`，覆盖议价同意生成待付款订单、议价拒绝、重复处理拦截、拍卖低价拦截、结束后出价拦截、拍卖结算幂等。
-- 补充 26 张 UC16-UC20 前端 UI/E2E 截图证据，覆盖发布、购买、议价、拍卖、履约闭环。
+- 补充 26 张 UC16-UC20 前端 Vite mock UI walkthrough 截图证据；真实 Compose E2E 不由这些截图证明。
 - 新增 UC16-UC20 专用 Issue 模板、PR 模板和 GitHub Actions 工作流，方便组长按统一格式检查。
 
 ## 验证结果
 
-- [x] `cd backend && mvn -B "-Dtest=SecondhandProductServiceImplTest,SecondhandTradeServiceImplTest,SecondhandOrderFlowIntegrationTest,SecondhandAuctionIntegrationTest" test`
-  - Tests run: 13, Failures: 0, Errors: 0, Skipped: 0
+- [x] `cd backend && mvn -B --no-transfer-progress "-Dgroups=DOMAIN_D" clean verify`
+  - 9 classes; Tests run: 20, Failures: 0, Errors: 0, Skipped: 0 (`API_PASS`)
 - [x] `cd frontend && npm run build:mock`
 - [x] Playwright 回归打开二手发布页，分类下拉显示“数码闲置”
 - [x] `04_tests/UC16-UC20-ui-run-result.json` 可解析
 - [x] `05_management/UC16-UC20-screenshots` 共 26 张截图
+- [ ] UC16-UC20 五个真实 Compose Playwright 流程（`E2E_PENDING`，由 Tasks #148-#152 分别跟踪）
 - [x] 未提交真实密码、Token 或云平台密钥
 
 ## 交付证据
@@ -44,4 +45,4 @@
 
 ## 备注
 
-关联 Issue 编号需要在 GitHub 上创建或确认后回填；如果暂时没有对应 Issue，可以先提交 PR，再由组长补充关联。
+Domain-D 共享测试入口对应 #119；UC16-UC20 的真实流程分别对应 #148-#152。PR 不直接关闭父 UC #55-#59。

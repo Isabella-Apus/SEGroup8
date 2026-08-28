@@ -1,0 +1,15 @@
+flowchart LR
+    Detail[SecondhandDetailView] --> ProductAPI[SecondhandProductController]
+    ProductAPI --> ProductService[SecondhandProductServiceImpl]
+    ProductService --> ProductMapper[SecondhandProductMapper]
+    ProductService --> AddressMapper[AddressMapper]
+    ProductService --> TradeService[SecondhandTradeServiceImpl]
+    ProductService --> OrderMapper[OrderInfoMapper]
+    ProductService --> ItemMapper[OrderItemMapper]
+    Orders[OrderView] --> OrderAPI[OrderController]
+    OrderAPI --> OrderService[OrderServiceImpl]
+    OrderService --> ProductMapper
+    ProductMapper --> DB[(MySQL)]
+    AddressMapper --> DB
+    OrderMapper --> DB
+    ItemMapper --> DB

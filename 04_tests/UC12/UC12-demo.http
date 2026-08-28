@@ -1,0 +1,16 @@
+### UC12 payment
+POST http://localhost:8088/api/order/12001/pay
+Authorization: Bearer {{buyerToken}}
+X-Idempotency-Key: uc12-demo-pay
+Content-Type: application/json
+
+{"payMode":"THIRD_PARTY","payChannel":"WECHAT"}
+
+### UC12 unpaid cancellation
+POST http://localhost:8088/api/order/12002/cancel
+Authorization: Bearer {{buyerToken}}
+X-Idempotency-Key: uc12-demo-cancel
+
+### Persisted order state
+GET http://localhost:8088/api/order/detail/12001
+Authorization: Bearer {{buyerToken}}

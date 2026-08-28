@@ -36,6 +36,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @Tag(DomainCTestTags.DOMAIN_C)
 @Tag(DomainCTestTags.PLATFORM)
+@Tag("DOMAIN_E")
+@Tag("UC23")
 class EscrowSettlementServiceTest {
 
     @Mock

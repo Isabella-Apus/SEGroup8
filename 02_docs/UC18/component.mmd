@@ -1,0 +1,17 @@
+flowchart LR
+    Detail[SecondhandDetailView] --> TradeAPI[SecondhandTradeController]
+    Chat[ChatView] --> TradeAPI
+    TradeAPI --> TradeService[SecondhandTradeServiceImpl]
+    TradeService --> NegotiationMapper[ProductNegotiationMapper]
+    TradeService --> ProductMapper[SecondhandProductMapper]
+    TradeService --> OrderMapper[OrderInfoMapper]
+    TradeService --> ItemMapper[OrderItemMapper]
+    TradeService -. 提交后 .-> ChatService[ChatService]
+    TradeService -. 提交后 .-> Notify[NotificationService]
+    TradeService -. 提交后 .-> Realtime[RealtimePushService]
+    NegotiationMapper --> DB[(MySQL)]
+    ProductMapper --> DB
+    OrderMapper --> DB
+    ItemMapper --> DB
+    ChatService --> DB
+    Notify --> DB

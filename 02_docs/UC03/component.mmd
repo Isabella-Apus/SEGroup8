@@ -1,0 +1,7 @@
+flowchart TB
+  Spec[uc03-merchant-application.spec.ts] --> API[真实 HTTP]
+  API --> Submit[submit/get mine]
+  API --> Review[list/approve/reject]
+  Review --> Service[MerchantApplicationServiceImpl]
+  Service --> Core[(application + user + shop)]
+  Service --> Notice[notification and realtime best effort]

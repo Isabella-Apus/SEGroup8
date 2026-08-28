@@ -1,8 +1,10 @@
 DROP TABLE IF EXISTS `idempotency_record`;
-DROP TABLE IF EXISTS `user_block`;
+DROP TABLE IF EXISTS `address`;
+DROP TABLE IF EXISTS `chat_message`;
+DROP TABLE IF EXISTS `chat_conversation`;
 DROP TABLE IF EXISTS `user_voucher`;
 DROP TABLE IF EXISTS `voucher`;
-DROP TABLE IF EXISTS `address`;
+DROP TABLE IF EXISTS `user_block`;
 DROP TABLE IF EXISTS `notification`;
 DROP TABLE IF EXISTS `transaction_record`;
 DROP TABLE IF EXISTS `balance`;
@@ -16,6 +18,13 @@ DROP TABLE IF EXISTS `order_info`;
 DROP TABLE IF EXISTS `secondhand_product`;
 DROP TABLE IF EXISTS `product`;
 DROP TABLE IF EXISTS `shop`;
+DROP TABLE IF EXISTS `category`;
+DROP TABLE IF EXISTS `user_block`;
+DROP TABLE IF EXISTS `user_report`;
+DROP TABLE IF EXISTS `credit_score_log`;
+DROP TABLE IF EXISTS `admin_audit_log`;
+DROP TABLE IF EXISTS `merchant_application`;
+DROP TABLE IF EXISTS `review`;
 DROP TABLE IF EXISTS `user`;
 
 CREATE TABLE `user` (
@@ -42,6 +51,102 @@ CREATE TABLE `user` (
   `buyer_credit_score` INT,
   `create_time` TIMESTAMP,
   `update_time` TIMESTAMP
+);
+
+CREATE TABLE `address` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `receiver_name` VARCHAR(50) NOT NULL,
+  `receiver_phone` VARCHAR(20) NOT NULL,
+  `province` VARCHAR(50) NOT NULL,
+  `city` VARCHAR(50) NOT NULL,
+  `detail_address` VARCHAR(255) NOT NULL,
+  `is_default` TINYINT NOT NULL DEFAULT 0,
+  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `update_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `merchant_application` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `store_name` VARCHAR(80),
+  `category_id` INT,
+  `id_card_no` VARCHAR(30),
+  `bank_card_no` VARCHAR(50),
+  `license_img` VARCHAR(255),
+  `warehouse_addr` VARCHAR(255),
+  `warehouse_province` VARCHAR(50),
+  `warehouse_city` VARCHAR(50),
+  `warehouse_detail` VARCHAR(255),
+  `contact_name` VARCHAR(50),
+  `contact_phone` VARCHAR(20),
+  `status` INT DEFAULT 0,
+  `reject_reason` VARCHAR(255),
+  `apply_time` TIMESTAMP
+);
+
+CREATE TABLE `admin_audit_log` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `admin_user_id` BIGINT,
+  `admin_username` VARCHAR(50),
+  `action` VARCHAR(80),
+  `target_type` VARCHAR(50),
+  `target_id` BIGINT,
+  `detail` VARCHAR(1000),
+  `create_time` TIMESTAMP
+);
+
+CREATE TABLE `credit_score_log` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `role` VARCHAR(30),
+  `delta` INT,
+  `reason_code` VARCHAR(80),
+  `reason_desc` VARCHAR(500),
+  `ref_id` BIGINT,
+  `operator_id` BIGINT,
+  `create_time` TIMESTAMP
+);
+
+CREATE TABLE `user_report` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `reporter_id` BIGINT NOT NULL,
+  `reported_id` BIGINT NOT NULL,
+  `reporter_role` VARCHAR(30),
+  `trade_context` VARCHAR(30),
+  `reason_type` VARCHAR(50),
+  `reason_desc` VARCHAR(500),
+  `evidence_urls` VARCHAR(1000),
+  `status` INT DEFAULT 0,
+  `admin_id` BIGINT,
+  `admin_remark` VARCHAR(500),
+  `audit_time` TIMESTAMP,
+  `create_time` TIMESTAMP,
+  `update_time` TIMESTAMP
+);
+
+CREATE TABLE `review` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `order_id` BIGINT,
+  `product_type` VARCHAR(20),
+  `product_id` BIGINT,
+  `user_id` BIGINT,
+  `score` INT,
+  `content` VARCHAR(1000),
+  `review_type` VARCHAR(30),
+  `seller_reply` VARCHAR(1000),
+  `seller_reply_time` TIMESTAMP,
+  `status` INT,
+  `create_time` TIMESTAMP,
+  `update_time` TIMESTAMP
+);
+
+CREATE TABLE `category` (
+  `id` INT PRIMARY KEY,
+  `name` VARCHAR(100),
+  `parent_id` INT,
+  `sort_order` INT,
+  `status` INT
 );
 
 CREATE TABLE `order_info` (
@@ -105,7 +210,7 @@ CREATE TABLE `order_item` (
 );
 
 CREATE TABLE `shop` (
-  `id` BIGINT PRIMARY KEY,
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
   `owner_user_id` BIGINT,
   `name` VARCHAR(80),
   `logo` VARCHAR(255),
@@ -300,6 +405,78 @@ CREATE TABLE `notification` (
   `target_path` VARCHAR(255),
   `is_read` INT DEFAULT 0,
   `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `voucher` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `issuer_type` TINYINT NOT NULL DEFAULT 1,
+  `voucher_type` TINYINT NOT NULL DEFAULT 1,
+  `issuer_user_id` BIGINT,
+  `scope_type` TINYINT NOT NULL DEFAULT 1,
+  `shop_id` BIGINT,
+  `product_id` BIGINT,
+  `can_stack` TINYINT NOT NULL DEFAULT 0,
+  `name` VARCHAR(100) NOT NULL,
+  `type` TINYINT NOT NULL DEFAULT 1,
+  `discount_amount` DECIMAL(10,2),
+  `discount_rate` DECIMAL(4,2),
+  `min_amount` DECIMAL(10,2) NOT NULL DEFAULT 0,
+  `total_count` INT NOT NULL DEFAULT 0,
+  `received_count` INT NOT NULL DEFAULT 0,
+  `used_count` INT NOT NULL DEFAULT 0,
+  `grab_start_time` TIMESTAMP,
+  `grab_end_time` TIMESTAMP,
+  `start_time` TIMESTAMP,
+  `end_time` TIMESTAMP,
+  `status` TINYINT NOT NULL DEFAULT 1,
+  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `update_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `user_voucher` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `voucher_id` BIGINT NOT NULL,
+  `status` TINYINT NOT NULL DEFAULT 1,
+  `received_time` TIMESTAMP,
+  `used_order_id` BIGINT,
+  `used_time` TIMESTAMP,
+  `expire_time` TIMESTAMP,
+  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `update_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `chat_conversation` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `buyer_user_id` BIGINT NOT NULL,
+  `seller_user_id` BIGINT NOT NULL,
+  `source_type` VARCHAR(20) NOT NULL DEFAULT 'DIRECT',
+  `source_id` BIGINT NOT NULL DEFAULT 0,
+  `source_title` VARCHAR(120),
+  `last_message_content` VARCHAR(1000),
+  `last_message_time` TIMESTAMP,
+  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `update_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT `uk_chat_conversation_pair`
+    UNIQUE (`buyer_user_id`, `seller_user_id`, `source_type`, `source_id`)
+);
+
+CREATE TABLE `chat_message` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `conversation_id` BIGINT NOT NULL,
+  `sender_user_id` BIGINT NOT NULL,
+  `receiver_user_id` BIGINT NOT NULL,
+  `content` VARCHAR(1000) NOT NULL,
+  `is_read` TINYINT NOT NULL DEFAULT 0,
+  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `user_block` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `blocker_id` BIGINT NOT NULL,
+  `blocked_id` BIGINT NOT NULL,
+  `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT `uk_user_block` UNIQUE (`blocker_id`, `blocked_id`)
 );
 
 CREATE TABLE `idempotency_record` (

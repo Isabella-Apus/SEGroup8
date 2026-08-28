@@ -1,0 +1,24 @@
+{
+  "uc": "UC02",
+  "integration": {"status": "PASS", "tests": 2, "failures": 0, "errors": 0},
+  "savedApiCoverage": {"status": "PASS", "tests": 8, "failures": 0, "errors": 0},
+  "compose_mysql_browser": {
+    "status": "PASS",
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "database": "MySQL",
+    "browser": "Chromium",
+    "command": "COMPOSE_FILE=compose.yml;compose.e2e.yml E2E_OUTPUT_DIR=04_tests/UC02/evidence run-compose-e2e.ps1 -ResetDatabase e2e/domain-a/uc02-profile-address.spec.ts"
+  },
+  "ciWorkflow": "https://github.com/Isabella-Apus/SEGroup8/actions/workflows/ci-cd.yml",
+  "evidencePaths": {
+    "rawReports": "04_tests/UC02/evidence/raw-reports/",
+    "logs": "04_tests/UC02/evidence/logs/",
+    "screenshots": "04_tests/UC02/evidence/screenshots/",
+    "playwrightReport": "04_tests/UC02/evidence/playwright-report/",
+    "playwrightResults": "04_tests/UC02/evidence/playwright-results.json"
+  },
+  "coverage": ["profile consistency", "address CRUD", "one default", "ownership isolation", "unauthenticated boundary"],
+  "evidenceRule": "H2 integration and real Compose browser evidence are reported separately."
+}

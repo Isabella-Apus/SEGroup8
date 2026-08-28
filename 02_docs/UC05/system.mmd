@@ -1,0 +1,10 @@
+flowchart LR
+  U[Reporter] --> R[Submit report]
+  U --> B[Create or remove block]
+  R --> DB[(MySQL/H2)]
+  A[Administrator] --> V[Review report]
+  V --> C[Credit score update]
+  C --> L[credit_score_log]
+  V --> AL[admin_audit_log]
+  B --> Q[Directional block queries]
+  Q --> DB

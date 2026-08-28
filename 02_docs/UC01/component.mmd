@@ -1,0 +1,7 @@
+flowchart TB
+  E2E[uc01-auth.spec.ts] --> API[真实 HTTP API]
+  API --> C1[AuthController]
+  API --> C2[AdminUserController]
+  C1 --> S1[AuthServiceImpl]
+  C2 --> S2[AdminUserServiceImpl]
+  S2 --> AL[AdminAuditLogService]

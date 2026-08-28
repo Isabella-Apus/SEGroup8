@@ -1,0 +1,38 @@
+{
+  "uc": "UC18",
+  "status": "PASS",
+  "executedAt": "2026-08-28T06:23:50+08:00",
+  "integration": {
+    "class": "SecondhandNegotiationIntegrationTest",
+    "tests": 7,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "database": "Testcontainers MySQL 8.4.6"
+  },
+  "regression": {
+    "classes": [
+      "SecondhandTradeServiceImplTest",
+      "SecondhandTradeControllerUc18WebMvcTest"
+    ],
+    "tests": 7,
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0
+  },
+  "fullBackendVerify": {
+    "command": "mvn clean verify",
+    "tests": 110,
+    "passed": 110,
+    "failed": 0,
+    "skipped": 0,
+    "build": "SUCCESS"
+  },
+  "e2e": {
+    "spec": "frontend/e2e/domain-d/uc18-bargain.spec.ts",
+    "tests": 1,
+    "passed": 1,
+    "failed": 0,
+    "stack": "Docker Compose: MySQL + Spring Boot + Nginx + Chromium"
+  }
+}

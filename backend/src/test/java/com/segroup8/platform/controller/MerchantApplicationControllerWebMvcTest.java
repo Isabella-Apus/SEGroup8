@@ -5,7 +5,9 @@ import com.segroup8.platform.service.AdminAuditLogService;
 import com.segroup8.platform.service.MerchantApplicationService;
 import com.segroup8.platform.service.UserService;
 import com.segroup8.platform.vo.MerchantApplicationVO;
+import com.segroup8.platform.vo.PageVO;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -17,6 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,6 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("DOMAIN_A")
+@Tag("UC03")
 class MerchantApplicationControllerWebMvcTest {
 
     private MockMvc mockMvc;
@@ -78,6 +83,26 @@ class MerchantApplicationControllerWebMvcTest {
     }
 
     @Test
+    void page_shouldReturnAdminApplicationQueue() throws Exception {
+        PageVO<MerchantApplicationVO> page = new PageVO<>();
+        page.setTotal(1L);
+        page.setPageNum(1L);
+        page.setPageSize(10L);
+        page.setRecords(java.util.List.of(new MerchantApplicationVO()));
+        when(merchantApplicationService.pageForAdmin(any())).thenReturn(page);
+
+        mockMvc.perform(get("/api/admin/merchant-applications")
+                        .param("pageNum", "1")
+                        .param("pageSize", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.total").value(1))
+                .andExpect(jsonPath("$.data.pageNum").value(1));
+
+        verify(merchantApplicationService).pageForAdmin(any());
+    }
+
+    @Test
     void reject_shouldRequireReason() throws Exception {
         mockMvc.perform(post("/api/admin/merchant-applications/8/reject")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -86,6 +111,20 @@ class MerchantApplicationControllerWebMvcTest {
                 .andExpect(jsonPath("$.code").value(400));
 
         verify(merchantApplicationService, never()).reject(any(), any());
+    }
+
+    @Test
+    void reject_shouldReturnSuccessAndRecordAudit() throws Exception {
+        mockMvc.perform(post("/api/admin/merchant-applications/8/reject")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"rejectReason\":\"License information is incomplete\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.message").value("success"));
+
+        verify(merchantApplicationService).reject(eq(8L), any());
+        verify(adminAuditLogService).record(eq("REJECT_MERCHANT_APPLICATION"), eq("MERCHANT_APPLICATION"),
+                eq(8L), any());
     }
 
     @Test
