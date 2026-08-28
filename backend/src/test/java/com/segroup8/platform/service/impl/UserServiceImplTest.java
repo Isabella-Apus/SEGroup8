@@ -13,6 +13,7 @@ import com.segroup8.platform.service.MerchantApplicationService;
 import com.segroup8.platform.vo.UserVO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -26,6 +27,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("DOMAIN_A")
+@Tag("UC02")
 class UserServiceImplTest {
 
     @Mock

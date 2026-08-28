@@ -289,6 +289,25 @@ CREATE TABLE IF NOT EXISTS `browse_history` (
   KEY `idx_browse_history_user_browse_time` (`user_id`, `browse_time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+CREATE TABLE IF NOT EXISTS `user_search_history` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `keyword` VARCHAR(100) NOT NULL,
+  `search_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_user_search_history_user_time` (`user_id`, `search_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `search_keyword_stat` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `keyword` VARCHAR(100) NOT NULL,
+  `stat_date` DATE NOT NULL,
+  `search_count` INT NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_search_keyword_stat_keyword_date` (`keyword`, `stat_date`),
+  KEY `idx_search_keyword_stat_date_count` (`stat_date`, `search_count`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- 兼容已存在库：补齐浏览记录类型字段和唯一索引（按 user + type + product 维度去重）
 SET @browse_history_product_type_add_sql = IF (
   EXISTS (
