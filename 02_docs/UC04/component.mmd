@@ -1,0 +1,7 @@
+flowchart TB
+  Spec[uc04-ban-unban.spec.ts] --> HTTP[真实 HTTP]
+  HTTP --> Ban[ban/unban]
+  HTTP --> Login[login]
+  HTTP --> Logs[audit query]
+  Ban --> Service[AdminUserServiceImpl]
+  Login --> Auth[AuthServiceImpl]

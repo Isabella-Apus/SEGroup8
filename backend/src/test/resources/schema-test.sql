@@ -20,6 +20,7 @@ DROP TABLE IF EXISTS `secondhand_product`;
 DROP TABLE IF EXISTS `product`;
 DROP TABLE IF EXISTS `shop`;
 DROP TABLE IF EXISTS `category`;
+DROP TABLE IF EXISTS `user_block`;
 DROP TABLE IF EXISTS `user_report`;
 DROP TABLE IF EXISTS `credit_score_log`;
 DROP TABLE IF EXISTS `admin_audit_log`;
@@ -449,5 +450,6 @@ CREATE TABLE `idempotency_record` (
   `response_body` TEXT,
   `expire_time` TIMESTAMP,
   `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  `update_time` TIMESTAMP
+  `update_time` TIMESTAMP,
+  UNIQUE (`user_id`, `request_method`, `request_path`, `idempotency_key`)
 );

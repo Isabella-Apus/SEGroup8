@@ -1,0 +1,15 @@
+### Register
+POST http://127.0.0.1:8089/api/auth/register
+Content-Type: application/json
+
+{"username":"uc01-demo","password":"secret123","nickname":"UC01 Demo","phone":"13800138000","email":"uc01-demo@example.com"}
+
+### Login
+POST http://127.0.0.1:8089/api/auth/login
+Content-Type: application/json
+
+{"username":"uc01-demo","password":"secret123"}
+
+### Admin list; replace token
+GET http://127.0.0.1:8089/api/admin/users
+Authorization: Bearer <jwt>
