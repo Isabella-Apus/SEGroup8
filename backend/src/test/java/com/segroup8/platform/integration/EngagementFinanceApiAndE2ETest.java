@@ -2,12 +2,9 @@ package com.segroup8.platform.integration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.segroup8.platform.common.TransactionTradeTypeEnum;
 import com.segroup8.platform.realtime.RealtimeHandshakeInterceptor;
-import com.segroup8.platform.realtime.RealtimePushService;
 import com.segroup8.platform.realtime.RealtimeWebSocketHandler;
 import com.segroup8.platform.service.NotificationService;
-import com.segroup8.platform.service.settlement.EscrowSettlementService;
 import com.segroup8.platform.utils.JwtUtils;
 import com.segroup8.platform.vo.NotificationVO;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +26,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.LocalDateTime;
@@ -37,10 +35,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -70,13 +70,7 @@ class EngagementFinanceApiAndE2ETest {
     private JwtUtils jwtUtils;
 
     @Autowired
-    private EscrowSettlementService escrowSettlementService;
-
-    @Autowired
     private NotificationService notificationService;
-
-    @Autowired
-    private RealtimePushService realtimePushService;
 
     @Autowired
     private RealtimeWebSocketHandler realtimeWebSocketHandler;
@@ -87,6 +81,7 @@ class EngagementFinanceApiAndE2ETest {
     private String buyerToken;
     private String adminToken;
     private String sellerToken;
+    private String otherSellerToken;
 
     @BeforeEach
     void resetEvidenceData() {
@@ -99,6 +94,12 @@ class EngagementFinanceApiAndE2ETest {
         db.update("delete from transaction_record");
         db.update("delete from balance");
         db.update("delete from address");
+        db.update("delete from shop where id = 101");
+        db.update("delete from user where id = 4");
+        db.update("insert into user(id, username, password, nickname, role, status, create_time, update_time) "
+                + "values(4, 'seller2', 'x', 'seller2', 'OFFICIAL_SELLER', 'ACTIVE', current_timestamp, current_timestamp)");
+        db.update("insert into shop(id, owner_user_id, name, status, create_time, update_time) "
+                + "values(101, 4, 'other test shop', 1, current_timestamp, current_timestamp)");
         db.update("insert into balance(user_id, personal_balance, business_balance, version) values(1, 100.00, 0.00, 0)");
         db.update("insert into balance(user_id, personal_balance, business_balance, version) values(3, 0.00, 0.00, 0)");
         db.update("insert into address(user_id, receiver_name, receiver_phone, province, city, detail_address, is_default) "
@@ -107,6 +108,7 @@ class EngagementFinanceApiAndE2ETest {
         buyerToken = jwtUtils.createToken(1L, "buyer1", "USER");
         adminToken = jwtUtils.createToken(2L, "admin1", "ADMIN");
         sellerToken = jwtUtils.createToken(3L, "seller1", "OFFICIAL_SELLER");
+        otherSellerToken = jwtUtils.createToken(4L, "seller2", "OFFICIAL_SELLER");
     }
 
     @Test
@@ -124,6 +126,17 @@ class EngagementFinanceApiAndE2ETest {
                         .content(voucherBody("越权平台券", "8.00")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(403));
+
+        mvc.perform(put("/api/voucher/seller/{id}", sellerVoucherId)
+                        .header("Authorization", bearer(otherSellerToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(voucherBody("跨卖家越权修改", "30.00")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(403));
+        assertEquals(new BigDecimal("10.00"), db.queryForObject(
+                "select discount_amount from voucher where id = ?",
+                BigDecimal.class,
+                sellerVoucherId));
 
         mvc.perform(put("/api/voucher/seller/{id}", sellerVoucherId)
                         .header("Authorization", bearer(sellerToken))
@@ -260,13 +273,51 @@ class EngagementFinanceApiAndE2ETest {
                 .andExpect(jsonPath("$.data[0].tradeType").value("RECHARGE"))
                 .andExpect(jsonPath("$.data[0].amount").value(50.0));
 
-        escrowSettlementService.changeBusinessBalance(
-                3L,
-                new BigDecimal("99.00"),
-                5001L,
-                "ORDER_SETTLEMENT",
-                TransactionTradeTypeEnum.INCOME_BUSINESS,
-                "UC23测试结算");
+        mvc.perform(post("/api/finance/recharge")
+                        .header("Authorization", bearer(buyerToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"amount\":0,\"channel\":\"WECHAT\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(400));
+        assertEquals(new BigDecimal("150.00"), db.queryForObject(
+                "select personal_balance from balance where user_id = 1", BigDecimal.class));
+        assertEquals(1, db.queryForObject(
+                "select count(*) from transaction_record where user_id = 1 and trade_type = 'RECHARGE'",
+                Integer.class));
+
+        mvc.perform(get("/api/finance/business/records")
+                        .header("Authorization", bearer(buyerToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(403));
+
+        MvcResult orderCreated = mvc.perform(post("/api/order/create")
+                        .header("Authorization", bearer(buyerToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"items\":[{\"productId\":1001,\"quantity\":1}]}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.payableAmount").value(99.0))
+                .andReturn();
+        long orderId = responseData(orderCreated).path("id").asLong();
+
+        mvc.perform(post("/api/order/{id}/pay", orderId)
+                        .header("Authorization", bearer(buyerToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"payMode\":\"THIRD_PARTY\",\"payChannel\":\"WECHAT\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
+
+        mvc.perform(post("/api/order/{id}/ship", orderId)
+                        .header("Authorization", bearer(sellerToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"originProvince\":\"北京市\",\"originCity\":\"北京市\",\"originDetail\":\"测试仓库\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
+
+        mvc.perform(post("/api/order/{id}/confirm-receive", orderId)
+                        .header("Authorization", bearer(buyerToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
 
         mvc.perform(get("/api/finance/dashboard")
                         .header("Authorization", bearer(sellerToken)))
@@ -276,8 +327,26 @@ class EngagementFinanceApiAndE2ETest {
         mvc.perform(get("/api/finance/business/records")
                         .header("Authorization", bearer(sellerToken)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].orderId").value(5001))
+                .andExpect(jsonPath("$.data[0].orderId").value(orderId))
                 .andExpect(jsonPath("$.data[0].amount").value(99.0));
+
+        assertEquals(new BigDecimal("0.00"), db.queryForObject(
+                "select personal_balance from balance where user_id = 3", BigDecimal.class));
+        assertEquals(1, db.queryForObject(
+                "select count(*) from transaction_record where user_id = 3 and order_id = ? and account_type = 'BUSINESS'",
+                Integer.class,
+                orderId));
+
+        mvc.perform(post("/api/order/{id}/confirm-receive", orderId)
+                        .header("Authorization", bearer(buyerToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(400));
+        assertEquals(new BigDecimal("99.00"), db.queryForObject(
+                "select business_balance from balance where user_id = 3", BigDecimal.class));
+        assertEquals(1, db.queryForObject(
+                "select count(*) from transaction_record where user_id = 3 and order_id = ? and account_type = 'BUSINESS'",
+                Integer.class,
+                orderId));
     }
 
     @Test
@@ -319,11 +388,28 @@ class EngagementFinanceApiAndE2ETest {
         assertEquals(1, db.queryForObject(
                 "select count(*) from notification where user_id = 3 and is_read = 0",
                 Integer.class));
+
+        mvc.perform(get("/api/chat/conversations/{id}/messages", conversationId)
+                        .header("Authorization", bearer(adminToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(403));
+
+        mvc.perform(post("/api/chat/conversations/{id}/messages", conversationId)
+                        .header("Authorization", bearer(adminToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"content\":\"越权消息不应落库\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(403));
+        assertEquals(1, db.queryForObject(
+                "select count(*) from chat_message where conversation_id = ?",
+                Integer.class,
+                conversationId));
     }
 
     @Test
     void uc25NotificationReadAndRealtimePush() throws Exception {
         verifyHandshakeAccepts(buyerToken);
+        verifyHandshakeRejects("invalid-token");
 
         WebSocketSession session = mock(WebSocketSession.class);
         Map<String, Object> attributes = new HashMap<>();
@@ -363,6 +449,33 @@ class EngagementFinanceApiAndE2ETest {
                     "select is_read from notification where id = ?",
                     Integer.class,
                     first.getId()));
+
+            NotificationVO sellerNotification = notificationService.createNotification(
+                    3L,
+                    "UC25卖家通知",
+                    "验证通知归属隔离",
+                    "/merchant/orders");
+            mvc.perform(post("/api/notifications/{id}/read", sellerNotification.getId())
+                            .header("Authorization", bearer(buyerToken)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.code").value(404));
+            assertEquals(0, db.queryForObject(
+                    "select is_read from notification where id = ?",
+                    Integer.class,
+                    sellerNotification.getId()));
+
+            clearInvocations(session);
+            doThrow(new IOException("simulated realtime delivery failure"))
+                    .when(session).sendMessage(any(TextMessage.class));
+            NotificationVO persistedAfterPushFailure = notificationService.createNotification(
+                    1L,
+                    "UC25推送失败隔离",
+                    "实时发送失败时通知仍应落库");
+            verify(session).close(CloseStatus.SERVER_ERROR);
+            assertEquals(1, db.queryForObject(
+                    "select count(*) from notification where id = ? and user_id = 1 and is_read = 0",
+                    Integer.class,
+                    persistedAfterPushFailure.getId()));
 
             notificationService.createNotification(1L, "UC25第二条通知", "验证全部已读");
             mvc.perform(post("/api/notifications/read-all")
@@ -424,6 +537,24 @@ class EngagementFinanceApiAndE2ETest {
         assertTrue(accepted);
         assertEquals(1L, attributes.get(RealtimeHandshakeInterceptor.USER_ID_ATTR));
         verify(response, org.mockito.Mockito.never()).setStatusCode(HttpStatus.UNAUTHORIZED);
+    }
+
+    private void verifyHandshakeRejects(String token) {
+        ServerHttpRequest request = mock(ServerHttpRequest.class);
+        ServerHttpResponse response = mock(ServerHttpResponse.class);
+        WebSocketHandler handler = mock(WebSocketHandler.class);
+        Map<String, Object> attributes = new HashMap<>();
+        when(request.getURI()).thenReturn(URI.create("http://localhost/ws/realtime?token=" + token));
+
+        boolean accepted = realtimeHandshakeInterceptor.beforeHandshake(
+                request,
+                response,
+                handler,
+                attributes);
+
+        assertFalse(accepted);
+        verify(response).setStatusCode(HttpStatus.UNAUTHORIZED);
+        assertTrue(attributes.isEmpty());
     }
 
     private String bearer(String token) {

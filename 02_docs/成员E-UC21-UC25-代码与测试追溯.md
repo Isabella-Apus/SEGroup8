@@ -4,11 +4,11 @@
 
 | UC | 页面 | Controller | Service | 主要数据库表 | 现有测试 | 当前判断 |
 |---|---|---|---|---|---|---|
-| UC21 | `SellerVoucher.vue`、`AdminVoucherView.vue` | `VoucherController` | `VoucherService` | `voucher` | `VoucherServiceTest`；`EngagementFinanceApiAndE2ETest` | 卖家/管理员列表、创建、修改、关闭、删除及普通用户越权均有 API 断言 |
-| UC22 | `CouponCenterView.vue`、`ProductDetailView.vue` | `VoucherController`、`OrderController` | `VoucherService`、`OrderServiceImpl` | `voucher`、`user_voucher`、`order_info` | `VoucherServiceTest`；`EngagementFinanceApiAndE2ETest`；订单集成测试 | 已覆盖领券→可用性→创建订单→支付→核销 E2E；仍可追加下单失败后的券释放断言 |
-| UC23 | `MerchantFinanceView.vue`（以及用户钱包入口） | `FinanceController` | `EscrowSettlementService`、财务相关逻辑 | `balance`、`transaction_record`、`order_info` | `EscrowSettlementServiceTest`；`OrderSettlementRefundFlowIntegrationTest`；`EngagementFinanceApiAndE2ETest` | 缺充值边界、越权、并发与重复结算覆盖 |
-| UC24 | `ChatView.vue`（用户与商家路由共用） | `ChatController` | `ChatService` / `ChatServiceImpl` | `chat_conversation`、`chat_message` | `ChatServiceImplTest`；`EngagementFinanceApiAndE2ETest` | 四个聊天公开 API 均已覆盖；非参与者越权由服务测试覆盖，仍可追加浏览器双用户 E2E |
-| UC25 | `NotificationView.vue`、`realtimeClient.js` | `NotificationController`、WebSocket 配置/处理器 | `NotificationService` / `NotificationServiceImpl` | `notification` | `RealtimeHandshakeInterceptorTest`；`EngagementFinanceApiAndE2ETest` | 缺浏览器级实时推送/断线重连和推送失败不回滚验证 |
+| UC21 | `SellerVoucher.vue`、`AdminVoucherView.vue` | `VoucherController` | `VoucherService` | `voucher` | `VoucherServiceTest`；`EngagementFinanceApiAndE2ETest` | 后端 E2E 覆盖卖家/管理员生命周期、普通用户越权和跨卖家越权；越权后数据库记录不变 |
+| UC22 | `CouponCenterView.vue`、`ProductDetailView.vue` | `VoucherController`、`OrderController` | `VoucherService`、`OrderServiceImpl` | `voucher`、`user_voucher`、`order_info` | `VoucherServiceTest`；`EngagementFinanceApiAndE2ETest`；订单集成测试 | 后端 E2E 覆盖发券、领券、门槛判断、下单、支付、核销和金额对账 |
+| UC23 | `MerchantFinanceView.vue`（以及用户钱包入口） | `FinanceController`、`OrderController` | `EscrowSettlementService`、`OrderServiceImpl` | `balance`、`transaction_record`、`order_info` | `EscrowSettlementServiceTest`；`OrderSettlementRefundFlowIntegrationTest`；`EngagementFinanceApiAndE2ETest` | 后端 E2E 覆盖充值、订单履约、经营账户结算、非法金额、经营流水权限和重复结算拦截 |
+| UC24 | `ChatView.vue`（用户与商家路由共用） | `ChatController` | `ChatService` / `ChatServiceImpl` | `chat_conversation`、`chat_message` | `ChatServiceImplTest`；`EngagementFinanceApiAndE2ETest` | 后端 E2E 覆盖双用户会话、消息持久化、离线历史补取和非参与者读写拒绝 |
+| UC25 | `NotificationView.vue`、`realtimeClient.js` | `NotificationController`、WebSocket 配置/处理器 | `NotificationService` / `NotificationServiceImpl` | `notification` | `RealtimeHandshakeInterceptorTest`；`EngagementFinanceApiAndE2ETest` | 后端 E2E 覆盖握手、心跳、实时推送、已读、通知归属、非法 token 和推送失败后的持久化 |
 
 ## 文件定位
 
@@ -61,4 +61,4 @@ SELECT conversation_id, sender_user_id, receiver_user_id, create_time FROM chat_
 SELECT id, user_id, is_read, create_time FROM notification ORDER BY id DESC;
 ```
 
-说明：字段名以运行 Schema 为准；验证脚本不得执行更新或删除，不输出消息正文、JWT、密码或密钥。
+说明：字段名以运行 Schema 为准；验证脚本不得执行更新或删除，不输出消息正文、JWT、密码或密钥。浏览器页面自动化和截图证据仍需在前后端服务启动后单独采集。
