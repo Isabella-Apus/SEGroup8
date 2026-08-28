@@ -266,8 +266,11 @@ class OrderServiceImplTest {
         order.setId(orderId);
         order.setOrderNo("ORDER-14");
         order.setBuyerUserId(buyerUserId);
+        order.setPayStatus(1);
         order.setOrderStatus(OrderStatusEnum.PENDING_SHIP.getCode());
+        order.setVersion(0);
         when(orderInfoMapper.selectById(orderId)).thenReturn(order);
+        when(orderInfoMapper.update(any(), any())).thenReturn(1);
 
         OrderItem item = new OrderItem();
         item.setId(3L);

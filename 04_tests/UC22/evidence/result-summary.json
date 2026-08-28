@@ -1,0 +1,19 @@
+{
+  "uc": "UC22",
+  "status": "PASS",
+  "environment": "Windows 11; backend test profile; real Compose Nginx + Spring Boot + MySQL; Playwright with local Edge",
+  "executedAt": "2026-08-28T17:25:17+08:00",
+  "counts": { "passed": 8, "failed": 0, "skipped": 0 },
+  "evidence": [
+    "raw-reports/TEST-com.segroup8.platform.integration.VoucherCheckoutUc22IntegrationTest.xml",
+    "raw-reports/TEST-com.segroup8.platform.integration.VoucherClaimUc22IntegrationTest.xml",
+    "raw-reports/TEST-com.segroup8.platform.service.UC22VoucherThresholdTest.xml",
+    "raw-reports/TEST-com.segroup8.platform.service.VoucherServiceTest.xml",
+    "raw-reports/playwright/playwright-results.json",
+    "raw-reports/playwright/playwright-results.xml",
+    "raw-reports/playwright/playwright-report/index.html",
+    "screenshots/uc22-voucher-used-after-paid-order-refresh.png",
+    "logs/runtime-health.txt",
+    "../test-report.md"
+  ]
+}

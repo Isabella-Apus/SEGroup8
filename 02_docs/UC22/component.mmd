@@ -1,0 +1,24 @@
+flowchart LR
+    subgraph Browser[浏览器]
+        Coupon[CouponCenterView.vue]
+        Product[ProductDetailView.vue]
+        Detail[OrderDetailView.vue]
+        Client[coupon.js / order.js]
+    end
+
+    subgraph Backend[Spring Boot]
+        VC[VoucherController]
+        OC[OrderController]
+        VS[VoucherService]
+        OS[OrderServiceImpl]
+        Mapper[MyBatis Mappers]
+    end
+
+    DB[(MySQL: voucher / user_voucher / order_info)]
+
+    Coupon --> Client
+    Product --> Client
+    Detail --> Client
+    Client --> VC --> VS --> Mapper
+    Client --> OC --> OS --> VS
+    OS --> Mapper --> DB

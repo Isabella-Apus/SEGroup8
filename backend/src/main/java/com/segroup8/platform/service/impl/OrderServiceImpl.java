@@ -48,8 +48,12 @@ import com.segroup8.platform.service.settlement.EscrowSettlementService;
 import com.segroup8.platform.vo.OrderItemVO;
 import com.segroup8.platform.vo.OrderVO;
 import com.segroup8.platform.vo.PageVO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -70,6 +74,7 @@ import java.util.UUID;
 @Service
 public class OrderServiceImpl implements OrderService {
 
+    private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
     private static final DateTimeFormatter ORDER_NO_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     private final OrderInfoMapper orderInfoMapper;
@@ -418,13 +423,15 @@ public class OrderServiceImpl implements OrderService {
                 .eq("order_status", OrderStatusEnum.SHIPPED.getCode())
                 .eq("version", version));
         if (updated == 0) {
-            throw new BusinessException(400, "仅待收货订单可确认收货");
+            throw new BusinessException(409, "订单状态已变化，请刷新后重试");
         }
         finalizeReceipt(orderId, order, now);
         List<Long> sellerUserIds = resolveSellerUserIds(orderId);
-        notifySellers(orderId, sellerUserIds, "买家已确认收货",
-                "订单号：" + order.getOrderNo() + "，交易资金已按规则结算。");
-        pushOrderRealtime(orderId, userId, sellerUserIds, "ORDER_STATUS_UPDATED", "买家已确认收货");
+        runAfterCommitBestEffort("notify sellers after receipt", () -> notifySellers(
+                orderId, sellerUserIds, "买家已确认收货",
+                "订单号：" + order.getOrderNo() + "，交易资金已按规则结算。"));
+        runAfterCommitBestEffort("push receipt status", () -> pushOrderRealtime(
+                orderId, userId, sellerUserIds, "ORDER_STATUS_UPDATED", "买家已确认收货"));
         return getMyOrderDetail(orderId);
     }
 
@@ -458,12 +465,15 @@ public class OrderServiceImpl implements OrderService {
         }
         finalizeReceipt(orderId, order, now);
         List<Long> sellerUserIds = resolveSellerUserIds(orderId);
-        notifyBuyer(order, "订单已自动确认收货",
-                "订单号：" + order.getOrderNo() + " 已由系统自动确认收货。");
-        notifySellers(orderId, sellerUserIds, "订单已自动确认收货",
-                "订单号：" + order.getOrderNo() + " 已自动确认收货，交易资金已按规则结算。");
-        pushOrderRealtime(orderId, order.getBuyerUserId(), sellerUserIds, "ORDER_STATUS_UPDATED",
-                "系统已自动确认收货");
+        runAfterCommitBestEffort("notify buyer after automatic receipt", () -> notifyBuyer(
+                order, "订单已自动确认收货",
+                "订单号：" + order.getOrderNo() + " 已由系统自动确认收货。"));
+        runAfterCommitBestEffort("notify sellers after automatic receipt", () -> notifySellers(
+                orderId, sellerUserIds, "订单已自动确认收货",
+                "订单号：" + order.getOrderNo() + " 已自动确认收货，交易资金已按规则结算。"));
+        runAfterCommitBestEffort("push automatic receipt status", () -> pushOrderRealtime(
+                orderId, order.getBuyerUserId(), sellerUserIds, "ORDER_STATUS_UPDATED",
+                "系统已自动确认收货"));
     }
 
     @Override
@@ -908,28 +918,52 @@ public class OrderServiceImpl implements OrderService {
         AccessControl.requireSellerOwnership(
                 () -> items.stream().anyMatch(item -> isItemOwnedBySeller(item, sellerUserId)), "无权操作该订单");
         if (Integer.valueOf(OrderStatusEnum.SHIPPED.getCode()).equals(order.getOrderStatus())) {
-            logisticsService.initializeWhenShipped(orderId, request);
             return buildOrderVO(order, items);
         }
         if (!Integer.valueOf(OrderStatusEnum.PENDING_SHIP.getCode()).equals(order.getOrderStatus())) {
             throw new BusinessException(400, "仅待发货订单可发货");
         }
-        order.setOrderStatus(OrderStatusEnum.SHIPPED.getCode());
+        if (!Integer.valueOf(1).equals(order.getPayStatus())) {
+            throw new BusinessException(400, "订单尚未支付，不能发货");
+        }
+        OrderShipRequest effectiveRequest = normalizeShipRequest(request, items);
         LocalDateTime now = LocalDateTime.now();
+        Integer version = normalizeVersion(order);
+        int updated = orderInfoMapper.update(null, new UpdateWrapper<OrderInfo>()
+                .set("order_status", OrderStatusEnum.SHIPPED.getCode())
+                .set("shipped_time", now)
+                .set("delivery_time", now)
+                .set("logistics_status", "IN_TRANSIT")
+                .setSql("version = version + 1")
+                .eq("id", orderId)
+                .eq("pay_status", 1)
+                .eq("order_status", OrderStatusEnum.PENDING_SHIP.getCode())
+                .eq("version", version));
+        if (updated == 0) {
+            OrderInfo current = orderInfoMapper.selectById(orderId);
+            if (current != null && Integer.valueOf(OrderStatusEnum.SHIPPED.getCode()).equals(current.getOrderStatus())) {
+                return buildOrderVO(current, items);
+            }
+            throw new BusinessException(409, "订单状态已变化，请刷新后重试");
+        }
+
+        order.setOrderStatus(OrderStatusEnum.SHIPPED.getCode());
         order.setShippedTime(now);
         order.setDeliveryTime(now);
         order.setLogisticsStatus("IN_TRANSIT");
+        order.setVersion(version + 1);
         if (order.getLogisticsCurrentIndex() == null) {
             order.setLogisticsCurrentIndex(0);
         }
-        orderInfoMapper.updateById(order);
-        OrderShipRequest effectiveRequest = normalizeShipRequest(request, items);
         logisticsService.initializeWhenShipped(orderId, effectiveRequest);
-        notifyBuyer(order, "订单已发货",
-                "订单号：" + order.getOrderNo() + "，卖家已发货，包裹正在运输中。");
-        pushOrderRealtime(orderId, order.getBuyerUserId(), List.of(sellerUserId), "ORDER_STATUS_UPDATED", "卖家已发货");
-        pushOrderRealtime(orderId, order.getBuyerUserId(), List.of(sellerUserId), "LOGISTICS_UPDATED",
-                "物流状态更新：包裹已揽收，开始运输");
+        runAfterCommitBestEffort("notify buyer after shipment", () -> notifyBuyer(
+                order, "订单已发货",
+                "订单号：" + order.getOrderNo() + "，卖家已发货，包裹正在运输中。"));
+        runAfterCommitBestEffort("push shipment status", () -> pushOrderRealtime(
+                orderId, order.getBuyerUserId(), List.of(sellerUserId), "ORDER_STATUS_UPDATED", "卖家已发货"));
+        runAfterCommitBestEffort("push initial logistics status", () -> pushOrderRealtime(
+                orderId, order.getBuyerUserId(), List.of(sellerUserId), "LOGISTICS_UPDATED",
+                "物流状态更新：包裹已揽收，开始运输"));
         return buildOrderVO(order, items);
     }
 
@@ -1524,6 +1558,27 @@ public class OrderServiceImpl implements OrderService {
             notificationService.createNotification(sellerUserId, title, content,
                     resolveSellerOrderTargetPath(orderId, sellerUserId));
         }
+    }
+
+    private void runAfterCommitBestEffort(String actionName, Runnable action) {
+        Runnable guardedAction = () -> {
+            try {
+                action.run();
+            } catch (RuntimeException exception) {
+                log.warn("UC20 side effect failed after core fulfillment action: {}", actionName, exception);
+            }
+        };
+        if (TransactionSynchronizationManager.isActualTransactionActive()
+                && TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    guardedAction.run();
+                }
+            });
+            return;
+        }
+        guardedAction.run();
     }
 
     private String resolveSellerOrderTargetPath(Long orderId, Long sellerUserId) {

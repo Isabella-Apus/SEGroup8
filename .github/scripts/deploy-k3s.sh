@@ -59,6 +59,7 @@ helm upgrade --install segroup8 "$chart_dir" \
   --atomic \
   --cleanup-on-fail \
   --wait \
+  --atomic \
   --timeout 10m \
   --history-max 5 \
   --set-string "backend.image.repository=$registry/$registry_namespace/backend" \

@@ -145,7 +145,7 @@
       </div>
       <div v-else class="actions">
         <el-space>
-          <el-button v-if="order.orderStatus === 1" type="primary" @click="shipBySeller">去发货</el-button>
+          <el-button v-if="order.orderStatus === 1 && order.payStatus === 1" type="primary" @click="shipBySeller">去发货</el-button>
           <el-button v-if="order.refundStatus === 1" type="success" @click="approveRefundBySeller">同意退货</el-button>
           <el-button v-if="order.refundStatus === 1" type="danger" plain @click="rejectRefundBySeller">拒绝退货</el-button>
           <!-- 卖家可举报/拉黑买家 -->
