@@ -1,0 +1,57 @@
+classDiagram
+    class OrderInfo {
+      Long id
+      Long buyerUserId
+      BigDecimal payableAmount
+      Integer payStatus
+      Integer orderStatus
+      String logisticsStatus
+      LocalDateTime shippedTime
+      LocalDateTime receivedTime
+      Integer version
+    }
+    class OrderItem {
+      Long orderId
+      String productType
+      Long productId
+      BigDecimal price
+      Integer quantity
+    }
+    class SecondhandProduct {
+      Long id
+      Long sellerUserId
+      String name
+      Integer status
+    }
+    class LogisticsPathTemplate {
+      Long id
+      String originRegion
+      String destRegion
+      String pathNodes
+    }
+    class LogisticsTrace {
+      Long orderId
+      String nodeName
+      String statusDesc
+      LocalDateTime createTime
+    }
+    class Balance {
+      Long userId
+      BigDecimal personalBalance
+      Integer version
+    }
+    class TransactionRecord {
+      Long orderId
+      Long userId
+      String accountType
+      String changeType
+      BigDecimal amount
+      BigDecimal balanceAfter
+    }
+    OrderInfo "1" --> "1..*" OrderItem
+    OrderItem "*" --> "1" SecondhandProduct
+    OrderInfo "0..1" --> "1" LogisticsPathTemplate
+    OrderInfo "1" --> "0..*" LogisticsTrace
+    SecondhandProduct "*" --> "1" Balance : 卖家个人钱包
+    OrderInfo "1" --> "0..1" TransactionRecord : 确认收货结算
+    Balance "1" --> "0..*" TransactionRecord

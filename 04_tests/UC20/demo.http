@@ -1,0 +1,39 @@
+@baseUrl = http://127.0.0.1:8089/api
+@sellerToken = REPLACE_WITH_SELLER_TOKEN
+@buyerToken = REPLACE_WITH_BUYER_TOKEN
+@orderId = 1
+
+### 卖家查看二手成交订单
+GET {{baseUrl}}/order/seller/list?pageNum=1&pageSize=10&productType=SECONDHAND
+Authorization: Bearer {{sellerToken}}
+
+### 卖家发货
+POST {{baseUrl}}/order/{{orderId}}/ship
+Authorization: Bearer {{sellerToken}}
+Content-Type: application/json
+
+{
+  "originProvince": "广东省",
+  "originCity": "广州市",
+  "originDetail": "天河区 UC20 发货点"
+}
+
+### 买家查看订单详情
+GET {{baseUrl}}/order/detail/{{orderId}}
+Authorization: Bearer {{buyerToken}}
+
+### 买家查看物流轨迹
+GET {{baseUrl}}/logistics/order/{{orderId}}/trace
+Authorization: Bearer {{buyerToken}}
+
+### 买家确认收货并触发结算
+POST {{baseUrl}}/order/{{orderId}}/confirm-receive
+Authorization: Bearer {{buyerToken}}
+
+### 卖家查看个人钱包结算结果
+GET {{baseUrl}}/finance/dashboard
+Authorization: Bearer {{sellerToken}}
+
+### 重复确认收货（幂等，不重复结算）
+POST {{baseUrl}}/order/{{orderId}}/confirm-receive
+Authorization: Bearer {{buyerToken}}

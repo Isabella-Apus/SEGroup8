@@ -1,0 +1,182 @@
+﻿database-1  | 2026-08-28T11:17:26.388186092Z 2026-08-28 19:17:26+08:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.4.6-1.el9 started.
+database-1  | 2026-08-28T11:17:27.498896396Z 2026-08-28 19:17:27+08:00 [Note] [Entrypoint]: Switching to dedicated user 'mysql'
+database-1  | 2026-08-28T11:17:27.543870347Z 2026-08-28 19:17:27+08:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.4.6-1.el9 started.
+database-1  | 2026-08-28T11:17:28.177997957Z 2026-08-28 19:17:28+08:00 [Note] [Entrypoint]: Initializing database files
+database-1  | 2026-08-28T11:17:28.237765157Z 2026-08-28T11:17:28.226939Z 0 [System] [MY-015017] [Server] MySQL Server Initialization - start.
+database-1  | 2026-08-28T11:17:28.237813311Z 2026-08-28T11:17:28.230345Z 0 [System] [MY-013169] [Server] /usr/sbin/mysqld (mysqld 8.4.6) initializing of server in progress as process 80
+database-1  | 2026-08-28T11:17:28.255461400Z 2026-08-28T11:17:28.254927Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+database-1  | 2026-08-28T11:17:30.132353158Z 2026-08-28T11:17:30.757794Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+database-1  | 2026-08-28T11:17:40.110067281Z 2026-08-28T11:17:40.109616Z 6 [Warning] [MY-010453] [Server] root@localhost is created with an empty password ! Please consider switching off the --initialize-insecure option.
+database-1  | 2026-08-28T11:17:48.741540282Z 2026-08-28T11:17:48.741075Z 0 [System] [MY-015018] [Server] MySQL Server Initialization - end.
+database-1  | 2026-08-28T11:17:48.813566923Z 2026-08-28 19:17:48+08:00 [Note] [Entrypoint]: Database files initialized
+database-1  | 2026-08-28T11:17:48.818129536Z 2026-08-28 19:17:48+08:00 [Note] [Entrypoint]: Starting temporary server
+database-1  | 2026-08-28T11:17:49.422449532Z 2026-08-28T11:17:48.857788Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+database-1  | 2026-08-28T11:17:49.422582446Z 2026-08-28T11:17:49.389583Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.4.6) starting as process 147
+database-1  | 2026-08-28T11:17:49.440709637Z 2026-08-28T11:17:49.440365Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+database-1  | 2026-08-28T11:17:50.918432221Z 2026-08-28T11:17:50.918081Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+database-1  | 2026-08-28T11:17:51.809735304Z 2026-08-28T11:17:51.809340Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+database-1  | 2026-08-28T11:17:51.809815286Z 2026-08-28T11:17:51.809442Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+database-1  | 2026-08-28T11:17:51.820790801Z 2026-08-28T11:17:51.820456Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+database-1  | 2026-08-28T11:17:51.868000411Z 2026-08-28T11:17:51.867611Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Socket: /var/run/mysqld/mysqlx.sock
+database-1  | 2026-08-28T11:17:51.868046633Z 2026-08-28T11:17:51.867860Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.4.6'  socket: '/var/run/mysqld/mysqld.sock'  port: 0  MySQL Community Server - GPL.
+database-1  | 2026-08-28T11:17:51.907903274Z 2026-08-28 19:17:51+08:00 [Note] [Entrypoint]: Temporary server started.
+database-1  | 2026-08-28T11:17:52.016891957Z '/var/lib/mysql/mysql.sock' -> '/var/run/mysqld/mysqld.sock'
+database-1  | 2026-08-28T11:17:54.022878914Z Warning: Unable to load '/usr/share/zoneinfo/iso3166.tab' as time zone. Skipping it.
+database-1  | 2026-08-28T11:17:54.023053349Z Warning: Unable to load '/usr/share/zoneinfo/leap-seconds.list' as time zone. Skipping it.
+database-1  | 2026-08-28T11:17:54.024198747Z Warning: Unable to load '/usr/share/zoneinfo/leapseconds' as time zone. Skipping it.
+database-1  | 2026-08-28T11:17:57.533923418Z Warning: Unable to load '/usr/share/zoneinfo/tzdata.zi' as time zone. Skipping it.
+database-1  | 2026-08-28T11:17:57.534377637Z Warning: Unable to load '/usr/share/zoneinfo/zone.tab' as time zone. Skipping it.
+database-1  | 2026-08-28T11:17:57.536691593Z Warning: Unable to load '/usr/share/zoneinfo/zone1970.tab' as time zone. Skipping it.
+database-1  | 2026-08-28T11:17:58.077122852Z 2026-08-28 19:17:58+08:00 [Note] [Entrypoint]: Creating database segroup8_platform
+database-1  | 2026-08-28T11:17:58.260203811Z 2026-08-28 19:17:58+08:00 [Note] [Entrypoint]: Creating user segroup8
+database-1  | 2026-08-28T11:17:58.317818539Z 2026-08-28 19:17:58+08:00 [Note] [Entrypoint]: Giving user segroup8 access to schema segroup8_platform
+database-1  | 2026-08-28T11:17:58.361369688Z 
+database-1  | 2026-08-28T11:17:58.369300556Z 2026-08-28 19:17:58+08:00 [Note] [Entrypoint]: /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/01-schema.sql
+database-1  | 2026-08-28T11:18:12.587626750Z 1
+database-1  | 2026-08-28T11:18:12.587713736Z 1
+database-1  | 2026-08-28T11:18:12.587726673Z 1
+database-1  | 2026-08-28T11:18:12.587735696Z 1
+database-1  | 2026-08-28T11:18:12.587745188Z 1
+database-1  | 2026-08-28T11:18:12.587757890Z 1
+database-1  | 2026-08-28T11:18:12.587770273Z 1
+database-1  | 2026-08-28T11:18:12.587783850Z 1
+database-1  | 2026-08-28T11:18:12.587797149Z 1
+database-1  | 2026-08-28T11:18:12.587850657Z 1
+database-1  | 2026-08-28T11:18:12.587866794Z 1
+database-1  | 2026-08-28T11:18:12.587879219Z 1
+database-1  | 2026-08-28T11:18:12.587891217Z 1
+database-1  | 2026-08-28T11:18:12.587903695Z 1
+database-1  | 2026-08-28T11:18:12.587914521Z 1
+database-1  | 2026-08-28T11:18:12.587926284Z 1
+database-1  | 2026-08-28T11:18:12.587938720Z 1
+database-1  | 2026-08-28T11:18:12.587953033Z 1
+database-1  | 2026-08-28T11:18:12.587965853Z 1
+database-1  | 2026-08-28T11:18:12.587977563Z 1
+database-1  | 2026-08-28T11:18:12.587990692Z 1
+database-1  | 2026-08-28T11:18:12.588004418Z 1
+database-1  | 2026-08-28T11:18:12.588017579Z 1
+database-1  | 2026-08-28T11:18:12.588030698Z 1
+database-1  | 2026-08-28T11:18:12.588042237Z 1
+database-1  | 2026-08-28T11:18:12.588053852Z 1
+database-1  | 2026-08-28T11:18:12.588066949Z 1
+database-1  | 2026-08-28T11:18:12.588079235Z 1
+database-1  | 2026-08-28T11:18:12.588090263Z 1
+database-1  | 2026-08-28T11:18:12.588102699Z 1
+database-1  | 2026-08-28T11:18:12.588115593Z 1
+database-1  | 2026-08-28T11:18:12.588128381Z 1
+database-1  | 2026-08-28T11:18:12.588141915Z 1
+database-1  | 2026-08-28T11:18:12.588154543Z 1
+database-1  | 2026-08-28T11:18:12.588200030Z 1
+database-1  | 2026-08-28T11:18:12.588210919Z 1
+database-1  | 2026-08-28T11:18:12.588218822Z 1
+database-1  | 2026-08-28T11:18:12.588227344Z 1
+database-1  | 2026-08-28T11:18:12.588235524Z 1
+database-1  | 2026-08-28T11:18:12.588243662Z 1
+database-1  | 2026-08-28T11:18:12.588251650Z 1
+database-1  | 2026-08-28T11:18:12.588259244Z 1
+database-1  | 2026-08-28T11:18:12.588267573Z 1
+database-1  | 2026-08-28T11:18:12.588275114Z 1
+database-1  | 2026-08-28T11:18:12.588282867Z 1
+database-1  | 2026-08-28T11:18:12.588290717Z 1
+database-1  | 2026-08-28T11:18:12.588298279Z 1
+database-1  | 2026-08-28T11:18:12.588306000Z 1
+database-1  | 2026-08-28T11:18:12.588314874Z 1
+database-1  | 2026-08-28T11:18:12.588322041Z 1
+database-1  | 2026-08-28T11:18:12.588330008Z 1
+database-1  | 2026-08-28T11:18:12.588337825Z 1
+database-1  | 2026-08-28T11:18:12.588345494Z 1
+database-1  | 2026-08-28T11:18:12.588353109Z 1
+database-1  | 2026-08-28T11:18:12.588362441Z 1
+database-1  | 2026-08-28T11:18:12.588370184Z 1
+database-1  | 2026-08-28T11:18:12.588378226Z 1
+database-1  | 2026-08-28T11:18:12.588385574Z 1
+database-1  | 2026-08-28T11:18:12.588393168Z 1
+database-1  | 2026-08-28T11:18:12.588401167Z 1
+database-1  | 2026-08-28T11:18:12.588408760Z 1
+database-1  | 2026-08-28T11:18:12.588416354Z 1
+database-1  | 2026-08-28T11:18:12.588423702Z 1
+database-1  | 2026-08-28T11:18:12.588431893Z 1
+database-1  | 2026-08-28T11:18:12.588439519Z 1
+database-1  | 2026-08-28T11:18:12.588447806Z 1
+database-1  | 2026-08-28T11:18:12.588456231Z 1
+database-1  | 2026-08-28T11:18:12.588464038Z 1
+database-1  | 2026-08-28T11:18:12.588471611Z 1
+database-1  | 2026-08-28T11:18:12.588479812Z 1
+database-1  | 2026-08-28T11:18:12.588486894Z 1
+database-1  | 2026-08-28T11:18:12.588496397Z 1
+database-1  | 2026-08-28T11:18:12.588504396Z 1
+database-1  | 2026-08-28T11:18:12.588511947Z 1
+database-1  | 2026-08-28T11:18:12.588520180Z 1
+database-1  | 2026-08-28T11:18:12.588527433Z 1
+database-1  | 2026-08-28T11:18:12.588535282Z 1
+database-1  | 2026-08-28T11:18:12.588543175Z 1
+database-1  | 2026-08-28T11:18:12.588550608Z 1
+database-1  | 2026-08-28T11:18:12.588558202Z 1
+database-1  | 2026-08-28T11:18:12.588565870Z 1
+database-1  | 2026-08-28T11:18:12.588573485Z 1
+database-1  | 2026-08-28T11:18:12.588581346Z 1
+database-1  | 2026-08-28T11:18:12.588588865Z 1
+database-1  | 2026-08-28T11:18:12.588596010Z 1
+database-1  | 2026-08-28T11:18:12.588601172Z 1
+database-1  | 2026-08-28T11:18:12.588605972Z 1
+database-1  | 2026-08-28T11:18:12.588610793Z 1
+database-1  | 2026-08-28T11:18:12.588615560Z 1
+database-1  | 2026-08-28T11:18:12.588620327Z 1
+database-1  | 2026-08-28T11:18:12.588625137Z 1
+database-1  | 2026-08-28T11:18:12.588649444Z 1
+database-1  | 2026-08-28T11:18:12.588658125Z 1
+database-1  | 2026-08-28T11:18:12.588667041Z 1
+database-1  | 2026-08-28T11:18:12.588675456Z 1
+database-1  | 2026-08-28T11:18:12.588682847Z 1
+database-1  | 2026-08-28T11:18:12.588717307Z 1
+database-1  | 2026-08-28T11:18:12.588725754Z 1
+database-1  | 2026-08-28T11:18:12.588734254Z 1
+database-1  | 2026-08-28T11:18:12.588741890Z 1
+database-1  | 2026-08-28T11:18:12.588749718Z 1
+database-1  | 2026-08-28T11:18:12.588758123Z 1
+database-1  | 2026-08-28T11:18:12.588766463Z 1
+database-1  | 2026-08-28T11:18:12.588774782Z 1
+database-1  | 2026-08-28T11:18:12.588782663Z 1
+database-1  | 2026-08-28T11:18:12.588790278Z 1
+database-1  | 2026-08-28T11:18:12.588798704Z 1
+database-1  | 2026-08-28T11:18:12.588812718Z 1
+database-1  | 2026-08-28T11:18:12.588820696Z 1
+database-1  | 2026-08-28T11:18:12.588827767Z 1
+database-1  | 2026-08-28T11:18:12.588832737Z 1
+database-1  | 2026-08-28T11:18:12.588837632Z 1
+database-1  | 2026-08-28T11:18:12.588842474Z 1
+database-1  | 2026-08-28T11:18:12.588847263Z 1
+database-1  | 2026-08-28T11:18:12.588853342Z 1
+database-1  | 2026-08-28T11:18:12.588860968Z 1
+database-1  | 2026-08-28T11:18:12.588869020Z 1
+database-1  | 2026-08-28T11:18:12.588877073Z 1
+database-1  | 2026-08-28T11:18:12.588885402Z 1
+database-1  | 2026-08-28T11:18:12.588893540Z 1
+database-1  | 2026-08-28T11:18:12.588901624Z 1
+database-1  | 2026-08-28T11:18:12.588910348Z 1
+database-1  | 2026-08-28T11:18:12.588917963Z 1
+database-1  | 2026-08-28T11:18:12.588925482Z 1
+database-1  | 2026-08-28T11:18:12.588933652Z 1
+database-1  | 2026-08-28T11:18:12.588941736Z 1
+database-1  | 2026-08-28T11:18:12.590193957Z 
+database-1  | 2026-08-28T11:18:12.590224471Z 
+database-1  | 2026-08-28T11:18:12.595380800Z 2026-08-28 19:18:12+08:00 [Note] [Entrypoint]: /usr/local/bin/docker-entrypoint.sh: running /docker-entrypoint-initdb.d/02-seed.sql
+database-1  | 2026-08-28T11:18:12.900278916Z 
+database-1  | 2026-08-28T11:18:12.900332648Z 
+database-1  | 2026-08-28T11:18:12.906823364Z 2026-08-28 19:18:12+08:00 [Note] [Entrypoint]: Stopping temporary server
+database-1  | 2026-08-28T11:18:12.923412407Z 2026-08-28T11:18:12.922938Z 15 [System] [MY-013172] [Server] Received SHUTDOWN from user root. Shutting down mysqld (Version: 8.4.6).
+database-1  | 2026-08-28T11:18:12.414599749Z 2026-08-28T11:18:13.536825Z 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.4.6)  MySQL Community Server - GPL.
+database-1  | 2026-08-28T11:18:12.414857337Z 2026-08-28T11:18:13.536826Z 0 [System] [MY-015016] [Server] MySQL Server - end.
+database-1  | 2026-08-28T11:18:12.787817178Z 2026-08-28 19:18:12+08:00 [Note] [Entrypoint]: Temporary server stopped
+database-1  | 2026-08-28T11:18:12.787868403Z 
+database-1  | 2026-08-28T11:18:12.797972664Z 2026-08-28 19:18:12+08:00 [Note] [Entrypoint]: MySQL init process done. Ready for start up.
+database-1  | 2026-08-28T11:18:12.798064972Z 
+database-1  | 2026-08-28T11:18:13.454978068Z 2026-08-28T11:18:12.867787Z 0 [System] [MY-015015] [Server] MySQL Server - start.
+database-1  | 2026-08-28T11:18:13.455020441Z 2026-08-28T11:18:13.448997Z 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.4.6) starting as process 1
+database-1  | 2026-08-28T11:18:13.463433327Z 2026-08-28T11:18:13.463146Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+database-1  | 2026-08-28T11:18:14.723272585Z 2026-08-28T11:18:14.722789Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+database-1  | 2026-08-28T11:18:15.524825037Z 2026-08-28T11:18:15.524347Z 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+database-1  | 2026-08-28T11:18:15.524905794Z 2026-08-28T11:18:15.524459Z 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+database-1  | 2026-08-28T11:18:15.541300402Z 2026-08-28T11:18:15.540915Z 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+database-1  | 2026-08-28T11:18:15.630239137Z 2026-08-28T11:18:15.629820Z 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock
+database-1  | 2026-08-28T11:18:15.630297210Z 2026-08-28T11:18:15.630129Z 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.4.6'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
