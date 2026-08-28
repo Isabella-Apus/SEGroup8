@@ -11,7 +11,8 @@ CI 链接：
 
 - Pull Request：执行 Domain A 定向测试、前端生产构建、后端全部自动化测试和
   JAR 打包、真实 Compose + Playwright E2E，并上传 Domain A、后端和浏览器证据。
-- `main`：重复执行质量检查；显式开启生产部署后，将已验证的前后端制品部署到 systemd + Nginx 服务器。
+- `main`：重复执行质量检查；显式开启生产部署后，将已验证的前后端制品封装为
+  Docker 镜像、推送至阿里云 ACR，并通过 Helm 部署到单节点 K3s。
 - `v*` 标签：执行质量检查并创建带前后端发布包的 GitHub Release。
 - 手动运行：在 Actions 页面按需执行构建和测试，不触发生产部署。
 
@@ -24,8 +25,13 @@ CI 链接：
 
 生产部署默认关闭。启用时创建 `production` Environment 并配置：
 
-- Repository variable：`ENABLE_PRODUCTION_DEPLOY=true`
-- Environment secrets：`DEPLOY_HOST`、`DEPLOY_USER`、`DEPLOY_SSH_KEY`、`DEPLOY_KNOWN_HOSTS`
-- 可选 variables：`DEPLOY_PATH`、`BACKEND_SERVICE`、`NGINX_SERVICE`
+- Repository/Environment variables：`ENABLE_PRODUCTION_DEPLOY=true`、
+  `ACR_REGISTRY`、`ACR_NAMESPACE`
+- Environment secrets：`ACR_USERNAME`、`ACR_PASSWORD`、`DEPLOY_HOST`、
+  `DEPLOY_USER`、`DEPLOY_SSH_KEY`、`DEPLOY_KNOWN_HOSTS`
+- 可选 variables：`K8S_NAMESPACE`（默认 `segroup8`）、`PRODUCTION_URL`
 
-部署脚本保留上一版前端和后端；服务启动或 Nginx 重载失败时尝试自动恢复。
+集群中需预先创建 `acr-pull-secret`、`segroup8-backend-secret` 和
+`segroup8-mysql-secret`。流水线使用不可变的 `sha-<Git SHA>` 标签发布镜像；
+Helm 通过 `--atomic --wait` 等待健康探针，升级失败时自动回滚。
+具体初始化和持久化说明见 `deploy/helm/segroup8/README.md`。

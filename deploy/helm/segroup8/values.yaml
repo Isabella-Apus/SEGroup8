@@ -1,0 +1,65 @@
+imagePullSecrets:
+  - name: acr-pull-secret
+
+backend:
+  replicaCount: 1
+  image:
+    repository: ""
+    tag: ""
+    pullPolicy: IfNotPresent
+  secretName: segroup8-backend-secret
+  uploads:
+    storageClassName: local-path
+    size: 5Gi
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1536Mi
+
+frontend:
+  replicaCount: 1
+  image:
+    repository: ""
+    tag: ""
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
+mysql:
+  image:
+    repository: mysql
+    tag: 8.4.6
+    pullPolicy: IfNotPresent
+  secretName: segroup8-mysql-secret
+  storage:
+    storageClassName: local-path
+    size: 10Gi
+  # Supplied by deploy-k3s.sh with Helm --set-file. Production deliberately
+  # does not load docker/mysql/02-seed.sql because it contains demo accounts.
+  initSchema: ""
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1536Mi
+
+ingress:
+  enabled: true
+  className: traefik
+  # Leave empty for an IP-based first deployment. Set a DNS name before TLS.
+  host: ""
+
+deployment:
+  version: ""
+  commit: ""
+  buildTime: ""
