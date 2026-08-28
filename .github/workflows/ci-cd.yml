@@ -236,55 +236,143 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-  # Level 5: release and deployment can only follow the complete E2E gate.
-  deploy-production:
-    name: 5 / Deploy production
+  delivery-config:
+    name: Validate Helm delivery configuration
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+      - name: Lint and render the production chart
+        run: |
+          helm lint deploy/helm/segroup8 \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-test \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-test \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql
+          helm template segroup8 deploy/helm/segroup8 \
+            --namespace segroup8 \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-test \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-test \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
+            >/dev/null
+
+  publish-images:
+    name: Publish verified images to ACR
     if: >-
       github.event_name == 'push' &&
-      github.ref == 'refs/heads/main' &&
-      vars.ENABLE_PRODUCTION_DEPLOY == 'true'
-    needs: [all-e2e-tests]
+      github.ref == 'refs/heads/main' 
+    needs: [all-e2e-tests, delivery-config]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Download tested backend JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-jar
+          path: backend/target
+      - name: Download built frontend
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend/dist
+      - name: Validate ACR configuration
+        env:
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+          ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+        run: |
+          test -n "$ACR_REGISTRY"
+          test -n "$ACR_NAMESPACE"
+          test -n "$ACR_USERNAME"
+          test -n "$ACR_PASSWORD"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Log in to Alibaba Cloud ACR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      - name: Build and push verified backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          file: backend/Dockerfile.runtime
+          push: true
+          tags: |
+            ${{ vars.ACR_REGISTRY }}/${{ vars.ACR_NAMESPACE }}/backend:sha-${{ github.sha }}
+            ${{ vars.ACR_REGISTRY }}/${{ vars.ACR_NAMESPACE }}/backend:latest
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+      - name: Build and push verified frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend
+          file: frontend/Dockerfile.runtime
+          push: true
+          tags: |
+            ${{ vars.ACR_REGISTRY }}/${{ vars.ACR_NAMESPACE }}/frontend:sha-${{ github.sha }}
+            ${{ vars.ACR_REGISTRY }}/${{ vars.ACR_NAMESPACE }}/frontend:latest
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+
+  deploy-production:
+    name: Deploy images to production K3s
+    needs: publish-images
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production
     steps:
-      - name: Check out deployment script
+      - name: Check out deployment configuration
         uses: actions/checkout@v4
-      - name: Download frontend artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-dist
-          path: release/frontend
-      - name: Download backend artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-jar
-          path: release/backend
-      - name: Package release bundle
-        run: tar -czf "release-$GITHUB_SHA.tar.gz" -C release .
+      - name: Package Helm chart and database schema
+        run: |
+          tar -czf "k3s-release-$GITHUB_SHA.tar.gz" \
+            deploy/helm/segroup8 \
+            backend/src/main/resources/schema.sql
       - name: Configure SSH
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
           DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
         run: |
           install -d -m 700 "$HOME/.ssh"
-          printf '%s' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/id_ed25519"
           chmod 600 "$HOME/.ssh/id_ed25519"
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
           chmod 600 "$HOME/.ssh/known_hosts"
-      - name: Upload and activate release
+      - name: Upload and deploy release
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/srv/SE/SEGroup8' }}
-          BACKEND_SERVICE: ${{ vars.BACKEND_SERVICE || 'segroup8-backend' }}
-          NGINX_SERVICE: ${{ vars.NGINX_SERVICE || 'nginx' }}
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
         run: |
-          remote_archive="/tmp/segroup8-$GITHUB_SHA.tar.gz"
-          scp "release-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$remote_archive"
+          remote_archive="/tmp/segroup8-k3s-$GITHUB_SHA.tar.gz"
+          scp "k3s-release-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$remote_archive"
           ssh "$DEPLOY_USER@$DEPLOY_HOST" \
-            "bash -s -- '$GITHUB_SHA' '$DEPLOY_PATH' '$BACKEND_SERVICE' '$NGINX_SERVICE'" \
-            < .github/scripts/deploy-production.sh
+            "bash -s -- '$GITHUB_SHA' '$remote_archive' '$ACR_REGISTRY' '$ACR_NAMESPACE' 'sha-$GITHUB_SHA' '$K8S_NAMESPACE'" \
+            < .github/scripts/deploy-k3s.sh
+      - name: Verify public production endpoint
+        if: vars.PRODUCTION_URL != ''
+        env:
+          PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
+        run: |
+          curl --fail --silent --show-error \
+            --retry 12 --retry-all-errors --retry-delay 5 \
+            "${PRODUCTION_URL%/}/health" >/dev/null
 
   release:
     name: 5 / Create GitHub release
