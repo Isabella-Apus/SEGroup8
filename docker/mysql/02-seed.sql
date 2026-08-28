@@ -81,7 +81,7 @@ VALUES
 INSERT IGNORE INTO `order_item`
   (`id`, `order_id`, `product_type`, `product_id`, `product_name`, `price`, `quantity`, `status`)
 VALUES
-  (14002, 14002, 'NEW', 1, 'Container Demo Keyboard', 299.00, 1, 1);
+  (14002, 14002, 'NEW', 1, 'Container Demo Keyboard', 299.00, 1, 1),
   (15001, 15001, 'NEW', 1, 'Container Demo Keyboard', 299.00, 1, 1);
 -- UC12 browser fixtures: one order for payment and one for unpaid cancellation.
 INSERT INTO `order_info`
