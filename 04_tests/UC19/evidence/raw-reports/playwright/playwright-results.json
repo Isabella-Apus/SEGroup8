@@ -1,0 +1,158 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\frontend\\playwright.config.ts",
+    "rootDir": "C:/Users/Chazey/Desktop/SEGroup8-main/frontend/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\UC19\\evidence\\raw-reports\\playwright\\playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\UC19\\evidence\\raw-reports\\playwright\\playwright-results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\UC19\\evidence\\raw-reports\\playwright\\playwright-results.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/Chazey/Desktop/SEGroup8-main/04_tests/UC19/evidence/raw-reports/playwright/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/Chazey/Desktop/SEGroup8-main/frontend/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "domain-d\\uc19-auction.spec.ts",
+      "file": "domain-d/uc19-auction.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_D @UC19 secondhand auction",
+          "file": "domain-d/uc19-auction.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
+            {
+              "title": "seller creates an auction, two buyers bid, and the winner receives one settled order",
+              "ok": true,
+              "tags": [
+                "DOMAIN_D",
+                "UC19"
+              ],
+              "tests": [
+                {
+                  "timeout": 150000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 34424,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-28T03:39:39.042Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "uc19-seller-created-auction",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\UC19\\evidence\\raw-reports\\playwright\\test-results\\domain-d-uc19-auction--DOM-63259--receives-one-settled-order\\attachments\\uc19-seller-created-auction-8ff570926cfbdbd79a473ea4f26208ef584d43e0.png"
+                        },
+                        {
+                          "name": "uc19-bidder-b-leading",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\UC19\\evidence\\raw-reports\\playwright\\test-results\\domain-d-uc19-auction--DOM-63259--receives-one-settled-order\\attachments\\uc19-bidder-b-leading-92baf5ba59bb3f6cc75c039cdc70fb11d4c3c511.png"
+                        },
+                        {
+                          "name": "uc19-seller-monitor-two-bids",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\UC19\\evidence\\raw-reports\\playwright\\test-results\\domain-d-uc19-auction--DOM-63259--receives-one-settled-order\\attachments\\uc19-seller-monitor-two-bids-1f5077ea6960c51b17311cd14717fc43337c1094.png"
+                        },
+                        {
+                          "name": "uc19-winner-paid-pending-shipment-order",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\UC19\\evidence\\raw-reports\\playwright\\test-results\\domain-d-uc19-auction--DOM-63259--receives-one-settled-order\\attachments\\uc19-winner-paid-pending-shipment-order-454f2dcf2ddbd2cd365ec93db0aabf96b81b61cd.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5e47e62cb99a63beb269-3afa07a6168afc7116dd",
+              "file": "domain-d/uc19-auction.spec.ts",
+              "line": 9,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-08-28T03:39:36.596Z",
+    "duration": 38798.08500000001,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

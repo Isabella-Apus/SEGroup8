@@ -675,7 +675,7 @@ async function handleCloseAuction(auction) {
   auctionActionKey.value = `close-${auction.id}`;
   try {
     await closeAuctionEarlyApi(auction.id);
-    ElMessage.success("已结束拍卖，若已有最高出价会为买家生成待付款订单");
+    ElMessage.success("已结束拍卖，若已有最高出价会生成已付款的待发货订单");
     await Promise.all([fetchAuctions(), fetchList(false)]);
   } finally {
     auctionActionKey.value = "";

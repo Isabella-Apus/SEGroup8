@@ -8,6 +8,7 @@ public class ProductAuctionVO {
 
     private Long id;
     private Long productId;
+    private String productName;
     private Long sellerUserId;
     private BigDecimal startPrice;
     private BigDecimal incrementAmount;
@@ -17,7 +18,9 @@ public class ProductAuctionVO {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String status;
+    private String statusName;
     private Long settledOrderId;
+    private Long bidCount;
     private List<AuctionLogVO> logs;
 
     public Long getId() {
@@ -34,6 +37,14 @@ public class ProductAuctionVO {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public Long getSellerUserId() {
@@ -108,12 +119,28 @@ public class ProductAuctionVO {
         this.status = status;
     }
 
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
+
     public Long getSettledOrderId() {
         return settledOrderId;
     }
 
     public void setSettledOrderId(Long settledOrderId) {
         this.settledOrderId = settledOrderId;
+    }
+
+    public Long getBidCount() {
+        return bidCount;
+    }
+
+    public void setBidCount(Long bidCount) {
+        this.bidCount = bidCount;
     }
 
     public List<AuctionLogVO> getLogs() {

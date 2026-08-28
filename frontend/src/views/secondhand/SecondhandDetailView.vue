@@ -384,17 +384,17 @@ const auctionStageCopy = computed(() => {
   if (!auctionInfo.value) return "";
   if (auctionInfo.value.status === "ONGOING") {
     if (isOwner.value) return "你是卖家，可以在卖家工作台查看全部出价情况。";
-    if (isLeadingAuction.value) return "你目前是最高出价，拍卖结束后会生成待付款订单。";
-    return "出价成功后会实时刷新当前最高价。";
+    if (isLeadingAuction.value) return "你目前是最高出价，竞价款已冻结，成交后会自动转为订单款。";
+    return "出价成功后会冻结竞价款，并实时刷新当前最高价。";
   }
   if (auctionInfo.value.status === "FLOW") return "本次拍卖已流拍，没有买家成交。";
-  if (isLeadingAuction.value) return "你已竞拍成功，请到我的订单里完成付款。";
+  if (isLeadingAuction.value) return "你已竞拍成功，可到二手订单查看待发货进度。";
   return "本次拍卖已结束。";
 });
 const auctionRoleHint = computed(() => {
   if (!auctionInfo.value) return "";
   if (isOwner.value) return "卖家可在工作台查看出价次数、最高出价和结束拍卖。";
-  if (auctionInfo.value.status !== "ONGOING") return "拍卖结束后，成交买家会收到一笔待付款二手订单。";
+  if (auctionInfo.value.status !== "ONGOING") return "拍卖结束后，成交买家可在二手订单查看结果。";
   return "买家在这里看当前最高价，并用“参与竞拍”提交新的出价。";
 });
 

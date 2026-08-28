@@ -1,0 +1,54 @@
+classDiagram
+    class SecondhandProduct {
+      Long id
+      Long sellerUserId
+      String name
+      BigDecimal salePrice
+      Integer status
+    }
+    class ProductAuction {
+      Long id
+      Long productId
+      Long sellerUserId
+      BigDecimal startPrice
+      BigDecimal incrementAmount
+      BigDecimal currentPrice
+      Long currentBidderUserId
+      LocalDateTime startTime
+      LocalDateTime endTime
+      String status
+      Long settledOrderId
+      Integer version
+    }
+    class AuctionLog {
+      Long id
+      Long auctionId
+      Long bidderUserId
+      BigDecimal bidAmount
+      String status
+    }
+    class Balance {
+      Long userId
+      BigDecimal personalBalance
+      Integer version
+    }
+    class OrderInfo {
+      Long id
+      Long buyerUserId
+      BigDecimal totalAmount
+      Integer payStatus
+      Integer orderStatus
+    }
+    class OrderItem {
+      Long orderId
+      String productType
+      Long productId
+      BigDecimal price
+      Integer quantity
+    }
+    SecondhandProduct "1" --> "0..*" ProductAuction
+    ProductAuction "1" --> "0..*" AuctionLog
+    AuctionLog "*" --> "1" Balance : 冻结或退款
+    ProductAuction "0..1" --> "1" OrderInfo : settledOrderId
+    OrderInfo "1" --> "1" OrderItem
+    SecondhandProduct "1" --> "0..1" OrderItem
