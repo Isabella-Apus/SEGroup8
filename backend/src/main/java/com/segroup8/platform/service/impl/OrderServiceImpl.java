@@ -1001,6 +1001,9 @@ public class OrderServiceImpl implements OrderService {
         if (sellerUserId == null) {
             return;
         }
+        if (Objects.equals(buyerUserId, sellerUserId)) {
+            throw new BusinessException(403, "不能购买本人店铺的商品");
+        }
         if (userBlockMapper.isBlocked(buyerUserId, sellerUserId) > 0) {
             throw new BusinessException(403, "您已拉黑该卖家，无法购买其商品");
         }

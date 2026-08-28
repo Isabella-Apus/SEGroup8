@@ -1,0 +1,137 @@
+{
+  "config": {
+    "configFile": "[repository]\\frontend\\playwright.config.ts",
+    "rootDir": "[repository]/frontend/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "[repository]\\04_tests\\UC11\\evidence\\raw-reports\\playwright\\playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "[repository]\\04_tests\\UC11\\evidence\\raw-reports\\playwright\\playwright-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "[repository]/04_tests/UC11/evidence/raw-reports/playwright/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "[repository]/frontend/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "domain-c\\uc11-checkout-order.spec.ts",
+      "file": "domain-c/uc11-checkout-order.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_C @UC11 checkout and order creation",
+          "file": "domain-c/uc11-checkout-order.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
+            {
+              "title": "persists cart checkout and renders the same order after refresh",
+              "ok": true,
+              "tags": [
+                "DOMAIN_C",
+                "UC11"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6101,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-27T07:24:45.527Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "uc11-checkout-order-persisted",
+                          "contentType": "image/png",
+                          "path": "[repository]\\04_tests\\UC11\\evidence\\raw-reports\\playwright\\test-results\\domain-c-uc11-checkout-ord-d35ae-he-same-order-after-refresh\\attachments\\uc11-checkout-order-persisted-ff6a3061c0e04744495b8cd0ab5745649ef4cf60.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8d49565aaee65b0d2a0f-de857f224c3a0c683133",
+              "file": "domain-c/uc11-checkout-order.spec.ts",
+              "line": 6,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-08-27T07:24:44.703Z",
+    "duration": 7724.64,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
