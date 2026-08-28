@@ -5,6 +5,7 @@ import com.segroup8.platform.service.UserService;
 import com.segroup8.platform.vo.AddressVO;
 import com.segroup8.platform.vo.UserVO;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -25,10 +26,13 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("DOMAIN_A")
+@Tag("UC02")
 class UserControllerWebMvcTest {
 
     private MockMvc mockMvc;
@@ -60,6 +64,31 @@ class UserControllerWebMvcTest {
                 .andExpect(jsonPath("$.code").value(0))
                 .andExpect(jsonPath("$.data.id").value(10))
                 .andExpect(jsonPath("$.data.username").value("member-a"));
+    }
+
+    @Test
+    void me_shouldReturnCurrentUser() throws Exception {
+        UserVO user = new UserVO();
+        user.setId(10L);
+        user.setUsername("member-a");
+        when(userService.getCurrentUserProfile()).thenReturn(user);
+
+        mockMvc.perform(get("/api/user/me"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.id").value(10));
+    }
+
+    @Test
+    void updateProfile_shouldReturnSuccess() throws Exception {
+        mockMvc.perform(put("/api/user/profile")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nickname\":\"Updated User\",\"phone\":\"13800138000\",\"email\":\"updated@example.com\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.message").value("success"));
+
+        verify(userService).updateCurrentUserProfile(any());
     }
 
     @Test
@@ -106,5 +135,16 @@ class UserControllerWebMvcTest {
                 .andExpect(jsonPath("$.code").value(0));
 
         verify(userService).deleteAddress(eq(20L));
+    }
+
+    @Test
+    void updateAddress_shouldReturnSuccess() throws Exception {
+        mockMvc.perform(put("/api/user/addresses/20")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"receiverName\":\"Updated User\",\"receiverPhone\":\"13800138000\",\"province\":\"Beijing\",\"city\":\"Beijing\",\"detailAddress\":\"No.2 Test Road\",\"isDefault\":1}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0));
+
+        verify(userService).updateAddress(eq(20L), any());
     }
 }

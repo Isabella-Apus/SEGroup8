@@ -4,11 +4,12 @@ export async function waitForApiResponse(
     page: Page,
     urlPart: string,
     status = 200,
+    method = "GET",
 ) {
     return page.waitForResponse(
         (response) =>
             response.url().includes(urlPart) &&
-            response.request().method() === "GET" &&
+            response.request().method() === method &&
             response.status() === status,
         { timeout: 20_000 },
     );

@@ -1,9 +1,11 @@
 package com.segroup8.platform.dto;
 
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 
 public class SecondhandOrderCreateRequest {
 
+    @NotNull(message = "请选择收货地址")
     private Long addressId;
 
     @Size(max = 255, message = "备注长度不能超过255")
@@ -25,4 +27,3 @@ public class SecondhandOrderCreateRequest {
         this.remark = remark;
     }
 }
-

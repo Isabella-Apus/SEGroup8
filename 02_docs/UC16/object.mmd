@@ -1,0 +1,41 @@
+classDiagram
+  class SecondhandProductSaveRequest {
+    +String name
+    +List~String~ images
+    +BigDecimal originPrice
+    +BigDecimal salePrice
+    +Integer categoryId
+    +Integer subCategoryId
+    +String conditionLevel
+    +Integer isNegotiable
+  }
+  class SecondhandProductController {
+    +sellerCreate(request)
+    +sellerUpdate(productId, request)
+    +sellerChangeStatus(productId, request)
+    +sellerDelete(productId)
+  }
+  class SecondhandProductServiceImpl {
+    +createSellerProduct(request)
+    +updateSellerProduct(productId, request)
+    +changeSellerProductStatus(productId, status)
+    +deleteSellerProduct(productId)
+    -validateSecondhandCategory(categoryId, subCategoryId)
+    -ensureProductMutable(product)
+  }
+  class SecondhandProduct {
+    +Long id
+    +Long sellerUserId
+    +String images
+    +BigDecimal originPrice
+    +BigDecimal salePrice
+    +Integer status
+  }
+  class Category
+  class ProductRiskAudit
+
+  SecondhandProductController --> SecondhandProductSaveRequest
+  SecondhandProductController --> SecondhandProductServiceImpl
+  SecondhandProductServiceImpl --> SecondhandProduct
+  SecondhandProductServiceImpl --> Category
+  SecondhandProductServiceImpl --> ProductRiskAudit

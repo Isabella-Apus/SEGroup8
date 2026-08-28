@@ -1,6 +1,8 @@
 package com.segroup8.platform.integration;
 
 import com.segroup8.platform.utils.JwtUtils;
+import com.segroup8.platform.testsupport.DomainCTestTags;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,6 +18,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@Tag(DomainCTestTags.DOMAIN_C)
+@Tag(DomainCTestTags.UC14)
 class OrderAfterSaleIntegrationTest {
 
     @Autowired
@@ -47,4 +51,3 @@ class OrderAfterSaleIntegrationTest {
                 .andExpect(jsonPath("$.data[0].id").exists());
     }
 }
-

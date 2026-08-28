@@ -44,3 +44,7 @@
 *.woff2 binary
 *.ttf binary
 *.eot binary
+
+# Generated test evidence must preserve original bytes and stay out of text diffs.
+04_tests/**/evidence/logs/** -text -diff
+04_tests/**/evidence/raw-reports/** -text -diff

@@ -6,6 +6,7 @@ import com.segroup8.platform.service.SearchBehaviorService;
 import com.segroup8.platform.service.SecondhandProductService;
 import com.segroup8.platform.vo.OrderVO;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -26,6 +27,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Tag("DOMAIN_D")
+@Tag("UC17")
 @ExtendWith(MockitoExtension.class)
 class SecondhandProductControllerUc17WebMvcTest {
 

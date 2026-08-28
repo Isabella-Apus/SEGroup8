@@ -1,0 +1,32 @@
+sequenceDiagram
+    actor Buyer as 买家
+    actor Seller as 商品卖家
+    participant UI as Vue/Nginx
+    participant API as SecondhandTradeController
+    participant Service as SecondhandTradeServiceImpl
+    participant DB as MySQL
+    participant SideEffect as Chat/Notification/Realtime
+
+    Buyer->>UI: 输入报价并发送
+    UI->>API: POST /bargain/apply
+    API->>Service: applyBargain
+    Service->>DB: 校验商品、价格、重复有效议价
+    Service->>DB: INSERT APPLIED
+    DB-->>Service: commit
+    Service-->>SideEffect: 提交后发送聊天卡片和通知
+    Seller->>UI: 打开买家消息
+    UI->>API: GET /bargain/list
+    API->>DB: 查询当前卖家相关记录
+    Seller->>UI: 同意并生成订单或拒绝
+    UI->>API: POST /bargain/confirm 或 /reject
+    API->>Service: 条件更新 APPLIED
+    alt 确认成功
+        Service->>DB: 商品 1 -> 3，写待付款订单和明细，议价 -> USED
+    else 拒绝成功
+        Service->>DB: 议价 -> REJECTED
+    else 已被并发处理
+        Service-->>UI: 409 请刷新
+    end
+    DB-->>Service: commit
+    Service-->>SideEffect: 提交后同步结果
+    Buyer->>UI: 刷新并查看结果/待付款订单

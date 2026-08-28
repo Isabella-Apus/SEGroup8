@@ -6,6 +6,7 @@ import com.segroup8.platform.dto.BargainConfirmRequest;
 import com.segroup8.platform.service.SecondhandTradeService;
 import com.segroup8.platform.vo.ProductNegotiationVO;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -23,6 +24,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Tag("DOMAIN_D")
+@Tag("UC18")
 @ExtendWith(MockitoExtension.class)
 class SecondhandTradeControllerUc18WebMvcTest {
 

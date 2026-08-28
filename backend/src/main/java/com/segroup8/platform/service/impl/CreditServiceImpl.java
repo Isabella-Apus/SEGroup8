@@ -12,6 +12,7 @@ import com.segroup8.platform.vo.CreditScoreVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -149,7 +150,7 @@ public class CreditServiceImpl implements CreditService {
         int delta = (customDelta != null) ? -Math.abs(customDelta) : calcReportPenalty(reasonType);
 
         // 近2年被判成立>=3次，额外扣5分
-        int upheldCount = userReportMapper.countUpheldReportsIn2Years(reportedId);
+        int upheldCount = countUpheldReportsIn2Years(reportedId);
         if (upheldCount >= 3) delta -= 5;
 
         /*
@@ -289,7 +290,7 @@ public class CreditServiceImpl implements CreditService {
         vo.setBuyerLevel(calcLevel(buyerScore));
         int buyerOrderCount = countBuyerOrders(uid);
         vo.setBuyerOrderCount(buyerOrderCount);
-        vo.setBuyerDisputeCount(userReportMapper.countUpheldReportsIn2Years(uid));
+        vo.setBuyerDisputeCount(countUpheldReportsIn2Years(uid));
         vo.setBuyerLogs(buildLogVOs(uid, "BUYER"));
 
         // -------- 二手卖家信用分（所有用户） --------
@@ -300,7 +301,7 @@ public class CreditServiceImpl implements CreditService {
         vo.setShSellerSoldCount(shSellerSoldCount);
         int shSellerGoodReview = countShSellerGoodReviews(uid);
         vo.setShSellerGoodReviewCount(shSellerGoodReview);
-        vo.setShSellerDisputeCount(userReportMapper.countUpheldReportsIn2Years(uid));
+        vo.setShSellerDisputeCount(countUpheldReportsIn2Years(uid));
         vo.setShSellerGoodRate(shSellerSoldCount == 0 ? 100.0
                 : Math.round(shSellerGoodReview * 1000.0 / shSellerSoldCount) / 10.0);
         vo.setShSellerLogs(buildLogVOs(uid, "SH_SELLER"));
@@ -470,5 +471,9 @@ public class CreditServiceImpl implements CreditService {
         if (soldCount == 0) return 100.0;
         int good = countShSellerGoodReviews(sellerUserId) + countShopGoodReviews(sellerUserId);
         return Math.round(good * 1000.0 / soldCount) / 10.0;
+    }
+
+    private int countUpheldReportsIn2Years(Long userId) {
+        return userReportMapper.countUpheldReportsIn2Years(userId, LocalDateTime.now().minusYears(2));
     }
 }

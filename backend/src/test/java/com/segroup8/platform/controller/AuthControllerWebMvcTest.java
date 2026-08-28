@@ -5,6 +5,7 @@ import com.segroup8.platform.service.AuthService;
 import com.segroup8.platform.vo.LoginVO;
 import com.segroup8.platform.vo.UserVO;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -24,6 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("DOMAIN_A")
+@Tag("UC01")
 class AuthControllerWebMvcTest {
 
     private MockMvc mockMvc;
@@ -88,5 +91,17 @@ class AuthControllerWebMvcTest {
                 .andExpect(jsonPath("$.data.user.id").value(3));
 
         verify(authService).login(any());
+    }
+
+    @Test
+    void login_shouldRejectInvalidBody() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"\",\"password\":\"\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(400))
+                .andExpect(jsonPath("$.data").doesNotExist());
+
+        verify(authService, never()).login(any());
     }
 }

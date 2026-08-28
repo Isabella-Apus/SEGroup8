@@ -23,19 +23,34 @@ on:
       - "frontend/src/layout/UserLayout.vue"
       - "frontend/src/layouts/MainLayout.vue"
       - "frontend/src/utils/search/**"
+      - "frontend/e2e/domain-d/**"
       - "02_docs/UC16-*"
       - "02_docs/UC17-*"
       - "02_docs/UC18-*"
       - "02_docs/UC19-*"
       - "02_docs/UC20-*"
+      - "02_docs/UC16/**"
+      - "02_docs/UC17/**"
+      - "02_docs/UC18/**"
+      - "02_docs/UC19/**"
+      - "02_docs/UC20/**"
+      - "02_docs/domains/D-secondhand/**"
+      - "03_devops/domains/domain-d.md"
       - "04_tests/UC16-UC20-*"
       - "04_tests/UC16-UC20-screenshots/**"
+      - "04_tests/UC16/**"
+      - "04_tests/UC17/**"
+      - "04_tests/UC18/**"
+      - "04_tests/UC19/**"
+      - "04_tests/UC20/**"
+      - "04_tests/domains/D-secondhand/**"
       - "04_tests/verify-uc16-uc20-evidence.mjs"
+      - "scripts/test/summarize-domain-d-surefire.ps1"
       - "05_management/UC16-UC20-*"
       - "05_management/UC16-UC20-screenshots/**"
       - ".github/workflows/uc16-uc20-secondhand.yml"
-      # Shared platform files intentionally do not trigger this workflow.
-      - "!frontend/e2e/**"
+      # Shared platform files intentionally do not trigger this workflow unless
+      # a Domain-D spec above changes.
       - "!frontend/playwright.config.ts"
       - "!frontend/package.json"
       - "!frontend/package-lock.json"
@@ -62,18 +77,32 @@ on:
       - "frontend/src/layout/UserLayout.vue"
       - "frontend/src/layouts/MainLayout.vue"
       - "frontend/src/utils/search/**"
+      - "frontend/e2e/domain-d/**"
       - "02_docs/UC16-*"
       - "02_docs/UC17-*"
       - "02_docs/UC18-*"
       - "02_docs/UC19-*"
       - "02_docs/UC20-*"
+      - "02_docs/UC16/**"
+      - "02_docs/UC17/**"
+      - "02_docs/UC18/**"
+      - "02_docs/UC19/**"
+      - "02_docs/UC20/**"
+      - "02_docs/domains/D-secondhand/**"
+      - "03_devops/domains/domain-d.md"
       - "04_tests/UC16-UC20-*"
       - "04_tests/UC16-UC20-screenshots/**"
+      - "04_tests/UC16/**"
+      - "04_tests/UC17/**"
+      - "04_tests/UC18/**"
+      - "04_tests/UC19/**"
+      - "04_tests/UC20/**"
+      - "04_tests/domains/D-secondhand/**"
       - "04_tests/verify-uc16-uc20-evidence.mjs"
+      - "scripts/test/summarize-domain-d-surefire.ps1"
       - "05_management/UC16-UC20-*"
       - "05_management/UC16-UC20-screenshots/**"
       - ".github/workflows/uc16-uc20-secondhand.yml"
-      - "!frontend/e2e/**"
       - "!frontend/playwright.config.ts"
       - "!frontend/package.json"
       - "!frontend/package-lock.json"
@@ -105,12 +134,45 @@ jobs:
           distribution: temurin
           java-version: "17"
           cache: maven
-      - name: Run focused tests and package backend
-        run: >-
-          mvn -B --no-transfer-progress
-          "-Dtest=SecondhandProductServiceImplTest,SecondhandTradeServiceImplTest,SecondhandOrderFlowIntegrationTest,SecondhandAuctionIntegrationTest"
-          clean verify
-      - name: Prepare deployable JAR
+      - name: Run all tagged Domain-D tests
+        id: domain-tests
+        shell: bash
+        run: |
+          mkdir -p ../.ci/domain-d
+          set +e
+          mvn -B --no-transfer-progress "-Dgroups=DOMAIN_D" clean verify \
+            2>&1 | tee ../.ci/domain-d/domain-d-maven-test.log
+          test_exit=${PIPESTATUS[0]}
+          echo "exit_code=${test_exit}" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Summarize actual Surefire results
+        id: domain-summary
+        shell: bash
+        run: |
+          set +e
+          pwsh -NoProfile -File ../scripts/test/summarize-domain-d-surefire.ps1 \
+            -ReportsDirectory target/surefire-reports \
+            -OutputDirectory target/domain-d-report
+          summary_exit=$?
+          echo "exit_code=${summary_exit}" >> "$GITHUB_OUTPUT"
+          exit 0
+      - name: Upload Domain-D logs and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: domain-d-test-evidence
+          path: |
+            .ci/domain-d/**
+            backend/target/surefire-reports/**
+            backend/target/domain-d-report/**
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Enforce real test exit codes
+        shell: bash
+        run: |
+          test "${{ steps.domain-tests.outputs.exit_code }}" = "0"
+          test "${{ steps.domain-summary.outputs.exit_code }}" = "0"
+      - name: Prepare backend artifact
         run: cp target/platform-backend-*.jar target/app.jar
       - name: Upload backend artifact
         uses: actions/upload-artifact@v4
@@ -119,17 +181,8 @@ jobs:
           path: backend/target/app.jar
           if-no-files-found: error
           retention-days: 7
-      - name: Upload test reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: uc16-uc20-surefire-reports
-          path: backend/target/surefire-reports/**
-          if-no-files-found: warn
-          retention-days: 7
-
   frontend:
-    name: UC16-UC20 frontend mock build
+    name: UC16-UC20 UI walkthrough build
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
@@ -148,10 +201,12 @@ jobs:
         run: npm ci
       - name: Audit high-severity frontend vulnerabilities
         run: npm audit --audit-level=high
-      - name: Build mock frontend
+      - name: Build mock UI walkthrough frontend
         run: npm run build:mock
-      - name: Verify UC16-UC20 evidence manifest
+      - name: Verify legacy UI walkthrough records
         run: node ../04_tests/verify-uc16-uc20-evidence.mjs
+      - name: Verify Domain-D evidence manifest
+        run: node ../04_tests/domains/D-secondhand/verify-evidence-manifest.mjs
       - name: Upload frontend artifact
         uses: actions/upload-artifact@v4
         with:
@@ -160,8 +215,8 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-  delivery-smoke:
-    name: CD release bundle smoke test
+  artifact-smoke:
+    name: Domain-D artifact smoke
     needs: [backend, frontend]
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -181,15 +236,15 @@ jobs:
           test -s release/backend/app.jar
           unzip -t release/backend/app.jar >/dev/null
           test -s release/frontend/index.html
-      - name: Package and inspect release bundle
+      - name: Package and inspect artifact bundle
         run: |
-          tar -czf uc16-uc20-release.tar.gz -C release .
-          tar -tzf uc16-uc20-release.tar.gz | grep -q "./backend/app.jar"
-          tar -tzf uc16-uc20-release.tar.gz | grep -q "./frontend/index.html"
-      - name: Upload verified release bundle
+          tar -czf uc16-uc20-artifact-smoke.tar.gz -C release .
+          tar -tzf uc16-uc20-artifact-smoke.tar.gz | grep -q "./backend/app.jar"
+          tar -tzf uc16-uc20-artifact-smoke.tar.gz | grep -q "./frontend/index.html"
+      - name: Upload verified artifact bundle
         uses: actions/upload-artifact@v4
         with:
-          name: uc16-uc20-release-bundle
-          path: uc16-uc20-release.tar.gz
+          name: uc16-uc20-artifact-smoke-bundle
+          path: uc16-uc20-artifact-smoke.tar.gz
           if-no-files-found: error
           retention-days: 7

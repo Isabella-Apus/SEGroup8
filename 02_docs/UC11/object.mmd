@@ -1,0 +1,45 @@
+classDiagram
+  class OrderInfo {
+    +Long id
+    +Long buyerUserId
+    +BigDecimal totalAmount
+    +BigDecimal payableAmount
+    +Integer orderStatus
+    +Long voucherId
+  }
+  class OrderItem {
+    +Long orderId
+    +Long productId
+    +BigDecimal price
+    +Integer quantity
+  }
+  class Product {
+    +Long shopId
+    +BigDecimal price
+    +Integer stock
+    +Integer status
+  }
+  class Address {
+    +Long userId
+    +String receiverName
+    +String detailAddress
+  }
+  class UserVoucher {
+    +Long userId
+    +Long voucherId
+    +Long usedOrderId
+    +Integer status
+  }
+  class IdempotencyRecord {
+    +Long userId
+    +String idempotencyKey
+    +Integer status
+    +String responseBody
+  }
+
+  OrderInfo "1" *-- "1..*" OrderItem
+  OrderItem "*" --> "1" Product
+  OrderInfo --> Address : stores snapshot
+  OrderInfo --> UserVoucher : occupies
+  IdempotencyRecord --> OrderInfo : replays creation result
+

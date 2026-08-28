@@ -1,0 +1,11 @@
+### Ban
+PUT http://127.0.0.1:8089/api/admin/users/<user-id>/ban
+Authorization: Bearer <admin-jwt>
+
+### Unban
+PUT http://127.0.0.1:8089/api/admin/users/<user-id>/unban
+Authorization: Bearer <admin-jwt>
+
+### Audit logs
+GET http://127.0.0.1:8089/api/admin/audit-logs?targetType=USER
+Authorization: Bearer <admin-jwt>

@@ -1,0 +1,9 @@
+flowchart LR
+  User[申请人浏览器] --> U[UserController]
+  U --> S[MerchantApplicationService]
+  S --> App[(merchant_application)]
+  S --> UserDB[(user)]
+  S --> Shop[(shop)]
+  S -. best effort .-> N[(notification)]
+  Admin[管理员] --> A[AdminMerchantApplicationController]
+  A --> Audit[(admin_audit_log)]

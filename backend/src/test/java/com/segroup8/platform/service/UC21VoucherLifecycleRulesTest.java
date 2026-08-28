@@ -9,6 +9,7 @@ import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.mapper.UserVoucherMapper;
 import com.segroup8.platform.mapper.VoucherMapper;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -24,6 +25,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@Tag("DOMAIN_E")
+@Tag("UC21")
 class UC21VoucherLifecycleRulesTest {
 
     @Mock

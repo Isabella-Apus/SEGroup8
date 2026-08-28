@@ -1,0 +1,36 @@
+@baseUrl = http://localhost:8089/api
+@token = replace-with-buyer-jwt
+@addressId = 1
+
+### 创建订单
+POST {{baseUrl}}/order/create
+Authorization: Bearer {{token}}
+X-Idempotency-Key: uc11-demo-001
+Content-Type: application/json
+
+{
+  "addressId": {{addressId}},
+  "items": [
+    {
+      "productId": 1,
+      "quantity": 1
+    }
+  ]
+}
+
+### 使用相同幂等键重放首次结果
+POST {{baseUrl}}/order/create
+Authorization: Bearer {{token}}
+X-Idempotency-Key: uc11-demo-001
+Content-Type: application/json
+
+{
+  "addressId": {{addressId}},
+  "items": [
+    {
+      "productId": 1,
+      "quantity": 1
+    }
+  ]
+}
+

@@ -3,11 +3,13 @@ package com.segroup8.platform.utils;
 import com.segroup8.platform.common.BusinessException;
 import com.segroup8.platform.config.JwtProperties;
 import io.jsonwebtoken.Claims;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Tag("PLATFORM")
 class JwtUtilsTest {
 
     @Test

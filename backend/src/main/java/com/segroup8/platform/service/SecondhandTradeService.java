@@ -18,6 +18,9 @@ public interface SecondhandTradeService {
 
     ProductNegotiationVO rejectBargain(Long negotiationId);
 
+    PageVO<ProductNegotiationVO> pageMyBargains(Long pageNum, Long pageSize, Long productId,
+            Long counterpartUserId, String status);
+
     ProductNegotiationVO getMyEffectiveNegotiation(Long productId);
 
     BigDecimal resolveEffectivePriceForBuyer(Long productId, Long buyerUserId);

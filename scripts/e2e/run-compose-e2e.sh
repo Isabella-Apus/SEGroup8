@@ -2,7 +2,59 @@
 set -Eeuo pipefail
 
 repository_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-evidence_root="${repository_root}/04_tests/platform-e2e/evidence"
+default_evidence_root="${repository_root}/04_tests/platform-e2e/evidence"
+
+resolve_configured_path() {
+  local configured_path="${1:-}"
+  local fallback_path="${2}"
+  local resolved_path="${configured_path:-${fallback_path}}"
+
+  if [[ "${resolved_path}" != /* ]]; then
+    resolved_path="${repository_root}/${resolved_path}"
+  fi
+
+  mkdir -p "${resolved_path}"
+  (cd "${resolved_path}" && pwd)
+}
+
+configured_evidence_root="${E2E_EVIDENCE_ROOT:-}"
+configured_output_root="${E2E_OUTPUT_DIR:-}"
+
+# 新脚手架优先使用 E2E_EVIDENCE_ROOT。
+# 只有 E2E_OUTPUT_DIR 时，兼容 test/domain-a-infra 的旧行为。
+if [[ -n "${configured_evidence_root}" ]]; then
+  evidence_root="$(
+    resolve_configured_path \
+      "${configured_evidence_root}" \
+      "${default_evidence_root}"
+  )"
+elif [[ -n "${configured_output_root}" ]]; then
+  evidence_root="$(
+    resolve_configured_path \
+      "${configured_output_root}" \
+      "${default_evidence_root}"
+  )"
+else
+  evidence_root="$(
+    resolve_configured_path \
+      "" \
+      "${default_evidence_root}"
+  )"
+fi
+
+# 同时设置两个变量时，Playwright 输出可以独立于 Compose 日志。
+# 只设置 E2E_OUTPUT_DIR 时，两者仍保持在同一个 UC 目录。
+if [[ -n "${configured_evidence_root}" && -n "${configured_output_root}" ]]; then
+  playwright_output_root="$(
+    resolve_configured_path \
+      "${configured_output_root}" \
+      "${evidence_root}"
+  )"
+else
+  playwright_output_root="${evidence_root}"
+fi
+
+export E2E_OUTPUT_DIR="${playwright_output_root}"
 logs_root="${evidence_root}/logs"
 mkdir -p "${logs_root}"
 rm -f "${logs_root}/failure-stage.txt"
@@ -100,7 +152,8 @@ trap on_exit EXIT
 : "${E2E_PASSWORD:=user123}"
 : "${E2E_ROLE:=USER}"
 : "${E2E_BASE_URL:=http://127.0.0.1:8088}"
-export E2E_USERNAME E2E_PASSWORD E2E_ROLE E2E_BASE_URL E2E_OUTPUT_DIR="${evidence_root}"
+export E2E_USERNAME E2E_PASSWORD E2E_ROLE E2E_BASE_URL
+export E2E_OUTPUT_DIR="${playwright_output_root}"
 
 if [[ "${RESET_DATABASE:-false}" == "true" ]]; then
   current_stage="database-reset"
