@@ -155,7 +155,7 @@ jobs:
   # Levels 3 and 4: one full-stack lifecycle runs smoke and every UC E2E suite.
   playwright:
     name: Playwright smoke and all UC E2E tests
-    needs: [domain-a, domain-b, domain-c, domain-d, domain-e]
+    needs: [domain-a, domain-b, domain-c, domain-d, domain-e, uc-e2e-coverage]
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
