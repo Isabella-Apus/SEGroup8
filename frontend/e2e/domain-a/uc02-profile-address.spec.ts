@@ -10,7 +10,7 @@ import {
     uniqueAccount,
 } from "../helpers/domain-a";
 
-test.describe("UC02 real profile and address flow", () => {
+test.describe("@DOMAIN_A @UC02 real profile and address flow", () => {
     test("updates profile, maintains one default address and isolates ownership", async ({ page, request }) => {
         const owner = await registerAccount(request, uniqueAccount("e2e-uc02-owner"));
         const ownerLogin = await loginApi(request, owner);

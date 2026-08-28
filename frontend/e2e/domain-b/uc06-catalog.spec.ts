@@ -1,7 +1,7 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures";
 import { accounts, expectBusinessSuccess, login } from "./support";
 
-test.describe("UC06 real catalog search flow", () => {
+test.describe("@DOMAIN_B @UC06 real catalog search flow", () => {
   test("searches, filters, opens matching detail and confirms persisted API fields", async ({ page, request }) => {
     await login(page, accounts.user);
     await page.goto("/product");

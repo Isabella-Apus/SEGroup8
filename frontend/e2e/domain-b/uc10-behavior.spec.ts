@@ -1,7 +1,7 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "../fixtures";
 import { accounts, apiToken, bearer, expectBusinessSuccess, login } from "./support";
 
-test.describe("UC10 real behavior history flow", () => {
+test.describe("@DOMAIN_B @UC10 real behavior history flow", () => {
   test("records browsing and search, views history/hot words, deletes history and persists the deletion", async ({ page, request }) => {
     await login(page, accounts.user);
     await page.goto("/product/1");

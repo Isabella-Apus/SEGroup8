@@ -25,7 +25,7 @@ function applicationPayload(storeName: string) {
     };
 }
 
-test.describe("UC03 real merchant application flow", () => {
+test.describe("@DOMAIN_A @UC03 real merchant application flow", () => {
     test("submit, review, role/shop upgrade and rejection persistence", async ({ page, request }) => {
         const admin = await loginApi(request, adminAccount());
         expect(admin.body.code).toBe(0);

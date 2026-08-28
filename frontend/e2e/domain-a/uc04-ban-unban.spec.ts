@@ -9,7 +9,7 @@ import {
     uniqueAccount,
 } from "../helpers/domain-a";
 
-test.describe("UC04 real ban and unban flow", () => {
+test.describe("@DOMAIN_A @UC04 real ban and unban flow", () => {
     test("ban blocks login, unban restores login and audit is queryable", async ({ page, request }) => {
         const user = await registerAccount(request, uniqueAccount("e2e-uc04"));
         const userLogin = await loginApi(request, user);

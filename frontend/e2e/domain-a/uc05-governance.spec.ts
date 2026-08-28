@@ -48,7 +48,7 @@ async function useToken(page: any, token: string) {
     await page.evaluate((value) => localStorage.setItem("segroup8_token", value), token);
 }
 
-test.describe("UC05 real report block credit governance", () => {
+test.describe("@DOMAIN_A @UC05 real report block credit governance", () => {
     test("report, bilateral block state, credit audit and refresh persistence", async ({ page }) => {
         const suffix = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
         const reporterUsername = `e2e-uc05-reporter-${suffix}`;
