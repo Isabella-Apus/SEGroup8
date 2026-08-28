@@ -295,7 +295,7 @@ public class ProductRiskAuditServiceImpl implements ProductRiskAuditService {
             if (score != null && score < 60) {
                 reasons.add("Seller credit score is low");
             }
-            if (seller.getId() != null && userReportMapper.countUpheldReportsIn2Years(seller.getId()) > 0) {
+            if (seller.getId() != null && countUpheldReportsIn2Years(seller.getId()) > 0) {
                 reasons.add("Seller has upheld reports in recent records");
             }
         }
@@ -723,7 +723,7 @@ public class ProductRiskAuditServiceImpl implements ProductRiskAuditService {
         if (seller == null || seller.getId() == null) {
             return 0;
         }
-        return userReportMapper.countUpheldReportsIn2Years(seller.getId());
+        return countUpheldReportsIn2Years(seller.getId());
     }
 
     private int calculateScore(List<String> reasons) {
@@ -988,5 +988,9 @@ public class ProductRiskAuditServiceImpl implements ProductRiskAuditService {
         if (user == null || !Objects.equals(user.getRole(), RoleEnum.ADMIN.name())) {
             throw new BusinessException(403, "Admin permission required");
         }
+    }
+
+    private int countUpheldReportsIn2Years(Long userId) {
+        return userReportMapper.countUpheldReportsIn2Years(userId, LocalDateTime.now().minusYears(2));
     }
 }

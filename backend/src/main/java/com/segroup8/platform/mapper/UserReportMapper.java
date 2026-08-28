@@ -8,6 +8,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
+
 @Mapper
 public interface UserReportMapper extends BaseMapper<UserReport> {
 
@@ -50,6 +52,8 @@ public interface UserReportMapper extends BaseMapper<UserReport> {
     @Select("SELECT COUNT(*) FROM user_report " +
             "WHERE reported_id = #{userId} " +
             "  AND status = 1 " +
-            "  AND audit_time >= CURRENT_TIMESTAMP - INTERVAL '2' YEAR")
-    int countUpheldReportsIn2Years(@Param("userId") Long userId);
+            "  AND audit_time >= #{cutoff}")
+    int countUpheldReportsIn2Years(
+            @Param("userId") Long userId,
+            @Param("cutoff") LocalDateTime cutoff);
 }

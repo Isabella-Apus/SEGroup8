@@ -620,7 +620,7 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         orderItemMapper.insert(orderItem);
 
         secondhandProductMapper.update(null, new UpdateWrapper<SecondhandProduct>()
-                .set("status", SECONDHAND_OFF_SHELF)
+                .set("status", SECONDHAND_SOLD)
                 .eq("id", product.getId())
                 .eq("status", SECONDHAND_ON_SHELF));
 
