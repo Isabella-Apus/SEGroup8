@@ -46,11 +46,15 @@ export async function login(page: Page, account: TestAccount): Promise<void> {
     await page.goto("/login");
     await fillLoginField(page, "login-username", account.username, 0);
     await fillLoginField(page, "login-password", account.password, 1);
+    const submitByTestId = page.getByTestId("login-submit");
+    const submitButton = await submitByTestId.count()
+        ? submitByTestId
+        : page.getByRole("button", { name: "登录", exact: true });
     await Promise.all([
         page.waitForURL((url) => url.pathname !== "/login", {
             timeout: 15_000,
         }),
-        page.getByTestId("login-submit").click(),
+        submitButton.click(),
     ]);
 }
 

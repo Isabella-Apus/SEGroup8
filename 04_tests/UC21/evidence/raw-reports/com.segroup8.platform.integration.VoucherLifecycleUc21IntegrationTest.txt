@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.segroup8.platform.integration.VoucherLifecycleUc21IntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.488 s -- in com.segroup8.platform.integration.VoucherLifecycleUc21IntegrationTest

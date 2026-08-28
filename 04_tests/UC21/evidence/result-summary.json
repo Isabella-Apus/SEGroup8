@@ -1,0 +1,21 @@
+{
+  "uc": "UC21",
+  "status": "PASS",
+  "environment": "Windows 11, Java 21, H2 backend tests; real Compose Nginx + Spring Boot + MySQL; Playwright with local Edge",
+  "executedAt": "2026-08-28T16:39:00+08:00",
+  "counts": {
+    "backend": { "passed": 7, "failed": 0, "skipped": 0 },
+    "playwright": { "passed": 1, "failed": 0, "skipped": 0 }
+  },
+  "evidence": [
+    "raw-reports/TEST-com.segroup8.platform.integration.VoucherLifecycleUc21IntegrationTest.xml",
+    "raw-reports/TEST-com.segroup8.platform.service.UC21VoucherLifecycleRulesTest.xml",
+    "raw-reports/TEST-com.segroup8.platform.service.VoucherServiceTest.xml",
+    "raw-reports/playwright/playwright-results.json",
+    "raw-reports/playwright/playwright-results.xml",
+    "raw-reports/playwright/playwright-report/index.html",
+    "screenshots/uc21-voucher-closed-after-refresh.png",
+    "logs/runtime-health.txt",
+    "../test-report.md"
+  ]
+}

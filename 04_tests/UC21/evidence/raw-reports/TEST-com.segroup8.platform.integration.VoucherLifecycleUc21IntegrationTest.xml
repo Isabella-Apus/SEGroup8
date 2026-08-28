@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.segroup8.platform.integration.VoucherLifecycleUc21IntegrationTest" time="9.488" tests="4" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="GBK"/>
+    <property name="java.class.path" value="C:\Users\Jerry\Desktop\SEGroup8\.codex-worktrees\uc21-bfa8451\backend\target\test-classes;C:\Users\Jerry\Desktop\SEGroup8\.codex-worktrees\uc21-bfa8451\backend\target\classes;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.3.4\spring-boot-starter-web-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter\3.3.4\spring-boot-starter-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot\3.3.4\spring-boot-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.3.4\spring-boot-starter-logging-3.3.4.jar;C:\Users\Jerry\.m2\repository\ch\qos\logback\logback-classic\1.5.8\logback-classic-1.5.8.jar;C:\Users\Jerry\.m2\repository\ch\qos\logback\logback-core\1.5.8\logback-core-1.5.8.jar;C:\Users\Jerry\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.23.1\log4j-to-slf4j-2.23.1.jar;C:\Users\Jerry\.m2\repository\org\apache\logging\log4j\log4j-api\2.23.1\log4j-api-2.23.1.jar;C:\Users\Jerry\.m2\repository\org\slf4j\jul-to-slf4j\2.0.16\jul-to-slf4j-2.0.16.jar;C:\Users\Jerry\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\Jerry\.m2\repository\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.3.4\spring-boot-starter-json-3.3.4.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.17.2\jackson-datatype-jdk8-2.17.2.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.17.2\jackson-datatype-jsr310-2.17.2.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.17.2\jackson-module-parameter-names-2.17.2.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.3.4\spring-boot-starter-tomcat-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.30\tomcat-embed-core-10.1.30.jar;C:\Users\Jerry\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.30\tomcat-embed-websocket-10.1.30.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-web\6.1.13\spring-web-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-beans\6.1.13\spring-beans-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-webmvc\6.1.13\spring-webmvc-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-aop\6.1.13\spring-aop-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-context\6.1.13\spring-context-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-expression\6.1.13\spring-expression-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-validation\3.3.4\spring-boot-starter-validation-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.30\tomcat-embed-el-10.1.30.jar;C:\Users\Jerry\.m2\repository\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\Jerry\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\Jerry\.m2\repository\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\classmate\1.7.0\classmate-1.7.0.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-websocket\3.3.4\spring-boot-starter-websocket-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-messaging\6.1.13\spring-messaging-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-websocket\6.1.13\spring-websocket-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-actuator\3.3.4\spring-boot-starter-actuator-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-actuator-autoconfigure\3.3.4\spring-boot-actuator-autoconfigure-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-actuator\3.3.4\spring-boot-actuator-3.3.4.jar;C:\Users\Jerry\.m2\repository\io\micrometer\micrometer-observation\1.13.4\micrometer-observation-1.13.4.jar;C:\Users\Jerry\.m2\repository\io\micrometer\micrometer-commons\1.13.4\micrometer-commons-1.13.4.jar;C:\Users\Jerry\.m2\repository\io\micrometer\micrometer-jakarta9\1.13.4\micrometer-jakarta9-1.13.4.jar;C:\Users\Jerry\.m2\repository\io\micrometer\micrometer-core\1.13.4\micrometer-core-1.13.4.jar;C:\Users\Jerry\.m2\repository\org\hdrhistogram\HdrHistogram\2.2.2\HdrHistogram-2.2.2.jar;C:\Users\Jerry\.m2\repository\org\latencyutils\LatencyUtils\2.0.3\LatencyUtils-2.0.3.jar;C:\Users\Jerry\.m2\repository\org\springframework\security\spring-security-crypto\6.3.3\spring-security-crypto-6.3.3.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-spring-boot3-starter\3.5.7\mybatis-plus-spring-boot3-starter-3.5.7.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus\3.5.7\mybatis-plus-3.5.7.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-core\3.5.7\mybatis-plus-core-3.5.7.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-annotation\3.5.7\mybatis-plus-annotation-3.5.7.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-extension\3.5.7\mybatis-plus-extension-3.5.7.jar;C:\Users\Jerry\.m2\repository\org\mybatis\mybatis\3.5.16\mybatis-3.5.16.jar;C:\Users\Jerry\.m2\repository\com\github\jsqlparser\jsqlparser\4.9\jsqlparser-4.9.jar;C:\Users\Jerry\.m2\repository\org\mybatis\mybatis-spring\3.0.3\mybatis-spring-3.0.3.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-spring-boot-autoconfigure\3.5.7\mybatis-plus-spring-boot-autoconfigure-3.5.7.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.3.4\spring-boot-autoconfigure-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\3.3.4\spring-boot-starter-jdbc-3.3.4.jar;C:\Users\Jerry\.m2\repository\com\zaxxer\HikariCP\5.1.0\HikariCP-5.1.0.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-jdbc\6.1.13\spring-jdbc-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-tx\6.1.13\spring-tx-6.1.13.jar;C:\Users\Jerry\.m2\repository\com\mysql\mysql-connector-j\8.3.0\mysql-connector-j-8.3.0.jar;C:\Users\Jerry\.m2\repository\org\projectlombok\lombok\1.18.34\lombok-1.18.34.jar;C:\Users\Jerry\.m2\repository\io\jsonwebtoken\jjwt-api\0.12.6\jjwt-api-0.12.6.jar;C:\Users\Jerry\.m2\repository\io\jsonwebtoken\jjwt-impl\0.12.6\jjwt-impl-0.12.6.jar;C:\Users\Jerry\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.12.6\jjwt-jackson-0.12.6.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.17.2\jackson-core-2.17.2.jar;C:\Users\Jerry\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.6.0\springdoc-openapi-starter-webmvc-ui-2.6.0.jar;C:\Users\Jerry\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-api\2.6.0\springdoc-openapi-starter-webmvc-api-2.6.0.jar;C:\Users\Jerry\.m2\repository\org\springdoc\springdoc-openapi-starter-common\2.6.0\springdoc-openapi-starter-common-2.6.0.jar;C:\Users\Jerry\.m2\repository\io\swagger\core\v3\swagger-core-jakarta\2.2.22\swagger-core-jakarta-2.2.22.jar;C:\Users\Jerry\.m2\repository\org\apache\commons\commons-lang3\3.14.0\commons-lang3-3.14.0.jar;C:\Users\Jerry\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.22\swagger-annotations-jakarta-2.2.22.jar;C:\Users\Jerry\.m2\repository\io\swagger\core\v3\swagger-models-jakarta\2.2.22\swagger-models-jakarta-2.2.22.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.17.2\jackson-dataformat-yaml-2.17.2.jar;C:\Users\Jerry\.m2\repository\org\webjars\swagger-ui\5.17.14\swagger-ui-5.17.14.jar;C:\Users\Jerry\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.3.4\spring-boot-starter-test-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-test\3.3.4\spring-boot-test-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.3.4\spring-boot-test-autoconfigure-3.3.4.jar;C:\Users\Jerry\.m2\repository\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\Jerry\.m2\repository\org\slf4j\slf4j-api\2.0.16\slf4j-api-2.0.16.jar;C:\Users\Jerry\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\Jerry\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\Jerry\.m2\repository\net\minidev\json-smart\2.5.1\json-smart-2.5.1.jar;C:\Users\Jerry\.m2\repository\net\minidev\accessors-smart\2.5.1\accessors-smart-2.5.1.jar;C:\Users\Jerry\.m2\repository\org\ow2\asm\asm\9.6\asm-9.6.jar;C:\Users\Jerry\.m2\repository\org\assertj\assertj-core\3.25.3\assertj-core-3.25.3.jar;C:\Users\Jerry\.m2\repository\net\bytebuddy\byte-buddy\1.14.19\byte-buddy-1.14.19.jar;C:\Users\Jerry\.m2\repository\org\awaitility\awaitility\4.2.2\awaitility-4.2.2.jar;C:\Users\Jerry\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\Jerry\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.3\junit-jupiter-5.10.3.jar;C:\Users\Jerry\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.3\junit-jupiter-api-5.10.3.jar;C:\Users\Jerry\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\Jerry\.m2\repository\org\junit\platform\junit-platform-commons\1.10.3\junit-platform-commons-1.10.3.jar;C:\Users\Jerry\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\Jerry\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.3\junit-jupiter-params-5.10.3.jar;C:\Users\Jerry\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.3\junit-jupiter-engine-5.10.3.jar;C:\Users\Jerry\.m2\repository\org\junit\platform\junit-platform-engine\1.10.3\junit-platform-engine-1.10.3.jar;C:\Users\Jerry\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\Jerry\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.19\byte-buddy-agent-1.14.19.jar;C:\Users\Jerry\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\Jerry\.m2\repository\org\mockito\mockito-junit-jupiter\5.11.0\mockito-junit-jupiter-5.11.0.jar;C:\Users\Jerry\.m2\repository\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\Jerry\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-core\6.1.13\spring-core-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-jcl\6.1.13\spring-jcl-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-test\6.1.13\spring-test-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;C:\Users\Jerry\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\mysql\1.21.4\mysql-1.21.4.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\jdbc\1.21.4\jdbc-1.21.4.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\database-commons\1.21.4\database-commons-1.21.4.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\junit-jupiter\1.21.4\junit-jupiter-1.21.4.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\testcontainers\1.21.4\testcontainers-1.21.4.jar;C:\Users\Jerry\.m2\repository\junit\junit\4.13.2\junit-4.13.2.jar;C:\Users\Jerry\.m2\repository\org\hamcrest\hamcrest-core\2.2\hamcrest-core-2.2.jar;C:\Users\Jerry\.m2\repository\org\apache\commons\commons-compress\1.24.0\commons-compress-1.24.0.jar;C:\Users\Jerry\.m2\repository\org\rnorth\duct-tape\duct-tape\1.0.8\duct-tape-1.0.8.jar;C:\Users\Jerry\.m2\repository\org\jetbrains\annotations\17.0.0\annotations-17.0.0.jar;C:\Users\Jerry\.m2\repository\com\github\docker-java\docker-java-api\3.4.2\docker-java-api-3.4.2.jar;C:\Users\Jerry\.m2\repository\com\github\docker-java\docker-java-transport-zerodep\3.4.2\docker-java-transport-zerodep-3.4.2.jar;C:\Users\Jerry\.m2\repository\com\github\docker-java\docker-java-transport\3.4.2\docker-java-transport-3.4.2.jar;C:\Users\Jerry\.m2\repository\net\java\dev\jna\jna\5.13.0\jna-5.13.0.jar;"/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://java.oracle.com/"/>
+    <property name="user.timezone" value="Asia/Shanghai"/>
+    <property name="org.jboss.logging.provider" value="slf4j"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="CN"/>
+    <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-21\bin"/>
+    <property name="sun.java.command" value="C:\Users\Jerry\AppData\Local\Temp\surefire9335600461261190040\surefirebooter-20260828153623739_3.jar C:\Users\Jerry\AppData\Local\Temp\surefire9335600461261190040 2026-08-28T15-36-23_573-jvmRun1 surefire-20260828153623739_1tmp surefire_0-20260828153623739_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="C:\Users\Jerry\Desktop\SEGroup8\.codex-worktrees\uc21-bfa8451\backend\target\test-classes;C:\Users\Jerry\Desktop\SEGroup8\.codex-worktrees\uc21-bfa8451\backend\target\classes;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.3.4\spring-boot-starter-web-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter\3.3.4\spring-boot-starter-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot\3.3.4\spring-boot-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.3.4\spring-boot-starter-logging-3.3.4.jar;C:\Users\Jerry\.m2\repository\ch\qos\logback\logback-classic\1.5.8\logback-classic-1.5.8.jar;C:\Users\Jerry\.m2\repository\ch\qos\logback\logback-core\1.5.8\logback-core-1.5.8.jar;C:\Users\Jerry\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.23.1\log4j-to-slf4j-2.23.1.jar;C:\Users\Jerry\.m2\repository\org\apache\logging\log4j\log4j-api\2.23.1\log4j-api-2.23.1.jar;C:\Users\Jerry\.m2\repository\org\slf4j\jul-to-slf4j\2.0.16\jul-to-slf4j-2.0.16.jar;C:\Users\Jerry\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\Jerry\.m2\repository\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.3.4\spring-boot-starter-json-3.3.4.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.17.2\jackson-datatype-jdk8-2.17.2.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.17.2\jackson-datatype-jsr310-2.17.2.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.17.2\jackson-module-parameter-names-2.17.2.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.3.4\spring-boot-starter-tomcat-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.30\tomcat-embed-core-10.1.30.jar;C:\Users\Jerry\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.30\tomcat-embed-websocket-10.1.30.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-web\6.1.13\spring-web-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-beans\6.1.13\spring-beans-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-webmvc\6.1.13\spring-webmvc-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-aop\6.1.13\spring-aop-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-context\6.1.13\spring-context-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-expression\6.1.13\spring-expression-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-validation\3.3.4\spring-boot-starter-validation-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.30\tomcat-embed-el-10.1.30.jar;C:\Users\Jerry\.m2\repository\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\Jerry\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\Jerry\.m2\repository\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\classmate\1.7.0\classmate-1.7.0.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-websocket\3.3.4\spring-boot-starter-websocket-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-messaging\6.1.13\spring-messaging-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-websocket\6.1.13\spring-websocket-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-actuator\3.3.4\spring-boot-starter-actuator-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-actuator-autoconfigure\3.3.4\spring-boot-actuator-autoconfigure-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-actuator\3.3.4\spring-boot-actuator-3.3.4.jar;C:\Users\Jerry\.m2\repository\io\micrometer\micrometer-observation\1.13.4\micrometer-observation-1.13.4.jar;C:\Users\Jerry\.m2\repository\io\micrometer\micrometer-commons\1.13.4\micrometer-commons-1.13.4.jar;C:\Users\Jerry\.m2\repository\io\micrometer\micrometer-jakarta9\1.13.4\micrometer-jakarta9-1.13.4.jar;C:\Users\Jerry\.m2\repository\io\micrometer\micrometer-core\1.13.4\micrometer-core-1.13.4.jar;C:\Users\Jerry\.m2\repository\org\hdrhistogram\HdrHistogram\2.2.2\HdrHistogram-2.2.2.jar;C:\Users\Jerry\.m2\repository\org\latencyutils\LatencyUtils\2.0.3\LatencyUtils-2.0.3.jar;C:\Users\Jerry\.m2\repository\org\springframework\security\spring-security-crypto\6.3.3\spring-security-crypto-6.3.3.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-spring-boot3-starter\3.5.7\mybatis-plus-spring-boot3-starter-3.5.7.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus\3.5.7\mybatis-plus-3.5.7.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-core\3.5.7\mybatis-plus-core-3.5.7.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-annotation\3.5.7\mybatis-plus-annotation-3.5.7.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-extension\3.5.7\mybatis-plus-extension-3.5.7.jar;C:\Users\Jerry\.m2\repository\org\mybatis\mybatis\3.5.16\mybatis-3.5.16.jar;C:\Users\Jerry\.m2\repository\com\github\jsqlparser\jsqlparser\4.9\jsqlparser-4.9.jar;C:\Users\Jerry\.m2\repository\org\mybatis\mybatis-spring\3.0.3\mybatis-spring-3.0.3.jar;C:\Users\Jerry\.m2\repository\com\baomidou\mybatis-plus-spring-boot-autoconfigure\3.5.7\mybatis-plus-spring-boot-autoconfigure-3.5.7.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.3.4\spring-boot-autoconfigure-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\3.3.4\spring-boot-starter-jdbc-3.3.4.jar;C:\Users\Jerry\.m2\repository\com\zaxxer\HikariCP\5.1.0\HikariCP-5.1.0.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-jdbc\6.1.13\spring-jdbc-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-tx\6.1.13\spring-tx-6.1.13.jar;C:\Users\Jerry\.m2\repository\com\mysql\mysql-connector-j\8.3.0\mysql-connector-j-8.3.0.jar;C:\Users\Jerry\.m2\repository\org\projectlombok\lombok\1.18.34\lombok-1.18.34.jar;C:\Users\Jerry\.m2\repository\io\jsonwebtoken\jjwt-api\0.12.6\jjwt-api-0.12.6.jar;C:\Users\Jerry\.m2\repository\io\jsonwebtoken\jjwt-impl\0.12.6\jjwt-impl-0.12.6.jar;C:\Users\Jerry\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.12.6\jjwt-jackson-0.12.6.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.17.2\jackson-core-2.17.2.jar;C:\Users\Jerry\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.6.0\springdoc-openapi-starter-webmvc-ui-2.6.0.jar;C:\Users\Jerry\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-api\2.6.0\springdoc-openapi-starter-webmvc-api-2.6.0.jar;C:\Users\Jerry\.m2\repository\org\springdoc\springdoc-openapi-starter-common\2.6.0\springdoc-openapi-starter-common-2.6.0.jar;C:\Users\Jerry\.m2\repository\io\swagger\core\v3\swagger-core-jakarta\2.2.22\swagger-core-jakarta-2.2.22.jar;C:\Users\Jerry\.m2\repository\org\apache\commons\commons-lang3\3.14.0\commons-lang3-3.14.0.jar;C:\Users\Jerry\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.22\swagger-annotations-jakarta-2.2.22.jar;C:\Users\Jerry\.m2\repository\io\swagger\core\v3\swagger-models-jakarta\2.2.22\swagger-models-jakarta-2.2.22.jar;C:\Users\Jerry\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.17.2\jackson-dataformat-yaml-2.17.2.jar;C:\Users\Jerry\.m2\repository\org\webjars\swagger-ui\5.17.14\swagger-ui-5.17.14.jar;C:\Users\Jerry\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.3.4\spring-boot-starter-test-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-test\3.3.4\spring-boot-test-3.3.4.jar;C:\Users\Jerry\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.3.4\spring-boot-test-autoconfigure-3.3.4.jar;C:\Users\Jerry\.m2\repository\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\Jerry\.m2\repository\org\slf4j\slf4j-api\2.0.16\slf4j-api-2.0.16.jar;C:\Users\Jerry\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\Jerry\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\Jerry\.m2\repository\net\minidev\json-smart\2.5.1\json-smart-2.5.1.jar;C:\Users\Jerry\.m2\repository\net\minidev\accessors-smart\2.5.1\accessors-smart-2.5.1.jar;C:\Users\Jerry\.m2\repository\org\ow2\asm\asm\9.6\asm-9.6.jar;C:\Users\Jerry\.m2\repository\org\assertj\assertj-core\3.25.3\assertj-core-3.25.3.jar;C:\Users\Jerry\.m2\repository\net\bytebuddy\byte-buddy\1.14.19\byte-buddy-1.14.19.jar;C:\Users\Jerry\.m2\repository\org\awaitility\awaitility\4.2.2\awaitility-4.2.2.jar;C:\Users\Jerry\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\Jerry\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.3\junit-jupiter-5.10.3.jar;C:\Users\Jerry\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.3\junit-jupiter-api-5.10.3.jar;C:\Users\Jerry\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\Jerry\.m2\repository\org\junit\platform\junit-platform-commons\1.10.3\junit-platform-commons-1.10.3.jar;C:\Users\Jerry\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\Jerry\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.3\junit-jupiter-params-5.10.3.jar;C:\Users\Jerry\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.3\junit-jupiter-engine-5.10.3.jar;C:\Users\Jerry\.m2\repository\org\junit\platform\junit-platform-engine\1.10.3\junit-platform-engine-1.10.3.jar;C:\Users\Jerry\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\Jerry\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.19\byte-buddy-agent-1.14.19.jar;C:\Users\Jerry\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\Jerry\.m2\repository\org\mockito\mockito-junit-jupiter\5.11.0\mockito-junit-jupiter-5.11.0.jar;C:\Users\Jerry\.m2\repository\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\Jerry\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-core\6.1.13\spring-core-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-jcl\6.1.13\spring-jcl-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\springframework\spring-test\6.1.13\spring-test-6.1.13.jar;C:\Users\Jerry\.m2\repository\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;C:\Users\Jerry\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\mysql\1.21.4\mysql-1.21.4.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\jdbc\1.21.4\jdbc-1.21.4.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\database-commons\1.21.4\database-commons-1.21.4.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\junit-jupiter\1.21.4\junit-jupiter-1.21.4.jar;C:\Users\Jerry\.m2\repository\org\testcontainers\testcontainers\1.21.4\testcontainers-1.21.4.jar;C:\Users\Jerry\.m2\repository\junit\junit\4.13.2\junit-4.13.2.jar;C:\Users\Jerry\.m2\repository\org\hamcrest\hamcrest-core\2.2\hamcrest-core-2.2.jar;C:\Users\Jerry\.m2\repository\org\apache\commons\commons-compress\1.24.0\commons-compress-1.24.0.jar;C:\Users\Jerry\.m2\repository\org\rnorth\duct-tape\duct-tape\1.0.8\duct-tape-1.0.8.jar;C:\Users\Jerry\.m2\repository\org\jetbrains\annotations\17.0.0\annotations-17.0.0.jar;C:\Users\Jerry\.m2\repository\com\github\docker-java\docker-java-api\3.4.2\docker-java-api-3.4.2.jar;C:\Users\Jerry\.m2\repository\com\github\docker-java\docker-java-transport-zerodep\3.4.2\docker-java-transport-zerodep-3.4.2.jar;C:\Users\Jerry\.m2\repository\com\github\docker-java\docker-java-transport\3.4.2\docker-java-transport-3.4.2.jar;C:\Users\Jerry\.m2\repository\net\java\dev\jna\jna\5.13.0\jna-5.13.0.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\Jerry"/>
+    <property name="user.language" value="zh"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2025-07-15"/>
+    <property name="java.home" value="C:\Program Files\Java\jdk-21"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="C:\Users\Jerry\Desktop\SEGroup8\.codex-worktrees\uc21-bfa8451\backend"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="FILE_LOG_CHARSET" value="UTF-8"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="C:\Users\Jerry\AppData\Local\Temp\surefire9335600461261190040\surefirebooter-20260828153623739_3.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.8+12-LTS-250"/>
+    <property name="user.name" value="Jerry"/>
+    <property name="stdout.encoding" value="GBK"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="localRepository" value="C:\Users\Jerry\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
+    <property name="java.io.tmpdir" value="C:\Users\Jerry\AppData\Local\Temp\"/>
+    <property name="com.zaxxer.hikari.pool_number" value="1"/>
+    <property name="java.version" value="21.0.8"/>
+    <property name="user.dir" value="C:\Users\Jerry\Desktop\SEGroup8\.codex-worktrees\uc21-bfa8451\backend"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="groups" value="DOMAIN_E"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="PID" value="48656"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
+    <property name="native.encoding" value="GBK"/>
+    <property name="java.library.path" value="C:\Program Files\Java\jdk-21\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Users\Jerry\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell;C:\Users\Jerry\.codex\tmp\arg0\codex-arg0ZTpsqH;C:\Users\Jerry\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\libheif\libheif\bin;C:\Users\Jerry\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\jxrlib\jxrlib\bin;C:\Users\Jerry\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\poppler\Library\bin;C:\Users\Jerry\.cache\codex-runtimes\codex-primary-runtime\dependencies\bin\override;C:\Program Files\Microsoft\jdk-21.0.11.10-hotspot\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.0\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.0\libnvvp;C:\MinGW\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\dotnet\;C:\Program Files\Git\cmd;E:\cursor\resources\app\bin;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\nodejs\;C:\Program Files\GitHub CLI\;C:\Program Files\NVIDIA Corporation\Nsight Compute 2022.4.0\;C:\Program Files\NVIDIA Corporation\NVIDIA App\NvDLISR;C:\Users\Jerry\AppData\Local\Programs\Python\Python311\Scripts\;C:\Users\Jerry\AppData\Local\Programs\Python\Python311\;C:\Users\Jerry\AppData\Local\Programs\Python\Launcher\;C:\Users\Jerry\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell;C:\Users\Jerry\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Java\bin;C:\Users\Jerry\AppData\Local\Programs\cursor\resources\app\bin;E:\TDM-GCC-64\bin;C:\Users\Jerry\AppData\Local\Programs\Microsoft VS Code\bin;C:\tools\apache-maven-3.9.9\bin;C:\Program Files\Java\jdk-21\bin;C:\Users\Jerry\AppData\Roaming\npm;C:\Users\Jerry\AppData\Local\Programs\JMeter\bin;C:\Users\Jerry\.cache\codex-runtimes\codex-primary-runtime\dependencies\bin\fallback;C:\Users\Jerry\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\cmd;C:\Users\Jerry\AppData\Local\OpenAI\Codex\bin\69b0fa6fcdec2587;C:\Users\Jerry\AppData\Local\OpenAI\Codex\bin\d5f4c71927a04589;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="GBK"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="java.vm.version" value="21.0.8+12-LTS-250"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+    <property name="LOGGED_APPLICATION_NAME" value="[segroup8-platform] "/>
+  </properties>
+  <testcase name="otherSellerCannotManageVoucherAndUsedVoucherCannotBeDeleted" classname="com.segroup8.platform.integration.VoucherLifecycleUc21IntegrationTest" time="1.295">
+    <system-out><![CDATA[15:36:24.826 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.segroup8.platform.integration.VoucherLifecycleUc21IntegrationTest]: VoucherLifecycleUc21IntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+15:36:24.975 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.segroup8.platform.PlatformApplication for test class com.segroup8.platform.integration.VoucherLifecycleUc21IntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2026-08-28T15:36:25.471+08:00  INFO 48656 --- [segroup8-platform] [           main] .p.i.VoucherLifecycleUc21IntegrationTest : Starting VoucherLifecycleUc21IntegrationTest using Java 21.0.8 with PID 48656 (started by Jerry in C:\Users\Jerry\Desktop\SEGroup8\.codex-worktrees\uc21-bfa8451\backend)
+2026-08-28T15:36:25.472+08:00  INFO 48656 --- [segroup8-platform] [           main] .p.i.VoucherLifecycleUc21IntegrationTest : The following 1 profile is active: "test"
+Logging initialized using 'class org.apache.ibatis.logging.stdout.StdOutImpl' adapter.
+Get /10.135.46.96 network interface 
+Get network interface info: name:wireless_32768 (Intel(R) Wi-Fi 6E AX211 160MHz)
+Initialization Sequence datacenterId:1 workerId:2
+ _ _   |_  _ _|_. ___ _ |    _ 
+| | |\/|_)(_| | |_\  |_)||_|_\ 
+     /               |         
+                        3.5.7 
+2026-08-28T15:36:27.699+08:00  INFO 48656 --- [segroup8-platform] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-28T15:36:28.031+08:00  INFO 48656 --- [segroup8-platform] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:segroup8_test user=SA
+2026-08-28T15:36:28.034+08:00  INFO 48656 --- [segroup8-platform] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-28T15:36:32.244+08:00  INFO 48656 --- [segroup8-platform] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-08-28T15:36:32.245+08:00  INFO 48656 --- [segroup8-platform] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-08-28T15:36:32.250+08:00  INFO 48656 --- [segroup8-platform] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoints beneath base path '/actuator'
+2026-08-28T15:36:32.260+08:00  INFO 48656 --- [segroup8-platform] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 15 ms
+2026-08-28T15:36:32.413+08:00  INFO 48656 --- [segroup8-platform] [           main] .p.i.VoucherLifecycleUc21IntegrationTest : Started VoucherLifecycleUc21IntegrationTest in 7.283 seconds (process running for 8.527)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@78d3f38d] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1508313111 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: DELETE FROM idempotency_record WHERE (expire_time < ?)
+==> Parameters: 2026-08-28T15:36:32.461290200(LocalDateTime)
+<==    Updates: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@78d3f38d]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8]
+JDBC Connection [HikariProxyConnection@1120531149 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+==> Parameters: 3(Long)
+<==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+<==        Row: 3, seller1, x, seller1, null, null, null, OFFICIAL_SELLER, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-28 15:36:28.123117, 2026-08-28 15:36:28.123117, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE (owner_user_id = ?) ORDER BY id DESC limit 1
+==> Parameters: 3(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 100, 3, test shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8] from current transaction
+==>  Preparing: INSERT INTO voucher ( issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, can_stack, name, type, discount_amount, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1(Integer), 1(Integer), 3(Long), 1(Integer), 100(Long), false(Boolean), UC21归属券(String), 1(Integer), 10.00(BigDecimal), 100.00(BigDecimal), 50(Integer), 0(Integer), 0(Integer), 2026-08-27T15:36:33.548388200(LocalDateTime), 2026-08-30T15:36:33.548388200(LocalDateTime), 2026-08-27T15:36:33.548388200(LocalDateTime), 2026-09-04T15:36:33.548388200(LocalDateTime), 1(Integer), 2026-08-28T15:36:33.781532800(LocalDateTime), 2026-08-28T15:36:33.781532800(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8] from current transaction
+==>  Preparing: SELECT id,issuer_type,voucher_type,issuer_user_id,scope_type,shop_id,product_id,can_stack,name,type,discount_amount,discount_rate,min_amount,total_count,received_count,used_count,grab_start_time,grab_end_time,start_time,end_time,status,create_time,update_time FROM voucher WHERE id=?
+==> Parameters: 1(Long)
+<==    Columns: id, issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, product_id, can_stack, name, type, discount_amount, discount_rate, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time
+<==        Row: 1, 1, 1, 3, 1, 100, null, 0, UC21归属券, 1, 10.00, null, 100.00, 50, 0, 0, 2026-08-27 15:36:33.548388, 2026-08-30 15:36:33.548388, 2026-08-27 15:36:33.548388, 2026-09-04 15:36:33.548388, 1, 2026-08-28 15:36:33.781533, 2026-08-28 15:36:33.781533
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8]
+2026-08-28T15:36:33.811+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=5db5ee5238c8493f9befe45b22b7a61a method=POST path=/api/voucher/seller status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8] from current transaction
+==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+==> Parameters: 5(Long)
+<==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+<==        Row: 5, seller2, x, seller2, null, null, null, OFFICIAL_SELLER, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-28 15:36:33.536092, 2026-08-28 15:36:33.536092, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8]
+2026-08-28T15:36:33.876+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=3f33e3c6f99e43eaba6af63425d96520 method=PUT path=/api/voucher/seller/1 status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8] from current transaction
+==>  Preparing: UPDATE voucher SET used_count=?, update_time=? WHERE id=?
+==> Parameters: 1(Integer), 2026-08-28T15:36:33.881589(LocalDateTime), 1(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8] from current transaction
+==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+==> Parameters: 3(Long)
+<==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+<==        Row: 3, seller1, x, seller1, null, null, null, OFFICIAL_SELLER, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-28 15:36:28.123117, 2026-08-28 15:36:28.123117, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8] from current transaction
+==>  Preparing: SELECT id,issuer_type,voucher_type,issuer_user_id,scope_type,shop_id,product_id,can_stack,name,type,discount_amount,discount_rate,min_amount,total_count,received_count,used_count,grab_start_time,grab_end_time,start_time,end_time,status,create_time,update_time FROM voucher WHERE id=?
+==> Parameters: 1(Long)
+<==    Columns: id, issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, product_id, can_stack, name, type, discount_amount, discount_rate, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time
+<==        Row: 1, 1, 1, 3, 1, 100, null, 0, UC21归属券, 1, 10.00, null, 100.00, 50, 0, 1, 2026-08-27 15:36:33.548388, 2026-08-30 15:36:33.548388, 2026-08-27 15:36:33.548388, 2026-09-04 15:36:33.548388, 1, 2026-08-28 15:36:33.781533, 2026-08-28 15:36:33.881589
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8]
+2026-08-28T15:36:33.888+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=d67a370a571143c1a145b561247c7da9 method=DELETE path=/api/voucher/seller/1 status=200
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2060df8]
+]]></system-out>
+    <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (C:\Users\Jerry\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.19\byte-buddy-agent-1.14.19.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+  </testcase>
+  <testcase name="invalidRulesAreRejectedWithoutWritingVoucher" classname="com.segroup8.platform.integration.VoucherLifecycleUc21IntegrationTest" time="0.033">
+    <system-out><![CDATA[Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ed4c822]
+JDBC Connection [HikariProxyConnection@1707823324 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+==> Parameters: 3(Long)
+<==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+<==        Row: 3, seller1, x, seller1, null, null, null, OFFICIAL_SELLER, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-28 15:36:28.123117, 2026-08-28 15:36:28.123117, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ed4c822]
+2026-08-28T15:36:33.928+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=e5dc5dc63c8b4d0ea5db660df05c0da8 method=POST path=/api/voucher/seller status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ed4c822] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ed4c822]
+2026-08-28T15:36:33.932+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=576ee384cbbc4ba2800df93c34db9164 method=POST path=/api/voucher/seller status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ed4c822] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ed4c822]
+2026-08-28T15:36:33.937+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=cb700f54526c471fada1dc5807886f1c method=POST path=/api/voucher/seller status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ed4c822] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ed4c822]
+2026-08-28T15:36:33.939+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=1c233a09a5a147c98948c517cccedffa method=POST path=/api/voucher/seller status=200
+2026-08-28T15:36:33.948+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=b48821b15b5c40dd963d7023aebfd06e method=POST path=/api/voucher/seller status=200
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ed4c822]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3ed4c822]
+]]></system-out>
+  </testcase>
+  <testcase name="closedVoucherCannotBeClaimed" classname="com.segroup8.platform.integration.VoucherLifecycleUc21IntegrationTest" time="0.026">
+    <system-out><![CDATA[Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9]
+JDBC Connection [HikariProxyConnection@1933672516 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+==> Parameters: 3(Long)
+<==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+<==        Row: 3, seller1, x, seller1, null, null, null, OFFICIAL_SELLER, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-28 15:36:28.123117, 2026-08-28 15:36:28.123117, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE (owner_user_id = ?) ORDER BY id DESC limit 1
+==> Parameters: 3(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 100, 3, test shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9] from current transaction
+==>  Preparing: INSERT INTO voucher ( issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, can_stack, name, type, discount_amount, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1(Integer), 1(Integer), 3(Long), 1(Integer), 100(Long), false(Boolean), UC21关闭不可领取(String), 1(Integer), 10.00(BigDecimal), 100.00(BigDecimal), 50(Integer), 0(Integer), 0(Integer), 2026-08-27T15:36:33.958926300(LocalDateTime), 2026-08-30T15:36:33.958926300(LocalDateTime), 2026-08-27T15:36:33.958926300(LocalDateTime), 2026-09-04T15:36:33.958926300(LocalDateTime), 1(Integer), 2026-08-28T15:36:33.966359200(LocalDateTime), 2026-08-28T15:36:33.966359200(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9] from current transaction
+==>  Preparing: SELECT id,issuer_type,voucher_type,issuer_user_id,scope_type,shop_id,product_id,can_stack,name,type,discount_amount,discount_rate,min_amount,total_count,received_count,used_count,grab_start_time,grab_end_time,start_time,end_time,status,create_time,update_time FROM voucher WHERE id=?
+==> Parameters: 2(Long)
+<==    Columns: id, issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, product_id, can_stack, name, type, discount_amount, discount_rate, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time
+<==        Row: 2, 1, 1, 3, 1, 100, null, 0, UC21关闭不可领取, 1, 10.00, null, 100.00, 50, 0, 0, 2026-08-27 15:36:33.958926, 2026-08-30 15:36:33.958926, 2026-08-27 15:36:33.958926, 2026-09-04 15:36:33.958926, 1, 2026-08-28 15:36:33.966359, 2026-08-28 15:36:33.966359
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9]
+2026-08-28T15:36:33.970+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=b1c3251e68924372a1ce28f8a4f63bec method=POST path=/api/voucher/seller status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9] from current transaction
+==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+==> Parameters: 3(Long)
+<==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+<==        Row: 3, seller1, x, seller1, null, null, null, OFFICIAL_SELLER, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-28 15:36:28.123117, 2026-08-28 15:36:28.123117, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9] from current transaction
+==>  Preparing: UPDATE voucher SET issuer_type=?, voucher_type=?, issuer_user_id=?, scope_type=?, shop_id=?, can_stack=?, name=?, type=?, discount_amount=?, min_amount=?, total_count=?, received_count=?, used_count=?, grab_start_time=?, grab_end_time=?, start_time=?, end_time=?, status=?, create_time=?, update_time=? WHERE id=?
+==> Parameters: 1(Integer), 1(Integer), 3(Long), 1(Integer), 100(Long), false(Boolean), UC21关闭不可领取(String), 1(Integer), 10.00(BigDecimal), 100.00(BigDecimal), 50(Integer), 0(Integer), 0(Integer), 2026-08-27T15:36:33.958926(LocalDateTime), 2026-08-30T15:36:33.958926(LocalDateTime), 2026-08-27T15:36:33.958926(LocalDateTime), 2026-09-04T15:36:33.958926(LocalDateTime), 0(Integer), 2026-08-28T15:36:33.966359(LocalDateTime), 2026-08-28T15:36:33.966359(LocalDateTime), 2(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9]
+2026-08-28T15:36:33.975+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=3781bbfbe3af414a8d5f12339cdb850d method=POST path=/api/voucher/seller/2/close status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9] from current transaction
+==>  Preparing: SELECT id,issuer_type,voucher_type,issuer_user_id,scope_type,shop_id,product_id,can_stack,name,type,discount_amount,discount_rate,min_amount,total_count,received_count,used_count,grab_start_time,grab_end_time,start_time,end_time,status,create_time,update_time FROM voucher WHERE id=?
+==> Parameters: 2(Long)
+<==    Columns: id, issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, product_id, can_stack, name, type, discount_amount, discount_rate, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time
+<==        Row: 2, 1, 1, 3, 1, 100, null, 0, UC21关闭不可领取, 1, 10.00, null, 100.00, 50, 0, 0, 2026-08-27 15:36:33.958926, 2026-08-30 15:36:33.958926, 2026-08-27 15:36:33.958926, 2026-09-04 15:36:33.958926, 0, 2026-08-28 15:36:33.966359, 2026-08-28 15:36:33.966359
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9]
+2026-08-28T15:36:33.977+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=acfecd607f004484a9f84789645b1479 method=POST path=/api/voucher/2/claim status=200
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c372e9]
+]]></system-out>
+  </testcase>
+  <testcase name="sellerAndAdminManageOwnedVoucherLifecycle" classname="com.segroup8.platform.integration.VoucherLifecycleUc21IntegrationTest" time="0.163">
+    <system-out><![CDATA[Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+JDBC Connection [HikariProxyConnection@1424200964 wrapping conn0: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+==> Parameters: 3(Long)
+<==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+<==        Row: 3, seller1, x, seller1, null, null, null, OFFICIAL_SELLER, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-28 15:36:28.123117, 2026-08-28 15:36:28.123117, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE (owner_user_id = ?) ORDER BY id DESC limit 1
+==> Parameters: 3(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 100, 3, test shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: INSERT INTO voucher ( issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, can_stack, name, type, discount_amount, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1(Integer), 1(Integer), 3(Long), 1(Integer), 100(Long), false(Boolean), UC21卖家优惠券(String), 1(Integer), 10.00(BigDecimal), 100.00(BigDecimal), 50(Integer), 0(Integer), 0(Integer), 2026-08-27T15:36:33.985358600(LocalDateTime), 2026-08-30T15:36:33.985358600(LocalDateTime), 2026-08-27T15:36:33.985358600(LocalDateTime), 2026-09-04T15:36:33.985358600(LocalDateTime), 1(Integer), 2026-08-28T15:36:33.989355900(LocalDateTime), 2026-08-28T15:36:33.989355900(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: SELECT id,issuer_type,voucher_type,issuer_user_id,scope_type,shop_id,product_id,can_stack,name,type,discount_amount,discount_rate,min_amount,total_count,received_count,used_count,grab_start_time,grab_end_time,start_time,end_time,status,create_time,update_time FROM voucher WHERE id=?
+==> Parameters: 3(Long)
+<==    Columns: id, issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, product_id, can_stack, name, type, discount_amount, discount_rate, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time
+<==        Row: 3, 1, 1, 3, 1, 100, null, 0, UC21卖家优惠券, 1, 10.00, null, 100.00, 50, 0, 0, 2026-08-27 15:36:33.985359, 2026-08-30 15:36:33.985359, 2026-08-27 15:36:33.985359, 2026-09-04 15:36:33.985359, 1, 2026-08-28 15:36:33.989356, 2026-08-28 15:36:33.989356
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+2026-08-28T15:36:33.991+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=7b4bb8f142da4b0ead3bf759e04bd888 method=POST path=/api/voucher/seller status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+==> Parameters: 3(Long)
+<==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+<==        Row: 3, seller1, x, seller1, null, null, null, OFFICIAL_SELLER, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-28 15:36:28.123117, 2026-08-28 15:36:28.123117, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: SELECT COUNT(*) AS total FROM voucher WHERE (issuer_user_id = ?)
+==> Parameters: 3(Long)
+<==    Columns: total
+<==        Row: 1
+<==      Total: 1
+==>  Preparing: SELECT id,issuer_type,voucher_type,issuer_user_id,scope_type,shop_id,product_id,can_stack,name,type,discount_amount,discount_rate,min_amount,total_count,received_count,used_count,grab_start_time,grab_end_time,start_time,end_time,status,create_time,update_time FROM voucher WHERE (issuer_user_id = ?) ORDER BY create_time DESC LIMIT ?
+==> Parameters: 3(Long), 10(Long)
+<==    Columns: id, issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, product_id, can_stack, name, type, discount_amount, discount_rate, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time
+<==        Row: 3, 1, 1, 3, 1, 100, null, 0, UC21卖家优惠券, 1, 10.00, null, 100.00, 50, 0, 0, 2026-08-27 15:36:33.985359, 2026-08-30 15:36:33.985359, 2026-08-27 15:36:33.985359, 2026-09-04 15:36:33.985359, 1, 2026-08-28 15:36:33.989356, 2026-08-28 15:36:33.989356
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+2026-08-28T15:36:34.083+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=29f3a1e085c84cb38df8e3714fc8deb8 method=GET path=/api/voucher/seller/list status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+==> Parameters: 1(Long)
+<==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+<==        Row: 1, buyer1, x, 买家1, null, null, null, USER, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-28 15:36:28.11512, 2026-08-28 15:36:28.11512, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+2026-08-28T15:36:34.094+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=d508bacfbaaf451b83c150ca80e4fbc5 method=POST path=/api/voucher/admin status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE (owner_user_id = ?) ORDER BY id DESC limit 1
+==> Parameters: 3(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 100, 3, test shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: UPDATE voucher SET issuer_type=?, voucher_type=?, issuer_user_id=?, scope_type=?, shop_id=?, can_stack=?, name=?, type=?, discount_amount=?, min_amount=?, total_count=?, received_count=?, used_count=?, grab_start_time=?, grab_end_time=?, start_time=?, end_time=?, status=?, create_time=?, update_time=? WHERE id=?
+==> Parameters: 1(Integer), 1(Integer), 3(Long), 1(Integer), 100(Long), false(Boolean), UC21卖家优惠券-已修改(String), 1(Integer), 15.00(BigDecimal), 100.00(BigDecimal), 50(Integer), 0(Integer), 0(Integer), 2026-08-27T15:36:34.095651500(LocalDateTime), 2026-08-30T15:36:34.095651500(LocalDateTime), 2026-08-27T15:36:34.095651500(LocalDateTime), 2026-09-04T15:36:34.095651500(LocalDateTime), 1(Integer), 2026-08-28T15:36:33.989356(LocalDateTime), 2026-08-28T15:36:33.989356(LocalDateTime), 3(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: SELECT id,issuer_type,voucher_type,issuer_user_id,scope_type,shop_id,product_id,can_stack,name,type,discount_amount,discount_rate,min_amount,total_count,received_count,used_count,grab_start_time,grab_end_time,start_time,end_time,status,create_time,update_time FROM voucher WHERE id=?
+==> Parameters: 3(Long)
+<==    Columns: id, issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, product_id, can_stack, name, type, discount_amount, discount_rate, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time
+<==        Row: 3, 1, 1, 3, 1, 100, null, 0, UC21卖家优惠券-已修改, 1, 15.00, null, 100.00, 50, 0, 0, 2026-08-27 15:36:34.095652, 2026-08-30 15:36:34.095652, 2026-08-27 15:36:34.095652, 2026-09-04 15:36:34.095652, 1, 2026-08-28 15:36:33.989356, 2026-08-28 15:36:33.989356
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+2026-08-28T15:36:34.101+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=9b35fe82493748aa974797543b2385bb method=PUT path=/api/voucher/seller/3 status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+==> Parameters: 3(Long)
+<==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+<==        Row: 3, seller1, x, seller1, null, null, null, OFFICIAL_SELLER, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-28 15:36:28.123117, 2026-08-28 15:36:28.123117, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: UPDATE voucher SET issuer_type=?, voucher_type=?, issuer_user_id=?, scope_type=?, shop_id=?, can_stack=?, name=?, type=?, discount_amount=?, min_amount=?, total_count=?, received_count=?, used_count=?, grab_start_time=?, grab_end_time=?, start_time=?, end_time=?, status=?, create_time=?, update_time=? WHERE id=?
+==> Parameters: 1(Integer), 1(Integer), 3(Long), 1(Integer), 100(Long), false(Boolean), UC21卖家优惠券-已修改(String), 1(Integer), 15.00(BigDecimal), 100.00(BigDecimal), 50(Integer), 0(Integer), 0(Integer), 2026-08-27T15:36:34.095652(LocalDateTime), 2026-08-30T15:36:34.095652(LocalDateTime), 2026-08-27T15:36:34.095652(LocalDateTime), 2026-09-04T15:36:34.095652(LocalDateTime), 0(Integer), 2026-08-28T15:36:33.989356(LocalDateTime), 2026-08-28T15:36:33.989356(LocalDateTime), 3(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+2026-08-28T15:36:34.105+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=26c88ac2c60d4cfeb38ff8e31fe82205 method=POST path=/api/voucher/seller/3/close status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+==> Parameters: 3(Long)
+<==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+<==        Row: 3, seller1, x, seller1, null, null, null, OFFICIAL_SELLER, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-28 15:36:28.123117, 2026-08-28 15:36:28.123117, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: SELECT id,issuer_type,voucher_type,issuer_user_id,scope_type,shop_id,product_id,can_stack,name,type,discount_amount,discount_rate,min_amount,total_count,received_count,used_count,grab_start_time,grab_end_time,start_time,end_time,status,create_time,update_time FROM voucher WHERE id=?
+==> Parameters: 3(Long)
+<==    Columns: id, issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, product_id, can_stack, name, type, discount_amount, discount_rate, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time
+<==        Row: 3, 1, 1, 3, 1, 100, null, 0, UC21卖家优惠券-已修改, 1, 15.00, null, 100.00, 50, 0, 0, 2026-08-27 15:36:34.095652, 2026-08-30 15:36:34.095652, 2026-08-27 15:36:34.095652, 2026-09-04 15:36:34.095652, 0, 2026-08-28 15:36:33.989356, 2026-08-28 15:36:33.989356
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: DELETE FROM voucher WHERE id=?
+==> Parameters: 3(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+2026-08-28T15:36:34.114+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=f49af96223d54bc8a1d5e48b26ec2e75 method=DELETE path=/api/voucher/seller/3 status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+==> Parameters: 2(Long)
+<==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+<==        Row: 2, admin1, x, 管理员1, null, null, null, ADMIN, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-28 15:36:28.11512, 2026-08-28 15:36:28.11512, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: INSERT INTO voucher ( issuer_type, voucher_type, issuer_user_id, scope_type, can_stack, name, type, discount_amount, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 2(Integer), 2(Integer), 2(Long), 2(Integer), false(Boolean), UC21平台优惠券(String), 1(Integer), 8.00(BigDecimal), 100.00(BigDecimal), 50(Integer), 0(Integer), 0(Integer), 2026-08-27T15:36:34.115588600(LocalDateTime), 2026-08-30T15:36:34.115588600(LocalDateTime), 2026-08-27T15:36:34.115588600(LocalDateTime), 2026-09-04T15:36:34.115588600(LocalDateTime), 1(Integer), 2026-08-28T15:36:34.117587900(LocalDateTime), 2026-08-28T15:36:34.117587900(LocalDateTime)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: SELECT id,issuer_type,voucher_type,issuer_user_id,scope_type,shop_id,product_id,can_stack,name,type,discount_amount,discount_rate,min_amount,total_count,received_count,used_count,grab_start_time,grab_end_time,start_time,end_time,status,create_time,update_time FROM voucher WHERE id=?
+==> Parameters: 4(Long)
+<==    Columns: id, issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, product_id, can_stack, name, type, discount_amount, discount_rate, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time
+<==        Row: 4, 2, 2, 2, 2, null, null, 0, UC21平台优惠券, 1, 8.00, null, 100.00, 50, 0, 0, 2026-08-27 15:36:34.115589, 2026-08-30 15:36:34.115589, 2026-08-27 15:36:34.115589, 2026-09-04 15:36:34.115589, 1, 2026-08-28 15:36:34.117588, 2026-08-28 15:36:34.117588
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+2026-08-28T15:36:34.120+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=72390b9c11eb46098675960f136c41fa method=POST path=/api/voucher/admin status=200
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: SELECT id,username,password,nickname,avatar,phone,email,role,status,credit_score,shop_name,shop_desc,banner_url,category,region,business_hours,return_policy,shipping_policy,announcement,create_time,update_time,seller_credit_score,buyer_credit_score AS shSellerCreditScore FROM user WHERE id=?
+==> Parameters: 2(Long)
+<==    Columns: id, username, password, nickname, avatar, phone, email, role, status, credit_score, shop_name, shop_desc, banner_url, category, region, business_hours, return_policy, shipping_policy, announcement, create_time, update_time, seller_credit_score, shSellerCreditScore
+<==        Row: 2, admin1, x, 管理员1, null, null, null, ADMIN, ACTIVE, null, null, null, null, null, null, null, null, null, null, 2026-08-28 15:36:28.11512, 2026-08-28 15:36:28.11512, null, null
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4] from current transaction
+==>  Preparing: SELECT COUNT(*) AS total FROM voucher WHERE (name LIKE ?)
+==> Parameters: %UC21平台优惠券%(String)
+<==    Columns: total
+<==        Row: 1
+<==      Total: 1
+==>  Preparing: SELECT id,issuer_type,voucher_type,issuer_user_id,scope_type,shop_id,product_id,can_stack,name,type,discount_amount,discount_rate,min_amount,total_count,received_count,used_count,grab_start_time,grab_end_time,start_time,end_time,status,create_time,update_time FROM voucher WHERE (name LIKE ?) ORDER BY create_time DESC LIMIT ?
+==> Parameters: %UC21平台优惠券%(String), 10(Long)
+<==    Columns: id, issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, product_id, can_stack, name, type, discount_amount, discount_rate, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time
+<==        Row: 4, 2, 2, 2, 2, null, null, 0, UC21平台优惠券, 1, 8.00, null, 100.00, 50, 0, 0, 2026-08-27 15:36:34.115589, 2026-08-30 15:36:34.115589, 2026-08-27 15:36:34.115589, 2026-09-04 15:36:34.115589, 1, 2026-08-28 15:36:34.117588, 2026-08-28 15:36:34.117588
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+2026-08-28T15:36:34.139+08:00  INFO 48656 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=71e20934d5a949328c551c760ef4c723 method=GET path=/api/voucher/admin/list status=200
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58ec04f4]
+]]></system-out>
+  </testcase>
+</testsuite>
