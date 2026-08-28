@@ -100,7 +100,7 @@ public class SecondhandProductController {
     @Operation(summary = "购买二手商品")
     @PostMapping("/{productId}/buy")
     public Result<OrderVO> buy(@PathVariable Long productId,
-            @Valid @RequestBody(required = false) SecondhandOrderCreateRequest request) {
+            @Valid @RequestBody SecondhandOrderCreateRequest request) {
         return Result.success(secondhandProductService.buySecondhandProduct(productId, request));
     }
 }

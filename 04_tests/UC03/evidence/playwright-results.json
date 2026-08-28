@@ -1,0 +1,128 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\playwright.config.ts",
+    "rootDir": "C:/Users/isabe/Desktop/SE/SEGroup8/frontend/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\UC03\\evidence\\playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\UC03\\evidence\\playwright-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/isabe/Desktop/SE/SEGroup8/04_tests/UC03/evidence/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/isabe/Desktop/SE/SEGroup8/frontend/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.1",
+    "workers": 16,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "domain-a\\uc03-merchant-application.spec.ts",
+      "file": "domain-a/uc03-merchant-application.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "UC03 real merchant application flow",
+          "file": "domain-a/uc03-merchant-application.spec.ts",
+          "line": 28,
+          "column": 6,
+          "specs": [
+            {
+              "title": "submit, review, role/shop upgrade and rejection persistence",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1700,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-27T07:42:15.426Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "908a4bd0b3977ad5ade7-c6af23a6c6236cf7e6f1",
+              "file": "domain-a/uc03-merchant-application.spec.ts",
+              "line": 29,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-08-27T07:42:14.574Z",
+    "duration": 3092.351,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

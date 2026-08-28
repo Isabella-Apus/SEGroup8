@@ -8,6 +8,7 @@ import com.segroup8.platform.context.UserContext;
 import com.segroup8.platform.dto.SecondhandOrderCreateRequest;
 import com.segroup8.platform.dto.SecondhandProductPageQueryRequest;
 import com.segroup8.platform.dto.SecondhandProductSaveRequest;
+import com.segroup8.platform.entity.Address;
 import com.segroup8.platform.entity.OrderInfo;
 import com.segroup8.platform.entity.SecondhandProduct;
 import com.segroup8.platform.mapper.OrderInfoMapper;
@@ -182,8 +183,9 @@ class SecondhandProductServiceImplTest {
         when(secondhandProductMapper.selectById(2L)).thenReturn(product);
         when(secondhandProductMapper.update(any(), any(UpdateWrapper.class))).thenReturn(1);
         when(secondhandTradeService.resolveEffectivePriceForBuyer(2L, 5L)).thenReturn(null);
+        when(addressMapper.selectById(1L)).thenReturn(ownedAddress(1L, 5L));
 
-        OrderVO vo = secondhandProductService.buySecondhandProduct(2L, new SecondhandOrderCreateRequest());
+        OrderVO vo = secondhandProductService.buySecondhandProduct(2L, orderRequest(1L));
 
         ArgumentCaptor<OrderInfo> orderCaptor = ArgumentCaptor.forClass(OrderInfo.class);
         verify(orderInfoMapper).insert(orderCaptor.capture());
@@ -214,13 +216,32 @@ class SecondhandProductServiceImplTest {
         when(secondhandProductMapper.update(any(), any(UpdateWrapper.class))).thenReturn(1);
         when(secondhandTradeService.resolveEffectivePriceForBuyer(2L, 5L)).thenReturn(null);
         when(secondhandTradeService.resolveEffectivePriceForBuyer(3L, 5L)).thenReturn(null);
+        when(addressMapper.selectById(1L)).thenReturn(ownedAddress(1L, 5L));
 
-        secondhandProductService.buySecondhandProduct(2L, new SecondhandOrderCreateRequest());
-        secondhandProductService.buySecondhandProduct(3L, new SecondhandOrderCreateRequest());
+        secondhandProductService.buySecondhandProduct(2L, orderRequest(1L));
+        secondhandProductService.buySecondhandProduct(3L, orderRequest(1L));
 
         ArgumentCaptor<OrderInfo> orderCaptor = ArgumentCaptor.forClass(OrderInfo.class);
         verify(orderInfoMapper, times(2)).insert(orderCaptor.capture());
         List<OrderInfo> insertedOrders = orderCaptor.getAllValues();
         assertNotEquals(insertedOrders.get(0).getOrderNo(), insertedOrders.get(1).getOrderNo());
+    }
+
+    private SecondhandOrderCreateRequest orderRequest(Long addressId) {
+        SecondhandOrderCreateRequest request = new SecondhandOrderCreateRequest();
+        request.setAddressId(addressId);
+        return request;
+    }
+
+    private Address ownedAddress(Long addressId, Long userId) {
+        Address address = new Address();
+        address.setId(addressId);
+        address.setUserId(userId);
+        address.setReceiverName("Buyer");
+        address.setReceiverPhone("13800000000");
+        address.setProvince("Guangdong");
+        address.setCity("Guangzhou");
+        address.setDetailAddress("Test Road 1");
+        return address;
     }
 }

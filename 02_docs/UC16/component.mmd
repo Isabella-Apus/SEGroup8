@@ -1,0 +1,27 @@
+flowchart LR
+  Seller[Seller browser]
+  Publish[SecondhandPublishView]
+  Manage[MerchantSecondhandProductsView]
+  Upload[UploadController]
+  ProductApi[SecondhandProductController]
+  CategoryApi[CategoryController]
+  ProductService[SecondhandProductServiceImpl]
+  RiskService[ProductRiskAuditServiceImpl]
+  ProductMapper[SecondhandProductMapper]
+  CategoryMapper[CategoryMapper]
+  DB[(MySQL)]
+
+  Seller --> Publish
+  Seller --> Manage
+  Publish --> Upload
+  Publish --> CategoryApi
+  Publish --> ProductApi
+  Manage --> ProductApi
+  ProductApi --> ProductService
+  CategoryApi --> CategoryMapper
+  ProductService --> CategoryMapper
+  ProductService --> ProductMapper
+  ProductService --> RiskService
+  RiskService --> DB
+  ProductMapper --> DB
+  CategoryMapper --> DB
