@@ -9,9 +9,9 @@
 | 范围 | Task | 状态 |
 |---|---:|---|
 | 共享标签、CI、Evidence 规范 | #147 | 本 PR 建立入口 |
-| UC21 | #142 | PENDING：由独立 PR 提供 |
+| UC21 | #142 | PASS：PR #197 已提供需求、Integration、真实 E2E 和 Evidence |
 | UC22 | #143 | PENDING：由独立 PR 提供 |
-| UC23 | #144 | PENDING：由独立 PR 提供 |
+| UC23 | #144 | PASS：本 PR 提供需求、事务修复、Integration、真实 E2E 和 Evidence |
 | UC24 | #145 | PENDING：由独立 PR 提供 |
 | UC25 | #146 | PENDING：由独立 PR 提供 |
 

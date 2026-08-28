@@ -1,0 +1,13 @@
+Executed: 2026-08-28 18:26 Asia/Shanghai
+Docker Server: 29.3.1, linux
+
+database: Up, healthy, localhost:3307 -> 3306
+backend: Up, healthy, localhost:8089 -> 8080
+frontend: Up, healthy, localhost:8088 -> 80
+
+GET http://127.0.0.1:8089/actuator/health
+{"status":"UP","groups":["liveness","readiness"]}
+
+HEAD http://127.0.0.1:8088
+HTTP/1.1 200 OK
+Server: nginx/1.27.4

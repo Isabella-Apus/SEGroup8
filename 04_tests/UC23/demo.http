@@ -1,0 +1,34 @@
+@base = http://127.0.0.1:8088/api
+@buyerToken = REPLACE_WITH_BUYER_JWT
+@sellerToken = REPLACE_WITH_SELLER_JWT
+@orderId = 1
+
+### 查询并按需初始化个人钱包
+GET {{base}}/finance/dashboard
+Authorization: Bearer {{buyerToken}}
+
+### 充值只写个人账户
+POST {{base}}/finance/recharge
+Authorization: Bearer {{buyerToken}}
+Content-Type: application/json
+
+{
+  "amount": 23.23,
+  "channel": "ALIPAY"
+}
+
+### 查询个人流水
+GET {{base}}/finance/my-wallet/records
+Authorization: Bearer {{buyerToken}}
+
+### 普通用户查询经营流水，应返回业务码 403
+GET {{base}}/finance/business/records
+Authorization: Bearer {{buyerToken}}
+
+### 确认收货触发结算
+POST {{base}}/order/{{orderId}}/confirm-receive
+Authorization: Bearer {{buyerToken}}
+
+### 官方卖家查询经营流水
+GET {{base}}/finance/business/records
+Authorization: Bearer {{sellerToken}}

@@ -1,0 +1,25 @@
+flowchart LR
+  subgraph Browser[前端]
+    Profile[Profile.vue]
+    Merchant[MerchantFinanceView.vue]
+    FinanceApi[finance.js]
+    OrderApi[order.js]
+  end
+  subgraph Backend[后端应用]
+    Auth[JWT 与角色校验]
+    FC[FinanceController]
+    OC[OrderController]
+    OS[OrderServiceImpl]
+    ES[EscrowSettlementService]
+    Strategy[NewProductSettlementStrategy]
+    BM[BalanceMapper]
+    TM[TransactionRecordMapper]
+  end
+  DB[(MySQL)]
+  Profile --> FinanceApi
+  Merchant --> FinanceApi
+  FinanceApi --> Auth --> FC --> ES
+  OrderApi --> Auth --> OC --> OS --> ES
+  Strategy --> ES
+  ES -->|乐观锁更新| BM --> DB
+  ES -->|同事务写流水| TM --> DB
