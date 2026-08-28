@@ -1,0 +1,97 @@
+name: Reusable domain tests
+
+on:
+  workflow_call:
+    inputs:
+      domain:
+        description: Domain letter (A-E)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: Domain ${{ inputs.domain }} tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DOMAIN: ${{ inputs.domain }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Validate domain input
+        shell: bash
+        run: |
+          case "$DOMAIN" in
+            A|B|C|D|E) ;;
+            *) echo "Unsupported domain: $DOMAIN" >&2; exit 2 ;;
+          esac
+      - name: Set up Java and shared Maven cache
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: |
+            backend/pom.xml
+            microservices/pom.xml
+            microservices/*/pom.xml
+      - name: Set up Node.js for Domain C evidence
+        if: inputs.domain == 'C'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run Domain A, D, or E tagged backend tests
+        if: inputs.domain == 'A' || inputs.domain == 'D' || inputs.domain == 'E'
+        run: >-
+          mvn -B --no-transfer-progress -f backend/pom.xml
+          "-Dgroups=DOMAIN_${DOMAIN}" clean test
+      - name: Run Domain B microservice tests
+        if: inputs.domain == 'B'
+        run: mvn -B --no-transfer-progress -f microservices/pom.xml -Pdomain-b clean test
+      - name: Run Domain C tests and collect evidence
+        if: inputs.domain == 'C'
+        run: node 04_tests/domains/C-order-fulfillment/run-domain-c-tests.mjs --suite DOMAIN_C --goal verify
+      - name: Verify Domain C evidence
+        if: inputs.domain == 'C'
+        run: node 04_tests/domains/C-order-fulfillment/verify-evidence.mjs --suite=DOMAIN_C
+      - name: Summarize Domain D Surefire results
+        if: inputs.domain == 'D'
+        shell: pwsh
+        run: >-
+          ./scripts/test/summarize-domain-d-surefire.ps1
+          -ReportsDirectory backend/target/surefire-reports
+          -OutputDirectory backend/target/domain-d-report
+      - name: Upload backend domain reports
+        if: always() && inputs.domain != 'B' && inputs.domain != 'C'
+        uses: actions/upload-artifact@v4
+        with:
+          name: domain-${{ inputs.domain }}-test-evidence
+          path: |
+            backend/target/surefire-reports/**
+            backend/target/domain-d-report/**
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload Domain B reports
+        if: always() && inputs.domain == 'B'
+        uses: actions/upload-artifact@v4
+        with:
+          name: domain-${{ inputs.domain }}-test-evidence
+          path: |
+            microservices/*/target/surefire-reports/**
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload Domain C reports and evidence
+        if: always() && inputs.domain == 'C'
+        uses: actions/upload-artifact@v4
+        with:
+          name: domain-${{ inputs.domain }}-test-evidence
+          path: |
+            backend/target/surefire-reports/**
+            04_tests/domains/C-order-fulfillment/evidence/logs/backend-domain-c.log
+            04_tests/domains/C-order-fulfillment/evidence/raw-reports/surefire/**
+            04_tests/domains/C-order-fulfillment/evidence/result-summary.json
+          if-no-files-found: error
+          retention-days: 14
