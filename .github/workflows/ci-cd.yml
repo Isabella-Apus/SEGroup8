@@ -17,7 +17,7 @@ concurrency:
 jobs:
   # Level 1: shared frontend and backend platform gates.
   frontend:
-    name: 1 / Frontend common tests
+    name: Frontend common tests
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
@@ -45,7 +45,7 @@ jobs:
           retention-days: 7
 
   backend-platform:
-    name: 1 / Backend platform tests and JAR
+    name: Backend platform tests and JAR
     runs-on: ubuntu-latest
     timeout-minutes: 30
     defaults:
@@ -92,35 +92,35 @@ jobs:
 
   # Level 2: every domain uses the same reusable workflow and Maven cache.
   domain-a:
-    name: 2 / Domain A (UC01-UC05)
+    name: DomainA(UC01-05)
     needs: [frontend, backend-platform]
     uses: ./.github/workflows/_domain-tests.yml
     with:
       domain: A
 
   domain-b:
-    name: 2 / Domain B (UC06-UC10)
+    name: DomainB(UC06-10)
     needs: [frontend, backend-platform]
     uses: ./.github/workflows/_domain-tests.yml
     with:
       domain: B
 
   domain-c:
-    name: 2 / Domain C (UC11-UC15)
+    name: DomainC(UC11-15)
     needs: [frontend, backend-platform]
     uses: ./.github/workflows/_domain-tests.yml
     with:
       domain: C
 
   domain-d:
-    name: 2 / Domain D (UC16-UC20)
+    name: DomainD(UC16-20)
     needs: [frontend, backend-platform]
     uses: ./.github/workflows/_domain-tests.yml
     with:
       domain: D
 
   domain-e:
-    name: 2 / Domain E (UC21-UC25)
+    name: DomainE(UC21-25)
     needs: [frontend, backend-platform]
     uses: ./.github/workflows/_domain-tests.yml
     with:
@@ -153,7 +153,7 @@ jobs:
 
   # Level 3: prove the tested artifacts boot together before the full UC run.
   playwright:
-    name: 3 / Playwright full-stack smoke
+    name: Playwright full-stack smoke
     needs: [domain-a, domain-b, domain-c, domain-d, domain-e, uc-e2e-coverage]
     runs-on: ubuntu-latest
     timeout-minutes: 35
@@ -205,7 +205,7 @@ jobs:
 
   # Level 4: a fresh full stack runs every checked-in UC E2E suite.
   all-e2e-tests:
-    name: 4 / All UC E2E tests
+    name: All UC E2E tests
     needs: [playwright]
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -334,6 +334,10 @@ jobs:
           context: backend
           file: backend/Dockerfile.runtime
           push: true
+          # ACR Personal Edition rejects BuildKit attestation manifests whose
+          # config media type is application/vnd.oci.empty.v1+json.
+          provenance: false
+          sbom: false
           tags: |
             ${{ vars.ACR_REGISTRY }}/${{ vars.ACR_NAMESPACE }}/backend:sha-${{ github.sha }}
             ${{ vars.ACR_REGISTRY }}/${{ vars.ACR_NAMESPACE }}/backend:latest
@@ -346,6 +350,8 @@ jobs:
           context: frontend
           file: frontend/Dockerfile.runtime
           push: true
+          provenance: false
+          sbom: false
           tags: |
             ${{ vars.ACR_REGISTRY }}/${{ vars.ACR_NAMESPACE }}/frontend:sha-${{ github.sha }}
             ${{ vars.ACR_REGISTRY }}/${{ vars.ACR_NAMESPACE }}/frontend:latest
@@ -400,7 +406,7 @@ jobs:
             "${PRODUCTION_URL%/}/health" >/dev/null
 
   release:
-    name: 5 / Create GitHub release
+    name: Create GitHub release
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
     needs: [all-e2e-tests]
     runs-on: ubuntu-latest
