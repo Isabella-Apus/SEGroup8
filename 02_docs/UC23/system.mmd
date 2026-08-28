@@ -1,0 +1,13 @@
+flowchart LR
+    Buyer[买家] --> Profile[个人资料 / 钱包]
+    Seller[官方卖家] --> Finance[财务看板]
+    Profile --> FC[FinanceController]
+    Finance --> FC
+    Buyer --> OC[OrderController]
+    OC --> OS[OrderService]
+    FC --> ES[EscrowSettlementService]
+    OS --> ES
+    ES --> BM[BalanceMapper]
+    ES --> TM[TransactionRecordMapper]
+    BM --> B[(balance)]
+    TM --> T[(transaction_record)]

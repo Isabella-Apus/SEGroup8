@@ -1,0 +1,23 @@
+{
+  "uc": "UC23",
+  "status": "PASS",
+  "environment": "Windows 11, Java 21, H2 integration tests; real Compose Nginx + Spring Boot + MySQL; Playwright 1.55.1 with local Edge",
+  "executedAt": "2026-08-28T18:28:00+08:00",
+  "counts": {
+    "passed": 13,
+    "failed": 0,
+    "skipped": 0
+  },
+  "evidence": [
+    "raw-reports/TEST-com.segroup8.platform.controller.FinanceControllerUc23WebMvcTest.xml",
+    "raw-reports/TEST-com.segroup8.platform.integration.FinanceSettlementUc23IntegrationTest.xml",
+    "raw-reports/TEST-com.segroup8.platform.service.settlement.EscrowSettlementServiceTest.xml",
+    "raw-reports/TEST-com.segroup8.platform.service.settlement.UC23AccountIsolationTest.xml",
+    "raw-reports/playwright/playwright-results.json",
+    "raw-reports/playwright/playwright-results.xml",
+    "raw-reports/playwright/playwright-report/index.html",
+    "screenshots/uc23-business-settlement-after-refresh.png",
+    "logs/runtime-health.txt",
+    "../test-report.md"
+  ]
+}

@@ -19,6 +19,7 @@ import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.TransactionRecordMapper;
 import com.segroup8.platform.mapper.VoucherMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -53,6 +54,7 @@ public class EscrowSettlementService {
         this.voucherMapper = voucherMapper;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void releaseEscrow(OrderInfo order, List<OrderItem> items) {
         Map<String, BigDecimal> groupedAmount = new HashMap<>();
         Map<String, OrderSettlementStrategy> groupedStrategy = new HashMap<>();
@@ -113,6 +115,7 @@ public class EscrowSettlementService {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public BigDecimal changePersonalBalance(Long userId, BigDecimal amount, Long orderId, String changeType,
             TransactionTradeTypeEnum tradeType, String remark) {
         BigDecimal finalBalance = changeBalanceWithOptimisticLock(userId, SettlementAccountType.PERSONAL, amount);
@@ -130,6 +133,7 @@ public class EscrowSettlementService {
         return finalBalance;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public BigDecimal changeBusinessBalance(Long userId, BigDecimal amount, Long orderId, String changeType,
             TransactionTradeTypeEnum tradeType, String remark) {
         BigDecimal finalBalance = changeBalanceWithOptimisticLock(userId, SettlementAccountType.BUSINESS, amount);

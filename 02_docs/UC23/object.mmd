@@ -1,0 +1,28 @@
+classDiagram
+    class FinanceController
+    class FinanceRechargeRequest
+    class FinanceDashboardVO
+    class FinanceRecordVO
+    class EscrowSettlementService
+    class NewProductSettlementStrategy
+    class Balance {
+      Long userId
+      BigDecimal personalBalance
+      BigDecimal businessBalance
+      Integer version
+    }
+    class TransactionRecord {
+      Long orderId
+      Long userId
+      String accountType
+      String tradeType
+      BigDecimal amount
+      BigDecimal balanceAfter
+    }
+    FinanceController --> FinanceRechargeRequest
+    FinanceController --> FinanceDashboardVO
+    FinanceController --> FinanceRecordVO
+    FinanceController --> EscrowSettlementService
+    NewProductSettlementStrategy --> EscrowSettlementService
+    EscrowSettlementService --> Balance
+    EscrowSettlementService --> TransactionRecord
