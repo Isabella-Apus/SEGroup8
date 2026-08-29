@@ -1,0 +1,19 @@
+2026-08-29T17:58+08:00 local container validation
+compose config: PASS
+image build: PASS
+identity-mysql: healthy, host port 3308
+identity-governance-service: healthy, host port 8091
+liveness: UP
+readiness: UP
+info.app.version: local-validation
+register smoke: code=0
+login smoke: code=0, role=USER
+own-schema query: PASS, SELECT COUNT(*) FROM identity_governance_db.user
+cross-schema query: EXPECTED DENIAL, MySQL ERROR 1142 for order_db.order_info
+database-isolation script final exit code: 0
+image user: app
+image healthcheck: curl /actuator/health/readiness
+image size: 140906870 bytes
+Flyway: successfully applied V1__identity_governance_schema.sql to MySQL 8.4
+Note: Flyway 10.10 emitted a compatibility warning for MySQL 8.4; migration, readiness and smoke checks still passed.
+Cleanup: temporary containers and network removed; MySQL volume preserved.

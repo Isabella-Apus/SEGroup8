@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="620" viewBox="0 0 1120 620" role="img" aria-labelledby="title desc">
+  <title id="title">identity-governance-service boundary</title>
+  <desc id="desc">Gateway routes to identity governance, which exclusively owns its database and publishes outbox events.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#355a7a"/></marker>
+    <style>.box{fill:#eef5fb;stroke:#355a7a;stroke-width:2}.db{fill:#fff5dd;stroke:#9b6a00;stroke-width:2}.bus{fill:#edf8ef;stroke:#397747;stroke-width:2}.t{font:16px system-ui,sans-serif;fill:#17324d}.s{font:13px system-ui,sans-serif;fill:#355a7a}.a{stroke:#355a7a;stroke-width:2;fill:none;marker-end:url(#arrow)}</style>
+  </defs>
+  <rect x="45" y="90" width="170" height="70" rx="10" class="box"/><text x="130" y="120" text-anchor="middle" class="t">Web / Admin</text><text x="130" y="143" text-anchor="middle" class="s">Client</text>
+  <rect x="285" y="90" width="170" height="70" rx="10" class="box"/><text x="370" y="132" text-anchor="middle" class="t">Gateway / Nginx</text>
+  <rect x="525" y="70" width="280" height="110" rx="12" class="box"/><text x="665" y="115" text-anchor="middle" class="t">identity-governance-service</text><text x="665" y="143" text-anchor="middle" class="s">UC01-UC05, port 8091</text>
+  <ellipse cx="975" cy="125" rx="110" ry="45" class="db"/><text x="975" y="120" text-anchor="middle" class="t">identity_governance_db</text><text x="975" y="143" text-anchor="middle" class="s">exclusive connection</text>
+  <rect x="525" y="285" width="280" height="90" rx="12" class="bus"/><text x="665" y="322" text-anchor="middle" class="t">outbox_event</text><text x="665" y="348" text-anchor="middle" class="s">versioned, retryable events</text>
+  <rect x="55" y="470" width="210" height="70" rx="10" class="box"/><text x="160" y="502" text-anchor="middle" class="t">catalog-shop-service</text><text x="160" y="525" text-anchor="middle" class="s">MerchantApproved.v1</text>
+  <rect x="325" y="470" width="180" height="70" rx="10" class="box"/><text x="415" y="512" text-anchor="middle" class="t">order-service</text>
+  <rect x="565" y="470" width="210" height="70" rx="10" class="box"/><text x="670" y="502" text-anchor="middle" class="t">messaging-service</text><text x="670" y="525" text-anchor="middle" class="s">block-check client</text>
+  <rect x="835" y="470" width="220" height="70" rx="10" class="box"/><text x="945" y="502" text-anchor="middle" class="t">other business services</text><text x="945" y="525" text-anchor="middle" class="s">local JWT verification</text>
+  <path d="M215 125 H285" class="a"/><path d="M455 125 H525" class="a"/><path d="M805 125 H865" class="a"/><path d="M665 180 V285" class="a"/><path d="M620 375 C540 420 240 410 160 470" class="a"/><path d="M650 375 C610 430 470 430 415 470" class="a"/><path d="M680 375 V470" class="a"/><path d="M775 505 C860 430 825 250 785 170" class="a"/><path d="M945 470 C945 320 820 250 770 180" class="a"/>
+</svg>

@@ -14,6 +14,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>security-contract</module>
+        <module>identity-governance-service</module>
         <module>catalog-service</module>
         <module>shop-service</module>
         <module>risk-service</module>

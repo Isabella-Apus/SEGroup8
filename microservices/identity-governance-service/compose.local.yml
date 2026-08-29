@@ -1,0 +1,38 @@
+services:
+  identity-mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${IDENTITY_MYSQL_ROOT_PASSWORD:?set IDENTITY_MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: identity_governance_db
+      MYSQL_USER: identity_governance_app
+      MYSQL_PASSWORD: ${IDENTITY_DB_PASSWORD:?set IDENTITY_DB_PASSWORD}
+    ports:
+      - "3308:3306"
+    volumes:
+      - identity_mysql_data:/var/lib/mysql
+      - ./docker/mysql-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "--password=$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  identity-governance-service:
+    build: .
+    environment:
+      DB_URL: jdbc:mysql://identity-mysql:3306/identity_governance_db?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+      DB_USERNAME: identity_governance_app
+      DB_PASSWORD: ${IDENTITY_DB_PASSWORD:?set IDENTITY_DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:?set INTERNAL_SERVICE_TOKEN}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:?set BOOTSTRAP_ADMIN_PASSWORD}
+      APP_VERSION: ${APP_VERSION:-local}
+      APP_COMMIT: ${APP_COMMIT:-unknown}
+    ports:
+      - "8091:8091"
+    depends_on:
+      identity-mysql:
+        condition: service_healthy
+
+volumes:
+  identity_mysql_data:

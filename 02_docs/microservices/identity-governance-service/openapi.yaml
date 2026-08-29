@@ -1,0 +1,162 @@
+openapi: 3.0.3
+info:
+  title: identity-governance-service API
+  version: 1.0.0
+  description: UC01-UC05 public compatibility API and service-only internal contracts.
+servers:
+  - url: http://localhost:8091
+tags:
+  - name: Auth
+  - name: User
+  - name: Admin
+  - name: Governance
+  - name: Internal
+x-secured-get: &securedGet
+  security: [{bearerAuth: []}]
+  responses: {'200': {$ref: '#/components/responses/Envelope'}}
+x-secured-write: &securedWrite
+  security: [{bearerAuth: []}]
+  requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+  responses: {'200': {$ref: '#/components/responses/Envelope'}}
+x-secured-delete: &securedDelete
+  security: [{bearerAuth: []}]
+  responses: {'200': {$ref: '#/components/responses/Envelope'}}
+x-admin-get: &adminGet
+  security: [{bearerAuth: []}]
+  responses: {'200': {$ref: '#/components/responses/Envelope'}}
+x-admin-write: &adminWrite
+  security: [{bearerAuth: []}]
+  requestBody:
+    required: false
+    content:
+      application/json:
+        schema: {type: object, additionalProperties: true}
+  responses: {'200': {$ref: '#/components/responses/Envelope'}}
+paths:
+  /api/auth/register:
+    post:
+      tags: [Auth]
+      operationId: register
+      requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+      responses: {'200': {$ref: '#/components/responses/Envelope'}}
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+      responses: {'200': {$ref: '#/components/responses/Envelope'}}
+  /api/user/profile:
+    get: *securedGet
+    put: *securedWrite
+  /api/user/me:
+    get: *securedGet
+  /api/user/search:
+    get: *securedGet
+  /api/user/addresses:
+    get: *securedGet
+    post: *securedWrite
+  /api/user/addresses/{addressId}:
+    parameters: [{$ref: '#/components/parameters/AddressId'}]
+    put: *securedWrite
+    delete: *securedDelete
+  /api/user/merchant-application:
+    post: *securedWrite
+  /api/user/merchant-application/me:
+    get: *securedGet
+  /api/admin/merchant-applications:
+    get: *adminGet
+  /api/admin/merchant-applications/{applicationId}/approve:
+    parameters: [{$ref: '#/components/parameters/ApplicationId'}]
+    post: *adminWrite
+  /api/admin/merchant-applications/{applicationId}/reject:
+    parameters: [{$ref: '#/components/parameters/ApplicationId'}]
+    post: *adminWrite
+  /api/admin/users:
+    get: *adminGet
+  /api/admin/users/{userId}/ban:
+    parameters: [{$ref: '#/components/parameters/UserId'}]
+    put: *adminWrite
+  /api/admin/users/{userId}/unban:
+    parameters: [{$ref: '#/components/parameters/UserId'}]
+    put: *adminWrite
+  /api/report-block/report:
+    post: *securedWrite
+  /api/report-block/report/my:
+    get: *securedGet
+  /api/report-block/block:
+    post: *securedWrite
+  /api/report-block/block/{targetUserId}:
+    parameters: [{$ref: '#/components/parameters/TargetUserId'}]
+    delete: *securedDelete
+  /api/report-block/block/my:
+    get: *securedGet
+  /api/report-block/block/check/{targetUserId}:
+    parameters: [{$ref: '#/components/parameters/TargetUserId'}]
+    get: *securedGet
+  /api/report-block/block/blocked-by/{targetUserId}:
+    parameters: [{$ref: '#/components/parameters/TargetUserId'}]
+    get: *securedGet
+  /api/credit/me:
+    get: *securedGet
+  /api/credit/{userId}:
+    parameters: [{$ref: '#/components/parameters/UserId'}]
+    get: *securedGet
+  /api/admin/reports:
+    get: *adminGet
+  /api/admin/reports/audit:
+    post: *adminWrite
+  /api/admin/reports/credit-adjust:
+    post: *adminWrite
+  /api/admin/audit-logs:
+    get: *adminGet
+  /internal/auth/introspect:
+    post:
+      tags: [Internal]
+      security: [{serviceToken: []}]
+      parameters: [{$ref: '#/components/parameters/RequestId'}, {$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+      responses: {'200': {$ref: '#/components/responses/Envelope'}}
+  /internal/users/{userId}/summary:
+    get:
+      tags: [Internal]
+      security: [{serviceToken: []}]
+      parameters: [{$ref: '#/components/parameters/UserId'}, {$ref: '#/components/parameters/RequestId'}]
+      responses: {'200': {$ref: '#/components/responses/Envelope'}}
+  /internal/blocks/check:
+    post:
+      tags: [Internal]
+      security: [{serviceToken: []}]
+      parameters: [{$ref: '#/components/parameters/RequestId'}, {$ref: '#/components/parameters/IdempotencyKey'}]
+      requestBody: {$ref: '#/components/requestBodies/JsonBody'}
+      responses: {'200': {$ref: '#/components/responses/Envelope'}}
+components:
+  securitySchemes:
+    bearerAuth: {type: http, scheme: bearer, bearerFormat: JWT}
+    serviceToken: {type: apiKey, in: header, name: X-Internal-Service-Token}
+  parameters:
+    UserId: {name: userId, in: path, required: true, schema: {type: integer, format: int64}}
+    TargetUserId: {name: targetUserId, in: path, required: true, schema: {type: integer, format: int64}}
+    AddressId: {name: addressId, in: path, required: true, schema: {type: integer, format: int64}}
+    ApplicationId: {name: applicationId, in: path, required: true, schema: {type: integer, format: int64}}
+    RequestId: {name: X-Request-Id, in: header, required: true, schema: {type: string}}
+    IdempotencyKey: {name: X-Idempotency-Key, in: header, required: true, schema: {type: string}}
+  schemas:
+    Envelope:
+      type: object
+      required: [code, message]
+      properties:
+        code: {type: integer, example: 0}
+        message: {type: string, example: success}
+        data: {nullable: true}
+  requestBodies:
+    JsonBody:
+      required: true
+      content:
+        application/json:
+          schema: {type: object, additionalProperties: true}
+  responses:
+    Envelope:
+      description: Compatibility envelope; business/authorization errors are reported in code.
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/Envelope'}

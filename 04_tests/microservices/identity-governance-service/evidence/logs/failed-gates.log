@@ -1,0 +1,19 @@
+Gate 1 - 2026-08-29 17:41 CST - ENVIRONMENT FAILURE
+Command: mvn -B -f microservices/pom.xml -pl identity-governance-service -am -DskipTests package
+Result: FAIL while sandboxed Maven read security-contract target JAR (Windows Access is denied).
+Control: identical command outside the sandbox passed; not classified as a code failure.
+
+Gate 2 - 2026-08-29 17:45 CST - CODE FAILURE
+Command: mvn -B -f microservices/pom.xml -pl identity-governance-service -am clean verify
+Result: FAIL, identity service tests 8 run / 0 failures / 7 context errors / 0 skipped.
+Cause: WebConfig constructor depended on AuthenticationInterceptor while the interceptor depended on a JwtTokenVerifier Bean declared by WebConfig.
+Fix: declare JwtTokenVerifier and BCryptPasswordEncoder factory methods static so Bean creation does not require the WebConfig instance.
+Regression: final clean verify passed 10/10 service tests plus 5/5 shared security-contract tests.
+
+Gate 3 - 2026-08-29 17:58 CST - SCRIPT EXIT SEMANTICS FAILURE
+Result: own-schema query passed and cross-schema query was correctly denied by MySQL 1142, but the PowerShell script inherited the expected mysql exit code 1.
+Fix: explicit exit 0 after confirming expected denial; final rerun passed.
+
+Gate 4 - 2026-08-29 17:59 CST - INVOCATION FAILURE
+Result: one isolation-script rerun omitted required Compose variables, so Compose interpolation stopped before the query.
+Fix: supply all documented local environment variables; final rerun passed.
