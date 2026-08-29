@@ -33,6 +33,24 @@ services:
     depends_on:
       identity-mysql:
         condition: service_healthy
+    networks:
+      default:
+        aliases:
+          - backend
+
+  identity-e2e-frontend:
+    profiles: ["e2e"]
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile.runtime
+    ports:
+      - "8089:80"
+    command: >-
+      /bin/sh -c "sed -i 's/backend:8080/backend:8091/g' /etc/nginx/conf.d/default.conf
+      && nginx -g 'daemon off;'"
+    depends_on:
+      identity-governance-service:
+        condition: service_healthy
 
 volumes:
   identity_mysql_data:

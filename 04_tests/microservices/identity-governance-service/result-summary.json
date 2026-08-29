@@ -14,7 +14,7 @@
   "containerSmoke": {"register": "PASS", "login": "PASS", "role": "USER"},
   "databaseIsolation": {"status": "PASS", "crossSchemaError": "MySQL 1142 SELECT command denied"},
   "openApiRuntimeParity": {"status": "PASS", "manualOperations": 34, "runtimeOperations": 34, "missing": 0, "extra": 0},
-  "domainAE2E": "NOT_RUN",
+  "domainAE2E": {"status": "PASS", "tests": 5, "passed": 5, "failed": 0, "skipped": 0, "errors": 0, "durationSeconds": 33.0, "failedFirstRunPreserved": true},
   "githubActions": "NOT_RUN",
   "cloudNative": "OUT_OF_SCOPE"
 }

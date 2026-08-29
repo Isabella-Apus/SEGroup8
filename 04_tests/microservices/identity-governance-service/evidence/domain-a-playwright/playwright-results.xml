@@ -1,0 +1,246 @@
+<testsuites id="" name="" tests="5" failures="5" skipped="0" errors="0" time="27.350782999999996">
+<testsuite name="domain-a\uc01-auth.spec.ts" timestamp="2026-08-29T10:08:39.017Z" hostname="" tests="1" failures="1" skipped="0" time="2.688" errors="0">
+<testcase name="@DOMAIN_A @UC01 real auth and identity flow › register, login, role boundary, ban and refresh persistence" classname="domain-a\uc01-auth.spec.ts" time="2.688">
+<failure message="uc01-auth.spec.ts:13:5 register, login, role boundary, ban and refresh persistence" type="FAILURE">
+<![CDATA[  domain-a\uc01-auth.spec.ts:13:5 › @DOMAIN_A @UC01 real auth and identity flow › register, login, role boundary, ban and refresh persistence
+
+    SyntaxError: Unexpected token '<', "<html>
+    <h"... is not valid JSON
+
+       at helpers\domain-a.ts:29
+
+      27 |
+      28 | export async function json(response: APIResponse): Promise<any> {
+    > 29 |     const body = await response.json();
+         |                  ^
+      30 |     if (typeof body?.code !== "number") {
+      31 |         throw new Error(`[E2E] unexpected API response: ${JSON.stringify(body)}`);
+      32 |     }
+        at json (C:\Users\isabe\Desktop\SE\SEGroup8\frontend\e2e\helpers\domain-a.ts:29:18)
+        at registerAccount (C:\Users\isabe\Desktop\SE\SEGroup8\frontend\e2e\helpers\domain-a.ts:49:18)
+        at C:\Users\isabe\Desktop\SE\SEGroup8\frontend\e2e\domain-a\uc01-auth.spec.ts:14:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc01-auth--DOMAIN-0e36c-ban-and-refresh-persistence\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc01-auth--DOMAIN-0e36c-ban-and-refresh-persistence\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc01-auth--DOMAIN-0e36c-ban-and-refresh-persistence\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc01-auth--DOMAIN-0e36c-ban-and-refresh-persistence\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-a-uc01-auth--DOMAIN-0e36c-ban-and-refresh-persistence\test-failed-1.png]]
+
+[[ATTACHMENT|test-results\domain-a-uc01-auth--DOMAIN-0e36c-ban-and-refresh-persistence\video.webm]]
+
+[[ATTACHMENT|test-results\domain-a-uc01-auth--DOMAIN-0e36c-ban-and-refresh-persistence\trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="domain-a\uc02-profile-address.spec.ts" timestamp="2026-08-29T10:08:39.017Z" hostname="" tests="1" failures="1" skipped="0" time="1.107" errors="0">
+<testcase name="@DOMAIN_A @UC02 real profile and address flow › updates profile, maintains one default address and isolates ownership" classname="domain-a\uc02-profile-address.spec.ts" time="1.107">
+<failure message="uc02-profile-address.spec.ts:14:5 updates profile, maintains one default address and isolates ownership" type="FAILURE">
+<![CDATA[  domain-a\uc02-profile-address.spec.ts:14:5 › @DOMAIN_A @UC02 real profile and address flow › updates profile, maintains one default address and isolates ownership
+
+    SyntaxError: Unexpected token '<', "<html>
+    <h"... is not valid JSON
+
+       at helpers\domain-a.ts:29
+
+      27 |
+      28 | export async function json(response: APIResponse): Promise<any> {
+    > 29 |     const body = await response.json();
+         |                  ^
+      30 |     if (typeof body?.code !== "number") {
+      31 |         throw new Error(`[E2E] unexpected API response: ${JSON.stringify(body)}`);
+      32 |     }
+        at json (C:\Users\isabe\Desktop\SE\SEGroup8\frontend\e2e\helpers\domain-a.ts:29:18)
+        at registerAccount (C:\Users\isabe\Desktop\SE\SEGroup8\frontend\e2e\helpers\domain-a.ts:49:18)
+        at C:\Users\isabe\Desktop\SE\SEGroup8\frontend\e2e\domain-a\uc02-profile-address.spec.ts:15:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc02-profile-addr-cf703-ress-and-isolates-ownership\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc02-profile-addr-cf703-ress-and-isolates-ownership\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc02-profile-addr-cf703-ress-and-isolates-ownership\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc02-profile-addr-cf703-ress-and-isolates-ownership\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-a-uc02-profile-addr-cf703-ress-and-isolates-ownership\test-failed-1.png]]
+
+[[ATTACHMENT|test-results\domain-a-uc02-profile-addr-cf703-ress-and-isolates-ownership\video.webm]]
+
+[[ATTACHMENT|test-results\domain-a-uc02-profile-addr-cf703-ress-and-isolates-ownership\trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="domain-a\uc03-merchant-application.spec.ts" timestamp="2026-08-29T10:08:39.017Z" hostname="" tests="1" failures="1" skipped="0" time="1.51" errors="0">
+<testcase name="@DOMAIN_A @UC03 real merchant application flow › submit, review, role/shop upgrade and rejection persistence" classname="domain-a\uc03-merchant-application.spec.ts" time="1.51">
+<failure message="uc03-merchant-application.spec.ts:29:5 submit, review, role/shop upgrade and rejection persistence" type="FAILURE">
+<![CDATA[  domain-a\uc03-merchant-application.spec.ts:29:5 › @DOMAIN_A @UC03 real merchant application flow › submit, review, role/shop upgrade and rejection persistence
+
+    SyntaxError: Unexpected token '<', "<html>
+    <h"... is not valid JSON
+
+       at helpers\domain-a.ts:29
+
+      27 |
+      28 | export async function json(response: APIResponse): Promise<any> {
+    > 29 |     const body = await response.json();
+         |                  ^
+      30 |     if (typeof body?.code !== "number") {
+      31 |         throw new Error(`[E2E] unexpected API response: ${JSON.stringify(body)}`);
+      32 |     }
+        at json (C:\Users\isabe\Desktop\SE\SEGroup8\frontend\e2e\helpers\domain-a.ts:29:18)
+        at loginApi (C:\Users\isabe\Desktop\SE\SEGroup8\frontend\e2e\helpers\domain-a.ts:63:18)
+        at C:\Users\isabe\Desktop\SE\SEGroup8\frontend\e2e\domain-a\uc03-merchant-application.spec.ts:30:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc03-merchant-app-8440d-e-and-rejection-persistence\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc03-merchant-app-8440d-e-and-rejection-persistence\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc03-merchant-app-8440d-e-and-rejection-persistence\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc03-merchant-app-8440d-e-and-rejection-persistence\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-a-uc03-merchant-app-8440d-e-and-rejection-persistence\test-failed-1.png]]
+
+[[ATTACHMENT|test-results\domain-a-uc03-merchant-app-8440d-e-and-rejection-persistence\video.webm]]
+
+[[ATTACHMENT|test-results\domain-a-uc03-merchant-app-8440d-e-and-rejection-persistence\trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="domain-a\uc04-ban-unban.spec.ts" timestamp="2026-08-29T10:08:39.017Z" hostname="" tests="1" failures="1" skipped="0" time="1.232" errors="0">
+<testcase name="@DOMAIN_A @UC04 real ban and unban flow › ban blocks login, unban restores login and audit is queryable" classname="domain-a\uc04-ban-unban.spec.ts" time="1.232">
+<failure message="uc04-ban-unban.spec.ts:13:5 ban blocks login, unban restores login and audit is queryable" type="FAILURE">
+<![CDATA[  domain-a\uc04-ban-unban.spec.ts:13:5 › @DOMAIN_A @UC04 real ban and unban flow › ban blocks login, unban restores login and audit is queryable
+
+    SyntaxError: Unexpected token '<', "<html>
+    <h"... is not valid JSON
+
+       at helpers\domain-a.ts:29
+
+      27 |
+      28 | export async function json(response: APIResponse): Promise<any> {
+    > 29 |     const body = await response.json();
+         |                  ^
+      30 |     if (typeof body?.code !== "number") {
+      31 |         throw new Error(`[E2E] unexpected API response: ${JSON.stringify(body)}`);
+      32 |     }
+        at json (C:\Users\isabe\Desktop\SE\SEGroup8\frontend\e2e\helpers\domain-a.ts:29:18)
+        at registerAccount (C:\Users\isabe\Desktop\SE\SEGroup8\frontend\e2e\helpers\domain-a.ts:49:18)
+        at C:\Users\isabe\Desktop\SE\SEGroup8\frontend\e2e\domain-a\uc04-ban-unban.spec.ts:14:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc04-ban-unban--D-ecbed-ogin-and-audit-is-queryable\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc04-ban-unban--D-ecbed-ogin-and-audit-is-queryable\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc04-ban-unban--D-ecbed-ogin-and-audit-is-queryable\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc04-ban-unban--D-ecbed-ogin-and-audit-is-queryable\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-a-uc04-ban-unban--D-ecbed-ogin-and-audit-is-queryable\test-failed-1.png]]
+
+[[ATTACHMENT|test-results\domain-a-uc04-ban-unban--D-ecbed-ogin-and-audit-is-queryable\video.webm]]
+
+[[ATTACHMENT|test-results\domain-a-uc04-ban-unban--D-ecbed-ogin-and-audit-is-queryable\trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="domain-a\uc05-governance.spec.ts" timestamp="2026-08-29T10:08:39.017Z" hostname="" tests="1" failures="1" skipped="0" time="0.899" errors="0">
+<testcase name="@DOMAIN_A @UC05 real report block credit governance › report, bilateral block state, credit audit and refresh persistence" classname="domain-a\uc05-governance.spec.ts" time="0.899">
+<failure message="uc05-governance.spec.ts:52:5 report, bilateral block state, credit audit and refresh persistence" type="FAILURE">
+<![CDATA[  domain-a\uc05-governance.spec.ts:52:5 › @DOMAIN_A @UC05 real report block credit governance › report, bilateral block state, credit audit and refresh persistence
+
+    Error: expect(received).toBeTruthy()
+
+    Received: false
+
+      19 |         data: body,
+      20 |     });
+    > 21 |     expect(response.ok()).toBeTruthy();
+         |                           ^
+      22 |     return response.json();
+      23 | }
+      24 |
+        at apiJson (C:\Users\isabe\Desktop\SE\SEGroup8\frontend\e2e\domain-a\uc05-governance.spec.ts:21:27)
+        at register (C:\Users\isabe\Desktop\SE\SEGroup8\frontend\e2e\domain-a\uc05-governance.spec.ts:26:21)
+        at C:\Users\isabe\Desktop\SE\SEGroup8\frontend\e2e\domain-a\uc05-governance.spec.ts:57:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc05-governance---c9cf8-dit-and-refresh-persistence\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc05-governance---c9cf8-dit-and-refresh-persistence\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc05-governance---c9cf8-dit-and-refresh-persistence\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\04_tests\microservices\identity-governance-service\evidence\domain-a-playwright\test-results\domain-a-uc05-governance---c9cf8-dit-and-refresh-persistence\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-a-uc05-governance---c9cf8-dit-and-refresh-persistence\test-failed-1.png]]
+
+[[ATTACHMENT|test-results\domain-a-uc05-governance---c9cf8-dit-and-refresh-persistence\video.webm]]
+
+[[ATTACHMENT|test-results\domain-a-uc05-governance---c9cf8-dit-and-refresh-persistence\trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

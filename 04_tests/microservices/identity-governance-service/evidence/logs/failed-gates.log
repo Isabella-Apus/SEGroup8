@@ -17,3 +17,9 @@ Fix: explicit exit 0 after confirming expected denial; final rerun passed.
 Gate 4 - 2026-08-29 17:59 CST - INVOCATION FAILURE
 Result: one isolation-script rerun omitted required Compose variables, so Compose interpolation stopped before the query.
 Fix: supply all documented local environment variables; final rerun passed.
+
+Gate 5 - 2026-08-29 18:07 CST - E2E ADAPTER FAILURE
+Command: Playwright Domain A UC01-UC05 against the temporary microservice frontend entry.
+Result: 0 passed / 5 failed. All API responses were Nginx 502 HTML because the reused frontend config still targeted backend:8080 while this service listens on 8091.
+Fix: the service-local Compose e2e profile rewrites only the temporary frontend proxy target to backend:8091.
+Regression: rerun-1 passed 5/5 in 33.0 seconds. The complete first-run failure artifacts remain under evidence/domain-a-playwright/.

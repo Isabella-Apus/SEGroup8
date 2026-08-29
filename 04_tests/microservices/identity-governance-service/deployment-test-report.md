@@ -8,9 +8,12 @@
 | liveness/readiness/info | PASS | `UP` / `UP` / `local-validation` |
 | 注册登录 smoke | PASS | 注册 `code=0`，登录 `code=0`、角色 `USER` |
 | 数据库权限拒绝 | PASS | 自有 Schema 查询成功；跨查 `order_db.order_info` 返回 MySQL 1142 |
+| E2E frontend profile | PASS | 既有 `frontend/dist`，Nginx 8089 代理本服务 8091 |
 | GitHub Actions | CONFIGURED / NOT_RUN | 分支未 push，无远端 run |
 | Kubernetes/Helm/HPA | OUT_OF_SCOPE | 用户明确暂不做云原生 |
 
 第一次隔离检查的业务断言已通过，但脚本未复位预期 MySQL 拒绝产生的退出码；补充 `exit 0` 后重跑为进程退出码 0。另一次重跑漏设 Compose 必填变量，按原样记录为脚本调用失败；补齐环境变量后最终通过。任何后续失败都必须保留日志和退出码，不能用 Dockerfile 存在替代运行证据。
 
 镜像检查：`USER=app`，healthcheck 指向 `/actuator/health/readiness`，本地镜像大小 140,906,870 bytes。验收后已停止并移除临时容器/网络，保留 `identity-governance-service_identity_mysql_data` volume 以便复查。
+
+E2E 使用独立项目名 `identity-governance-e2e` 和新测试 volume；最终 5/5 后已执行 `down -v`，只删除该临时项目的容器、网络和测试 volume，不影响上面的常规验证 volume。

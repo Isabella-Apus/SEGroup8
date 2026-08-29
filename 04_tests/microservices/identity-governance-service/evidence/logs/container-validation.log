@@ -17,3 +17,8 @@ image size: 140906870 bytes
 Flyway: successfully applied V1__identity_governance_schema.sql to MySQL 8.4
 Note: Flyway 10.10 emitted a compatibility warning for MySQL 8.4; migration, readiness and smoke checks still passed.
 Cleanup: temporary containers and network removed; MySQL volume preserved.
+E2E project: identity-governance-e2e, isolated fresh MySQL volume
+E2E first run: FAIL 0/5, frontend proxy used backend:8080 and returned Nginx 502 HTML
+E2E proxy correction: backend:8091 in service-local e2e profile
+E2E rerun-1: PASS 5/5, 0 failed, 0 skipped, 0 errors, 33.0 seconds
+E2E cleanup: temporary containers, network and E2E-only volume removed
