@@ -47,6 +47,6 @@
 - [测试汇总](test-summary.md)
 - [编号规则](traceability-conventions.md)
 - [图模型规范](diagram-conventions.md)
-- [历史归档](archive/README.md)
+- [历史归档](../05_management/archive/README.md)
 
 旧材料只用于追溯，不再维护当前状态。测试源码保留在框架默认目录，原始证据位于 `../04_tests/`。

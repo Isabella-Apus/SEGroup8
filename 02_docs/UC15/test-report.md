@@ -26,7 +26,7 @@ node 04_tests/domains/C-order-fulfillment/run-domain-c-tests.mjs --suite UC15 --
 
 - 执行时间：2026-08-27。
 - JUnit Tag：`DOMAIN_C & UC15`。
-- 数据库：Testcontainers MySQL 8.4.6，加载生产 `docker/mysql/init/schema.sql`。
+- 数据库：Testcontainers MySQL 8.4.6，加载生产 `backend/src/main/resources/schema.sql`。
 - 结果：9 tests passed，0 failures，0 errors，0 skipped。
 - Maven 退出码：0。
 - Surefire 后缀：`domain-c-uc15-20260827135302750`。

@@ -48,7 +48,7 @@ function walk(target) {
   for (const entry of fs.readdirSync(target, { withFileTypes: true })) {
     const child = path.join(target, entry.name);
     const rel = path.relative(root, child).replaceAll('\\', '/');
-    if (entry.isDirectory() && (rel === '02_docs/archive' || rel.startsWith('02_docs/archive/') || rel === '05_management/archive' || rel.startsWith('05_management/archive/'))) continue;
+    if (entry.isDirectory() && (rel === '02_docs/archive' || rel.startsWith('02_docs/archive/') || rel === '05_management/archive' || rel.startsWith('05_management/archive/') || rel === '05_management/archive-' || rel.startsWith('05_management/archive-/'))) continue;
     walk(child);
   }
 }

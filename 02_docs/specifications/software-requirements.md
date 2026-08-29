@@ -21,7 +21,7 @@ Kinda Goods 面向校园和社区交易，包含官方商城、个人闲置交�
 ## 3 系统用例图
 
 
-![系统用例图（UC 编号版）](system-use-case-numbered.svg)
+![系统用例图（UC 编号版）](679b05357b73ba94eb5426d72f6fef05.png)
 
 ## 4 需求、用户故事与用例索引
 

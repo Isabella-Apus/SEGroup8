@@ -367,7 +367,7 @@ ${Array.from({ length: 25 }, (_, i) => `- [UC${String(i + 1).padStart(2, '0')}](
 - [用例总清单](use-case-catalog.md)
 - [测试汇总](test-summary.md)
 - [编号规则](traceability-conventions.md)
-- [历史归档](archive/README.md)
+- [历史归档](../05_management/archive/README.md)
 
 旧材料只用于追溯，不再维护当前状态。测试源码保留在框架默认目录，原始证据位于 \`../04_tests/\`。
 `);
@@ -403,14 +403,14 @@ write(path.join(root, 'MIDTERM_DELIVERY.md'), `# Kinda Goods 中期检查交付�
 ## 中期入口
 
 - 文档索引：\`02_docs/README.md\`
-- 课程对照审计：\`02_docs/midterm-audit.md\`
+- 课程对照审计：\`05_management/midterm-audit.md\`
 - 源码清单：\`01_source/README.md\`
 - DevOps：\`03_devops/\`
 - 测试与证据：\`04_tests/README.md\`
 - 管理材料：\`05_management/\`
 - 答辩占位：\`06_defense/README.md\`
 `);
-write(path.join(docs, 'midterm-audit.md'), `# Kinda Goods 中期检查审计
+write(path.join(management, 'midterm-audit.md'), `# Kinda Goods 中期检查审计
 
 ## 总体判定
 

@@ -215,7 +215,7 @@ write(path.join(management, 'README.md'), `# 05_management - 项目管理材料
 
 - \`archive/\`：已结束的计划、Issue 草案、PR 说明和阶段性远程审计，仅作历史追溯；
 - \`UC16-UC20-screenshots/\`：历史人工走查截图，不替代真实 E2E；
-- 当前完成状态以 GitHub Project、最新 CI 和 \`../02_docs/midterm-audit.md\` 为准。
+- 当前完成状态以 GitHub Project、最新 CI 和 \`midterm-audit.md\` 为准。
 
 归档文件中的旧路径和 \`PENDING\` 描述保留当时语境，不作为当前状态。
 `);
@@ -227,7 +227,7 @@ if (!readme.includes('## 中期检查交付入口')) {
 
 - [中期交付说明](MIDTERM_DELIVERY.md)
 - [文档索引](02_docs/README.md)
-- [课程对照审计](02_docs/midterm-audit.md)
+- [课程对照审计](05_management/midterm-audit.md)
 - [测试与原始证据](04_tests/README.md)
 
 当前六个微服务是目标架构，不等同于全部实现；最新完成状态以课程对照审计为准。

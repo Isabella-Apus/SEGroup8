@@ -8,7 +8,7 @@
 
 - [中期交付说明](MIDTERM_DELIVERY.md)
 - [文档索引](02_docs/README.md)
-- [课程对照审计](02_docs/midterm-audit.md)
+- [课程对照审计](05_management/midterm-audit.md)
 - [测试与原始证据](04_tests/README.md)
 
 当前六个微服务是目标架构，不等同于全部实现；最新完成状态以课程对照审计为准。
