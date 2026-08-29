@@ -1,9 +1,9 @@
 # Kinda Goods 软件概要设计说明书
 
-> 文档基线：2026-08-28，代码基线 `09db0eed`
+> 文档基线：2026-08-28
 > 覆盖范围：`UC01`–`UC25`
 > 编号规则：组件结构图使用 `COMP-STRUCTxx`，组件顺序图使用 `COMP-SEQxx`。
-> 状态口径：`CURRENT` 表示仓库中可运行实现，`TARGET` 表示后续微服务边界。目标设计不得作为已部署证据。
+
 
 ## 1 架构与职责
 
@@ -42,11 +42,11 @@ flowchart LR
 | `benefits-finance-service` | UC21–UC23：优惠券、钱包和资金结算 | 券、余额与资金流水表 |
 | `messaging-service` | UC24–UC25：会话、消息、通知与实时推送 | 会话、消息与通知表 |
 
-服务只能写自己管理的表。跨服务读取使用 API，跨服务写操作使用 API 或事件；调用失败时由发起方回滚、重试或记录待补偿任务。详细边界、接口和表归属分别见 `../architecture/microservice-boundaries.md`、`../architecture/service-api-catalog.md` 和 `../architecture/database-ownership.md`。当前六个目标服务尚未全部实现，不能据此声称微服务阶段完成。
+服务只能写自己管理的表。跨服务读取使用 API，跨服务写操作使用 API 或事件；调用失败时由发起方回滚、重试或记录待补偿任务。详细边界、接口和表归属分别见 `../architecture/microservice-boundaries.md`、`../architecture/service-api-catalog.md` 和 `../architecture/database-ownership.md`。
 
 ## 3 分用例组件顺序模型
 
-每个用例另有与本节顺序图配套的组件结构图，统一位于 `../UCxx/component.mmd`；顺序图的独立 Mermaid 源位于 `../UCxx/component-sequence.mmd`。结构图表达职责和依赖，顺序图表达一次场景交互，两者不互相替代。
+每个用例另有与本节顺序图配套的组件结构图，统一位于 `../UCxx/component.mmd`；顺序图的独立 Mermaid 源位于 `../UCxx/component-sequence.mmd`。结构图表达职责和依赖，顺序图表达一次场景交互。
 
 ## UC01 注册、登录和角色鉴权
 

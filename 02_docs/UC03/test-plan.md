@@ -3,6 +3,20 @@
 状态：后端/API/H2 集成、测试脚本、报告、追溯与真实 Compose + MySQL + Chromium
 浏览器执行均已完成。
 
+## 自动化测试清单
+
+编号规则统一为：`UNIT-TCxx` 表示 Service/规则单元测试，`MVC-TCxx` 表示
+Controller 的 MockMvc/API 契约测试，`INT-TCxx` 表示 Spring Boot HTTP + 数据库
+集成测试，`E2E-TCxx` 表示 Compose + MySQL + Playwright 真浏览器测试。
+
+| 编号 | 层级 | 实际入口（文件#方法） | 验证内容与核心断言 |
+|---|---|---|---|
+| `UNIT-TC03-001` | Unit | `backend/src/test/java/com/segroup8/platform/service/impl/MerchantApplicationServiceImplTest.java#approve_shouldUpgradeRoleAndInsertNotification`; `#submit_shouldRejectDuplicatePendingApplication`; `#reject_shouldPersistReasonAndNotifyApplicant` | 审核通过升级角色并通知、重复待审申请拒绝、驳回理由和通知持久化。 |
+| `MVC-TC03-001` | API/MockMvc | `backend/src/test/java/com/segroup8/platform/controller/MerchantApplicationControllerWebMvcTest.java#submit_shouldReturnSuccess`; `#getMyApplication_shouldReturnRecord`; `#page_shouldReturnAdminApplicationQueue`; `#reject_shouldRequireReason`; `#reject_shouldReturnSuccessAndRecordAudit`; `#approve_shouldReturnSuccessAndRecordAudit` | 提交、查询、管理员分页、驳回理由校验以及审核成功响应/审计委托正确。 |
+| `INT-TC03-001` | Integration | `backend/src/test/java/com/segroup8/platform/integration/MerchantApplicationUc03IntegrationTest.java#submitApproveUpgradeShopNotificationAndAuditMustBeConsistent` | 申请、审核、角色/店铺升级、通知和审计在数据库中保持一致。 |
+| `INT-TC03-002` | Integration | `backend/src/test/java/com/segroup8/platform/integration/MerchantApplicationNotificationFailureIntegrationTest.java#notificationStorageFailureMustNotRollbackApprovalCoreState` | 通知存储失败时审核核心状态仍提交，不产生错误的角色/申请回滚。 |
+| `E2E-TC03-001` | Browser E2E | `frontend/e2e/domain-a/uc03-merchant-application.spec.ts#submit, review, role/shop upgrade and rejection persistence` | 真实页面完成申请、管理员审核、角色/店铺升级和驳回持久化。 |
+
 ## Prompt 验收项
 
 | 验收项 | 状态 | 主要证据 |

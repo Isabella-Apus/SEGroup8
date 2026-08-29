@@ -13,6 +13,19 @@
 Register, login, password hashing, JWT claims, role authorization, ban/login
 linkage, duplicate registration, invalid parameters and wrong passwords.
 
+## 自动化测试清单
+
+编号规则统一为：`UNIT-TCxx` 表示 Service/规则单元测试，`MVC-TCxx` 表示
+Controller 的 MockMvc/API 契约测试，`INT-TCxx` 表示 Spring Boot HTTP + 数据库
+集成测试，`E2E-TCxx` 表示 Compose + MySQL + Playwright 真浏览器测试。
+
+| 编号 | 层级 | 实际入口（文件#方法） | 验证内容与核心断言 |
+|---|---|---|---|
+| `UNIT-TC01-001` | Unit | `backend/src/test/java/com/segroup8/platform/service/impl/AuthServiceImplTest.java#register_shouldEncodePasswordAndInsertUser`; `#login_shouldUpgradeLegacyPasswordAndReturnToken`; `#login_shouldThrowWhenPasswordInvalid`; `#register_shouldRejectDuplicateUsername`; `#login_shouldRejectBannedUser` | BCrypt 不保存明文；登录返回可解析 JWT；错误密码、重复用户名和封禁用户被拒绝。 |
+| `MVC-TC01-001` | API/MockMvc | `backend/src/test/java/com/segroup8/platform/controller/AuthControllerWebMvcTest.java#register_shouldReturnUnifiedSuccess`; `#register_shouldRejectInvalidBody`; `#login_shouldReturnTokenAndRole`; `#login_shouldRejectInvalidBody` | 统一响应、参数校验、Token/角色字段和非法请求状态正确。 |
+| `INT-TC01-001` | Integration | `backend/src/test/java/com/segroup8/platform/integration/IdentityUc01IntegrationTest.java#registerLoginRoleBoundaryAndBanMustShareOnePersistedChain`; `#duplicateInvalidAndWrongPasswordRequestsMustNotCreateDirtyUsers` | 注册、登录、角色越权、封禁/解禁及异常请求在同一持久化链路中保持一致且无脏用户。 |
+| `E2E-TC01-001` | Browser E2E | `frontend/e2e/domain-a/uc01-auth.spec.ts#register, login, role boundary, ban and refresh persistence` | 真实页面完成注册、登录、角色边界、封禁和刷新后身份持久化。 |
+
 ## Prompt 验收项
 
 | 验收项 | 状态 | 主要证据 |

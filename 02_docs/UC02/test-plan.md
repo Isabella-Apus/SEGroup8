@@ -3,6 +3,19 @@
 状态：后端/API/H2 集成、真实 Compose + MySQL + Chromium 浏览器执行、测试脚本、
 报告、追溯与 Evidence 均已完成。
 
+## 自动化测试清单
+
+编号规则统一为：`UNIT-TCxx` 表示 Service/规则单元测试，`MVC-TCxx` 表示
+Controller 的 MockMvc/API 契约测试，`INT-TCxx` 表示 Spring Boot HTTP + 数据库
+集成测试，`E2E-TCxx` 表示 Compose + MySQL + Playwright 真浏览器测试。
+
+| 编号 | 层级 | 实际入口（文件#方法） | 验证内容与核心断言 |
+|---|---|---|---|
+| `UNIT-TC02-001` | Unit | `backend/src/test/java/com/segroup8/platform/service/impl/UserServiceImplTest.java#getCurrentUserProfile_shouldMapUserInfo`; `#createAddress_whenDefault_shouldClearPreviousDefault`; `#deleteAddress_shouldThrowWhenAddressNotOwned` | 资料映射、默认地址唯一性和地址所有权边界正确。 |
+| `MVC-TC02-001` | API/MockMvc | `backend/src/test/java/com/segroup8/platform/controller/UserControllerWebMvcTest.java#profile_shouldReturnCurrentUser`; `#me_shouldReturnCurrentUser`; `#updateProfile_shouldReturnSuccess`; `#createAddress_shouldReturnSuccess`; `#createAddress_shouldRejectInvalidPhone`; `#listAddresses_shouldReturnOnlyServiceResult`; `#deleteAddress_shouldReturnSuccess`; `#updateAddress_shouldReturnSuccess` | 资料/地址路由的响应、参数校验、当前用户注入和委托结果正确。 |
+| `INT-TC02-001` | Integration | `backend/src/test/java/com/segroup8/platform/integration/ProfileAddressUc02IntegrationTest.java#profileAndAddressCrudMustPersistAndKeepOneDefaultPerUser`; `#addressOwnershipMustPreventCrossUserUpdateAndDelete` | 资料与地址 CRUD 持久化、默认地址约束及跨用户修改/删除拒绝。 |
+| `E2E-TC02-001` | Browser E2E | `frontend/e2e/domain-a/uc02-profile-address.spec.ts#updates profile, maintains one default address and isolates ownership` | 真实页面更新资料、维护一个默认地址并验证他人地址隔离。 |
+
 ## Prompt 验收项
 
 | 验收项 | 状态 | 主要证据 |

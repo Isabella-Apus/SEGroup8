@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="939" height="672" viewBox="0 0 939 672">
+  <title>Kinda Goods 系统用例图（UC 编号版）</title>
+  <image x="0" y="0" width="939" height="672" href="679b05357b73ba94eb5426d72f6fef05.png" xlink:href="679b05357b73ba94eb5426d72f6fef05.png"/>
+  <style>
+    .case { fill: #dbe7f4; stroke: #8996a3; stroke-width: 1; }
+    .stereotype { font: 10px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #222; }
+    .number { font: bold 10px Arial, "Microsoft YaHei", sans-serif; fill: #1f3b5b; }
+    .name { font: 11px "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; fill: #222; }
+  </style>
+  <g text-anchor="middle">
+    <g><ellipse class="case" cx="236" cy="120" rx="51" ry="31"/><text class="stereotype" x="236" y="107">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="236" y="121">UC01</text><text class="name" x="236" y="137">注册登录鉴权</text></g>
+    <g><ellipse class="case" cx="350" cy="120" rx="51" ry="31"/><text class="stereotype" x="350" y="107">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="350" y="121">UC02</text><text class="name" x="350" y="137">资料与地址</text></g>
+    <g><ellipse class="case" cx="456" cy="120" rx="51" ry="31"/><text class="stereotype" x="456" y="107">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="456" y="121">UC03</text><text class="name" x="456" y="137">商家申请</text></g>
+    <g><ellipse class="case" cx="564" cy="120" rx="51" ry="31"/><text class="stereotype" x="564" y="107">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="564" y="121">UC04</text><text class="name" x="564" y="137">封禁解禁审计</text></g>
+    <g><ellipse class="case" cx="676" cy="120" rx="51" ry="31"/><text class="stereotype" x="676" y="107">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="676" y="121">UC05</text><text class="name" x="676" y="137">举报拉黑信用</text></g>
+
+    <g><ellipse class="case" cx="236" cy="248" rx="51" ry="31"/><text class="stereotype" x="236" y="235">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="236" y="249">UC06</text><text class="name" x="236" y="265">搜索筛选详情</text></g>
+    <g><ellipse class="case" cx="350" cy="248" rx="51" ry="31"/><text class="stereotype" x="350" y="235">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="350" y="249">UC07</text><text class="name" x="350" y="265">商品生命周期</text></g>
+    <g><ellipse class="case" cx="456" cy="248" rx="51" ry="31"/><text class="stereotype" x="456" y="235">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="456" y="249">UC08</text><text class="name" x="456" y="265">店铺设置装修</text></g>
+    <g><ellipse class="case" cx="564" cy="248" rx="51" ry="31"/><text class="stereotype" x="564" y="235">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="564" y="249">UC09</text><text class="name" x="564" y="265">商品风险审核</text></g>
+    <g><ellipse class="case" cx="676" cy="248" rx="51" ry="31"/><text class="stereotype" x="676" y="235">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="676" y="249">UC10</text><text class="name" x="676" y="265">浏览搜索热词</text></g>
+
+    <g><ellipse class="case" cx="236" cy="351" rx="51" ry="31"/><text class="stereotype" x="236" y="338">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="236" y="352">UC11</text><text class="name" x="236" y="368">购物车结算</text></g>
+    <g><ellipse class="case" cx="350" cy="351" rx="51" ry="31"/><text class="stereotype" x="350" y="338">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="350" y="352">UC12</text><text class="name" x="350" y="368">支付取消</text></g>
+    <g><ellipse class="case" cx="456" cy="351" rx="51" ry="31"/><text class="stereotype" x="456" y="338">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="456" y="352">UC13</text><text class="name" x="456" y="368">发货收货</text></g>
+    <g><ellipse class="case" cx="564" cy="351" rx="51" ry="31"/><text class="stereotype" x="564" y="338">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="564" y="352">UC14</text><text class="name" x="564" y="368">售后仲裁</text></g>
+    <g><ellipse class="case" cx="676" cy="351" rx="51" ry="31"/><text class="stereotype" x="676" y="338">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="676" y="352">UC15</text><text class="name" x="676" y="368">评价回复</text></g>
+
+    <g><ellipse class="case" cx="236" cy="459" rx="51" ry="31"/><text class="stereotype" x="236" y="446">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="236" y="460">UC16</text><text class="name" x="236" y="476">二手发布管理</text></g>
+    <g><ellipse class="case" cx="350" cy="459" rx="51" ry="31"/><text class="stereotype" x="350" y="446">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="350" y="460">UC17</text><text class="name" x="350" y="476">二手直购</text></g>
+    <g><ellipse class="case" cx="456" cy="459" rx="51" ry="31"/><text class="stereotype" x="456" y="446">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="456" y="460">UC18</text><text class="name" x="456" y="476">议价</text></g>
+    <g><ellipse class="case" cx="564" cy="459" rx="51" ry="31"/><text class="stereotype" x="564" y="446">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="564" y="460">UC19</text><text class="name" x="564" y="476">拍卖</text></g>
+    <g><ellipse class="case" cx="676" cy="459" rx="51" ry="31"/><text class="stereotype" x="676" y="446">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="676" y="460">UC20</text><text class="name" x="676" y="476">二手履约</text></g>
+
+    <g><ellipse class="case" cx="236" cy="579" rx="51" ry="31"/><text class="stereotype" x="236" y="566">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="236" y="580">UC21</text><text class="name" x="236" y="596">优惠券管理</text></g>
+    <g><ellipse class="case" cx="350" cy="579" rx="51" ry="31"/><text class="stereotype" x="350" y="566">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="350" y="580">UC22</text><text class="name" x="350" y="596">领券核销</text></g>
+    <g><ellipse class="case" cx="456" cy="579" rx="51" ry="31"/><text class="stereotype" x="456" y="566">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="456" y="580">UC23</text><text class="name" x="456" y="596">钱包结算</text></g>
+    <g><ellipse class="case" cx="564" cy="579" rx="51" ry="31"/><text class="stereotype" x="564" y="566">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="564" y="580">UC24</text><text class="name" x="564" y="596">会话消息</text></g>
+    <g><ellipse class="case" cx="676" cy="579" rx="51" ry="31"/><text class="stereotype" x="676" y="566">&lt;&lt;UseCase&gt;&gt;</text><text class="number" x="676" y="580">UC25</text><text class="name" x="676" y="596">通知推送</text></g>
+  </g>
+</svg>

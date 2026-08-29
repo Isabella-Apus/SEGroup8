@@ -4,13 +4,17 @@
 
 验证“发货、物流、收货和完成”的主成功流程、至少一个异常或权限分支，以及页面、接口和数据库结果的一致性。
 
-## 自动化范围
+## 自动化测试清单
+
+编号规则统一为：`UNIT-TCxx` 表示 Service/规则单元测试，`MVC-TCxx` 表示
+Controller 的 MockMvc/API 契约测试，`INT-TCxx` 表示 Spring Boot HTTP + 数据库
+集成测试，`E2E-TCxx` 表示 Compose + MySQL + Playwright 真浏览器测试。
 
 | 编号 | 层级 | 入口 | 通过条件 |
 |---|---|---|---|
-| `UNIT-TC13-001` | 单元/服务 | 见 [traceability.md](traceability.md) 中的测试类 | 关键业务规则与异常分支均有断言 |
-| `INT-TC13-001` | 集成/API | 见 [traceability.md](traceability.md) 中的测试类 | HTTP、数据库状态和权限边界一致 |
-| `E2E-TC13-001` | Compose + MySQL + Playwright | `frontend/e2e/domain-c/uc13-fulfillment.spec.ts` | 完整业务链路成功，失败为非零退出码并保留原始证据 |
+| `UNIT-TC13-001` | Unit | `backend/src/test/java/com/segroup8/platform/service/impl/OrderServiceImplTest.java#shipSellerOrder_shouldPersistNotificationForBuyer` | 发货后通知买家 |
+| `INT-TC13-001` | Integration | `backend/src/test/java/com/segroup8/platform/integration/NewProductFulfillmentUc13IntegrationTest.java#sellerShipsNewProduct_createsOneInitialTrace_andBothPartiesCanQuery`; `#nonSellerAndNonPendingShipAreRejected_andMergedOrderIsUnchanged`; `#receiveSettlesOnce_andConcurrentManualAutomaticConfirmationCannotDuplicateLedger`; `#repeatedShippingDoesNotCreateAnotherInitialTrace` | 发货、物流、收货结算、权限和幂等一致 |
+| `E2E-TC13-001` | Compose + MySQL + Playwright | `frontend/e2e/domain-c/uc13-fulfillment.spec.ts#seller ships, buyer views logistics and confirms receipt` | 发货、物流、收货和状态持久化均在真实栈验证，失败为非零退出码并保留原始证据 |
 
 ## 执行入口
 

@@ -4,25 +4,19 @@
 
 验证二手成交订单从付款、卖家发货、物流可见、买家确认收货到卖家个人钱包结算的权限、状态、幂等、事务和故障隔离，并确认收货后的用户界面停留在待评价状态。
 
-## 层次
+## 自动化测试清单
 
-| 层次 | 环境 | 场景 |
-| --- | --- | --- |
-| Controller/Service 回归 | MockMvc + Mockito | 稳定路由、服务状态机和既有二手发货兼容性 |
-| Integration | Spring Boot + Testcontainers MySQL 8.4.6 | 6 个真实数据库/API 场景，含权限、幂等、结算、通知失败和事务回滚 |
-| E2E | Docker Compose + Nginx + Spring Boot + MySQL + Chromium | 已付款订单、卖家发货、买家物流与收货、待评价、钱包只入账一次 |
+编号规则统一为：`UNIT-TCxx` 表示 Service/规则单元测试，`MVC-TCxx` 表示
+Controller 的 MockMvc/API 契约测试，`INT-TCxx` 表示 Spring Boot HTTP + 数据库
+集成测试，`E2E-TCxx` 表示 Compose + MySQL + Playwright 真浏览器测试。
 
-## 自动化场景
-
-| 编号 | 场景 | 核心断言 |
-| --- | --- | --- |
-| `INT-TC20-001` | 非卖家、未付款、错误状态发货 | 全部拒绝，订单和物流不变化 |
-| `INT-TC20-002` | 合法发货后重复发货 | 订单保持已发货，仅一条首物流轨迹 |
-| `INT-TC20-003` | 非买家确认、合法确认和重复确认 | 越权拒绝；合法收货进入待评价；重复确认返回 400 且卖家仅入账一次 |
-| `INT-TC20-004` | 发货/收货通知抛异常 | 主交易仍提交，订单状态正确 |
-| `INT-TC20-005` | 结算服务首次失败后重试 | 首次整体回滚；重试只有一笔卖家入账 |
-| `INT-TC20-006` | 议价成交建单失败 | 商品和议价状态回滚，无残缺订单 |
-| `E2E-TC20-001` | 真实页面履约闭环 | 卖家发货、买家看物流并收货、订单待评价、重复确认被拒且不重复结算 |
+| 编号 | 层级 | 实际入口（文件#方法） | 验证内容与核心断言 |
+|---|---|---|---|
+| `UNIT-TC20-001` | Unit | `backend/src/test/java/com/segroup8/platform/service/impl/OrderServiceImplTest.java#shipSellerOrder_shouldPersistNotificationForBuyer`; `#shipSellerOrder_shouldRejectLegacyMergedOrder` | 发货通知和旧合并订单兼容性。 |
+| `MVC-TC20-001` | API/MockMvc | `backend/src/test/java/com/segroup8/platform/controller/OrderControllerUc20WebMvcTest.java#shipAndConfirmReceive_shouldExposeStableRoutes` | 发货/确认收货路由契约。 |
+| `INT-TC20-001` | Integration | `backend/src/test/java/com/segroup8/platform/integration/SecondhandFulfillmentLifecycleIntegrationTest.java#shipmentRequiresSellerOwnershipPaymentAndPendingShipmentState`; `#repeatedShipmentIsIdempotentAndCreatesOneInitialTrace`; `#onlyBuyerCanConfirmAndRepeatedReceiptSettlesExactlyOnce`; `#notificationFailuresDoNotRollbackShipmentOrReceipt`; `#settlementFailureRollsBackReceiptAndRetryDoesNotDuplicateCredit`; `#bargainOrderCreationFailureRestoresNegotiationAndProduct` | 发货/收货权限、物流轨迹、结算、通知故障和事务回滚。 |
+| `INT-TC20-002` | Integration | `backend/src/test/java/com/segroup8/platform/integration/SecondhandOrderFlowIntegrationTest.java#secondhandSellerCanViewShipAndPushLogistics` | 既有二手订单物流可见性回归。 |
+| `E2E-TC20-001` | Browser E2E | `frontend/e2e/domain-d/uc20-fulfillment.spec.ts#seller ships, buyer sees logistics and confirms receipt with one settlement` | 真实页面履约、物流、收货、待评价和一次结算。 |
 
 ## 命令
 

@@ -12,18 +12,24 @@
 | Integration | Spring Boot + Testcontainers MySQL 8.4.6 | 7 个真实数据库/API 场景，含并发、失败注入和重试 |
 | E2E | Docker Compose + Nginx + Spring Boot + MySQL + Chromium | 卖家创建、两名买家出价、卖家监控与结束、赢家查看订单 |
 
-## 自动化场景
+## 自动化测试清单
 
-| 编号 | 场景 | 核心断言 |
-| --- | --- | --- |
-| `INT-TC19-001` | 创建、历史拍卖、重复进行中拍卖和非本人商品 | 只有合法创建写入一场 `ONGOING` 拍卖 |
-| `INT-TC19-002` | 两名买家依次合法出价 | 两条日志、前一名退款、后一名冻结正确 |
-| `INT-TC19-003` | 不存在、未开始、已结束、过期和卖家自购 | 全部拒绝且余额/日志不变 |
-| `INT-TC19-004` | 两个请求并发出价 | 仅一个成功、一个最高出价人和一笔冻结 |
-| `INT-TC19-005` | 非卖家结束与无出价结束 | 越权拒绝；流拍不创建订单 |
-| `INT-TC19-006` | 有出价结束并重复触发结算 | 一个已付款待发货订单、一个明细、商品已售 |
-| `INT-TC19-007` | 写订单明细时失败后重试 | 首次整体回滚，重试只创建一个订单 |
-| `E2E-TC19-001` | 真实页面完整竞拍 | 卖家/两买家页面、余额、竞价数、成交订单一致 |
+编号规则统一为：`UNIT-TCxx` 表示 Service/规则单元测试，`MVC-TCxx` 表示
+Controller 的 MockMvc/API 契约测试，`INT-TCxx` 表示 Spring Boot HTTP + 数据库
+集成测试，`E2E-TCxx` 表示 Compose + MySQL + Playwright 真浏览器测试。
+
+| 编号 | 层级 | 实际入口（文件#方法） | 场景与核心断言 |
+| --- | --- | --- | --- |
+| `UNIT-TC19-001` | Unit | `backend/src/test/java/com/segroup8/platform/service/impl/SecondhandTradeServiceImplTest.java#placeBid_shouldRejectBidLowerThanMinimumIncrement`; `#placeBid_shouldRejectEndedAuction`; `#settleExpiredAuctions_shouldCreateOnlyOneOrderForAlreadySettledAuction` | 出价边界、结束状态和结算幂等。 |
+| `MVC-TC19-001` | API/MockMvc | `backend/src/test/java/com/segroup8/platform/controller/SecondhandTradeControllerUc19WebMvcTest.java#auctionCreateQueryAndBid_shouldExposeSellerAndBuyerRoutes` | 拍卖创建、查询和竞价路由契约。 |
+| `INT-TC19-001` | Integration | `backend/src/test/java/com/segroup8/platform/integration/SecondhandAuctionLifecycleIntegrationTest.java#sellerCanCreateAfterHistoricalAuctionButDuplicateAndNonOwnerAreRejected` | 只有合法创建写入一场 `ONGOING` 拍卖。 |
+| `INT-TC19-002` | Integration | `#legalBidsPersistLogsAndReleaseThePreviousBidderFunds` | 两条日志、前一名退款、后一名冻结正确。 |
+| `INT-TC19-003` | Integration | `#nonexistentFutureClosedExpiredAndSelfBidsAreRejected` | 不存在、未开始、已结束、过期和卖家自购全部拒绝且余额/日志不变。 |
+| `INT-TC19-004` | Integration | `#concurrentBidsLeaveExactlyOneLeaderAndOneFundHold` | 并发竞价只保留一个成功领先者和一笔冻结。 |
+| `INT-TC19-005` | Integration | `#onlySellerCanCloseAndNoBidAuctionFlowsWithoutAnOrder` | 非卖家结束被拒；流拍不创建订单。 |
+| `INT-TC19-006` | Integration | `#sellerCloseCreatesOnePaidPendingShipmentOrderAndItem` | 结束后只产生一个已付款待发货订单和一条明细。 |
+| `INT-TC19-007` | Integration | `#failedSettlementRollsBackAndCanRetryWithoutDuplicateOrder` | 写订单明细失败时整体回滚，重试只创建一个订单。 |
+| `E2E-TC19-001` | Browser E2E | `frontend/e2e/domain-d/uc19-auction.spec.ts#seller creates an auction, two buyers bid, and the winner receives one settled order` | 卖家/两买家页面、余额、竞价数和成交订单一致。 |
 
 ## 命令
 

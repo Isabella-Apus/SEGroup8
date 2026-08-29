@@ -127,7 +127,7 @@ jobs:
       domain: E
 
   uc-e2e-coverage:
-    name: 2 / UC01-UC25 browser coverage manifest
+    name: UC01-UC25 browser coverage manifest
     if: vars.TEST == 'true'
     needs: [frontend]
     runs-on: ubuntu-latest

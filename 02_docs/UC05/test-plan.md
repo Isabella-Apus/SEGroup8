@@ -9,6 +9,20 @@
 - H2 集成：从注册用户开始，验证真实 mapper、事务状态和跨表一致性。
 - Compose E2E：连接 Docker Compose 的 frontend/backend/MySQL，验证页面刷新后举报记录与信用分仍然存在。
 
+## 自动化测试清单
+
+编号规则统一为：`UNIT-TCxx` 表示 Service/规则单元测试，`MVC-TCxx` 表示
+Controller 的 MockMvc/API 契约测试，`INT-TCxx` 表示 Spring Boot HTTP + 数据库
+集成测试，`E2E-TCxx` 表示 Compose + MySQL + Playwright 真浏览器测试。
+
+| 编号 | 层级 | 实际入口（文件#方法） | 验证内容与核心断言 |
+|---|---|---|---|
+| `UNIT-TC05-001` | Unit | `backend/src/test/java/com/segroup8/platform/service/impl/ReportBlockServiceImplTest.java#submitReport_shouldRejectSelfReport`; `#submitReport_shouldInsertPendingReport`; `#submitReport_shouldRejectDuplicateActiveReport`; `#blockUser_shouldRejectSelfBlock`; `#blockUser_shouldRejectDuplicateBlock`; `#adminAuditReport_shouldRejectDuplicateReview` | 举报/拉黑资格、重复操作、待审状态和管理员重复审核边界正确。 |
+| `UNIT-TC05-002` | Unit | `backend/src/test/java/com/segroup8/platform/service/impl/CreditServiceImplTest.java#adminAdjust_shouldRejectUnsupportedRole`; `#adminAdjust_shouldWriteScoreLog` | 信用分调整角色边界和信用流水写入正确。 |
+| `MVC-TC05-001` | API/MockMvc | `backend/src/test/java/com/segroup8/platform/controller/ReportBlockControllerWebMvcTest.java#submitReport_shouldReturnSuccess`; `#block_shouldRejectMissingTarget`; `#block_shouldReturnSuccess`; `#reportAndBlockQueries_shouldReturnSuccess`; `#unblock_shouldReturnSuccess`; `#myCredit_shouldReturnSuccess`; `#userCredit_shouldReturnSuccess`; `#adminListReports_shouldReturnSuccess`; `#creditAdjust_shouldReturnSuccessAndDelegate`; `#auditReport_shouldRequireAdmin`; `#adminEndpoint_shouldRejectNonAdmin` | 举报、拉黑/解除、查询、信用和管理员路由的响应、参数、角色边界正确。 |
+| `INT-TC05-001` | Integration | `backend/src/test/java/com/segroup8/platform/integration/ReportBlockCreditUc05IntegrationTest.java#reportBlockCredit_shouldPersistOwnershipAuditAndIdempotency` | 举报、双向拉黑、信用审计、所有权隔离和重复请求幂等均落库一致。 |
+| `E2E-TC05-001` | Browser E2E | `frontend/e2e/domain-a/uc05-governance.spec.ts#report, bilateral block state, credit audit and refresh persistence` | 真实页面完成举报、双向拉黑、信用审计及刷新后状态回读。 |
+
 ## Prompt 验收项
 
 | 验收项 | 状态 | 主要证据 |
