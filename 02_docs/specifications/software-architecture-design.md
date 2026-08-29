@@ -388,7 +388,7 @@ sequenceDiagram
   Mapper->>DB: 写入商品
   UI->>API: GET /api/secondhand/seller/list
   API->>Svc: pageSellerProducts(query)
-  Svc-->>UI: PageVO<SecondhandProductVO>
+  Svc-->>UI: PageVO of SecondhandProductVO
 ```
 
 ## UC17 二手直接购买及禁止自购

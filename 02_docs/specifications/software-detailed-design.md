@@ -209,7 +209,7 @@ sequenceDiagram
   alt 参数或详情无效
     S->>H: mapException(errorCode)
   else 有效
-    S-->>C: PageVO<ProductVO>/ProductVO
+    S-->>C: PageVO of ProductVO or ProductVO
   end
 ```
 
@@ -321,7 +321,7 @@ sequenceDiagram
     S->>I: 构造订单项快照
     S->>OM: insert order and items
   end
-  S-->>C: List<OrderVO>
+  S-->>C: List of OrderVO
 ```
 
 ## UC12 支付和取消
