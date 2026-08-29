@@ -10,6 +10,7 @@
 ## 改造后
 
 - 分支：`feature/ms-identity-governance`。
+- 实现提交：`cdb09c19`（服务源码、测试、Docker 与第一版完整交付）。
 - 独立模块：`microservices/identity-governance-service`。
 - 独立命令：`mvn -B -f microservices/pom.xml -pl identity-governance-service -am clean verify`。
 - 流量切换：`NOT_RUN`；根 Compose/Nginx 仍指向单体，避免未完成的其他五个目标服务被误报为已迁移。

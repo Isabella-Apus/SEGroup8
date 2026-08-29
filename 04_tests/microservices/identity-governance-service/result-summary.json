@@ -2,6 +2,7 @@
   "service": "identity-governance-service",
   "generatedAt": "2026-08-29T18:00:00+08:00",
   "branch": "feature/ms-identity-governance",
+  "implementationCommit": "cdb09c19",
   "maven": {
     "status": "PASS",
     "securityContract": {"tests": 5, "passed": 5, "failed": 0, "errors": 0, "skipped": 0},
