@@ -4,6 +4,11 @@ This is the single browser E2E entry point for UC01-UC25. Domain specs belong
 under `frontend/e2e/domain-a/` through `frontend/e2e/domain-e/` and reuse the
 shared `frontend/playwright.config.ts`, fixtures, and helpers.
 
+The CI lifecycle starts MySQL, backend, and frontend once, runs the smoke gate
+first, and then runs every Domain A-E Playwright suite against the same stack.
+`container-acceptance/` retains the independently reproducible Compose
+acceptance checks that were originally tracked as Issue #65.
+
 ## Local run
 
 From the repository root, with Docker Desktop/Engine running:
@@ -43,15 +48,24 @@ were produced by the earlier jobs; it does not compile Maven a second time.
 
 Results are written to `04_tests/platform-e2e/evidence/`:
 
-- `playwright-report/`: HTML report
-- `playwright-results.json`: machine-readable result
-- `test-results/`: failure screenshot, trace, and retained video
+- `smoke/`: smoke Playwright JSON/HTML and failure artifacts
+- `full/`: complete Domain A-E Playwright JSON/HTML and failure artifacts
 - `logs/`: Compose status/config, per-service logs, startup-stage logs, and
   Playwright output
+
+The final A-E + Playwright aggregate is generated under `.ci/pipeline-summary/`
+and uploaded with the E2E evidence. It is intentionally not retained as a
+root-level `04_tests` directory.
 
 The script returns the real Playwright/Compose exit code. On failure it records
 the failing stage and collects frontend, backend, database, and Compose logs.
 CI uploads this directory and blocks deploy/release through the E2E job.
+
+The container acceptance entry point is:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\04_tests\platform-e2e\container-acceptance\collect-evidence.ps1
+```
 
 For an independently reviewed UC run, set `E2E_OUTPUT_DIR` before invoking the
 same runner, for example

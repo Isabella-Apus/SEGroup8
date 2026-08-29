@@ -25,7 +25,7 @@
 先运行 `docker compose -f compose.yml up -d --build`，再运行：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\04_tests\issue-65\collect-evidence.ps1
+powershell -ExecutionPolicy Bypass -File .\04_tests\platform-e2e\container-acceptance\collect-evidence.ps1
 ```
 
 只有脚本打印 `ISSUE-65 ACCEPTANCE: PASS` 且退出码为 0，才能确认“代码、配置、测试、日志/原始报告完整，且容器化用例能够运行”。截图是辅助证据，原始日志和机器可判定的退出码是主要结论依据。

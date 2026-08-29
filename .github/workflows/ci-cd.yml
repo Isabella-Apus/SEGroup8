@@ -218,7 +218,7 @@ jobs:
           ./scripts/test/summarize-ci-tests.ps1
           -DomainEvidenceRoot .ci/domain-test-evidence
           -PlaywrightEvidenceRoot 04_tests/platform-e2e/evidence
-          -OutputDirectory 04_tests/pipeline-summary
+          -OutputDirectory .ci/pipeline-summary
           -E2EOutcome $env:E2E_STEP_OUTCOME
       - name: Upload combined E2E evidence and final summary
         if: always()
@@ -227,8 +227,8 @@ jobs:
           name: all-uc-e2e-evidence
           path: |
             04_tests/platform-e2e/evidence/**
-            04_tests/pipeline-summary/final-test-summary.json
-            04_tests/pipeline-summary/final-test-summary.md
+            .ci/pipeline-summary/final-test-summary.json
+            .ci/pipeline-summary/final-test-summary.md
           if-no-files-found: warn
           retention-days: 14
 

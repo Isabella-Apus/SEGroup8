@@ -24,10 +24,10 @@ docker compose -f compose.yml ps
 ## 验证与取证
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\04_tests\issue-65\collect-evidence.ps1
+powershell -ExecutionPolicy Bypass -File .\04_tests\platform-e2e\container-acceptance\collect-evidence.ps1
 ```
 
-脚本会校验 Compose 配置、三个容器状态、前后端健康接口、数据库连通性和初始化表数量，并把原始输出保存到 `04_tests/issue-65/evidence/`。任一关键检查失败时脚本以非零状态退出。
+脚本会校验 Compose 配置、三个容器状态、前后端健康接口、数据库连通性和初始化表数量，并把原始输出保存到 `04_tests/platform-e2e/container-acceptance/evidence/`。任一关键检查失败时脚本以非零状态退出。
 
 ## 运维命令
 

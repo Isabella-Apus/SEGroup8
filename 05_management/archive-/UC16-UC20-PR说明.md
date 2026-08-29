@@ -18,7 +18,7 @@
   - 9 classes; Tests run: 20, Failures: 0, Errors: 0, Skipped: 0 (`API_PASS`)
 - [x] `cd frontend && npm run build:mock`
 - [x] Playwright 回归打开二手发布页，分类下拉显示“数码闲置”
-- [x] `04_tests/UC16-UC20-ui-run-result.json` 可解析
+- [x] `05_management/archive/test-assets/UC16-UC20/UC16-UC20-ui-run-result.json` 可解析
 - [x] `05_management/UC16-UC20-screenshots` 共 26 张截图
 - [ ] UC16-UC20 五个真实 Compose Playwright 流程（`E2E_PENDING`，由 Tasks #148-#152 分别跟踪）
 - [x] 未提交真实密码、Token 或云平台密钥
@@ -28,10 +28,10 @@
 - `02_docs/UC16-UC20-用例说明与三层模型.md`
 - `02_docs/UC16-UC20-接口与数据归属.md`
 - `02_docs/UC16-UC20-追溯矩阵.md`
-- `04_tests/UC16-UC20-测试报告.md`
-- `04_tests/UC16-UC20-用例验收检查表.md`
-- `04_tests/UC16-UC20-UI运行记录.md`
-- `04_tests/UC16-UC20-ui-run-result.json`
+- `05_management/archive/test-assets/UC16-UC20/UC16-UC20-测试报告.md`
+- `05_management/archive/test-assets/UC16-UC20/UC16-UC20-用例验收检查表.md`
+- `05_management/archive/test-assets/UC16-UC20/UC16-UC20-UI运行记录.md`
+- `05_management/archive/test-assets/UC16-UC20/UC16-UC20-ui-run-result.json`
 - `05_management/UC16-UC20-评审与演示证据.md`
 - `05_management/UC16-UC20-screenshots/`
 

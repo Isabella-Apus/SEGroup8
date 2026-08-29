@@ -48,7 +48,7 @@ Total time: 11.094 s
 Finished at: 2026-08-28T10:49:18+08:00
 ```
 
-Surefire 文本报告和运行汇总保存在 `04_tests/UC21-UC25/evidence/`。报告排除了含本机用户名、路径和内网地址的 XML 控制台输出。
+Surefire 文本报告和运行汇总保存在同目录的 `evidence/`。报告排除了含本机用户名、路径和内网地址的 XML 控制台输出。
 
 后端全量回归：`Tests run: 57, Failures: 0, Errors: 0, Skipped: 0`，`BUILD SUCCESS`，完成时间 `2026-08-28T10:29:15+08:00`。
 
