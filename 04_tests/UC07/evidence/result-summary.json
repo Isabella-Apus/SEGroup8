@@ -1,0 +1,13 @@
+{
+  "uc": "UC07",
+  "status": "PENDING",
+  "environment": "Local Compose/MySQL evidence not archived",
+  "executedAt": null,
+  "counts": {
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0
+  },
+  "evidence": [],
+  "reason": "CI coverage exists, but a reproducible local browser artifact has not been archived."
+}

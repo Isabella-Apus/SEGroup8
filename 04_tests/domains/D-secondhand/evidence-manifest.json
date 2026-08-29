@@ -25,7 +25,7 @@
   "uiWalkthrough": {
     "status": "UI_WALKTHROUGH_PASS",
     "environment": "Vite mock",
-    "records": "04_tests/UC16-UC20-ui-run-result.json",
+    "records": "05_management/archive/test-assets/UC16-UC20/UC16-UC20-ui-run-result.json",
     "report": "04_tests/domains/D-secondhand/ui-walkthrough-report.md",
     "screenshots": "05_management/UC16-UC20-screenshots"
   },

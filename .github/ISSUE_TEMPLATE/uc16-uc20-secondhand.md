@@ -26,7 +26,7 @@ assignees: ""
 
 - 分支：`codex/uc16-uc20-secondhand`
 - 文档：`02_docs/UC16-UC20-用例说明与三层模型.md`
-- 测试报告：`04_tests/UC16-UC20-测试报告.md`
-- 验收检查表：`04_tests/UC16-UC20-用例验收检查表.md`
+- 测试报告：`05_management/archive/test-assets/UC16-UC20/UC16-UC20-测试报告.md`
+- 验收检查表：`05_management/archive/test-assets/UC16-UC20/UC16-UC20-用例验收检查表.md`
 - 演示证据：`05_management/UC16-UC20-评审与演示证据.md`
 - 后端测试命令：`cd backend && mvn -B "-Dtest=SecondhandProductServiceImplTest,SecondhandTradeServiceImplTest,SecondhandOrderFlowIntegrationTest,SecondhandAuctionIntegrationTest" test`

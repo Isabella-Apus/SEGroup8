@@ -76,7 +76,7 @@ jobs:
           } else {
             "backend/target/surefire-reports"
           }
-          $outputDirectory = "04_tests/test-summaries/domain-$($env:DOMAIN.ToLowerInvariant())"
+          $outputDirectory = ".ci/test-summaries/domain-$($env:DOMAIN.ToLowerInvariant())"
           ./scripts/test/summarize-domain-surefire.ps1 `
             -Domain $env:DOMAIN `
             -ReportsRoot $reportsRoot `
@@ -88,7 +88,7 @@ jobs:
           name: domain-${{ inputs.domain }}-test-evidence
           path: |
             backend/target/surefire-reports/**
-            04_tests/test-summaries/**
+            .ci/test-summaries/**
           if-no-files-found: error
           retention-days: 14
       - name: Upload Domain B reports
@@ -98,7 +98,7 @@ jobs:
           name: domain-${{ inputs.domain }}-test-evidence
           path: |
             microservices/*/target/surefire-reports/**
-            04_tests/test-summaries/**
+            .ci/test-summaries/**
           if-no-files-found: error
           retention-days: 14
       - name: Upload Domain C reports and evidence
@@ -111,6 +111,6 @@ jobs:
             04_tests/domains/C-order-fulfillment/evidence/logs/backend-domain-c.log
             04_tests/domains/C-order-fulfillment/evidence/raw-reports/surefire/**
             04_tests/domains/C-order-fulfillment/evidence/result-summary.json
-            04_tests/test-summaries/**
+            .ci/test-summaries/**
           if-no-files-found: error
           retention-days: 14

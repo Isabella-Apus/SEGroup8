@@ -18,7 +18,7 @@ async function requireFile(relativePath, label) {
     }
 
     const absolutePath = path.resolve(scriptDirectory, relativePath);
-    const evidenceRoot = path.resolve(scriptDirectory, "..", "05_management", "UC16-UC20-screenshots");
+    const evidenceRoot = path.resolve(scriptDirectory, "..", "..", "..", "UC16-UC20-screenshots");
     const relativeToRoot = path.relative(evidenceRoot, absolutePath);
 
     if (relativeToRoot.startsWith("..") || path.isAbsolute(relativeToRoot)) {

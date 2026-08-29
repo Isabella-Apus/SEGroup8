@@ -3,7 +3,8 @@
   "status": "PASS",
   "environment": "Windows 11, Java 21, H2 backend tests; real Compose Nginx + Spring Boot + MySQL; Playwright with local Edge",
   "executedAt": "2026-08-28T16:39:00+08:00",
-  "counts": {
+  "counts": { "passed": 8, "failed": 0, "skipped": 0 },
+  "breakdown": {
     "backend": { "passed": 7, "failed": 0, "skipped": 0 },
     "playwright": { "passed": 1, "failed": 0, "skipped": 0 }
   },
@@ -16,6 +17,6 @@
     "raw-reports/playwright/playwright-report/index.html",
     "screenshots/uc21-voucher-closed-after-refresh.png",
     "logs/runtime-health.txt",
-    "../test-report.md"
+    "../../../02_docs/UC21/test-report.md"
   ]
 }

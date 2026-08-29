@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 
-$repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
+$repositoryRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 $evidenceRoot = Join-Path $PSScriptRoot 'evidence'
 $logsRoot = Join-Path $evidenceRoot 'logs'
 $rawReportsRoot = Join-Path $evidenceRoot 'raw-reports'
