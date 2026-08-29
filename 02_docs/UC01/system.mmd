@@ -1,7 +1,15 @@
-flowchart LR
-  Browser[真实浏览器] --> Auth[AuthController]
-  Auth --> Service[AuthService]
-  Service --> User[(MySQL/H2 user)]
-  Admin[AdminUserController] --> Audit[(admin_audit_log)]
-  Admin --> User
-  Service --> JWT[JWT]
+%% SYS-BEH01
+sequenceDiagram
+  autonumber
+  actor User as 用户
+  participant System as 交易平台
+  User->>System: 提交注册信息
+  System-->>User: 注册成功或用户名冲突
+  User->>System: 提交用户名和密码
+  alt 凭据有效
+    System-->>User: 返回 JWT 和角色
+  else 凭据无效
+    System-->>User: 返回登录失败
+  end
+  User->>System: 携带 JWT 访问受保护资源
+  System-->>User: 返回资源或权限拒绝

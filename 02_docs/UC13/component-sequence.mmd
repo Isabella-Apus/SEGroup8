@@ -1,0 +1,17 @@
+%% COMP-SEQ13
+sequenceDiagram
+  autonumber
+  participant UI as MerchantOrders/OrderDetail.vue
+  participant API as OrderController
+  participant Order as OrderServiceImpl
+  participant Logistics as LogisticsServiceImpl
+  participant Scheduler as OrderAutoConfirmScheduler
+  participant Finance as EscrowSettlementService
+  UI->>API: 发货/确认收货
+  API->>Order: ship/confirmReceive
+  Order->>Logistics: 初始化或读取轨迹
+  opt 到期未确认
+    Scheduler->>Order: autoConfirm(orderId)
+  end
+  Order->>Finance: 释放担保资金
+  Finance-->>UI: 待评价订单和结算结果

@@ -1,13 +1,19 @@
-# UC25 追溯
+# UC25 追溯矩阵
 
-| 需求 | 设计 | 实现 | 自动化验证 |
-|---|---|---|---|
-| 本人通知与 scope 筛选 | `system.mmd`、`component.mmd` | `NotificationController`、`NotificationServiceImpl` | `NotificationControllerUc25WebMvcTest`、`NotificationFlowUc25IntegrationTest` |
-| 单条、全量、范围已读 | `component.mmd` | `markRead`、`markAllRead` | `NotificationFlowUc25IntegrationTest` |
-| 他人及不存在通知不泄露 | `component.mmd` | 归属校验与统一 404 | Controller 与 Integration 测试 |
-| 写库后定向推送，推送失败保留记录 | `component.mmd`、`object.mmd` | `createNotification`、`RealtimePushService` | `UC25NotificationOwnershipAndPushTest`、Integration 测试 |
-| JWT WebSocket 鉴权 | `system.mmd`、`object.mmd` | `RealtimeHandshakeInterceptor` | `RealtimeHandshakeInterceptorTest` |
-| 浏览器实时接收、已读持久化 | `component.mmd` | `realtimeClient.js`、`NotificationView.vue` | `uc25-notification.spec.ts` |
-| 重连列表补偿 | `component.mmd` | `REALTIME_RECONNECTED` 后重新查询 | `uc25-notification.spec.ts` 断网场景 |
+| 需求 / 用例 | 六类图模型 | 主要代码模块 | 测试编号与现有测试 | 结果 / 证据 |
+|---|---|---|---|---|
+| REQ25 / UC25 通知实时推送 | SYS-BEH25 / CONCEPT-CLASS25 / COMP-STRUCT25 / COMP-SEQ25 / DESIGN-CLASS25 / OBJ-SEQ25 | `NotificationView.vue`、`realtimeClient.js`；`NotificationServiceImpl`、`RealtimeWebSocketHandler` | E2E-TC25-001 `uc25NotificationReadAndRealtimePush`；UNIT-TC25-001 握手有效/无效 Token；E2E-TC25-001 `frontend/e2e/domain-e/uc25-notification.spec.ts` | **LOCAL_E2E_PASS**：已归档 Playwright JSON，1/1 通过、unexpected 0；路径 `../../04_tests/UC25/evidence/raw-reports/playwright/playwright-results.json`。最新 main 全量 E2E CI 同时通过：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611 |
 
-执行结果和原始报告统一保存于 `04_tests/UC25/evidence/`。
+## 权威材料
+
+- 需求：[requirement.md](requirement.md)
+- 系统行为模型：[system.mmd](system.mmd)
+- 概念类图：[concept.mmd](concept.mmd)
+- 组件结构图：[component.mmd](component.mmd)
+- 组件顺序图：[component-sequence.mmd](component-sequence.mmd)
+- 详细设计类图：[object.mmd](object.mmd)
+- 对象顺序图：[object-sequence.mmd](object-sequence.mmd)
+- 测试计划：[test-plan.md](test-plan.md)
+- 测试报告：[test-report.md](test-report.md)
+- 浏览器测试：`frontend/e2e/domain-e/uc25-notification.spec.ts`
+- 原始证据：`../../04_tests/UC25/evidence/`

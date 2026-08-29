@@ -1,0 +1,16 @@
+%% COMP-SEQ05
+sequenceDiagram
+  autonumber
+  participant UI as Credit/AdminReport.vue
+  participant API as ReportBlockController/AdminReportController
+  participant Svc as ReportBlockServiceImpl
+  participant Credit as CreditServiceImpl
+  participant DB as user_report/user_block/credit_score_log
+  UI->>API: 举报、拉黑或审核
+  API->>Svc: 校验身份和目标
+  Svc->>DB: 保存关系或审核状态
+  opt 举报成立
+    Svc->>Credit: adjustScore(targetUserId)
+    Credit->>DB: 写信用分日志
+  end
+  DB-->>UI: 返回状态

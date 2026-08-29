@@ -1,19 +1,13 @@
+%% COMP-STRUCT19
 flowchart LR
-    Detail[SecondhandDetailView] --> TradeAPI[SecondhandTradeController]
-    SellerDesk[MerchantSecondhandProductsView] --> TradeAPI
-    TradeAPI --> TradeService[SecondhandTradeServiceImpl]
-    Scheduler[AuctionSettlementScheduler] --> TradeService
-    TradeService --> AuctionMapper[ProductAuctionMapper]
-    TradeService --> LogMapper[AuctionLogMapper]
-    TradeService --> ProductMapper[SecondhandProductMapper]
-    TradeService --> OrderMapper[OrderInfoMapper]
-    TradeService --> ItemMapper[OrderItemMapper]
-    TradeService --> Funds[EscrowSettlementService]
-    TradeService -. 通知 .-> Notify[NotificationService]
-    TradeService -. 实时事件 .-> Realtime[RealtimePushService]
-    AuctionMapper --> DB[(MySQL)]
-    LogMapper --> DB
-    ProductMapper --> DB
-    OrderMapper --> DB
-    ItemMapper --> DB
-    Funds --> DB
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«collaborator»<br/>二手详情/二手管理"]
+    API["«controller»<br/>SecondhandTradeController"]
+    Svc["«service»<br/>SecondhandTradeService"]
+    Auction["«repository»<br/>ProductAuctionMapper"]
+    Log["«repository»<br/>AuctionLogMapper"]
+  end
+  UI -->|"POST /api/secondhand/tra"| API
+  API -->|"placeBid"| Svc
+  Svc -->|"update currentPrice/lead"| Auction
+  Svc -->|"insert bid log"| Log

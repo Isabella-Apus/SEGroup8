@@ -32,7 +32,7 @@ node scripts/ci/verify-uc-e2e-coverage.mjs
 它要求 UC01-UC25 分别在约定的 `frontend/e2e/domain-*/` 下至少有一个
 `ucXX-*.spec.ts`，并拒绝放错 Domain 或超出 UC01-UC25 的文件。平台 smoke/health
 spec 不计作业务 UC。报告同时写入 Actions Step Summary，并作为
-`uc01-uc25-e2e-coverage` artifact 上传。当前缺 UC19-UC25 时该门禁会按设计失败。
+`uc01-uc25-e2e-coverage` artifact 上传。当前 UC01-UC25 均已有规范位置的 spec，门禁结果为 25/25；未来任一用例入口缺失或放错 Domain 时，该门禁会按设计失败并阻断流水线。
 
 创建 `production` Environment 并配置：
 

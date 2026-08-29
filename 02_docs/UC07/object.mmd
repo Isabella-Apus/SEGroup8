@@ -1,0 +1,32 @@
+%% DESIGN-CLASS07
+classDiagram
+  class C["ProductController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class S["ProductServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class Req["ProductSaveRequest/ProductStockAdjustRequest"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class Shop["Shop"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class P["Product"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class M["ProductMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  C --> S : create/update/status/adj
+  S --> Shop : 解析当前卖家店铺
+  S --> Req : 校验分类、价格、库存和状态转换
+  S --> P : 应用字段和版本号
+  S --> M : insert/updateById/condit

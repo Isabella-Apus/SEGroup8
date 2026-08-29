@@ -1,13 +1,24 @@
-# UC01 注册、登录与角色联动
+# UC01 注册、登录和角色鉴权
 
-状态：后端/API/H2 集成与真实 Compose + MySQL + Chromium 浏览器执行均已完成。
+状态：**LOCAL_E2E_PASS**。
 
-UC01 的可审计入口。业务实现沿用现有 Auth/AdminUser 服务；本分支补充
-Spring Boot + H2 的 HTTP 集成链和 Compose 前端 Playwright 入口。
+本目录是 UC01 需求、六类图模型、追溯和测试文档的唯一事实来源。
 
-- 需求：`REQ01 / UC01`
-- 集成测试：`IdentityUc01IntegrationTest`
+- [需求说明](requirement.md)
+- [追溯矩阵](traceability.md)
+- [测试计划](test-plan.md)
+- [测试报告](test-report.md)
 - 浏览器测试：`frontend/e2e/domain-a/uc01-auth.spec.ts`
-- 运行证据：`04_tests/UC01/evidence/`
+- 原始证据：`../../04_tests/UC01/evidence/`
+- Domain：`A-identity`
 
-这是成员 A 的独立分支交付；UC 父 Issue 仍需等待后续微服务阶段完成。
+最新 main 全 UC Playwright Job：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611
+
+## 图模型（按参考文档分层）
+
+- [系统行为模型](system.mmd)
+- [概念类图](concept.mmd)
+- [组件结构图](component.mmd)
+- [组件顺序图](component-sequence.mmd)
+- [详细设计类图](object.mmd)
+- [对象顺序图](object-sequence.mmd)

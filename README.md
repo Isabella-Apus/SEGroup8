@@ -4,6 +4,15 @@
 
 项目当前的核心设计是：用户入口可以统一，但业务规则在结算和订单侧保持区分。新品订单和二手订单不会混在同一个订单里，统一购物车在结算时会自动拆分为官方商城订单和个人闲置订单。
 
+## 中期检查交付入口
+
+- [中期交付说明](MIDTERM_DELIVERY.md)
+- [文档索引](02_docs/README.md)
+- [课程对照审计](05_management/midterm-audit.md)
+- [测试与原始证据](04_tests/README.md)
+
+当前六个微服务是目标架构，不等同于全部实现；最新完成状态以课程对照审计为准。
+
 ## 功能概览
 
 ### 用户端
@@ -75,27 +84,21 @@
 
 ```text
 SEGroup8
-├── backend/                 # Spring Boot 后端
-│   ├── src/main/java/       # 业务代码
-│   ├── src/main/resources/  # 配置、SQL、静态资源
-│   ├── src/test/java/       # 后端测试
-│   ├── start.ps1            # 常规启动脚本
-│   ├── start-reset.ps1      # 重置数据库启动脚本
-│   └── pom.xml
-├── frontend/                # Vue 3 前端
-│   ├── src/api/             # API 封装
-│   ├── src/assets/          # 静态资源
-│   ├── src/components/      # 公共组件
-│   ├── src/layout/          # 用户端/卖家端/管理端布局
-│   ├── src/mock-data/       # 前端 mock 数据
-│   ├── src/router/          # 路由配置
-│   ├── src/stores/          # Pinia 状态管理
-│   ├── src/utils/           # 工具方法
-│   ├── src/views/           # 页面视图
-│   └── package.json
+├── 01_source/               # 源码入口与构建根清单（不复制源码）
+├── 02_docs/                 # 四份权威总文档、UC01–UC25 与图模型
+│   ├── specifications/      # 需求、概要、详细设计、追溯矩阵
+│   ├── UC01/ ... UC25/      # 单用例需求、六类图、测试计划/报告
+│   └── archive/             # 旧学期和旧分支材料，只读历史基线
+├── 03_devops/               # 容器、CI/CD、Helm/K3s 与 Domain 状态
+├── 04_tests/                # 每 UC 原始证据和可执行入口
+├── 05_management/           # 当前管理入口；旧 Issue/PR 草稿归档
+├── 06_defense/              # 答辩材料入口（未完成项明确标记）
+├── backend/                 # Spring Boot 单体当前实现与测试
+├── frontend/                # Vue 3 前端与 Playwright UC 测试
+├── microservices/           # Domain B 四个当前原型及共享安全契约
 ├── sql/                     # 数据库脚本
-├── DEPLOY_ALIYUN.md         # 阿里云部署说明
-├── SECURITY.md              # 安全说明
+├── scripts/                 # CI、E2E 与文档门禁脚本
+├── MIDTERM_DELIVERY.md      # 中期交付总入口
 └── README.md
 ```
 

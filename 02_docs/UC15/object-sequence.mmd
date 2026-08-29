@@ -1,0 +1,19 @@
+%% OBJ-SEQ15
+sequenceDiagram
+  autonumber
+  participant OC as OrderController
+  participant OS as OrderServiceImpl
+  participant RC as ReviewController
+  participant Req as OrderReviewSubmitRequest/ReviewReplyRequest
+  participant O as OrderInfo
+  participant I as OrderItem
+  participant R as Review
+  participant M as ReviewMapper
+  OC->>OS: submitMyOrderReview(orderId, Req)
+  OS->>O: 校验订单完成和买家归属
+  OS->>I: 定位订单项
+  OS->>R: 构造 ORIGINAL 评价
+  OS->>M: insert Review
+  RC->>M: 校验原评价并写 FOLLOW_UP
+  RC->>M: 校验卖家归属并写回复
+  M-->>RC: 成功结果

@@ -1,0 +1,33 @@
+%% DESIGN-CLASS09
+classDiagram
+  class C["AdminProductRiskAuditController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class S["ProductRiskAuditServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class PB["ProductRiskAuditPromptBuilder"] {
+    <<boundary>>
+    +submit()
+  }
+  class R["ProductRiskAudit"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class RM["ProductRiskAuditMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  class PM["ProductMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  C --> S : audit
+  S --> PB : build
+  S --> R : 合并规则/LLM风险和管理员决定
+  S --> RM : insert/update audit
+  S --> PM : update product review st

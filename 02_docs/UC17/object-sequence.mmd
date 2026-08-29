@@ -1,0 +1,13 @@
+%% OBJ-SEQ17
+sequenceDiagram
+  autonumber
+  participant C as SecondhandProductController
+  participant S as SecondhandProductServiceImpl
+  participant P as SecondhandProduct
+  participant O as OrderInfo
+  participant I as OrderItem
+  C->>S: buySecondhandProduct(productId, request)
+  S->>P: 检查 status=ON_SALE 且 buyer != seller
+  S->>O: create PENDING_PAY
+  S->>I: create productType=SECONDHAND
+  S-->>C: OrderVO

@@ -1,17 +1,13 @@
+%% COMP-STRUCT18
 flowchart LR
-    Detail[SecondhandDetailView] --> TradeAPI[SecondhandTradeController]
-    Chat[ChatView] --> TradeAPI
-    TradeAPI --> TradeService[SecondhandTradeServiceImpl]
-    TradeService --> NegotiationMapper[ProductNegotiationMapper]
-    TradeService --> ProductMapper[SecondhandProductMapper]
-    TradeService --> OrderMapper[OrderInfoMapper]
-    TradeService --> ItemMapper[OrderItemMapper]
-    TradeService -. 提交后 .-> ChatService[ChatService]
-    TradeService -. 提交后 .-> Notify[NotificationService]
-    TradeService -. 提交后 .-> Realtime[RealtimePushService]
-    NegotiationMapper --> DB[(MySQL)]
-    ProductMapper --> DB
-    OrderMapper --> DB
-    ItemMapper --> DB
-    ChatService --> DB
-    Notify --> DB
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«collaborator»<br/>二手详情/聊天/我的闲置"]
+    API["«controller»<br/>SecondhandTradeController"]
+    Svc["«service»<br/>SecondhandTradeService"]
+    Neg["«repository»<br/>ProductNegotiationMapper"]
+    Order["«service»<br/>OrderService"]
+  end
+  UI -->|"POST /api/secondhand/tra"| API
+  API -->|"confirmBargain"| Svc
+  Svc -->|"insert"| Neg
+  Svc -->|"create order with bargai"| Order

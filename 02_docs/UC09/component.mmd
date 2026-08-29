@@ -1,0 +1,15 @@
+%% COMP-STRUCT09
+flowchart LR
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«boundary»<br/>AdminProductRiskAuditView.vue"]
+    API["«controller»<br/>AdminProductRiskAuditController"]
+    Svc["«service»<br/>ProductRiskAuditServiceImpl"]
+    Rule["«collaborator»<br/>风险规则/LLM适配器"]
+    DB["«repository»<br/>ProductRiskAuditMapper"]
+    Catalog["«service»<br/>商品服务回调"]
+  end
+  UI -->|"查询待审/提交决定"| API
+  API -->|"audit"| Svc
+  Svc -->|"计算或读取风险结果"| Rule
+  Svc -->|"保存审核和理由"| DB
+  Svc -->|"回写商品状态"| Catalog

@@ -1,6 +1,14 @@
-flowchart LR
-  Browser[真实浏览器] --> UserController[UserController]
-  UserController --> UserService[UserServiceImpl]
-  UserService --> User[(user)]
-  UserService --> Address[(address)]
-  UserService --> Merchant[MerchantApplicationService]
+%% SYS-BEH02
+sequenceDiagram
+  autonumber
+  actor User as 用户
+  participant System as 交易平台
+  User->>System: 查询本人资料和地址
+  System-->>User: 返回资料与地址列表
+  User->>System: 保存资料或地址
+  System->>System: 校验字段、归属和默认地址规则
+  alt 校验通过
+    System-->>User: 返回更新后的数据
+  else 校验失败
+    System-->>User: 返回字段或权限错误
+  end

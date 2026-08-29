@@ -1,21 +1,41 @@
+%% DESIGN-CLASS15
 classDiagram
-    class OrderInfo {
-      Long id
-      Long buyerUserId
-      Integer orderStatus
-    }
-    class Review {
-      Long id
-      Long orderId
-      Long buyerUserId
-      Integer rating
-      String content
-      String followUpContent
-    }
-    class ReviewReply {
-      Long reviewId
-      Long sellerUserId
-      String content
-    }
-    OrderInfo "1" --> "0..1" Review
-    Review "1" o-- "0..1" ReviewReply
+  class OC["OrderController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class OS["OrderServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class RC["ReviewController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class Req["OrderReviewSubmitRequest/ReviewReplyRequest"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class O["OrderInfo"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class I["OrderItem"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class R["Review"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class M["ReviewMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  OC --> OS : submitMyOrderReview
+  OS --> O : 校验订单完成和买家归属
+  OS --> I : 定位订单项
+  OS --> R : 构造 ORIGINAL 评价
+  OS --> M : insert Review
+  RC --> M : 校验原评价并写 FOLLOW_UP

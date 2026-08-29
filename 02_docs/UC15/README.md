@@ -1,28 +1,24 @@
-# UC15 订单评价、追评与回复
+# UC15 评价、追评和卖家回复
 
-- 需求：`REQ15 / UC15`
-- 所属领域：Domain C（Order Fulfillment）
-- 本目录是 UC15 的标准嵌套文档入口。
+状态：**LOCAL_E2E_PASS**。
 
-## 文档导航
+本目录是 UC15 需求、六类图模型、追溯和测试文档的唯一事实来源。
 
-- [需求](../../01_requirements/UC15-订单评价追评与回复.md)
-- [系统级图](system.mmd)
-- [组件级图](component.mmd)
-- [对象级图](object.mmd)
+- [需求说明](requirement.md)
 - [追溯矩阵](traceability.md)
-- [后端测试报告](../../04_tests/UC15/UC15-订单评价追评与回复-测试报告.md)
+- [测试计划](test-plan.md)
+- [测试报告](test-report.md)
+- 浏览器测试：`frontend/e2e/domain-c/uc15-review.spec.ts`
+- 原始证据：`../../04_tests/UC15/evidence/`
+- Domain：`C-order-fulfillment`
 
-## 业务与设计边界
+最新 main 全 UC Playwright Job：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611
 
-买家对已完成且本人购买的订单发表评价，并在规则允许时追评；卖家只能回复本人商品对应评价。当前实现中追评、回复和查询仍直接由 `ReviewController` 及现有 review 服务/持久化链路承接，文档不虚构不存在的服务拆分。
+## 图模型（按参考文档分层）
 
-| 组件 | 责任 |
-| --- | --- |
-| `ReviewController` | 评价、追评、回复和查询接口。 |
-| Review service/mapper | 校验订单完成状态、用户归属、评价时限和回复归属。 |
-| 订单与评价表 | 保存评价内容、评分、追评、回复和时间。 |
-
-## 验证口径
-
-`04_tests/UC15/evidence/result-summary.json` 记录 9 条后端 MySQL/集成测试通过；已有浏览器产物为历史记录，本轮不重新执行 Playwright E2E。
+- [系统行为模型](system.mmd)
+- [概念类图](concept.mmd)
+- [组件结构图](component.mmd)
+- [组件顺序图](component-sequence.mmd)
+- [详细设计类图](object.mmd)
+- [对象顺序图](object-sequence.mmd)

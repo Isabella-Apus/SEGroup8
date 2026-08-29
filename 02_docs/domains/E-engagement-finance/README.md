@@ -1,6 +1,6 @@
 # E-engagement-finance 设计索引
 
-本目录是 Domain-E 的共享索引，不集中存放五个 UC 的需求或三层模型。
+本目录是 Domain-E 的共享索引，不集中存放五个 UC 的需求或六类图模型。
 
 | UC | 父 Issue | Day3–Day5 Task | 设计目录 |
 |---|---:|---:|---|

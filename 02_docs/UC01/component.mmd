@@ -1,7 +1,14 @@
-flowchart TB
-  E2E[uc01-auth.spec.ts] --> API[真实 HTTP API]
-  API --> C1[AuthController]
-  API --> C2[AdminUserController]
-  C1 --> S1[AuthServiceImpl]
-  C2 --> S2[AdminUserServiceImpl]
-  S2 --> AL[AdminAuditLogService]
+%% COMP-STRUCT01
+flowchart LR
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«boundary»<br/>Login/Register.vue"]
+    API["«controller»<br/>AuthController"]
+    Svc["«service»<br/>AuthServiceImpl"]
+    UserDB["«repository»<br/>UserMapper"]
+    JWT["«collaborator»<br/>JwtUtils/JwtAuthInterceptor"]
+  end
+  UI -->|"注册或登录请求"| API
+  API -->|"register/login"| Svc
+  Svc -->|"查询或保存用户"| UserDB
+  Svc -->|"签发 JWT"| JWT
+  UI -->|"携带 Token 访问接口"| JWT

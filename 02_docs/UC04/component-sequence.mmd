@@ -1,0 +1,13 @@
+%% COMP-SEQ04
+sequenceDiagram
+  autonumber
+  participant UI as AdminUserList.vue
+  participant API as AdminUserController
+  participant Svc as AdminUserServiceImpl
+  participant DB as UserMapper
+  participant Audit as AdminAuditLogServiceImpl
+  UI->>API: 封禁/解禁用户
+  API->>Svc: changeStatus(adminId, userId)
+  Svc->>DB: 更新用户状态
+  Svc->>Audit: 记录操作者、目标和原因
+  Audit-->>UI: 返回结果和审计信息

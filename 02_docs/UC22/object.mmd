@@ -1,31 +1,31 @@
+%% DESIGN-CLASS22
 classDiagram
-    class Voucher {
-        +Long id
-        +Long shopId
-        +BigDecimal minAmount
-        +BigDecimal discountAmount
-        +Integer usedCount
-    }
-    class UserVoucher {
-        +Long userId
-        +Long voucherId
-        +Integer status
-        +Long usedOrderId
-    }
-    class OrderInfo {
-        +Long id
-        +Long voucherId
-        +BigDecimal totalAmount
-        +BigDecimal voucherDiscountAmount
-        +BigDecimal payableAmount
-        +Integer orderStatus
-    }
-    class VoucherService
-    class OrderServiceImpl
-
-    Voucher "1" --> "0..*" UserVoucher
-    UserVoucher "0..1" --> "1" OrderInfo : usedOrderId
-    OrderServiceImpl --> VoucherService
-    VoucherService --> Voucher
-    VoucherService --> UserVoucher
-    OrderServiceImpl --> OrderInfo
+  class C["VoucherController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class VS["VoucherService"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class V["Voucher"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class UV["UserVoucher"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class OS["OrderServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class O["OrderInfo"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  C --> VS : claim
+  VS --> V : 校验状态、时间、库存和范围
+  VS --> UV : insert unique user-vouch
+  OS --> VS : occupyForOrder
+  OS --> O : 保存优惠额和应付额

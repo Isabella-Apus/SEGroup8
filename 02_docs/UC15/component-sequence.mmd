@@ -1,0 +1,17 @@
+%% COMP-SEQ15
+sequenceDiagram
+  autonumber
+  participant BuyerUI as MyReviews/OrderDetail.vue
+  participant SellerUI as MerchantReviews.vue
+  participant OrderAPI as OrderController
+  participant OrderSvc as OrderServiceImpl
+  participant ReviewAPI as ReviewController
+  participant DB as ReviewMapper/order_item
+  BuyerUI->>OrderAPI: 提交首评
+  OrderAPI->>OrderSvc: 校验订单、用户和重复首评
+  OrderSvc->>DB: 写 ORIGINAL 评价
+  BuyerUI->>ReviewAPI: 提交追评
+  ReviewAPI->>DB: 校验原评价并写 FOLLOW_UP
+  SellerUI->>ReviewAPI: 回复评价
+  ReviewAPI->>DB: 校验卖家归属并写回复
+  DB-->>BuyerUI: 最新评价

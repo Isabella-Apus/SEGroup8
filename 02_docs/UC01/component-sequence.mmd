@@ -1,0 +1,15 @@
+%% COMP-SEQ01
+sequenceDiagram
+  autonumber
+  participant UI as Login/Register.vue
+  participant API as AuthController
+  participant Svc as AuthServiceImpl
+  participant UserDB as UserMapper
+  participant JWT as JwtUtils/JwtAuthInterceptor
+  UI->>API: 注册或登录请求
+  API->>Svc: register/login(request)
+  Svc->>UserDB: 查询或保存用户
+  Svc->>JWT: 签发 JWT
+  JWT-->>UI: Token 和角色
+  UI->>JWT: 携带 Token 访问接口
+  JWT-->>API: 注入当前用户

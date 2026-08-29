@@ -9,7 +9,8 @@ frontend/test-results/
 !04_tests/platform-e2e/evidence/.gitkeep
 frontend/playwright-report/
 frontend/blob-report/
-04_tests/reports/
+.ci/
+05_management/archive/test-assets/runtime-reports/
 
 # backend
 backend/target/

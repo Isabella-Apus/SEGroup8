@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS10
+classDiagram
+  class BrowseHistory {
+    +identifier: String
+    +state: String
+  }
+  class SearchHistory {
+    +identifier: String
+    +state: String
+  }
+  class HotKeyword {
+    +identifier: String
+    +state: String
+  }
+  BrowseHistory "1" --> "0..*" SearchHistory : 关联
+  SearchHistory "0..*" --> "1" HotKeyword : 产生/归属

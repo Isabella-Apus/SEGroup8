@@ -14,6 +14,6 @@
     "raw-reports/playwright/playwright-report/index.html",
     "screenshots/uc22-voucher-used-after-paid-order-refresh.png",
     "logs/runtime-health.txt",
-    "../test-report.md"
+    "../../../02_docs/UC22/test-report.md"
   ]
 }

@@ -1,7 +1,19 @@
-# UC21 追溯
+# UC21 追溯矩阵
 
-| REQ | SYS / COMP / OBJ | Code / Table | Test | Report / Evidence | 状态 |
-|---|---|---|---|---|---|
-| 卖家券生命周期与归属 | `system.mmd`、`component.mmd`、`object.mmd`、历史 #90 | `VoucherController`、`VoucherService`、`VoucherMapper`、`voucher` | `VoucherLifecycleUc21IntegrationTest` | `04_tests/UC21/test-report.md` | API/Integration PASS |
-| 管理员平台券与角色隔离 | 同上 | `UserMapper`、`ShopMapper`、`voucher` | `VoucherServiceTest`、UC21 Integration | 同上 | PASS |
-| 真实浏览器刷新持久化 | 同上 | `SellerVoucher.vue` | `uc21-voucher-lifecycle.spec.ts` | `04_tests/UC21/evidence/` | PASS |
+| 需求 / 用例 | 六类图模型 | 主要代码模块 | 测试编号与现有测试 | 结果 / 证据 |
+|---|---|---|---|---|
+| REQ21 / UC21 优惠券生命周期 | SYS-BEH21 / CONCEPT-CLASS21 / COMP-STRUCT21 / COMP-SEQ21 / DESIGN-CLASS21 / OBJ-SEQ21 | `SellerVoucher.vue`、`AdminVoucherView.vue`；`VoucherController`、`VoucherService` | E2E-TC21-001 `uc21SellerAndAdminManageVoucherLifecycle`；UNIT-TC21-001 `VoucherServiceTest`；E2E-TC21-001 `frontend/e2e/domain-e/uc21-voucher-lifecycle.spec.ts` | **LOCAL_E2E_PASS**：已归档 Playwright JSON，1/1 通过、unexpected 0；路径 `../../04_tests/UC21/evidence/raw-reports/playwright/playwright-results.json`。最新 main 全量 E2E CI 同时通过：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611 |
+
+## 权威材料
+
+- 需求：[requirement.md](requirement.md)
+- 系统行为模型：[system.mmd](system.mmd)
+- 概念类图：[concept.mmd](concept.mmd)
+- 组件结构图：[component.mmd](component.mmd)
+- 组件顺序图：[component-sequence.mmd](component-sequence.mmd)
+- 详细设计类图：[object.mmd](object.mmd)
+- 对象顺序图：[object-sequence.mmd](object-sequence.mmd)
+- 测试计划：[test-plan.md](test-plan.md)
+- 测试报告：[test-report.md](test-report.md)
+- 浏览器测试：`frontend/e2e/domain-e/uc21-voucher-lifecycle.spec.ts`
+- 原始证据：`../../04_tests/UC21/evidence/`

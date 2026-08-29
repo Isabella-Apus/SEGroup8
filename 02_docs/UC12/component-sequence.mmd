@@ -1,0 +1,16 @@
+%% COMP-SEQ12
+sequenceDiagram
+  autonumber
+  participant UI as OrderView.vue
+  participant API as OrderController
+  participant Order as OrderServiceImpl
+  participant Finance as EscrowSettlementService
+  participant Idem as IdempotencyInterceptor
+  participant DB as order/balance/transaction
+  UI->>Idem: 支付或取消请求 + 幂等键
+  Idem->>API: 首次请求
+  API->>Order: payMyOrder/cancelMyOrder
+  Order->>Finance: 扣款或释放预留
+  Finance->>DB: 更新余额并写流水
+  Order->>DB: 更新状态/恢复库存
+  DB-->>UI: 稳定结果或幂等回放

@@ -1,0 +1,16 @@
+%% COMP-SEQ20
+sequenceDiagram
+  autonumber
+  participant UI as 二手卖出/订单页
+  participant OrderAPI as OrderController
+  participant OrderSvc as OrderService
+  participant Logistics as LogisticsService
+  participant DB as order_info/logistics_trace
+  UI->>OrderAPI: GET /api/order/seller/list?productType=SECONDHAND
+  OrderAPI->>OrderSvc: pageSellerOrders(query)
+  UI->>OrderAPI: POST /api/order/{orderId}/ship
+  OrderAPI->>OrderSvc: shipSellerOrder(orderId, request)
+  OrderSvc->>Logistics: create first trace
+  OrderSvc->>DB: orderStatus=SHIPPED
+  UI->>OrderAPI: POST /api/order/{orderId}/confirm-receive
+  OrderSvc->>DB: orderStatus=RECEIVED

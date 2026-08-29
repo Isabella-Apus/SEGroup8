@@ -1,27 +1,24 @@
 # UC20 二手成交后的订单履约
 
-## 范围
+状态：**LOCAL_E2E_PASS**。
 
-UC20 承接直接购买、议价成交或拍卖成交后已经生成的二手订单，完成“买家付款、卖家发货、买家查看物流、买家确认收货、担保资金结算、进入待评价”的履约闭环。
+本目录是 UC20 需求、六类图模型、追溯和测试文档的唯一事实来源。
 
-## 核心规则
+- [需求说明](requirement.md)
+- [追溯矩阵](traceability.md)
+- [测试计划](test-plan.md)
+- [测试报告](test-report.md)
+- 浏览器测试：`frontend/e2e/domain-d/uc20-fulfillment.spec.ts`
+- 原始证据：`../../04_tests/UC20/evidence/`
+- Domain：`D-secondhand`
 
-- 只有二手商品所属卖家可以发货；订单必须已付款且处于待发货状态。
-- 发货使用订单版本号和状态条件原子更新；重复发货直接返回当前结果，不重复创建物流轨迹。
-- 买家可在真实订单详情页查看物流节点，只有订单买家可以确认收货。
-- 确认收货后订单进入 `RECEIVED(3)`，页面显示“待评价”，不会直接跳成已完成。
-- 二手订单通过 `SecondhandSettlementStrategy` 将担保资金结算到卖家个人钱包，并写入唯一资金流水。
-- 重复确认收货按既有契约返回 `400`，且不重复结算；结算失败时订单状态和资金变动整体回滚，可安全重试。
-- 通知和实时推送在事务提交后以 best-effort 执行，失败不会回滚已经成功的发货或收货。
-- 议价或拍卖成交建单失败时，原事务回滚并保留可重试状态，避免商品被错误售出或生成残缺订单。
+最新 main 全 UC Playwright Job：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611
 
-## 实现与验证入口
+## 图模型（按参考文档分层）
 
-- 服务：`OrderServiceImpl`、`EscrowSettlementService`、`SecondhandSettlementStrategy`
-- API：`OrderController`、`LogisticsController`
-- Integration：`SecondhandFulfillmentLifecycleIntegrationTest`
-- 兼容回归：`SecondhandOrderFlowIntegrationTest`、`OrderControllerUc20WebMvcTest`
-- E2E：`frontend/e2e/domain-d/uc20-fulfillment.spec.ts`
-- 测试证据：`04_tests/UC20/evidence/`
-
-父用例：#59；本阶段 Task：#152；Epic：#37。
+- [系统行为模型](system.mmd)
+- [概念类图](concept.mmd)
+- [组件结构图](component.mmd)
+- [组件顺序图](component-sequence.mmd)
+- [详细设计类图](object.mmd)
+- [对象顺序图](object-sequence.mmd)

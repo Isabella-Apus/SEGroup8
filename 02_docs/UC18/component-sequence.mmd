@@ -1,0 +1,14 @@
+%% COMP-SEQ18
+sequenceDiagram
+  autonumber
+  participant UI as 二手详情/聊天/我的闲置
+  participant API as SecondhandTradeController
+  participant Svc as SecondhandTradeService
+  participant Neg as ProductNegotiationMapper
+  participant Order as OrderService
+  UI->>API: POST /api/secondhand/trade/bargain/apply
+  API->>Svc: applyBargain(buyerId, request)
+  Svc->>Neg: insert(PENDING)
+  UI->>API: POST /api/secondhand/trade/bargain/confirm
+  API->>Svc: confirmBargain(sellerId, request)
+  Svc->>Order: create order with bargain price

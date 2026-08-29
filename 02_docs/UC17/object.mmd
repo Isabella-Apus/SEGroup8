@@ -1,37 +1,26 @@
+%% DESIGN-CLASS17
 classDiagram
-    class SecondhandProduct {
-      Long id
-      Long sellerUserId
-      BigDecimal salePrice
-      Integer status
-    }
-    class Address {
-      Long id
-      Long userId
-      String detailAddress
-    }
-    class ProductNegotiation {
-      Long productId
-      Long buyerUserId
-      BigDecimal confirmedPrice
-      LocalDateTime effectiveFrom
-      LocalDateTime effectiveUntil
-      String status
-    }
-    class OrderInfo {
-      Long id
-      Long buyerUserId
-      BigDecimal payableAmount
-      Integer payStatus
-      Integer orderStatus
-    }
-    class OrderItem {
-      Long orderId
-      String productType
-      Long productId
-      BigDecimal price
-    }
-    SecondhandProduct "1" --> "0..1" ProductNegotiation
-    Address --> OrderInfo : 快照
-    SecondhandProduct --> OrderItem
-    OrderInfo "1" --> "1" OrderItem
+  class C["SecondhandProductController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class S["SecondhandProductServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class P["SecondhandProduct"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class O["OrderInfo"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class I["OrderItem"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  C --> S : buySecondhandProduct
+  S --> P : 检查 status=ON_SALE 且 buye
+  S --> O : create PENDING_PAY
+  S --> I : create productType=SECON

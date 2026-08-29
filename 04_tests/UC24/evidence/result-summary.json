@@ -18,6 +18,6 @@
     "raw-reports/playwright/playwright-report/index.html",
     "screenshots/uc24-chat-history-and-block.png",
     "logs/runtime-health.txt",
-    "../test-report.md"
+    "../../../02_docs/UC24/test-report.md"
   ]
 }

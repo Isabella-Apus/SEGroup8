@@ -26,7 +26,7 @@
 
 `microservices/security-contract` 是共享认证契约库，不是可部署业务服务，也不计入“至少三个业务微服务”。
 
-### “一个服务”的验收定义
+### 每个微服务的验收定义
 
 本设计中的 6 个服务都是独立部署单元，不是仅靠 Java package 命名进行逻辑分组。每个服务必须同时满足：
 
@@ -50,7 +50,7 @@
 
 Domain B 现有四个 module 目前各自可构建，但不等于目标 `catalog-shop-service` 已完成。合并时可保留四个内部 Maven library module，另加一个唯一的 boot application 作为部署入口；CI 对这个部署入口执行独立构建、测试和镜像发布。
 
-## 3. 交付域与运行时服务不是一一对应
+## 3. 交付域与运行时服务对应
 
 | 交付域 | 主要协作服务 | 说明 |
 |---|---|---|
@@ -92,14 +92,13 @@ flowchart LR
 
 ## 5. Domain A 到底是不是其他服务的前置条件
 
-答案分两层：
 
 1. **业务上是前置条件**：游客可以浏览公开商品；创建订单、发布商品、聊天、领券等受保护操作需要先通过 UC01 登录并取得 JWT。
 2. **运行时不应成为逐请求同步前置服务**：登录成功后，业务服务应本地校验 JWT 的签名、有效期和角色，不应每次请求都调用 `identity-governance-service` 查询“这个 token 是否有效”。否则身份服务故障会扩散为全站故障。
 
 当前代码已经具备这一方向的基础：单体使用 JWT，`microservices/security-contract` 能独立校验 `uid`、`username`、`role`。但当前仍使用共享对称密钥，默认 token 有效期为 24 小时；这是当前事实，不是最终安全设计。
 
-### 推荐认证流程
+### 认证流程
 
 ```mermaid
 sequenceDiagram
@@ -160,13 +159,3 @@ sequenceDiagram
 6. 抽取 benefits-finance 与 messaging，恢复 UC21-UC25。
 7. 对每次迁移执行契约测试、服务 API 测试、Compose E2E、故障注入和性能对比；没有运行证据时标记 `NOT_RUN`。
 
-## 8. 当前是否已经满足独立交付要求
-
-| 检查项 | 当前证据 | 结论 |
-|---|---|---|
-| identity-governance 可单独构建/测试/部署 | 尚无独立 module、Dockerfile、Helm Deployment 和独立 schema 运行记录 | `NOT_IMPLEMENTED` |
-| catalog/shop/risk/behavior 原型可独立测试 | `microservices/` 下已有四个 module 和测试 | `PARTIAL`；与目标单部署服务仍需整合 |
-| order、secondhand、benefits-finance、messaging 独立部署 | 仍在单体 | `NOT_IMPLEMENTED` |
-| 六个 schema 权限隔离和禁止跨库 | 目前主路径仍为单体 schema | `NOT_RUN` |
-
-助教验收时应展示每个已迁移服务的单独构建命令、测试报告、镜像 SHA、Helm release、健康检查和数据库权限证明，而不是只展示总仓库一次构建成功。

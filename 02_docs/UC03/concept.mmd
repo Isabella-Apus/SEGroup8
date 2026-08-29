@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS03
+classDiagram
+  class MerchantApplication {
+    +identifier: String
+    +state: String
+  }
+  class User {
+    +identifier: String
+    +state: String
+  }
+  class Shop {
+    +identifier: String
+    +state: String
+  }
+  MerchantApplication "1" --> "0..*" User : 关联
+  User "0..*" --> "1" Shop : 产生/归属

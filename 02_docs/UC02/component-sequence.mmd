@@ -1,0 +1,13 @@
+%% COMP-SEQ02
+sequenceDiagram
+  autonumber
+  participant UI as Profile/AddressManager.vue
+  participant API as UserController
+  participant Svc as UserServiceImpl
+  participant UserDB as UserMapper
+  participant AddrDB as AddressMapper
+  UI->>API: 查询或保存资料/地址
+  API->>Svc: 当前用户操作
+  Svc->>UserDB: 读写本人资料
+  Svc->>AddrDB: 校验归属并维护默认地址
+  AddrDB-->>UI: 最新资料与地址

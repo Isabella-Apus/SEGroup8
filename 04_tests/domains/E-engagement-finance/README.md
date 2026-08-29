@@ -2,18 +2,18 @@
 
 ## 统计边界
 
-本目录汇总 `DOMAIN_E` 标签测试与 UC21–UC25 的实际结果。平台 smoke 单独位于 `04_tests/platform-e2e/`，不能计作 UC PASS。
+本目录汇总 `DOMAIN_E` 标签测试与 UC21–UC25 的实际结果。平台 smoke 与全量 E2E 共用 `04_tests/platform-e2e/` 入口，但 smoke 不能单独计作 UC PASS。
 
 ## 当前状态
 
 | 范围 | Task | 状态 |
 |---|---:|---|
 | 共享标签、CI、Evidence 规范 | #147 | 本 PR 建立入口 |
-| UC21 | #142 | PASS：PR #197，证据在 `04_tests/UC21/` |
-| UC22 | #143 | PASS：后端 7/7、真实 Playwright 1/1，证据在 `04_tests/UC22/` |
-| UC23 | #144 | PENDING：由独立 PR 提供 |
-| UC24 | #145 | PASS：独立 PR 提供需求、设计、后端测试、真实 Edge E2E 与证据 |
-| UC25 | #146 | PASS：14 个后端测试、1 个真实 Edge E2E，含 WebSocket 断线重连补偿 |
+| UC21 | #142 | PASS：证据在 `04_tests/UC21/` |
+| UC22 | #143 | PASS：后端与真实 Playwright 证据在 `04_tests/UC22/` |
+| UC23 | #144 | PASS：后端与真实 Playwright 证据在 `04_tests/UC23/` |
+| UC24 | #145 | PASS：后端与真实 Playwright 证据在 `04_tests/UC24/` |
+| UC25 | #146 | PASS：后端与真实 Playwright 证据在 `04_tests/UC25/`，包含 WebSocket 断线重连补偿 |
 
 ## 输出要求
 

@@ -1,0 +1,14 @@
+%% SYS-BEH10
+sequenceDiagram
+  autonumber
+  actor User as 用户
+  participant System as 交易平台
+  participant Stats as 统计模块
+  User->>System: 浏览商品或提交关键词
+  System->>System: 去重并保存本人历史
+  System->>Stats: 累计有效搜索词
+  User->>System: 查询历史和热词
+  Stats-->>System: 返回时间窗内排名
+  System-->>User: 返回本人历史与热词
+  User->>System: 删除或清空本人历史
+  System-->>User: 返回最新列表

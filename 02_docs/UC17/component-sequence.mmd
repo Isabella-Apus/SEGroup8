@@ -1,0 +1,14 @@
+%% COMP-SEQ17
+sequenceDiagram
+  autonumber
+  participant UI as 二手详情/订单页
+  participant API as SecondhandProductController
+  participant Svc as SecondhandProductService
+  participant Order as OrderService
+  participant DB as order_info/order_item
+  UI->>API: POST /api/secondhand/{productId}/buy
+  API->>Svc: buySecondhandProduct(buyerId, request)
+  Svc->>Order: createSecondhandOrder(...)
+  Order->>DB: 写入待付款订单和明细
+  UI->>Order: POST /api/order/{orderId}/pay
+  Order->>DB: 更新为 PENDING_SHIP

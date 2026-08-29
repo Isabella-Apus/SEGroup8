@@ -1,0 +1,20 @@
+%% OBJ-SEQ11
+sequenceDiagram
+  autonumber
+  participant C as OrderController
+  participant S as OrderServiceImpl
+  participant Req as CreateOrderRequest
+  participant P as Product/SecondhandProduct
+  participant O as OrderInfo
+  participant I as OrderItem
+  participant OM as OrderInfoMapper/OrderItemMapper
+  C->>S: createMyOrders(userId, Req)
+  S->>Req: 合并商品项并校验地址
+  S->>P: 读取价格、状态、库存和卖家
+  S->>S: 按商品类型和店铺拆分
+  loop 每个子订单
+    S->>O: 构造 PENDING_PAY
+    S->>I: 构造订单项快照
+    S->>OM: insert order and items
+  end
+  S-->>C: List of OrderVO

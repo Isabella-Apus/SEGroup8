@@ -1,20 +1,16 @@
+%% SYS-BEH13
 sequenceDiagram
-    actor Seller as 卖家
-    actor Buyer as 买家
-    participant API as Order/LogisticsController
-    participant OS as OrderServiceImpl
-    participant LS as LogisticsServiceImpl
-    participant DB as 订单与物流表
-    Seller->>API: 提交发货
-    API->>OS: 校验卖家归属和待发货状态
-    OS->>DB: 更新已发货状态
-    OS->>LS: 创建物流轨迹
-    LS->>DB: 写入首个物流节点
-    API-->>Seller: 发货成功
-    Buyer->>API: 查询物流
-    API->>LS: 按订单归属查询轨迹
-    LS-->>Buyer: 返回节点
-    Buyer->>API: 确认收货
-    API->>OS: 校验买家归属
-    OS->>DB: 更新待评价状态
-    API-->>Buyer: 收货成功
+  autonumber
+  actor Seller as 卖家
+  actor Buyer as 买家
+  participant System as 交易平台
+  participant Logistics as 物流模块
+  Seller->>System: 对待发货订单确认发货
+  System->>Logistics: 初始化并推进物流轨迹
+  Logistics-->>Buyer: 展示运输进度
+  alt 买家主动确认
+    Buyer->>System: 确认收货
+  else 到达后超时
+    System->>System: 定时任务自动确认
+  end
+  System-->>Buyer: 订单进入待评价

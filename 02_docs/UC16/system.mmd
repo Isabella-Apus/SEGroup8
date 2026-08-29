@@ -1,31 +1,11 @@
+%% SYS-BEH16
 sequenceDiagram
-  actor Seller as Seller
-  actor Other as Other user
-  participant UI as Publish/Manage UI
-  participant API as SecondhandProductController
-  participant Service as SecondhandProductServiceImpl
-  participant Audit as ProductRiskAuditService
-  participant DB as MySQL
-
-  Seller->>UI: Select real category and upload image
-  UI->>API: POST /api/secondhand/seller
-  API->>Service: createSellerProduct(request)
-  Service->>DB: Validate category and insert product
-  Service->>Audit: auditSecondhandProduct(productId)
-  Audit->>DB: Insert product_risk_audit
-  Service-->>UI: Published product
-
-  Seller->>UI: Edit description and change shelf status
-  UI->>API: PUT product / POST status
-  API->>Service: Validate owner and mutable state
-  Service->>DB: Persist update
-  Service-->>UI: Refreshed product
-
-  Other->>API: DELETE seller product
-  API->>Service: deleteSellerProduct(productId)
-  Service-->>Other: 403 ownership rejection
-
-  Seller->>UI: Delete off-shelf product
-  UI->>API: DELETE /api/secondhand/seller/{id}
-  Service->>DB: Delete owned mutable product
-  Service-->>UI: Product no longer visible
+  autonumber
+  actor Seller as 二手卖家
+  participant System as 交易平台
+  Seller->>System: 填写闲置商品信息
+  System-->>Seller: 返回发布成功和商品详情
+  Seller->>System: 查看我的闲置
+  System-->>Seller: 返回本人发布的商品
+  Seller->>System: 编辑、上下架或删除
+  System-->>Seller: 返回最新商品状态

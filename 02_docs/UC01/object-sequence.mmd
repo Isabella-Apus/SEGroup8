@@ -1,0 +1,20 @@
+%% OBJ-SEQ01
+sequenceDiagram
+  autonumber
+  participant C as AuthController
+  participant S as AuthServiceImpl
+  participant Req as RegisterRequest/LoginRequest
+  participant U as User
+  participant M as UserMapper
+  participant P as PasswordUtils
+  participant J as JwtUtils
+  C->>S: register/login(Req)
+  S->>M: selectByUsername
+  S->>P: encode 或 matches
+  alt 注册
+    S->>U: 构造用户与默认角色
+    S->>M: insert(U)
+  else 登录
+    S->>J: generateToken(userId, role)
+  end
+  S-->>C: UserVO/LoginVO

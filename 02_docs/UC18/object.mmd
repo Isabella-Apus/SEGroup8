@@ -1,46 +1,26 @@
+%% DESIGN-CLASS18
 classDiagram
-    class SecondhandProduct {
-      Long id
-      Long sellerUserId
-      BigDecimal salePrice
-      Integer isNegotiable
-      Integer status
-    }
-    class ProductNegotiation {
-      Long id
-      Long productId
-      Long buyerUserId
-      Long sellerUserId
-      Long conversationId
-      BigDecimal proposedPrice
-      BigDecimal confirmedPrice
-      String status
-      LocalDateTime effectiveFrom
-      LocalDateTime effectiveUntil
-      Long usedOrderId
-    }
-    class ChatConversation {
-      Long id
-      Long buyerUserId
-      Long sellerUserId
-      String sourceType
-      Long sourceId
-    }
-    class OrderInfo {
-      Long id
-      Long buyerUserId
-      BigDecimal totalAmount
-      Integer payStatus
-      Integer orderStatus
-    }
-    class OrderItem {
-      Long orderId
-      String productType
-      Long productId
-      BigDecimal price
-    }
-    SecondhandProduct "1" --> "0..*" ProductNegotiation
-    ProductNegotiation "0..1" --> "1" ChatConversation
-    ProductNegotiation "0..1" --> "1" OrderInfo : usedOrderId
-    OrderInfo "1" --> "1" OrderItem
-    SecondhandProduct "1" --> "0..1" OrderItem
+  class C["SecondhandTradeController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class S["SecondhandTradeServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class N["ProductNegotiation"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class P["SecondhandProduct"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class O["OrderInfo"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  C --> S : confirmBargain
+  S --> N : 检查 PENDING
+  S --> P : 检查 sellerUserId 和在售状态
+  S --> O : create PENDING_PAY with

@@ -1,11 +1,19 @@
-# UC23 追溯
+# UC23 追溯矩阵
 
-| REQ | SYS / COMP / OBJ | Controller / Service / Mapper / Table | UNIT / API / Integration / E2E | Report / Evidence | 状态 |
-|---|---|---|---|---|---|
-| 首次查询初始化；充值只进个人账户 | `system.mmd`、`component.mmd`、`object.mmd` | `FinanceController`、`EscrowSettlementService`、`BalanceMapper`、`balance` | `FinanceControllerUc23WebMvcTest`、`FinanceSettlementUc23IntegrationTest`、`uc23-wallet-settlement.spec.ts` | `04_tests/UC23/test-report.md`、`evidence/` | PASS |
-| 个人与经营流水字段正确 | 同上 | `TransactionRecordMapper`、`transaction_record` | `UC23AccountIsolationTest`、UC23 Controller/Integration/E2E | 同上 | PASS |
-| 普通用户不能查看经营流水；用户数据隔离 | 同上 | `FinanceController`、`UserMapper`、JWT `UserContext` | UC23 Controller/Integration/E2E | 同上 | PASS |
-| 流水失败时余额回滚 | 同上 | `EscrowSettlementService`、Spring Transaction、`balance`、`transaction_record` | `FinanceSettlementUc23IntegrationTest.transactionRecordFailureRollsBackTheBalanceUpdate` | Surefire XML | PASS |
-| 并发更新不丢金额 | 同上 | `EscrowSettlementService`、`balance.version` | `FinanceSettlementUc23IntegrationTest.concurrentPersonalCreditsDoNotLoseMoneyOrLedgerRows` | Surefire XML | PASS |
-| 商家结算只进经营账户；重复结算幂等 | 同上 | `OrderController`、`OrderServiceImpl`、`NewProductSettlementStrategy` | UC23 Integration/E2E | Playwright JSON/XML、截图 | PASS |
-| 退款后个人与经营账户守恒 | 同上 | `OrderServiceImpl`、`EscrowSettlementService` | `FinanceSettlementUc23IntegrationTest.refundMovesTheSettledAmountBackWithoutChangingTheCombinedBalance`、`OrderRefundUc14IntegrationTest` | Surefire XML | PASS |
+| 需求 / 用例 | 六类图模型 | 主要代码模块 | 测试编号与现有测试 | 结果 / 证据 |
+|---|---|---|---|---|
+| REQ23 / UC23 钱包账户结算 | SYS-BEH23 / CONCEPT-CLASS23 / COMP-STRUCT23 / COMP-SEQ23 / DESIGN-CLASS23 / OBJ-SEQ23 | `MerchantFinanceView.vue`；`FinanceController`、`EscrowSettlementService` | E2E-TC23-001 `uc23RechargeWalletBusinessAccountAndRecords`；UNIT-TC23-001~02 结算策略；E2E-TC23-001 `frontend/e2e/domain-e/uc23-wallet-settlement.spec.ts` | **LOCAL_E2E_PASS**：已归档 Playwright JSON，1/1 通过、unexpected 0；路径 `../../04_tests/UC23/evidence/raw-reports/playwright/playwright-results.json`。最新 main 全量 E2E CI 同时通过：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611 |
+
+## 权威材料
+
+- 需求：[requirement.md](requirement.md)
+- 系统行为模型：[system.mmd](system.mmd)
+- 概念类图：[concept.mmd](concept.mmd)
+- 组件结构图：[component.mmd](component.mmd)
+- 组件顺序图：[component-sequence.mmd](component-sequence.mmd)
+- 详细设计类图：[object.mmd](object.mmd)
+- 对象顺序图：[object-sequence.mmd](object-sequence.mmd)
+- 测试计划：[test-plan.md](test-plan.md)
+- 测试报告：[test-report.md](test-report.md)
+- 浏览器测试：`frontend/e2e/domain-e/uc23-wallet-settlement.spec.ts`
+- 原始证据：`../../04_tests/UC23/evidence/`

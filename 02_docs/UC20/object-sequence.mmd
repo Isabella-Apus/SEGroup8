@@ -1,0 +1,15 @@
+%% OBJ-SEQ20
+sequenceDiagram
+  autonumber
+  participant C as OrderController
+  participant S as OrderServiceImpl
+  participant O as OrderInfo
+  participant I as OrderItem
+  participant L as LogisticsTrace
+  C->>S: shipSellerOrder(orderId, request)
+  S->>O: 检查 PENDING_SHIP
+  S->>I: 检查 seller owns SECONDHAND item
+  S->>L: insert first trace
+  S->>O: update SHIPPED
+  C->>S: confirmReceive(orderId)
+  S->>O: update RECEIVED

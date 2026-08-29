@@ -1,0 +1,44 @@
+# UC13 订单发货、物流与收货测试报告
+
+## 测试目标
+
+验证新品订单发货、物流模板与轨迹、查询权限、人工/自动确认收货和资金结算幂等。
+
+## 基线证据
+
+- `OrderServiceImplTest` 覆盖发货通知和遗留合并订单拒绝。
+- `OrderSettlementRefundFlowIntegrationTest` 覆盖自动确认与账户隔离。
+- `SecondhandOrderFlowIntegrationTest` 只提供共享物流组件的邻近覆盖，不能替代新品闭环。
+
+## 验收用例
+
+| 编号 | 层级 | 场景 | 核心断言 |
+|---|---|---|---|
+| `UT-UC13-001` | 单元 | 发货状态与卖家权限 | 非卖家/非待发货拒绝 |
+| `UT-UC13-002/003` | 单元 | 路径生成、终点和重复发货 | 轨迹有序且不重复 |
+| `API-TC13-001` | API | 新品订单发货 | 待收货状态和首条已揽收轨迹 |
+| `API-TC13-002` | API | 推进与查询权限 | 买卖双方可见，无关用户 403 |
+| `API-TC13-003` | API | 买家确认收货 | 待评价、余额和流水只结算一次 |
+| `API-TC13-004` | API | 人工/自动确认竞态 | 只有一次条件更新与结算成功 |
+| `API-TC13-005` | API | 遗留合并订单 | 返回 409 且订单/物流表不变 |
+| `E2E-TC13-001` | E2E | 卖家发货到买家收货 | 双方页面与物流时间线一致 |
+
+## 验证命令
+
+```powershell
+node 04_tests/domains/C-order-fulfillment/run-domain-c-tests.mjs --suite UC13 --goal verify --maven-repository backend/.m2repo
+```
+
+## 自动化执行结果
+
+`NewProductFulfillmentUc13IntegrationTest` 使用 Testcontainers MySQL 8.4.6、生产 `schema.sql` 和独立新品订单 fixture，覆盖卖家权限、待发货状态、物流首轨内容、查询隔离、重复发货、遗留合并订单拒绝、人工/自动确认竞态、版本条件更新和一次性结算。所有方法标记 `DOMAIN_C` 与 `UC13`，不使用二手订单测试替代新品闭环。
+
+定向命令：
+
+```powershell
+node 04_tests/domains/C-order-fulfillment/run-domain-c-tests.mjs --suite UC13 --goal verify --maven-repository backend/.m2repo
+```
+
+当前真实 MySQL Integration 结果：4 tests passed，0 failures，0 errors。
+
+真实双账号浏览器结果：`uc13-fulfillment.spec.ts` 1 passed。测试通过专用 Compose MySQL、后端服务和 Vite 前端执行，覆盖卖家发货、买家查询物流、确认收货、刷新后状态持久化；原始报告和截图位于 `evidence/raw-reports/playwright/`。

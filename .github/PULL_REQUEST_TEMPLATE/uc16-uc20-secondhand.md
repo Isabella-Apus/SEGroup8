@@ -14,7 +14,7 @@
 - [x] `cd frontend && npm run build:mock`
 - [x] 前端 Vite mock 环境完成 UC16-UC20 走查
 - [x] `05_management/UC16-UC20-screenshots` 共 26 张截图可打开
-- [x] `04_tests/UC16-UC20-ui-run-result.json` 可解析
+- [x] `05_management/archive/test-assets/UC16-UC20/UC16-UC20-ui-run-result.json` 可解析
 - [x] 未提交真实密码、Token 或云平台密钥
 
 ## 评审重点
@@ -24,4 +24,3 @@
 - 拍卖是否正确处理历史拍卖、当前价、最低出价和领先买家
 - 二手订单发货、物流、确认收货和待评价状态是否闭环
 - 前端 mock 路由与后端接口是否一致，特别是二手分类树
-

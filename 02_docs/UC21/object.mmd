@@ -1,10 +1,32 @@
+%% DESIGN-CLASS21
 classDiagram
-    class VoucherController
-    class VoucherService
-    class VoucherSaveRequest
-    class Voucher
-    class VoucherVO
-    VoucherController --> VoucherService
-    VoucherController --> VoucherSaveRequest
-    VoucherService --> Voucher
-    VoucherService --> VoucherVO
+  class C["VoucherController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class S["VoucherService"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class Req["VoucherSaveRequest"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class Shop["Shop"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class V["Voucher"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class M["VoucherMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  C --> S : create/update/close/dele
+  S --> Shop : 解析 sellerUserId 对应 shopI
+  S --> Req : 校验面额、门槛、数量和时间
+  S --> V : 校验 issuer/scope/owner/st
+  S --> M : insert/update/deleteById

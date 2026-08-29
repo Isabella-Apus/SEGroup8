@@ -1,19 +1,31 @@
+%% DESIGN-CLASS13
 classDiagram
-    class OrderInfo {
-      Long id
-      Long buyerUserId
-      Integer orderStatus
-      String receiverDetailAddress
-    }
-    class LogisticsTrace {
-      Long orderId
-      String nodeName
-      String status
-      Date eventTime
-    }
-    class User {
-      Long id
-      String role
-    }
-    User "1" --> "0..*" OrderInfo : buyer/seller scope
-    OrderInfo "1" o-- "0..*" LogisticsTrace
+  class C["OrderController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class S["OrderServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class O["OrderInfo"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class L["LogisticsServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class T["LogisticsTrace"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class F["EscrowSettlementService"] {
+    <<service>>
+    +executeUseCase()
+  }
+  C --> S : shipSellerOrder/confirmR
+  S --> O : 校验卖家/买家和状态版本
+  S --> L : initializeOrAdvance
+  L --> T : insert trace nodes
+  S --> F : settle

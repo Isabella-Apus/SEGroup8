@@ -1,10 +1,12 @@
-flowchart LR
-  U[Reporter] --> R[Submit report]
-  U --> B[Create or remove block]
-  R --> DB[(MySQL/H2)]
-  A[Administrator] --> V[Review report]
-  V --> C[Credit score update]
-  C --> L[credit_score_log]
-  V --> AL[admin_audit_log]
-  B --> Q[Directional block queries]
-  Q --> DB
+%% SYS-BEH05
+flowchart TD
+  A[用户提交举报或拉黑] --> B{请求有效?}
+  B -- 否 --> X[拒绝请求]
+  B -- 是 --> C[保存举报或拉黑关系]
+  C --> D{是否为举报?}
+  D -- 否 --> H[返回关系状态]
+  D -- 是 --> E[管理员审核]
+  E --> F{举报成立?}
+  F -- 是 --> G[调整信用分并写审计]
+  F -- 否 --> H
+  G --> H

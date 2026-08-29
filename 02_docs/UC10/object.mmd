@@ -1,0 +1,33 @@
+%% DESIGN-CLASS10
+classDiagram
+  class C["SearchController/BrowseHistoryController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class SS["SearchBehaviorServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class BS["BrowseHistoryServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class H["UserSearchHistory/SearchKeywordStat"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class B["BrowseHistory"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class HM["History/KeywordMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  C --> SS : recordSearch
+  SS --> H : normalize/deduplicate/co
+  SS --> HM : deleteOldAndInsert/lates
+  C --> BS : record/list/delete
+  BS --> B : 构造唯一浏览键
+  BS --> HM : upsert/queryByUser

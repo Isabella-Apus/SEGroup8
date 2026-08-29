@@ -1,34 +1,12 @@
+%% SYS-BEH19
 sequenceDiagram
-    actor Seller as 二手卖家
-    actor BidderA as 买家 A
-    actor BidderB as 买家 B
-    participant UI as Vue/Nginx
-    participant API as SecondhandTradeController
-    participant Service as SecondhandTradeServiceImpl
-    participant Funds as EscrowSettlementService
-    participant DB as MySQL
-
-    Seller->>UI: 填写起拍价、加价幅度和时长
-    UI->>API: POST /auction
-    API->>Service: createAuction
-    Service->>DB: 校验商品所有权、状态和重复进行中拍卖
-    Service->>DB: INSERT product_auction(ONGOING)
-    BidderA->>UI: 首次出价
-    UI->>API: POST /auction/{id}/bid
-    Service->>Funds: 冻结首次出价
-    Service->>DB: 乐观锁更新最高价并写竞价日志
-    BidderB->>UI: 更高出价
-    UI->>API: POST /auction/{id}/bid
-    Service->>Funds: 冻结新出价并退回买家 A
-    Service->>DB: 乐观锁更新最高价并写竞价日志
-    Seller->>UI: 查看当前价、最高出价人和出价次数
-    Seller->>API: POST /auction/{id}/close
-    API->>Service: closeAuctionEarly
-    Service->>DB: 抢占 ONGOING -> SETTLING
-    alt 没有有效出价
-        Service->>DB: 拍卖 -> FLOW，商品 -> 下架
-    else 存在最高出价
-        Service->>DB: 写已付款待发货订单和明细
-        Service->>DB: 商品 -> 已售，拍卖 -> FINISHED
-    end
-    BidderB->>UI: 查看竞拍结果和待发货订单
+  autonumber
+  actor Seller as 二手卖家
+  actor Buyer as 竞拍买家
+  participant System as 交易平台
+  Seller->>System: 发起拍卖
+  System-->>Seller: 拍卖进行中
+  Buyer->>System: 查看拍卖商品
+  Buyer->>System: 提交出价
+  System-->>Buyer: 出价成功，显示最新当前价
+  System-->>Seller: 拍卖监控更新

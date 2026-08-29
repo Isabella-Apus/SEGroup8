@@ -1,7 +1,13 @@
-flowchart TB
-  Spec[uc04-ban-unban.spec.ts] --> HTTP[真实 HTTP]
-  HTTP --> Ban[ban/unban]
-  HTTP --> Login[login]
-  HTTP --> Logs[audit query]
-  Ban --> Service[AdminUserServiceImpl]
-  Login --> Auth[AuthServiceImpl]
+%% COMP-STRUCT04
+flowchart LR
+  subgraph Boundary["Kinda Goods 组件边界"]
+    UI["«boundary»<br/>AdminUserList.vue"]
+    API["«controller»<br/>AdminUserController"]
+    Svc["«service»<br/>AdminUserServiceImpl"]
+    DB["«repository»<br/>UserMapper"]
+    Audit["«service»<br/>AdminAuditLogServiceImpl"]
+  end
+  UI -->|"封禁/解禁用户"| API
+  API -->|"changeStatus"| Svc
+  Svc -->|"更新用户状态"| DB
+  Svc -->|"记录操作者、目标和原因"| Audit

@@ -1,0 +1,16 @@
+%% CONCEPT-CLASS05
+classDiagram
+  class UserReport {
+    +identifier: String
+    +state: String
+  }
+  class UserBlock {
+    +identifier: String
+    +state: String
+  }
+  class CreditScoreLog {
+    +identifier: String
+    +state: String
+  }
+  UserReport "1" --> "0..*" UserBlock : 关联
+  UserBlock "0..*" --> "1" CreditScoreLog : 产生/归属

@@ -1,26 +1,31 @@
+%% DESIGN-CLASS05
 classDiagram
-  class UserReport {
-    +id
-    +reporterId
-    +reportedId
-    +status
-    +tradeContext
+  class C["ReportBlockController/AdminReportController"] {
+    <<controller>>
+    +handleRequest()
   }
-  class UserBlock {
-    +blockerId
-    +blockedId
+  class S["ReportBlockServiceImpl"] {
+    <<service>>
+    +executeUseCase()
   }
-  class CreditScoreLog {
-    +userId
-    +role
-    +delta
-    +reasonCode
-    +refId
+  class R["UserReport"] {
+    <<collaborator>>
+    +applyBusinessRule()
   }
-  class AdminAuditLog {
-    +adminUserId
-    +action
-    +targetId
+  class B["UserBlock"] {
+    <<collaborator>>
+    +applyBusinessRule()
   }
-  UserReport --> CreditScoreLog : upheld report
-  UserReport --> AdminAuditLog : audit record
+  class Credit["CreditServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class Log["CreditScoreLog"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  C --> S : report/block/review
+  S --> R : 新建或流转举报状态
+  S --> B : insert/delete 拉黑关系
+  S --> Credit : adjustScore
+  Credit --> Log : insert change record

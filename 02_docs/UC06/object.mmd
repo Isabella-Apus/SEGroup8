@@ -1,0 +1,31 @@
+%% DESIGN-CLASS06
+classDiagram
+  class C["CatalogController/ProductController"] {
+    <<controller>>
+    +handleRequest()
+  }
+  class S["CatalogService/ProductServiceImpl"] {
+    <<service>>
+    +executeUseCase()
+  }
+  class Q["ProductPageQueryRequest"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class P["Product"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  class M["ProductMapper"] {
+    <<repository>>
+    +load()
+    +save()
+  }
+  class H["CatalogErrorHandler"] {
+    <<collaborator>>
+    +applyBusinessRule()
+  }
+  C --> S : search/publicDetail
+  S --> Q : 规范关键词、价格和排序
+  S --> M : select ON_SALE products
+  S --> H : mapException

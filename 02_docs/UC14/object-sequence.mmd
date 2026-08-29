@@ -1,0 +1,19 @@
+%% OBJ-SEQ14
+sequenceDiagram
+  autonumber
+  participant C as OrderController/AdminOrderController
+  participant S as OrderServiceImpl
+  participant Req as OrderRefundApplyRequest/AdminRefundDecisionRequest
+  participant O as OrderInfo
+  participant L as OrderAfterSaleLog
+  participant F as EscrowSettlementService
+  C->>S: apply/approve/reject(orderId, Req)
+  S->>O: 校验售后期、状态、归属和 version
+  S->>L: append action log
+  alt 审核通过
+    S->>F: refundBuyerAndRecoverSeller(order)
+    S->>O: update REFUNDED/CLOSED
+  else 驳回
+    S->>O: update REJECTED and reason
+  end
+  S-->>C: OrderVO

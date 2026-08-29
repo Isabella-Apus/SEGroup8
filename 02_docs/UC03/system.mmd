@@ -1,9 +1,10 @@
-flowchart LR
-  User[申请人浏览器] --> U[UserController]
-  U --> S[MerchantApplicationService]
-  S --> App[(merchant_application)]
-  S --> UserDB[(user)]
-  S --> Shop[(shop)]
-  S -. best effort .-> N[(notification)]
-  Admin[管理员] --> A[AdminMerchantApplicationController]
-  A --> Audit[(admin_audit_log)]
+%% SYS-BEH03
+flowchart TD
+  A[用户提交商家申请] --> B{资料完整?}
+  B -- 否 --> X[返回校验错误]
+  B -- 是 --> C[申请进入待审核]
+  C --> D{管理员决定}
+  D -- 通过 --> E[创建店铺并升级角色]
+  D -- 拒绝 --> F[保存拒绝原因]
+  E --> G[通知申请人]
+  F --> G
