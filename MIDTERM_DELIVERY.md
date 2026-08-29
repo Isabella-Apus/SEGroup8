@@ -8,10 +8,11 @@
 
 当前已确认：25/25 Playwright spec 静态覆盖；最新 main CI 全 UC Playwright Job 成功；UC01–05、UC11–25 有仓库内逐 UC Playwright JSON。当前未完成：UC06–10 逐 UC 浏览器原始产物未归档；六个目标业务微服务尚未全部实现为独立部署单元。
 
-本分支本轮验证：后端 Maven 233/233 通过；现有 Domain B 微服务 Maven 20/20 通过；前端 `build:real` 成功（2421 modules transformed）；中期文档门禁通过 25/25 UC 目录、227 份当前 Markdown 与 156 份 Mermaid 源码。未在本分支重跑 Compose 全 UC 浏览器套件，相关 E2E 结论仍引用最新 main CI 与既有逐 UC 原始产物。
+本分支本轮验证：后端 Maven 233/233 通过；现有 Domain B 微服务 Maven 20/20 通过；前端 `build:real` 成功（2421 modules transformed）；中期文档门禁通过 25/25 UC 目录、228 份当前 Markdown 与 156 份 Mermaid 源码。未在本分支重跑 Compose 全 UC 浏览器套件，相关 E2E 结论仍引用最新 main CI 与既有逐 UC 原始产物。
 
 ## 中期入口
 
+- 中期检查总报告：`02_docs/specifications/midterm-inspection-report.md`
 - 文档索引：`02_docs/README.md`
 - 图模型规范：`02_docs/diagram-conventions.md`
 - 课程对照审计：`02_docs/midterm-audit.md`

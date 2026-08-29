@@ -22,7 +22,7 @@
 | `mvn test`（backend） | PASS：233 tests，0 failures，0 errors，0 skipped |
 | `mvn test`（microservices） | PASS：20 tests，0 failures，0 errors，0 skipped |
 | `npm.cmd run build:real`（frontend） | PASS：2421 modules transformed |
-| `node scripts/docs/validate-midterm-docs.mjs` | PASS：25/25 UC 目录、227 份当前 Markdown、156 份 Mermaid 源码 |
+| `node scripts/docs/validate-midterm-docs.mjs` | PASS：25/25 UC 目录、228 份当前 Markdown、156 份 Mermaid 源码 |
 | `node scripts/ci/verify-uc-e2e-coverage.mjs` | PASS：UC01–UC25 静态覆盖 25/25 |
 | 本分支 Compose 全 UC Playwright | NOT_RUN；文档改动不冒充新的浏览器执行证据 |
 

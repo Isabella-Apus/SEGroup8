@@ -1,5 +1,9 @@
 # 02_docs - 中期文档索引
 
+## 中期检查单一入口
+
+- [Kinda Goods 中期检查总报告](specifications/midterm-inspection-report.md)
+
 ## 四份权威总文档
 
 - [软件需求说明书](specifications/software-requirements.md)
