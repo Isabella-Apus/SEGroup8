@@ -89,6 +89,7 @@ jobs:
           path: |
             backend/target/surefire-reports/**
             .ci/test-summaries/**
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 14
       - name: Upload Domain B reports
@@ -99,6 +100,7 @@ jobs:
           path: |
             microservices/*/target/surefire-reports/**
             .ci/test-summaries/**
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 14
       - name: Upload Domain C reports and evidence
@@ -112,5 +114,6 @@ jobs:
             04_tests/domains/C-order-fulfillment/evidence/raw-reports/surefire/**
             04_tests/domains/C-order-fulfillment/evidence/result-summary.json
             .ci/test-summaries/**
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 14

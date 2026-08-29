@@ -20,17 +20,20 @@ $outputPath = [System.IO.Path]::GetFullPath($OutputDirectory)
 New-Item -ItemType Directory -Force -Path $outputPath | Out-Null
 
 $domains = @()
+$foundDomainSummaries = 0
 foreach ($domain in @("A", "B", "C", "D", "E")) {
     $fileName = "domain-$($domain.ToLowerInvariant())-test-summary.json"
     $matches = @()
     if (Test-Path -LiteralPath $domainEvidencePath) {
         $matches = @(
-            Get-ChildItem -LiteralPath $domainEvidencePath -Recurse -File -Filter $fileName |
+            Get-ChildItem -LiteralPath $domainEvidencePath -Recurse -Force -File -Filter $fileName |
                 Sort-Object FullName
         )
     }
 
     if ($matches.Count -eq 1) {
+        $foundDomainSummaries += 1
+        Write-Host "Found DOMAIN_$domain summary: $($matches[0].FullName)"
         $domainSummary = Get-Content -Raw -LiteralPath $matches[0].FullName | ConvertFrom-Json
         $domains += [pscustomobject][ordered]@{
             scope = $domainSummary.scope
@@ -44,6 +47,8 @@ foreach ($domain in @("A", "B", "C", "D", "E")) {
             durationSeconds = $domainSummary.totals.durationSeconds
         }
     } else {
+        $matchDescription = if ($matches.Count -eq 0) { "none" } else { $matches.FullName -join "; " }
+        Write-Warning "Expected exactly one $fileName under $domainEvidencePath; found $($matches.Count): $matchDescription"
         $domains += [pscustomobject][ordered]@{
             scope = "DOMAIN_$domain"
             result = "MISSING"
@@ -74,7 +79,7 @@ $playwright = [ordered]@{
 $playwrightResultFiles = @()
 if (Test-Path -LiteralPath $playwrightEvidencePath) {
     $playwrightResultFiles = @(
-        Get-ChildItem -LiteralPath $playwrightEvidencePath -Recurse -File -Filter "playwright-results.json" |
+        Get-ChildItem -LiteralPath $playwrightEvidencePath -Recurse -Force -File -Filter "playwright-results.json" |
             Sort-Object FullName
     )
 }
@@ -157,7 +162,7 @@ if ($env:GITHUB_STEP_SUMMARY) {
     )
 }
 
-Write-Host "Final test summary: domainTests=$($domainTotals.tests), playwrightExpected=$($playwright.expected), result=$result"
+Write-Host "Final test summary: domainSummaries=$foundDomainSummaries/5, domainTests=$($domainTotals.tests), playwrightExpected=$($playwright.expected), result=$result"
 if ($result -ne "PASS") {
     exit 1
 }

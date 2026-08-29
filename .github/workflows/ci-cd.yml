@@ -229,6 +229,7 @@ jobs:
             04_tests/platform-e2e/evidence/**
             .ci/pipeline-summary/final-test-summary.json
             .ci/pipeline-summary/final-test-summary.md
+          include-hidden-files: true
           if-no-files-found: warn
           retention-days: 14
 
