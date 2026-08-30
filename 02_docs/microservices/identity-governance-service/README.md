@@ -6,7 +6,7 @@
 
 - 已实现：独立 Spring Boot JAR、Flyway、MySQL/H2 测试、Dockerfile、本地 Compose、JWT、UC01-UC05 公开 API、内部 API、outbox、健康/就绪/版本信息和 JSON 日志。
 - 已验证：Maven 独立测试、真实 MySQL 全链路、31 个公开 method-path 的成功/鉴权/失效账户状态矩阵、UC01-UC05 在改造前后两版上的同断言 E2E。
-- 已接入：完整系统 GitHub Actions、ACR 不可变镜像、K3s/Helm `--atomic --wait` 部署、探针/版本/smoke 和失败诊断日志上传。远端 CI/CD 要在 PR/合并后以 GitHub run 为准。
+- 已接入：独立 `Identity Governance Service CI/CD` 与完整系统集成门禁并行运行；服务流水线负责 ACR 不可变镜像和 K3s/Helm `--atomic --wait` 独立升级，完整系统流水线负责跨域回归。远端 CI/CD 要以对应 GitHub run 为准。
 - 暂不实验：HPA 自动扩缩容实验、停止/延迟依赖服务的故障处理实验；HPA 模板默认关闭，两个实验均标为 `NOT_RUN`。性能对比在全组微服务版本稳定后统一执行。
 
 ## 文件导航

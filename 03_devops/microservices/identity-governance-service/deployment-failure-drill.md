@@ -8,7 +8,7 @@
 
 ## K3s/Helm 中同一故障如何定位
 
-主流水线使用 `helm upgrade --install --atomic --wait`。如果 `identity-governance-secret` 中数据库口令错误，新 Pod 的 readiness 不会通过，Helm 等待超时后自动回滚到上一 revision。远端脚本的退出陷阱会把以下信息写入 Actions 的 `identity-governance-deployment-<sha>` artifact：
+身份服务独立流水线使用 `helm upgrade --install --reuse-values --atomic --wait`。如果 `identity-governance-secret` 中数据库口令错误，新 Pod 的 readiness 不会通过，Helm 等待超时后自动回滚到上一 revision。远端脚本的退出陷阱会把以下信息写入 Actions 的 `identity-governance-deployment-<sha>` artifact：
 
 1. `helm status` 和 `helm history`：确认失败 revision 与自动回滚结果。
 2. `kubectl get pods,service,ingress -o wide`：确认 Pod 状态、重启次数和调度节点。

@@ -1,0 +1,222 @@
+name: Identity Governance Service CI/CD
+
+on:
+  pull_request:
+    paths:
+      - "microservices/identity-governance-service/**"
+      - "microservices/security-contract/**"
+      - "microservices/pom.xml"
+      - "frontend/e2e/domain-a/**"
+      - "02_docs/microservices/identity-governance-service/**"
+      - "03_devops/microservices/identity-governance-service/**"
+      - "04_tests/microservices/identity-governance-service/**"
+      - "05_management/microservices/identity-governance-service/**"
+      - "deploy/helm/segroup8/templates/identity-governance-*.yaml"
+      - "deploy/helm/segroup8/values.yaml"
+      - ".github/scripts/deploy-identity-governance-k3s.sh"
+      - ".github/workflows/identity-governance-ci-cd.yml"
+  push:
+    branches: [main]
+    paths:
+      - "microservices/identity-governance-service/**"
+      - "microservices/security-contract/**"
+      - "microservices/pom.xml"
+      - "frontend/e2e/domain-a/**"
+      - "02_docs/microservices/identity-governance-service/**"
+      - "03_devops/microservices/identity-governance-service/**"
+      - "04_tests/microservices/identity-governance-service/**"
+      - "05_management/microservices/identity-governance-service/**"
+      - "deploy/helm/segroup8/templates/identity-governance-*.yaml"
+      - "deploy/helm/segroup8/values.yaml"
+      - ".github/scripts/deploy-identity-governance-k3s.sh"
+      - ".github/workflows/identity-governance-ci-cd.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: identity-governance-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  verify:
+    name: API, MySQL, contract, image and Helm gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Java 17 and Maven cache
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: |
+            microservices/pom.xml
+            microservices/security-contract/pom.xml
+            microservices/identity-governance-service/pom.xml
+      - name: Unit, API, contract and real MySQL integration tests
+        run: mvn -B --no-transfer-progress -f microservices/pom.xml -pl identity-governance-service -am clean verify
+      - name: Build candidate image from the tested JAR
+        run: |
+          docker build \
+            --label org.opencontainers.image.revision=${GITHUB_SHA} \
+            -t segroup8/identity-governance:sha-${GITHUB_SHA} \
+            microservices/identity-governance-service
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+      - name: Lint and render identity-governance deployment
+        run: |
+          helm lint deploy/helm/segroup8 \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-existing \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-existing \
+            --set identityGovernance.enabled=true \
+            --set-string identityGovernance.image.repository=registry.example/segroup8/identity-governance \
+            --set-string identityGovernance.image.tag=sha-test \
+            --set-string identityGovernance.deployment.version=sha-test \
+            --set-string identityGovernance.deployment.commit=$GITHUB_SHA \
+            --set-string identityGovernance.deployment.buildTime=ci \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql
+          helm template segroup8 deploy/helm/segroup8 \
+            --namespace segroup8 \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-existing \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-existing \
+            --set identityGovernance.enabled=true \
+            --set-string identityGovernance.image.repository=registry.example/segroup8/identity-governance \
+            --set-string identityGovernance.image.tag=sha-test \
+            --set-string identityGovernance.deployment.version=sha-test \
+            --set-string identityGovernance.deployment.commit=$GITHUB_SHA \
+            --set-string identityGovernance.deployment.buildTime=ci \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
+            >/dev/null
+      - name: Upload tested Boot JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-governance-jar
+          path: microservices/identity-governance-service/target/identity-governance-service-*.jar
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload raw test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-governance-surefire-${{ github.sha }}
+          path: 04_tests/microservices/identity-governance-service/evidence/raw-reports/surefire/**
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish immutable identity-governance image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Download tested Boot JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: identity-governance-jar
+          path: microservices/identity-governance-service/target
+      - name: Validate ACR configuration
+        env:
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+          ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+        run: |
+          test -n "$ACR_REGISTRY"
+          test -n "$ACR_NAMESPACE"
+          test -n "$ACR_USERNAME"
+          test -n "$ACR_PASSWORD"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Log in to ACR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      - name: Build and push the verified SHA image
+        id: identity-image
+        uses: docker/build-push-action@v6
+        with:
+          context: microservices/identity-governance-service
+          file: microservices/identity-governance-service/Dockerfile
+          push: true
+          provenance: false
+          sbom: false
+          tags: ${{ vars.ACR_REGISTRY }}/${{ vars.ACR_NAMESPACE }}/identity-governance:sha-${{ github.sha }}
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+      - name: Record image digest
+        run: |
+          mkdir -p release-metadata
+          printf '%s\n' '${{ steps.identity-image.outputs.digest }}' > release-metadata/identity-governance-image-digest.txt
+      - name: Upload image digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-governance-image-digest-${{ github.sha }}
+          path: release-metadata/identity-governance-image-digest.txt
+          if-no-files-found: error
+          retention-days: 30
+
+  deploy:
+    name: Helm atomic deploy identity-governance-service
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ENABLE_PRODUCTION_DEPLOY == 'true'
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: production
+    concurrency:
+      group: segroup8-production-helm
+      cancel-in-progress: false
+    steps:
+      - name: Check out deployment configuration
+        uses: actions/checkout@v4
+      - name: Package Helm chart
+        run: tar -czf "identity-governance-chart-$GITHUB_SHA.tar.gz" deploy/helm/segroup8
+      - name: Configure SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+      - name: Upload and deploy identity-governance-service
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
+        run: |
+          set -o pipefail
+          remote_archive="/tmp/identity-governance-$GITHUB_SHA.tar.gz"
+          scp "identity-governance-chart-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$remote_archive"
+          ssh \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=10 \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            "bash -s -- '$GITHUB_SHA' '$remote_archive' '$ACR_REGISTRY' '$ACR_NAMESPACE' 'sha-$GITHUB_SHA' '$K8S_NAMESPACE'" \
+            < .github/scripts/deploy-identity-governance-k3s.sh | tee identity-governance-deployment.log
+      - name: Upload deployment and rollback diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-governance-deployment-${{ github.sha }}
+          path: identity-governance-deployment.log
+          if-no-files-found: warn
+          retention-days: 30

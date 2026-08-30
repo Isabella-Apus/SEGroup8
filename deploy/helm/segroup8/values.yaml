@@ -34,7 +34,9 @@ frontend:
       memory: 256Mi
 
 identityGovernance:
-  enabled: true
+  # The component is enabled by its own service pipeline after the shared
+  # segroup8 release exists. This keeps platform-only releases installable.
+  enabled: false
   replicaCount: 1
   image:
     repository: ""
@@ -43,6 +45,10 @@ identityGovernance:
   secretName: identity-governance-secret
   service:
     port: 8091
+  deployment:
+    version: ""
+    commit: ""
+    buildTime: ""
   resources:
     requests:
       cpu: 100m

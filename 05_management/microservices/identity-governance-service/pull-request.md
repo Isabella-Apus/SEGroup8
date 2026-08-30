@@ -1,4 +1,4 @@
-# feat(ms-01): 交付身份治理微服务并接入完整系统 K3s CI/CD
+# feat(ms-01): 交付身份治理微服务独立 CI/CD 与系统集成门禁
 
 ## 关联任务
 
@@ -8,7 +8,7 @@ Refs: MS-01 `identity-governance-service`，覆盖 UC01-UC05。本 PR 不使用 
 
 本 PR 从单体身份与平台治理模块中拆出可独立构建、测试、制作镜像和部署的 `identity-governance-service`。服务独占 `identity_governance_db`，保留原 `/api/**` 契约，通过 JWT、本地验签契约、内部最小 API 和事务 outbox 与其他服务协作。
 
-Kubernetes 部署已经纳入现有完整系统 `Kinda Goods CI/CD`：PR 阶段执行 Maven、真实 MySQL、API 契约和候选镜像构建；合并到 `main` 后，在全系统测试通过的前提下推送 ACR 不可变镜像，并随 `segroup8` Helm release 执行 `--atomic --wait` 部署、探针/版本/smoke 验证和失败诊断上传。
+Kubernetes 交付使用双层流水线：独立 `Identity Governance Service CI/CD` 在相关路径变化时执行 Maven、真实 MySQL、API 契约、候选镜像和 Helm 门禁；合并到 `main` 后推送 ACR 不可变镜像，并对共享 `segroup8` release 执行串行、原子的服务升级。现有 `Kinda Goods CI/CD` 独立运行完整系统 UC01-UC25 回归，不再承载身份服务的构建和发布细节。
 
 暂不执行的只有课程中的两个云原生实验：HPA 自动扩缩容实验、停止或延迟依赖服务的故障处理实验。HPA 模板已提供但默认关闭。这不代表 Kubernetes 部署未完成。
 
@@ -33,11 +33,11 @@ Kubernetes 部署已经纳入现有完整系统 `Kinda Goods CI/CD`：PR 阶段�
 
 ## CI/CD 流程
 
-1. 完整系统主工作流调用 `.github/workflows/ci-cd-microservices.yml`。
+1. `.github/workflows/identity-governance-ci-cd.yml` 按身份服务、契约、Domain A、Helm 和交付材料路径独立触发；完整系统工作流另行执行集成回归。
 2. Java 17 + Maven 执行单元、API、契约、H2 和 Testcontainers MySQL 测试，失败立即停止。
 3. 构建候选镜像并上传 Boot JAR/Surefire 原始报告。
-4. 仅 `main` 且前置全系统门禁通过后，登录现有 ACR 并推送 `identity-governance:sha-<full-sha>`，保存镜像 digest。
-5. 复用现有 SSH/K3s 发布路径，检查 `identity-governance-secret`，执行 Helm 原子升级。
+4. 仅合并到 `main` 后登录现有 ACR，使用已测试 JAR 推送 `identity-governance:sha-<full-sha>` 并保存镜像 digest。
+5. 复用现有 SSH/K3s 凭据，检查 `identity-governance-secret`，使用共享的 `segroup8-production-helm` 并发锁和 `--reuse-values --atomic --wait` 独立升级身份组件。
 6. 等待 `segroup8-identity-governance` rollout，验证 liveness、readiness、`/actuator/info` 版本和公开登录失败 smoke。
 7. 失败时记录 Helm status/history、Pod/Service/Ingress、Deployment describe 和最近 200 行服务日志并上传 artifact。
 
@@ -79,7 +79,8 @@ Kubernetes 部署已经纳入现有完整系统 `Kinda Goods CI/CD`：PR 阶段�
 
 ### CI/CD 与 Kubernetes
 
-- `.github/workflows/ci-cd-microservices.yml`
+- `.github/workflows/identity-governance-ci-cd.yml`
+- `.github/scripts/deploy-identity-governance-k3s.sh`
 - `.github/workflows/ci-cd.yml`
 - `.github/scripts/deploy-k3s.sh`
 - `deploy/helm/segroup8/values.yaml`
