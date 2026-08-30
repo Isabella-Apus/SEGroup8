@@ -18,6 +18,7 @@ services:
       retries: 30
 
   identity-governance-service:
+    image: ${IDENTITY_ACCEPTANCE_IMAGE:-segroup8/identity-governance:local}
     build: .
     environment:
       DB_URL: jdbc:mysql://identity-mysql:3306/identity_governance_db?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true

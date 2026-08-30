@@ -71,12 +71,32 @@ jobs:
             exit 1
           fi
       - name: Build candidate image from the tested JAR
+        shell: bash
         run: |
+          set -Eeuo pipefail
+          mkdir -p release-candidate
+          mapfile -t jars < <(find microservices/identity-governance-service/target -maxdepth 1 -type f -name 'identity-governance-service-*.jar' ! -name '*.original' -print)
+          test "${#jars[@]}" -eq 1
+          jar_sha="$(sha256sum "${jars[0]}" | cut -d ' ' -f 1)"
+          candidate="segroup8/identity-governance:candidate-${GITHUB_SHA}"
           docker build \
-            --label org.opencontainers.image.revision=${GITHUB_SHA} \
-            -t segroup8/identity-governance:sha-${GITHUB_SHA} \
+            --label "org.opencontainers.image.revision=${GITHUB_SHA}" \
+            --label "org.opencontainers.image.source=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --label "com.segroup8.identity-governance.jar-sha256=${jar_sha}" \
+            -t "$candidate" \
             microservices/identity-governance-service
-          test "$(docker image inspect segroup8/identity-governance:sha-${GITHUB_SHA} --format '{{.Config.User}}')" = "10001:10001"
+          test "$(docker image inspect "$candidate" --format '{{.Config.User}}')" = "10001:10001"
+          test "$(docker image inspect "$candidate" --format '{{index .Config.Labels "com.segroup8.identity-governance.jar-sha256"}}')" = "$jar_sha"
+          image_id="$(docker image inspect "$candidate" --format '{{.Id}}')"
+          printf '%s  %s\n' "$jar_sha" "$(basename "${jars[0]}")" > release-candidate/identity-governance-jar.sha256
+          jq -n \
+            --arg gitSha "$GITHUB_SHA" \
+            --arg jarSha256 "$jar_sha" \
+            --arg candidateImage "$candidate" \
+            --arg candidateImageId "$image_id" \
+            '{gitSha:$gitSha,jarSha256:$jarSha256,candidateImage:$candidateImage,candidateImageId:$candidateImageId}' \
+            > release-candidate/release-metadata.json
+          docker image save "$candidate" | gzip -1 > release-candidate/identity-governance-image.tar.gz
       - name: Set up Helm
         uses: azure/setup-helm@v4
       - name: Lint and render identity-governance deployment
@@ -129,7 +149,16 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: identity-governance-jar
-          path: microservices/identity-governance-service/target/identity-governance-service-*.jar
+          path: |
+            microservices/identity-governance-service/target/identity-governance-service-*.jar
+            release-candidate/identity-governance-jar.sha256
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload tested candidate image and trace metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-governance-candidate-${{ github.sha }}
+          path: release-candidate/**
           if-no-files-found: error
           retention-days: 7
       - name: Upload raw test reports
@@ -160,6 +189,7 @@ jobs:
       APP_COMMIT: ${{ github.sha }}
       E2E_BASE_URL: http://127.0.0.1:8089
       E2E_OUTPUT_DIR: ${{ runner.temp }}/identity-domain-a-e2e
+      IDENTITY_ACCEPTANCE_IMAGE: segroup8/identity-governance:candidate-${{ github.sha }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -169,11 +199,20 @@ jobs:
           node-version: "20"
           cache: npm
           cache-dependency-path: frontend/package-lock.json
-      - name: Download tested Boot JAR
+      - name: Download the tested candidate image
         uses: actions/download-artifact@v4
         with:
-          name: identity-governance-jar
-          path: microservices/identity-governance-service/target
+          name: identity-governance-candidate-${{ github.sha }}
+          path: release-candidate
+      - name: Load and verify the exact candidate image
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          docker image load --input release-candidate/identity-governance-image.tar.gz
+          test "$(jq -r '.gitSha' release-candidate/release-metadata.json)" = "$GITHUB_SHA"
+          test "$(docker image inspect "$IDENTITY_ACCEPTANCE_IMAGE" --format '{{.Id}}')" = "$(jq -r '.candidateImageId' release-candidate/release-metadata.json)"
+          test "$(docker image inspect "$IDENTITY_ACCEPTANCE_IMAGE" --format '{{index .Config.Labels "com.segroup8.identity-governance.jar-sha256"}}')" = "$(jq -r '.jarSha256' release-candidate/release-metadata.json)"
+          cp release-candidate/release-metadata.json "$RUNNER_TEMP/identity-candidate-metadata.json"
       - name: Build the real frontend and install Chromium
         working-directory: frontend
         run: |
@@ -184,7 +223,10 @@ jobs:
         run: |
           docker compose \
             -f microservices/identity-governance-service/compose.local.yml \
-            --profile e2e up -d --build
+            --profile e2e build identity-e2e-frontend
+          docker compose \
+            -f microservices/identity-governance-service/compose.local.yml \
+            --profile e2e up -d --no-build
           for attempt in $(seq 1 90); do
             if curl --fail --silent http://127.0.0.1:8091/actuator/health/readiness | grep -q '"status":"UP"' \
               && curl --fail --silent http://127.0.0.1:8089/ >/dev/null; then
@@ -206,6 +248,10 @@ jobs:
             >"$RUNNER_TEMP/identity-domain-a-e2e/logs/compose-ps.txt" 2>&1 || true
           docker compose -f microservices/identity-governance-service/compose.local.yml --profile e2e logs --no-color --timestamps \
             >"$RUNNER_TEMP/identity-domain-a-e2e/logs/compose.log" 2>&1 || true
+          cp "$RUNNER_TEMP/identity-candidate-metadata.json" \
+            "$RUNNER_TEMP/identity-domain-a-e2e/release-metadata.json" || true
+          curl --silent --show-error http://127.0.0.1:8091/v3/api-docs \
+            >"$RUNNER_TEMP/identity-domain-a-e2e/runtime-openapi.json" || true
       - name: Stop the independent identity-service stack
         if: always()
         run: docker compose -f microservices/identity-governance-service/compose.local.yml --profile e2e down -v --remove-orphans || true
@@ -229,11 +275,11 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-      - name: Download tested Boot JAR
+      - name: Download the E2E-tested candidate image
         uses: actions/download-artifact@v4
         with:
-          name: identity-governance-jar
-          path: microservices/identity-governance-service/target
+          name: identity-governance-candidate-${{ github.sha }}
+          path: release-candidate
       - name: Validate ACR configuration
         env:
           ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
@@ -245,36 +291,43 @@ jobs:
           test -n "$ACR_NAMESPACE"
           test -n "$ACR_USERNAME"
           test -n "$ACR_PASSWORD"
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
       - name: Log in to ACR
         uses: docker/login-action@v3
         with:
           registry: ${{ vars.ACR_REGISTRY }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
-      - name: Build and push the verified SHA image
-        id: identity-image
-        uses: docker/build-push-action@v6
-        with:
-          context: microservices/identity-governance-service
-          file: microservices/identity-governance-service/Dockerfile
-          push: true
-          provenance: false
-          sbom: false
-          tags: ${{ vars.ACR_REGISTRY }}/${{ vars.ACR_NAMESPACE }}/identity-governance:sha-${{ github.sha }}
-          labels: |
-            org.opencontainers.image.revision=${{ github.sha }}
-            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-      - name: Record image digest
+      - name: Push the exact candidate image without rebuilding
+        shell: bash
+        env:
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
         run: |
+          set -Eeuo pipefail
+          candidate="segroup8/identity-governance:candidate-${GITHUB_SHA}"
+          target="${ACR_REGISTRY}/${ACR_NAMESPACE}/identity-governance:sha-${GITHUB_SHA}"
+          docker image load --input release-candidate/identity-governance-image.tar.gz
+          test "$(docker image inspect "$candidate" --format '{{.Id}}')" = "$(jq -r '.candidateImageId' release-candidate/release-metadata.json)"
+          test "$(docker image inspect "$candidate" --format '{{index .Config.Labels "com.segroup8.identity-governance.jar-sha256"}}')" = "$(jq -r '.jarSha256' release-candidate/release-metadata.json)"
+          docker image tag "$candidate" "$target"
+          docker image push "$target" | tee identity-governance-image-push.log
+          repo_digest="$(docker image inspect "$target" --format '{{join .RepoDigests "\n"}}' | head -n 1)"
+          test -n "$repo_digest"
           mkdir -p release-metadata
-          printf '%s\n' '${{ steps.identity-image.outputs.digest }}' > release-metadata/identity-governance-image-digest.txt
-      - name: Upload image digest
+          printf '%s\n' "$repo_digest" > release-metadata/identity-governance-image-digest.txt
+          jq \
+            --arg publishedImage "$target" \
+            --arg repositoryDigest "$repo_digest" \
+            '. + {publishedImage:$publishedImage,repositoryDigest:$repositoryDigest}' \
+            release-candidate/release-metadata.json > release-metadata/identity-governance-release-metadata.json
+      - name: Upload image digest and release metadata
         uses: actions/upload-artifact@v4
         with:
           name: identity-governance-image-digest-${{ github.sha }}
-          path: release-metadata/identity-governance-image-digest.txt
+          path: |
+            release-metadata/identity-governance-image-digest.txt
+            release-metadata/identity-governance-release-metadata.json
+            identity-governance-image-push.log
           if-no-files-found: error
           retention-days: 30
 

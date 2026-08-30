@@ -39,7 +39,7 @@ Invoke-RestMethod http://localhost:8091/actuator/info
 
 ## K3s 自动部署
 
-完整系统 `.github/workflows/ci-cd.yml` 调用身份服务验证工作流。PR 阶段执行 Maven、真实 MySQL 和候选镜像构建；合并到 `main` 后统一推送 ACR 的 `identity-governance:sha-<full-sha>`，再随 `segroup8` Helm release 原子升级。集群一次性前置条件见 `deploy/helm/segroup8/README.md`。
+身份服务使用独立的 `Identity Governance Service CI/CD`。PR 阶段执行 Maven、真实 MySQL，并从唯一已测试 JAR 构建候选镜像；流水线保存 JAR SHA-256、候选 Image ID 和 release metadata，Domain A 独立 E2E 加载并验证该镜像。合并到 `main` 后不再重新构建，而是把同一候选镜像原样 tag/push 为 ACR 的 `identity-governance:sha-<full-sha>`，保存 registry digest，再随共享 `segroup8` Helm release 原子升级。集群一次性前置条件见 `deploy/helm/segroup8/README.md`。
 
 ## Domain A 浏览器回归入口
 
