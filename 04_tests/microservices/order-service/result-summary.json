@@ -2,7 +2,7 @@
   "taskId": "MS-03",
   "service": "order-service",
   "generatedAt": "2026-08-30T11:02:03+08:00",
-  "sourceRevision": "bb72290c+working-tree",
+  "sourceRevision": "366c26b1",
   "maven": {"passed": 9, "failed": 0, "skipped": 1, "securityContractPassed": 5, "status": "passed_with_mysql_test_skipped"},
   "e2e": {"status": "not_run", "requiredUseCases": ["UC11", "UC12", "UC13", "UC14", "UC15", "UC20"]},
   "deployment": {"status": "not_run"},
