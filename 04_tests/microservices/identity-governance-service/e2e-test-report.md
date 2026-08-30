@@ -22,7 +22,7 @@
 
 运行拓扑：既有 `frontend/dist` → 临时 E2E Nginx（8089）→ `identity-governance-service`（8091）→ 独立 MySQL。没有复制或改写 spec，也没有改变根网关。
 
-首次运行：0/5，Nginx 仍代理单体端口 `backend:8080`，五条均收到 502 HTML；完整截图、视频、trace、JSON/JUnit 保留在 `evidence/domain-a-playwright/`。修正 E2E profile 把代理目标改为 `backend:8091` 后，重新运行：
+首次运行：0/5，Nginx 仍代理单体端口 `backend:8080`，五条均收到 502 HTML；Git 保留 JSON/JUnit、失败摘要和一张关键截图 `evidence/domain-a-initial-nginx-502.png`。修正 E2E profile 把代理目标改为 `backend:8091` 后，重新运行：
 
 | UC | 结果 | 时间 |
 |---|---|---|
@@ -32,4 +32,4 @@
 | UC04 封禁解禁/审计 | PASS | 6.2s |
 | UC05 举报拉黑信用 | PASS | 4.6s |
 
-成功原始 JSON、JUnit XML 和 HTML 报告位于 `evidence/domain-a-playwright-rerun-1/`。这证明本服务的 Domain A 浏览器回归；不代表六个目标微服务或全站 E2E 已完成。
+成功原始 JSON 和 JUnit XML 位于 `evidence/domain-a-playwright-rerun-1/`。独立身份服务流水线会重新运行这五条用例，并把完整 HTML、trace、video、截图和 Compose 日志作为 Actions artifact 保存；这些大体积生成物不再长期提交到 Git。这证明本服务的 Domain A 浏览器回归；不代表六个目标微服务或全站 E2E 已完成。

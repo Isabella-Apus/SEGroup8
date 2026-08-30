@@ -9,6 +9,11 @@ frontend/test-results/
 !04_tests/platform-e2e/evidence/.gitkeep
 frontend/playwright-report/
 frontend/blob-report/
+04_tests/**/evidence/**/playwright-report/
+04_tests/**/evidence/**/test-results/
+04_tests/**/evidence/screenshots/
+04_tests/**/evidence/**/*.zip
+04_tests/**/evidence/**/*.webm
 .ci/
 05_management/archive/test-assets/runtime-reports/
 

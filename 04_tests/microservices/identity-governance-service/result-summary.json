@@ -1,13 +1,13 @@
 {
   "service": "identity-governance-service",
-  "generatedAt": "2026-08-30T12:10:00+08:00",
+  "generatedAt": "2026-08-30T18:09:01+08:00",
   "branch": "feature/ms-identity-governance",
   "implementationCommit": "cdb09c19",
   "auditCommit": "ea1f1854dbd32cf39291be3204b328f31b96c4e3",
   "maven": {
     "status": "PASS",
     "securityContract": {"tests": 5, "passed": 5, "failed": 0, "errors": 0, "skipped": 0},
-    "service": {"tests": 15, "passed": 15, "failed": 0, "errors": 0, "skipped": 0},
+    "service": {"tests": 16, "passed": 16, "failed": 0, "errors": 0, "skipped": 0},
     "mysql": {"tests": 2, "passed": 2, "skipped": 0, "fullApiPath": "PASS"}
   },
   "apiCoverage": {
@@ -24,7 +24,7 @@
   "databaseIsolation": {"status": "PASS", "crossSchemaError": "MySQL 1142 SELECT command denied"},
   "domainAE2E": {
     "monolithStart": {"status": "PASS", "tests": 5, "passed": 5, "failed": 0, "durationSeconds": 9.9},
-    "microservice": {"status": "PASS", "tests": 5, "passed": 5, "failed": 0, "durationSeconds": 33.0, "failedFirstRunPreserved": true}
+    "microservice": {"status": "PASS", "tests": 5, "passed": 5, "failed": 0, "durationSeconds": 20.1, "failedFirstRunPreserved": true}
   },
   "deploymentFailureDrill": {"localContainer": "PASS", "k3sAtomicRollback": "NOT_RUN"},
   "kubernetes": {
@@ -34,6 +34,7 @@
       "serviceRun": {"id": 33297661588, "status": "PASS"},
       "fullSystemRun": {"id": 33297661706, "status": "PASS"}
     },
+    "currentBranchPipeline": "PENDING_CURRENT_PUSH",
     "registryPublish": "NOT_RUN_ON_PULL_REQUEST",
     "clusterRollout": "NOT_RUN_ON_PULL_REQUEST"
   },

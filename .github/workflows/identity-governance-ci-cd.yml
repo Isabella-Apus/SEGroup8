@@ -7,6 +7,7 @@ on:
       - "microservices/security-contract/**"
       - "microservices/pom.xml"
       - "frontend/e2e/domain-a/**"
+      - "frontend/playwright.config.ts"
       - "02_docs/microservices/identity-governance-service/**"
       - "03_devops/microservices/identity-governance-service/**"
       - "04_tests/microservices/identity-governance-service/**"
@@ -22,6 +23,7 @@ on:
       - "microservices/security-contract/**"
       - "microservices/pom.xml"
       - "frontend/e2e/domain-a/**"
+      - "frontend/playwright.config.ts"
       - "02_docs/microservices/identity-governance-service/**"
       - "03_devops/microservices/identity-governance-service/**"
       - "04_tests/microservices/identity-governance-service/**"
@@ -59,12 +61,22 @@ jobs:
             microservices/identity-governance-service/pom.xml
       - name: Unit, API, contract and real MySQL integration tests
         run: mvn -B --no-transfer-progress -f microservices/pom.xml -pl identity-governance-service -am clean verify
+      - name: Reject forbidden cross-domain persistence
+        shell: bash
+        run: |
+          if grep -R -n -E \
+            'OrderMapper|ProductMapper|BalanceMapper|VoucherMapper|NotificationMapper|INSERT[[:space:]]+INTO[[:space:]]+order_info' \
+            microservices/identity-governance-service/src/main/java; then
+            echo "identity-governance-service contains forbidden cross-domain persistence"
+            exit 1
+          fi
       - name: Build candidate image from the tested JAR
         run: |
           docker build \
             --label org.opencontainers.image.revision=${GITHUB_SHA} \
             -t segroup8/identity-governance:sha-${GITHUB_SHA} \
             microservices/identity-governance-service
+          test "$(docker image inspect segroup8/identity-governance:sha-${GITHUB_SHA} --format '{{.Config.User}}')" = "10001:10001"
       - name: Set up Helm
         uses: azure/setup-helm@v4
       - name: Lint and render identity-governance deployment
@@ -125,14 +137,92 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: identity-governance-surefire-${{ github.sha }}
-          path: 04_tests/microservices/identity-governance-service/evidence/raw-reports/surefire/**
+          path: |
+            microservices/identity-governance-service/target/surefire-reports/**
+            microservices/identity-governance-service/target/failsafe-reports/**
+          if-no-files-found: warn
+          retention-days: 14
+
+  identity-domain-a-e2e:
+    name: UC01-UC05 independent identity-service browser E2E
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      CI: "true"
+      COMPOSE_PROJECT_NAME: identity-governance-e2e
+      IDENTITY_MYSQL_ROOT_PASSWORD: identity-e2e-root
+      IDENTITY_DB_PASSWORD: identity-e2e-password
+      JWT_SECRET: identity-e2e-jwt-secret-with-at-least-32-bytes
+      INTERNAL_SERVICE_TOKEN: identity-e2e-internal-token
+      BOOTSTRAP_ADMIN_PASSWORD: admin123
+      APP_VERSION: sha-${{ github.sha }}
+      APP_COMMIT: ${{ github.sha }}
+      E2E_BASE_URL: http://127.0.0.1:8089
+      E2E_OUTPUT_DIR: ${{ runner.temp }}/identity-domain-a-e2e
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js and npm cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Download tested Boot JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: identity-governance-jar
+          path: microservices/identity-governance-service/target
+      - name: Build the real frontend and install Chromium
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build:real
+          npx playwright install --with-deps chromium
+      - name: Start the independent identity-service stack
+        run: |
+          docker compose \
+            -f microservices/identity-governance-service/compose.local.yml \
+            --profile e2e up -d --build
+          for attempt in $(seq 1 90); do
+            if curl --fail --silent http://127.0.0.1:8091/actuator/health/readiness | grep -q '"status":"UP"' \
+              && curl --fail --silent http://127.0.0.1:8089/ >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose -f microservices/identity-governance-service/compose.local.yml --profile e2e ps
+          docker compose -f microservices/identity-governance-service/compose.local.yml --profile e2e logs --no-color
+          exit 1
+      - name: Run UC01-UC05 against the independent service
+        working-directory: frontend
+        run: npx playwright test e2e/domain-a --workers=1
+      - name: Collect independent stack diagnostics
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/identity-domain-a-e2e/logs"
+          docker compose -f microservices/identity-governance-service/compose.local.yml --profile e2e ps --all \
+            >"$RUNNER_TEMP/identity-domain-a-e2e/logs/compose-ps.txt" 2>&1 || true
+          docker compose -f microservices/identity-governance-service/compose.local.yml --profile e2e logs --no-color --timestamps \
+            >"$RUNNER_TEMP/identity-domain-a-e2e/logs/compose.log" 2>&1 || true
+      - name: Stop the independent identity-service stack
+        if: always()
+        run: docker compose -f microservices/identity-governance-service/compose.local.yml --profile e2e down -v --remove-orphans || true
+      - name: Upload Domain A browser and service evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-domain-a-e2e-${{ github.sha }}
+          path: ${{ runner.temp }}/identity-domain-a-e2e/**
+          include-hidden-files: true
           if-no-files-found: error
           retention-days: 14
 
   publish:
     name: Publish immutable identity-governance image
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: verify
+    needs: [verify, identity-domain-a-e2e]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production

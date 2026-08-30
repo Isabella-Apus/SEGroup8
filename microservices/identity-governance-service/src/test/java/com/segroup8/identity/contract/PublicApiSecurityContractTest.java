@@ -11,11 +11,14 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -24,6 +27,15 @@ class PublicApiSecurityContractTest extends IdentityTestSupport {
     @BeforeEach
     void setUp() {
         resetDatabase();
+    }
+
+    @Test
+    void productionActuatorDoesNotExposeFlywayDetails() throws Exception {
+        String links = mvc.perform(get("/actuator"))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        assertThat(links).doesNotContain("flyway");
+        mvc.perform(get("/actuator/flyway")).andExpect(status().isNotFound());
     }
 
     @Test

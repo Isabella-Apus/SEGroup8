@@ -33,6 +33,7 @@ diagnostics() {
   kubectl --namespace "$k8s_namespace" get pods,service,ingress -o wide
   kubectl --namespace "$k8s_namespace" describe deployment/segroup8-identity-governance
   kubectl --namespace "$k8s_namespace" logs deployment/segroup8-identity-governance --all-containers --tail=200
+  kubectl --namespace "$k8s_namespace" logs deployment/segroup8-identity-governance --all-containers --previous --tail=200
   echo "::endgroup::"
   set -e
 }

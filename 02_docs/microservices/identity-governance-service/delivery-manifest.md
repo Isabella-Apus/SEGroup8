@@ -10,7 +10,7 @@
 | JSON 日志、liveness/readiness/info | PASS | 三项运行检查为 UP/正确版本，日志为 JSON |
 | 数据库跨 Schema 拒绝 | PASS | 本 Schema COUNT 成功；跨查返回 MySQL 1142 |
 | Domain A 真实浏览器 E2E | PASS | 既有 UC01-UC05 spec 5/5，经临时 Nginx → 独立服务 → MySQL |
-| 改造前后同断言版本 | PASS | `monolith-start` 5/5；微服务 5/5，均保留 Playwright 原始报告 |
+| 改造前后同断言版本 | PASS | `monolith-start` 5/5；微服务 5/5，Git 保留 JSON/XML，完整报告由 Actions artifact 保存 |
 | 全公开接口 API 测试 | PASS | 31/31 成功；29/29 匿名与失效账户；10/10 管理越权 |
 | GitHub Actions PR 门禁 | PASS | 独立服务 run `33297661588` 与完整系统 run `33297661706` 均成功 |
 | ACR/K3s 发布部署 | CONFIGURED / NOT_RUN | 仅合并到 `main` 后发布；PR run 中 publish/deploy 按设计跳过 |
