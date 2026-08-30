@@ -1,8 +1,8 @@
 # MS-04 非作者 Review 清单
 
-评审人：待填写（不得为 Chazeynnn）
+评审人：Isabella-Apus（已请求 Review，不得为 Chazeynnn）
 评审日期：待填写
-PR：待填写
+PR：[#213](https://github.com/Isabella-Apus/SEGroup8/pull/213)
 
 - [ ] 服务只拥有 `secondhand_db`，无跨库 Mapper 或 SQL
 - [ ] UC20 履约仍由 order-service 负责
