@@ -1,0 +1,724 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"monolith","namespace":"segroup8-cloud-exp-20260830-2300-ef71f1fe"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"monolith"}},"template":{"metadata":{"annotations":{"experiment.segroup8/baseline-image-digest":"sha256:c15925877511353f870b7f811ba81af3a53dccac3acbfddddbf29b928a2a8f5a"},"labels":{"app":"monolith"}},"spec":{"containers":[{"env":[{"name":"DB_URL","value":"jdbc:mysql://mysql:3306/monolith_db?useSSL=false\u0026allowPublicKeyRetrieval=true\u0026serverTimezone=Asia/Shanghai"},{"name":"DB_USERNAME","value":"monolith_app"},{"name":"DB_PASSWORD","valueFrom":{"secretKeyRef":{"key":"DB_PASSWORD","name":"experiment-secrets"}}},{"name":"JWT_SECRET","valueFrom":{"secretKeyRef":{"key":"JWT_SECRET","name":"experiment-secrets"}}},{"name":"APP_RISK_AUDIT_LLM_ENABLED","value":"false"},{"name":"APP_VERSION","value":"experiment-monolith-baseline"},{"name":"APP_COMMIT","value":"bb72290cff96c78ab189468b82db1f8ba3cd9323"},{"name":"TZ","value":"Asia/Shanghai"}],"image":"crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323","imagePullPolicy":"IfNotPresent","livenessProbe":{"httpGet":{"path":"/actuator/health/liveness","port":"http"},"periodSeconds":10},"name":"monolith","ports":[{"containerPort":8080,"name":"http"}],"readinessProbe":{"httpGet":{"path":"/actuator/health/readiness","port":"http"},"periodSeconds":5},"resources":{"limits":{"cpu":"500m","memory":"768Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"startupProbe":{"failureThreshold":36,"httpGet":{"path":"/actuator/health/liveness","port":"http"},"periodSeconds":5},"volumeMounts":[{"mountPath":"/app/uploads","name":"uploads"}]}],"securityContext":{"fsGroup":10001,"runAsGroup":10001,"runAsNonRoot":true,"runAsUser":10001},"volumes":[{"emptyDir":{},"name":"uploads"}]}}}}
+    creationTimestamp: "2026-08-30T15:04:21Z"
+    generation: 1
+    name: monolith
+    namespace: segroup8-cloud-exp-20260830-2300-ef71f1fe
+    resourceVersion: "92277"
+    uid: 5d87bc04-00f5-4456-833f-145ada58ac75
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: monolith
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          experiment.segroup8/baseline-image-digest: sha256:c15925877511353f870b7f811ba81af3a53dccac3acbfddddbf29b928a2a8f5a
+        labels:
+          app: monolith
+      spec:
+        containers:
+        - env:
+          - name: DB_URL
+            value: jdbc:mysql://mysql:3306/monolith_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          - name: DB_USERNAME
+            value: monolith_app
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: DB_PASSWORD
+                name: experiment-secrets
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                key: JWT_SECRET
+                name: experiment-secrets
+          - name: APP_RISK_AUDIT_LLM_ENABLED
+            value: "false"
+          - name: APP_VERSION
+            value: experiment-monolith-baseline
+          - name: APP_COMMIT
+            value: bb72290cff96c78ab189468b82db1f8ba3cd9323
+          - name: TZ
+            value: Asia/Shanghai
+          image: crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: monolith
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 768Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          startupProbe:
+            failureThreshold: 36
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/uploads
+            name: uploads
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 10001
+          runAsGroup: 10001
+          runAsNonRoot: true
+          runAsUser: 10001
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: uploads
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-08-30T15:06:01Z"
+      lastUpdateTime: "2026-08-30T15:06:01Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-08-30T15:04:21Z"
+      lastUpdateTime: "2026-08-30T15:06:01Z"
+      message: ReplicaSet "monolith-86f5d4c556" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"mysql","namespace":"segroup8-cloud-exp-20260830-2300-ef71f1fe"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"mysql"}},"template":{"metadata":{"labels":{"app":"mysql"}},"spec":{"containers":[{"env":[{"name":"MYSQL_ROOT_PASSWORD","valueFrom":{"secretKeyRef":{"key":"MYSQL_ROOT_PASSWORD","name":"experiment-secrets"}}}],"image":"crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/mysql:8.4.6","imagePullPolicy":"IfNotPresent","name":"mysql","ports":[{"containerPort":3306,"name":"mysql"}],"readinessProbe":{"exec":{"command":["sh","-c","mysqladmin ping -h 127.0.0.1 -uroot -p$MYSQL_ROOT_PASSWORD --silent"]},"initialDelaySeconds":10,"periodSeconds":5},"resources":{"limits":{"cpu":"1","memory":"1536Mi"},"requests":{"cpu":"250m","memory":"512Mi"}},"volumeMounts":[{"mountPath":"/docker-entrypoint-initdb.d","name":"mysql-init","readOnly":true},{"mountPath":"/var/lib/mysql","name":"mysql-data"}]}],"volumes":[{"hostPath":{"path":"/root/segroup8-experiments/20260830-2300-ef71f1fe/mysql-init","type":"Directory"},"name":"mysql-init"},{"emptyDir":{},"name":"mysql-data"}]}}}}
+    creationTimestamp: "2026-08-30T15:04:21Z"
+    generation: 1
+    name: mysql
+    namespace: segroup8-cloud-exp-20260830-2300-ef71f1fe
+    resourceVersion: "92188"
+    uid: d5013f44-9855-4978-92ce-a1bc584e2249
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: mysql
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app: mysql
+      spec:
+        containers:
+        - env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: MYSQL_ROOT_PASSWORD
+                name: experiment-secrets
+          image: crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/mysql:8.4.6
+          imagePullPolicy: IfNotPresent
+          name: mysql
+          ports:
+          - containerPort: 3306
+            name: mysql
+            protocol: TCP
+          readinessProbe:
+            exec:
+              command:
+              - sh
+              - -c
+              - mysqladmin ping -h 127.0.0.1 -uroot -p$MYSQL_ROOT_PASSWORD --silent
+            failureThreshold: 3
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1536Mi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /docker-entrypoint-initdb.d
+            name: mysql-init
+            readOnly: true
+          - mountPath: /var/lib/mysql
+            name: mysql-data
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /root/segroup8-experiments/20260830-2300-ef71f1fe/mysql-init
+            type: Directory
+          name: mysql-init
+        - emptyDir: {}
+          name: mysql-data
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-08-30T15:04:52Z"
+      lastUpdateTime: "2026-08-30T15:04:52Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-08-30T15:04:21Z"
+      lastUpdateTime: "2026-08-30T15:04:52Z"
+      message: ReplicaSet "mysql-797646cfd5" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"order-service","namespace":"segroup8-cloud-exp-20260830-2300-ef71f1fe"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"order-service"}},"template":{"metadata":{"annotations":{"experiment.segroup8/jar-sha256":"4bcc3686fcd28432c8ef006298eb44f8d0a67b35d9fa7d862e81ea0e0e24909f"},"labels":{"app":"order-service"}},"spec":{"containers":[{"command":["java","-XX:MaxRAMPercentage=75","-jar","/app/app.jar"],"env":[{"name":"SERVER_PORT","value":"8085"},{"name":"DB_URL","value":"jdbc:mysql://mysql:3306/order_db?useSSL=false\u0026allowPublicKeyRetrieval=true\u0026serverTimezone=Asia/Shanghai"},{"name":"DB_USERNAME","value":"order_app"},{"name":"DB_PASSWORD","valueFrom":{"secretKeyRef":{"key":"DB_PASSWORD","name":"experiment-secrets"}}},{"name":"JWT_SECRET","valueFrom":{"secretKeyRef":{"key":"JWT_SECRET","name":"experiment-secrets"}}},{"name":"INTERNAL_SERVICE_TOKEN","valueFrom":{"secretKeyRef":{"key":"INTERNAL_SERVICE_TOKEN","name":"experiment-secrets"}}},{"name":"OUTBOX_PUBLISHER_ENABLED","value":"false"},{"name":"APP_VERSION","value":"experiment-20260830-2300-ef71f1fe"},{"name":"APP_COMMIT","value":"ef71f1fe2349"},{"name":"TZ","value":"Asia/Shanghai"}],"image":"crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323","imagePullPolicy":"IfNotPresent","livenessProbe":{"httpGet":{"path":"/actuator/health/liveness","port":"http"},"periodSeconds":10},"name":"order-service","ports":[{"containerPort":8085,"name":"http"}],"readinessProbe":{"httpGet":{"path":"/actuator/health/readiness","port":"http"},"periodSeconds":5},"resources":{"limits":{"cpu":"500m","memory":"768Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"startupProbe":{"failureThreshold":36,"httpGet":{"path":"/actuator/health/liveness","port":"http"},"periodSeconds":5},"volumeMounts":[{"mountPath":"/app/app.jar","name":"order-jar","readOnly":true}]}],"securityContext":{"fsGroup":10001,"runAsGroup":10001,"runAsNonRoot":true,"runAsUser":10001},"volumes":[{"hostPath":{"path":"/root/segroup8-experiments/20260830-2300-ef71f1fe/jars/order-service-1.0.0.jar","type":"File"},"name":"order-jar"}]}}}}
+    creationTimestamp: "2026-08-30T15:04:21Z"
+    generation: 1
+    name: order-service
+    namespace: segroup8-cloud-exp-20260830-2300-ef71f1fe
+    resourceVersion: "92260"
+    uid: cc4b9153-9038-476a-a650-3c44048f0692
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: order-service
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          experiment.segroup8/jar-sha256: 4bcc3686fcd28432c8ef006298eb44f8d0a67b35d9fa7d862e81ea0e0e24909f
+        labels:
+          app: order-service
+      spec:
+        containers:
+        - command:
+          - java
+          - -XX:MaxRAMPercentage=75
+          - -jar
+          - /app/app.jar
+          env:
+          - name: SERVER_PORT
+            value: "8085"
+          - name: DB_URL
+            value: jdbc:mysql://mysql:3306/order_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          - name: DB_USERNAME
+            value: order_app
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: DB_PASSWORD
+                name: experiment-secrets
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                key: JWT_SECRET
+                name: experiment-secrets
+          - name: INTERNAL_SERVICE_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: INTERNAL_SERVICE_TOKEN
+                name: experiment-secrets
+          - name: OUTBOX_PUBLISHER_ENABLED
+            value: "false"
+          - name: APP_VERSION
+            value: experiment-20260830-2300-ef71f1fe
+          - name: APP_COMMIT
+            value: ef71f1fe2349
+          - name: TZ
+            value: Asia/Shanghai
+          image: crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: order-service
+          ports:
+          - containerPort: 8085
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 768Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          startupProbe:
+            failureThreshold: 36
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/app.jar
+            name: order-jar
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 10001
+          runAsGroup: 10001
+          runAsNonRoot: true
+          runAsUser: 10001
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /root/segroup8-experiments/20260830-2300-ef71f1fe/jars/order-service-1.0.0.jar
+            type: File
+          name: order-jar
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-08-30T15:05:51Z"
+      lastUpdateTime: "2026-08-30T15:05:51Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-08-30T15:04:21Z"
+      lastUpdateTime: "2026-08-30T15:05:51Z"
+      message: ReplicaSet "order-service-b486d7b94" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+    updatedReplicas: 1
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "1"
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"secondhand-service","namespace":"segroup8-cloud-exp-20260830-2300-ef71f1fe"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"secondhand-service"}},"template":{"metadata":{"annotations":{"experiment.segroup8/jar-sha256":"52717f94e705d42e3668b994794205463ae9861725099656a7679fd196216e1e"},"labels":{"app":"secondhand-service"}},"spec":{"containers":[{"command":["java","-XX:MaxRAMPercentage=75","-jar","/app/app.jar"],"env":[{"name":"SERVER_PORT","value":"8080"},{"name":"DB_URL","value":"jdbc:mysql://mysql:3306/secondhand_db?useSSL=false\u0026allowPublicKeyRetrieval=true\u0026serverTimezone=Asia/Shanghai"},{"name":"DB_USERNAME","value":"secondhand_app"},{"name":"DB_PASSWORD","valueFrom":{"secretKeyRef":{"key":"DB_PASSWORD","name":"experiment-secrets"}}},{"name":"JWT_SECRET","valueFrom":{"secretKeyRef":{"key":"JWT_SECRET","name":"experiment-secrets"}}},{"name":"INTERNAL_SERVICE_TOKEN","valueFrom":{"secretKeyRef":{"key":"INTERNAL_SERVICE_TOKEN","name":"experiment-secrets"}}},{"name":"ORDER_SERVICE_URL","value":"http://order-service:8085"},{"name":"ORDER_CONNECT_TIMEOUT","value":"500ms"},{"name":"ORDER_READ_TIMEOUT","value":"1s"},{"name":"ORDER_MAX_ATTEMPTS","value":"5"},{"name":"TRADE_RECOVERY_DELAY_MS","value":"2000"},{"name":"APP_VERSION","value":"experiment-20260830-2300-ef71f1fe"},{"name":"APP_COMMIT","value":"ef71f1fe2349"},{"name":"TZ","value":"Asia/Shanghai"}],"image":"crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323","imagePullPolicy":"IfNotPresent","livenessProbe":{"httpGet":{"path":"/actuator/health/liveness","port":"http"},"periodSeconds":10},"name":"secondhand-service","ports":[{"containerPort":8080,"name":"http"}],"readinessProbe":{"httpGet":{"path":"/actuator/health/readiness","port":"http"},"periodSeconds":5},"resources":{"limits":{"cpu":"500m","memory":"768Mi"},"requests":{"cpu":"100m","memory":"256Mi"}},"startupProbe":{"failureThreshold":36,"httpGet":{"path":"/actuator/health/liveness","port":"http"},"periodSeconds":5},"volumeMounts":[{"mountPath":"/app/app.jar","name":"secondhand-jar","readOnly":true}]}],"securityContext":{"fsGroup":10001,"runAsGroup":10001,"runAsNonRoot":true,"runAsUser":10001},"volumes":[{"hostPath":{"path":"/root/segroup8-experiments/20260830-2300-ef71f1fe/jars/secondhand-service-1.0.0.jar","type":"File"},"name":"secondhand-jar"}]}}}}
+    creationTimestamp: "2026-08-30T15:04:21Z"
+    generation: 1
+    name: secondhand-service
+    namespace: segroup8-cloud-exp-20260830-2300-ef71f1fe
+    resourceVersion: "92266"
+    uid: 6115a8d5-b421-446b-9990-4b48420bb072
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 10
+    selector:
+      matchLabels:
+        app: secondhand-service
+    strategy:
+      rollingUpdate:
+        maxSurge: 25%
+        maxUnavailable: 25%
+      type: RollingUpdate
+    template:
+      metadata:
+        annotations:
+          experiment.segroup8/jar-sha256: 52717f94e705d42e3668b994794205463ae9861725099656a7679fd196216e1e
+        labels:
+          app: secondhand-service
+      spec:
+        containers:
+        - command:
+          - java
+          - -XX:MaxRAMPercentage=75
+          - -jar
+          - /app/app.jar
+          env:
+          - name: SERVER_PORT
+            value: "8080"
+          - name: DB_URL
+            value: jdbc:mysql://mysql:3306/secondhand_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+          - name: DB_USERNAME
+            value: secondhand_app
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: DB_PASSWORD
+                name: experiment-secrets
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                key: JWT_SECRET
+                name: experiment-secrets
+          - name: INTERNAL_SERVICE_TOKEN
+            valueFrom:
+              secretKeyRef:
+                key: INTERNAL_SERVICE_TOKEN
+                name: experiment-secrets
+          - name: ORDER_SERVICE_URL
+            value: http://order-service:8085
+          - name: ORDER_CONNECT_TIMEOUT
+            value: 500ms
+          - name: ORDER_READ_TIMEOUT
+            value: 1s
+          - name: ORDER_MAX_ATTEMPTS
+            value: "5"
+          - name: TRADE_RECOVERY_DELAY_MS
+            value: "2000"
+          - name: APP_VERSION
+            value: experiment-20260830-2300-ef71f1fe
+          - name: APP_COMMIT
+            value: ef71f1fe2349
+          - name: TZ
+            value: Asia/Shanghai
+          image: crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: secondhand-service
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 768Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          startupProbe:
+            failureThreshold: 36
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/app.jar
+            name: secondhand-jar
+            readOnly: true
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 10001
+          runAsGroup: 10001
+          runAsNonRoot: true
+          runAsUser: 10001
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - hostPath:
+            path: /root/segroup8-experiments/20260830-2300-ef71f1fe/jars/secondhand-service-1.0.0.jar
+            type: File
+          name: secondhand-jar
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-08-30T15:05:52Z"
+      lastUpdateTime: "2026-08-30T15:05:52Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-08-30T15:04:21Z"
+      lastUpdateTime: "2026-08-30T15:05:52Z"
+      message: ReplicaSet "secondhand-service-75df9ff569" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 1
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+    updatedReplicas: 1
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"monolith","namespace":"segroup8-cloud-exp-20260830-2300-ef71f1fe"},"spec":{"ports":[{"name":"http","port":8080,"targetPort":"http"}],"selector":{"app":"monolith"}}}
+    creationTimestamp: "2026-08-30T15:04:21Z"
+    name: monolith
+    namespace: segroup8-cloud-exp-20260830-2300-ef71f1fe
+    resourceVersion: "92058"
+    uid: 0550a3c1-a2b1-47d5-b017-e94d73160228
+  spec:
+    clusterIP: 10.43.120.41
+    clusterIPs:
+    - 10.43.120.41
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: http
+    selector:
+      app: monolith
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"mysql","namespace":"segroup8-cloud-exp-20260830-2300-ef71f1fe"},"spec":{"ports":[{"name":"mysql","port":3306,"targetPort":"mysql"}],"selector":{"app":"mysql"}}}
+    creationTimestamp: "2026-08-30T15:04:21Z"
+    name: mysql
+    namespace: segroup8-cloud-exp-20260830-2300-ef71f1fe
+    resourceVersion: "92046"
+    uid: f81d6550-0531-471e-bae2-2b5b1357090f
+  spec:
+    clusterIP: 10.43.134.57
+    clusterIPs:
+    - 10.43.134.57
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: mysql
+      port: 3306
+      protocol: TCP
+      targetPort: mysql
+    selector:
+      app: mysql
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"order-service","namespace":"segroup8-cloud-exp-20260830-2300-ef71f1fe"},"spec":{"ports":[{"name":"http","port":8085,"targetPort":"http"}],"selector":{"app":"order-service"}}}
+    creationTimestamp: "2026-08-30T15:04:21Z"
+    name: order-service
+    namespace: segroup8-cloud-exp-20260830-2300-ef71f1fe
+    resourceVersion: "92068"
+    uid: f4036e30-3f92-47ba-8303-eae881e807cb
+  spec:
+    clusterIP: 10.43.176.32
+    clusterIPs:
+    - 10.43.176.32
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8085
+      protocol: TCP
+      targetPort: http
+    selector:
+      app: order-service
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"name":"secondhand-service","namespace":"segroup8-cloud-exp-20260830-2300-ef71f1fe"},"spec":{"ports":[{"name":"http","port":8080,"targetPort":"http"}],"selector":{"app":"secondhand-service"}}}
+    creationTimestamp: "2026-08-30T15:04:21Z"
+    name: secondhand-service
+    namespace: segroup8-cloud-exp-20260830-2300-ef71f1fe
+    resourceVersion: "92099"
+    uid: d1212c10-94bc-41db-abe5-6ecf7ddb822a
+  spec:
+    clusterIP: 10.43.213.198
+    clusterIPs:
+    - 10.43.213.198
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: http
+    selector:
+      app: secondhand-service
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: autoscaling/v2
+  kind: HorizontalPodAutoscaler
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"autoscaling/v2","kind":"HorizontalPodAutoscaler","metadata":{"annotations":{},"name":"secondhand-service","namespace":"segroup8-cloud-exp-20260830-2300-ef71f1fe"},"spec":{"behavior":{"scaleDown":{"policies":[{"periodSeconds":15,"type":"Percent","value":50}],"selectPolicy":"Max","stabilizationWindowSeconds":60},"scaleUp":{"policies":[{"periodSeconds":15,"type":"Pods","value":2}],"selectPolicy":"Max","stabilizationWindowSeconds":0}},"maxReplicas":4,"metrics":[{"resource":{"name":"cpu","target":{"averageUtilization":60,"type":"Utilization"}},"type":"Resource"}],"minReplicas":1,"scaleTargetRef":{"apiVersion":"apps/v1","kind":"Deployment","name":"secondhand-service"}}}
+    creationTimestamp: "2026-08-30T15:04:21Z"
+    name: secondhand-service
+    namespace: segroup8-cloud-exp-20260830-2300-ef71f1fe
+    resourceVersion: "92179"
+    uid: a8e3d8d6-957d-4222-9338-20a837da9d31
+  spec:
+    behavior:
+      scaleDown:
+        policies:
+        - periodSeconds: 15
+          type: Percent
+          value: 50
+        selectPolicy: Max
+        stabilizationWindowSeconds: 60
+      scaleUp:
+        policies:
+        - periodSeconds: 15
+          type: Pods
+          value: 2
+        selectPolicy: Max
+        stabilizationWindowSeconds: 0
+    maxReplicas: 4
+    metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 60
+          type: Utilization
+      type: Resource
+    minReplicas: 1
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: secondhand-service
+  status:
+    conditions:
+    - lastTransitionTime: "2026-08-30T15:04:36Z"
+      message: the HPA controller was able to get the target's current scale
+      reason: SucceededGetScale
+      status: "True"
+      type: AbleToScale
+    - lastTransitionTime: "2026-08-30T15:04:36Z"
+      message: 'the HPA was unable to compute the replica count: failed to get cpu
+        utilization: did not receive metrics for targeted pods (pods might be unready)'
+      reason: FailedGetResourceMetric
+      status: "False"
+      type: ScalingActive
+    currentMetrics:
+    - type: ""
+    currentReplicas: 1
+    desiredReplicas: 0
+kind: List
+metadata:
+  resourceVersion: ""

@@ -1,0 +1,21 @@
+time="2026-08-30T23:04:20+08:00" level=warning msg="DEPRECATION: The `configs` property of `[plugins.\"io.containerd.grpc.v1.cri\".registry]` is deprecated since containerd v1.5 and will be removed in containerd v2.4. Use `config_path` instead."
+namespace/segroup8-cloud-exp-20260830-2300-ef71f1fe created
+secret/experiment-secrets created
+deployment.apps/mysql created
+service/mysql created
+deployment.apps/monolith created
+service/monolith created
+deployment.apps/order-service created
+service/order-service created
+deployment.apps/secondhand-service created
+service/secondhand-service created
+horizontalpodautoscaler.autoscaling/secondhand-service created
+Waiting for deployment "mysql" rollout to finish: 0 of 1 updated replicas are available...
+deployment "mysql" successfully rolled out
+Waiting for deployment "monolith" rollout to finish: 0 of 1 updated replicas are available...
+deployment "monolith" successfully rolled out
+deployment "order-service" successfully rolled out
+deployment "secondhand-service" successfully rolled out
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Prepared namespace segroup8-cloud-exp-20260830-2300-ef71f1fe
+State file: /root/segroup8-experiments/20260830-2300-ef71f1fe/state.env

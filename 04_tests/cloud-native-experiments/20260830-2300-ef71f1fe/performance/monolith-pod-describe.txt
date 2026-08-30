@@ -1,0 +1,84 @@
+Name:             monolith-86f5d4c556-dn9lt
+Namespace:        segroup8-cloud-exp-20260830-2300-ef71f1fe
+Priority:         0
+Service Account:  default
+Node:             izbp1fcr5ltsng9ra8gt84z/172.28.7.2
+Start Time:       Sun, 30 Aug 2026 23:04:21 +0800
+Labels:           app=monolith
+                  pod-template-hash=86f5d4c556
+Annotations:      experiment.segroup8/baseline-image-digest: sha256:c15925877511353f870b7f811ba81af3a53dccac3acbfddddbf29b928a2a8f5a
+Status:           Running
+IP:               10.42.0.51
+IPs:
+  IP:           10.42.0.51
+Controlled By:  ReplicaSet/monolith-86f5d4c556
+Containers:
+  monolith:
+    Container ID:   containerd://c125e9cf5394ef9b92e851d037b5d134c58cea0a006fe46a95155d52ec993427
+    Image:          crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323
+    Image ID:       crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend@sha256:c15925877511353f870b7f811ba81af3a53dccac3acbfddddbf29b928a2a8f5a
+    Port:           8080/TCP (http)
+    Host Port:      0/TCP (http)
+    State:          Running
+      Started:      Sun, 30 Aug 2026 23:18:42 +0800
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    143
+      Started:      Sun, 30 Aug 2026 23:15:02 +0800
+      Finished:     Sun, 30 Aug 2026 23:18:42 +0800
+    Ready:          True
+    Restart Count:  3
+    Limits:
+      cpu:     500m
+      memory:  768Mi
+    Requests:
+      cpu:      100m
+      memory:   256Mi
+    Liveness:   http-get http://:http/actuator/health/liveness delay=0s timeout=1s period=10s #success=1 #failure=3
+    Readiness:  http-get http://:http/actuator/health/readiness delay=0s timeout=1s period=5s #success=1 #failure=3
+    Startup:    http-get http://:http/actuator/health/liveness delay=0s timeout=1s period=5s #success=1 #failure=36
+    Environment:
+      DB_URL:                      jdbc:mysql://mysql:3306/monolith_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+      DB_USERNAME:                 monolith_app
+      DB_PASSWORD:                 <set to the key 'DB_PASSWORD' in secret 'experiment-secrets'>  Optional: false
+      JWT_SECRET:                  <set to the key 'JWT_SECRET' in secret 'experiment-secrets'>   Optional: false
+      APP_RISK_AUDIT_LLM_ENABLED:  false
+      APP_VERSION:                 experiment-monolith-baseline
+      APP_COMMIT:                  bb72290cff96c78ab189468b82db1f8ba3cd9323
+      TZ:                          Asia/Shanghai
+    Mounts:
+      /app/uploads from uploads (rw)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-w49r8 (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  uploads:
+    Type:       EmptyDir (a temporary directory that shares a pod's lifetime)
+    Medium:     
+    SizeLimit:  <unset>
+  kube-api-access-w49r8:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                 From               Message
+  ----     ------     ----                ----               -------
+  Normal   Scheduled  33m                 default-scheduler  Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/monolith-86f5d4c556-dn9lt to izbp1fcr5ltsng9ra8gt84z
+  Warning  Unhealthy  31m                 kubelet            spec.containers{monolith}: Startup probe failed: Get "http://10.42.0.51:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+  Warning  Unhealthy  23m (x44 over 29m)  kubelet            spec.containers{monolith}: Readiness probe failed: Get "http://10.42.0.51:8080/actuator/health/readiness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+  Normal   Killing    19m (x3 over 27m)   kubelet            spec.containers{monolith}: Container monolith failed liveness probe, will be restarted
+  Normal   Pulled     19m (x4 over 33m)   kubelet            spec.containers{monolith}: Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+  Normal   Created    19m (x4 over 33m)   kubelet            spec.containers{monolith}: Container created
+  Normal   Started    19m (x4 over 33m)   kubelet            spec.containers{monolith}: Container started
+  Warning  Unhealthy  18m (x52 over 33m)  kubelet            spec.containers{monolith}: Startup probe failed: Get "http://10.42.0.51:8080/actuator/health/liveness": dial tcp 10.42.0.51:8080: connect: connection refused

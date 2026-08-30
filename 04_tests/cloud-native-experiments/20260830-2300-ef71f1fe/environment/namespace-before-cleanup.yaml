@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Namespace","metadata":{"annotations":{},"labels":{"purpose":"segroup8-cloud-native-experiment"},"name":"segroup8-cloud-exp-20260830-2300-ef71f1fe"}}
+  creationTimestamp: "2026-08-30T15:04:20Z"
+  labels:
+    kubernetes.io/metadata.name: segroup8-cloud-exp-20260830-2300-ef71f1fe
+    purpose: segroup8-cloud-native-experiment
+  name: segroup8-cloud-exp-20260830-2300-ef71f1fe
+  resourceVersion: "92040"
+  uid: 48923ef0-6338-48af-8159-621dfe86aa2a
+spec:
+  finalizers:
+  - kubernetes
+status:
+  phase: Active

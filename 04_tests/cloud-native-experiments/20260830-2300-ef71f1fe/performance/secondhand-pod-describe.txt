@@ -1,0 +1,88 @@
+Name:             secondhand-service-75df9ff569-fkxxm
+Namespace:        segroup8-cloud-exp-20260830-2300-ef71f1fe
+Priority:         0
+Service Account:  default
+Node:             izbp1fcr5ltsng9ra8gt84z/172.28.7.2
+Start Time:       Sun, 30 Aug 2026 23:04:21 +0800
+Labels:           app=secondhand-service
+                  pod-template-hash=75df9ff569
+Annotations:      experiment.segroup8/jar-sha256: 52717f94e705d42e3668b994794205463ae9861725099656a7679fd196216e1e
+Status:           Running
+IP:               10.42.0.52
+IPs:
+  IP:           10.42.0.52
+Controlled By:  ReplicaSet/secondhand-service-75df9ff569
+Containers:
+  secondhand-service:
+    Container ID:  containerd://1780cba2b54bad97bc300d0f0929caf45b81f95f3658680add649abe3118260f
+    Image:         crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323
+    Image ID:      crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend@sha256:c15925877511353f870b7f811ba81af3a53dccac3acbfddddbf29b928a2a8f5a
+    Port:          8080/TCP (http)
+    Host Port:     0/TCP (http)
+    Command:
+      java
+      -XX:MaxRAMPercentage=75
+      -jar
+      /app/app.jar
+    State:          Running
+      Started:      Sun, 30 Aug 2026 23:04:22 +0800
+    Ready:          True
+    Restart Count:  0
+    Limits:
+      cpu:     500m
+      memory:  768Mi
+    Requests:
+      cpu:      100m
+      memory:   256Mi
+    Liveness:   http-get http://:http/actuator/health/liveness delay=0s timeout=1s period=10s #success=1 #failure=3
+    Readiness:  http-get http://:http/actuator/health/readiness delay=0s timeout=1s period=5s #success=1 #failure=3
+    Startup:    http-get http://:http/actuator/health/liveness delay=0s timeout=1s period=5s #success=1 #failure=36
+    Environment:
+      SERVER_PORT:              8080
+      DB_URL:                   jdbc:mysql://mysql:3306/secondhand_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+      DB_USERNAME:              secondhand_app
+      DB_PASSWORD:              <set to the key 'DB_PASSWORD' in secret 'experiment-secrets'>             Optional: false
+      JWT_SECRET:               <set to the key 'JWT_SECRET' in secret 'experiment-secrets'>              Optional: false
+      INTERNAL_SERVICE_TOKEN:   <set to the key 'INTERNAL_SERVICE_TOKEN' in secret 'experiment-secrets'>  Optional: false
+      ORDER_SERVICE_URL:        http://order-service:8085
+      ORDER_CONNECT_TIMEOUT:    500ms
+      ORDER_READ_TIMEOUT:       1s
+      ORDER_MAX_ATTEMPTS:       5
+      TRADE_RECOVERY_DELAY_MS:  2000
+      APP_VERSION:              experiment-20260830-2300-ef71f1fe
+      APP_COMMIT:               ef71f1fe2349
+      TZ:                       Asia/Shanghai
+    Mounts:
+      /app/app.jar from secondhand-jar (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-92c8l (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       True 
+  ContainersReady             True 
+  PodScheduled                True 
+Volumes:
+  secondhand-jar:
+    Type:          HostPath (bare host directory volume)
+    Path:          /root/segroup8-experiments/20260830-2300-ef71f1fe/jars/secondhand-service-1.0.0.jar
+    HostPathType:  File
+  kube-api-access-92c8l:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   Burstable
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                 From               Message
+  ----     ------     ----                ----               -------
+  Normal   Scheduled  33m                 default-scheduler  Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/secondhand-service-75df9ff569-fkxxm to izbp1fcr5ltsng9ra8gt84z
+  Normal   Pulled     33m                 kubelet            spec.containers{secondhand-service}: Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+  Normal   Created    33m                 kubelet            spec.containers{secondhand-service}: Container created
+  Normal   Started    33m                 kubelet            spec.containers{secondhand-service}: Container started
+  Warning  Unhealthy  32m (x16 over 33m)  kubelet            spec.containers{secondhand-service}: Startup probe failed: Get "http://10.42.0.52:8080/actuator/health/liveness": dial tcp 10.42.0.52:8080: connect: connection refused
+  Warning  Unhealthy  32m                 kubelet            spec.containers{secondhand-service}: Startup probe failed: Get "http://10.42.0.52:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)

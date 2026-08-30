@@ -1,0 +1,10 @@
+CREATE DATABASE IF NOT EXISTS monolith_db CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE DATABASE IF NOT EXISTS secondhand_db CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE DATABASE IF NOT EXISTS order_db CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE USER IF NOT EXISTS 'monolith_app'@'%' IDENTIFIED BY '__DB_PASSWORD__';
+CREATE USER IF NOT EXISTS 'secondhand_app'@'%' IDENTIFIED BY '__DB_PASSWORD__';
+CREATE USER IF NOT EXISTS 'order_app'@'%' IDENTIFIED BY '__DB_PASSWORD__';
+GRANT ALL PRIVILEGES ON monolith_db.* TO 'monolith_app'@'%';
+GRANT ALL PRIVILEGES ON secondhand_db.* TO 'secondhand_app'@'%';
+GRANT ALL PRIVILEGES ON order_db.* TO 'order_app'@'%';
+FLUSH PRIVILEGES;

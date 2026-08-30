@@ -1,0 +1,795 @@
+[2026-08-30T23:43:38+08:00] round=1 phase=pre-load
+NAME                 REFERENCE                       TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 3%/60%   1         4         1          17s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-fkxxm   3m           233Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   474m         11%      4413Mi          60%         
+[2026-08-30T23:43:39+08:00] round=1 phase=load
+NAME                 REFERENCE                       TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 3%/60%   1         4         1          18s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-fkxxm   3m           233Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   474m         11%      4413Mi          60%         
+[2026-08-30T23:43:46+08:00] round=1 phase=load
+NAME                 REFERENCE                       TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 3%/60%   1         4         1          25s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-fkxxm   3m           233Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   624m         15%      4429Mi          60%         
+[2026-08-30T23:43:52+08:00] round=1 phase=load
+NAME                 REFERENCE                       TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 3%/60%   1         4         1          31s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-fkxxm   3m           233Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   624m         15%      4429Mi          60%         
+[2026-08-30T23:43:59+08:00] round=1 phase=load
+NAME                 REFERENCE                       TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 3%/60%   1         4         1          38s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-fkxxm   3m           233Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   624m         15%      4429Mi          60%         
+[2026-08-30T23:44:05+08:00] round=1 phase=load
+NAME                 REFERENCE                       TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 3%/60%   1         4         1          44s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-fkxxm   182m         245Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   1462m        36%      4464Mi          61%         
+[2026-08-30T23:44:13+08:00] round=1 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 182%/60%   1         4         1          52s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-fkxxm   182m         245Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   1462m        36%      4464Mi          61%         
+[2026-08-30T23:44:20+08:00] round=1 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 182%/60%   1         4         1          60s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-fkxxm   500m         313Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   1856m        46%      4595Mi          63%         
+[2026-08-30T23:44:28+08:00] round=1 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 500%/60%   1         4         3          71s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-dj7l9   493m         63Mi            
+secondhand-service-75df9ff569-fkxxm   500m         334Mi           
+secondhand-service-75df9ff569-pqs7f   493m         70Mi            
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2933m        73%      4691Mi          64%         
+[2026-08-30T23:44:39+08:00] round=1 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 500%/60%   1         4         4          80s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-dj7l9   493m         63Mi            
+secondhand-service-75df9ff569-fkxxm   500m         334Mi           
+secondhand-service-75df9ff569-pqs7f   493m         70Mi            
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2933m        73%      4691Mi          64%         
+[2026-08-30T23:44:49+08:00] round=1 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 493%/60%   1         4         4          90s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   476m         52Mi            
+secondhand-service-75df9ff569-dj7l9   476m         80Mi            
+secondhand-service-75df9ff569-fkxxm   493m         359Mi           
+secondhand-service-75df9ff569-pqs7f   479m         90Mi            
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   3508m        87%      4783Mi          65%         
+[2026-08-30T23:44:58+08:00] round=1 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 493%/60%   1         4         4          98s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   476m         52Mi            
+secondhand-service-75df9ff569-dj7l9   476m         80Mi            
+secondhand-service-75df9ff569-fkxxm   493m         359Mi           
+secondhand-service-75df9ff569-pqs7f   479m         90Mi            
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   3508m        87%      4783Mi          65%         
+[2026-08-30T23:45:05+08:00] round=1 phase=post-load
+NAME                 REFERENCE                       TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: <unknown>/60%   1         4         4          105s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   489m         79Mi            
+secondhand-service-75df9ff569-dj7l9   478m         95Mi            
+secondhand-service-75df9ff569-pqs7f   493m         106Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   3409m        85%      4487Mi          61%         
+[2026-08-30T23:45:08+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: <unknown>/60%   1         4         4          107s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   489m         79Mi            
+secondhand-service-75df9ff569-dj7l9   478m         95Mi            
+secondhand-service-75df9ff569-pqs7f   493m         106Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   3409m        85%      4487Mi          61%         
+[2026-08-30T23:45:21+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 494%/60%   1         4         4          2m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   499m         92Mi            
+secondhand-service-75df9ff569-dj7l9   500m         124Mi           
+secondhand-service-75df9ff569-fkxxm   494m         50Mi            
+secondhand-service-75df9ff569-pqs7f   499m         132Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2711m        67%      4640Mi          63%         
+[2026-08-30T23:45:34+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 494%/60%   1         4         4          2m13s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   500m         136Mi           
+secondhand-service-75df9ff569-dj7l9   501m         143Mi           
+secondhand-service-75df9ff569-fkxxm   499m         82Mi            
+secondhand-service-75df9ff569-pqs7f   500m         155Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2563m        64%      4728Mi          65%         
+[2026-08-30T23:45:47+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 499%/60%   1         4         4          2m26s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   502m         162Mi           
+secondhand-service-75df9ff569-dj7l9   500m         170Mi           
+secondhand-service-75df9ff569-fkxxm   499m         103Mi           
+secondhand-service-75df9ff569-pqs7f   499m         173Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2288m        57%      4834Mi          66%         
+[2026-08-30T23:45:59+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 499%/60%   1         4         4          2m37s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   502m         162Mi           
+secondhand-service-75df9ff569-dj7l9   500m         170Mi           
+secondhand-service-75df9ff569-fkxxm   499m         103Mi           
+secondhand-service-75df9ff569-pqs7f   499m         173Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2288m        57%      4834Mi          66%         
+[2026-08-30T23:46:10+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 500%/60%   1         4         4          2m49s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   339m         176Mi           
+secondhand-service-75df9ff569-dj7l9   174m         182Mi           
+secondhand-service-75df9ff569-fkxxm   500m         143Mi           
+secondhand-service-75df9ff569-pqs7f   192m         173Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   1396m        34%      4855Mi          66%         
+[2026-08-30T23:46:22+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 257%/60%   1         4         4          3m1s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   41m          177Mi           
+secondhand-service-75df9ff569-dj7l9   174m         182Mi           
+secondhand-service-75df9ff569-fkxxm   501m         187Mi           
+secondhand-service-75df9ff569-pqs7f   13m          174Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   1049m        26%      4912Mi          67%         
+[2026-08-30T23:46:34+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 257%/60%   1         4         4          3m12s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   10m          177Mi           
+secondhand-service-75df9ff569-dj7l9   15m          183Mi           
+secondhand-service-75df9ff569-fkxxm   329m         198Mi           
+secondhand-service-75df9ff569-pqs7f   13m          175Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   511m         12%      4912Mi          67%         
+[2026-08-30T23:46:45+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 91%/60%   1         4         4          3m24s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   12m          177Mi           
+secondhand-service-75df9ff569-dj7l9   11m          183Mi           
+secondhand-service-75df9ff569-fkxxm   20m          199Mi           
+secondhand-service-75df9ff569-pqs7f   10m          175Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   376m         9%       4908Mi          67%         
+[2026-08-30T23:46:57+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 13%/60%   1         4         4          3m35s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   12m          177Mi           
+secondhand-service-75df9ff569-dj7l9   11m          183Mi           
+secondhand-service-75df9ff569-fkxxm   20m          199Mi           
+secondhand-service-75df9ff569-pqs7f   10m          175Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   376m         9%       4908Mi          67%         
+[2026-08-30T23:47:08+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 13%/60%   1         4         4          3m47s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   14m          178Mi           
+secondhand-service-75df9ff569-dj7l9   11m          183Mi           
+secondhand-service-75df9ff569-fkxxm   20m          199Mi           
+secondhand-service-75df9ff569-pqs7f   10m          175Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   467m         11%      4908Mi          67%         
+[2026-08-30T23:47:20+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 13%/60%   1         4         4          3m58s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   10m          178Mi           
+secondhand-service-75df9ff569-dj7l9   13m          184Mi           
+secondhand-service-75df9ff569-fkxxm   16m          200Mi           
+secondhand-service-75df9ff569-pqs7f   24m          176Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   470m         11%      4913Mi          67%         
+[2026-08-30T23:47:31+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 15%/60%   1         4         4          4m10s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   9m           178Mi           
+secondhand-service-75df9ff569-dj7l9   13m          184Mi           
+secondhand-service-75df9ff569-fkxxm   12m          200Mi           
+secondhand-service-75df9ff569-pqs7f   49m          194Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   597m         14%      4909Mi          67%         
+[2026-08-30T23:47:43+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 20%/60%   1         4         4          4m21s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   9m           178Mi           
+secondhand-service-75df9ff569-pqs7f   49m          194Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   597m         14%      4909Mi          67%         
+[2026-08-30T23:47:54+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 11%/60%   1         4         2          4m33s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   11m          178Mi           
+secondhand-service-75df9ff569-pqs7f   11m          176Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   685m         17%      4536Mi          62%         
+[2026-08-30T23:48:06+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 11%/60%   1         4         2          4m44s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   9m           178Mi           
+secondhand-service-75df9ff569-pqs7f   11m          176Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   306m         7%       4517Mi          62%         
+[2026-08-30T23:48:17+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 10%/60%   1         4         2          4m56s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   11m          179Mi           
+secondhand-service-75df9ff569-pqs7f   29m          177Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   434m         10%      4518Mi          62%         
+[2026-08-30T23:48:29+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 20%/60%   1         4         2          5m8s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   11m          179Mi           
+secondhand-service-75df9ff569-pqs7f   29m          177Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   434m         10%      4518Mi          62%         
+[2026-08-30T23:48:41+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 10%/60%   1         4         2          5m19s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   12m          180Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   458m         11%      4519Mi          62%         
+[2026-08-30T23:48:52+08:00] round=1 phase=scale-down
+NAME                 REFERENCE                       TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 8%/60%   1         4         1          5m31s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   8m           180Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   532m         13%      4341Mi          59%         
+[2026-08-30T23:48:54+08:00] round=2 phase=pre-load
+NAME                 REFERENCE                       TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 8%/60%   1         4         1          5m33s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   8m           180Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   532m         13%      4341Mi          59%         
+[2026-08-30T23:48:55+08:00] round=2 phase=load
+NAME                 REFERENCE                       TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 8%/60%   1         4         1          5m34s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   8m           180Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   532m         13%      4341Mi          59%         
+[2026-08-30T23:49:02+08:00] round=2 phase=load
+NAME                 REFERENCE                       TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 8%/60%   1         4         1          5m41s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   117m         182Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   550m         13%      4354Mi          59%         
+[2026-08-30T23:49:08+08:00] round=2 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 117%/60%   1         4         1          5m47s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   117m         182Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   550m         13%      4354Mi          59%         
+[2026-08-30T23:49:15+08:00] round=2 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 117%/60%   1         4         1          5m54s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   501m         217Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   1391m        34%      4436Mi          61%         
+[2026-08-30T23:49:22+08:00] round=2 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 501%/60%   1         4         2          6m3s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   501m         217Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   1391m        34%      4436Mi          61%         
+[2026-08-30T23:49:32+08:00] round=2 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 501%/60%   1         4         2          6m14s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   499m         236Mi           
+secondhand-service-75df9ff569-m8bt8   497m         63Mi            
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2384m        59%      4514Mi          62%         
+[2026-08-30T23:49:42+08:00] round=2 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 499%/60%   1         4         4          6m23s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   499m         236Mi           
+secondhand-service-75df9ff569-m8bt8   497m         63Mi            
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   3314m        82%      4706Mi          64%         
+[2026-08-30T23:49:51+08:00] round=2 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 498%/60%   1         4         4          6m32s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   498m         255Mi           
+secondhand-service-75df9ff569-kjktw   490m         68Mi            
+secondhand-service-75df9ff569-lf9vx   470m         43Mi            
+secondhand-service-75df9ff569-m8bt8   494m         91Mi            
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   3314m        82%      4706Mi          64%         
+[2026-08-30T23:50:00+08:00] round=2 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 498%/60%   1         4         4          6m41s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-kjktw   498m         95Mi            
+secondhand-service-75df9ff569-lf9vx   497m         78Mi            
+secondhand-service-75df9ff569-m8bt8   498m         108Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   3305m        82%      4475Mi          61%         
+[2026-08-30T23:50:09+08:00] round=2 phase=load
+NAME                 REFERENCE                       TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: <unknown>/60%   1         4         4          6m49s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-kjktw   498m         95Mi            
+secondhand-service-75df9ff569-lf9vx   497m         78Mi            
+secondhand-service-75df9ff569-m8bt8   498m         108Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   3305m        82%      4475Mi          61%         
+[2026-08-30T23:50:17+08:00] round=2 phase=post-load
+NAME                 REFERENCE                       TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: <unknown>/60%   1         4         4          6m56s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   493m         47Mi            
+secondhand-service-75df9ff569-kjktw   499m         113Mi           
+secondhand-service-75df9ff569-lf9vx   495m         103Mi           
+secondhand-service-75df9ff569-m8bt8   499m         134Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2861m        71%      4632Mi          63%         
+[2026-08-30T23:50:19+08:00] round=2 phase=scale-down
+NAME                 REFERENCE                       TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: <unknown>/60%   1         4         4          6m58s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   493m         47Mi            
+secondhand-service-75df9ff569-kjktw   499m         113Mi           
+secondhand-service-75df9ff569-lf9vx   495m         103Mi           
+secondhand-service-75df9ff569-m8bt8   499m         134Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2861m        71%      4632Mi          63%         
+[2026-08-30T23:50:32+08:00] round=2 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 493%/60%   1         4         4          7m11s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   499m         78Mi            
+secondhand-service-75df9ff569-kjktw   499m         113Mi           
+secondhand-service-75df9ff569-lf9vx   495m         103Mi           
+secondhand-service-75df9ff569-m8bt8   499m         134Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2886m        72%      4683Mi          64%         
+[2026-08-30T23:50:44+08:00] round=2 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 499%/60%   1         4         4          7m24s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   500m         109Mi           
+secondhand-service-75df9ff569-kjktw   500m         143Mi           
+secondhand-service-75df9ff569-lf9vx   500m         138Mi           
+secondhand-service-75df9ff569-m8bt8   453m         188Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2328m        58%      4819Mi          66%         
+[2026-08-30T23:50:57+08:00] round=2 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 500%/60%   1         4         4          7m36s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   500m         109Mi           
+secondhand-service-75df9ff569-kjktw   500m         143Mi           
+secondhand-service-75df9ff569-lf9vx   500m         138Mi           
+secondhand-service-75df9ff569-m8bt8   453m         188Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2328m        58%      4819Mi          66%         
+[2026-08-30T23:51:09+08:00] round=2 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 257%/60%   1         4         4          7m48s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   499m         139Mi           
+secondhand-service-75df9ff569-kjktw   500m         173Mi           
+secondhand-service-75df9ff569-lf9vx   502m         168Mi           
+secondhand-service-75df9ff569-m8bt8   15m          176Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   1938m        48%      4863Mi          66%         
+[2026-08-30T23:51:21+08:00] round=2 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 257%/60%   1         4         4          8m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   499m         139Mi           
+secondhand-service-75df9ff569-kjktw   151m         181Mi           
+secondhand-service-75df9ff569-lf9vx   295m         181Mi           
+secondhand-service-75df9ff569-m8bt8   14m          176Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   1153m        28%      4902Mi          67%         
+[2026-08-30T23:51:33+08:00] round=2 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 256%/60%   1         4         4          8m11s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   438m         175Mi           
+secondhand-service-75df9ff569-kjktw   15m          181Mi           
+secondhand-service-75df9ff569-lf9vx   13m          181Mi           
+secondhand-service-75df9ff569-m8bt8   14m          176Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   585m         14%      4903Mi          67%         
+[2026-08-30T23:51:44+08:00] round=2 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 120%/60%   1         4         4          8m23s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   438m         175Mi           
+secondhand-service-75df9ff569-kjktw   15m          181Mi           
+secondhand-service-75df9ff569-lf9vx   13m          181Mi           
+secondhand-service-75df9ff569-m8bt8   14m          176Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   585m         14%      4903Mi          67%         
+[2026-08-30T23:51:56+08:00] round=2 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 21%/60%   1         4         4          8m34s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   39m          176Mi           
+secondhand-service-75df9ff569-kjktw   21m          181Mi           
+secondhand-service-75df9ff569-lf9vx   12m          181Mi           
+secondhand-service-75df9ff569-m8bt8   13m          177Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   452m         11%      4911Mi          67%         
+[2026-08-30T23:52:07+08:00] round=2 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 15%/60%   1         4         4          8m46s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   13m          177Mi           
+secondhand-service-75df9ff569-kjktw   11m          182Mi           
+secondhand-service-75df9ff569-lf9vx   26m          182Mi           
+secondhand-service-75df9ff569-m8bt8   12m          177Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   325m         8%       4905Mi          67%         
+[2026-08-30T23:52:19+08:00] round=2 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 15%/60%   1         4         4          8m57s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   12m          177Mi           
+secondhand-service-75df9ff569-kjktw   9m           182Mi           
+secondhand-service-75df9ff569-lf9vx   11m          182Mi           
+secondhand-service-75df9ff569-m8bt8   11m          178Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   478m         11%      4907Mi          67%         
+[2026-08-30T23:52:30+08:00] round=2 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 10%/60%   1         4         4          9m9s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   12m          177Mi           
+secondhand-service-75df9ff569-kjktw   12m          182Mi           
+secondhand-service-75df9ff569-lf9vx   9m           182Mi           
+secondhand-service-75df9ff569-m8bt8   10m          178Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   452m         11%      4907Mi          67%         
+[2026-08-30T23:52:42+08:00] round=2 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 10%/60%   1         4         4          9m20s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   12m          177Mi           
+secondhand-service-75df9ff569-m8bt8   10m          178Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   452m         11%      4907Mi          67%         
+[2026-08-30T23:52:54+08:00] round=2 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 11%/60%   1         4         2          9m33s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   11m          178Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   582m         14%      4538Mi          62%         
+[2026-08-30T23:53:06+08:00] round=2 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 11%/60%   1         4         2          9m45s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   11m          178Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   595m         14%      4366Mi          60%         
+[2026-08-30T23:53:17+08:00] round=2 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 11%/60%   1         4         1          9m56s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   11m          178Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   340m         8%       4356Mi          59%         
+[2026-08-30T23:53:19+08:00] round=3 phase=pre-load
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 11%/60%   1         4         1          9m58s
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   11m          178Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   340m         8%       4356Mi          59%         
+[2026-08-30T23:53:21+08:00] round=3 phase=load
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 11%/60%   1         4         1          10m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   11m          178Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   340m         8%       4356Mi          59%         
+[2026-08-30T23:53:27+08:00] round=3 phase=load
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 11%/60%   1         4         1          10m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   11m          178Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   340m         8%       4356Mi          59%         
+[2026-08-30T23:53:33+08:00] round=3 phase=load
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 11%/60%   1         4         1          10m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   308m         198Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   1138m        28%      4373Mi          60%         
+[2026-08-30T23:53:40+08:00] round=3 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 308%/60%   1         4         1          10m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   308m         198Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   1138m        28%      4373Mi          60%         
+[2026-08-30T23:53:48+08:00] round=3 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 308%/60%   1         4         1          10m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   500m         230Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   1184m        29%      4404Mi          60%         
+[2026-08-30T23:53:56+08:00] round=3 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 500%/60%   1         4         3          10m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   500m         230Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   1184m        29%      4404Mi          60%         
+[2026-08-30T23:54:05+08:00] round=3 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 499%/60%   1         4         4          10m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   499m         254Mi           
+secondhand-service-75df9ff569-l84gg   497m         48Mi            
+secondhand-service-75df9ff569-t7bw7   498m         55Mi            
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2565m        64%      4602Mi          63%         
+[2026-08-30T23:54:15+08:00] round=3 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 499%/60%   1         4         4          10m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   493m         61Mi            
+secondhand-service-75df9ff569-c82fm   499m         270Mi           
+secondhand-service-75df9ff569-l84gg   494m         74Mi            
+secondhand-service-75df9ff569-t7bw7   497m         89Mi            
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   3340m        83%      4688Mi          64%         
+[2026-08-30T23:54:24+08:00] round=3 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 499%/60%   1         4         4          11m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   493m         61Mi            
+secondhand-service-75df9ff569-c82fm   499m         270Mi           
+secondhand-service-75df9ff569-l84gg   494m         74Mi            
+secondhand-service-75df9ff569-t7bw7   497m         89Mi            
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   3340m        83%      4688Mi          64%         
+[2026-08-30T23:54:33+08:00] round=3 phase=load
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 499%/60%   1         4         4          11m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   494m         84Mi            
+secondhand-service-75df9ff569-l84gg   499m         105Mi           
+secondhand-service-75df9ff569-t7bw7   491m         97Mi            
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   3194m        79%      4547Mi          62%         
+[2026-08-30T23:54:41+08:00] round=3 phase=load
+NAME                 REFERENCE                       TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: <unknown>/60%   1         4         4          11m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   494m         84Mi            
+secondhand-service-75df9ff569-l84gg   499m         105Mi           
+secondhand-service-75df9ff569-t7bw7   491m         97Mi            
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   3194m        79%      4547Mi          62%         
+[2026-08-30T23:54:48+08:00] round=3 phase=post-load
+NAME                 REFERENCE                       TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: <unknown>/60%   1         4         4          11m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   499m         99Mi            
+secondhand-service-75df9ff569-c82fm   501m         72Mi            
+secondhand-service-75df9ff569-l84gg   501m         125Mi           
+secondhand-service-75df9ff569-t7bw7   500m         116Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   3027m        75%      4605Mi          63%         
+[2026-08-30T23:54:50+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: <unknown>/60%   1         4         4          11m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   499m         99Mi            
+secondhand-service-75df9ff569-c82fm   501m         72Mi            
+secondhand-service-75df9ff569-l84gg   501m         125Mi           
+secondhand-service-75df9ff569-t7bw7   500m         116Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   3027m        75%      4605Mi          63%         
+[2026-08-30T23:55:03+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 501%/60%   1         4         4          11m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   500m         123Mi           
+secondhand-service-75df9ff569-c82fm   501m         86Mi            
+secondhand-service-75df9ff569-l84gg   499m         161Mi           
+secondhand-service-75df9ff569-t7bw7   501m         141Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2695m        67%      4735Mi          65%         
+[2026-08-30T23:55:16+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 501%/60%   1         4         4          11m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   500m         159Mi           
+secondhand-service-75df9ff569-c82fm   500m         101Mi           
+secondhand-service-75df9ff569-l84gg   390m         180Mi           
+secondhand-service-75df9ff569-t7bw7   500m         171Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2512m        62%      4811Mi          66%         
+[2026-08-30T23:55:29+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 500%/60%   1         4         4          12m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   500m         159Mi           
+secondhand-service-75df9ff569-c82fm   500m         101Mi           
+secondhand-service-75df9ff569-l84gg   390m         180Mi           
+secondhand-service-75df9ff569-t7bw7   500m         171Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2512m        62%      4811Mi          66%         
+[2026-08-30T23:55:40+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 257%/60%   1         4         4          12m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   369m         181Mi           
+secondhand-service-75df9ff569-c82fm   502m         125Mi           
+secondhand-service-75df9ff569-l84gg   12m          173Mi           
+secondhand-service-75df9ff569-t7bw7   198m         175Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   1645m        41%      4868Mi          66%         
+[2026-08-30T23:55:52+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 257%/60%   1         4         4          12m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   13m          181Mi           
+secondhand-service-75df9ff569-c82fm   500m         173Mi           
+secondhand-service-75df9ff569-l84gg   17m          173Mi           
+secondhand-service-75df9ff569-t7bw7   21m          175Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   1079m        26%      4909Mi          67%         
+[2026-08-30T23:56:04+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 137%/60%   1         4         4          12m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   19m          181Mi           
+secondhand-service-75df9ff569-c82fm   283m         178Mi           
+secondhand-service-75df9ff569-l84gg   27m          176Mi           
+secondhand-service-75df9ff569-t7bw7   13m          175Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   798m         19%      4931Mi          67%         
+[2026-08-30T23:56:16+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 85%/60%   1         4         4          12m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   14m          182Mi           
+secondhand-service-75df9ff569-c82fm   13m          179Mi           
+secondhand-service-75df9ff569-l84gg   12m          177Mi           
+secondhand-service-75df9ff569-t7bw7   18m          176Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   482m         12%      4931Mi          67%         
+[2026-08-30T23:56:27+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 14%/60%   1         4         4          13m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   14m          182Mi           
+secondhand-service-75df9ff569-c82fm   13m          179Mi           
+secondhand-service-75df9ff569-l84gg   12m          177Mi           
+secondhand-service-75df9ff569-t7bw7   18m          176Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   482m         12%      4931Mi          67%         
+[2026-08-30T23:56:39+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 16%/60%   1         4         4          13m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   12m          182Mi           
+secondhand-service-75df9ff569-c82fm   11m          179Mi           
+secondhand-service-75df9ff569-l84gg   33m          179Mi           
+secondhand-service-75df9ff569-t7bw7   10m          176Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   383m         9%       4931Mi          67%         
+[2026-08-30T23:56:51+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 16%/60%   1         4         4          13m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   12m          182Mi           
+secondhand-service-75df9ff569-c82fm   12m          179Mi           
+secondhand-service-75df9ff569-l84gg   18m          174Mi           
+secondhand-service-75df9ff569-t7bw7   12m          176Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   507m         12%      4936Mi          67%         
+[2026-08-30T23:57:02+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 13%/60%   1         4         4          13m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-892m2   11m          183Mi           
+secondhand-service-75df9ff569-c82fm   13m          180Mi           
+secondhand-service-75df9ff569-l84gg   12m          175Mi           
+secondhand-service-75df9ff569-t7bw7   12m          176Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   554m         13%      4926Mi          67%         
+[2026-08-30T23:57:14+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 12%/60%   1         4         4          13m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   13m          180Mi           
+secondhand-service-75df9ff569-t7bw7   12m          176Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   554m         13%      4926Mi          67%         
+[2026-08-30T23:57:25+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 13%/60%   1         4         2          14m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   11m          180Mi           
+secondhand-service-75df9ff569-t7bw7   16m          177Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   496m         12%      4925Mi          67%         
+[2026-08-30T23:57:37+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 13%/60%   1         4         2          14m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-c82fm   12m          180Mi           
+secondhand-service-75df9ff569-t7bw7   10m          177Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   610m         15%      4562Mi          62%         
+[2026-08-30T23:57:48+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 11%/60%   1         4         2          14m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-t7bw7   11m          177Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   252m         6%       4573Mi          62%         
+[2026-08-30T23:58:00+08:00] round=3 phase=scale-down
+NAME                 REFERENCE                       TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+secondhand-service   Deployment/secondhand-service   cpu: 11%/60%   1         4         1          14m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+secondhand-service-75df9ff569-t7bw7   25m          179Mi           
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   477m         11%      4377Mi          60%         

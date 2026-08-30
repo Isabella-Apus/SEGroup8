@@ -1,0 +1,5 @@
+NAME                                  CPU(cores)   MEMORY(bytes)   
+monolith-86f5d4c556-dn9lt             4m           248Mi           
+mysql-797646cfd5-bjhpl                226m         504Mi           
+order-service-b486d7b94-79c64         4m           192Mi           
+secondhand-service-75df9ff569-fkxxm   496m         234Mi           
