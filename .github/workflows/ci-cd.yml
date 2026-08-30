@@ -15,6 +15,10 @@ concurrency:
   cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
+  identity-governance:
+    name: Identity governance service gates
+    uses: ./.github/workflows/ci-cd-microservices.yml
+
   # Level 1: shared frontend and backend platform gates.
   frontend:
     name: Frontend common tests
@@ -249,6 +253,8 @@ jobs:
             --set-string backend.image.tag=sha-test \
             --set-string frontend.image.repository=registry.example/segroup8/frontend \
             --set-string frontend.image.tag=sha-test \
+            --set-string identityGovernance.image.repository=registry.example/segroup8/identity-governance \
+            --set-string identityGovernance.image.tag=sha-test \
             --set-file mysql.initSchema=backend/src/main/resources/schema.sql
           helm template segroup8 deploy/helm/segroup8 \
             --namespace segroup8 \
@@ -256,6 +262,8 @@ jobs:
             --set-string backend.image.tag=sha-test \
             --set-string frontend.image.repository=registry.example/segroup8/frontend \
             --set-string frontend.image.tag=sha-test \
+            --set-string identityGovernance.image.repository=registry.example/segroup8/identity-governance \
+            --set-string identityGovernance.image.tag=sha-test \
             --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
             >/dev/null
 
@@ -264,7 +272,7 @@ jobs:
     if: >-
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main' 
-    needs: [playwright, delivery-config]
+    needs: [playwright, delivery-config, identity-governance]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
@@ -281,6 +289,11 @@ jobs:
         with:
           name: frontend-dist
           path: frontend/dist
+      - name: Download tested identity governance JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: identity-governance-jar
+          path: microservices/identity-governance-service/target
       - name: Validate ACR configuration
         env:
           ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
@@ -330,9 +343,35 @@ jobs:
           labels: |
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+      - name: Build and push verified identity governance image
+        id: identity-image
+        uses: docker/build-push-action@v6
+        with:
+          context: microservices/identity-governance-service
+          file: microservices/identity-governance-service/Dockerfile
+          push: true
+          provenance: false
+          sbom: false
+          tags: |
+            ${{ vars.ACR_REGISTRY }}/${{ vars.ACR_NAMESPACE }}/identity-governance:sha-${{ github.sha }}
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+      - name: Record identity image digest
+        run: |
+          mkdir -p release-metadata
+          printf '%s\n' '${{ steps.identity-image.outputs.digest }}' > release-metadata/identity-governance-image-digest.txt
+      - name: Upload identity image digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-governance-image-digest-${{ github.sha }}
+          path: release-metadata/identity-governance-image-digest.txt
+          if-no-files-found: error
+          retention-days: 30
 
   deploy-production:
     name: Deploy images to production K3s
+    if: vars.ENABLE_PRODUCTION_DEPLOY == 'true'
     needs: publish-images
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -363,6 +402,7 @@ jobs:
           ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
         run: |
+          set -o pipefail
           remote_archive="/tmp/segroup8-k3s-$GITHUB_SHA.tar.gz"
           scp "k3s-release-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$remote_archive"
           ssh \
@@ -370,7 +410,15 @@ jobs:
             -o ServerAliveCountMax=10 \
             "$DEPLOY_USER@$DEPLOY_HOST" \
             "bash -s -- '$GITHUB_SHA' '$remote_archive' '$ACR_REGISTRY' '$ACR_NAMESPACE' 'sha-$GITHUB_SHA' '$K8S_NAMESPACE'" \
-            < .github/scripts/deploy-k3s.sh
+            < .github/scripts/deploy-k3s.sh | tee identity-governance-deployment.log
+      - name: Upload deployment and rollback diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-governance-deployment-${{ github.sha }}
+          path: identity-governance-deployment.log
+          if-no-files-found: warn
+          retention-days: 30
       - name: Verify public production endpoint
         if: vars.PRODUCTION_URL != ''
         env:

@@ -1,49 +1,46 @@
-name: Identity Governance Service CI
+name: Identity Governance Service Verification
 
 on:
-  push:
-    branches:
-      - feature/ms-identity-governance
-    paths:
-      - "microservices/identity-governance-service/**"
-      - "microservices/security-contract/**"
-      - "microservices/pom.xml"
-      - ".github/workflows/ci-cd-microservices.yml"
-  pull_request:
-    paths:
-      - "microservices/identity-governance-service/**"
-      - "microservices/security-contract/**"
-      - "microservices/pom.xml"
+  workflow_call:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
   verify-and-build-image:
+    name: Verify identity service and build candidate image
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
           cache: maven
-      - name: Unit, API, contract, and MySQL integration tests
+      - name: Unit, API, contract, and real MySQL integration tests
         run: mvn -B --no-transfer-progress -f microservices/pom.xml -pl identity-governance-service -am clean verify
-      - name: Build immutable local CI image
+      - name: Upload tested Boot JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-governance-jar
+          path: microservices/identity-governance-service/target/identity-governance-service-*.jar
+          if-no-files-found: error
+          retention-days: 7
+      - name: Build immutable candidate image
         run: |
           docker build \
             --label org.opencontainers.image.revision=${GITHUB_SHA} \
             -t segroup8/identity-governance:sha-${GITHUB_SHA} \
             microservices/identity-governance-service
-      - name: Upload raw test reports
+      - name: Upload raw Surefire reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: identity-governance-surefire-${{ github.sha }}
           path: 04_tests/microservices/identity-governance-service/evidence/raw-reports/surefire/**
           if-no-files-found: error
-
-# This workflow intentionally stops after immutable image construction.
-# Kubernetes/Helm deployment and cloud-native experiments are outside MS-01's current scope.
+          retention-days: 14

@@ -1,0 +1,22 @@
+<testsuites id="" name="" tests="5" failures="0" skipped="0" errors="0" time="9.946117">
+<testsuite name="domain-a\uc01-auth.spec.ts" timestamp="2026-08-30T04:03:51.453Z" hostname="" tests="1" failures="0" skipped="0" time="5.444" errors="0">
+<testcase name="@DOMAIN_A @UC01 real auth and identity flow › register, login, role boundary, ban and refresh persistence" classname="domain-a\uc01-auth.spec.ts" time="5.444">
+</testcase>
+</testsuite>
+<testsuite name="domain-a\uc02-profile-address.spec.ts" timestamp="2026-08-30T04:03:51.453Z" hostname="" tests="1" failures="0" skipped="0" time="6.529" errors="0">
+<testcase name="@DOMAIN_A @UC02 real profile and address flow › updates profile, maintains one default address and isolates ownership" classname="domain-a\uc02-profile-address.spec.ts" time="6.529">
+</testcase>
+</testsuite>
+<testsuite name="domain-a\uc03-merchant-application.spec.ts" timestamp="2026-08-30T04:03:51.453Z" hostname="" tests="1" failures="0" skipped="0" time="5.928" errors="0">
+<testcase name="@DOMAIN_A @UC03 real merchant application flow › submit, review, role/shop upgrade and rejection persistence" classname="domain-a\uc03-merchant-application.spec.ts" time="5.928">
+</testcase>
+</testsuite>
+<testsuite name="domain-a\uc04-ban-unban.spec.ts" timestamp="2026-08-30T04:03:51.453Z" hostname="" tests="1" failures="0" skipped="0" time="6.698" errors="0">
+<testcase name="@DOMAIN_A @UC04 real ban and unban flow › ban blocks login, unban restores login and audit is queryable" classname="domain-a\uc04-ban-unban.spec.ts" time="6.698">
+</testcase>
+</testsuite>
+<testsuite name="domain-a\uc05-governance.spec.ts" timestamp="2026-08-30T04:03:51.453Z" hostname="" tests="1" failures="0" skipped="0" time="5.636" errors="0">
+<testcase name="@DOMAIN_A @UC05 real report block credit governance › report, bilateral block state, credit audit and refresh persistence" classname="domain-a\uc05-governance.spec.ts" time="5.636">
+</testcase>
+</testsuite>
+</testsuites>

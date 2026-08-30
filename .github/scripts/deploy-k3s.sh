@@ -39,7 +39,27 @@ cleanup() {
   rm -rf -- "$work_dir"
   rm -f -- "$archive"
 }
-trap cleanup EXIT
+
+diagnostics() {
+  set +e
+  echo "::group::Helm and identity-governance failure diagnostics"
+  helm --namespace "$k8s_namespace" status segroup8
+  helm --namespace "$k8s_namespace" history segroup8
+  kubectl --namespace "$k8s_namespace" get pods,service,ingress -o wide
+  kubectl --namespace "$k8s_namespace" describe deployment/segroup8-identity-governance
+  kubectl --namespace "$k8s_namespace" logs deployment/segroup8-identity-governance --all-containers --tail=200
+  echo "::endgroup::"
+  set -e
+}
+
+on_exit() {
+  status=$?
+  if [[ $status -ne 0 ]]; then
+    diagnostics
+  fi
+  cleanup
+}
+trap on_exit EXIT
 
 tar -xzf "$archive" -C "$work_dir"
 chart_dir="$work_dir/deploy/helm/segroup8"
@@ -48,7 +68,7 @@ test -f "$chart_dir/Chart.yaml"
 test -s "$schema_file"
 
 kubectl get namespace "$k8s_namespace" >/dev/null
-for secret_name in acr-pull-secret segroup8-backend-secret segroup8-mysql-secret; do
+for secret_name in acr-pull-secret segroup8-backend-secret segroup8-mysql-secret identity-governance-secret; do
   kubectl --namespace "$k8s_namespace" get secret "$secret_name" >/dev/null
 done
 
@@ -56,6 +76,7 @@ build_time="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 helm upgrade --install segroup8 "$chart_dir" \
   --namespace "$k8s_namespace" \
+  --atomic \
   --cleanup-on-fail \
   --wait \
   --timeout 10m \
@@ -64,6 +85,8 @@ helm upgrade --install segroup8 "$chart_dir" \
   --set-string "backend.image.tag=$image_tag" \
   --set-string "frontend.image.repository=$registry/$registry_namespace/frontend" \
   --set-string "frontend.image.tag=$image_tag" \
+  --set-string "identityGovernance.image.repository=$registry/$registry_namespace/identity-governance" \
+  --set-string "identityGovernance.image.tag=$image_tag" \
   --set-string "mysql.image.repository=$registry/$registry_namespace/mysql" \
   --set-string "deployment.version=$image_tag" \
   --set-string "deployment.commit=$release_id" \
@@ -72,7 +95,22 @@ helm upgrade --install segroup8 "$chart_dir" \
 
 kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-backend --timeout=5m
 kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-frontend --timeout=5m
+kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-identity-governance --timeout=5m
 kubectl --namespace "$k8s_namespace" get pods,service,ingress
+
+identity_info="$(kubectl --namespace "$k8s_namespace" exec deployment/segroup8-identity-governance -- \
+  curl --fail --silent --show-error http://127.0.0.1:8091/actuator/info)"
+grep -F '"version":"'"$image_tag"'"' <<<"$identity_info" >/dev/null
+grep -F '"commit":"'"$release_id"'"' <<<"$identity_info" >/dev/null
+kubectl --namespace "$k8s_namespace" exec deployment/segroup8-identity-governance -- \
+  curl --fail --silent --show-error http://127.0.0.1:8091/actuator/health/liveness >/dev/null
+kubectl --namespace "$k8s_namespace" exec deployment/segroup8-identity-governance -- \
+  curl --fail --silent --show-error http://127.0.0.1:8091/actuator/health/readiness >/dev/null
+identity_smoke="$(kubectl --namespace "$k8s_namespace" exec deployment/segroup8-identity-governance -- \
+  curl --fail --silent --show-error -H 'Content-Type: application/json' \
+  -d '{"username":"__deployment_smoke__","password":"invalid"}' \
+  http://127.0.0.1:8091/api/auth/login)"
+grep -F '"code":401' <<<"$identity_smoke" >/dev/null
 
 # K3s installs Traefik by default, so this verifies the public routing path from
 # the host without exposing the backend actuator endpoint through the Ingress.

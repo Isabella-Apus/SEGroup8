@@ -1,6 +1,6 @@
-# 本地交付与运行
+# 本地与 K3s 交付运行
 
-本服务本次仅交付本地容器化，不包含 Kubernetes/Helm/HPA。
+本服务同时交付本地 Compose 和完整系统 K3s/Helm 自动部署。HPA 模板默认关闭；自动扩缩容和依赖故障处理两个云原生实验暂不执行。
 
 ## 环境
 
@@ -36,6 +36,10 @@ Invoke-RestMethod http://localhost:8091/actuator/info
 ```
 
 停止时使用 `docker compose ... down`；除非确认不再需要本地数据，不要加 `-v`。
+
+## K3s 自动部署
+
+完整系统 `.github/workflows/ci-cd.yml` 调用身份服务验证工作流。PR 阶段执行 Maven、真实 MySQL 和候选镜像构建；合并到 `main` 后统一推送 ACR 的 `identity-governance:sha-<full-sha>`，再随 `segroup8` Helm release 原子升级。集群一次性前置条件见 `deploy/helm/segroup8/README.md`。
 
 ## Domain A 浏览器回归入口
 

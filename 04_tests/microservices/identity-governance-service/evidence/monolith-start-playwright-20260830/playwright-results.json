@@ -1,0 +1,353 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\playwright.config.ts",
+    "rootDir": "C:/Users/isabe/Desktop/SE/SEGroup8/frontend/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 5
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\monolith-start-playwright-20260830\\playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\monolith-start-playwright-20260830\\playwright-results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\monolith-start-playwright-20260830\\playwright-results.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/isabe/Desktop/SE/SEGroup8/04_tests/microservices/identity-governance-service/evidence/monolith-start-playwright-20260830/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 5
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/isabe/Desktop/SE/SEGroup8/frontend/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.1",
+    "workers": 16,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "domain-a\\uc01-auth.spec.ts",
+      "file": "domain-a/uc01-auth.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_A @UC01 real auth and identity flow",
+          "file": "domain-a/uc01-auth.spec.ts",
+          "line": 12,
+          "column": 6,
+          "specs": [
+            {
+              "title": "register, login, role boundary, ban and refresh persistence",
+              "ok": true,
+              "tags": [
+                "DOMAIN_A",
+                "UC01"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5444,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-30T04:03:52.169Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "e391467a18de3133f62a-0fe1de53fb8516fe73a0",
+              "file": "domain-a/uc01-auth.spec.ts",
+              "line": 13,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "domain-a\\uc02-profile-address.spec.ts",
+      "file": "domain-a/uc02-profile-address.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_A @UC02 real profile and address flow",
+          "file": "domain-a/uc02-profile-address.spec.ts",
+          "line": 13,
+          "column": 6,
+          "specs": [
+            {
+              "title": "updates profile, maintains one default address and isolates ownership",
+              "ok": true,
+              "tags": [
+                "DOMAIN_A",
+                "UC02"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 6529,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-30T04:03:52.170Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "68158a7a5f9141eea067-1ba9e0156e66a30905a8",
+              "file": "domain-a/uc02-profile-address.spec.ts",
+              "line": 14,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "domain-a\\uc03-merchant-application.spec.ts",
+      "file": "domain-a/uc03-merchant-application.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_A @UC03 real merchant application flow",
+          "file": "domain-a/uc03-merchant-application.spec.ts",
+          "line": 28,
+          "column": 6,
+          "specs": [
+            {
+              "title": "submit, review, role/shop upgrade and rejection persistence",
+              "ok": true,
+              "tags": [
+                "DOMAIN_A",
+                "UC03"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 5928,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-30T04:03:52.169Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "908a4bd0b3977ad5ade7-e5003f6f9d273ece0f74",
+              "file": "domain-a/uc03-merchant-application.spec.ts",
+              "line": 29,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "domain-a\\uc04-ban-unban.spec.ts",
+      "file": "domain-a/uc04-ban-unban.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_A @UC04 real ban and unban flow",
+          "file": "domain-a/uc04-ban-unban.spec.ts",
+          "line": 12,
+          "column": 6,
+          "specs": [
+            {
+              "title": "ban blocks login, unban restores login and audit is queryable",
+              "ok": true,
+              "tags": [
+                "DOMAIN_A",
+                "UC04"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 6698,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-30T04:03:52.170Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "4bfc9f78690f82f04370-d10b8dbed199e9670815",
+              "file": "domain-a/uc04-ban-unban.spec.ts",
+              "line": 13,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "domain-a\\uc05-governance.spec.ts",
+      "file": "domain-a/uc05-governance.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_A @UC05 real report block credit governance",
+          "file": "domain-a/uc05-governance.spec.ts",
+          "line": 51,
+          "column": 6,
+          "specs": [
+            {
+              "title": "report, bilateral block state, credit audit and refresh persistence",
+              "ok": true,
+              "tags": [
+                "DOMAIN_A",
+                "UC05"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 5636,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-30T04:03:52.170Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "d96935ec92f0237bc134-d7b4d06b0e92e5c15e3b",
+              "file": "domain-a/uc05-governance.spec.ts",
+              "line": 52,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-08-30T04:03:51.036Z",
+    "duration": 9946.116999999998,
+    "expected": 5,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

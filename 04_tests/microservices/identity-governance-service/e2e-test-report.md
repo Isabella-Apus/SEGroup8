@@ -1,5 +1,15 @@
 # Domain A E2E 报告
 
+## 改造前单体基线
+
+- 版本：`monolith-start` / `2d39751cbda8d4e6d6b4a10565a9f9f9e266f119`
+- 日期：2026-08-30
+- 断言：复用当前同一组 `frontend/e2e/domain-a/uc01-uc05*.spec.ts`
+- 结果：5/5 passed，0 failed，耗时 9.9 秒
+- 原始结果：`evidence/monolith-start-playwright-20260830/`
+
+## 改造后微服务
+
 最终状态：`PASS`，5 passed / 0 failed / 0 skipped / 0 errors，耗时 33.0 秒。
 
 既有真实浏览器 spec 位于：

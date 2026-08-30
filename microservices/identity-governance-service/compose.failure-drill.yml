@@ -1,0 +1,4 @@
+services:
+  identity-governance-service:
+    environment:
+      DB_PASSWORD: deliberately-wrong-password

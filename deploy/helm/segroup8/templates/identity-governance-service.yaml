@@ -1,0 +1,17 @@
+{{- if .Values.identityGovernance.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity-governance-service
+  labels:
+    {{- include "segroup8.labels" . | nindent 4 }}
+    app.kubernetes.io/component: identity-governance
+spec:
+  selector:
+    {{- include "segroup8.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: identity-governance
+  ports:
+    - name: http
+      port: {{ .Values.identityGovernance.service.port }}
+      targetPort: http
+{{- end }}

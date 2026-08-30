@@ -9,8 +9,11 @@
 | 注册登录 smoke | PASS | 注册 `code=0`，登录 `code=0`、角色 `USER` |
 | 数据库权限拒绝 | PASS | 自有 Schema 查询成功；跨查 `order_db.order_info` 返回 MySQL 1142 |
 | E2E frontend profile | PASS | 既有 `frontend/dist`，Nginx 8089 代理本服务 8091 |
-| GitHub Actions | CONFIGURED / NOT_RUN | 分支未 push，无远端 run |
-| Kubernetes/Helm/HPA | OUT_OF_SCOPE | 用户明确暂不做云原生 |
+| 错口令失败/恢复演练 | PASS | 服务 Exited(1)、readiness 不可达、SQLState 28000/1045；恢复后 healthy/UP/smoke PASS |
+| Helm Deployment/Service | CONFIGURED / NOT_RUN | 已接入完整系统 chart 与主流水线；需 PR Actions/合并后远端 run 证明 |
+| GitHub Actions/ACR/K3s | CONFIGURED / NOT_RUN | PR 验证，`main` 推送不可变镜像并 `--atomic --wait` 部署；当前尚无本分支远端 run |
+| HPA 扩缩容实验 | NOT_RUN | HPA 模板已交付但默认关闭，按用户要求暂不执行实验 |
+| 依赖故障处理实验 | NOT_RUN | 按用户要求暂不执行停止/延迟依赖服务实验 |
 
 第一次隔离检查的业务断言已通过，但脚本未复位预期 MySQL 拒绝产生的退出码；补充 `exit 0` 后重跑为进程退出码 0。另一次重跑漏设 Compose 必填变量，按原样记录为脚本调用失败；补齐环境变量后最终通过。任何后续失败都必须保留日志和退出码，不能用 Dockerfile 存在替代运行证据。
 
