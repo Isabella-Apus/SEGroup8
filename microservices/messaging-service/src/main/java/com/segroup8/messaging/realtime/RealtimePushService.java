@@ -33,15 +33,20 @@ public class RealtimePushService implements RealtimePublisher {
     public int sessionCount(long userId) { return sessions.getOrDefault(userId, Set.of()).size(); }
 
     public void pushToUser(long userId, String eventType, Object payload) {
+        tryPushToUser(userId, eventType, payload);
+    }
+    public boolean tryPushToUser(long userId, String eventType, Object payload) {
         Set<WebSocketSession> values = sessions.get(userId);
-        if (values == null || values.isEmpty()) return;
+        if (values == null || values.isEmpty()) return false;
         TextMessage message = new TextMessage(serialize(Map.of(
                 "eventType", eventType, "timestamp", LocalDateTime.now().toString(), "payload", payload)));
+        boolean delivered = false;
         for (WebSocketSession session : Set.copyOf(values)) {
             if (!session.isOpen()) { unregister(session); continue; }
-            try { session.sendMessage(message); }
+            try { session.sendMessage(message); delivered = true; }
             catch (IOException | RuntimeException ex) { unregister(session); close(session, CloseStatus.SERVER_ERROR); }
         }
+        return delivered;
     }
     public void pushToUsers(Iterable<Long> userIds, String eventType, Object payload) {
         if (userIds != null) userIds.forEach(id -> pushToUser(id, eventType, payload));

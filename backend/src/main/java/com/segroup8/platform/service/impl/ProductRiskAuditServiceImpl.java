@@ -225,6 +225,7 @@ public class ProductRiskAuditServiceImpl implements ProductRiskAuditService {
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional(rollbackFor = Exception.class)
     public ProductRiskAuditVO decide(Long auditId, ProductRiskAuditDecisionRequest request) {
         assertAdmin();
         ProductRiskAudit audit = productRiskAuditMapper.selectById(auditId);

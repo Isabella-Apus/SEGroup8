@@ -5,6 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.segroup8.messaging.realtime.RealtimePushService;
+import com.segroup8.messaging.event.EventEnvelope;
+import com.segroup8.messaging.event.EventTypes;
+import com.segroup8.messaging.event.InboxEventService;
+import com.segroup8.messaging.event.InboxWorker;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.io.IOException;
@@ -41,8 +45,11 @@ class RealtimeIntegrationTest {
     @LocalServerPort int port;
     @Autowired JdbcTemplate jdbc;
     @Autowired RealtimePushService realtime;
+    @Autowired InboxEventService inbox;
+    @Autowired InboxWorker inboxWorker;
 
     @BeforeEach void seed() {
+        jdbc.update("delete from inbox_event");
         jdbc.update("delete from user_access_projection");
         jdbc.update("insert into user_access_projection(user_id,access_status,role,display_name,source_version) " +
                 "values(1,'ACTIVE','USER','Alice',1),(4,'BANNED','USER','Banned',1)");
@@ -69,6 +76,20 @@ class RealtimeIntegrationTest {
         realtime.pushToUser(1, "NOTIFICATION", Map.of("id", 1));
         assertEquals(0, realtime.sessionCount(1));
         assertTrue(failed.closed);
+    }
+
+    @Test
+    void userAccessEventActivelyDisconnectsExistingSessionAndRejectsReconnect() throws Exception {
+        WebSocketSession connected = connect("http://localhost:5174", token(1));
+        assertTrue(connected.isOpen());
+        EventEnvelope event = new EventEnvelope("ws-ban-event", EventTypes.USER_ACCESS_CHANGED, 1,
+                "identity-governance-monolith", "USER", "1", Instant.now(), "ws-ban-trace",
+                Map.of("userId", 1L, "status", "BANNED", "role", "USER", "version", 2L));
+        assertTrue(inbox.accept(event));
+        inboxWorker.runOnce();
+
+        awaitNoSessions(1);
+        assertThrows(ExecutionException.class, () -> connect("http://localhost:5174", token(1)));
     }
 
     private WebSocketSession connect(String origin, String token) throws Exception {

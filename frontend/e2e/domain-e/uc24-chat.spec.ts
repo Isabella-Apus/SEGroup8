@@ -5,7 +5,6 @@ import {
     bearer,
     captureDomainEEvidence,
     domainEToken,
-    expectBusinessFailure,
     expectBusinessSuccess,
     loginAsDomainE,
     uniqueName,
@@ -61,7 +60,8 @@ test.describe("@DOMAIN_E @UC24 chat authorization and delivery", () => {
         const conversationId = Number(conversation.id);
         expect(conversationId).toBeGreaterThan(0);
         await expect(page.getByRole("heading", { name: "站内消息" })).toBeVisible();
-        await expect(page.getByRole("heading", { name: "Demo Seller" })).toBeVisible();
+        await expect(page.getByRole("heading", { name: conversation.other?.nickname || "" }))
+            .toBeVisible();
 
         const repeated = await expectBusinessSuccess<Conversation>(await request.post(
             "/api/chat/conversations",
@@ -87,7 +87,8 @@ test.describe("@DOMAIN_E @UC24 chat authorization and delivery", () => {
 
         await loginAsDomainE(page, "OFFICIAL_SELLER");
         await page.goto(`/merchant/messages?conversationId=${conversationId}`);
-        await expect(page.getByRole("heading", { name: "Demo User" })).toBeVisible();
+        await expect(page.getByRole("heading", { name: repeated.other?.nickname || "" }))
+            .toBeVisible();
         await expect(page.locator(".message-content", { hasText: buyerMessage })).toBeVisible();
         await sendThroughUi(page, sellerReply);
         await expect(page.locator(".message-content", { hasText: sellerReply })).toBeVisible();
@@ -106,12 +107,12 @@ test.describe("@DOMAIN_E @UC24 chat authorization and delivery", () => {
             `/api/chat/conversations/${conversationId}/messages`,
             { headers: bearer(outsiderToken) },
         );
-        expect(Number((await expectBusinessFailure(outsiderRead)).code)).toBe(403);
+        expect(outsiderRead.status()).toBe(403);
         const outsiderSend = await request.post(
             `/api/chat/conversations/${conversationId}/messages`,
             { headers: bearer(outsiderToken), data: { content: "outsider message" } },
         );
-        expect(Number((await expectBusinessFailure(outsiderSend)).code)).toBe(403);
+        expect(outsiderSend.status()).toBe(403);
 
         const historyBeforeBlock = await messages(request, buyerToken, conversationId);
         const blockResponse = page.waitForResponse(
@@ -124,14 +125,15 @@ test.describe("@DOMAIN_E @UC24 chat authorization and delivery", () => {
         await expectBusinessSuccess(await blockResponse);
         await expect(page.getByRole("button", { name: "已拉黑", exact: true })).toBeDisabled();
 
+        const blockedMessage = uniqueName("UC24 blocked message");
         const blockedSend = await request.post(
             `/api/chat/conversations/${conversationId}/messages`,
-            { headers: bearer(sellerToken), data: { content: "blocked message" } },
+            { headers: bearer(sellerToken), data: { content: blockedMessage } },
         );
-        expect(Number((await expectBusinessFailure(blockedSend)).code)).toBe(403);
+        expect(blockedSend.status()).toBe(403);
         const historyAfterBlock = await messages(request, buyerToken, conversationId);
         expect(historyAfterBlock).toHaveLength(historyBeforeBlock.length);
-        expect(historyAfterBlock.some((message) => message.content === "blocked message")).toBeFalsy();
+        expect(historyAfterBlock.some((message) => message.content === blockedMessage)).toBeFalsy();
 
         await assertNoVisibleError(page);
         await captureDomainEEvidence(page, testInfo, "UC24", "uc24-chat-history-and-block");

@@ -7,10 +7,9 @@ import com.segroup8.messaging.chat.ChatModels.Conversation;
 import com.segroup8.messaging.chat.ChatModels.CreateConversationRequest;
 import com.segroup8.messaging.chat.ChatModels.Message;
 import com.segroup8.messaging.chat.ChatModels.Participant;
-import com.segroup8.messaging.common.AfterCommitExecutor;
 import com.segroup8.messaging.common.ApiException;
+import com.segroup8.messaging.delivery.DeliveryOutboxService;
 import com.segroup8.messaging.notification.NotificationService;
-import com.segroup8.messaging.realtime.RealtimePublisher;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -18,6 +17,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -32,13 +32,12 @@ public class ChatService {
     private final AccessPolicy access;
     private final BlockPolicy blocks;
     private final NotificationService notifications;
-    private final RealtimePublisher realtime;
-    private final AfterCommitExecutor afterCommit;
+    private final DeliveryOutboxService delivery;
 
     public ChatService(JdbcTemplate jdbc, AccessPolicy access, BlockPolicy blocks,
-            NotificationService notifications, RealtimePublisher realtime, AfterCommitExecutor afterCommit) {
+            NotificationService notifications, DeliveryOutboxService delivery) {
         this.jdbc = jdbc; this.access = access; this.blocks = blocks; this.notifications = notifications;
-        this.realtime = realtime; this.afterCommit = afterCommit;
+        this.delivery = delivery;
     }
 
     @Transactional
@@ -104,8 +103,12 @@ public class ChatService {
         String senderName = message.sender().nickname();
         String targetPath = "OFFICIAL_SELLER".equalsIgnoreCase(participant(conversation, receiverId).role())
                 ? "/merchant/messages?conversationId=" + conversationId : "/messages?conversationId=" + conversationId;
-        notifications.create(receiverId, "New message", senderName + " sent you a message", targetPath, null);
-        afterCommit.run(() -> realtime.pushToUsers(List.of(senderId, receiverId), "CHAT_MESSAGE", message));
+        notifications.create(receiverId, "新消息", senderName + " 给你发送了新消息", targetPath, null);
+        String traceId = UUID.randomUUID().toString();
+        delivery.enqueueWebSocket(null, "delivery:chat:" + messageId + ":" + senderId,
+                senderId, "CHAT_MESSAGE", message, traceId);
+        delivery.enqueueWebSocket(null, "delivery:chat:" + messageId + ":" + receiverId,
+                receiverId, "CHAT_MESSAGE", message, traceId);
         return message;
     }
 
@@ -179,8 +182,9 @@ public class ChatService {
     }
 
     private Participants participants(AccessSnapshot actor, AccessSnapshot target, String type) {
-        if (!"DIRECT".equals(type)) return new Participants(actor, target);
         if (isSeller(actor.role()) && !isSeller(target.role())) return new Participants(target, actor);
+        if (!isSeller(actor.role()) && isSeller(target.role())) return new Participants(actor, target);
+        if (actor.userId() > target.userId()) return new Participants(target, actor);
         return new Participants(actor, target);
     }
     private boolean isSeller(String role) { return "SELLER".equalsIgnoreCase(role) || "OFFICIAL_SELLER".equalsIgnoreCase(role); }

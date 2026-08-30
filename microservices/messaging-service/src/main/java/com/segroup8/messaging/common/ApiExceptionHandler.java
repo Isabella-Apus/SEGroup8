@@ -33,6 +33,7 @@ public class ApiExceptionHandler {
             case 401 -> HttpStatus.UNAUTHORIZED;
             case 403 -> HttpStatus.FORBIDDEN;
             case 404 -> HttpStatus.NOT_FOUND;
+            case 409 -> HttpStatus.CONFLICT;
             case 503 -> HttpStatus.SERVICE_UNAVAILABLE;
             default -> HttpStatus.INTERNAL_SERVER_ERROR;
         };

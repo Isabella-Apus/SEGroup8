@@ -1,0 +1,225 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\34267\\Desktop\\code\\SEGroup8\\frontend\\playwright.config.ts",
+    "rootDir": "C:/Users/34267/Desktop/code/SEGroup8/frontend/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "C:\\Users\\34267\\Desktop\\code\\SEGroup8\\04_tests\\microservices\\messaging-service\\v2-e2e-final\\playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "C:\\Users\\34267\\Desktop\\code\\SEGroup8\\04_tests\\microservices\\messaging-service\\v2-e2e-final\\playwright-results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "C:\\Users\\34267\\Desktop\\code\\SEGroup8\\04_tests\\microservices\\messaging-service\\v2-e2e-final\\playwright-results.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/34267/Desktop/code/SEGroup8/04_tests/microservices/messaging-service/v2-e2e-final/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/34267/Desktop/code/SEGroup8/frontend/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "domain-e\\uc24-chat.spec.ts",
+      "file": "domain-e/uc24-chat.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_E @UC24 chat authorization and delivery",
+          "file": "domain-e/uc24-chat.spec.ts",
+          "line": 37,
+          "column": 6,
+          "specs": [
+            {
+              "title": "buyer and seller exchange persisted messages while outsider and blocks are isolated",
+              "ok": true,
+              "tags": [
+                "DOMAIN_E",
+                "UC24"
+              ],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4217,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-30T14:22:55.860Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "uc24-chat-history-and-block",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\34267\\Desktop\\code\\SEGroup8\\04_tests\\microservices\\messaging-service\\v2-e2e-final\\test-results\\domain-e-uc24-chat--DOMAIN-a8df9-der-and-blocks-are-isolated\\attachments\\uc24-chat-history-and-block-20ceddd0186fefe3c6dd5aa0fb716044a2d16ae5.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "8df11b6a3d903d92432d-de9ccd08405a2fa77247",
+              "file": "domain-e/uc24-chat.spec.ts",
+              "line": 40,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "domain-e\\uc25-notification.spec.ts",
+      "file": "domain-e/uc25-notification.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_E @UC25 notification websocket and reconnect compensation",
+          "file": "domain-e/uc25-notification.spec.ts",
+          "line": 76,
+          "column": 6,
+          "specs": [
+            {
+              "title": "buyer receives, reads and recovers missed notifications in real Edge",
+              "ok": true,
+              "tags": [
+                "DOMAIN_E",
+                "UC25"
+              ],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7497,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "steps": [
+                        {
+                          "title": "Expect \"poll toBeGreaterThan\"",
+                          "duration": 0
+                        },
+                        {
+                          "title": "Expect \"poll toBeGreaterThan\"",
+                          "duration": 912
+                        },
+                        {
+                          "title": "Expect \"poll toBeTruthy\"",
+                          "duration": 0
+                        },
+                        {
+                          "title": "Expect \"poll toBeGreaterThan\"",
+                          "duration": 898
+                        },
+                        {
+                          "title": "Expect \"poll toBeTruthy\"",
+                          "duration": 113
+                        }
+                      ],
+                      "startTime": "2026-08-30T14:23:00.270Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "uc25-realtime-reconnect-and-read",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\34267\\Desktop\\code\\SEGroup8\\04_tests\\microservices\\messaging-service\\v2-e2e-final\\test-results\\domain-e-uc25-notification-c9609--notifications-in-real-Edge\\attachments\\uc25-realtime-reconnect-and-read-feb8ee427b64a4aec556dc82fc6274dc30d9d14e.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "34a32b84d6689dcaf6d7-32edbef73930d21b55da",
+              "file": "domain-e/uc25-notification.spec.ts",
+              "line": 79,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-08-30T14:22:55.285Z",
+    "duration": 12604.152,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

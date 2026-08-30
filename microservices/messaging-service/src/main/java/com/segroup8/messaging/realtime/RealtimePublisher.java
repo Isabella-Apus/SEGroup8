@@ -7,6 +7,7 @@ public interface RealtimePublisher {
     void unregister(WebSocketSession session);
     void disconnectUser(long userId);
     int sessionCount(long userId);
+    boolean tryPushToUser(long userId, String eventType, Object payload);
     void pushToUser(long userId, String eventType, Object payload);
     void pushToUsers(Iterable<Long> userIds, String eventType, Object payload);
 }

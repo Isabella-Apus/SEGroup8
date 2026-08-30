@@ -16,7 +16,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, REFERENCES
   ON messaging_db.* TO 'messaging_app'@'%';
 ```
 
-The application never creates databases or users. Flyway creates only the five V1 tables and its schema-history table inside the already-provisioned schema.
+The application never creates databases or users. Flyway V1/V2 creates only the eight owned business/reliability tables and schema history inside the provisioned schema.
 
 ## Tables
 
@@ -27,5 +27,10 @@ The application never creates databases or users. Flyway creates only the five V
 | `notification` | Durable user-owned notifications and minimal nullable V2 correlation reservations |
 | `user_access_projection` | Minimal access status, role and display projection |
 | `user_block_projection` | Versioned directional blocked/allowed decision |
+| `inbox_event` | Unique eventId boundary, serialized envelope, processing/retry/DLQ state |
+| `idempotency_record` | Internal notification HTTP request hash and stable result by dedupeKey |
+| `outbox_event` | Durable WebSocket delivery and replay-audit backlog |
 
-There are no foreign keys to another schema and no runtime cross-schema joins. The MySQL migration test creates a second isolated schema and proves the messaging test account receives an SQL permission error when selecting it.
+Notification has unique event-recipient and business dedupe indexes. Inbox eventId, idempotency dedupeKey, and delivery event/dedupe IDs are unique. There are no foreign-schema keys/joins. The real MySQL 8 test migrates both versions, exercises these reliability constraints/states, and proves the Messaging account cannot read an isolated foreign schema.
+
+The producer `segroup8_platform.outbox_event` is not a Messaging-owned table. It is committed with producer business state and is accessed only by the producer relay; Messaging never reads it.

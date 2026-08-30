@@ -12,6 +12,7 @@ import com.segroup8.platform.mapper.NotificationMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.realtime.RealtimePushService;
+import com.segroup8.platform.event.ProducerOutboxService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -46,6 +47,8 @@ class MerchantApplicationServiceImplTest {
 
     @Mock
     private RealtimePushService realtimePushService;
+    @Mock
+    private ProducerOutboxService outbox;
 
     private MerchantApplicationServiceImpl merchantApplicationService;
 
@@ -54,9 +57,8 @@ class MerchantApplicationServiceImplTest {
         merchantApplicationService = new MerchantApplicationServiceImpl(
                 merchantApplicationMapper,
                 userMapper,
-            notificationMapper,
-            shopMapper,
-            realtimePushService);
+                shopMapper,
+                outbox);
     }
 
     @AfterEach
@@ -95,7 +97,9 @@ class MerchantApplicationServiceImplTest {
         verify(userMapper).updateById(userCaptor.capture());
         assertEquals(RoleEnum.OFFICIAL_SELLER.name(), userCaptor.getValue().getRole());
 
-        verify(notificationMapper).insert(org.mockito.ArgumentMatchers.any(Notification.class));
+        verify(outbox).publish(org.mockito.ArgumentMatchers.eq("MerchantApproved.v1"),
+                org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyMap());
     }
 
     @Test
@@ -134,6 +138,11 @@ class MerchantApplicationServiceImplTest {
         verify(merchantApplicationMapper).updateById(appCaptor.capture());
         assertEquals(2, appCaptor.getValue().getStatus());
         assertEquals("License information is incomplete", appCaptor.getValue().getRejectReason());
-        verify(notificationMapper).insert(org.mockito.ArgumentMatchers.any(Notification.class));
+        verify(outbox).notification(org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.anyList(), org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.isNull(),
+                org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.anyString());
     }
 }

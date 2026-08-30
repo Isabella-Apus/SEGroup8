@@ -17,12 +17,14 @@ import com.segroup8.platform.schedule.OrderAutoConfirmScheduler;
 import com.segroup8.platform.service.OrderService;
 import com.segroup8.platform.testsupport.DomainCTestTags;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -52,6 +54,14 @@ class OrderSettlementRefundFlowIntegrationTest {
     @Autowired
     private TransactionRecordMapper transactionRecordMapper;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @BeforeEach
+    void cleanOutbox() {
+        jdbcTemplate.update("delete from outbox_event");
+    }
+
     @AfterEach
     void tearDown() {
         UserContext.clear();
@@ -78,6 +88,8 @@ class OrderSettlementRefundFlowIntegrationTest {
         assertEquals("BUSINESS", sellerRecords.get(0).getAccountType());
         assertEquals(TransactionTradeTypeEnum.INCOME_BUSINESS.getCode(), sellerRecords.get(0).getTradeType());
         assertEquals(new BigDecimal("120.00"), sellerRecords.get(0).getAmount());
+        assertEquals(2, jdbcTemplate.queryForObject(
+                "select count(*) from outbox_event where event_type='OrderStatusChanged.v1'", Integer.class));
     }
 
     @Test
@@ -111,5 +123,8 @@ class OrderSettlementRefundFlowIntegrationTest {
         assertEquals(2, buyerRecords.size());
         assertEquals(TransactionTradeTypeEnum.REFUND_BACKFLOW.getCode(), buyerRecords.get(0).getTradeType());
         assertEquals(TransactionTradeTypeEnum.REFUND_BACKFLOW.getCode(), buyerRecords.get(1).getTradeType());
+        Integer refundEvents = jdbcTemplate.queryForObject(
+                "select count(*) from outbox_event where event_type='RefundCompleted.v1'", Integer.class);
+        org.junit.jupiter.api.Assertions.assertTrue(refundEvents != null && refundEvents >= 2);
     }
 }

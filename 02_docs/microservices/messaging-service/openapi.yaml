@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
   title: Kinda Goods Messaging Service API
-  version: 1.0.0-v1
-  description: V1 Chat, Notification, and realtime recovery API. Business event ingestion is not part of V1.
+  version: 2.0.0-v2
+  description: V1 public Chat/Notification/realtime APIs plus authenticated V2 event reliability APIs.
 servers:
   - url: /
 security:
@@ -108,6 +108,70 @@ paths:
       responses:
         '200': { $ref: '#/components/responses/Success' }
         '401': { $ref: '#/components/responses/Unauthorized' }
+  /internal/events:
+    post:
+      operationId: acceptEvent
+      description: Private transport ingress for the common event envelope. Duplicate eventId is acknowledged without reprocessing.
+      security: [{ serviceToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EventEnvelope' }
+      responses:
+        '200': { description: RECEIVED or DUPLICATE }
+        '400': { description: Invalid envelope or unsupported event type/version }
+        '401': { description: Missing or invalid service credential }
+  /internal/notifications:
+    post:
+      operationId: createInternalNotification
+      description: Synchronous compatibility endpoint; core domain producers use Outbox events.
+      security: [{ serviceToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/InternalNotificationRequest' }
+      responses:
+        '200': { description: Stable Notification result for the dedupeKey }
+        '400': { description: Missing required data/dedupeKey }
+        '401': { description: Missing or invalid service credential }
+        '409': { description: dedupeKey already belongs to a different request }
+  /internal/events/replay/{eventId}:
+    post:
+      operationId: replayEvent
+      description: Operations-only replay; resets the stored Inbox row and commits a durable audit task without bypassing dedupe.
+      security: [{ operationsToken: [] }]
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: reason
+          in: query
+          required: false
+          schema: { type: string }
+      responses:
+        '200': { description: Event queued for replay }
+        '401': { description: Missing/invalid operations credential }
+        '404': { description: Event not found }
+  /internal/delivery/{dedupeKey}:
+    get:
+      operationId: getDeliveryStatus
+      description: Returns persistence/delivery metadata only; no notification body or credentials.
+      security: [{ serviceToken: [] }]
+      parameters:
+        - name: dedupeKey
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Current delivery state
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DeliveryStatusResult' }
+        '401': { description: Missing or invalid service credential }
   /ws/realtime:
     get:
       operationId: realtimeHandshake
@@ -129,6 +193,16 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    serviceToken:
+      type: apiKey
+      in: header
+      name: X-Internal-Service-Token
+      description: Environment-injected INTERNAL_SERVICE_TOKEN.
+    operationsToken:
+      type: apiKey
+      in: header
+      name: X-Internal-Service-Token
+      description: Separately scoped environment-injected INTERNAL_OPERATIONS_TOKEN.
   parameters:
     ConversationId:
       name: conversationId
@@ -199,6 +273,51 @@ components:
         scope: { type: string, enum: [buyer, seller] }
         isRead: { type: integer, enum: [0, 1] }
         createTime: { type: string, format: date-time }
+    EventEnvelope:
+      type: object
+      required: [eventId, eventType, eventVersion, producer, aggregateType, aggregateId, occurredAt, traceId, payload]
+      properties:
+        eventId: { type: string }
+        eventType:
+          type: string
+          enum: [NotificationRequested.v1, OrderStatusChanged.v1, PaymentCompleted.v1, RefundCompleted.v1, MerchantApproved.v1, SecondhandTradeSettled.v1, UserAccessChanged.v1]
+        eventVersion: { type: integer, enum: [1] }
+        producer: { type: string }
+        aggregateType: { type: string }
+        aggregateId: { type: string }
+        occurredAt: { type: string, format: date-time }
+        traceId: { type: string }
+        payload:
+          type: object
+          additionalProperties: true
+          description: Complete minimum historical snapshot; notification events require recipient(s), display values, and dedupeKey. UserAccessChanged requires userId/status/version.
+    InternalNotificationRequest:
+      type: object
+      required: [recipientUserId, title, content, dedupeKey, traceId]
+      properties:
+        recipientUserId: { type: integer, format: int64 }
+        title: { type: string }
+        content: { type: string }
+        notificationType: { type: string, nullable: true }
+        businessType: { type: string, nullable: true }
+        businessId: { type: string, nullable: true }
+        targetPath: { type: string, nullable: true }
+        scope: { type: string, enum: [buyer, seller], nullable: true }
+        dedupeKey: { type: string }
+        traceId: { type: string }
+    DeliveryStatusResult:
+      type: object
+      properties:
+        code: { type: integer, example: 0 }
+        message: { type: string, example: success }
+        data:
+          type: object
+          properties:
+            persisted: { type: boolean }
+            status: { type: string, enum: [PERSISTED, PENDING, DELIVERED, DLQ, FAILED] }
+            retryCount: { type: integer }
+            lastError: { type: string, nullable: true }
+            deliveredAt: { type: string, format: date-time, nullable: true }
     VoidResult:
       type: object
       properties:

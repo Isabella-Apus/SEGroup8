@@ -4,17 +4,20 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.segroup8.messaging.access.GovernanceBlockPort;
 import com.segroup8.messaging.realtime.RealtimePublisher;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,7 @@ class MessagingApiIntegrationTest {
     @Autowired MockMvc mvc;
     @Autowired JdbcTemplate jdbc;
     @MockBean RealtimePublisher realtime;
+    @MockBean GovernanceBlockPort governanceBlocks;
 
     @BeforeEach
     void seed() {
@@ -113,6 +117,20 @@ class MessagingApiIntegrationTest {
     }
 
     @Test
+    void conversationCreationIsIdempotentWhenSellerInitiatesTheSameSource() throws Exception {
+        mvc.perform(post("/api/chat/conversations").header("Authorization", bearer(token(1, 3600)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"targetUserId\":2,\"sourceType\":\"PRODUCT\",\"sourceId\":55}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.id").isNumber());
+        mvc.perform(post("/api/chat/conversations").header("Authorization", bearer(token(2, 3600)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"targetUserId\":1,\"sourceType\":\"PRODUCT\",\"sourceId\":55}"))
+                .andExpect(status().isOk());
+        org.junit.jupiter.api.Assertions.assertEquals(1, jdbc.queryForObject(
+                "select count(*) from chat_conversation where source_type='PRODUCT' and source_id=55", Integer.class));
+    }
+
+    @Test
     void sendingFailsWhenEitherDirectionIsBlocked() throws Exception {
         jdbc.update("update user_block_projection set active=1 where blocker_user_id=1 and blocked_user_id=2");
         mvc.perform(post("/api/chat/conversations/10/messages").header("Authorization", bearer(token(1, 3600)))
@@ -120,6 +138,19 @@ class MessagingApiIntegrationTest {
                 .andExpect(status().isForbidden());
         org.junit.jupiter.api.Assertions.assertEquals(0,
                 jdbc.queryForObject("select count(*) from chat_message where content='blocked'", Integer.class));
+    }
+
+    @Test
+    void migratedInactiveProjectionUsesGovernanceFallbackAndFailsClosedOnBlock() throws Exception {
+        jdbc.update("update user_block_projection set source_version=0 where "
+                + "(blocker_user_id=1 and blocked_user_id=2) or (blocker_user_id=2 and blocked_user_id=1)");
+        when(governanceBlocks.isCommunicationBlocked(anyLong(), anyLong(), anyString()))
+                .thenReturn(Optional.of(true));
+        mvc.perform(post("/api/chat/conversations/10/messages").header("Authorization", bearer(token(1, 3600)))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"content\":\"stale allowed state\"}"))
+                .andExpect(status().isForbidden());
+        org.junit.jupiter.api.Assertions.assertEquals(0, jdbc.queryForObject(
+                "select count(*) from chat_message where content='stale allowed state'", Integer.class));
     }
 
     @Test
@@ -150,7 +181,7 @@ class MessagingApiIntegrationTest {
         org.junit.jupiter.api.Assertions.assertEquals(1,
                 jdbc.queryForObject("select count(*) from chat_message where content='durable'", Integer.class));
         org.junit.jupiter.api.Assertions.assertEquals(1,
-                jdbc.queryForObject("select count(*) from notification where user_id=2 and title='New message'", Integer.class));
+                jdbc.queryForObject("select count(*) from notification where user_id=2 and title='新消息'", Integer.class));
     }
 
     private String bearer(String token) { return "Bearer " + token; }
