@@ -1,6 +1,6 @@
 import { test, expect } from "../fixtures";
 import type { APIRequestContext, Response } from "@playwright/test";
-import { assertNoVisibleError } from "../helpers/http";
+import { assertIdempotentReceiveReplay, assertNoVisibleError } from "../helpers/http";
 import {
     bearer,
     captureDomainEEvidence,
@@ -138,8 +138,15 @@ test.describe("@DOMAIN_E @UC23 wallet and settlement", () => {
             id: number;
             payableAmount: number;
         }>(await request.post("/api/order/create", {
-            headers: bearer(buyerToken),
-            data: { items: [{ productId: 1, quantity: 1 }] },
+            headers: { ...bearer(buyerToken), "Idempotency-Key": "uc23-create-order" },
+            data: {
+                items: [{ productId: 1, quantity: 1 }],
+                receiverName: "UC23 Buyer",
+                receiverPhone: "13800138023",
+                receiverProvince: "Beijing",
+                receiverCity: "Beijing",
+                receiverDetailAddress: "UC23 E2E Address",
+            },
         }));
         const orderId = Number(order.id);
         const settlementAmount = Number(order.payableAmount);
@@ -147,26 +154,31 @@ test.describe("@DOMAIN_E @UC23 wallet and settlement", () => {
         expect(settlementAmount).toBeGreaterThan(0);
 
         await expectBusinessSuccess(await request.post(`/api/order/${orderId}/pay`, {
-            headers: bearer(buyerToken),
+            headers: { ...bearer(buyerToken), "Idempotency-Key": `uc23-pay-${orderId}` },
             data: { payMode: "THIRD_PARTY", payChannel: "WECHAT" },
         }));
         await expectBusinessSuccess(await request.post(`/api/order/${orderId}/ship`, {
-            headers: bearer(sellerToken),
+            headers: { ...bearer(sellerToken), "Idempotency-Key": `uc23-ship-${orderId}` },
             data: {
                 originProvince: "Beijing",
                 originCity: "Beijing",
                 originDetail: "UC23 E2E Warehouse",
             },
         }));
-        await expectBusinessSuccess(await request.post(`/api/order/${orderId}/confirm-receive`, {
-            headers: bearer(buyerToken),
-        }));
+        const receiveKey = `uc23-receive-${orderId}`;
+        const received = await expectBusinessSuccess<{ id: number; orderStatus: number }>(
+            await request.post(`/api/order/${orderId}/confirm-receive`, {
+                headers: { ...bearer(buyerToken), "Idempotency-Key": receiveKey },
+            }),
+        );
+        expect(Number(received.orderStatus)).toBe(3);
 
-        const duplicateSettlement = await request.post(`/api/order/${orderId}/confirm-receive`, {
-            headers: bearer(buyerToken),
-        });
-        const duplicatePayload = await expectBusinessFailure(duplicateSettlement);
-        expect(Number(duplicatePayload.code)).toBe(400);
+        await assertIdempotentReceiveReplay(
+            await request.post(`/api/order/${orderId}/confirm-receive`, {
+                headers: { ...bearer(buyerToken), "Idempotency-Key": receiveKey },
+            }),
+            orderId,
+        );
 
         const sellerAfter = await financeDashboard(request, sellerToken);
         expect(Number(sellerAfter.personalBalance)).toBe(Number(sellerBefore.personalBalance));

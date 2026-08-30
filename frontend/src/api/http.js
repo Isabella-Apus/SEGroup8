@@ -4,11 +4,26 @@ import { useUserStore } from "@/stores/user";
 import { mockRequest } from "@/mock-data";
 import { API_BASE_URL } from "@/utils/url";
 
-// 开发环境默认连真实后端；生产构建未配置时仍可用 mock。也可用 .env.development 显式设置 VITE_DATA_SOURCE。
+// 默认连接真实后端；只有显式设置 VITE_DATA_SOURCE=mock 时才启用演示数据。
 const DATA_SOURCE = (
     import.meta.env.VITE_DATA_SOURCE ||
-    (import.meta.env.DEV ? "real" : "mock")
+    "real"
 ).toLowerCase();
+
+function createIdempotencyKey() {
+    if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+    return `web-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function withIdempotency(method, url, config = {}) {
+    if (!["post", "put", "delete"].includes(method.toLowerCase())) return config;
+    if (!/^\/(order|review|logistics|admin\/orders)(\/|$)/.test(url)) return config;
+    const headers = { ...(config.headers || {}) };
+    if (!headers["Idempotency-Key"]) {
+        headers["Idempotency-Key"] = config.idempotencyKey || createIdempotencyKey();
+    }
+    return { ...config, headers };
+}
 
 const realHttp = axios.create({
     baseURL: API_BASE_URL,
@@ -29,7 +44,7 @@ realHttp.interceptors.request.use(
 realHttp.interceptors.response.use(
     (response) => {
         const { data } = response;
-        if (data && data.code !== 0) {
+        if (data && Object.prototype.hasOwnProperty.call(data, "code") && data.code !== 0) {
             const message = data.message || "Request failed";
             if (!response.config?.silent) {
                 ElMessage.error(message);
@@ -86,18 +101,21 @@ const http = {
         return realHttp.get(url, config);
     },
     post(url, data = {}, config = {}) {
+        config = withIdempotency("post", url, config);
         if (DATA_SOURCE === "mock") {
             return mockAdapter("post", url, data, config);
         }
         return realHttp.post(url, data, config);
     },
     put(url, data = {}, config = {}) {
+        config = withIdempotency("put", url, config);
         if (DATA_SOURCE === "mock") {
             return mockAdapter("put", url, data, config);
         }
         return realHttp.put(url, data, config);
     },
     delete(url, config = {}) {
+        config = withIdempotency("delete", url, config);
         if (DATA_SOURCE === "mock") {
             return mockAdapter("delete", url, undefined, config);
         }

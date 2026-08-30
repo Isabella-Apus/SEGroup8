@@ -1,0 +1,11 @@
+flowchart LR
+  Gateway --> Order[order-service]
+  Order --> ODB[(order_db)]
+  Order -->|reserve confirm release| Catalog[catalog-shop-service]
+  Order -->|quote debit refund settle| Finance[benefits-finance-service]
+  Secondhand[secondhand-service] -->|idempotent secondhand order| Order
+  Identity[identity-governance-service] -->|JWT and projected snapshot| Order
+  Order -->|OrderStatusChanged.v1| Bus[(Outbox/Event)]
+  Bus --> Messaging[messaging-service]
+  Bus --> Secondhand
+  Bus --> Finance

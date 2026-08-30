@@ -260,12 +260,16 @@ async function handleBuyNow() {
     ElMessage.warning("购买数量超过库存");
     return;
   }
-  const selectedAddressId = await confirmAddressAndPickId();
-  if (!selectedAddressId) {
+  const selectedAddress = await confirmAddressAndPickId();
+  if (!selectedAddress) {
     return;
   }
   const result = await createOrderApi({
-    addressId: selectedAddressId,
+    receiverName: selectedAddress.receiverName,
+    receiverPhone: selectedAddress.receiverPhone,
+    receiverProvince: selectedAddress.province,
+    receiverCity: selectedAddress.city,
+    receiverDetailAddress: selectedAddress.detailAddress,
     voucherId: selectedVoucherId.value || null,
     items: [{ productId: product.value.id, quantity: Number(quantity.value) }],
   });
@@ -328,7 +332,7 @@ async function confirmAddressAndPickId() {
   if (!confirmed) {
     return null;
   }
-  return preferred.id;
+  return preferred;
 }
 </script>
 

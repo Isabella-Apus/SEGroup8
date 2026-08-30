@@ -1,0 +1,46 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:order_test;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password: ''
+  flyway:
+    enabled: true
+security:
+  jwt:
+    secret: test-jwt-secret-that-is-longer-than-thirty-two-bytes
+  internal-service-token: test-internal-token
+  test-headers-enabled: true
+downstream:
+  catalog-url: http://127.0.0.1:1
+  finance-url: http://127.0.0.1:1
+  messaging-url: http://127.0.0.1:1
+outbox.publisher.enabled: false
+logging.level.root: WARN
+management:
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    info:
+      enabled: true
+    prometheus:
+      enabled: true
+    health:
+      probes.enabled: true
+      group:
+        readiness.include: readinessState,db
+        liveness.include: livenessState,ping
+  info:
+    env.enabled: true
+info:
+  app:
+    version: test
+  git:
+    commit: test
+  build:
+    time: test

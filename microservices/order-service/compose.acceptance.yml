@@ -1,0 +1,57 @@
+name: segroup8-order-acceptance
+
+services:
+  database:
+    image: mysql:8.4.6
+    environment:
+      MYSQL_DATABASE: order_db
+      MYSQL_USER: order_app
+      MYSQL_PASSWORD: order_app
+      MYSQL_ROOT_PASSWORD: order_root
+      TZ: Asia/Shanghai
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_general_ci"]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    volumes:
+      - order_acceptance_db:/var/lib/mysql
+
+  order:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${ORDER_ACCEPTANCE_IMAGE:-segroup8/order:acceptance}
+    environment:
+      DB_URL: jdbc:mysql://database:3306/order_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+      DB_USERNAME: order_app
+      DB_PASSWORD: order_app
+      JWT_SECRET: test-jwt-secret-must-have-at-least-thirty-two-bytes
+      INTERNAL_SERVICE_TOKEN: acceptance-internal-token
+      SECURITY_TEST_HEADERS_ENABLED: "true"
+      CATALOG_SERVICE_URL: http://host.docker.internal:18086
+      BENEFITS_FINANCE_SERVICE_URL: http://host.docker.internal:18086
+      MESSAGING_SERVICE_URL: http://host.docker.internal:18086
+      OUTBOX_PUBLISHER_ENABLED: "false"
+      APP_VERSION: acceptance
+      APP_COMMIT: acceptance
+      APP_BUILD_TIME: acceptance
+      TZ: Asia/Shanghai
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    ports:
+      - "${ORDER_ACCEPTANCE_PORT:-18081}:8085"
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://127.0.0.1:8085/actuator/health/readiness"]
+      interval: 5s
+      timeout: 3s
+      retries: 24
+      start_period: 30s
+
+volumes:
+  order_acceptance_db:

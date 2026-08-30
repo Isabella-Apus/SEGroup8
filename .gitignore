@@ -63,3 +63,4 @@ backend-err.log
 
 # Maven build output
 microservices/*/target/
+.m2/

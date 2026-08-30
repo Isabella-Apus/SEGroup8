@@ -486,10 +486,11 @@ async function checkout() {
     return;
   }
 
-  const selectedAddressId = await confirmAddressAndPickId();
-  if (!selectedAddressId) {
+  const selectedAddress = await confirmAddressAndPickId();
+  if (!selectedAddress) {
     return;
   }
+  const selectedAddressId = selectedAddress.id;
 
   let officialOrderId = null;
   const createdSecondhandIds = new Set();
@@ -502,7 +503,11 @@ async function checkout() {
       const validOfficialItems = officialCheckout.filter((_, index) => checks[index].status === "fulfilled");
       if (validOfficialItems.length) {
         const result = await createOrderApi({
-          addressId: selectedAddressId,
+          receiverName: selectedAddress.receiverName,
+          receiverPhone: selectedAddress.receiverPhone,
+          receiverProvince: selectedAddress.province,
+          receiverCity: selectedAddress.city,
+          receiverDetailAddress: selectedAddress.detailAddress,
           voucherId: selectedVoucherId.value || null,
           items: validOfficialItems.map((item) => ({
             productId: item.productId,
@@ -577,7 +582,7 @@ async function confirmAddressAndPickId() {
     router.push({ name: "addressManager" });
     return false;
   });
-  return confirmed ? preferred.id : null;
+  return confirmed ? preferred : null;
 }
 </script>
 

@@ -1,0 +1,57 @@
+server:
+  port: ${SERVER_PORT:8085}
+  shutdown: graceful
+spring:
+  application:
+    name: order-service
+  datasource:
+    url: ${DB_URL:jdbc:mysql://mysql:3306/order_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai}
+    username: ${DB_USERNAME:order_app}
+    password: ${DB_PASSWORD:change-me}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+security:
+  jwt:
+    secret: ${JWT_SECRET:change-this-development-secret-at-least-32-bytes}
+  internal-service-token: ${INTERNAL_SERVICE_TOKEN:change-this-internal-token}
+downstream:
+  catalog-url: ${CATALOG_SERVICE_URL:http://catalog-shop-service:8080}
+  finance-url: ${BENEFITS_FINANCE_SERVICE_URL:http://benefits-finance-service:8080}
+  messaging-url: ${MESSAGING_SERVICE_URL:http://messaging-service:8080}
+  connect-timeout: 1s
+  read-timeout: 2s
+outbox:
+  publisher:
+    enabled: ${OUTBOX_PUBLISHER_ENABLED:true}
+    fixed-delay: 2s
+management:
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    info:
+      enabled: true
+    prometheus:
+      enabled: true
+    health:
+      probes.enabled: true
+      group:
+        readiness.include: readinessState,db
+        liveness.include: livenessState,ping
+  info:
+    env.enabled: true
+info:
+  app:
+    version: ${APP_VERSION:dev}
+  git:
+    commit: ${APP_COMMIT:${GIT_COMMIT:unknown}}
+  build:
+    time: ${APP_BUILD_TIME:${BUILD_TIME:unknown}}
+springdoc:
+  swagger-ui.path: /swagger-ui.html

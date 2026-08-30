@@ -1,0 +1,17 @@
+{{- if .Values.order.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-order
+  labels:
+    {{- include "segroup8.labels" . | nindent 4 }}
+    app.kubernetes.io/component: order-service
+spec:
+  selector:
+    {{- include "segroup8.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: order-service
+  ports:
+    - name: http
+      port: {{ .Values.order.service.port }}
+      targetPort: http
+{{- end }}

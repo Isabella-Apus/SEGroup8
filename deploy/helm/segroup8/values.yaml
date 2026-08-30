@@ -77,6 +77,32 @@ secondhand:
         percent: 50
         periodSeconds: 15
 
+order:
+  enabled: false
+  replicaCount: 1
+  deployment:
+    version: ""
+    commit: ""
+    buildTime: ""
+  image:
+    repository: ""
+    tag: ""
+    pullPolicy: IfNotPresent
+  secretName: segroup8-order-secret
+  service:
+    port: 8085
+  downstream:
+    catalogUrl: http://catalog-shop-service:8080
+    financeUrl: http://benefits-finance-service:8080
+    messagingUrl: http://messaging-service:8080
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 768Mi
+
 mysql:
   image:
     repository: mysql

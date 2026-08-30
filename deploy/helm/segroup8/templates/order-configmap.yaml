@@ -1,0 +1,13 @@
+{{- if .Values.order.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-order
+  labels:
+    {{- include "segroup8.labels" . | nindent 4 }}
+    app.kubernetes.io/component: order-service
+data:
+  CATALOG_SERVICE_URL: {{ .Values.order.downstream.catalogUrl | quote }}
+  BENEFITS_FINANCE_SERVICE_URL: {{ .Values.order.downstream.financeUrl | quote }}
+  MESSAGING_SERVICE_URL: {{ .Values.order.downstream.messagingUrl | quote }}
+{{- end }}
