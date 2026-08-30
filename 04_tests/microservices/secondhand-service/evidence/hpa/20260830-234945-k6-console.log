@@ -1,0 +1,41 @@
+
+
+  █ THRESHOLDS
+
+    http_req_failed
+    ✓ 'rate<0.05' rate=0.00%
+
+    server_error
+    ✓ 'rate==0' rate=0.00%
+
+
+  █ TOTAL RESULTS
+
+    checks_total.......: 32076   214.692373/s
+    checks_succeeded...: 100.00% 32076 out of 32076
+    checks_failed......: 0.00%   0 out of 32076
+
+    ✓ secondhand HPA list: HTTP 200
+    ✓ secondhand HPA list: business success
+    ✓ secondhand HPA list: records returned
+
+    CUSTOM
+    business_guarded...............: 0.00%   0 out of 10692
+    business_success...............: 100.00% 10692 out of 10692
+    server_error...................: 0.00%   0 out of 10692
+
+    HTTP
+    http_req_duration..............: avg=208.57ms min=-190181722ns med=187.34ms max=1.43s p(90)=342.4ms  p(95)=413.29ms
+      { expected_response:true }...: avg=208.57ms min=-190181722ns med=187.34ms max=1.43s p(90)=342.4ms  p(95)=413.29ms
+    http_req_failed................: 0.00%   0 out of 10692
+    http_reqs......................: 10692   71.564124/s
+
+    EXECUTION
+    iteration_duration.............: avg=210.52ms min=33.11ms      med=189.2ms  max=1.43s p(90)=344.94ms p(95)=414.83ms
+    iterations.....................: 10692   71.564124/s
+    vus............................: 15      min=15             max=15
+    vus_max........................: 15      min=15             max=15
+
+    NETWORK
+    data_received..................: 3.4 MB  23 kB/s
+    data_sent......................: 1.3 MB  8.8 kB/s

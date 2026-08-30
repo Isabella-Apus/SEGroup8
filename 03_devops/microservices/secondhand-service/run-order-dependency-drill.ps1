@@ -18,6 +18,7 @@ $responsesPath = Join-Path $evidenceDir "$runId-api-responses.json"
 $logsPath = Join-Path $evidenceDir "$runId-compose.log"
 $stubLogPath = Join-Path $evidenceDir "$runId-order-stub.log"
 $stubErrorPath = Join-Path $evidenceDir "$runId-order-stub-error.log"
+$failurePath = Join-Path $evidenceDir "$runId-failure.log"
 $serviceSecret = "test-jwt-secret-must-have-at-least-thirty-two-bytes"
 $originalServicePort = $env:SECONDHAND_ACCEPTANCE_PORT
 $env:SECONDHAND_ACCEPTANCE_PORT = "18080"
@@ -72,6 +73,18 @@ function Invoke-CheckedDocker {
     }
 }
 
+function Invoke-DockerBestEffort {
+    param([string[]]$Arguments)
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    & docker @Arguments *> $null
+    $exitCode = $LASTEXITCODE
+    $ErrorActionPreference = $previousErrorActionPreference
+    if ($exitCode -ne 0) {
+        Write-Warning "Cleanup command 'docker $($Arguments -join ' ')' exited with code $exitCode."
+    }
+}
+
 function Wait-HealthyHttp {
     param([string]$Url, [int]$Timeout = 180)
     $deadline = (Get-Date).AddSeconds($Timeout)
@@ -121,7 +134,10 @@ function Invoke-DbQuery {
 function Get-DbScalar {
     param([string]$Sql)
     $output = @(Invoke-DbQuery -Sql $Sql)
-    return if ($output.Count -eq 0) { $null } else { [string]$output[0] }
+    if ($output.Count -eq 0) {
+        return $null
+    }
+    return [string]$output[0]
 }
 
 function Wait-DbValue {
@@ -145,7 +161,7 @@ function Invoke-Buy {
 }
 
 try {
-    & docker @composeArgs down -v --remove-orphans *> $null
+    Invoke-DockerBestEffort -Arguments ($composeArgs + @("down", "-v", "--remove-orphans"))
     foreach ($port in @(18080, 18085)) {
         if (Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue) {
             throw "Port $port is already in use; stop the unrelated process before running the isolated drill."
@@ -168,10 +184,13 @@ try {
 
     $jwt = New-TestJwt -UserId 950002 -Username "fault_buyer" -Secret $serviceSecret
     $initialResponse = Invoke-Buy -ProductId 991001 -Jwt $jwt -Remark "order dependency unavailable"
+    Write-Host "Dependency-down response: code=$($initialResponse.code), requestStatus=$($initialResponse.data.requestStatus)"
     if ($initialResponse.code -ne 0 -or $initialResponse.data.requestStatus -ne "RETRY") {
         throw "Expected first buy to return RETRY while order dependency is down."
     }
-    if ((Get-DbScalar "select status from secondhand_product where id=991001") -ne "4") {
+    $initialProductStatus = Get-DbScalar "select status from secondhand_product where id=991001"
+    Write-Host "Dependency-down database product status: $initialProductStatus"
+    if ($initialProductStatus -ne "4") {
         throw "Product 991001 was not frozen in TRADE_PENDING after the uncertain order request."
     }
 
@@ -251,13 +270,21 @@ try {
     Write-Utf8NoBom -Path $summaryPath -Content ($summary | ConvertTo-Json -Depth 12)
     $resultStatus = "PASSED"
     Write-Host "Order dependency fault drill passed. Evidence: $summaryPath"
+} catch {
+    $failureMessage = $_ | Out-String
+    Write-Utf8NoBom -Path $failurePath -Content $failureMessage.Trim()
+    Write-Warning "Fault drill failed: $($_.Exception.Message)"
+    throw
 } finally {
     if ($stubProcess -and -not $stubProcess.HasExited) {
         Stop-Process -Id $stubProcess.Id -Force -ErrorAction SilentlyContinue
         Wait-Process -Id $stubProcess.Id -ErrorAction SilentlyContinue
     }
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
     & docker @composeArgs logs --no-color --timestamps 2>&1 | Out-File -LiteralPath $logsPath -Encoding utf8
-    & docker @composeArgs down -v --remove-orphans *> $null
+    $ErrorActionPreference = $previousErrorActionPreference
+    Invoke-DockerBestEffort -Arguments ($composeArgs + @("down", "-v", "--remove-orphans"))
     if ($null -eq $originalServicePort) {
         Remove-Item Env:SECONDHAND_ACCEPTANCE_PORT -ErrorAction SilentlyContinue
     } else {

@@ -14,7 +14,8 @@ PR：[#213](https://github.com/Isabella-Apus/SEGroup8/pull/213)
 - [ ] Docker 非 root，Helm 探针、资源限制和 Secret/ConfigMap 分离正确
 - [ ] CI 在 Maven/API/E2E 失败时停止，成功后才发布不可变镜像
 - [ ] 未提交 token、密码、私钥或生产 Secret
-- [ ] Maven 21/21 与 Domain D E2E 5/5 证据可打开
+- [ ] Maven 26/26、独立服务 E2E 4/4 与 Domain D E2E 5/5 证据可打开
+- [ ] HPA、三轮拍卖性能对比、订单依赖故障和 Helm 回滚证据结论与原始文件一致
 - [ ] 至少提出一条有效评审意见或明确记录“无阻断问题”
 
 评审结论：待非作者 Review 后填写。

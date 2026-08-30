@@ -1,0 +1,8 @@
+Release "segroup8-rollback" does not exist. Installing it now.
+NAME: segroup8-rollback
+LAST DEPLOYED: Sun Aug 30 23:39:53 2026
+NAMESPACE: segroup8-rollback-20260830-233919
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None

@@ -1,9 +1,31 @@
-# secondhand-service 部署失败排查说明
+# secondhand-service 部署失败与回滚实测
 
-一次典型失败是把数据库 Secret 的用户名写错。流水线执行 Helm 原子升级后，新 Pod 启动，但 readiness 一直不通过，rollout 超时，Helm 自动回滚。
+执行时间：2026-08-30 23:39-23:45（UTC+08:00）
+环境：Docker Desktop Kubernetes，隔离命名空间 `segroup8-rollback-20260830-233919`
 
-排查时先打开部署 job 上传的诊断 artifact：`helm history` 显示新 revision 为 failed，`kubectl describe deployment/pod` 显示 readiness 失败；再看当前和 previous 容器日志，JSON 日志中的根异常是 MySQL `Access denied`。此时 `/actuator/info` 仍显示旧提交号，证明回滚已生效、线上仍运行旧版本。
+## 演练步骤
 
-修复 Secret 后重新部署，依次确认 rollout 成功、liveness/readiness 为 `UP`、`/actuator/info` 的 commit 等于本次完整 SHA、公开商品列表返回 `code=0`。诊断脚本只读取 Secret 是否存在和日志，不输出 Secret 内容。
+1. 安装共享基础 chart，但先关闭 secondhand；创建独立 `secondhand_db`。
+2. 构建并导入唯一基线镜像 `segroup8/secondhand:rollback-20260830-232712`。
+3. 启用 secondhand，确认 Pod Ready、readiness `UP`、版本和 commit 正确。
+4. 将镜像升级为不存在的 `segroup8/secondhand:missing-20260830-233919`，并使用
+   `imagePullPolicy=Never`，稳定复现 `ErrImageNeverPull`。
+5. 使用 Helm 原子升级和失败回滚，保存退出码、events、describe、resources、status 与 history。
+6. 验证旧镜像恢复、readiness `UP`，再删除隔离命名空间。
 
-这段文字说明的是可复现的排查路径；在生产集群实际演练前，状态仍标记为 `NOT_RUN`，不能用文档代替集群证据。
+## 结果
+
+- 失败升级按预期返回退出码 1。
+- Helm revision 3 为 `failed`，revision 4 为 `deployed: Rollback to 2`。
+- 回滚后镜像恢复为唯一基线镜像，运行时 image ID 为
+  `sha256:e352a2c43d10cf7c5f8ab9e4f249351c9f963c32d690b96ec1585d4e58f5dbae`。
+- readiness 为 `UP`，版本为 `rollback-baseline`，commit 为
+  `137f2293edd24eb07ad6a7ec229082b1f4940d0d`。
+- Secret 只使用本次随机测试值，证据不保存明文 Secret。
+
+汇总：`04_tests/microservices/secondhand-service/evidence/deployment-drill/20260830-233919-summary.json`。
+
+## 结论边界
+
+本地真实 Kubernetes 的错误镜像诊断和自动回滚已经完成。生产 ACR 镜像、共享命名空间、生产 Helm revision
+和线上健康检查仍必须由 main 流水线生成；本报告不把本地 revision 当作生产部署结果。

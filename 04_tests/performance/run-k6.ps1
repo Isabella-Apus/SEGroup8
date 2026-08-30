@@ -9,7 +9,8 @@ param(
     [string]$TargetVersion = "monolith-start",
     [string]$K6Image = "grafana/k6:latest",
     [string]$ResultPrefix = "",
-    [switch]$CompressRaw
+    [switch]$CompressRaw,
+    [switch]$AllowThresholdFailure
 )
 
 $ErrorActionPreference = "Stop"
@@ -176,7 +177,9 @@ $metadata = [ordered]@{
 }
 Write-Utf8NoBom -Path (Join-Path $resultDir $metadataName) -Content ($metadata | ConvertTo-Json -Depth 6)
 
-if ($exitCode -ne 0) {
+if ($exitCode -eq 99 -and $AllowThresholdFailure) {
+    Write-Warning "k6 thresholds were exceeded during a non-measured warmup; continuing with formal runs."
+} elseif ($exitCode -ne 0) {
     throw "k6 exited with code $exitCode. See $logPath"
 }
 Write-Host "Saved k6 evidence under $resultDir"

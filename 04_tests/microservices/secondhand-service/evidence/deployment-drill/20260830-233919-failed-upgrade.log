@@ -1,0 +1,13 @@
+helm.exe : level=WARN msg="upgrade failed" name=segroup8-rollback error="resource
+Deployment/segroup8-rollback-20260830-233919/segroup8-secondhand not ready. status: InProgress, message: Pending
+termination: 1\ncontext deadline exceeded"
+At line:14 char:1
++ & $helm @arguments 2>&1 | Tee-Object '.\04_tests\microservices\second ...
++ ~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (level=WARN msg=...dline exceeded":String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+Error: UPGRADE FAILED: release segroup8-rollback failed, and has been rolled back due to rollback-on-failure being
+set: resource Deployment/segroup8-rollback-20260830-233919/segroup8-secondhand not ready. status: InProgress, message:
+Pending termination: 1
+context deadline exceeded

@@ -1,0 +1,12 @@
+<testsuites id="" name="" tests="4" failures="0" skipped="0" errors="0" time="6.256394">
+<testsuite name="microservices\secondhand-service-api.spec.ts" timestamp="2026-08-30T15:07:51.817Z" hostname="" tests="4" failures="0" skipped="0" time="3.165" errors="0">
+<testcase name="secondhand-service acceptance › UC16 product lifecycle reaches the independent service and database" classname="microservices\secondhand-service-api.spec.ts" time="1.388">
+</testcase>
+<testcase name="secondhand-service acceptance › UC17 direct purchase creates one idempotent order request" classname="microservices\secondhand-service-api.spec.ts" time="0.64">
+</testcase>
+<testcase name="secondhand-service acceptance › UC18 bargain confirmation creates an order through the contract" classname="microservices\secondhand-service-api.spec.ts" time="0.421">
+</testcase>
+<testcase name="secondhand-service acceptance › UC19 auction accepts a bid and settles exactly once" classname="microservices\secondhand-service-api.spec.ts" time="0.716">
+</testcase>
+</testsuite>
+</testsuites>

@@ -14,7 +14,7 @@ docker compose -f microservices/secondhand-service/compose.acceptance.yml up -d 
 E2E_BASE_URL=http://127.0.0.1:18080 npx playwright test e2e/microservices/secondhand-service-api.spec.ts --workers=1
 ```
 
-## HPA 本地预实验
+## HPA 本地实验
 
 前置条件：Docker Desktop Kubernetes 已启动，`kubectl config current-context` 指向本地测试集群，且 Metrics API 可用。
 脚本会创建独立命名空间和临时数据库，不读取生产 Secret，结束后默认自动清理。
@@ -22,13 +22,20 @@ E2E_BASE_URL=http://127.0.0.1:18080 npx playwright test e2e/microservices/second
 ```powershell
 powershell -ExecutionPolicy Bypass -File `
   .\03_devops\microservices\secondhand-service\run-hpa-preexperiment.ps1 `
-  -SkipImageBuild -VUs 15 -Duration 150s `
+  -ExperimentType formal -RunNumber 1 `
+  -MinReplicas 1 -MaxReplicas 4 `
+  -VUs 15 -Duration 150s `
   -TargetCpuUtilization 70 -ScaleDownTimeoutSeconds 360
 ```
 
 如果仅在本地测试集群缺少 Metrics Server，可追加 `-InstallMetricsServer`。生产集群必须由平台管理员统一安装，
-不得由业务流水线临时修改。通过条件为初始 1 个 Ready Pod、负载期间至少 2 个 Ready Pod、停压后回到 1 个，
-且 k6 的 HTTP 失败率和服务端错误率都通过门限。原始证据输出到：
+不得由业务流水线临时修改。脚本默认使用本次运行号构建唯一镜像；在 Docker Desktop 上会把该镜像显式导入
+Kubernetes 节点并使用 `imagePullPolicy=Never`，防止同名旧镜像污染实验。`-SkipImageBuild` 只用于调试已知镜像，
+不得用于正式结果。
+
+通过条件为初始 1 个 Ready Pod、负载期间出现额外 Ready Pod、Deployment 扩容、停压后回到 1 个，且 k6 的
+HTTP 失败率和服务端错误率通过门限。汇总同时记录峰值副本与峰值 Ready 数；两者不同必须在报告中如实说明。
+原始证据输出到：
 
 ```text
 04_tests/microservices/secondhand-service/evidence/hpa/
@@ -36,6 +43,20 @@ powershell -ExecutionPolicy Bypass -File `
 
 启用 HPA 时 `secondhand-deployment.yaml` 不固定 `replicas`，由 `secondhand-hpa.yaml` 管理。课程配置默认范围为
 1–4，CPU 目标为 70%。
+
+## 订单依赖停止与恢复
+
+前置条件：Docker Desktop 正常运行，端口 `18080` 和 `18085` 未被其他程序占用。脚本使用隔离 Compose project、
+真实 secondhand-service、MySQL 8.4.6 和独立 HTTP 订单契约进程，不读取生产 Secret。
+
+```powershell
+powershell -ExecutionPolicy Bypass -File `
+  .\03_devops\microservices\secondhand-service\run-order-dependency-drill.ps1
+```
+
+通过条件为：依赖停止时返回 `RETRY` 且 readiness 保持 `UP`；恢复后沿用同一 business key 并只生成一条请求；
+达到重试上限时请求为 `FAILED`、商品恢复 `ON_SHELF` 且只有一条失败 outbox。证据输出到
+`04_tests/microservices/secondhand-service/evidence/fault-drill/`。
 
 ## Helm 静态检查
 
@@ -82,6 +103,9 @@ kubectl -n segroup8 exec deployment/segroup8-secondhand -- curl -fsS http://127.
 3. 用 `kubectl get/describe` 区分镜像拉取、调度、Secret、HPA 或探针失败。
 4. 同时查看当前与 `--previous` 容器 JSON 日志，使用 `traceId/requestId` 串联请求。
 5. 用 `/actuator/info` 对照运行中的 commit 和期望 SHA，避免排查错版本。
+
+本地错误镜像与 Helm 自动回滚已按上述顺序实测，结果和证据索引见
+`deployment-failure-drill.md`。生产演练仍使用同一诊断顺序，但不得复制本地测试 Secret 或把本地 revision 写成生产结果。
 
 订单依赖不可用时，二手服务 readiness 应保持 `UP`；查看 `trade_order_request` 的 `PENDING/RETRY`、尝试次数和
 business key。恢复订单服务后，先按 business key 查询再重试，验证没有重复订单。

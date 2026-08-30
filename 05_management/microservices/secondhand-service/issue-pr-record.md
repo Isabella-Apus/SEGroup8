@@ -19,10 +19,12 @@
 | PR | `#213`：<https://github.com/Isabella-Apus/SEGroup8/pull/213> |
 | Issue/PR 关联 | PR `#213` 使用 `Closes #214`，只关闭 MS-04，不直接关闭 EPIC-D `#37` |
 | 看板状态 | Issue `#214` 已加入 `SEGroup8` Project，并归属 EPIC-D `#37`；状态为 `In review` |
-| CI | [Microservices CI/CD 成功](https://github.com/Isabella-Apus/SEGroup8/actions/runs/33298506368)；[Kinda Goods CI/CD 成功](https://github.com/Isabella-Apus/SEGroup8/actions/runs/33298506580) |
+| CI | 上一版：[Microservices CI/CD 成功](https://github.com/Isabella-Apus/SEGroup8/actions/runs/33298506368)；[Kinda Goods CI/CD 成功](https://github.com/Isabella-Apus/SEGroup8/actions/runs/33298506580)。当前提交推送后重新核对 |
 | Merge SHA | 待合并后填写 |
 | 镜像 | `segroup8/secondhand:sha-<git-sha>`，digest 待 CI 推送后填写 |
-| Helm revision | 待集群部署后填写 |
+| 本地 Helm 回滚 | 隔离集群 revision 3 failed，revision 4 rollback to 2；生产 revision 待 main 部署 |
 | 目标 tag | `microservices-v1`，由全队验收后统一创建 |
 
-PR 描述已使用 `Closes #214` 关联唯一任务 Issue，并把 EPIC-D `#37` 标为父项。描述中写明 21/21 Maven 结果、5/5 E2E 结果和未完成的集群证据；合并 PR 只关闭 `#214`，不会提前关闭 Epic。
+PR 描述使用 `Closes #214` 关联唯一任务 Issue，并把 EPIC-D `#37` 标为父项。当前本地证据为 Maven 26/26、
+独立服务 E2E 4/4、Domain D E2E 5/5、正式 HPA、二手拍卖六轮性能数据、订单故障恢复和 Helm 回滚。
+合并 PR 只关闭 `#214`，不会提前关闭 Epic；生产部署和非作者 Review 仍单独保留。

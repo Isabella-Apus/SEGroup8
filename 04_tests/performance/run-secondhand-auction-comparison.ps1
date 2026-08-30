@@ -146,7 +146,8 @@ function Invoke-TargetRuns {
     & $ResetData
     $warmupPrefix = "$experimentId-warmup-$Target-secondhand-auction-bid"
     & $runK6 -Scenario secondhand-auction-bid -BaseUrl $BaseUrl -VUs $VUs -Duration "5s" `
-        -Environment $Environment -TargetVersion $TargetVersion -ResultPrefix $warmupPrefix -CompressRaw
+        -Environment $Environment -TargetVersion $TargetVersion -ResultPrefix $warmupPrefix `
+        -CompressRaw -AllowThresholdFailure
     Remove-WarmupEvidence -Prefix $warmupPrefix
 
     for ($run = 1; $run -le $Rounds; $run++) {
