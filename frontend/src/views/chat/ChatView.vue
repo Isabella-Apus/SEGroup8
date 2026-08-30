@@ -703,6 +703,11 @@ function handleRealtimeEvent(event) {
     sendStatus.value = "消息会自动同步给对方";
     return;
   }
+  if (detail.eventType === "REALTIME_RECONNECTED") {
+    sendStatus.value = "连接已恢复，正在同步消息";
+    syncActiveChat();
+    return;
+  }
   if (detail.eventType === "CHAT_MESSAGE" && detail.payload) {
     sendStatus.value = "收到新消息";
     appendIncomingMessage(detail.payload);

@@ -1,0 +1,232 @@
+openapi: 3.0.3
+info:
+  title: Kinda Goods Messaging Service API
+  version: 1.0.0-v1
+  description: V1 Chat, Notification, and realtime recovery API. Business event ingestion is not part of V1.
+servers:
+  - url: /
+security:
+  - bearerAuth: []
+paths:
+  /api/chat/conversations:
+    get:
+      operationId: listConversations
+      responses:
+        '200':
+          description: Current user's conversations
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConversationListResult' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+    post:
+      operationId: createConversation
+      description: The caller supplies an already-resolved target user and source snapshot; Messaging does not query product/shop schemas.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateConversationRequest' }
+      responses:
+        '200':
+          description: Existing or newly created conversation
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConversationResult' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /api/chat/conversations/{conversationId}/messages:
+    parameters:
+      - $ref: '#/components/parameters/ConversationId'
+    get:
+      operationId: listMessages
+      description: Participant-only durable history and REST recovery endpoint; marks received messages read.
+      responses:
+        '200':
+          description: Ordered messages
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MessageListResult' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      operationId: sendMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SendMessageRequest' }
+      responses:
+        '200':
+          description: Persisted message; realtime push is best effort after commit.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MessageResult' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '503': { $ref: '#/components/responses/Unavailable' }
+  /api/notifications:
+    get:
+      operationId: listNotifications
+      description: Current user's durable notifications and REST recovery endpoint.
+      parameters:
+        - name: scope
+          in: query
+          schema: { type: string, enum: [buyer, seller] }
+      responses:
+        '200':
+          description: Notifications owned by current user
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/NotificationListResult' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+  /api/notifications/{notificationId}/read:
+    post:
+      operationId: markNotificationRead
+      parameters:
+        - name: notificationId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404':
+          description: Missing notification or notification owned by another user
+  /api/notifications/read-all:
+    post:
+      operationId: markAllNotificationsRead
+      parameters:
+        - name: scope
+          in: query
+          schema: { type: string, enum: [buyer, seller] }
+      responses:
+        '200': { $ref: '#/components/responses/Success' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /ws/realtime:
+    get:
+      operationId: realtimeHandshake
+      description: WebSocket handshake. Supply JWT as `?token=...`; Origin must match configured patterns. Supports PING/PONG and CHAT_SEND, and pushes CHAT_MESSAGE and NOTIFICATION_CREATED.
+      security: []
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '101': { description: Switching Protocols }
+        '401': { description: Missing, invalid, expired, or uid-less JWT }
+        '403': { description: Banned user or disallowed Origin }
+        '503': { description: Access projection unavailable }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    ConversationId:
+      name: conversationId
+      in: path
+      required: true
+      schema: { type: integer, format: int64 }
+  responses:
+    Success:
+      description: Success
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/VoidResult' }
+    BadRequest: { description: Invalid content, self communication, or unresolved source }
+    Unauthorized: { description: Missing, invalid, expired, or uid-less JWT }
+    Forbidden: { description: Banned user, nonparticipant, or blocked communication }
+    Unavailable: { description: Required access/block state cannot be confirmed; operation fails closed }
+  schemas:
+    CreateConversationRequest:
+      type: object
+      required: [targetUserId]
+      properties:
+        targetUserId: { type: integer, format: int64 }
+        sourceType: { type: string, enum: [DIRECT, PRODUCT, SECONDHAND], default: DIRECT }
+        sourceId: { type: integer, format: int64, nullable: true }
+        sourceTitle: { type: string, maxLength: 120, nullable: true }
+    SendMessageRequest:
+      type: object
+      required: [content]
+      properties:
+        content: { type: string, minLength: 1, maxLength: 1000 }
+    Participant:
+      type: object
+      properties:
+        userId: { type: integer, format: int64 }
+        nickname: { type: string }
+        avatar: { type: string, nullable: true }
+        role: { type: string, nullable: true }
+    Conversation:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        sourceType: { type: string }
+        sourceId: { type: integer, format: int64 }
+        sourceTitle: { type: string, nullable: true }
+        lastMessageContent: { type: string, nullable: true }
+        lastMessageTime: { type: string, format: date-time, nullable: true }
+        unreadCount: { type: integer }
+        self: { $ref: '#/components/schemas/Participant' }
+        other: { $ref: '#/components/schemas/Participant' }
+    Message:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        conversationId: { type: integer, format: int64 }
+        senderUserId: { type: integer, format: int64 }
+        receiverUserId: { type: integer, format: int64 }
+        content: { type: string }
+        isRead: { type: integer, enum: [0, 1] }
+        createTime: { type: string, format: date-time }
+        sender: { $ref: '#/components/schemas/Participant' }
+    Notification:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        title: { type: string }
+        content: { type: string }
+        targetPath: { type: string, nullable: true }
+        scope: { type: string, enum: [buyer, seller] }
+        isRead: { type: integer, enum: [0, 1] }
+        createTime: { type: string, format: date-time }
+    VoidResult:
+      type: object
+      properties:
+        code: { type: integer, example: 0 }
+        message: { type: string, example: success }
+        data: { nullable: true }
+    ConversationResult:
+      allOf:
+        - $ref: '#/components/schemas/VoidResult'
+        - type: object
+          properties: { data: { $ref: '#/components/schemas/Conversation' } }
+    ConversationListResult:
+      allOf:
+        - $ref: '#/components/schemas/VoidResult'
+        - type: object
+          properties: { data: { type: array, items: { $ref: '#/components/schemas/Conversation' } } }
+    MessageResult:
+      allOf:
+        - $ref: '#/components/schemas/VoidResult'
+        - type: object
+          properties: { data: { $ref: '#/components/schemas/Message' } }
+    MessageListResult:
+      allOf:
+        - $ref: '#/components/schemas/VoidResult'
+        - type: object
+          properties: { data: { type: array, items: { $ref: '#/components/schemas/Message' } } }
+    NotificationListResult:
+      allOf:
+        - $ref: '#/components/schemas/VoidResult'
+        - type: object
+          properties: { data: { type: array, items: { $ref: '#/components/schemas/Notification' } } }
