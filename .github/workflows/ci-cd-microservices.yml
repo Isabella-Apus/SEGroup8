@@ -25,6 +25,7 @@ concurrency:
 
 jobs:
   verify:
+    name: Order service Maven and Helm verification
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:

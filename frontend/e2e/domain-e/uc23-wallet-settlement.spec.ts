@@ -1,6 +1,6 @@
 import { test, expect } from "../fixtures";
 import type { APIRequestContext, Response } from "@playwright/test";
-import { assertNoVisibleError } from "../helpers/http";
+import { assertIdempotentReceiveReplay, assertNoVisibleError } from "../helpers/http";
 import {
     bearer,
     captureDomainEEvidence,
@@ -173,13 +173,12 @@ test.describe("@DOMAIN_E @UC23 wallet and settlement", () => {
         );
         expect(Number(received.orderStatus)).toBe(3);
 
-        const duplicateSettlement = await expectBusinessSuccess<{ id: number; orderStatus: number }>(
+        await assertIdempotentReceiveReplay(
             await request.post(`/api/order/${orderId}/confirm-receive`, {
                 headers: { ...bearer(buyerToken), "Idempotency-Key": receiveKey },
             }),
+            orderId,
         );
-        expect(Number(duplicateSettlement.id)).toBe(orderId);
-        expect(Number(duplicateSettlement.orderStatus)).toBe(3);
 
         const sellerAfter = await financeDashboard(request, sellerToken);
         expect(Number(sellerAfter.personalBalance)).toBe(Number(sellerBefore.personalBalance));

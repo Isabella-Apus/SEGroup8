@@ -7,6 +7,7 @@ import {
     loginAsDomainD,
     uniqueName,
 } from "./support";
+import { assertIdempotentReceiveReplay } from "../helpers/http";
 
 const responseTimeout = 30_000;
 const productPrice = 86;
@@ -143,12 +144,12 @@ test.describe("@DOMAIN_D @UC20 secondhand fulfillment", () => {
                 2,
             );
 
-            const repeated = await expectBusinessSuccess<any>(
+            await assertIdempotentReceiveReplay(
                 await request.post(`/api/order/${orderId}/confirm-receive`, {
                     headers: { ...bearer(buyerToken), "Idempotency-Key": receiveKey },
                 }),
+                orderId,
             );
-            expect(Number(repeated.orderStatus)).toBe(3);
             const sellerAfterRepeated = await expectBusinessSuccess<any>(
                 await request.get("/api/finance/dashboard", { headers: bearer(sellerToken) }),
             );
