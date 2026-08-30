@@ -17,6 +17,7 @@
 | 分支 | `feature/ms-secondhand` |
 | PR | `#213`：<https://github.com/Isabella-Apus/SEGroup8/pull/213> |
 | 看板状态 | 已加入 `SEGroup8` Project，状态为 `In review` |
+| CI | [Microservices CI/CD 成功](https://github.com/Isabella-Apus/SEGroup8/actions/runs/33298170339)；[Kinda Goods CI/CD 成功](https://github.com/Isabella-Apus/SEGroup8/actions/runs/33298170436) |
 | Merge SHA | 待合并后填写 |
 | 镜像 | `segroup8/secondhand:sha-<git-sha>`，digest 待 CI 推送后填写 |
 | Helm revision | 待集群部署后填写 |

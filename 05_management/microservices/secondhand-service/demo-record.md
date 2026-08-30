@@ -9,9 +9,13 @@
 - [x] 非 root Docker 镜像构建
 - [x] Helm lint 与 template
 
-## PR/集群阶段待完成
+## PR/CI 已完成
 
-- [ ] GitHub Actions 成功和失败阻断记录
+- [x] GitHub Actions 失败阻断：[Microservices CI/CD #33297309271](https://github.com/Isabella-Apus/SEGroup8/actions/runs/33297309271)
+- [x] 修复后两条流水线通过：[Microservices CI/CD #33298170339](https://github.com/Isabella-Apus/SEGroup8/actions/runs/33298170339)、[Kinda Goods CI/CD #33298170436](https://github.com/Isabella-Apus/SEGroup8/actions/runs/33298170436)
+
+## 集群阶段待完成
+
 - [ ] ACR `sha-<git-sha>` 镜像 digest
 - [ ] Kubernetes rollout 和探针结果
 - [ ] order-service 实际停止/恢复演示日志
