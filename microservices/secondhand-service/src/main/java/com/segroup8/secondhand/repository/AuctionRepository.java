@@ -64,8 +64,13 @@ public class AuctionRepository {
     }
 
     public void insertBid(long auctionId, long productId, long bidderId, String bidderName, BigDecimal amount) {
-        db.update("update auction_log set status='OUTBID' where auction_id=:auction and status='LEADING'",
-                Map.of("auction", auctionId));
+        Long leadingBidId = db.query("select id from auction_log where auction_id=:auction and status='LEADING' "
+                        + "order by id desc limit 1",
+                Map.of("auction", auctionId), (rs, rowNum) -> rs.getLong("id")).stream().findFirst().orElse(null);
+        if (leadingBidId != null) {
+            db.update("update auction_log set status='OUTBID' where id=:id and status='LEADING'",
+                    Map.of("id", leadingBidId));
+        }
         db.update("insert into auction_log(auction_id,product_id,bidder_user_id,bidder_name_snapshot,bid_amount,status) "
                         + "values(:auction,:product,:bidder,:name,:amount,'LEADING')",
                 new MapSqlParameterSource().addValue("auction", auctionId).addValue("product", productId)

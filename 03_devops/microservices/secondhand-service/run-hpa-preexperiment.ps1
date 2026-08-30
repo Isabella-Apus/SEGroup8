@@ -1,5 +1,9 @@
 [CmdletBinding()]
 param(
+    [ValidateSet("preexperiment", "formal")]
+    [string]$ExperimentType = "preexperiment",
+    [ValidateRange(1, 10)]
+    [int]$RunNumber = 1,
     [string]$Namespace = "",
     [ValidateRange(1, 10)]
     [int]$MinReplicas = 1,
@@ -38,7 +42,7 @@ if ($MaxReplicas -lt $MinReplicas) {
 New-Item -ItemType Directory -Force -Path $evidenceDir | Out-Null
 $snapshotPath = Join-Path $evidenceDir "$runId-hpa-snapshots.csv"
 $resourceLogPath = Join-Path $evidenceDir "$runId-kubectl-resources.log"
-$summaryPath = Join-Path $evidenceDir "$runId-preexperiment-summary.json"
+$summaryPath = Join-Path $evidenceDir "$runId-$ExperimentType-summary.json"
 $k6SummaryPath = Join-Path $evidenceDir "$runId-k6-summary.json"
 $k6StdoutPath = Join-Path $evidenceDir "$runId-k6-console.log"
 $k6StderrPath = Join-Path $evidenceDir "$runId-k6-error.log"
@@ -282,7 +286,7 @@ try {
         "--set", "secondhand.autoscaling.behavior.scaleDown.stabilizationWindowSeconds=60",
         "--set-string", "secondhand.image.repository=segroup8/secondhand",
         "--set-string", "secondhand.image.tag=hpa-local",
-        "--set-string", "secondhand.deployment.version=hpa-preexperiment",
+        "--set-string", "secondhand.deployment.version=hpa-$ExperimentType",
         "--set-string", "secondhand.deployment.commit=$(& git -C $repoRoot rev-parse HEAD)",
         "--set-string", "secondhand.deployment.buildTime=$((Get-Date).ToString('o'))",
         "--set-file", "mysql.initSchema=$schemaPath"
@@ -394,6 +398,8 @@ try {
 
     $summary = [ordered]@{
         executedAt = (Get-Date).ToString("o")
+        experimentType = $ExperimentType
+        runNumber = $RunNumber
         status = if (
             $peakReplicas -gt $initialReplicas -and
             $peakReadyReplicas -gt $initialReadyReplicas -and
@@ -443,7 +449,7 @@ try {
     if ($finalReadyReplicas -gt $MinReplicas) {
         throw "Ready secondhand-service pods did not return to MinReplicas within $ScaleDownTimeoutSeconds seconds."
     }
-    Write-Host "HPA pre-experiment passed. Evidence: $summaryPath"
+    Write-Host "HPA $ExperimentType run $RunNumber passed. Evidence: $summaryPath"
 } finally {
     if ($loadJob) {
         if ($loadJob.State -eq "Running") {
