@@ -62,6 +62,20 @@ secondhand:
     limits:
       cpu: 500m
       memory: 768Mi
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 70
+    behavior:
+      scaleUp:
+        stabilizationWindowSeconds: 0
+        pods: 2
+        periodSeconds: 15
+      scaleDown:
+        stabilizationWindowSeconds: 60
+        percent: 50
+        periodSeconds: 15
 
 mysql:
   image:

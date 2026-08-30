@@ -6,8 +6,8 @@
     "commit": "2d39751cbda8d4e6d6b4a10565a9f9f9e266f119"
   },
   "implementationBaseCommit": "bb72290cff96c78ab189468b82db1f8ba3cd9323",
-  "executedAt": "2026-08-30T17:53:00+08:00",
-  "status": "LOCAL_ACCEPTANCE_PASSED",
+  "executedAt": "2026-08-30T18:17:12+08:00",
+  "status": "LOCAL_ACCEPTANCE_AND_HPA_PREEXPERIMENT_PASSED",
   "maven": {
     "securityContract": { "tests": 5, "failures": 0, "errors": 0, "skipped": 0 },
     "secondhandService": { "tests": 20, "failures": 0, "errors": 0, "skipped": 0 },
@@ -37,5 +37,30 @@
     "registryDigest": "PENDING_PUSH",
     "kubernetesRollout": "PENDING_CLUSTER",
     "rollbackDrill": "PENDING_CLUSTER"
+  },
+  "hpaPreexperiment": {
+    "status": "PASSED",
+    "environment": "docker-desktop / Kubernetes v1.34.3 / metrics-server v0.9.0",
+    "configuration": {
+      "minReplicas": 1,
+      "maxReplicas": 3,
+      "targetCpuUtilizationPercentage": 70,
+      "vus": 15,
+      "duration": "150s"
+    },
+    "replicas": { "initial": 1, "peak": 3, "peakReady": 3, "final": 1 },
+    "http": {
+      "requests": 14814,
+      "requestsPerSecond": 102.337,
+      "averageDurationMs": 148.99,
+      "p95DurationMs": 303.16,
+      "failedRate": 0,
+      "businessSuccessRate": 1,
+      "serverErrorRate": 0
+    },
+    "peakPodCpuMillicores": 551,
+    "peakPodMemoryMi": 208,
+    "evidence": "evidence/hpa/20260830-181116-preexperiment-summary.json",
+    "scope": "Day8 pre-experiment; Day9 three-run comparison remains pending"
   }
 }

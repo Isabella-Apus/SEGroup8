@@ -8,11 +8,16 @@
 - [x] order-service 超时、恢复、达到上限后解冻的自动化演示
 - [x] 非 root Docker 镜像构建
 - [x] Helm lint 与 template
+- [x] HPA Day8 本地预实验：1→3→1，峰值 Ready 3，14,814 请求零错误
 
 ## PR/CI 已完成
 
-- [x] GitHub Actions 失败阻断：[Microservices CI/CD #33297309271](https://github.com/Isabella-Apus/SEGroup8/actions/runs/33297309271)
-- [x] 修复后两条流水线通过：[Microservices CI/CD #33298170339](https://github.com/Isabella-Apus/SEGroup8/actions/runs/33298170339)、[Kinda Goods CI/CD #33298170436](https://github.com/Isabella-Apus/SEGroup8/actions/runs/33298170436)
+- [x] 历史 GitHub Actions 失败阻断：[Microservices CI/CD #33297309271](https://github.com/Isabella-Apus/SEGroup8/actions/runs/33297309271)
+- [x] 历史修复后流水线通过：[Microservices CI/CD #33298170339](https://github.com/Isabella-Apus/SEGroup8/actions/runs/33298170339)、[Kinda Goods CI/CD #33298170436](https://github.com/Isabella-Apus/SEGroup8/actions/runs/33298170436)
+- [ ] 当前 HPA 与独立服务验收整合提交的 Actions（推送后填写）
+
+HPA 原始证据：`04_tests/microservices/secondhand-service/evidence/hpa/20260830-181116-*`。
+该记录是 Day8 预实验，Day9 正式三轮性能对比由全队统一部署后执行。
 
 ## 集群阶段待完成
 

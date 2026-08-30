@@ -11,6 +11,9 @@ on:
       - "02_docs/microservices/secondhand-service/**"
       - "03_devops/microservices/secondhand-service/**"
       - "04_tests/microservices/secondhand-service/**"
+      - "04_tests/performance/k6/common.js"
+      - "04_tests/performance/k6/secondhand-hpa.k6.js"
+      - "04_tests/performance/HPA实验记录表.md"
       - "05_management/microservices/secondhand-service/**"
       - "deploy/helm/segroup8/templates/secondhand-*.yaml"
       - "deploy/helm/segroup8/values.yaml"
@@ -27,6 +30,9 @@ on:
       - "02_docs/microservices/secondhand-service/**"
       - "03_devops/microservices/secondhand-service/**"
       - "04_tests/microservices/secondhand-service/**"
+      - "04_tests/performance/k6/common.js"
+      - "04_tests/performance/k6/secondhand-hpa.k6.js"
+      - "04_tests/performance/HPA实验记录表.md"
       - "05_management/microservices/secondhand-service/**"
       - "deploy/helm/segroup8/templates/secondhand-*.yaml"
       - "deploy/helm/segroup8/values.yaml"
@@ -76,10 +82,10 @@ jobs:
       - name: Build candidate image from the tested JAR
         run: |
           docker build \
-            --label org.opencontainers.image.revision=${GITHUB_SHA} \
-            -t segroup8/secondhand:sha-${GITHUB_SHA} \
+            --label "org.opencontainers.image.revision=${GITHUB_SHA}" \
+            -t "segroup8/secondhand:sha-${GITHUB_SHA}" \
             microservices/secondhand-service
-          test "$(docker image inspect segroup8/secondhand:sha-${GITHUB_SHA} --format '{{.Config.User}}')" = "10001:10001"
+          test "$(docker image inspect "segroup8/secondhand:sha-${GITHUB_SHA}" --format '{{.Config.User}}')" = "10001:10001"
       - name: Upload tested Boot JAR
         uses: actions/upload-artifact@v4
         with:
@@ -106,7 +112,6 @@ jobs:
     env:
       CI: "true"
       E2E_BASE_URL: http://127.0.0.1:18080
-      E2E_OUTPUT_DIR: ${{ runner.temp }}/secondhand-service-e2e
       COMPOSE_PROJECT_NAME: segroup8-secondhand-service-e2e
     steps:
       - name: Check out repository
@@ -132,7 +137,7 @@ jobs:
           docker compose \
             -f microservices/secondhand-service/compose.acceptance.yml \
             up -d --build
-          for attempt in $(seq 1 90); do
+          for _ in $(seq 1 90); do
             if curl --fail --silent http://127.0.0.1:18080/actuator/health/readiness | grep -q '"status":"UP"'; then
               exit 0
             fi
@@ -143,6 +148,8 @@ jobs:
           exit 1
       - name: Run UC16-UC19 through the independent service image
         working-directory: frontend
+        env:
+          E2E_OUTPUT_DIR: ${{ runner.temp }}/secondhand-service-e2e
         run: npx playwright test e2e/microservices/secondhand-service-api.spec.ts --workers=1
       - name: Collect independent service diagnostics
         if: always()
@@ -180,8 +187,6 @@ jobs:
       CI: "true"
       COMPOSE_FILE: compose.yml:compose.e2e.yml
       COMPOSE_PROJECT_NAME: segroup8-secondhand-e2e
-      E2E_EVIDENCE_ROOT: ${{ runner.temp }}/secondhand-domain-d-evidence
-      E2E_OUTPUT_DIR: ${{ runner.temp }}/secondhand-domain-d-evidence/playwright
       E2E_USERNAME: user
       E2E_PASSWORD: user123
       E2E_ROLE: USER
@@ -217,6 +222,9 @@ jobs:
           npm ci
           npm run build:real
       - name: Run the shared full-stack smoke and Domain D specs
+        env:
+          E2E_EVIDENCE_ROOT: ${{ runner.temp }}/secondhand-domain-d-evidence
+          E2E_OUTPUT_DIR: ${{ runner.temp }}/secondhand-domain-d-evidence/playwright
         run: |
           chmod +x scripts/e2e/run-compose-e2e.sh
           scripts/e2e/run-compose-e2e.sh \
@@ -249,6 +257,7 @@ jobs:
             --set-string frontend.image.repository=registry.example/segroup8/frontend \
             --set-string frontend.image.tag=sha-test \
             --set secondhand.enabled=true \
+            --set secondhand.autoscaling.enabled=true \
             --set-string secondhand.image.repository=registry.example/segroup8/secondhand \
             --set-string secondhand.image.tag=sha-test \
             --set-file mysql.initSchema=backend/src/main/resources/schema.sql
@@ -259,10 +268,45 @@ jobs:
             --set-string frontend.image.repository=registry.example/segroup8/frontend \
             --set-string frontend.image.tag=sha-test \
             --set secondhand.enabled=true \
+            --set secondhand.autoscaling.enabled=true \
             --set-string secondhand.image.repository=registry.example/segroup8/secondhand \
             --set-string secondhand.image.tag=sha-test \
             --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
             >/dev/null
+          helm template segroup8 deploy/helm/segroup8 \
+            --namespace segroup8 \
+            --show-only templates/secondhand-hpa.yaml \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-test \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-test \
+            --set secondhand.enabled=true \
+            --set secondhand.autoscaling.enabled=true \
+            --set-string secondhand.image.repository=registry.example/segroup8/secondhand \
+            --set-string secondhand.image.tag=sha-test \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
+            > /tmp/secondhand-hpa.yaml
+          helm template segroup8 deploy/helm/segroup8 \
+            --namespace segroup8 \
+            --show-only templates/secondhand-deployment.yaml \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-test \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-test \
+            --set secondhand.enabled=true \
+            --set secondhand.autoscaling.enabled=true \
+            --set-string secondhand.image.repository=registry.example/segroup8/secondhand \
+            --set-string secondhand.image.tag=sha-test \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
+            > /tmp/secondhand-deployment.yaml
+          grep -q "kind: HorizontalPodAutoscaler" /tmp/secondhand-hpa.yaml
+          grep -q "minReplicas: 1" /tmp/secondhand-hpa.yaml
+          grep -q "maxReplicas: 4" /tmp/secondhand-hpa.yaml
+          grep -q "averageUtilization: 70" /tmp/secondhand-hpa.yaml
+          if grep -q '^  replicas:' /tmp/secondhand-deployment.yaml; then
+            echo "secondhand Deployment must not pin replicas while HPA is enabled"
+            exit 1
+          fi
 
   publish-secondhand-image:
     name: Publish immutable secondhand-service image
