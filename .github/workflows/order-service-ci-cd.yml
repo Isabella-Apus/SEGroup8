@@ -6,14 +6,14 @@ on:
       - "microservices/order-service/**"
       - "microservices/pom.xml"
       - "deploy/helm/segroup8/**"
-      - ".github/workflows/ci-cd-microservices.yml"
+      - ".github/workflows/order-service-ci-cd.yml"
   push:
     branches: [main]
     paths:
       - "microservices/order-service/**"
       - "microservices/pom.xml"
       - "deploy/helm/segroup8/**"
-      - ".github/workflows/ci-cd-microservices.yml"
+      - ".github/workflows/order-service-ci-cd.yml"
   workflow_dispatch:
 
 permissions:
