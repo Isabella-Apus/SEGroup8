@@ -25,7 +25,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: segroup8/secondhand:acceptance
+    image: ${SECONDHAND_ACCEPTANCE_IMAGE:-segroup8/secondhand:acceptance}
     environment:
       DB_URL: jdbc:mysql://database:3306/secondhand_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
       DB_USERNAME: secondhand_app

@@ -9,6 +9,7 @@
 - [x] JWT、内部服务令牌、所有权、幂等、CAS、恢复与 outbox 测试
 - [x] 非 root 运行时镜像，且镜像从已测试 JAR 制作
 - [x] 独立服务流水线、不可变 SHA 标签与 digest artifact
+- [x] 保存 JAR SHA-256、候选 Image ID 和 release metadata；独立 E2E 后原样 tag/push，不重新构建
 - [x] Helm Deployment/Service、startup/liveness/readiness、资源限制
 - [x] JSON 日志、请求关联、健康/就绪/存活/版本查询
 - [x] 共享生产部署锁、原子升级、失败诊断和自动回滚

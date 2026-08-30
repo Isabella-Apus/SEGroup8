@@ -18,5 +18,9 @@ ConfigMap 保存服务地址、超时和重试参数；Kubernetes Secret `segrou
 ${ACR_REGISTRY}/${ACR_NAMESPACE}/secondhand:sha-${GIT_SHA}
 ```
 
+验证阶段从唯一已测试 JAR 构建候选镜像，并保存 JAR SHA-256、候选 Image ID 和 release metadata。UC16-UC19
+独立服务 E2E 加载并验证该镜像；合并到 `main` 后发布阶段不重新构建，只把同一候选镜像原样换成上述 ACR
+标签并推送，最后保存 registry digest。
+
 `secondhand.enabled` 和 `secondhand.autoscaling.enabled` 默认为 `false`，专用流水线完成测试、E2E 和 Helm
 静态门禁后才显式启用。HPA 默认使用 1–4 副本和 70% CPU 目标。
