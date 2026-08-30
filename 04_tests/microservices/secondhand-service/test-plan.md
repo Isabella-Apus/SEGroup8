@@ -36,5 +36,5 @@ npx playwright test e2e/domain-d
 ## 证据规则
 
 - Maven 原始 XML/TXT 放在 `evidence/raw-reports/surefire/`。
-- Playwright JSON、JUnit XML 和 HTML 保留在 `evidence/playwright-*`；命名截图放在 `evidence/screenshots/`，失败 trace/video 放在 `evidence/raw-reports/playwright-failure/`。
+- Git 长期只保留 Playwright JSON、JUnit XML、摘要和关键失败截图/上下文；完整 HTML、重复截图、trace、video 与 Compose 日志由 Actions artifact 保存。
 - 只报告实际执行结果；GitHub Actions、ACR digest、真实 Kubernetes revision 和回滚截图必须在对应环境执行后补录。

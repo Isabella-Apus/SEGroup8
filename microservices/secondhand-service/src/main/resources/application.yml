@@ -39,7 +39,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus,flyway
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       probes:
@@ -64,7 +64,3 @@ info:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-
-logging:
-  pattern:
-    level: "%5p traceId=%X{traceId:-none} requestId=%X{requestId:-none}"

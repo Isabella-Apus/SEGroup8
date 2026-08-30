@@ -1,0 +1,55 @@
+name: segroup8-secondhand-acceptance
+
+services:
+  database:
+    image: mysql:8.4.6
+    environment:
+      MYSQL_DATABASE: secondhand_db
+      MYSQL_USER: secondhand_app
+      MYSQL_PASSWORD: secondhand_app
+      MYSQL_ROOT_PASSWORD: secondhand_root
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    volumes:
+      - secondhand_acceptance_db:/var/lib/mysql
+
+  secondhand:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: segroup8/secondhand:acceptance
+    environment:
+      DB_URL: jdbc:mysql://database:3306/secondhand_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+      DB_USERNAME: secondhand_app
+      DB_PASSWORD: secondhand_app
+      JWT_SECRET: test-jwt-secret-must-have-at-least-thirty-two-bytes
+      INTERNAL_SERVICE_TOKEN: acceptance-internal-token
+      ORDER_SERVICE_URL: http://host.docker.internal:18085
+      APP_VERSION: acceptance
+      APP_COMMIT: acceptance
+      APP_BUILD_TIME: acceptance
+      TZ: Asia/Shanghai
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    ports:
+      - "${SECONDHAND_ACCEPTANCE_PORT:-18080}:8080"
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://127.0.0.1:8080/actuator/health/readiness"]
+      interval: 5s
+      timeout: 3s
+      retries: 24
+      start_period: 30s
+
+volumes:
+  secondhand_acceptance_db:

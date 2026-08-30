@@ -1,19 +1,12 @@
-FROM maven:3.9.11-eclipse-temurin-17 AS build
-WORKDIR /workspace
-COPY pom.xml pom.xml
-COPY catalog-service/pom.xml catalog-service/pom.xml
-COPY shop-service/pom.xml shop-service/pom.xml
-COPY risk-service/pom.xml risk-service/pom.xml
-COPY behavior-service/pom.xml behavior-service/pom.xml
-COPY security-contract/pom.xml security-contract/pom.xml
-COPY security-contract/src security-contract/src
-COPY secondhand-service/pom.xml secondhand-service/pom.xml
-COPY secondhand-service/src secondhand-service/src
-RUN mvn -B -pl secondhand-service -am -DskipTests package
-
 FROM eclipse-temurin:17-jre-jammy
-RUN useradd --system --uid 10001 --create-home appuser
-USER appuser
-COPY --from=build /workspace/secondhand-service/target/secondhand-service-1.0.0.jar /app.jar
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --gid 10001 app \
+    && useradd --uid 10001 --gid app --no-create-home --shell /usr/sbin/nologin app
+WORKDIR /app
+COPY target/secondhand-service-*.jar app.jar
+USER 10001:10001
 EXPOSE 8080
-ENTRYPOINT ["java","-XX:MaxRAMPercentage=75","-jar","/app.jar"]
+HEALTHCHECK --interval=15s --timeout=3s --start-period=30s --retries=5 \
+  CMD curl --fail --silent http://127.0.0.1:8080/actuator/health/readiness || exit 1
+ENTRYPOINT ["java","-XX:MaxRAMPercentage=75","-jar","/app/app.jar"]

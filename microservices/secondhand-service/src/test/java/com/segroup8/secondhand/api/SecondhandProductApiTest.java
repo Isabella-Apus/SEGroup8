@@ -1,6 +1,7 @@
 package com.segroup8.secondhand.api;
 
 import static com.segroup8.secondhand.support.TestJwt.bearer;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -76,6 +77,28 @@ class SecondhandProductApiTest extends SecondhandIntegrationSupport {
         mvc.perform(post("/api/secondhand/seller").header("Authorization", bearer(10, "alice"))
                         .contentType(MediaType.APPLICATION_JSON).content(json.writeValueAsBytes(invalidPrice)))
                 .andExpect(status().isBadRequest()).andExpect(jsonPath("$.message").value("二手售价不能高于原价"));
+    }
+
+    @Test
+    void everyRemainingProductRouteHasASuccessAssertion() throws Exception {
+        long productId = seedApprovedProduct(10, "全接口教材", "48.00", true);
+        String seller = bearer(10, "alice");
+
+        mvc.perform(get("/api/secondhand/detail/{id}", productId))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.id").value(productId));
+        mvc.perform(get("/api/secondhand/seller-public/{id}", 10))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.userId").value(10));
+        mvc.perform(get("/api/secondhand/seller-public/{id}/products", 10))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.total").value(1));
+        mvc.perform(get("/api/secondhand/seller/list").header("Authorization", seller))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.total").value(1));
+        mvc.perform(post("/api/secondhand/seller/{id}/status", productId)
+                        .header("Authorization", seller).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":2}"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.status").value(2));
+        mvc.perform(delete("/api/secondhand/seller/{id}", productId)
+                        .header("Authorization", seller))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(0));
     }
 
     private ProductSaveRequest validProduct(String name) {

@@ -45,11 +45,11 @@ spec:
                 name: segroup8-secondhand-config
           env:
             - name: APP_VERSION
-              value: {{ .Values.deployment.version | quote }}
+              value: {{ .Values.secondhand.deployment.version | quote }}
             - name: APP_COMMIT
-              value: {{ .Values.deployment.commit | quote }}
+              value: {{ .Values.secondhand.deployment.commit | quote }}
             - name: APP_BUILD_TIME
-              value: {{ .Values.deployment.buildTime | quote }}
+              value: {{ .Values.secondhand.deployment.buildTime | quote }}
             - name: TZ
               value: Asia/Shanghai
           startupProbe:

@@ -1,4 +1,4 @@
-name: Microservices CI/CD
+name: Secondhand Service CI/CD
 
 on:
   pull_request:
@@ -6,34 +6,40 @@ on:
       - "microservices/secondhand-service/**"
       - "microservices/pom.xml"
       - "frontend/e2e/domain-d/**"
+      - "frontend/e2e/microservices/secondhand-service-api.spec.ts"
+      - "scripts/e2e/stubs/secondhand-order-contract-stub.mjs"
       - "02_docs/microservices/secondhand-service/**"
       - "03_devops/microservices/secondhand-service/**"
       - "04_tests/microservices/secondhand-service/**"
       - "05_management/microservices/secondhand-service/**"
       - "deploy/helm/segroup8/templates/secondhand-*.yaml"
       - "deploy/helm/segroup8/values.yaml"
-      - ".github/workflows/ci-cd-microservices.yml"
+      - ".github/scripts/deploy-secondhand-k3s.sh"
+      - ".github/workflows/secondhand-service-ci-cd.yml"
   push:
     branches: [main]
     paths:
       - "microservices/secondhand-service/**"
       - "microservices/pom.xml"
       - "frontend/e2e/domain-d/**"
+      - "frontend/e2e/microservices/secondhand-service-api.spec.ts"
+      - "scripts/e2e/stubs/secondhand-order-contract-stub.mjs"
       - "02_docs/microservices/secondhand-service/**"
       - "03_devops/microservices/secondhand-service/**"
       - "04_tests/microservices/secondhand-service/**"
       - "05_management/microservices/secondhand-service/**"
       - "deploy/helm/segroup8/templates/secondhand-*.yaml"
       - "deploy/helm/segroup8/values.yaml"
-      - ".github/workflows/ci-cd-microservices.yml"
+      - ".github/scripts/deploy-secondhand-k3s.sh"
+      - ".github/workflows/secondhand-service-ci-cd.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: microservices-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: secondhand-service-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   secondhand-verify:
@@ -67,6 +73,20 @@ jobs:
           mvn -B --no-transfer-progress
           -f microservices/pom.xml
           -pl secondhand-service -am clean verify
+      - name: Build candidate image from the tested JAR
+        run: |
+          docker build \
+            --label org.opencontainers.image.revision=${GITHUB_SHA} \
+            -t segroup8/secondhand:sha-${GITHUB_SHA} \
+            microservices/secondhand-service
+          test "$(docker image inspect segroup8/secondhand:sha-${GITHUB_SHA} --format '{{.Config.User}}')" = "10001:10001"
+      - name: Upload tested Boot JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: secondhand-service-jar
+          path: microservices/secondhand-service/target/secondhand-service-*.jar
+          if-no-files-found: error
+          retention-days: 7
       - name: Upload service test reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -78,6 +98,79 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+  secondhand-service-e2e:
+    name: UC16-UC19 independent service API E2E
+    needs: secondhand-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI: "true"
+      E2E_BASE_URL: http://127.0.0.1:18080
+      E2E_OUTPUT_DIR: ${{ runner.temp }}/secondhand-service-e2e
+      COMPOSE_PROJECT_NAME: segroup8-secondhand-service-e2e
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js and npm cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Download tested Boot JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: secondhand-service-jar
+          path: microservices/secondhand-service/target
+      - name: Install Playwright test runner
+        working-directory: frontend
+        run: npm ci
+      - name: Start order contract stub and secondhand-service stack
+        run: |
+          node scripts/e2e/stubs/secondhand-order-contract-stub.mjs >"$RUNNER_TEMP/order-contract-stub.log" 2>&1 &
+          echo $! >"$RUNNER_TEMP/order-contract-stub.pid"
+          docker compose \
+            -f microservices/secondhand-service/compose.acceptance.yml \
+            up -d --build
+          for attempt in $(seq 1 90); do
+            if curl --fail --silent http://127.0.0.1:18080/actuator/health/readiness | grep -q '"status":"UP"'; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose -f microservices/secondhand-service/compose.acceptance.yml ps
+          docker compose -f microservices/secondhand-service/compose.acceptance.yml logs --no-color
+          exit 1
+      - name: Run UC16-UC19 through the independent service image
+        working-directory: frontend
+        run: npx playwright test e2e/microservices/secondhand-service-api.spec.ts --workers=1
+      - name: Collect independent service diagnostics
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/secondhand-service-e2e/logs"
+          docker compose -f microservices/secondhand-service/compose.acceptance.yml ps --all \
+            >"$RUNNER_TEMP/secondhand-service-e2e/logs/compose-ps.txt" 2>&1 || true
+          docker compose -f microservices/secondhand-service/compose.acceptance.yml logs --no-color --timestamps \
+            >"$RUNNER_TEMP/secondhand-service-e2e/logs/compose.log" 2>&1 || true
+          cp "$RUNNER_TEMP/order-contract-stub.log" \
+            "$RUNNER_TEMP/secondhand-service-e2e/logs/order-contract-stub.log" || true
+      - name: Stop independent service stack
+        if: always()
+        run: |
+          docker compose -f microservices/secondhand-service/compose.acceptance.yml down -v --remove-orphans || true
+          if test -f "$RUNNER_TEMP/order-contract-stub.pid"; then
+            kill "$(cat "$RUNNER_TEMP/order-contract-stub.pid")" || true
+          fi
+      - name: Upload independent service E2E evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: secondhand-service-api-e2e-${{ github.sha }}
+          path: ${{ runner.temp }}/secondhand-service-e2e/**
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+
   domain-d-e2e:
     name: UC16-UC20 Compose Playwright regression
     needs: secondhand-verify
@@ -87,8 +180,8 @@ jobs:
       CI: "true"
       COMPOSE_FILE: compose.yml:compose.e2e.yml
       COMPOSE_PROJECT_NAME: segroup8-secondhand-e2e
-      E2E_EVIDENCE_ROOT: 04_tests/microservices/secondhand-service/evidence
-      E2E_OUTPUT_DIR: 04_tests/microservices/secondhand-service/evidence/playwright
+      E2E_EVIDENCE_ROOT: ${{ runner.temp }}/secondhand-domain-d-evidence
+      E2E_OUTPUT_DIR: ${{ runner.temp }}/secondhand-domain-d-evidence/playwright
       E2E_USERNAME: user
       E2E_PASSWORD: user123
       E2E_ROLE: USER
@@ -133,7 +226,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: secondhand-service-e2e-evidence
-          path: 04_tests/microservices/secondhand-service/evidence/**
+          path: ${{ runner.temp }}/secondhand-domain-d-evidence/**
           include-hidden-files: true
           if-no-files-found: warn
           retention-days: 14
@@ -174,13 +267,18 @@ jobs:
   publish-secondhand-image:
     name: Publish immutable secondhand-service image
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [secondhand-verify, domain-d-e2e, delivery-config]
+    needs: [secondhand-verify, secondhand-service-e2e, domain-d-e2e, delivery-config]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Download tested Boot JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: secondhand-service-jar
+          path: microservices/secondhand-service/target
       - name: Validate shared ACR configuration
         env:
           ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
@@ -201,9 +299,10 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
       - name: Build and push the verified SHA image
+        id: secondhand-image
         uses: docker/build-push-action@v6
         with:
-          context: microservices
+          context: microservices/secondhand-service
           file: microservices/secondhand-service/Dockerfile
           push: true
           provenance: false
@@ -212,14 +311,30 @@ jobs:
           labels: |
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+      - name: Record immutable image digest
+        run: |
+          printf '%s\n' '${{ steps.secondhand-image.outputs.digest }}' > secondhand-image-digest.txt
+      - name: Upload immutable image digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: secondhand-image-digest-${{ github.sha }}
+          path: secondhand-image-digest.txt
+          if-no-files-found: error
+          retention-days: 30
 
   deploy-secondhand:
     name: Helm atomic deploy secondhand-service
-    if: vars.ENABLE_PRODUCTION_DEPLOY == 'true'
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      vars.ENABLE_PRODUCTION_DEPLOY == 'true'
     needs: publish-secondhand-image
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
+    concurrency:
+      group: segroup8-production-helm
+      cancel-in-progress: false
     steps:
       - name: Check out deployment files
         uses: actions/checkout@v4
@@ -243,17 +358,20 @@ jobs:
           ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
         run: |
+          set -o pipefail
           archive="/tmp/secondhand-chart-$GITHUB_SHA.tar.gz"
-          release_dir="/tmp/secondhand-chart-$GITHUB_SHA"
           scp "secondhand-chart-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$archive"
-          ssh "$DEPLOY_USER@$DEPLOY_HOST" \
-            "rm -rf '$release_dir' && mkdir -p '$release_dir' && tar -xzf '$archive' -C '$release_dir' && helm upgrade --install segroup8 '$release_dir/deploy/helm/segroup8' --namespace '$K8S_NAMESPACE' --create-namespace --reuse-values --atomic --timeout 5m --set secondhand.enabled=true --set-string secondhand.image.repository='$ACR_REGISTRY/$ACR_NAMESPACE/secondhand' --set-string secondhand.image.tag='sha-$GITHUB_SHA' --set-string deployment.commit='$GITHUB_SHA' --set-string deployment.version='sha-$GITHUB_SHA'"
-      - name: Verify rollout and readiness
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
-        run: >-
-          ssh "$DEPLOY_USER@$DEPLOY_HOST"
-          "kubectl -n '$K8S_NAMESPACE' rollout status deployment/segroup8-secondhand --timeout=5m &&
-          kubectl -n '$K8S_NAMESPACE' get pods -l app.kubernetes.io/component=secondhand-service"
+          ssh \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=10 \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            "bash -s -- '$GITHUB_SHA' '$archive' '$ACR_REGISTRY' '$ACR_NAMESPACE' 'sha-$GITHUB_SHA' '$K8S_NAMESPACE'" \
+            < .github/scripts/deploy-secondhand-k3s.sh | tee secondhand-deployment.log
+      - name: Upload deployment and rollback diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: secondhand-deployment-${{ github.sha }}
+          path: secondhand-deployment.log
+          if-no-files-found: warn
+          retention-days: 30

@@ -43,7 +43,11 @@ secondhand:
   secretName: segroup8-secondhand-secret
   service:
     port: 8080
-  orderServiceUrl: http://order-service:8080
+  deployment:
+    version: ""
+    commit: ""
+    buildTime: ""
+  orderServiceUrl: http://segroup8-order:8085
   catalogShopServiceUrl: http://catalog-shop-service:8080
   orderConnectTimeout: 1s
   orderReadTimeout: 2s

@@ -6,11 +6,11 @@
     "commit": "2d39751cbda8d4e6d6b4a10565a9f9f9e266f119"
   },
   "implementationBaseCommit": "bb72290cff96c78ab189468b82db1f8ba3cd9323",
-  "executedAt": "2026-08-29T21:37:33+08:00",
+  "executedAt": "2026-08-30T17:53:00+08:00",
   "status": "LOCAL_ACCEPTANCE_PASSED",
   "maven": {
     "securityContract": { "tests": 5, "failures": 0, "errors": 0, "skipped": 0 },
-    "secondhandService": { "tests": 16, "failures": 0, "errors": 0, "skipped": 0 },
+    "secondhandService": { "tests": 20, "failures": 0, "errors": 0, "skipped": 0 },
     "mysql84OwnershipTest": "PASSED"
   },
   "playwright": {
@@ -21,12 +21,19 @@
     "durationMs": 89059.846,
     "result": "evidence/playwright-final/playwright-results.json"
   },
+  "independentServiceE2E": {
+    "useCases": ["UC16", "UC17", "UC18", "UC19"],
+    "tests": 4,
+    "passed": 4,
+    "failed": 0,
+    "result": "LOCAL_PASS_ACTIONS_ARTIFACT_PENDING"
+  },
   "delivery": {
     "dockerBuild": "PASSED",
     "containerUid": 10001,
     "helmLint": "PASSED",
     "helmTemplate": "PASSED",
-    "githubActions": "PENDING_PR_RUN",
+    "githubActions": "PENDING_CURRENT_PUSH",
     "registryDigest": "PENDING_PUSH",
     "kubernetesRollout": "PENDING_CLUSTER",
     "rollbackDrill": "PENDING_CLUSTER"

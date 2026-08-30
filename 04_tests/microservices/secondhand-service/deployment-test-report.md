@@ -1,23 +1,21 @@
 # MS-04 构建与部署测试报告
 
-## 本地已验证
+## 最近本地验证
 
-| 项目 | 结果 | 证据 |
+| 项目 | 结果 | 证据边界 |
 |---|---|---|
-| Maven 独立构建 | PASS | `secondhand-service` 16/16，安全契约 5/5 |
-| Docker 镜像构建 | PASS | 本地镜像 `segroup8/secondhand:local`，ID `sha256:ea41b838b5a3...` |
-| 容器身份 | PASS | UID `10001`，镜像配置用户 `appuser` |
-| 可执行制品 | PASS | `/app.jar` 可读 |
-| Helm lint | PASS | 1 chart linted，0 chart failed |
-| Helm template | PASS | ConfigMap、Service、Deployment 成功渲染 |
-| 探针配置 | PASS | liveness/readiness 分别指向 Actuator probe |
-| 不可变镜像策略 | PASS（配置） | workflow 使用 `sha-${GITHUB_SHA}`，Helm 默认 `IfNotPresent` |
+| Maven 独立构建与测试 | PASS | `security-contract 5/5`，`secondhand-service 20/20` |
+| 已测试 JAR 制作镜像 | PASS | 运行时 Dockerfile 只复制 `target/secondhand-service-*.jar` |
+| 容器身份 | PASS | 本地镜像用户 `10001:10001` |
+| 独立镜像 + MySQL API E2E | PASS | UC16-UC19 `4/4` |
+| Compose 配置 | PASS | `docker compose ... config --quiet` |
+| 部署脚本语法 | PASS | `bash -n .github/scripts/deploy-secondhand-k3s.sh` |
+| Workflow YAML | PASS | YAML 解析通过 |
+| 本机 Helm lint/template | NOT_RUN | 当前机器未安装 Helm；由 Actions `delivery-config` 执行 |
+| 实际 K8s rollout | NOT_RUN | 仅 main 发布且开启生产部署变量时执行 |
 
-## 尚需部署环境验证
+## CI/CD 门禁
 
-- GitHub Actions 成功运行链接及失败门禁截图。
-- ACR 推送后的镜像 digest。
-- Kubernetes 实际 rollout、探针响应、Helm revision。
-- 错误启动参数演练及 `helm rollback` 结果。
+`Secondhand Service CI/CD` 的顺序为：Maven/真实 MySQL → 从已测试 JAR 构建候选镜像 → 独立服务 API E2E + 完整系统 Domain D E2E → Helm lint/template → main 发布 SHA 镜像并保存 digest → 共享生产锁下 Helm 原子部署 → rollout、版本、存活、就绪、公开接口冒烟。
 
-这些项目不能在没有仓库 Actions 运行和 Kubernetes 访问权限的本地环境中伪造，PR 推送后按 `03_devops/microservices/secondhand-service/deployment-failure-drill.md` 补录。
+PR/功能分支不会发布镜像或部署，因此这些 job 显示 `skipped` 是预期行为，不等同于部署成功。实际 digest、Helm revision 和 rollout 只能由 main 的生产 run 证明。
