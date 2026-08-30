@@ -1,0 +1,113 @@
+name: Order microservice CI/CD
+
+on:
+  pull_request:
+    paths:
+      - "microservices/order-service/**"
+      - "microservices/pom.xml"
+      - "deploy/helm/segroup8/**"
+      - ".github/workflows/ci-cd-microservices.yml"
+  push:
+    branches: [main]
+    paths:
+      - "microservices/order-service/**"
+      - "microservices/pom.xml"
+      - "deploy/helm/segroup8/**"
+      - ".github/workflows/ci-cd-microservices.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: order-service-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: microservices/**/pom.xml
+      - name: Verify order-service independently
+        run: mvn -B --no-transfer-progress -f microservices/pom.xml -pl order-service -am clean verify
+      - uses: azure/setup-helm@v4
+      - name: Lint and render order deployment
+        run: >-
+          helm lint deploy/helm/segroup8
+          --set order.enabled=true
+          --set-string order.image.repository=registry.example/segroup8/order
+          --set-string order.image.tag=sha-test
+          --set-string backend.image.repository=registry.example/segroup8/backend
+          --set-string backend.image.tag=sha-test
+          --set-string frontend.image.repository=registry.example/segroup8/frontend
+          --set-string frontend.image.tag=sha-test
+      - name: Upload raw test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: order-service-test-reports
+          path: microservices/order-service/target/surefire-reports/**
+          if-no-files-found: warn
+          retention-days: 14
+
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: microservices
+          file: microservices/order-service/Dockerfile
+          push: true
+          provenance: false
+          sbom: false
+          tags: ${{ vars.ACR_REGISTRY }}/${{ vars.ACR_NAMESPACE }}/order:sha-${{ github.sha }}
+          labels: org.opencontainers.image.revision=${{ github.sha }}
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ENABLE_PRODUCTION_DEPLOY == 'true'
+    needs: publish
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+      - name: Deploy chart atomically and smoke readiness, version and order route
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
+        run: |
+          BUILD_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          tar -czf order-chart.tgz deploy/helm/segroup8
+          scp order-chart.tgz "$DEPLOY_USER@$DEPLOY_HOST:/tmp/order-chart-$GITHUB_SHA.tgz"
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "kubectl -n '$K8S_NAMESPACE' get service catalog-shop-service benefits-finance-service messaging-service"
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "mkdir -p /tmp/order-chart-$GITHUB_SHA && tar -xzf /tmp/order-chart-$GITHUB_SHA.tgz -C /tmp/order-chart-$GITHUB_SHA && helm upgrade --install segroup8 /tmp/order-chart-$GITHUB_SHA/deploy/helm/segroup8 --namespace '$K8S_NAMESPACE' --create-namespace --reuse-values --atomic --wait --timeout 10m --set order.enabled=true --set-string order.image.repository='$ACR_REGISTRY/$ACR_NAMESPACE/order' --set-string order.image.tag='sha-$GITHUB_SHA' --set-string deployment.version='sha-$GITHUB_SHA' --set-string deployment.commit='$GITHUB_SHA' --set-string deployment.buildTime='$BUILD_TIME'"
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "kubectl -n '$K8S_NAMESPACE' rollout status deployment/segroup8-order --timeout=5m && kubectl -n '$K8S_NAMESPACE' get deployment/segroup8-order -o jsonpath='{.spec.template.spec.containers[0].image}'"
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "kubectl -n '$K8S_NAMESPACE' run order-smoke-$GITHUB_RUN_ID --rm -i --restart=Never --image=curlimages/curl:8.10.1 --command -- sh -ec \"curl -fsS http://segroup8-order:8085/actuator/health/readiness | grep -q UP; curl -fsS http://segroup8-order:8085/actuator/info | grep -q '$GITHUB_SHA'; curl -sS -o /dev/null -w '%{http_code}' http://segroup8-order:8085/api/order/list | grep -q '^401$'\""

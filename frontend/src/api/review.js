@@ -15,3 +15,6 @@ export function getSellerReviewsApi(params = {}) {
 export function replyReviewApi(reviewId, payload) {
   return http.post(`/review/${reviewId}/reply`, payload);
 }
+
+export const getMyReviewsApi = getMyReviewListApi;
+export const followupReviewApi = submitFollowUpReviewApi;

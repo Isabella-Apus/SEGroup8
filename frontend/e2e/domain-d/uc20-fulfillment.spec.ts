@@ -3,7 +3,6 @@ import {
     apiToken,
     bearer,
     captureEvidence,
-    expectBusinessFailure,
     expectBusinessSuccess,
     loginAsDomainD,
     uniqueName,
@@ -63,7 +62,7 @@ test.describe("@DOMAIN_D @UC20 secondhand fulfillment", () => {
 
         const paid = await expectBusinessSuccess<any>(
             await request.post(`/api/order/${orderId}/pay`, {
-                headers: bearer(buyerToken),
+                headers: { ...bearer(buyerToken), "Idempotency-Key": `uc20-pay-${orderId}` },
                 data: { payMode: "THIRD_PARTY", payChannel: "WECHAT" },
             }),
         );
@@ -116,7 +115,10 @@ test.describe("@DOMAIN_D @UC20 secondhand fulfillment", () => {
                 { timeout: responseTimeout },
             );
             await confirmBox.getByRole("button", { name: "确认收货", exact: true }).click();
-            const received = await expectBusinessSuccess<any>(await receiveResponse);
+            const receiveApiResponse = await receiveResponse;
+            const receiveKey = receiveApiResponse.request().headers()["idempotency-key"];
+            expect(receiveKey).toBeTruthy();
+            const received = await expectBusinessSuccess<any>(receiveApiResponse);
             expect(Number(received.orderStatus)).toBe(3);
             expect(Number(received.payStatus)).toBe(1);
             await confirmBox.waitFor({ state: "hidden", timeout: 10_000 });
@@ -141,12 +143,12 @@ test.describe("@DOMAIN_D @UC20 secondhand fulfillment", () => {
                 2,
             );
 
-            const repeated = await expectBusinessFailure(
+            const repeated = await expectBusinessSuccess<any>(
                 await request.post(`/api/order/${orderId}/confirm-receive`, {
-                    headers: bearer(buyerToken),
+                    headers: { ...bearer(buyerToken), "Idempotency-Key": receiveKey },
                 }),
             );
-            expect(Number(repeated.code)).toBe(400);
+            expect(Number(repeated.orderStatus)).toBe(3);
             const sellerAfterRepeated = await expectBusinessSuccess<any>(
                 await request.get("/api/finance/dashboard", { headers: bearer(sellerToken) }),
             );

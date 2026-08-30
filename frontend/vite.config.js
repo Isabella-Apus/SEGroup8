@@ -13,6 +13,10 @@ export default defineConfig({
         port: 5174,
         host: '0.0.0.0',
         proxy: {
+            '/api/order': { target: 'http://localhost:8085', changeOrigin: true },
+            '/api/review': { target: 'http://localhost:8085', changeOrigin: true },
+            '/api/logistics': { target: 'http://localhost:8085', changeOrigin: true },
+            '/api/admin/orders': { target: 'http://localhost:8085', changeOrigin: true },
             '/api': {
                 target: 'http://localhost:8080',
                 changeOrigin: true
