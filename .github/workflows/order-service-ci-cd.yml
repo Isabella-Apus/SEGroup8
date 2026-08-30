@@ -168,8 +168,20 @@ jobs:
         run: npm ci
       - name: Start downstream contract stub and order-service stack
         run: |
-          node scripts/e2e/stubs/order-downstream-contract-stub.mjs >"$RUNNER_TEMP/order-downstream-stub.log" 2>&1 &
+          ORDER_STUB_HOST=0.0.0.0 node scripts/e2e/stubs/order-downstream-contract-stub.mjs >"$RUNNER_TEMP/order-downstream-stub.log" 2>&1 &
           echo $! >"$RUNNER_TEMP/order-downstream-stub.pid"
+          stub_ready=false
+          for _ in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:18086/health | grep -q '"status":"UP"'; then
+              stub_ready=true
+              break
+            fi
+            sleep 1
+          done
+          if test "$stub_ready" != true; then
+            cat "$RUNNER_TEMP/order-downstream-stub.log"
+            exit 1
+          fi
           docker compose -f microservices/order-service/compose.acceptance.yml up -d --no-build
           for _ in $(seq 1 90); do
             if curl --fail --silent http://127.0.0.1:18081/actuator/health/readiness | grep -q '"status":"UP"'; then exit 0; fi

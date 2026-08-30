@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
 
 const port = Number(process.env.ORDER_STUB_PORT || 18086);
+const host = process.env.ORDER_STUB_HOST || "127.0.0.1";
 const readJson = async (request) => {
   const chunks = [];
   for await (const chunk of request) chunks.push(chunk);
@@ -14,6 +15,9 @@ const json = (response, status, body) => {
 const server = createServer(async (request, response) => {
   const url = new URL(request.url, `http://${request.headers.host}`);
   try {
+    if (request.method === "GET" && url.pathname === "/health") {
+      return json(response, 200, { status: "UP" });
+    }
     if (request.method === "POST" && url.pathname === "/internal/inventory/reservations") {
       const body = await readJson(request);
       return json(response, 200, {
@@ -54,6 +58,6 @@ const server = createServer(async (request, response) => {
   }
 });
 
-server.listen(port, "127.0.0.1", () => {
-  console.log(`order downstream contract stub listening on ${port}`);
+server.listen(port, host, () => {
+  console.log(`order downstream contract stub listening on ${host}:${port}`);
 });
