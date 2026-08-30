@@ -26,6 +26,10 @@ outbox:
     enabled: ${OUTBOX_PUBLISHER_ENABLED:true}
     fixed-delay: 2s
 management:
+  prometheus:
+    metrics:
+      export:
+        enabled: true
   endpoints:
     web:
       exposure:

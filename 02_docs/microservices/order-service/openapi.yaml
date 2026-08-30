@@ -110,6 +110,16 @@ paths:
       operationId: replyReview
       parameters: [{$ref: '#/components/parameters/ReviewId'}, {$ref: '#/components/parameters/IdempotencyKey'}]
       responses: {'200': {$ref: '#/components/responses/SuccessResponse'}}
+  /api/review/seller/{reviewId}/reply:
+    post:
+      operationId: replySellerReview
+      parameters: [{$ref: '#/components/parameters/ReviewId'}, {$ref: '#/components/parameters/IdempotencyKey'}]
+      responses: {'200': {$ref: '#/components/responses/SuccessResponse'}}
+  /api/logistics/{orderId}:
+    get:
+      operationId: getLogisticsTrace
+      parameters: [{$ref: '#/components/parameters/OrderId'}]
+      responses: {'200': {$ref: '#/components/responses/SuccessResponse'}}
   /api/logistics/order/{orderId}/trace:
     get:
       operationId: listLogisticsTrace
@@ -130,9 +140,19 @@ paths:
       operationId: listAdminOrders
       parameters: [{$ref: '#/components/parameters/PageNum'}, {$ref: '#/components/parameters/PageSize'}]
       responses: {'200': {$ref: '#/components/responses/OrderPageResponse'}, '403': {$ref: '#/components/responses/ErrorResponse'}}
+  /api/admin/orders:
+    get:
+      operationId: listAdminOrdersAlias
+      parameters: [{$ref: '#/components/parameters/PageNum'}, {$ref: '#/components/parameters/PageSize'}]
+      responses: {'200': {$ref: '#/components/responses/OrderPageResponse'}, '403': {$ref: '#/components/responses/ErrorResponse'}}
   /api/admin/orders/detail/{orderId}:
     get:
       operationId: getAdminOrder
+      parameters: [{$ref: '#/components/parameters/OrderId'}]
+      responses: {'200': {$ref: '#/components/responses/OrderResponse'}, '403': {$ref: '#/components/responses/ErrorResponse'}}
+  /api/admin/orders/{orderId}:
+    get:
+      operationId: getAdminOrderAlias
       parameters: [{$ref: '#/components/parameters/OrderId'}]
       responses: {'200': {$ref: '#/components/responses/OrderResponse'}, '403': {$ref: '#/components/responses/ErrorResponse'}}
   /api/admin/orders/{orderId}/after-sale-logs:

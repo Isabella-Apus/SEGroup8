@@ -23,7 +23,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: segroup8/order:acceptance
+    image: ${ORDER_ACCEPTANCE_IMAGE:-segroup8/order:acceptance}
     environment:
       DB_URL: jdbc:mysql://database:3306/order_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
       DB_USERNAME: order_app

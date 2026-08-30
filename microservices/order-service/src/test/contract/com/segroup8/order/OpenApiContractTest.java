@@ -1,7 +1,10 @@
 package com.segroup8.order;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,13 +17,16 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.yaml.snakeyaml.Yaml;
 
 @Tag("CONTRACT")
 @SpringBootTest
+@AutoConfigureMockMvc
 class OpenApiContractTest {
     private static final Pattern TEMPLATE = Pattern.compile("\\{([^}]+)}");
     private static final Set<String> RUNTIME_OPERATIONS = Set.of(
@@ -42,6 +48,8 @@ class OpenApiContractTest {
             "GET /internal/orders/by-business-key/{key}", "GET /internal/orders/{id}/snapshot");
 
     @Autowired @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping mappings;
+    @Autowired MockMvc mvc;
+    @Autowired ObjectMapper json;
 
     @Test
     void runtimeControllerSurfaceIsAnExactReviewedSet() {
@@ -89,6 +97,46 @@ class OpenApiContractTest {
                 }
             }
         }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void generatedRuntimeOpenApiMatchesTheReviewedYamlOperationSurface() throws Exception {
+        Path repositoryRoot = findRepositoryRoot(Path.of("").toAbsolutePath());
+        Map<String,Object> reviewed;
+        try (InputStream input = Files.newInputStream(
+                repositoryRoot.resolve("02_docs/microservices/order-service/openapi.yaml"))) {
+            reviewed = new Yaml().load(input);
+        }
+        Map<String,Object> generated = json.readValue(mvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray(), Map.class);
+
+        Set<String> reviewedOperations = operations(reviewed);
+        Set<String> generatedOperations = operations(generated);
+        assertThat(reviewedOperations).hasSize(36);
+        assertThat(generatedOperations)
+                .as("Springdoc runtime operations must match the reviewed OpenAPI YAML")
+                .containsExactlyInAnyOrderElementsOf(reviewedOperations);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Set<String> operations(Map<String,Object> document) {
+        Set<String> operations = new TreeSet<>();
+        Map<String,Object> paths = (Map<String,Object>) document.get("paths");
+        assertThat(paths).isNotNull();
+        paths.forEach((path, itemValue) -> {
+            Map<String,Object> pathItem = (Map<String,Object>) itemValue;
+            pathItem.keySet().stream()
+                    .filter(method -> List.of("get", "post", "put", "delete", "patch").contains(method))
+                    .map(String::toUpperCase)
+                    .map(method -> method + " " + canonicalPath(path))
+                    .forEach(operations::add);
+        });
+        return operations;
+    }
+
+    private String canonicalPath(String path) {
+        return TEMPLATE.matcher(path).replaceAll("{}");
     }
 
     private Path findRepositoryRoot(Path start) {

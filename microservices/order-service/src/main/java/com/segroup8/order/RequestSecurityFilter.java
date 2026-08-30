@@ -10,6 +10,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -18,6 +21,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 class RequestSecurityFilter extends OncePerRequestFilter {
     static final String PRINCIPAL = RequestSecurityFilter.class.getName() + ".principal";
+    private static final Logger LOG = LoggerFactory.getLogger(RequestSecurityFilter.class);
+    private static final Pattern SAFE_CORRELATION_ID = Pattern.compile("[A-Za-z0-9._:-]{1,100}");
+    private static final Pattern TRACEPARENT = Pattern.compile(
+            "^[0-9a-fA-F]{2}-([0-9a-fA-F]{32})-[0-9a-fA-F]{16}-[0-9a-fA-F]{2}$");
     private final JwtTokenVerifier verifier;
     private final String internalToken;
     private final boolean testHeaders;
@@ -33,10 +40,13 @@ class RequestSecurityFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String requestId = Optional.ofNullable(request.getHeader("X-Request-Id"))
-                .filter(v -> !v.isBlank()).orElseGet(() -> UUID.randomUUID().toString());
+        long startedAt = System.nanoTime();
+        String requestId = correlationId(request.getHeader("X-Request-Id"));
+        String traceId = traceId(request);
         MDC.put("requestId", requestId);
+        MDC.put("traceId", traceId);
         response.setHeader("X-Request-Id", requestId);
+        response.setHeader("X-Trace-Id", traceId);
         try {
             if (request.getRequestURI().startsWith("/internal/")) {
                 if (!constantTimeEquals(internalToken, request.getHeader("X-Internal-Service-Token"))) {
@@ -60,8 +70,29 @@ class RequestSecurityFilter extends OncePerRequestFilter {
             }
             chain.doFilter(request, response);
         } finally {
+            MDC.put("httpMethod", request.getMethod());
+            MDC.put("requestPath", request.getRequestURI());
+            MDC.put("httpStatus", Integer.toString(response.getStatus()));
+            MDC.put("durationMs", Long.toString((System.nanoTime() - startedAt) / 1_000_000));
+            LOG.info("HTTP request completed");
             MDC.clear();
         }
+    }
+
+    private String correlationId(String value) {
+        return Optional.ofNullable(value).filter(SAFE_CORRELATION_ID.asMatchPredicate())
+                .orElseGet(() -> UUID.randomUUID().toString());
+    }
+
+    private String traceId(HttpServletRequest request) {
+        String explicit = request.getHeader("X-Trace-Id");
+        if (explicit != null && SAFE_CORRELATION_ID.matcher(explicit).matches()) return explicit;
+        String traceparent = request.getHeader("traceparent");
+        if (traceparent != null) {
+            var matcher = TRACEPARENT.matcher(traceparent);
+            if (matcher.matches()) return matcher.group(1).toLowerCase();
+        }
+        return UUID.randomUUID().toString().replace("-", "");
     }
 
     static JwtPrincipal principal(HttpServletRequest request) {

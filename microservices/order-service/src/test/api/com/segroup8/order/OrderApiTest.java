@@ -1,5 +1,6 @@
 package com.segroup8.order;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
@@ -13,11 +14,16 @@ import com.segroup8.order.DownstreamGateway.ProductSnapshot;
 import com.segroup8.order.DownstreamGateway.Quote;
 import com.segroup8.order.DownstreamGateway.RemoteResult;
 import com.segroup8.order.DownstreamGateway.Reservation;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -206,6 +212,59 @@ class OrderApiTest {
         mvc.perform(post("/api/order/{id}/confirm-receive",id).headers(user(1)).header("Idempotency-Key","receive-timeout"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.data.orderStatus").value(3));
         verify(downstream,times(1)).settle(anyString(),eq(id),eq(2L),eq(new BigDecimal("50.00")));
+    }
+
+    @Test void structuredRequestLogsCarryCorrelationAndOrderSagaIdentifiers() throws Exception {
+        Logger logger = (Logger) LoggerFactory.getLogger(RequestSecurityFilter.class);
+        Level previousLevel = logger.getLevel();
+        ListAppender<ILoggingEvent> events = new ListAppender<>();
+        events.start();
+        logger.setLevel(Level.INFO);
+        logger.addAppender(events);
+        try {
+            String created = mvc.perform(post("/api/order/create").headers(user(1))
+                            .header("X-Request-Id", "request-log-create")
+                            .header("X-Trace-Id", "trace-log-create")
+                            .header("Idempotency-Key", "log-create")
+                            .contentType("application/json").content(createBody()))
+                    .andExpect(status().isOk())
+                    .andExpect(header().string("X-Request-Id", "request-log-create"))
+                    .andExpect(header().string("X-Trace-Id", "trace-log-create"))
+                    .andReturn().getResponse().getContentAsString();
+            long orderId = json.readTree(created).path("data").path("id").asLong();
+
+            ILoggingEvent createLog = events.list.stream()
+                    .filter(event -> "/api/order/create".equals(event.getMDCPropertyMap().get("requestPath")))
+                    .findFirst().orElseThrow();
+            assertThat(createLog.getMDCPropertyMap())
+                    .containsEntry("requestId", "request-log-create")
+                    .containsEntry("traceId", "trace-log-create")
+                    .containsEntry("orderId", Long.toString(orderId))
+                    .containsEntry("sagaId", "create:log-create")
+                    .containsEntry("reservationId", "reservation:log-create")
+                    .containsEntry("httpStatus", "200");
+            assertThat(createLog.getMDCPropertyMap().get("orderNo")).isNotBlank();
+
+            mvc.perform(post("/api/order/{id}/pay", orderId).headers(user(1))
+                            .header("X-Request-Id", "request-log-pay")
+                            .header("traceparent", "00-0123456789abcdef0123456789abcdef-0123456789abcdef-01")
+                            .header("Idempotency-Key", "log-pay")
+                            .contentType("application/json").content("{\"payMode\":\"COIN\"}"))
+                    .andExpect(status().isOk())
+                    .andExpect(header().string("X-Trace-Id", "0123456789abcdef0123456789abcdef"));
+            ILoggingEvent payLog = events.list.stream()
+                    .filter(event -> "request-log-pay".equals(event.getMDCPropertyMap().get("requestId")))
+                    .findFirst().orElseThrow();
+            assertThat(payLog.getMDCPropertyMap())
+                    .containsEntry("orderId", Long.toString(orderId))
+                    .containsEntry("paymentRequestId", "payment:log-pay")
+                    .containsEntry("traceId", "0123456789abcdef0123456789abcdef");
+            assertThat(payLog.getMDCPropertyMap().get("orderNo")).isNotBlank();
+        } finally {
+            logger.detachAppender(events);
+            logger.setLevel(previousLevel);
+            events.stop();
+        }
     }
 
     private org.springframework.http.HttpHeaders user(long id){var h=new org.springframework.http.HttpHeaders();h.set("X-User-Id",String.valueOf(id));h.set("X-User-Role","USER");return h;}
