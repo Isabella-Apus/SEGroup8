@@ -103,6 +103,26 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Set up Java and Maven cache
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+      - name: Set up Node.js and npm cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Build runtime artifacts for Compose
+        run: |
+          mvn -B --no-transfer-progress -f backend/pom.xml -DskipTests package
+          cp backend/target/platform-backend-*.jar backend/target/app.jar
+          cd frontend
+          npm ci
+          npm run build:real
       - name: Run the shared full-stack smoke and Domain D specs
         run: |
           chmod +x scripts/e2e/run-compose-e2e.sh
