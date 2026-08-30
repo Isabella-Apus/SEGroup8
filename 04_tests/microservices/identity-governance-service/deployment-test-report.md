@@ -10,8 +10,10 @@
 | 数据库权限拒绝 | PASS | 自有 Schema 查询成功；跨查 `order_db.order_info` 返回 MySQL 1142 |
 | E2E frontend profile | PASS | 既有 `frontend/dist`，Nginx 8089 代理本服务 8091 |
 | 错口令失败/恢复演练 | PASS | 服务 Exited(1)、readiness 不可达、SQLState 28000/1045；恢复后 healthy/UP/smoke PASS |
-| Helm Deployment/Service | CONFIGURED / NOT_RUN | 已接入完整系统 chart 与主流水线；需 PR Actions/合并后远端 run 证明 |
-| GitHub Actions/ACR/K3s | CONFIGURED / NOT_RUN | PR 验证，`main` 推送不可变镜像并 `--atomic --wait` 部署；当前尚无本分支远端 run |
+| Helm Deployment/Service | CONFIGURED / CI_PASS | 独立服务 run `33297661588` 已通过 Helm lint/template；实际集群 rollout 仍未运行 |
+| GitHub Actions PR 门禁 | PASS | 独立服务 run `33297661588`、完整系统 run `33297661706` 均为 success |
+| ACR/K3s | CONFIGURED / NOT_RUN | `main` 推送不可变镜像并 `--atomic --wait` 部署；PR run 中 publish/deploy 按设计跳过 |
+| HPA 静态配置 | CONFIGURED | `autoscaling/v2`、CPU target 与副本范围已配置，并在启用形态下做 Helm 静态渲染；不等同于运行实验 |
 | HPA 扩缩容实验 | NOT_RUN | HPA 模板已交付但默认关闭，按用户要求暂不执行实验 |
 | 依赖故障处理实验 | NOT_RUN | 按用户要求暂不执行停止/延迟依赖服务实验 |
 

@@ -95,6 +95,24 @@ jobs:
             --set-string identityGovernance.deployment.buildTime=ci \
             --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
             >/dev/null
+          hpa_render="$(mktemp)"
+          helm template segroup8 deploy/helm/segroup8 \
+            --namespace segroup8 \
+            --show-only templates/identity-governance-hpa.yaml \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-existing \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-existing \
+            --set identityGovernance.enabled=true \
+            --set identityGovernance.autoscaling.enabled=true \
+            --set-string identityGovernance.image.repository=registry.example/segroup8/identity-governance \
+            --set-string identityGovernance.image.tag=sha-test \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
+            >"$hpa_render"
+          grep -q '^kind: HorizontalPodAutoscaler$' "$hpa_render"
+          grep -q '^  minReplicas: 1$' "$hpa_render"
+          grep -q '^  maxReplicas: 4$' "$hpa_render"
+          grep -q '^          averageUtilization: 70$' "$hpa_render"
       - name: Upload tested Boot JAR
         uses: actions/upload-artifact@v4
         with:

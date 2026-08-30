@@ -3,7 +3,7 @@
   "generatedAt": "2026-08-30T12:10:00+08:00",
   "branch": "feature/ms-identity-governance",
   "implementationCommit": "cdb09c19",
-  "auditCommit": "PR_HEAD",
+  "auditCommit": "ea1f1854dbd32cf39291be3204b328f31b96c4e3",
   "maven": {
     "status": "PASS",
     "securityContract": {"tests": 5, "passed": 5, "failed": 0, "errors": 0, "skipped": 0},
@@ -27,6 +27,15 @@
     "microservice": {"status": "PASS", "tests": 5, "passed": 5, "failed": 0, "durationSeconds": 33.0, "failedFirstRunPreserved": true}
   },
   "deploymentFailureDrill": {"localContainer": "PASS", "k3sAtomicRollback": "NOT_RUN"},
-  "kubernetes": {"manifests": "CONFIGURED", "pipeline": "CONFIGURED", "remoteRun": "NOT_RUN"},
+  "kubernetes": {
+    "manifests": "CONFIGURED",
+    "pipeline": "CONFIGURED",
+    "prVerification": {
+      "serviceRun": {"id": 33297661588, "status": "PASS"},
+      "fullSystemRun": {"id": 33297661706, "status": "PASS"}
+    },
+    "registryPublish": "NOT_RUN_ON_PULL_REQUEST",
+    "clusterRollout": "NOT_RUN_ON_PULL_REQUEST"
+  },
   "cloudNativeExperiments": {"hpaAutoscaling": "NOT_RUN", "dependencyFailureHandling": "NOT_RUN"}
 }

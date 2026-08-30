@@ -21,3 +21,4 @@
 - `before-after-code-diff.md`：改造前后版本、同断言结果和代码结构差异
 - `traceability.md`：UC 到代码和测试的追溯
 - `delivery-manifest.md`：交付状态与复现命令
+- `../three-service-course-comparison.md`：身份治理、订单、二手服务按课程要求的逐项差距与阶段分类

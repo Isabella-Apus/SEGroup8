@@ -92,6 +92,7 @@ Kubernetes 交付使用双层流水线：独立 `Identity Governance Service CI/
 ### 架构、运维与管理资料
 
 - `02_docs/microservices/identity-governance-service/**`：服务图及 SVG、边界、OpenAPI、接口清单、表归属、跨服务调用、前后版本差异、追溯和交付清单。
+- `02_docs/microservices/three-service-course-comparison.md`：身份治理、订单和二手服务的课程必交项、建议项、超出本阶段项及 HPA 并行边界。
 - `03_devops/microservices/identity-governance-service/**`：运行手册、数据库隔离和部署失败排查。
 - `05_management/microservices/identity-governance-service/**`：分支、PR、评审和未完成项记录。
 
@@ -112,7 +113,8 @@ Kubernetes 交付使用双层流水线：独立 `Identity Governance Service CI/
 | 本地错误口令失败/恢复 | PASS |
 | 文档门禁 | PASS，25/25 UC |
 | UC E2E 静态覆盖门禁 | PASS，25/25 |
-| Helm lint/template | 等待 PR Actions（本机未安装 Helm） |
+| Helm lint/template | PASS：独立服务 run `33297661588` |
+| GitHub PR 远程门禁 | PASS：独立服务 run `33297661588`；完整系统 run `33297661706` |
 | ACR 推送与 K3s 部署 | 合并到 `main` 后运行；PR 阶段 NOT_RUN |
 
 ## 尚未完成/不在本 PR 中冒充完成
