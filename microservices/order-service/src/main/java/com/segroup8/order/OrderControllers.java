@@ -15,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestController
 @RequestMapping("/api/order")
@@ -312,6 +313,12 @@ class OrderErrorHandler {
     ResponseEntity<ApiResponse<Void>> badRequest(Exception exception) {
         return ResponseEntity.badRequest()
                 .body(new ApiResponse<>("INVALID_REQUEST", "Request headers, parameters or body are invalid", null));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    ResponseEntity<ApiResponse<Void>> notFound(NoResourceFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponse<>("NOT_FOUND", "Resource does not exist", null));
     }
 
     @ExceptionHandler(Exception.class)

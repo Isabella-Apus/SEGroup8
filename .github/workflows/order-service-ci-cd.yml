@@ -1,18 +1,38 @@
-name: Order microservice CI/CD
+name: Order Service CI/CD
 
 on:
   pull_request:
     paths:
       - "microservices/order-service/**"
       - "microservices/pom.xml"
-      - "deploy/helm/segroup8/**"
+      - "frontend/e2e/domain-c/**"
+      - "frontend/e2e/domain-d/uc20-fulfillment.spec.ts"
+      - "frontend/e2e/microservices/order-service-api.spec.ts"
+      - "scripts/e2e/stubs/order-downstream-contract-stub.mjs"
+      - "02_docs/microservices/order-service/**"
+      - "03_devops/microservices/order-service/**"
+      - "04_tests/microservices/order-service/**"
+      - "05_management/microservices/order-service/**"
+      - "deploy/helm/segroup8/templates/order-*.yaml"
+      - "deploy/helm/segroup8/values.yaml"
+      - ".github/scripts/deploy-order-k3s.sh"
       - ".github/workflows/order-service-ci-cd.yml"
   push:
     branches: [main]
     paths:
       - "microservices/order-service/**"
       - "microservices/pom.xml"
-      - "deploy/helm/segroup8/**"
+      - "frontend/e2e/domain-c/**"
+      - "frontend/e2e/domain-d/uc20-fulfillment.spec.ts"
+      - "frontend/e2e/microservices/order-service-api.spec.ts"
+      - "scripts/e2e/stubs/order-downstream-contract-stub.mjs"
+      - "02_docs/microservices/order-service/**"
+      - "03_devops/microservices/order-service/**"
+      - "04_tests/microservices/order-service/**"
+      - "05_management/microservices/order-service/**"
+      - "deploy/helm/segroup8/templates/order-*.yaml"
+      - "deploy/helm/segroup8/values.yaml"
+      - ".github/scripts/deploy-order-k3s.sh"
       - ".github/workflows/order-service-ci-cd.yml"
   workflow_dispatch:
 
@@ -24,10 +44,10 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
-  verify:
-    name: Order service Maven and Helm verification
+  order-verify:
+    name: order-service API, integration and contract tests
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -36,68 +56,223 @@ jobs:
           java-version: "17"
           cache: maven
           cache-dependency-path: microservices/**/pom.xml
-      - name: Verify order-service independently
+      - name: Reject forbidden cross-domain persistence
+        shell: bash
+        run: |
+          if grep -R -n -E 'ProductMapper|BalanceMapper|VoucherMapper|NotificationMapper|INSERT[[:space:]]+INTO[[:space:]]+(product|balance|voucher|notification)' microservices/order-service/src/main/java; then
+            echo "order-service contains forbidden cross-domain persistence"
+            exit 1
+          fi
+      - name: Run clean verification with real MySQL integration test
         run: mvn -B --no-transfer-progress -f microservices/pom.xml -pl order-service -am clean verify
-      - uses: azure/setup-helm@v4
-      - name: Lint and render order deployment
-        run: >-
-          helm lint deploy/helm/segroup8
-          --set order.enabled=true
-          --set-string order.image.repository=registry.example/segroup8/order
-          --set-string order.image.tag=sha-test
-          --set-string backend.image.repository=registry.example/segroup8/backend
-          --set-string backend.image.tag=sha-test
-          --set-string frontend.image.repository=registry.example/segroup8/frontend
-          --set-string frontend.image.tag=sha-test
-      - name: Upload raw test reports
+      - name: Reject skipped order-service tests
+        shell: bash
+        run: |
+          if grep -R -E 'tests="[0-9]+"[^>]*skipped="[1-9][0-9]*"|skipped="[1-9][0-9]*"[^>]*tests="[0-9]+"' microservices/order-service/target/surefire-reports/TEST-*.xml; then
+            echo "order-service verification skipped at least one required test"
+            exit 1
+          fi
+      - name: Build candidate image from the tested JAR
+        run: |
+          docker build --label org.opencontainers.image.revision=${GITHUB_SHA} -t segroup8/order:sha-${GITHUB_SHA} microservices/order-service
+          test "$(docker image inspect segroup8/order:sha-${GITHUB_SHA} --format '{{.Config.User}}')" = "10001:10001"
+      - name: Upload tested Boot JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: order-service-jar
+          path: microservices/order-service/target/order-service-*.jar
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload service test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: order-service-test-reports
-          path: microservices/order-service/target/surefire-reports/**
+          path: |
+            microservices/order-service/target/surefire-reports/**
+            microservices/order-service/target/failsafe-reports/**
           if-no-files-found: warn
           retention-days: 14
 
-  publish:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: verify
+  order-service-e2e:
+    name: UC11-UC15 independent service API E2E
+    needs: order-verify
     runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI: "true"
+      E2E_BASE_URL: http://127.0.0.1:18081
+      E2E_OUTPUT_DIR: ${{ runner.temp }}/order-service-e2e
+      COMPOSE_PROJECT_NAME: segroup8-order-service-e2e
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: actions/download-artifact@v4
+        with:
+          name: order-service-jar
+          path: microservices/order-service/target
+      - name: Install Playwright test runner
+        working-directory: frontend
+        run: npm ci
+      - name: Start downstream contract stub and order-service stack
+        run: |
+          node scripts/e2e/stubs/order-downstream-contract-stub.mjs >"$RUNNER_TEMP/order-downstream-stub.log" 2>&1 &
+          echo $! >"$RUNNER_TEMP/order-downstream-stub.pid"
+          docker compose -f microservices/order-service/compose.acceptance.yml up -d --build
+          for attempt in $(seq 1 90); do
+            if curl --fail --silent http://127.0.0.1:18081/actuator/health/readiness | grep -q '"status":"UP"'; then exit 0; fi
+            sleep 2
+          done
+          docker compose -f microservices/order-service/compose.acceptance.yml ps
+          docker compose -f microservices/order-service/compose.acceptance.yml logs --no-color
+          exit 1
+      - name: Run UC11-UC15 through the independent service image
+        working-directory: frontend
+        run: npx playwright test e2e/microservices/order-service-api.spec.ts --workers=1
+      - name: Collect independent service diagnostics
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/order-service-e2e/logs"
+          docker compose -f microservices/order-service/compose.acceptance.yml ps --all >"$RUNNER_TEMP/order-service-e2e/logs/compose-ps.txt" 2>&1 || true
+          docker compose -f microservices/order-service/compose.acceptance.yml logs --no-color --timestamps >"$RUNNER_TEMP/order-service-e2e/logs/compose.log" 2>&1 || true
+          cp "$RUNNER_TEMP/order-downstream-stub.log" "$RUNNER_TEMP/order-service-e2e/logs/order-downstream-stub.log" || true
+      - name: Stop independent service stack
+        if: always()
+        run: |
+          docker compose -f microservices/order-service/compose.acceptance.yml down -v --remove-orphans || true
+          if test -f "$RUNNER_TEMP/order-downstream-stub.pid"; then kill "$(cat "$RUNNER_TEMP/order-downstream-stub.pid")" || true; fi
+      - name: Upload independent service E2E evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: order-service-api-e2e-${{ github.sha }}
+          path: ${{ runner.temp }}/order-service-e2e/**
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+
+  order-domain-e2e:
+    name: UC11-UC15 and UC20 Compose Playwright regression
+    needs: order-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CI: "true"
+      COMPOSE_FILE: compose.yml:compose.e2e.yml
+      COMPOSE_PROJECT_NAME: segroup8-order-e2e
+      E2E_EVIDENCE_ROOT: ${{ runner.temp }}/order-domain-evidence
+      E2E_OUTPUT_DIR: ${{ runner.temp }}/order-domain-evidence/playwright
+      E2E_USERNAME: user
+      E2E_PASSWORD: user123
+      E2E_ROLE: USER
+      E2E_ADMIN_USERNAME: admin
+      E2E_ADMIN_PASSWORD: admin123
+      E2E_OFFICIAL_SELLER_USERNAME: seller
+      E2E_OFFICIAL_SELLER_PASSWORD: seller123
+      E2E_BUYER_USERNAME: user
+      E2E_BUYER_PASSWORD: user123
+      E2E_THIRD_PARTY_USERNAME: third
+      E2E_THIRD_PARTY_PASSWORD: third123
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: "17", cache: maven, cache-dependency-path: backend/pom.xml}
+      - uses: actions/setup-node@v4
+        with: {node-version: "20", cache: npm, cache-dependency-path: frontend/package-lock.json}
+      - name: Build runtime artifacts for Compose
+        run: |
+          mvn -B --no-transfer-progress -f backend/pom.xml -DskipTests package
+          cp backend/target/platform-backend-*.jar backend/target/app.jar
+          cd frontend
+          npm ci
+          npm run build:real
+      - name: Run full-stack smoke and order use cases
+        run: |
+          chmod +x scripts/e2e/run-compose-e2e.sh
+          scripts/e2e/run-compose-e2e.sh --smoke-first e2e/smoke -- e2e/domain-c e2e/domain-d/uc20-fulfillment.spec.ts --workers=1
+      - name: Upload browser, Compose and service logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: order-service-e2e-evidence
+          path: ${{ runner.temp }}/order-domain-evidence/**
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 14
+
+  delivery-config:
+    name: Lint order-service Helm delivery
+    needs: order-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - name: Lint and render order-service
+        run: |
+          helm lint deploy/helm/segroup8 --set order.enabled=true --set-string order.image.repository=registry.example/segroup8/order --set-string order.image.tag=sha-test --set-string backend.image.repository=registry.example/segroup8/backend --set-string backend.image.tag=sha-test --set-string frontend.image.repository=registry.example/segroup8/frontend --set-string frontend.image.tag=sha-test --set-file mysql.initSchema=backend/src/main/resources/schema.sql
+          helm template segroup8 deploy/helm/segroup8 --namespace segroup8 --set order.enabled=true --set-string order.image.repository=registry.example/segroup8/order --set-string order.image.tag=sha-test --set-string backend.image.repository=registry.example/segroup8/backend --set-string backend.image.tag=sha-test --set-string frontend.image.repository=registry.example/segroup8/frontend --set-string frontend.image.tag=sha-test --set-file mysql.initSchema=backend/src/main/resources/schema.sql >/dev/null
+
+  publish-order-image:
+    name: Publish immutable order-service image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [order-verify, order-service-e2e, order-domain-e2e, delivery-config]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment: production
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {name: order-service-jar, path: microservices/order-service/target}
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           registry: ${{ vars.ACR_REGISTRY }}
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
-      - uses: docker/build-push-action@v6
+      - name: Build and push the verified SHA image
+        id: order-image
+        uses: docker/build-push-action@v6
         with:
-          context: microservices
+          context: microservices/order-service
           file: microservices/order-service/Dockerfile
           push: true
           provenance: false
           sbom: false
           tags: ${{ vars.ACR_REGISTRY }}/${{ vars.ACR_NAMESPACE }}/order:sha-${{ github.sha }}
-          labels: org.opencontainers.image.revision=${{ github.sha }}
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+      - name: Record immutable image digest
+        run: printf '%s\n' '${{ steps.order-image.outputs.digest }}' > order-image-digest.txt
+      - uses: actions/upload-artifact@v4
+        with: {name: order-image-digest-${{ github.sha }}, path: order-image-digest.txt, retention-days: 30}
 
-  deploy:
+  deploy-order:
+    name: Helm atomic deploy order-service
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ENABLE_PRODUCTION_DEPLOY == 'true'
-    needs: publish
+    needs: publish-order-image
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment: production
+    concurrency: {group: segroup8-production-helm, cancel-in-progress: false}
     steps:
       - uses: actions/checkout@v4
+      - name: Package Helm chart
+        run: tar -czf "order-chart-$GITHUB_SHA.tar.gz" deploy/helm/segroup8
       - name: Configure SSH
-        env:
-          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        env: {DEPLOY_SSH_KEY: "${{ secrets.DEPLOY_SSH_KEY }}", DEPLOY_KNOWN_HOSTS: "${{ secrets.DEPLOY_KNOWN_HOSTS }}"}
         run: |
           install -d -m 700 "$HOME/.ssh"
           printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/id_ed25519"
           chmod 600 "$HOME/.ssh/id_ed25519"
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
-      - name: Deploy chart atomically and smoke readiness, version and order route
+          chmod 600 "$HOME/.ssh/known_hosts"
+      - name: Upload chart and deploy atomically
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
@@ -105,10 +280,15 @@ jobs:
           ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
         run: |
-          BUILD_TIME="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          tar -czf order-chart.tgz deploy/helm/segroup8
-          scp order-chart.tgz "$DEPLOY_USER@$DEPLOY_HOST:/tmp/order-chart-$GITHUB_SHA.tgz"
-          ssh "$DEPLOY_USER@$DEPLOY_HOST" "kubectl -n '$K8S_NAMESPACE' get service catalog-shop-service benefits-finance-service messaging-service"
-          ssh "$DEPLOY_USER@$DEPLOY_HOST" "mkdir -p /tmp/order-chart-$GITHUB_SHA && tar -xzf /tmp/order-chart-$GITHUB_SHA.tgz -C /tmp/order-chart-$GITHUB_SHA && helm upgrade --install segroup8 /tmp/order-chart-$GITHUB_SHA/deploy/helm/segroup8 --namespace '$K8S_NAMESPACE' --create-namespace --reuse-values --atomic --wait --timeout 10m --set order.enabled=true --set-string order.image.repository='$ACR_REGISTRY/$ACR_NAMESPACE/order' --set-string order.image.tag='sha-$GITHUB_SHA' --set-string deployment.version='sha-$GITHUB_SHA' --set-string deployment.commit='$GITHUB_SHA' --set-string deployment.buildTime='$BUILD_TIME'"
-          ssh "$DEPLOY_USER@$DEPLOY_HOST" "kubectl -n '$K8S_NAMESPACE' rollout status deployment/segroup8-order --timeout=5m && kubectl -n '$K8S_NAMESPACE' get deployment/segroup8-order -o jsonpath='{.spec.template.spec.containers[0].image}'"
-          ssh "$DEPLOY_USER@$DEPLOY_HOST" "kubectl -n '$K8S_NAMESPACE' run order-smoke-$GITHUB_RUN_ID --rm -i --restart=Never --image=curlimages/curl:8.10.1 --command -- sh -ec \"curl -fsS http://segroup8-order:8085/actuator/health/readiness | grep -q UP; curl -fsS http://segroup8-order:8085/actuator/info | grep -q '$GITHUB_SHA'; curl -sS -o /dev/null -w '%{http_code}' http://segroup8-order:8085/api/order/list | grep -q '^401$'\""
+          set -o pipefail
+          archive="/tmp/order-chart-$GITHUB_SHA.tar.gz"
+          scp "order-chart-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$archive"
+          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=10 "$DEPLOY_USER@$DEPLOY_HOST" "bash -s -- '$GITHUB_SHA' '$archive' '$ACR_REGISTRY' '$ACR_NAMESPACE' 'sha-$GITHUB_SHA' '$K8S_NAMESPACE'" < .github/scripts/deploy-order-k3s.sh | tee order-deployment.log
+      - name: Upload deployment and rollback diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: order-deployment-${{ github.sha }}
+          path: order-deployment.log
+          if-no-files-found: warn
+          retention-days: 30

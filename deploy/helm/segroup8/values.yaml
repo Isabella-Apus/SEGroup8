@@ -36,6 +36,10 @@ frontend:
 order:
   enabled: false
   replicaCount: 1
+  deployment:
+    version: ""
+    commit: ""
+    buildTime: ""
   image:
     repository: ""
     tag: ""

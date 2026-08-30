@@ -26,8 +26,15 @@ outbox:
     enabled: ${OUTBOX_PUBLISHER_ENABLED:true}
     fixed-delay: 2s
 management:
-  endpoints.web.exposure.include: health,info,prometheus
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
   endpoint:
+    info:
+      enabled: true
+    prometheus:
+      enabled: true
     health:
       probes.enabled: true
       group:
@@ -39,10 +46,8 @@ info:
   app:
     version: ${APP_VERSION:dev}
   git:
-    commit: ${GIT_COMMIT:unknown}
+    commit: ${APP_COMMIT:${GIT_COMMIT:unknown}}
   build:
-    time: ${BUILD_TIME:unknown}
-logging:
-  pattern.console: '%d{ISO8601} %-5level service=order-service traceId=%X{traceId:-} requestId=%X{requestId:-} orderId=%X{orderId:-} orderNo=%X{orderNo:-} sagaId=%X{sagaId:-} paymentRequestId=%X{paymentRequestId:-} reservationId=%X{reservationId:-} %logger - %msg%n'
+    time: ${APP_BUILD_TIME:${BUILD_TIME:unknown}}
 springdoc:
   swagger-ui.path: /swagger-ui.html

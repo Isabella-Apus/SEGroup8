@@ -49,6 +49,16 @@ class OrderApiTest {
         when(downstream.settlementResult(anyString())).thenReturn(RemoteResult.UNKNOWN);
     }
 
+    @Test void actuatorExposesOperationsWithoutFlywayMetadata() throws Exception {
+        mvc.perform(get("/actuator")).andExpect(status().isOk())
+                .andExpect(jsonPath("$._links.health").exists())
+                .andExpect(jsonPath("$._links.flyway").doesNotExist());
+        mvc.perform(get("/actuator/info")).andExpect(status().isOk());
+        mvc.perform(get("/actuator/prometheus")).andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("jvm_")));
+        mvc.perform(get("/actuator/flyway")).andExpect(status().isNotFound());
+    }
+
     @Test void publicApisCoverCreatePayFulfilReviewAndQueries() throws Exception {
         mvc.perform(post("/api/order/create").header("Idempotency-Key","create-unauth").contentType("application/json").content(createBody()))
                 .andExpect(status().isUnauthorized());
