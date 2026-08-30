@@ -839,7 +839,9 @@ function parseBargainMessage(text) {
     return {
       ...data,
       id: data.negotiationId,
-      status: kind === "APPLY" ? "APPLIED" : (kind === "CONFIRM" ? "CONFIRMED" : "REJECTED"),
+      status: kind === "APPLY"
+        ? "APPLIED"
+        : (kind === "CONFIRM" ? (Number(data.orderId) > 0 ? "USED" : "CONFIRMED") : "REJECTED"),
       bargainKind: kind,
     };
   } catch {
