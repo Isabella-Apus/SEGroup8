@@ -1,0 +1,122 @@
+<testsuites id="" name="" tests="5" failures="1" skipped="0" errors="0" time="142.20789700000003">
+<testsuite name="domain-d\uc16-product-management.spec.ts" timestamp="2026-08-29T08:53:19.468Z" hostname="" tests="1" failures="0" skipped="0" time="27.721" errors="0">
+<testcase name="@DOMAIN_D @UC16 secondhand product management › persists publish, edit, shelf changes and delete while rejecting a non-owner" classname="domain-d\uc16-product-management.spec.ts" time="27.721">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-d-uc16-product-mana-296c7-while-rejecting-a-non-owner\attachments\uc16-product-persisted-off-shelf-bc788a07eb6b736cc7b191e7e203bc9bc896a88b.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc16-product-mana-296c7-while-rejecting-a-non-owner\attachments\uc16-product-deleted-after-refresh-557612d5de8457237eb31844c4d508decb4a73d2.png]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="domain-d\uc17-direct-purchase.spec.ts" timestamp="2026-08-29T08:53:19.468Z" hostname="" tests="1" failures="0" skipped="0" time="12.485" errors="0">
+<testcase name="@DOMAIN_D @UC17 direct secondhand purchase › creates one pending order through the real UI and rejects a repeated purchase" classname="domain-d\uc17-direct-purchase.spec.ts" time="12.485">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-d-uc17-direct-purch-71cb6-rejects-a-repeated-purchase\attachments\uc17-pending-order-and-sold-product-4dfd9075fd8d098b50c0c9c5e5ff3647cf41368b.png]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="domain-d\uc18-bargain.spec.ts" timestamp="2026-08-29T08:53:19.468Z" hostname="" tests="1" failures="1" skipped="0" time="27.945" errors="0">
+<testcase name="@DOMAIN_D @UC18 secondhand bargain › buyer applies, seller confirms in chat, and buyer receives a pending-payment order" classname="domain-d\uc18-bargain.spec.ts" time="27.945">
+<failure message="uc18-bargain.spec.ts:11:3 buyer applies, seller confirms in chat, and buyer receives a pending-payment order" type="FAILURE">
+<![CDATA[  domain-d\uc18-bargain.spec.ts:11:3 › @DOMAIN_D @UC18 secondhand bargain › buyer applies, seller confirms in chat, and buyer receives a pending-payment order
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator:  getByText('已生成订单').first()
+    Expected: visible
+    Received: <element(s) not found>
+    Timeout:  10000ms
+
+    Call log:
+      - Expect "toBeVisible" with timeout 10000ms
+      - waiting for getByText('已生成订单').first()
+
+
+      90 |             expect(confirmed.status).toBe("USED");
+      91 |             expect(orderId).toBeGreaterThan(0);
+    > 92 |             await expect(sellerPage.getByText("已生成订单").first()).toBeVisible();
+         |                                                                 ^
+      93 |             await capture(sellerPage, testInfo, "uc18-seller-confirmed-order");
+      94 |
+      95 |             await page.reload();
+        at C:\Users\Chazey\Desktop\SEGroup8-main\frontend\e2e\domain-d\uc18-bargain.spec.ts:92:65
+
+    attachment #1: uc18-buyer-application-pending (image/png) ──────────────────────────────────────
+    ..\..\04_tests\microservices\secondhand-service\evidence\playwright\test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\attachments\uc18-buyer-application-pending-89831bd9d01f79e1c368ff34c7a89bb5ecbc17cb.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\secondhand-service\evidence\playwright\test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\secondhand-service\evidence\playwright\test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\secondhand-service\evidence\playwright\test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\04_tests\microservices\secondhand-service\evidence\playwright\test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\error-context.md
+
+    attachment #6: trace (application/zip) ─────────────────────────────────────────────────────────
+    ..\..\04_tests\microservices\secondhand-service\evidence\playwright\test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\trace.zip
+    Usage:
+
+        npx playwright show-trace ..\..\04_tests\microservices\secondhand-service\evidence\playwright\test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\attachments\uc18-buyer-application-pending-89831bd9d01f79e1c368ff34c7a89bb5ecbc17cb.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\test-failed-1.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\video.webm]]
+
+[[ATTACHMENT|test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\test-failed-2.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\error-context.md]]
+
+[[ATTACHMENT|test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\trace.zip]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="domain-d\uc19-auction.spec.ts" timestamp="2026-08-29T08:53:19.468Z" hostname="" tests="1" failures="0" skipped="0" time="40.584" errors="0">
+<testcase name="@DOMAIN_D @UC19 secondhand auction › seller creates an auction, two buyers bid, and the winner receives one settled order" classname="domain-d\uc19-auction.spec.ts" time="40.584">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-d-uc19-auction--DOM-63259--receives-one-settled-order\attachments\uc19-seller-created-auction-50a597398e7eacc8644758d718d369e6dcf34e57.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc19-auction--DOM-63259--receives-one-settled-order\attachments\uc19-bidder-b-leading-413844dcd621f9815e0416b5bac8153844527efc.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc19-auction--DOM-63259--receives-one-settled-order\attachments\uc19-seller-monitor-two-bids-2cde21cccb411f163daf2840d76976dff1b58be7.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc19-auction--DOM-63259--receives-one-settled-order\attachments\uc19-winner-paid-pending-shipment-order-8bd612beaf7987f937a71a7d19ee971b97aa7df8.png]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="domain-d\uc20-fulfillment.spec.ts" timestamp="2026-08-29T08:53:19.468Z" hostname="" tests="1" failures="0" skipped="0" time="19.075" errors="0">
+<testcase name="@DOMAIN_D @UC20 secondhand fulfillment › seller ships, buyer sees logistics and confirms receipt with one settlement" classname="domain-d\uc20-fulfillment.spec.ts" time="19.075">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-d-uc20-fulfillment--ca433-receipt-with-one-settlement\attachments\uc20-seller-shipped-order-53691c881bcea8c990292f198a9012dcf2b9d639.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc20-fulfillment--ca433-receipt-with-one-settlement\attachments\uc20-buyer-logistics-visible-ee17c1afbb3a16d284cf98079837ceb9372c2aea.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc20-fulfillment--ca433-receipt-with-one-settlement\attachments\uc20-buyer-pending-review-8a6c8ad2d79d7c2f8008837ec5722e65100a8a35.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc20-fulfillment--ca433-receipt-with-one-settlement\attachments\uc20-seller-settled-once-498cc82e85fc2985572804bf1963c8053be24e75.png]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

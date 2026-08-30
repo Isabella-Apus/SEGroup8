@@ -1,0 +1,24 @@
+flowchart LR
+    Gateway[API Gateway] --> Secondhand[secondhand-service]
+    Identity[identity-governance-service] -->|JWT / access projection| Secondhand
+    Secondhand --> SDB[(secondhand_db)]
+    Secondhand -->|ProductSubmitted.v1| Catalog[catalog-shop-service]
+    Secondhand -->|POST /internal/orders/secondhand| Order[order-service]
+    Secondhand -->|GET by business key| Order
+    Order -->|OrderStatusChanged.v1| Secondhand
+    Secondhand -->|NotificationRequested.v1| Messaging[messaging-service]
+
+    subgraph Owned[secondhand-service 强一致边界]
+      Product[二手商品]
+      Bargain[议价]
+      Auction[拍卖与出价]
+      Trade[成交请求/恢复]
+      Outbox[Outbox/幂等]
+      Product --> Bargain
+      Product --> Auction
+      Bargain --> Trade
+      Auction --> Trade
+      Product --> Trade
+      Trade --> Outbox
+    end
+    Secondhand --> Owned

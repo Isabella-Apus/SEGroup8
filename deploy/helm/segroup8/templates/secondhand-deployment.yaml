@@ -1,0 +1,78 @@
+{{- if .Values.secondhand.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: segroup8-secondhand
+  labels:
+    {{- include "segroup8.labels" . | nindent 4 }}
+    app.kubernetes.io/component: secondhand-service
+spec:
+  replicas: {{ .Values.secondhand.replicaCount }}
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      {{- include "segroup8.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: secondhand-service
+  template:
+    metadata:
+      labels:
+        {{- include "segroup8.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: secondhand-service
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      containers:
+        - name: secondhand-service
+          image: "{{ required "secondhand.image.repository is required when enabled" .Values.secondhand.image.repository }}:{{ required "secondhand.image.tag is required when enabled" .Values.secondhand.image.tag }}"
+          imagePullPolicy: {{ .Values.secondhand.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: {{ .Values.secondhand.secretName }}
+            - configMapRef:
+                name: segroup8-secondhand-config
+          env:
+            - name: APP_VERSION
+              value: {{ .Values.deployment.version | quote }}
+            - name: APP_COMMIT
+              value: {{ .Values.deployment.commit | quote }}
+            - name: APP_BUILD_TIME
+              value: {{ .Values.deployment.buildTime | quote }}
+            - name: TZ
+              value: Asia/Shanghai
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 24
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.secondhand.resources | nindent 12 }}
+{{- end }}

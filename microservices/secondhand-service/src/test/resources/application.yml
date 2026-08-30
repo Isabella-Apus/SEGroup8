@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:secondhand;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  flyway:
+    enabled: true
+debug: false
+logging:
+  level:
+    root: INFO
+    org.springframework.jdbc.core: WARN
+security:
+  jwt:
+    secret: test-jwt-secret-must-have-at-least-thirty-two-bytes
+  internal-token: test-internal-token
+clients:
+  order:
+    base-url: http://127.0.0.1:9
+    connect-timeout: 100ms
+    read-timeout: 100ms
+    max-attempts: 3
+secondhand:
+  recovery:
+    delay-ms: 600000
+  auction:
+    settlement-delay-ms: 600000

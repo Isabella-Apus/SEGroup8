@@ -33,6 +33,32 @@ frontend:
       cpu: 250m
       memory: 256Mi
 
+secondhand:
+  enabled: false
+  replicaCount: 1
+  image:
+    repository: ""
+    tag: ""
+    pullPolicy: IfNotPresent
+  secretName: segroup8-secondhand-secret
+  service:
+    port: 8080
+  orderServiceUrl: http://order-service:8080
+  catalogShopServiceUrl: http://catalog-shop-service:8080
+  orderConnectTimeout: 1s
+  orderReadTimeout: 2s
+  orderMaxAttempts: 3
+  tradeRecoveryDelayMs: 5000
+  tradeRecoveryBatchSize: 20
+  auctionSettlementDelayMs: 5000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 768Mi
+
 mysql:
   image:
     repository: mysql

@@ -1,0 +1,108 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e7]: 欢迎来到 Kinda Goods
+      - generic [ref=e8]:
+        - button "常见问题" [ref=e9] [cursor=pointer]
+        - button "信用中心" [ref=e10] [cursor=pointer]
+        - button "消息" [ref=e11] [cursor=pointer]
+        - button "通知" [ref=e12] [cursor=pointer]
+    - generic [ref=e13]:
+      - button "Kinda Goods" [ref=e14] [cursor=pointer]:
+        - img "Kinda Goods" [ref=e15] [cursor=pointer]
+      - generic [ref=e17]:
+        - textbox "搜索商品、闲置、教材、数码好物" [ref=e20]
+        - button "搜索" [ref=e21] [cursor=pointer]:
+          - generic [ref=e22] [cursor=pointer]: 搜索
+      - generic [ref=e23]:
+        - navigation "主导航" [ref=e24]:
+          - button "首页" [ref=e25] [cursor=pointer]:
+            - generic [ref=e26] [cursor=pointer]: 首页
+          - button "新品商城" [ref=e27] [cursor=pointer]:
+            - generic [ref=e28] [cursor=pointer]: 新品商城
+          - button "二手商城" [ref=e29] [cursor=pointer]:
+            - generic [ref=e30] [cursor=pointer]: 二手商城
+        - button "D Demo User" [ref=e32] [cursor=pointer]:
+          - generic [ref=e33] [cursor=pointer]: D
+          - generic [ref=e34] [cursor=pointer]: Demo User
+  - main [ref=e35]:
+    - generic [ref=e36]:
+      - complementary [ref=e37]:
+        - generic [ref=e38]:
+          - generic [ref=e39]:
+            - heading "站内消息" [level=2] [ref=e40]
+            - paragraph [ref=e41]: 买家和卖家可以在这里实时沟通
+          - button "刷新" [ref=e42] [cursor=pointer]:
+            - generic [ref=e43] [cursor=pointer]: 刷新
+        - button "Demo Seller 08/29 16:54 二手商品咨询：UC18-E2E-1787993645284-3039 卖家已同意议价 ¥76.00" [ref=e45] [cursor=pointer]:
+          - generic [ref=e46] [cursor=pointer]:
+            - strong [ref=e47] [cursor=pointer]: Demo Seller
+            - generic [ref=e48] [cursor=pointer]: 08/29 16:54
+          - generic [ref=e49] [cursor=pointer]: 二手商品咨询：UC18-E2E-1787993645284-3039
+          - generic [ref=e51] [cursor=pointer]: 卖家已同意议价 ¥76.00
+      - generic [ref=e52]:
+        - generic [ref=e53]:
+          - generic [ref=e54]:
+            - heading "Demo Seller" [level=3] [ref=e55]
+            - paragraph [ref=e56]: 二手商品咨询：UC18-E2E-1787993645284-3039
+          - generic [ref=e57]:
+            - button "拉黑" [ref=e58] [cursor=pointer]:
+              - generic [ref=e59] [cursor=pointer]: 拉黑
+            - button "举报" [ref=e60] [cursor=pointer]:
+              - generic [ref=e61] [cursor=pointer]: 举报
+        - generic [ref=e62]:
+          - generic [ref=e64]:
+            - generic [ref=e65]: Demo User
+            - article [ref=e67]:
+              - generic [ref=e68]:
+                - generic [ref=e69]: 已确认
+                - strong [ref=e70]: 卖家已同意议价
+              - generic [ref=e71]:
+                - generic [ref=e72]:
+                  - generic [ref=e73]: 商品
+                  - generic [ref=e74]: UC18-E2E-1787993645284-3039
+                - generic [ref=e75]:
+                  - generic [ref=e76]: 买家出价
+                  - generic [ref=e77]: ¥76.00
+                - generic [ref=e78]:
+                  - generic [ref=e79]: 确认价格
+                  - generic [ref=e80]: ¥76.00
+                - generic [ref=e81]:
+                  - generic [ref=e82]: 有效期至
+                  - generic [ref=e83]: 2026/8/30 16:54:18
+              - generic [ref=e85]: 议价已确认
+            - generic [ref=e86]: 2026/8/29 16:54:11
+          - generic [ref=e88]:
+            - generic [ref=e89]: Demo Seller
+            - article [ref=e91]:
+              - generic [ref=e92]:
+                - generic [ref=e93]: 已确认
+                - strong [ref=e94]: 卖家已同意议价
+              - generic [ref=e95]:
+                - generic [ref=e96]:
+                  - generic [ref=e97]: 商品
+                  - generic [ref=e98]: UC18-E2E-1787993645284-3039
+                - generic [ref=e99]:
+                  - generic [ref=e100]: 确认价格
+                  - generic [ref=e101]: ¥76.00
+                - generic [ref=e102]:
+                  - generic [ref=e103]: 有效期至
+                  - generic [ref=e104]: 2026/8/30 16:54:18
+              - button "去支付订单" [ref=e106] [cursor=pointer]:
+                - generic [ref=e107] [cursor=pointer]: 去支付订单
+            - generic [ref=e108]: 2026/8/29 16:54:19
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - textbox "输入消息" [ref=e111]
+            - generic [ref=e112]: 0 / 1000
+          - generic [ref=e113]:
+            - generic [ref=e114]: 消息会自动同步给对方
+            - generic [ref=e115]:
+              - button "上传图片/视频" [ref=e116] [cursor=pointer]:
+                - generic [ref=e117] [cursor=pointer]: 上传图片/视频
+              - button "发送" [ref=e118] [cursor=pointer]:
+                - generic [ref=e119] [cursor=pointer]: 发送
+```

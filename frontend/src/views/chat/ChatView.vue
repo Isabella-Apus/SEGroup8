@@ -664,6 +664,8 @@ function updateBargainInList(next) {
   const index = bargainRequests.value.findIndex((item) => Number(item.id) === Number(next.id));
   if (index >= 0) {
     bargainRequests.value.splice(index, 1, next);
+  } else {
+    bargainRequests.value.push(next);
   }
 }
 
