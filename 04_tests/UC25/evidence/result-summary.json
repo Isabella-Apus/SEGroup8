@@ -13,9 +13,6 @@
     "raw-reports/TEST-com.segroup8.platform.integration.NotificationFlowUc25IntegrationTest.xml",
     "raw-reports/TEST-com.segroup8.platform.realtime.RealtimeHandshakeInterceptorTest.xml",
     "raw-reports/TEST-com.segroup8.platform.service.impl.UC25NotificationOwnershipAndPushTest.xml",
-    "raw-reports/playwright/playwright-results.json",
-    "raw-reports/playwright/playwright-results.xml",
-    "raw-reports/playwright/playwright-report/index.html",
     "screenshots/uc25-realtime-reconnect-and-read.png",
     "logs/runtime-health.txt",
     "../../../02_docs/UC25/test-report.md"

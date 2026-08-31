@@ -6,6 +6,7 @@ import com.segroup8.platform.common.UserStatusEnum;
 import com.segroup8.platform.context.UserContext;
 import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.UserMapper;
+import com.segroup8.platform.event.ProducerOutboxService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -20,6 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @ExtendWith(MockitoExtension.class)
 @Tag("DOMAIN_A")
@@ -28,12 +32,14 @@ class AdminUserServiceImplTest {
 
     @Mock
     private UserMapper userMapper;
+    @Mock
+    private ProducerOutboxService outbox;
 
     private AdminUserServiceImpl adminUserService;
 
     @BeforeEach
     void setUp() {
-        adminUserService = new AdminUserServiceImpl(userMapper);
+        adminUserService = new AdminUserServiceImpl(userMapper, outbox);
     }
 
     @AfterEach
@@ -61,6 +67,7 @@ class AdminUserServiceImplTest {
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         verify(userMapper).updateById(captor.capture());
         assertEquals(UserStatusEnum.BANNED.name(), captor.getValue().getStatus());
+        verify(outbox).publish(eq("UserAccessChanged.v1"), anyString(), eq("USER"), eq(2L), any());
     }
 
     @Test
@@ -95,6 +102,7 @@ class AdminUserServiceImplTest {
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         verify(userMapper).updateById(captor.capture());
         assertEquals(UserStatusEnum.NORMAL.name(), captor.getValue().getStatus());
+        verify(outbox).publish(eq("UserAccessChanged.v1"), anyString(), eq("USER"), eq(2L), any());
     }
 
     @Test

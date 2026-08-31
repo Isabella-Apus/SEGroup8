@@ -7,7 +7,9 @@ the chart.
 
 ## One-time cluster prerequisites
 
-Create the namespace and the four required secrets before enabling CD:
+Create the namespace and the platform secrets before enabling CD. The
+Messaging secret is required when the Messaging service pipeline enables that
+component:
 
 ```bash
 kubectl create namespace segroup8
@@ -27,6 +29,17 @@ The secrets must contain these keys:
 - `identity-governance-secret`: `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`,
   `JWT_SECRET`, `INTERNAL_SERVICE_TOKEN`, and `BOOTSTRAP_ADMIN_PASSWORD`.
   Its database account must be restricted to `identity_governance_db.*`.
+- `segroup8-messaging-secret`: required by the Messaging service pipeline;
+  `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, and
+  `INTERNAL_SERVICE_TOKEN`; add `INTERNAL_OPERATIONS_TOKEN` for the replay
+  endpoint and `IDENTITY_SERVICE_TOKEN` for the governance fallback. This is a
+  service-to-service token, never an end-user Bearer token.
+
+`REALTIME_ALLOWED_ORIGIN_PATTERNS` must be supplied as an explicit
+non-wildcard production allow-list. The deployment script rejects an empty
+value or `*`. `IDENTITY_SERVICE_URL` is an optional non-secret variable for the
+governance fallback endpoint. The ConfigMap also carries bounded identity
+timeout/retry settings.
 
 Use `mysql:3306` as the database host in `DB_URL`. Do not expose MySQL with a
 NodePort or cloud security-group rule.
@@ -42,10 +55,11 @@ The `production` GitHub Environment must provide:
 
 - Secrets: `ACR_USERNAME`, `ACR_PASSWORD`, `DEPLOY_HOST`, `DEPLOY_USER`,
   `DEPLOY_SSH_KEY`, and `DEPLOY_KNOWN_HOSTS`.
-- Variables: `ACR_REGISTRY`, `ACR_NAMESPACE`, and
-  `ENABLE_PRODUCTION_DEPLOY=true`.
+- Variables: `ACR_REGISTRY`, `ACR_NAMESPACE`, `ENABLE_PRODUCTION_DEPLOY=true`,
+  and `TEST=true`.
 - Optional variables: `K8S_NAMESPACE` (defaults to `segroup8`) and
-  `PRODUCTION_URL` (enables an external `/health` check).
+  `PRODUCTION_URL` (enables an external `/health` check),
+  `REALTIME_ALLOWED_ORIGIN_PATTERNS`, and `IDENTITY_SERVICE_URL`.
 
 The SSH user needs `helm`, `kubectl`, `curl`, and a working
 `$HOME/.kube/config` for the local K3s cluster.
@@ -64,7 +78,8 @@ The demo seed file is intentionally excluded from production.
 ## Deployment behavior
 
 The platform workflow installs the base `segroup8` release. The identity
-pipeline then uses `helm upgrade --install --reset-then-reuse-values --atomic --wait`.
+and individual service pipelines then use
+`helm upgrade --install --reset-then-reuse-values --atomic --wait`.
 This loads keys newly introduced by the current chart, then preserves explicit
 values owned by the existing release and upgrades only the selected component.
 All service deployment jobs must share the

@@ -19,6 +19,36 @@ backend:
       cpu: "1"
       memory: 1536Mi
 
+messaging:
+  # The messaging service is delivered by its own pipeline. Keep the shared
+  # platform release installable without a messaging image or secret.
+  enabled: false
+  replicaCount: 1
+  image:
+    repository: ""
+    # CI supplies an immutable sha-<git-sha> tag; no latest fallback is allowed.
+    tag: ""
+    pullPolicy: IfNotPresent
+  secretName: segroup8-messaging-secret
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 768Mi
+  config:
+    identityServiceUrl: http://identity-governance-service:8091
+    realtimeAllowedOriginPatterns: ""
+    identityConnectTimeoutMs: "2000"
+    identityReadTimeoutMs: "3000"
+    identityMaxAttempts: "3"
+    identityRetryBackoffMs: "100"
+    inboxPollDelayMs: "1000"
+    inboxMaxRetries: "5"
+    deliveryPollDelayMs: "1000"
+    deliveryMaxRetries: "5"
+
 frontend:
   replicaCount: 1
   image:

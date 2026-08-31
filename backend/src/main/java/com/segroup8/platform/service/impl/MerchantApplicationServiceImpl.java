@@ -12,16 +12,14 @@ import com.segroup8.platform.entity.MerchantApplication;
 import com.segroup8.platform.entity.Notification;
 import com.segroup8.platform.entity.Shop;
 import com.segroup8.platform.entity.User;
+import com.segroup8.platform.event.EventTypes;
+import com.segroup8.platform.event.ProducerOutboxService;
 import com.segroup8.platform.mapper.MerchantApplicationMapper;
-import com.segroup8.platform.mapper.NotificationMapper;
 import com.segroup8.platform.mapper.ShopMapper;
 import com.segroup8.platform.mapper.UserMapper;
-import com.segroup8.platform.realtime.RealtimePushService;
 import com.segroup8.platform.service.MerchantApplicationService;
 import com.segroup8.platform.vo.MerchantApplicationVO;
 import com.segroup8.platform.vo.PageVO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -35,24 +33,19 @@ import java.util.Objects;
 @Service
 public class MerchantApplicationServiceImpl implements MerchantApplicationService {
 
-    private static final Logger log = LoggerFactory.getLogger(MerchantApplicationServiceImpl.class);
-
     private final MerchantApplicationMapper merchantApplicationMapper;
     private final UserMapper userMapper;
-    private final NotificationMapper notificationMapper;
     private final ShopMapper shopMapper;
-    private final RealtimePushService realtimePushService;
+    private final ProducerOutboxService outbox;
 
     public MerchantApplicationServiceImpl(MerchantApplicationMapper merchantApplicationMapper,
             UserMapper userMapper,
-            NotificationMapper notificationMapper,
             ShopMapper shopMapper,
-            RealtimePushService realtimePushService) {
+            ProducerOutboxService outbox) {
         this.merchantApplicationMapper = merchantApplicationMapper;
         this.userMapper = userMapper;
-        this.notificationMapper = notificationMapper;
         this.shopMapper = shopMapper;
-        this.realtimePushService = realtimePushService;
+        this.outbox = outbox;
     }
 
     @Override
@@ -158,10 +151,23 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
         notification.setContent("恭喜，您的入驻申请已通过，现可进入卖家工作台。");
         notification.setIsRead(0);
         notification.setCreateTime(LocalDateTime.now());
-        persistNotificationSafely(notification, "seller");
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("recipientUserIds", List.of(user.getId()));
+        payload.put("applicationId", app.getId());
+        payload.put("userId", user.getId());
+        payload.put("shopSnapshot", Map.of("name", app.getStoreName() == null ? "[Shop]" : app.getStoreName()));
+        payload.put("displayTitle", notification.getTitle());
+        payload.put("displayText", notification.getContent());
+        payload.put("targetPath", "/merchant");
+        payload.put("businessType", "MERCHANT_APPLICATION");
+        payload.put("businessId", String.valueOf(app.getId()));
+        payload.put("dedupeKey", "merchant-approved:" + app.getId());
+        outbox.publish(EventTypes.MERCHANT_APPROVED, "identity-governance-monolith",
+                "MERCHANT_APPLICATION", app.getId(), payload);
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void reject(Long applicationId, MerchantApplicationRejectRequest request) {
         assertAdmin();
         MerchantApplication app = merchantApplicationMapper.selectById(applicationId);
@@ -178,36 +184,9 @@ public class MerchantApplicationServiceImpl implements MerchantApplicationServic
         notification.setContent("您的入驻申请被驳回，原因：" + request.getRejectReason());
         notification.setIsRead(0);
         notification.setCreateTime(LocalDateTime.now());
-        persistNotificationSafely(notification, "buyer");
-    }
-
-    /**
-     * Approval/rejection is the source-of-truth business action. Notification
-     * storage and realtime delivery are best-effort side effects and must not
-     * undo the application, role, shop, or audit state when they fail.
-     */
-    private void persistNotificationSafely(Notification notification, String scope) {
-        try {
-            notificationMapper.insert(notification);
-            pushNotification(notification, scope);
-        } catch (RuntimeException ex) {
-            log.warn("Unable to persist or push merchant application notification for user {}",
-                    notification == null ? null : notification.getUserId(), ex);
-        }
-    }
-
-    private void pushNotification(Notification notification, String scope) {
-        if (notification == null || realtimePushService == null) {
-            return;
-        }
-        Map<String, Object> payload = new LinkedHashMap<>();
-        payload.put("id", notification.getId());
-        payload.put("title", notification.getTitle());
-        payload.put("content", notification.getContent());
-        payload.put("scope", scope);
-        payload.put("isRead", notification.getIsRead());
-        payload.put("createTime", notification.getCreateTime());
-        realtimePushService.pushToUser(notification.getUserId(), "NOTIFICATION_CREATED", payload);
+        outbox.notification("identity-governance-monolith", "MERCHANT_APPLICATION", app.getId(),
+                List.of(app.getUserId()), notification.getTitle(), notification.getContent(), null,
+                "MERCHANT_REJECTED", "MERCHANT_APPLICATION", "merchant-rejected:" + app.getId());
     }
 
     private MerchantApplicationVO toVO(MerchantApplication app, User user, boolean includeSensitive) {

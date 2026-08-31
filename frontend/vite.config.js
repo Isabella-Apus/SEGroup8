@@ -24,6 +24,14 @@ export default defineConfig({
                 target: process.env.VITE_CATALOG_SHOP_TARGET || 'http://localhost:8086',
                 changeOrigin: true
             }])),
+            '/api/chat': {
+                target: 'http://localhost:8084',
+                changeOrigin: true
+            },
+            '/api/notifications': {
+                target: 'http://localhost:8084',
+                changeOrigin: true
+            },
             '/api': {
                 target: 'http://localhost:8080',
                 changeOrigin: true
@@ -33,7 +41,7 @@ export default defineConfig({
                 changeOrigin: true
             },
             '/ws': {
-                target: 'ws://localhost:8080',
+                target: 'ws://localhost:8084',
                 changeOrigin: true,
                 ws: true
             }

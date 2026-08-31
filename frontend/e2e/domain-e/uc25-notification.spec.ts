@@ -6,7 +6,6 @@ import {
     domainEToken,
     expectBusinessSuccess,
     loginAsDomainE,
-    uniqueName,
 } from "../helpers/domain-e";
 
 type NotificationRecord = {
@@ -25,21 +24,30 @@ async function listNotifications(
     return expectBusinessSuccess<NotificationRecord[]>(response);
 }
 
-async function sendBuyerMessage(
+async function triggerBuyerNotificationFromBusinessFlow(
     request: APIRequestContext,
     sellerToken: string,
-    content: string,
+    buyerToken: string,
 ): Promise<void> {
-    const conversationResponse = await request.post("/api/chat/conversations", {
+    const order = await expectBusinessSuccess<{ id: number }>(await request.post(
+        "/api/order/create",
+        {
+            headers: bearer(buyerToken),
+            data: { items: [{ productId: 1, quantity: 1 }] },
+        },
+    ));
+    await expectBusinessSuccess(await request.post(`/api/order/${order.id}/pay`, {
+        headers: bearer(buyerToken),
+        data: { payMode: "THIRD_PARTY", payChannel: "WECHAT" },
+    }));
+    await expectBusinessSuccess(await request.post(`/api/order/${order.id}/ship`, {
         headers: bearer(sellerToken),
-        data: { targetUserId: 3, sourceType: "DIRECT" },
-    });
-    const conversation = await expectBusinessSuccess<{ id: number }>(conversationResponse);
-    const messageResponse = await request.post(
-        `/api/chat/conversations/${conversation.id}/messages`,
-        { headers: bearer(sellerToken), data: { content } },
-    );
-    await expectBusinessSuccess(messageResponse);
+        data: {
+            originProvince: "Guangdong",
+            originCity: "Shenzhen",
+            originDetail: "UC25 event source",
+        },
+    }));
 }
 
 async function clearMutualBlocks(
@@ -110,7 +118,9 @@ test.describe("@DOMAIN_E @UC25 notification websocket and reconnect compensation
 
         const initial = await listNotifications(request, buyerToken);
         const initialIds = new Set(initial.map((item) => Number(item.id)));
-        await sendBuyerMessage(request, sellerToken, uniqueName("UC25-realtime"));
+        await triggerBuyerNotificationFromBusinessFlow(
+            request, sellerToken, buyerToken,
+        );
         const pushed = await newlyCreatedNotification(request, buyerToken, initialIds);
 
         const pushedCard = page.locator(`[data-notification-id="${pushed.id}"]`);
@@ -139,7 +149,9 @@ test.describe("@DOMAIN_E @UC25 notification websocket and reconnect compensation
         });
         await expect.poll(() => realtimeSockets.at(-1)?.isClosed(), { timeout: 10_000 })
             .toBeTruthy();
-        await sendBuyerMessage(request, sellerToken, uniqueName("UC25-missed"));
+        await triggerBuyerNotificationFromBusinessFlow(
+            request, sellerToken, buyerToken,
+        );
         const missed = await newlyCreatedNotification(request, buyerToken, beforeDisconnectIds);
 
         await page.context().setOffline(false);

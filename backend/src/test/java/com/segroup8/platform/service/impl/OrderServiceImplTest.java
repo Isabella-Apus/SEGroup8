@@ -25,6 +25,7 @@ import com.segroup8.platform.service.LogisticsService;
 import com.segroup8.platform.service.NotificationService;
 import com.segroup8.platform.service.VoucherService;
 import com.segroup8.platform.service.settlement.EscrowSettlementService;
+import com.segroup8.platform.event.ProducerOutboxService;
 import com.segroup8.platform.testsupport.DomainCTestTags;
 import com.segroup8.platform.vo.OrderVO;
 import org.junit.jupiter.api.AfterEach;
@@ -87,6 +88,8 @@ class OrderServiceImplTest {
     private VoucherService voucherService;
     @Mock
     private NotificationService notificationService;
+    @Mock
+    private ProducerOutboxService outbox;
 
     private OrderServiceImpl orderService;
 
@@ -106,7 +109,7 @@ class OrderServiceImplTest {
                 logisticsService,
                 escrowSettlementService,
                 voucherService,
-                notificationService);
+                outbox);
     }
 
     @AfterEach
@@ -293,8 +296,8 @@ class OrderServiceImplTest {
 
         orderService.shipSellerOrder(orderId);
 
-        verify(notificationService).createNotification(
-                eq(buyerUserId), anyString(), anyString(), eq("/order/" + orderId));
+        verify(outbox).publish(eq("OrderStatusChanged.v1"), anyString(), eq("ORDER"),
+                eq(orderId), any());
     }
 
     @Test
@@ -383,7 +386,8 @@ class OrderServiceImplTest {
         assertEquals(new BigDecimal("180.00"), child.getPayableAmount());
         assertEquals(OrderStatusEnum.PENDING_SHIP.getCode(), child.getOrderStatus());
         assertEquals(21L, secondItem.getOrderId());
-        verify(notificationService, times(2)).createNotification(anyLong(), anyString(), anyString(), anyString());
+        verify(outbox).publish(eq("PaymentCompleted.v1"), anyString(), eq("ORDER"),
+                eq(orderId), any());
     }
 
     @Test

@@ -22,6 +22,7 @@
         <module>order-service</module>
         <module>secondhand-service</module>
         <module>catalog-shop-service</module>
+        <module>messaging-service</module>
     </modules>
     <properties>
         <java.version>17</java.version>

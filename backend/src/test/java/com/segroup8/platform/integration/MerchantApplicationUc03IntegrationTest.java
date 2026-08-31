@@ -59,10 +59,11 @@ class MerchantApplicationUc03IntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0));
 
-        int notificationsBefore = count("notification", "user_id", userId(username));
+        int eventsBefore = countOutbox("MerchantApproved.v1", applicationId);
         int auditsBefore = count("admin_audit_log", "target_id", applicationId);
         mockMvc.perform(post("/api/admin/merchant-applications/{id}/approve", applicationId)
-                        .header("Authorization", bearer(adminToken)))
+                        .header("Authorization", bearer(adminToken))
+                        .header("X-Trace-Id", "uc03-merchant-trace"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0));
 
@@ -71,7 +72,10 @@ class MerchantApplicationUc03IntegrationTest {
         assertThat(jdbcTemplate.queryForObject(
                 "select role from user where username = ?", String.class, username)).isEqualTo("OFFICIAL_SELLER");
         assertThat(count("shop", "owner_user_id", userId(username))).isEqualTo(1);
-        assertThat(count("notification", "user_id", userId(username))).isEqualTo(notificationsBefore + 1);
+        assertThat(countOutbox("MerchantApproved.v1", applicationId)).isEqualTo(eventsBefore + 1);
+        assertThat(jdbcTemplate.queryForObject(
+                "select trace_id from outbox_event where event_type='MerchantApproved.v1' and aggregate_id=?",
+                String.class, String.valueOf(applicationId))).isEqualTo("uc03-merchant-trace");
         assertThat(count("admin_audit_log", "target_id", applicationId)).isEqualTo(auditsBefore + 1);
         mockMvc.perform(get("/api/user/profile").header("Authorization", bearer(userToken)))
                 .andExpect(status().isOk())
@@ -79,13 +83,13 @@ class MerchantApplicationUc03IntegrationTest {
                 .andExpect(jsonPath("$.data.shopName").value("Approved Shop"));
 
         int shopsAfterApproval = count("shop", "owner_user_id", userId(username));
-        int notificationsAfterApproval = count("notification", "user_id", userId(username));
+        int eventsAfterApproval = countOutbox("MerchantApproved.v1", applicationId);
         mockMvc.perform(post("/api/admin/merchant-applications/{id}/approve", applicationId)
                         .header("Authorization", bearer(adminToken)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(0));
         assertThat(count("shop", "owner_user_id", userId(username))).isEqualTo(shopsAfterApproval);
-        assertThat(count("notification", "user_id", userId(username))).isEqualTo(notificationsAfterApproval);
+        assertThat(countOutbox("MerchantApproved.v1", applicationId)).isEqualTo(eventsAfterApproval);
 
         String rejectedUsername = uniqueUsername("uc03-rejected");
         register(rejectedUsername, "Rejected Applicant");
@@ -148,6 +152,13 @@ class MerchantApplicationUc03IntegrationTest {
     private int count(String table, String column, Long value) {
         Integer result = jdbcTemplate.queryForObject(
                 "select count(*) from " + table + " where " + column + " = ?", Integer.class, value);
+        return result == null ? 0 : result;
+    }
+
+    private int countOutbox(String eventType, Long aggregateId) {
+        Integer result = jdbcTemplate.queryForObject(
+                "select count(*) from outbox_event where event_type = ? and aggregate_id = ?",
+                Integer.class, eventType, String.valueOf(aggregateId));
         return result == null ? 0 : result;
     }
 

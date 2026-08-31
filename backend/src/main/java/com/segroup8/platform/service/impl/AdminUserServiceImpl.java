@@ -8,23 +8,30 @@ import com.segroup8.platform.common.UserStatusEnum;
 import com.segroup8.platform.context.UserContext;
 import com.segroup8.platform.dto.AdminUserQueryRequest;
 import com.segroup8.platform.entity.User;
+import com.segroup8.platform.event.EventTypes;
+import com.segroup8.platform.event.ProducerOutboxService;
 import com.segroup8.platform.mapper.UserMapper;
 import com.segroup8.platform.service.AdminUserService;
 import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.vo.UserVO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Service
 public class AdminUserServiceImpl implements AdminUserService {
 
     private final UserMapper userMapper;
+    private final ProducerOutboxService outbox;
 
-    public AdminUserServiceImpl(UserMapper userMapper) {
+    public AdminUserServiceImpl(UserMapper userMapper, ProducerOutboxService outbox) {
         this.userMapper = userMapper;
+        this.outbox = outbox;
     }
 
     @Override
@@ -44,6 +51,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void banUser(Long userId) {
         Long currentUserId = UserContext.getUserId();
         assertAdmin();
@@ -54,6 +62,7 @@ public class AdminUserServiceImpl implements AdminUserService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void unbanUser(Long userId) {
         assertAdmin();
         updateUserStatus(userId, UserStatusEnum.NORMAL.name());
@@ -66,6 +75,15 @@ public class AdminUserServiceImpl implements AdminUserService {
         }
         user.setStatus(status);
         userMapper.updateById(user);
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("userId", userId);
+        payload.put("status", status);
+        payload.put("role", user.getRole());
+        payload.put("displayName", user.getNickname() == null ? user.getUsername() : user.getNickname());
+        payload.put("avatarUrl", user.getAvatar());
+        payload.put("version", System.currentTimeMillis());
+        outbox.publish(EventTypes.USER_ACCESS_CHANGED, "identity-governance-monolith",
+                "USER", userId, payload);
     }
 
     private LambdaQueryWrapper<User> buildQuery(AdminUserQueryRequest request) {

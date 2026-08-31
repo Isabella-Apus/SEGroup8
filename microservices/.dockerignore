@@ -1,0 +1,9 @@
+.git
+**/target/surefire-reports
+**/target/test-classes
+**/target/*.jar.original
+**/*.log
+**/*.zip
+**/*.webm
+**/*.env
+**/*secret*

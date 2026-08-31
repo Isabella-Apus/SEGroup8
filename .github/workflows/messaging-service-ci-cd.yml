@@ -1,0 +1,465 @@
+name: Messaging Service CI/CD
+
+on:
+  pull_request:
+    paths:
+      - "microservices/messaging-service/**"
+      - "microservices/security-contract/**"
+      - "microservices/pom.xml"
+      - "backend/pom.xml"
+      - "backend/Dockerfile"
+      - "backend/Dockerfile.runtime"
+      - "backend/src/main/java/com/segroup8/platform/event/**"
+      - "backend/src/main/java/com/segroup8/platform/internal/**"
+      - "backend/src/main/java/com/segroup8/platform/interceptor/InternalServiceInterceptor.java"
+      - "backend/src/main/java/com/segroup8/platform/service/impl/**"
+      - "backend/src/main/resources/schema.sql"
+      - "backend/src/test/resources/schema-test.sql"
+      - "microservices/messaging-service/src/main/resources/db/migration/**"
+      - "docker/mysql/02-seed.sql"
+      - "compose.yml"
+      - "compose.e2e.yml"
+      - "compose.messaging-service-e2e.yml"
+      - "compose.messaging-system-e2e.yml"
+      - "frontend/Dockerfile"
+      - "frontend/Dockerfile.runtime"
+      - "frontend/docker/nginx.conf"
+      - "frontend/docker/nginx.compose.conf"
+      - "frontend/src/**"
+      - "frontend/vite.config.js"
+      - "frontend/e2e/domain-e/**"
+      - "frontend/package.json"
+      - "frontend/package-lock.json"
+      - "frontend/playwright.config.ts"
+      - "scripts/ci/verify-messaging-*.mjs"
+      - "scripts/ci/run-messaging-*.mjs"
+      - "scripts/ci/strict-downstream-stub.mjs"
+      - "scripts/e2e/run-messaging-*.sh"
+      - "02_docs/microservices/messaging-service/**"
+      - "03_devops/microservices/messaging-service/**"
+      - "04_tests/microservices/messaging-service/**"
+      - "05_management/microservices/messaging-service/**"
+      - "deploy/helm/segroup8/templates/messaging-*.yaml"
+      - "deploy/helm/segroup8/values.yaml"
+      - "deploy/helm/segroup8/Chart.yaml"
+      - ".github/scripts/deploy-messaging-k3s.sh"
+      - ".github/workflows/messaging-service-ci-cd.yml"
+  push:
+    branches: [main]
+    paths:
+      - "microservices/messaging-service/**"
+      - "microservices/security-contract/**"
+      - "microservices/pom.xml"
+      - "backend/pom.xml"
+      - "backend/Dockerfile"
+      - "backend/Dockerfile.runtime"
+      - "backend/src/main/java/com/segroup8/platform/event/**"
+      - "backend/src/main/java/com/segroup8/platform/internal/**"
+      - "backend/src/main/java/com/segroup8/platform/interceptor/InternalServiceInterceptor.java"
+      - "backend/src/main/java/com/segroup8/platform/service/impl/**"
+      - "backend/src/main/resources/schema.sql"
+      - "backend/src/test/resources/schema-test.sql"
+      - "microservices/messaging-service/src/main/resources/db/migration/**"
+      - "docker/mysql/02-seed.sql"
+      - "compose.yml"
+      - "compose.e2e.yml"
+      - "compose.messaging-service-e2e.yml"
+      - "compose.messaging-system-e2e.yml"
+      - "frontend/Dockerfile"
+      - "frontend/Dockerfile.runtime"
+      - "frontend/docker/nginx.conf"
+      - "frontend/docker/nginx.compose.conf"
+      - "frontend/src/**"
+      - "frontend/vite.config.js"
+      - "frontend/e2e/domain-e/**"
+      - "frontend/package.json"
+      - "frontend/package-lock.json"
+      - "frontend/playwright.config.ts"
+      - "scripts/ci/verify-messaging-*.mjs"
+      - "scripts/ci/run-messaging-*.mjs"
+      - "scripts/ci/strict-downstream-stub.mjs"
+      - "scripts/e2e/run-messaging-*.sh"
+      - "02_docs/microservices/messaging-service/**"
+      - "03_devops/microservices/messaging-service/**"
+      - "04_tests/microservices/messaging-service/**"
+      - "05_management/microservices/messaging-service/**"
+      - "deploy/helm/segroup8/templates/messaging-*.yaml"
+      - "deploy/helm/segroup8/values.yaml"
+      - "deploy/helm/segroup8/Chart.yaml"
+      - ".github/scripts/deploy-messaging-k3s.sh"
+      - ".github/workflows/messaging-service-ci-cd.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: messaging-service-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  messaging-verify:
+    name: messaging-service API, integration and contract tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: microservices/**/pom.xml
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Enforce messaging source and route contracts
+        run: |
+          node scripts/ci/verify-messaging-boundary.mjs
+          node scripts/ci/verify-messaging-routes.mjs
+      - name: Run clean messaging-service verification
+        run: mvn -B --no-transfer-progress -f microservices/pom.xml -pl messaging-service -am clean verify
+      - name: Build candidate image from the tested JAR
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p release-candidate
+          mapfile -t jars < <(find microservices/messaging-service/target -maxdepth 1 -type f -name 'messaging-service-*.jar' ! -name '*.original' -print)
+          test "${#jars[@]}" -eq 1
+          jar_sha="$(sha256sum "${jars[0]}" | cut -d ' ' -f 1)"
+          candidate="segroup8/messaging:candidate-${GITHUB_SHA}"
+          docker build --pull \
+            -f microservices/messaging-service/Dockerfile \
+            --build-arg GIT_SHA="${GITHUB_SHA}" \
+            --build-arg JAR_SHA256="${jar_sha}" \
+            --build-arg IMAGE_SOURCE="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --label "org.opencontainers.image.revision=${GITHUB_SHA}" \
+            --label "org.opencontainers.image.source=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            -t "$candidate" \
+            microservices
+          test "$(docker image inspect "$candidate" --format '{{.Config.User}}')" = "10001:10001"
+          test "$(docker image inspect "$candidate" --format '{{index .Config.Labels "com.segroup8.messaging.jar-sha256"}}')" = "$jar_sha"
+          image_id="$(docker image inspect "$candidate" --format '{{.Id}}')"
+          printf '%s  %s\n' "$jar_sha" "$(basename "${jars[0]}")" > release-candidate/messaging-service-jar.sha256
+          jq -n \
+            --arg gitSha "$GITHUB_SHA" \
+            --arg jarSha256 "$jar_sha" \
+            --arg candidateImage "$candidate" \
+            --arg candidateImageId "$image_id" \
+            '{gitSha:$gitSha,jarSha256:$jarSha256,candidateImage:$candidateImage,candidateImageId:$candidateImageId}' \
+            > release-candidate/release-metadata.json
+          docker image save "$candidate" | gzip -1 > release-candidate/messaging-service-image.tar.gz
+      - name: Upload tested Boot JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: messaging-service-jar
+          path: |
+            microservices/messaging-service/target/messaging-service-*.jar
+            release-candidate/messaging-service-jar.sha256
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload tested candidate image and trace metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: messaging-service-candidate-${{ github.sha }}
+          path: release-candidate/**
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload service test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: messaging-service-test-reports
+          path: |
+            microservices/messaging-service/target/surefire-reports/**
+            microservices/messaging-service/target/failsafe-reports/**
+            microservices/security-contract/target/surefire-reports/**
+          if-no-files-found: warn
+          retention-days: 14
+
+  messaging-mysql:
+    name: messaging-service real MySQL migration
+    needs: messaging-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      mysql:
+        image: mysql:8.4.6
+        env:
+          MYSQL_ROOT_PASSWORD: audit-root
+          MYSQL_DATABASE: messaging_db
+          MYSQL_USER: messaging_app
+          MYSQL_PASSWORD: audit-app
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -paudit-root"
+          --health-interval=5s --health-timeout=3s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: microservices/**/pom.xml
+      - name: Run Flyway migration and permission checks on real MySQL
+        run: >-
+          mvn -B --no-transfer-progress -f microservices/pom.xml -pl messaging-service -am
+          -Dmessaging.mysql.test=true
+          -Dmessaging.mysql.root-url=jdbc:mysql://127.0.0.1:3306/
+          -Dmessaging.mysql.root-user=root -Dmessaging.mysql.root-password=audit-root
+          -Dtest=MySqlMigrationTest -Dsurefire.failIfNoSpecifiedTests=false test
+      - name: Upload migration test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: messaging-service-mysql-reports
+          path: microservices/messaging-service/target/surefire-reports/**
+          if-no-files-found: warn
+          retention-days: 14
+
+  messaging-independent-e2e:
+    name: messaging-service independent API and WebSocket E2E
+    needs: messaging-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: messaging-service-candidate-${{ github.sha }}
+          path: release-candidate
+      - name: Load the exact tested candidate image
+        run: docker image load --input release-candidate/messaging-service-image.tar.gz
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Run independent service API, internal-auth and WebSocket E2E
+        env:
+          MESSAGING_IMAGE: segroup8/messaging:candidate-${{ github.sha }}
+          E2E_OUTPUT_DIR: ${{ runner.temp }}/messaging-service-e2e
+        run: bash scripts/e2e/run-messaging-service-e2e.sh
+      - name: Upload full independent E2E report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: messaging-service-independent-e2e-${{ github.sha }}
+          path: ${{ runner.temp }}/messaging-service-e2e/**
+          if-no-files-found: warn
+          retention-days: 14
+
+  messaging-system-e2e:
+    name: full system UC24 and UC25 E2E with messaging-service
+    needs: [messaging-verify, messaging-independent-e2e]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: messaging-service-candidate-${{ github.sha }}
+          path: release-candidate
+      - name: Load the exact tested candidate image
+        run: docker image load --input release-candidate/messaging-service-image.tar.gz
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Run full system Compose E2E through production routing
+        env:
+          MESSAGING_IMAGE: segroup8/messaging:candidate-${{ github.sha }}
+          E2E_OUTPUT_DIR: ${{ runner.temp }}/messaging-system-e2e
+          E2E_ADMIN_USERNAME: admin
+          E2E_ADMIN_PASSWORD: admin123
+          E2E_OFFICIAL_SELLER_USERNAME: seller
+          E2E_OFFICIAL_SELLER_PASSWORD: seller123
+          E2E_BUYER_USERNAME: user
+          E2E_BUYER_PASSWORD: user123
+          E2E_THIRD_PARTY_USERNAME: third
+          E2E_THIRD_PARTY_PASSWORD: third123
+          E2E_USERNAME: user
+          E2E_PASSWORD: user123
+          E2E_BASE_URL: http://127.0.0.1:8088
+        run: bash scripts/e2e/run-messaging-system-e2e.sh
+      - name: Upload full system Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: messaging-service-system-e2e-${{ github.sha }}
+          path: ${{ runner.temp }}/messaging-system-e2e/**
+          if-no-files-found: warn
+          retention-days: 14
+
+  delivery-config:
+    name: Lint messaging-service Helm delivery
+    needs: messaging-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - name: Lint and render messaging-service
+        run: |
+          helm lint deploy/helm/segroup8 \
+            --set messaging.enabled=true \
+            --set-string messaging.image.repository=registry.example/segroup8/messaging \
+            --set-string messaging.image.tag=sha-test \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-test \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-test \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql
+          helm template segroup8 deploy/helm/segroup8 \
+            --namespace segroup8 \
+            --set messaging.enabled=true \
+            --set-string messaging.image.repository=registry.example/segroup8/messaging \
+            --set-string messaging.image.tag=sha-test \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-test \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-test \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
+            --show-only templates/messaging-deployment.yaml \
+            > messaging-rendered.yaml
+          grep -q 'runAsUser: 10001' messaging-rendered.yaml
+          grep -q 'runAsGroup: 10001' messaging-rendered.yaml
+          grep -q 'readOnlyRootFilesystem: true' messaging-rendered.yaml
+          grep -q 'mountPath: /tmp' messaging-rendered.yaml
+
+  acceptance-summary:
+    name: Current revision acceptance summary
+    needs: [messaging-verify, messaging-mysql, messaging-independent-e2e, messaging-system-e2e, delivery-config]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record current-SHA acceptance result
+        run: |
+          jq -n --arg revision "$GITHUB_SHA" \
+            '{revision:$revision,maven:"PASS",mysqlIntegration:"PASS",publicApiCoverage:"PASS",independentServiceE2E:"PASS",fullSystemUseCaseE2E:"PASS",candidateImage:"PASS",helmStatic:"PASS",registryDigest:"PENDING_MAIN",kubernetesRollout:"NOT_RUN_ON_PULL_REQUEST"}' \
+            > messaging-acceptance-summary.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: messaging-acceptance-summary-${{ github.sha }}
+          path: messaging-acceptance-summary.json
+          if-no-files-found: error
+          retention-days: 30
+
+  publish-messaging-image:
+    name: Publish immutable messaging-service image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [messaging-verify, messaging-mysql, messaging-independent-e2e, messaging-system-e2e, delivery-config, acceptance-summary]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: messaging-service-candidate-${{ github.sha }}
+          path: release-candidate
+      - name: Validate shared ACR configuration
+        env:
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+          ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+        run: |
+          test -n "$ACR_REGISTRY"
+          test -n "$ACR_NAMESPACE"
+          test -n "$ACR_USERNAME"
+          test -n "$ACR_PASSWORD"
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      - name: Push the exact tested candidate image without rebuilding
+        shell: bash
+        env:
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+        run: |
+          set -Eeuo pipefail
+          candidate="segroup8/messaging:candidate-${GITHUB_SHA}"
+          target="${ACR_REGISTRY}/${ACR_NAMESPACE}/messaging:sha-${GITHUB_SHA}"
+          docker image load --input release-candidate/messaging-service-image.tar.gz
+          test "$(docker image inspect "$candidate" --format '{{.Id}}')" = "$(jq -r '.candidateImageId' release-candidate/release-metadata.json)"
+          test "$(docker image inspect "$candidate" --format '{{index .Config.Labels "com.segroup8.messaging.jar-sha256"}}')" = "$(jq -r '.jarSha256' release-candidate/release-metadata.json)"
+          docker image tag "$candidate" "$target"
+          docker image push "$target" | tee messaging-image-push.log
+          repo_digest="$(docker image inspect "$target" --format '{{join .RepoDigests "\n"}}' | head -n 1)"
+          test -n "$repo_digest"
+          printf '%s\n' "$repo_digest" > messaging-image-digest.txt
+          jq \
+            --arg publishedImage "$target" \
+            --arg repositoryDigest "$repo_digest" \
+            '. + {publishedImage:$publishedImage,repositoryDigest:$repositoryDigest}' \
+            release-candidate/release-metadata.json > messaging-release-metadata.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: messaging-image-digest-${{ github.sha }}
+          path: |
+            messaging-image-digest.txt
+            messaging-image-push.log
+            messaging-release-metadata.json
+          if-no-files-found: error
+          retention-days: 30
+
+  deploy-messaging:
+    name: Helm atomic deploy messaging-service
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      vars.ENABLE_PRODUCTION_DEPLOY == 'true'
+    needs: publish-messaging-image
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    concurrency:
+      group: segroup8-production-helm
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package Helm chart
+        run: tar -czf "messaging-chart-$GITHUB_SHA.tar.gz" deploy/helm/segroup8
+      - name: Configure SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+      - name: Upload chart and deploy atomically
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
+          REALTIME_ALLOWED_ORIGIN_PATTERNS: ${{ vars.REALTIME_ALLOWED_ORIGIN_PATTERNS }}
+          IDENTITY_SERVICE_URL: ${{ vars.IDENTITY_SERVICE_URL }}
+        run: |
+          set -o pipefail
+          archive="/tmp/messaging-chart-$GITHUB_SHA.tar.gz"
+          scp "messaging-chart-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$archive"
+          ssh \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=10 \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            "bash -s -- '$GITHUB_SHA' '$archive' '$ACR_REGISTRY' '$ACR_NAMESPACE' 'sha-$GITHUB_SHA' '$K8S_NAMESPACE' '$REALTIME_ALLOWED_ORIGIN_PATTERNS' '$IDENTITY_SERVICE_URL'" \
+            < .github/scripts/deploy-messaging-k3s.sh | tee messaging-deployment.log
+      - name: Upload deployment and rollback diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: messaging-deployment-${{ github.sha }}
+          path: messaging-deployment.log
+          if-no-files-found: warn
+          retention-days: 30

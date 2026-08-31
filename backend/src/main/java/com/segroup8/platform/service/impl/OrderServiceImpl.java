@@ -30,6 +30,8 @@ import com.segroup8.platform.entity.SecondhandProduct;
 import com.segroup8.platform.entity.Shop;
 import com.segroup8.platform.entity.Address;
 import com.segroup8.platform.entity.OrderAfterSaleLog;
+import com.segroup8.platform.event.EventTypes;
+import com.segroup8.platform.event.ProducerOutboxService;
 import com.segroup8.platform.mapper.OrderInfoMapper;
 import com.segroup8.platform.mapper.OrderItemMapper;
 import com.segroup8.platform.mapper.ProductMapper;
@@ -50,6 +52,8 @@ import com.segroup8.platform.vo.OrderVO;
 import com.segroup8.platform.vo.PageVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -88,9 +92,14 @@ public class OrderServiceImpl implements OrderService {
     private final OrderAfterSaleLogMapper orderAfterSaleLogMapper;
     private final RealtimePushService realtimePushService;
     private final LogisticsService logisticsService;
-    private final NotificationService notificationService;
     private final EscrowSettlementService escrowSettlementService;
     private final VoucherService voucherService;
+    private final ProducerOutboxService outbox;
+    @Autowired(required = false)
+    private NotificationService notificationService;
+
+    @Value("${app.messaging.event-notifications-enabled:true}")
+    private boolean eventNotificationsEnabled = true;
 
     public OrderServiceImpl(OrderInfoMapper orderInfoMapper, OrderItemMapper orderItemMapper,
             ProductMapper productMapper, ReviewMapper reviewMapper, SecondhandProductMapper secondhandProductMapper,
@@ -100,7 +109,7 @@ public class OrderServiceImpl implements OrderService {
             OrderAfterSaleLogMapper orderAfterSaleLogMapper,
             RealtimePushService realtimePushService, LogisticsService logisticsService,
             EscrowSettlementService escrowSettlementService, VoucherService voucherService,
-            NotificationService notificationService) {
+            ProducerOutboxService outbox) {
         this.orderInfoMapper = orderInfoMapper;
         this.orderItemMapper = orderItemMapper;
         this.productMapper = productMapper;
@@ -114,7 +123,7 @@ public class OrderServiceImpl implements OrderService {
         this.logisticsService = logisticsService;
         this.escrowSettlementService = escrowSettlementService;
         this.voucherService = voucherService;
-        this.notificationService = notificationService;
+        this.outbox = outbox;
     }
 
     @Override
@@ -361,7 +370,8 @@ public class OrderServiceImpl implements OrderService {
         for (PaidOrderPart part : paidOrders) {
             List<Long> sellerUserIds = resolveSellerUserIds(part.items());
             notifySellers(part.order().getId(), sellerUserIds, "新订单已支付",
-                    "订单号：" + part.order().getOrderNo() + "，买家已完成支付，请及时发货。");
+                    "订单号：" + part.order().getOrderNo() + "，买家已完成支付，请及时发货。",
+                    EventTypes.PAYMENT_COMPLETED);
             pushOrderRealtime(part.order().getId(), userId, sellerUserIds,
                     "ORDER_STATUS_UPDATED", "订单已支付，等待卖家发货");
         }
@@ -533,6 +543,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public OrderVO completeMyOrder(Long orderId) {
         Long userId = requireUserId();
         OrderInfo order = orderInfoMapper.selectById(orderId);
@@ -967,6 +978,7 @@ public class OrderServiceImpl implements OrderService {
         return buildOrderVO(order, items);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public OrderVO shipSellerOrder(Long orderId) {
         return shipSellerOrder(orderId, null);
     }
@@ -1546,17 +1558,88 @@ public class OrderServiceImpl implements OrderService {
         if (order == null || order.getBuyerUserId() == null) {
             return;
         }
-        notificationService.createNotification(order.getBuyerUserId(), title, content,
+        publishOrderNotification(order, List.of(order.getBuyerUserId()), title, content,
                 "/order/" + order.getId());
     }
 
     private void notifySellers(Long orderId, List<Long> sellerUserIds, String title, String content) {
+        notifySellers(orderId, sellerUserIds, title, content, null);
+    }
+
+    private void notifySellers(Long orderId, List<Long> sellerUserIds, String title, String content,
+            String forcedEventType) {
         if (sellerUserIds == null || sellerUserIds.isEmpty()) {
             return;
         }
         for (Long sellerUserId : sellerUserIds.stream().filter(Objects::nonNull).distinct().toList()) {
-            notificationService.createNotification(sellerUserId, title, content,
-                    resolveSellerOrderTargetPath(orderId, sellerUserId));
+            OrderInfo order = orderInfoMapper.selectById(orderId);
+            if (order != null) publishOrderNotification(order, List.of(sellerUserId), title, content,
+                    resolveSellerOrderTargetPath(orderId, sellerUserId), forcedEventType);
+        }
+    }
+
+    private void publishOrderNotification(OrderInfo order, List<Long> recipients, String title,
+            String content, String targetPath) {
+        publishOrderNotification(order, recipients, title, content, targetPath, null);
+    }
+
+    private void publishOrderNotification(OrderInfo order, List<Long> recipients, String title,
+            String content, String targetPath, String forcedEventType) {
+        if (!eventNotificationsEnabled) {
+            publishLegacyOrderNotifications(recipients, title, content, targetPath);
+            return;
+        }
+        String eventType;
+        String producer;
+        String result;
+        if (EventTypes.PAYMENT_COMPLETED.equals(forcedEventType)) {
+            eventType = EventTypes.PAYMENT_COMPLETED;
+            producer = "benefits-finance-monolith";
+            result = "PAID";
+        } else if (Integer.valueOf(RefundStatusEnum.APPROVED.getCode()).equals(order.getRefundStatus())) {
+            eventType = EventTypes.REFUND_COMPLETED;
+            producer = "benefits-finance-monolith";
+            result = "REFUNDED";
+        } else {
+            eventType = EventTypes.ORDER_STATUS_CHANGED;
+            producer = "order-monolith";
+            result = String.valueOf(order.getOrderStatus());
+        }
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("recipientUserIds", recipients);
+        payload.put("businessId", String.valueOf(order.getId()));
+        payload.put("orderId", order.getId());
+        payload.put("orderNo", order.getOrderNo() == null ? "[Unavailable order number]" : order.getOrderNo());
+        payload.put("amount", payableAmount(order));
+        payload.put("result", result);
+        payload.put("newStatus", result);
+        payload.put("sourceId", String.valueOf(order.getId()));
+        payload.put("sourceType", "ORDER");
+        payload.put("displayTitle", title);
+        payload.put("displayText", content);
+        payload.put("targetPath", targetPath);
+        payload.put("businessType", "ORDER");
+        payload.put("dedupeKey", eventType + ":" + order.getId() + ":" + recipients.get(0) + ":" + result
+                + ":" + Integer.toHexString((title + "|" + content).hashCode()));
+        outbox.publish(eventType, producer, "ORDER", order.getId(), payload);
+    }
+
+    /**
+     * Compatibility path for the monolith-only Compose/E2E stack. Production
+     * keeps eventNotificationsEnabled=true and uses the producer outbox above.
+     */
+    private void publishLegacyOrderNotifications(List<Long> recipients, String title,
+            String content, String targetPath) {
+        if (notificationService == null || recipients == null) {
+            return;
+        }
+        for (Long recipient : recipients.stream().filter(Objects::nonNull).distinct().toList()) {
+            try {
+                notificationService.createNotification(recipient, title, content, targetPath);
+            } catch (RuntimeException exception) {
+                log.warn("Legacy notification persistence failed for recipient={}: {}",
+                        recipient, exception.getMessage());
+            }
         }
     }
 
