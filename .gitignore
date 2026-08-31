@@ -9,6 +9,8 @@ frontend/test-results/
 !04_tests/platform-e2e/evidence/.gitkeep
 frontend/playwright-report/
 frontend/blob-report/
+# Full Playwright HTML reports, traces, videos and success screenshots belong in
+# GitHub Actions artifacts. Keep compact JSON/XML and selected failure evidence.
 04_tests/**/evidence/**/playwright-report/
 04_tests/**/evidence/**/test-results/
 04_tests/**/evidence/screenshots/

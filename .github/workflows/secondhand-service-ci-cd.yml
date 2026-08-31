@@ -1,0 +1,485 @@
+name: Secondhand Service CI/CD
+
+on:
+  pull_request:
+    paths:
+      - "microservices/secondhand-service/**"
+      - "microservices/security-contract/**"
+      - "microservices/pom.xml"
+      - "frontend/e2e/domain-d/**"
+      - "frontend/e2e/microservices/secondhand-service-api.spec.ts"
+      - "frontend/src/**"
+      - "frontend/vite.config.js"
+      - "frontend/docker/nginx.conf"
+      - "compose*.yml"
+      - "scripts/e2e/stubs/secondhand-order-contract-stub.mjs"
+      - "02_docs/microservices/secondhand-service/**"
+      - "03_devops/microservices/secondhand-service/**"
+      - "04_tests/microservices/secondhand-service/**"
+      - "04_tests/performance/k6/common.js"
+      - "04_tests/performance/k6/secondhand-hpa.k6.js"
+      - "04_tests/performance/HPA实验记录表.md"
+      - "05_management/microservices/secondhand-service/**"
+      - "deploy/helm/segroup8/templates/secondhand-*.yaml"
+      - "deploy/helm/segroup8/values.yaml"
+      - ".github/scripts/deploy-secondhand-k3s.sh"
+      - ".github/workflows/secondhand-service-ci-cd.yml"
+  push:
+    branches: [main]
+    paths:
+      - "microservices/secondhand-service/**"
+      - "microservices/security-contract/**"
+      - "microservices/pom.xml"
+      - "frontend/e2e/domain-d/**"
+      - "frontend/e2e/microservices/secondhand-service-api.spec.ts"
+      - "frontend/src/**"
+      - "frontend/vite.config.js"
+      - "frontend/docker/nginx.conf"
+      - "compose*.yml"
+      - "scripts/e2e/stubs/secondhand-order-contract-stub.mjs"
+      - "02_docs/microservices/secondhand-service/**"
+      - "03_devops/microservices/secondhand-service/**"
+      - "04_tests/microservices/secondhand-service/**"
+      - "04_tests/performance/k6/common.js"
+      - "04_tests/performance/k6/secondhand-hpa.k6.js"
+      - "04_tests/performance/HPA实验记录表.md"
+      - "05_management/microservices/secondhand-service/**"
+      - "deploy/helm/segroup8/templates/secondhand-*.yaml"
+      - "deploy/helm/segroup8/values.yaml"
+      - ".github/scripts/deploy-secondhand-k3s.sh"
+      - ".github/workflows/secondhand-service-ci-cd.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: secondhand-service-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  secondhand-verify:
+    name: secondhand-service API, integration and contract tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Java and Maven cache
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: |
+            microservices/pom.xml
+            microservices/security-contract/pom.xml
+            microservices/secondhand-service/pom.xml
+      - name: Reject forbidden cross-domain persistence
+        shell: bash
+        run: |
+          if grep -R -n -E \
+            'OrderMapper|BalanceMapper|VoucherMapper|NotificationMapper|INSERT[[:space:]]+INTO[[:space:]]+order_info' \
+            microservices/secondhand-service/src/main/java; then
+            echo "secondhand-service contains forbidden cross-domain persistence"
+            exit 1
+          fi
+      - name: Run clean verification with real MySQL integration test
+        run: >-
+          mvn -B --no-transfer-progress
+          -f microservices/pom.xml
+          -pl secondhand-service -am clean verify
+      - name: Build candidate image from the tested JAR
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p release-candidate
+          mapfile -t jars < <(find microservices/secondhand-service/target -maxdepth 1 -type f -name 'secondhand-service-*.jar' ! -name '*.original' -print)
+          test "${#jars[@]}" -eq 1
+          jar_sha="$(sha256sum "${jars[0]}" | cut -d ' ' -f 1)"
+          candidate="segroup8/secondhand:candidate-${GITHUB_SHA}"
+          docker build \
+            --label "org.opencontainers.image.revision=${GITHUB_SHA}" \
+            --label "org.opencontainers.image.source=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --label "com.segroup8.secondhand.jar-sha256=${jar_sha}" \
+            -t "$candidate" \
+            microservices/secondhand-service
+          test "$(docker image inspect "$candidate" --format '{{.Config.User}}')" = "10001:10001"
+          test "$(docker image inspect "$candidate" --format '{{index .Config.Labels "com.segroup8.secondhand.jar-sha256"}}')" = "$jar_sha"
+          image_id="$(docker image inspect "$candidate" --format '{{.Id}}')"
+          printf '%s  %s\n' "$jar_sha" "$(basename "${jars[0]}")" > release-candidate/secondhand-service-jar.sha256
+          jq -n \
+            --arg gitSha "$GITHUB_SHA" \
+            --arg jarSha256 "$jar_sha" \
+            --arg candidateImage "$candidate" \
+            --arg candidateImageId "$image_id" \
+            '{gitSha:$gitSha,jarSha256:$jarSha256,candidateImage:$candidateImage,candidateImageId:$candidateImageId}' \
+            > release-candidate/release-metadata.json
+          docker image save "$candidate" | gzip -1 > release-candidate/secondhand-service-image.tar.gz
+      - name: Upload tested Boot JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: secondhand-service-jar
+          path: |
+            microservices/secondhand-service/target/secondhand-service-*.jar
+            release-candidate/secondhand-service-jar.sha256
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload tested candidate image and trace metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: secondhand-service-candidate-${{ github.sha }}
+          path: release-candidate/**
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload service test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: secondhand-service-test-reports
+          path: |
+            microservices/secondhand-service/target/surefire-reports/**
+            microservices/secondhand-service/target/failsafe-reports/**
+          if-no-files-found: warn
+          retention-days: 14
+
+  secondhand-service-e2e:
+    name: UC16-UC19 independent service API E2E
+    needs: secondhand-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      CI: "true"
+      E2E_BASE_URL: http://127.0.0.1:18080
+      COMPOSE_PROJECT_NAME: segroup8-secondhand-service-e2e
+      SECONDHAND_ACCEPTANCE_IMAGE: segroup8/secondhand:candidate-${{ github.sha }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js and npm cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Download the tested candidate image
+        uses: actions/download-artifact@v4
+        with:
+          name: secondhand-service-candidate-${{ github.sha }}
+          path: release-candidate
+      - name: Load and verify the exact candidate image
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          docker image load --input release-candidate/secondhand-service-image.tar.gz
+          test "$(jq -r '.gitSha' release-candidate/release-metadata.json)" = "$GITHUB_SHA"
+          test "$(docker image inspect "$SECONDHAND_ACCEPTANCE_IMAGE" --format '{{.Id}}')" = "$(jq -r '.candidateImageId' release-candidate/release-metadata.json)"
+          test "$(docker image inspect "$SECONDHAND_ACCEPTANCE_IMAGE" --format '{{index .Config.Labels "com.segroup8.secondhand.jar-sha256"}}')" = "$(jq -r '.jarSha256' release-candidate/release-metadata.json)"
+          cp release-candidate/release-metadata.json "$RUNNER_TEMP/secondhand-candidate-metadata.json"
+      - name: Install Playwright test runner
+        working-directory: frontend
+        run: npm ci
+      - name: Start order contract stub and secondhand-service stack
+        run: |
+          node scripts/e2e/stubs/secondhand-order-contract-stub.mjs >"$RUNNER_TEMP/order-contract-stub.log" 2>&1 &
+          echo $! >"$RUNNER_TEMP/order-contract-stub.pid"
+          docker compose \
+            -f microservices/secondhand-service/compose.acceptance.yml \
+            up -d --no-build
+          for _ in $(seq 1 90); do
+            if curl --fail --silent http://127.0.0.1:18080/actuator/health/readiness | grep -q '"status":"UP"'; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose -f microservices/secondhand-service/compose.acceptance.yml ps
+          docker compose -f microservices/secondhand-service/compose.acceptance.yml logs --no-color
+          exit 1
+      - name: Run UC16-UC19 through the independent service image
+        working-directory: frontend
+        env:
+          E2E_OUTPUT_DIR: ${{ runner.temp }}/secondhand-service-e2e
+        run: npx playwright test e2e/microservices/secondhand-service-api.spec.ts --workers=1
+      - name: Collect independent service diagnostics
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/secondhand-service-e2e/logs"
+          docker compose -f microservices/secondhand-service/compose.acceptance.yml ps --all \
+            >"$RUNNER_TEMP/secondhand-service-e2e/logs/compose-ps.txt" 2>&1 || true
+          docker compose -f microservices/secondhand-service/compose.acceptance.yml logs --no-color --timestamps \
+            >"$RUNNER_TEMP/secondhand-service-e2e/logs/compose.log" 2>&1 || true
+          cp "$RUNNER_TEMP/order-contract-stub.log" \
+            "$RUNNER_TEMP/secondhand-service-e2e/logs/order-contract-stub.log" || true
+          cp "$RUNNER_TEMP/secondhand-candidate-metadata.json" \
+            "$RUNNER_TEMP/secondhand-service-e2e/release-metadata.json" || true
+          curl --silent --show-error http://127.0.0.1:18080/v3/api-docs \
+            >"$RUNNER_TEMP/secondhand-service-e2e/runtime-openapi.json" || true
+      - name: Stop independent service stack
+        if: always()
+        run: |
+          docker compose -f microservices/secondhand-service/compose.acceptance.yml down -v --remove-orphans || true
+          if test -f "$RUNNER_TEMP/order-contract-stub.pid"; then
+            kill "$(cat "$RUNNER_TEMP/order-contract-stub.pid")" || true
+          fi
+      - name: Upload independent service E2E evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: secondhand-service-api-e2e-${{ github.sha }}
+          path: ${{ runner.temp }}/secondhand-service-e2e/**
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+
+  domain-d-e2e:
+    name: UC16-UC20 Compose Playwright regression
+    needs: secondhand-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CI: "true"
+      COMPOSE_FILE: compose.yml:compose.e2e.yml
+      COMPOSE_PROJECT_NAME: segroup8-secondhand-e2e
+      E2E_USERNAME: user
+      E2E_PASSWORD: user123
+      E2E_ROLE: USER
+      E2E_ADMIN_USERNAME: admin
+      E2E_ADMIN_PASSWORD: admin123
+      E2E_OFFICIAL_SELLER_USERNAME: seller
+      E2E_OFFICIAL_SELLER_PASSWORD: seller123
+      E2E_BUYER_USERNAME: user
+      E2E_BUYER_PASSWORD: user123
+      E2E_THIRD_PARTY_USERNAME: third
+      E2E_THIRD_PARTY_PASSWORD: third123
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Java and Maven cache
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+      - name: Set up Node.js and npm cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Build runtime artifacts for Compose
+        run: |
+          mvn -B --no-transfer-progress -f backend/pom.xml -DskipTests package
+          cp backend/target/platform-backend-*.jar backend/target/app.jar
+          cd frontend
+          npm ci
+          npm run build:real
+      - name: Run the shared full-stack smoke and Domain D specs
+        env:
+          E2E_EVIDENCE_ROOT: ${{ runner.temp }}/secondhand-domain-d-evidence
+          E2E_OUTPUT_DIR: ${{ runner.temp }}/secondhand-domain-d-evidence/playwright
+        run: |
+          chmod +x scripts/e2e/run-compose-e2e.sh
+          scripts/e2e/run-compose-e2e.sh \
+            --smoke-first e2e/smoke -- e2e/domain-d --workers=1
+      - name: Upload browser, Compose and service logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: secondhand-service-e2e-evidence
+          path: ${{ runner.temp }}/secondhand-domain-d-evidence/**
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 14
+
+  delivery-config:
+    name: Lint secondhand-service Helm delivery
+    needs: secondhand-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+      - name: Lint and render secondhand-service
+        run: |
+          helm lint deploy/helm/segroup8 \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-test \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-test \
+            --set secondhand.enabled=true \
+            --set secondhand.autoscaling.enabled=true \
+            --set-string secondhand.image.repository=registry.example/segroup8/secondhand \
+            --set-string secondhand.image.tag=sha-test \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql
+          helm template segroup8 deploy/helm/segroup8 \
+            --namespace segroup8 \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-test \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-test \
+            --set secondhand.enabled=true \
+            --set secondhand.autoscaling.enabled=true \
+            --set-string secondhand.image.repository=registry.example/segroup8/secondhand \
+            --set-string secondhand.image.tag=sha-test \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
+            >/dev/null
+          helm template segroup8 deploy/helm/segroup8 \
+            --namespace segroup8 \
+            --show-only templates/secondhand-hpa.yaml \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-test \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-test \
+            --set secondhand.enabled=true \
+            --set secondhand.autoscaling.enabled=true \
+            --set-string secondhand.image.repository=registry.example/segroup8/secondhand \
+            --set-string secondhand.image.tag=sha-test \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
+            > /tmp/secondhand-hpa.yaml
+          helm template segroup8 deploy/helm/segroup8 \
+            --namespace segroup8 \
+            --show-only templates/secondhand-deployment.yaml \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-test \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-test \
+            --set secondhand.enabled=true \
+            --set secondhand.autoscaling.enabled=true \
+            --set-string secondhand.image.repository=registry.example/segroup8/secondhand \
+            --set-string secondhand.image.tag=sha-test \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
+            > /tmp/secondhand-deployment.yaml
+          grep -q "kind: HorizontalPodAutoscaler" /tmp/secondhand-hpa.yaml
+          grep -q "minReplicas: 1" /tmp/secondhand-hpa.yaml
+          grep -q "maxReplicas: 4" /tmp/secondhand-hpa.yaml
+          grep -q "averageUtilization: 70" /tmp/secondhand-hpa.yaml
+          grep -q 'runAsUser: 10001' /tmp/secondhand-deployment.yaml
+          grep -q 'runAsGroup: 10001' /tmp/secondhand-deployment.yaml
+          grep -q 'readOnlyRootFilesystem: true' /tmp/secondhand-deployment.yaml
+          grep -q 'mountPath: /tmp' /tmp/secondhand-deployment.yaml
+          if grep -q '^  replicas:' /tmp/secondhand-deployment.yaml; then
+            echo "secondhand Deployment must not pin replicas while HPA is enabled"
+            exit 1
+          fi
+
+  publish-secondhand-image:
+    name: Publish immutable secondhand-service image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [secondhand-verify, secondhand-service-e2e, domain-d-e2e, delivery-config]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Download the E2E-tested candidate image
+        uses: actions/download-artifact@v4
+        with:
+          name: secondhand-service-candidate-${{ github.sha }}
+          path: release-candidate
+      - name: Validate shared ACR configuration
+        env:
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+          ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+        run: |
+          test -n "$ACR_REGISTRY"
+          test -n "$ACR_NAMESPACE"
+          test -n "$ACR_USERNAME"
+          test -n "$ACR_PASSWORD"
+      - name: Log in to ACR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      - name: Push the exact candidate image without rebuilding
+        shell: bash
+        env:
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+        run: |
+          set -Eeuo pipefail
+          candidate="segroup8/secondhand:candidate-${GITHUB_SHA}"
+          target="${ACR_REGISTRY}/${ACR_NAMESPACE}/secondhand:sha-${GITHUB_SHA}"
+          docker image load --input release-candidate/secondhand-service-image.tar.gz
+          test "$(docker image inspect "$candidate" --format '{{.Id}}')" = "$(jq -r '.candidateImageId' release-candidate/release-metadata.json)"
+          test "$(docker image inspect "$candidate" --format '{{index .Config.Labels "com.segroup8.secondhand.jar-sha256"}}')" = "$(jq -r '.jarSha256' release-candidate/release-metadata.json)"
+          docker image tag "$candidate" "$target"
+          docker image push "$target" | tee secondhand-image-push.log
+          repo_digest="$(docker image inspect "$target" --format '{{join .RepoDigests "\n"}}' | head -n 1)"
+          test -n "$repo_digest"
+          printf '%s\n' "$repo_digest" > secondhand-image-digest.txt
+          jq \
+            --arg publishedImage "$target" \
+            --arg repositoryDigest "$repo_digest" \
+            '. + {publishedImage:$publishedImage,repositoryDigest:$repositoryDigest}' \
+            release-candidate/release-metadata.json > secondhand-release-metadata.json
+      - name: Upload immutable image digest and release metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: secondhand-image-digest-${{ github.sha }}
+          path: |
+            secondhand-image-digest.txt
+            secondhand-release-metadata.json
+            secondhand-image-push.log
+          if-no-files-found: error
+          retention-days: 30
+
+  deploy-secondhand:
+    name: Helm atomic deploy secondhand-service
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      vars.ENABLE_PRODUCTION_DEPLOY == 'true'
+    needs: publish-secondhand-image
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    concurrency:
+      group: segroup8-production-helm
+      cancel-in-progress: false
+    steps:
+      - name: Check out deployment files
+        uses: actions/checkout@v4
+      - name: Package Helm chart
+        run: tar -czf "secondhand-chart-$GITHUB_SHA.tar.gz" deploy/helm/segroup8
+      - name: Configure SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+      - name: Upload chart and deploy atomically
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
+        run: |
+          set -o pipefail
+          archive="/tmp/secondhand-chart-$GITHUB_SHA.tar.gz"
+          scp "secondhand-chart-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$archive"
+          ssh \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=10 \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            "bash -s -- '$GITHUB_SHA' '$archive' '$ACR_REGISTRY' '$ACR_NAMESPACE' 'sha-$GITHUB_SHA' '$K8S_NAMESPACE'" \
+            < .github/scripts/deploy-secondhand-k3s.sh | tee secondhand-deployment.log
+      - name: Upload deployment and rollback diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: secondhand-deployment-${{ github.sha }}
+          path: secondhand-deployment.log
+          if-no-files-found: warn
+          retention-days: 30

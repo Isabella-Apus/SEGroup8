@@ -1,0 +1,41 @@
+{{- if and .Values.secondhand.enabled .Values.secondhand.autoscaling.enabled }}
+{{- if lt (int .Values.secondhand.autoscaling.maxReplicas) (int .Values.secondhand.autoscaling.minReplicas) }}
+{{- fail "secondhand.autoscaling.maxReplicas must be greater than or equal to minReplicas" }}
+{{- end }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: segroup8-secondhand
+  labels:
+    {{- include "segroup8.labels" . | nindent 4 }}
+    app.kubernetes.io/component: secondhand-service
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: segroup8-secondhand
+  minReplicas: {{ .Values.secondhand.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.secondhand.autoscaling.maxReplicas }}
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: {{ .Values.secondhand.autoscaling.behavior.scaleUp.stabilizationWindowSeconds }}
+      selectPolicy: Max
+      policies:
+        - type: Pods
+          value: {{ .Values.secondhand.autoscaling.behavior.scaleUp.pods }}
+          periodSeconds: {{ .Values.secondhand.autoscaling.behavior.scaleUp.periodSeconds }}
+    scaleDown:
+      stabilizationWindowSeconds: {{ .Values.secondhand.autoscaling.behavior.scaleDown.stabilizationWindowSeconds }}
+      selectPolicy: Max
+      policies:
+        - type: Percent
+          value: {{ .Values.secondhand.autoscaling.behavior.scaleDown.percent }}
+          periodSeconds: {{ .Values.secondhand.autoscaling.behavior.scaleDown.periodSeconds }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.secondhand.autoscaling.targetCPUUtilizationPercentage }}
+{{- end }}

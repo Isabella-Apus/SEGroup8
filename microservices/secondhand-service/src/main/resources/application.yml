@@ -1,0 +1,73 @@
+server:
+  port: ${SERVER_PORT:8080}
+  shutdown: graceful
+
+spring:
+  application:
+    name: secondhand-service
+  datasource:
+    url: ${DB_URL:jdbc:mysql://mysql:3306/secondhand_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai}
+    username: ${DB_USERNAME:secondhand_app}
+    password: ${DB_PASSWORD:secondhand_app}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    validate-migration-naming: true
+  lifecycle:
+    timeout-per-shutdown-phase: 20s
+
+security:
+  jwt:
+    secret: ${JWT_SECRET:change-this-development-secret-at-least-32-bytes}
+  internal-token: ${INTERNAL_SERVICE_TOKEN:local-internal-service-token}
+
+clients:
+  messaging:
+    base-url: ${MESSAGING_SERVICE_URL:http://messaging:8084}
+    publish-delay-ms: ${OUTBOX_PUBLISH_DELAY_MS:2000}
+  identity:
+    base-url: ${IDENTITY_SERVICE_URL:http://identity-governance-service:8091}
+    connect-timeout: ${IDENTITY_CONNECT_TIMEOUT:1s}
+    read-timeout: ${IDENTITY_READ_TIMEOUT:2s}
+  order:
+    base-url: ${ORDER_SERVICE_URL:http://segroup8-order:8085}
+    connect-timeout: ${ORDER_CONNECT_TIMEOUT:1s}
+    read-timeout: ${ORDER_READ_TIMEOUT:2s}
+    max-attempts: ${ORDER_MAX_ATTEMPTS:3}
+
+secondhand:
+  recovery:
+    delay-ms: ${TRADE_RECOVERY_DELAY_MS:5000}
+    batch-size: ${TRADE_RECOVERY_BATCH_SIZE:20}
+  auction:
+    settlement-delay-ms: ${AUCTION_SETTLEMENT_DELAY_MS:5000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when_authorized
+  health:
+    readinessstate:
+      enabled: true
+    livenessstate:
+      enabled: true
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: secondhand-service
+    version: ${APP_VERSION:dev}
+    commit: ${APP_COMMIT:unknown}
+    build-time: ${APP_BUILD_TIME:unknown}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html

@@ -91,6 +91,52 @@ order:
       cpu: 500m
       memory: 768Mi
 
+secondhand:
+  enabled: false
+  replicaCount: 1
+  image:
+    repository: ""
+    tag: ""
+    pullPolicy: IfNotPresent
+  secretName: segroup8-secondhand-secret
+  service:
+    port: 8080
+  deployment:
+    version: ""
+    commit: ""
+    buildTime: ""
+  orderServiceUrl: http://segroup8-order:8085
+  identityServiceUrl: http://identity-governance-service:8091
+  messagingServiceUrl: http://messaging:8084
+  catalogShopServiceUrl: http://segroup8-catalog-shop:8080
+  orderConnectTimeout: 1s
+  orderReadTimeout: 2s
+  orderMaxAttempts: 3
+  tradeRecoveryDelayMs: 5000
+  tradeRecoveryBatchSize: 20
+  auctionSettlementDelayMs: 5000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 768Mi
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 70
+    behavior:
+      scaleUp:
+        stabilizationWindowSeconds: 0
+        pods: 2
+        periodSeconds: 15
+      scaleDown:
+        stabilizationWindowSeconds: 60
+        percent: 50
+        periodSeconds: 15
+
 mysql:
   image:
     repository: mysql

@@ -1,0 +1,58 @@
+Name:                   segroup8-secondhand
+Namespace:              segroup8-rollback-20260830-233919
+CreationTimestamp:      Sun, 30 Aug 2026 23:41:37 +0800
+Labels:                 app.kubernetes.io/component=secondhand-service
+                        app.kubernetes.io/instance=segroup8-rollback
+                        app.kubernetes.io/managed-by=Helm
+                        app.kubernetes.io/name=segroup8
+                        helm.sh/chart=segroup8-0.1.0
+Annotations:            deployment.kubernetes.io/revision: 3
+                        meta.helm.sh/release-name: segroup8-rollback
+                        meta.helm.sh/release-namespace: segroup8-rollback-20260830-233919
+Selector:               app.kubernetes.io/component=secondhand-service,app.kubernetes.io/instance=segroup8-rollback
+Replicas:               1 desired | 1 updated | 1 total | 1 available | 0 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  0 max unavailable, 1 max surge
+Pod Template:
+  Labels:  app.kubernetes.io/component=secondhand-service
+           app.kubernetes.io/instance=segroup8-rollback
+  Containers:
+   secondhand-service:
+    Image:      segroup8/secondhand:rollback-20260830-232712
+    Port:       8080/TCP (http)
+    Host Port:  0/TCP (http)
+    Limits:
+      cpu:     500m
+      memory:  768Mi
+    Requests:
+      cpu:      100m
+      memory:   256Mi
+    Liveness:   http-get http://:http/actuator/health/liveness delay=0s timeout=3s period=10s #success=1 #failure=3
+    Readiness:  http-get http://:http/actuator/health/readiness delay=0s timeout=3s period=5s #success=1 #failure=3
+    Startup:    http-get http://:http/actuator/health/liveness delay=0s timeout=3s period=5s #success=1 #failure=24
+    Environment Variables from:
+      segroup8-secondhand-secret  Secret     Optional: false
+      segroup8-secondhand-config  ConfigMap  Optional: false
+    Environment:
+      APP_VERSION:     rollback-baseline
+      APP_COMMIT:      137f2293edd24eb07ad6a7ec229082b1f4940d0d
+      APP_BUILD_TIME:  2026-08-30T23:39:19+08:00
+      TZ:              Asia/Shanghai
+    Mounts:            <none>
+  Volumes:             <none>
+  Node-Selectors:      <none>
+  Tolerations:         <none>
+Conditions:
+  Type           Status  Reason
+  ----           ------  ------
+  Available      True    MinimumReplicasAvailable
+  Progressing    True    NewReplicaSetAvailable
+OldReplicaSets:  segroup8-secondhand-84c88b8c6c (0/0 replicas created)
+NewReplicaSet:   segroup8-secondhand-bcdd8766 (1/1 replicas created)
+Events:
+  Type    Reason             Age    From                   Message
+  ----    ------             ----   ----                   -------
+  Normal  ScalingReplicaSet  4m16s  deployment-controller  Scaled up replica set segroup8-secondhand-bcdd8766 from 0 to 1
+  Normal  ScalingReplicaSet  2m6s   deployment-controller  Scaled up replica set segroup8-secondhand-84c88b8c6c from 0 to 1
+  Normal  ScalingReplicaSet  35s    deployment-controller  Scaled down replica set segroup8-secondhand-84c88b8c6c from 1 to 0

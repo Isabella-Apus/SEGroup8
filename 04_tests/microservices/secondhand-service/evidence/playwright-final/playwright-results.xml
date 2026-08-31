@@ -1,0 +1,65 @@
+<testsuites id="" name="" tests="5" failures="0" skipped="0" errors="0" time="89.05984600000001">
+<testsuite name="domain-d\uc16-product-management.spec.ts" timestamp="2026-08-29T09:28:10.583Z" hostname="" tests="1" failures="0" skipped="0" time="21.015" errors="0">
+<testcase name="@DOMAIN_D @UC16 secondhand product management › persists publish, edit, shelf changes and delete while rejecting a non-owner" classname="domain-d\uc16-product-management.spec.ts" time="21.015">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-d-uc16-product-mana-296c7-while-rejecting-a-non-owner\attachments\uc16-product-persisted-off-shelf-bc788a07eb6b736cc7b191e7e203bc9bc896a88b.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc16-product-mana-296c7-while-rejecting-a-non-owner\attachments\uc16-product-deleted-after-refresh-557612d5de8457237eb31844c4d508decb4a73d2.png]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="domain-d\uc17-direct-purchase.spec.ts" timestamp="2026-08-29T09:28:10.583Z" hostname="" tests="1" failures="0" skipped="0" time="9.349" errors="0">
+<testcase name="@DOMAIN_D @UC17 direct secondhand purchase › creates one pending order through the real UI and rejects a repeated purchase" classname="domain-d\uc17-direct-purchase.spec.ts" time="9.349">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-d-uc17-direct-purch-71cb6-rejects-a-repeated-purchase\attachments\uc17-pending-order-and-sold-product-4dfd9075fd8d098b50c0c9c5e5ff3647cf41368b.png]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="domain-d\uc18-bargain.spec.ts" timestamp="2026-08-29T09:28:10.583Z" hostname="" tests="1" failures="0" skipped="0" time="15.596" errors="0">
+<testcase name="@DOMAIN_D @UC18 secondhand bargain › buyer applies, seller confirms in chat, and buyer receives a pending-payment order" classname="domain-d\uc18-bargain.spec.ts" time="15.596">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\attachments\uc18-buyer-application-pending-89831bd9d01f79e1c368ff34c7a89bb5ecbc17cb.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\attachments\uc18-seller-confirmed-order-57c8913dfb64879ea61451d33864faa666bb049c.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\attachments\uc18-buyer-confirmed-pending-payment-dfcdbde0616f5d1c3638e895ada13f28b97c6800.png]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="domain-d\uc19-auction.spec.ts" timestamp="2026-08-29T09:28:10.583Z" hostname="" tests="1" failures="0" skipped="0" time="23.197" errors="0">
+<testcase name="@DOMAIN_D @UC19 secondhand auction › seller creates an auction, two buyers bid, and the winner receives one settled order" classname="domain-d\uc19-auction.spec.ts" time="23.197">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-d-uc19-auction--DOM-63259--receives-one-settled-order\attachments\uc19-seller-created-auction-50a597398e7eacc8644758d718d369e6dcf34e57.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc19-auction--DOM-63259--receives-one-settled-order\attachments\uc19-bidder-b-leading-413844dcd621f9815e0416b5bac8153844527efc.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc19-auction--DOM-63259--receives-one-settled-order\attachments\uc19-seller-monitor-two-bids-2cde21cccb411f163daf2840d76976dff1b58be7.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc19-auction--DOM-63259--receives-one-settled-order\attachments\uc19-winner-paid-pending-shipment-order-8bd612beaf7987f937a71a7d19ee971b97aa7df8.png]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="domain-d\uc20-fulfillment.spec.ts" timestamp="2026-08-29T09:28:10.583Z" hostname="" tests="1" failures="0" skipped="0" time="16.566" errors="0">
+<testcase name="@DOMAIN_D @UC20 secondhand fulfillment › seller ships, buyer sees logistics and confirms receipt with one settlement" classname="domain-d\uc20-fulfillment.spec.ts" time="16.566">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-d-uc20-fulfillment--ca433-receipt-with-one-settlement\attachments\uc20-seller-shipped-order-53691c881bcea8c990292f198a9012dcf2b9d639.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc20-fulfillment--ca433-receipt-with-one-settlement\attachments\uc20-buyer-logistics-visible-ee17c1afbb3a16d284cf98079837ceb9372c2aea.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc20-fulfillment--ca433-receipt-with-one-settlement\attachments\uc20-buyer-pending-review-8a6c8ad2d79d7c2f8008837ec5722e65100a8a35.png]]
+
+[[ATTACHMENT|test-results\domain-d-uc20-fulfillment--ca433-receipt-with-one-settlement\attachments\uc20-seller-settled-once-498cc82e85fc2985572804bf1963c8053be24e75.png]]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

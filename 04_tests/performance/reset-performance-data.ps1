@@ -38,13 +38,25 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 $verifySql = @"
-SELECT 'users' AS item, COUNT(*) AS count FROM user WHERE id IN (950001,950002,950003)
+SELECT 'users' AS item, COUNT(*) AS count FROM user WHERE id BETWEEN 950001 AND 950021
 UNION ALL SELECT 'new_products', COUNT(*) FROM product WHERE id=980001
-UNION ALL SELECT 'secondhand_products', COUNT(*) FROM secondhand_product WHERE id BETWEEN 990001 AND 990042
-UNION ALL SELECT 'ongoing_auctions', COUNT(*) FROM product_auction WHERE id BETWEEN 999001 AND 999002 AND status='ONGOING';
+UNION ALL SELECT 'secondhand_products', COUNT(*) FROM secondhand_product WHERE id BETWEEN 990001 AND 990050
+UNION ALL SELECT 'ongoing_auctions', COUNT(*) FROM product_auction WHERE id BETWEEN 999001 AND 999010 AND status='ONGOING';
 "@
 
-& docker @composeArgs exec -T $DatabaseService mysql -N -B "-u$DatabaseUser" "-p$DatabasePassword" $DatabaseName -e $verifySql
+$verification = & docker @composeArgs exec -T $DatabaseService mysql -N -B "-u$DatabaseUser" "-p$DatabasePassword" $DatabaseName -e $verifySql
 if ($LASTEXITCODE -ne 0) {
     throw "Performance data verification failed with exit code $LASTEXITCODE"
+}
+$verification | Write-Host
+$counts = @{}
+foreach ($line in $verification) {
+    $parts = $line -split "\s+"
+    if ($parts.Count -ge 2) {
+        $counts[$parts[0]] = [int]$parts[1]
+    }
+}
+if ($counts["users"] -ne 21 -or $counts["new_products"] -ne 1 -or
+    $counts["secondhand_products"] -ne 50 -or $counts["ongoing_auctions"] -ne 10) {
+    throw "Unexpected performance seed counts: $($verification -join '; ')"
 }

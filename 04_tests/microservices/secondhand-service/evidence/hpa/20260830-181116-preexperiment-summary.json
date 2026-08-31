@@ -1,0 +1,32 @@
+﻿{
+    "executedAt":  "2026-08-30T18:17:12.1159908+08:00",
+    "status":  "PASS",
+    "clusterContext":  "docker-desktop",
+    "kubernetesVersion":  "v1.34.3",
+    "metricsServer":  "v0.9.0",
+    "namespace":  "segroup8-hpa-20260830-181116",
+    "serviceImage":  "segroup8/secondhand:hpa-local",
+    "gitCommit":  "4f99ea3aa8bbaff01c5e125af66888bf90c9fcb2",
+    "hpa":  {
+                "minReplicas":  1,
+                "maxReplicas":  3,
+                "targetCpuUtilizationPercentage":  70,
+                "initialReplicas":  1,
+                "initialReadyReplicas":  1,
+                "peakReplicas":  3,
+                "peakReadyReplicas":  3,
+                "finalReplicas":  1,
+                "finalReadyReplicas":  1
+            },
+    "load":  {
+                 "vus":  15,
+                 "duration":  "150s",
+                 "summary":  "20260830-181116-k6-summary.json"
+             },
+    "evidence":  [
+                     "20260830-181116-hpa-snapshots.csv",
+                     "20260830-181116-kubectl-resources.log",
+                     "20260830-181116-k6-console.log",
+                     "20260830-181116-k6-error.log"
+                 ]
+}

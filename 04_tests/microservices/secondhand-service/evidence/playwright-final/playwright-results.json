@@ -1,0 +1,428 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\frontend\\playwright.config.ts",
+    "rootDir": "C:/Users/Chazey/Desktop/SEGroup8-main/frontend/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\playwright-results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\playwright-results.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/Chazey/Desktop/SEGroup8-main/04_tests/microservices/secondhand-service/evidence/playwright-final/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/Chazey/Desktop/SEGroup8-main/frontend/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "domain-d\\uc16-product-management.spec.ts",
+      "file": "domain-d/uc16-product-management.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_D @UC16 secondhand product management",
+          "file": "domain-d/uc16-product-management.spec.ts",
+          "line": 9,
+          "column": 6,
+          "specs": [
+            {
+              "title": "persists publish, edit, shelf changes and delete while rejecting a non-owner",
+              "ok": true,
+              "tags": [
+                "DOMAIN_D",
+                "UC16"
+              ],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 21015,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-29T09:28:12.442Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "uc16-product-persisted-off-shelf",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\test-results\\domain-d-uc16-product-mana-296c7-while-rejecting-a-non-owner\\attachments\\uc16-product-persisted-off-shelf-bc788a07eb6b736cc7b191e7e203bc9bc896a88b.png"
+                        },
+                        {
+                          "name": "uc16-product-deleted-after-refresh",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\test-results\\domain-d-uc16-product-mana-296c7-while-rejecting-a-non-owner\\attachments\\uc16-product-deleted-after-refresh-557612d5de8457237eb31844c4d508decb4a73d2.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "041f0d6048b09c88cdba-b6ac82320584de51ae04",
+              "file": "domain-d/uc16-product-management.spec.ts",
+              "line": 13,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "domain-d\\uc17-direct-purchase.spec.ts",
+      "file": "domain-d/uc17-direct-purchase.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_D @UC17 direct secondhand purchase",
+          "file": "domain-d/uc17-direct-purchase.spec.ts",
+          "line": 7,
+          "column": 6,
+          "specs": [
+            {
+              "title": "creates one pending order through the real UI and rejects a repeated purchase",
+              "ok": true,
+              "tags": [
+                "DOMAIN_D",
+                "UC17"
+              ],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9349,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-29T09:28:33.870Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "uc17-pending-order-and-sold-product",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\test-results\\domain-d-uc17-direct-purch-71cb6-rejects-a-repeated-purchase\\attachments\\uc17-pending-order-and-sold-product-4dfd9075fd8d098b50c0c9c5e5ff3647cf41368b.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "2190b3b8c22cdbb75a06-97d3ccf3232e2d3ffc5a",
+              "file": "domain-d/uc17-direct-purchase.spec.ts",
+              "line": 11,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "domain-d\\uc18-bargain.spec.ts",
+      "file": "domain-d/uc18-bargain.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_D @UC18 secondhand bargain",
+          "file": "domain-d/uc18-bargain.spec.ts",
+          "line": 7,
+          "column": 6,
+          "specs": [
+            {
+              "title": "buyer applies, seller confirms in chat, and buyer receives a pending-payment order",
+              "ok": true,
+              "tags": [
+                "DOMAIN_D",
+                "UC18"
+              ],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 15596,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-29T09:28:43.345Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "uc18-buyer-application-pending",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\test-results\\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\\attachments\\uc18-buyer-application-pending-89831bd9d01f79e1c368ff34c7a89bb5ecbc17cb.png"
+                        },
+                        {
+                          "name": "uc18-seller-confirmed-order",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\test-results\\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\\attachments\\uc18-seller-confirmed-order-57c8913dfb64879ea61451d33864faa666bb049c.png"
+                        },
+                        {
+                          "name": "uc18-buyer-confirmed-pending-payment",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\test-results\\domain-d-uc18-bargain--DOM-8fa04-ves-a-pending-payment-order\\attachments\\uc18-buyer-confirmed-pending-payment-dfcdbde0616f5d1c3638e895ada13f28b97c6800.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "aaa381ba0837b580a3f6-acc9e23de3e00946eea3",
+              "file": "domain-d/uc18-bargain.spec.ts",
+              "line": 11,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "domain-d\\uc19-auction.spec.ts",
+      "file": "domain-d/uc19-auction.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_D @UC19 secondhand auction",
+          "file": "domain-d/uc19-auction.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
+            {
+              "title": "seller creates an auction, two buyers bid, and the winner receives one settled order",
+              "ok": true,
+              "tags": [
+                "DOMAIN_D",
+                "UC19"
+              ],
+              "tests": [
+                {
+                  "timeout": 150000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 23197,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-29T09:28:58.996Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "uc19-seller-created-auction",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\test-results\\domain-d-uc19-auction--DOM-63259--receives-one-settled-order\\attachments\\uc19-seller-created-auction-50a597398e7eacc8644758d718d369e6dcf34e57.png"
+                        },
+                        {
+                          "name": "uc19-bidder-b-leading",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\test-results\\domain-d-uc19-auction--DOM-63259--receives-one-settled-order\\attachments\\uc19-bidder-b-leading-413844dcd621f9815e0416b5bac8153844527efc.png"
+                        },
+                        {
+                          "name": "uc19-seller-monitor-two-bids",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\test-results\\domain-d-uc19-auction--DOM-63259--receives-one-settled-order\\attachments\\uc19-seller-monitor-two-bids-2cde21cccb411f163daf2840d76976dff1b58be7.png"
+                        },
+                        {
+                          "name": "uc19-winner-paid-pending-shipment-order",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\test-results\\domain-d-uc19-auction--DOM-63259--receives-one-settled-order\\attachments\\uc19-winner-paid-pending-shipment-order-8bd612beaf7987f937a71a7d19ee971b97aa7df8.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5e47e62cb99a63beb269-3afa07a6168afc7116dd",
+              "file": "domain-d/uc19-auction.spec.ts",
+              "line": 9,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "domain-d\\uc20-fulfillment.spec.ts",
+      "file": "domain-d/uc20-fulfillment.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_D @UC20 secondhand fulfillment",
+          "file": "domain-d/uc20-fulfillment.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "seller ships, buyer sees logistics and confirms receipt with one settlement",
+              "ok": true,
+              "tags": [
+                "DOMAIN_D",
+                "UC20"
+              ],
+              "tests": [
+                {
+                  "timeout": 150000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 16566,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-29T09:29:22.245Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "uc20-seller-shipped-order",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\test-results\\domain-d-uc20-fulfillment--ca433-receipt-with-one-settlement\\attachments\\uc20-seller-shipped-order-53691c881bcea8c990292f198a9012dcf2b9d639.png"
+                        },
+                        {
+                          "name": "uc20-buyer-logistics-visible",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\test-results\\domain-d-uc20-fulfillment--ca433-receipt-with-one-settlement\\attachments\\uc20-buyer-logistics-visible-ee17c1afbb3a16d284cf98079837ceb9372c2aea.png"
+                        },
+                        {
+                          "name": "uc20-buyer-pending-review",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\test-results\\domain-d-uc20-fulfillment--ca433-receipt-with-one-settlement\\attachments\\uc20-buyer-pending-review-8a6c8ad2d79d7c2f8008837ec5722e65100a8a35.png"
+                        },
+                        {
+                          "name": "uc20-seller-settled-once",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Chazey\\Desktop\\SEGroup8-main\\04_tests\\microservices\\secondhand-service\\evidence\\playwright-final\\test-results\\domain-d-uc20-fulfillment--ca433-receipt-with-one-settlement\\attachments\\uc20-seller-settled-once-498cc82e85fc2985572804bf1963c8053be24e75.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "14cc25e26bf716c75406-ebf427c55f964a3b34b3",
+              "file": "domain-d/uc20-fulfillment.spec.ts",
+              "line": 10,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-08-29T09:28:10.362Z",
+    "duration": 89059.846,
+    "expected": 5,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

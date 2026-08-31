@@ -1,0 +1,18 @@
+2026-08-29T21:37:33+08:00 MS-04 local validation
+baseline=bb72290cff96c78ab189468b82db1f8ba3cd9323
+branch=feature/ms-secondhand
+maven.security-contract=5 passed, 0 failed
+maven.secondhand-service=16 passed, 0 failed
+mysql.version=8.4.6
+mysql.owned-tables=7
+mysql.cross-database-insert=REJECTED_AS_EXPECTED
+playwright.domain-d.final=5 passed, 0 failed, 89059.846ms
+docker.image=segroup8/secondhand:local
+docker.image-id=sha256:ea41b838b5a395aba7ff36ecd4d3a953cdd47a93b154c24fb9662dab3117c6e9
+docker.user=appuser
+docker.uid=10001
+docker.app-jar=OK
+helm.lint=PASS
+helm.template=PASS
+github-actions=PENDING_PR_RUN
+kubernetes-rollout=PENDING_CLUSTER

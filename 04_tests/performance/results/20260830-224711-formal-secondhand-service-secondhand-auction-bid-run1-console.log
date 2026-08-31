@@ -1,0 +1,52 @@
+
+
+  █ THRESHOLDS
+
+    business_guarded
+    ✓ 'rate<0.01' rate=0.00%
+
+    business_success
+    ✓ 'rate>0.99' rate=100.00%
+
+    checks
+    ✓ 'rate>0.99' rate=100.00%
+
+    http_req_duration
+    ✓ 'p(95)<1500' p(95)=179.08ms
+
+    http_req_failed
+    ✓ 'rate<0.05' rate=0.00%
+
+    server_error
+    ✓ 'rate==0' rate=0.00%
+
+
+  █ TOTAL RESULTS
+
+    checks_total.......: 2210    73.153986/s
+    checks_succeeded...: 100.00% 2210 out of 2210
+    checks_failed......: 0.00%   0 out of 2210
+
+    ✓ auction bid: no server error
+    ✓ auction bid: business success
+
+    CUSTOM
+    business_guarded...............: 0.00%   0 out of 1105
+    business_success...............: 100.00% 1105 out of 1105
+    server_error...................: 0.00%   0 out of 1105
+
+    HTTP
+    http_req_duration..............: avg=70.14ms  min=25.36ms  med=49.89ms  max=334.43ms p(90)=138.07ms p(95)=179.08ms
+      { expected_response:true }...: avg=70.14ms  min=25.36ms  med=49.89ms  max=334.43ms p(90)=138.07ms p(95)=179.08ms
+    http_req_failed................: 0.00%   0 out of 1105
+    http_reqs......................: 1105    36.576993/s
+
+    EXECUTION
+    iteration_duration.............: avg=272.69ms min=227.31ms med=252.12ms max=537.01ms p(90)=339.8ms  p(95)=388.49ms
+    iterations.....................: 1105    36.576993/s
+    vus............................: 10      min=10           max=10
+    vus_max........................: 10      min=10           max=10
+
+    NETWORK
+    data_received..................: 3.6 MB  119 kB/s
+    data_sent......................: 467 kB  16 kB/s
