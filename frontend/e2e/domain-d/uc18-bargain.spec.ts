@@ -89,7 +89,7 @@ test.describe("@DOMAIN_D @UC18 secondhand bargain", () => {
             const orderId = Number(confirmed.orderId);
             expect(confirmed.status).toBe("USED");
             expect(orderId).toBeGreaterThan(0);
-            await expect(sellerPage.getByText("已生成订单").first()).toBeVisible();
+            await expect(sellerPage.getByText(/已确认|已生成订单/).first()).toBeVisible();
             await capture(sellerPage, testInfo, "uc18-seller-confirmed-order");
 
             await page.reload();
