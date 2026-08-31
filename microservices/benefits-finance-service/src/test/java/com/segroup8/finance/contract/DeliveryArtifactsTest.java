@@ -39,7 +39,7 @@ class DeliveryArtifactsTest {
         assertThat(paths.containsKey("/internal/settlements")).isTrue();
         yaml(root.resolve("deploy/helm/segroup8/Chart.yaml"));
         yaml(root.resolve("deploy/helm/segroup8/values.yaml"));
-        yaml(root.resolve(".github/workflows/ci-cd-microservices.yml"));
+        yaml(root.resolve(".github/workflows/benefits-finance-service-ci-cd.yml"));
         try (InputStream input = Files.newInputStream(architecture.resolve("service-diagram.svg"))) {
             DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input);
         }
