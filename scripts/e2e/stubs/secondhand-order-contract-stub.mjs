@@ -23,9 +23,11 @@ const server = createServer(async (request, response) => {
     }
 
     const address = request.url?.match(/^\/internal\/users\/(\d+)\/addresses\/(\d+)$/);
-    if (request.method === "GET" && address) {
+    const shipping = request.url?.match(/^\/internal\/users\/(\d+)\/shipping-address$/);
+    if (request.method === "GET" && (address || shipping)) {
+        const userId = Number((address || shipping)[1]);
         send(response, 200, { code: 0, message: "success", data: {
-            addressId: Number(address[2]), userId: Number(address[1]), receiverName: "Acceptance Buyer",
+            addressId: address ? Number(address[2]) : 100, userId, receiverName: "Acceptance Buyer",
             receiverPhone: "13800138000", province: "Guangdong", city: "Shenzhen",
             detailAddress: "Nanshan Acceptance Road"
         }});

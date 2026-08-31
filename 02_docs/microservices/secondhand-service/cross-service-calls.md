@@ -4,7 +4,7 @@
 
 二手服务不读取身份库或订单库。创建订单前按以下固定顺序调用：
 
-1. `GET http://identity-governance-service:8091/internal/users/{buyerId}/addresses/{addressId}`，携带 `X-Internal-Service-Token` 和 `X-Request-Id`。身份治理服务校验地址属于买家，并返回收件人、电话、省、市、详细地址。
+1. 直接购买调用 `GET http://identity-governance-service:8091/internal/users/{buyerId}/addresses/{addressId}`；议价和定时拍卖结算没有地址参数时调用 `GET /internal/users/{buyerId}/shipping-address` 取得默认优先的配送地址。两者都携带 `X-Internal-Service-Token` 和 `X-Request-Id`，并返回收件人、电话、省、市、详细地址。
 2. `POST http://segroup8-order:8085/internal/orders/secondhand`，携带同一内部 Token，以及稳定的 `Idempotency-Key=tradeType:tradeId`。请求中写入第 1 步取得的完整地址快照，不传地址表 ID，不使用占位姓名、电话或地址。
 3. 调用结果不确定时，以相同业务键请求 `GET /internal/orders/by-business-key/{key}`。只在确定订单不存在时重试创建；达到 `ORDER_MAX_ATTEMPTS` 后解除商品冻结并记录失败事件。
 

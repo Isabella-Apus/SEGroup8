@@ -25,11 +25,10 @@ public class HttpOrderGateway implements OrderGateway {
     @Override
     public OrderReceipt createSecondhandOrder(TradeOrderRequest request) {
         try {
-            if (request.addressId() == null) {
-                throw new OrderServiceUnavailableException("addressId is required for secondhand order");
-            }
-            AddressGateway.AddressSnapshot address = addresses.requireOwnedAddress(
-                    request.buyerUserId(), request.addressId(), request.orderBusinessKey());
+            AddressGateway.AddressSnapshot address = request.addressId() == null
+                    ? addresses.requireDefaultAddress(request.buyerUserId(), request.orderBusinessKey())
+                    : addresses.requireOwnedAddress(request.buyerUserId(), request.addressId(),
+                            request.orderBusinessKey());
             OrderData order = client.post().uri("/internal/orders/secondhand")
                     .header("X-Internal-Service-Token", internalToken)
                     .header("Idempotency-Key", request.orderBusinessKey())

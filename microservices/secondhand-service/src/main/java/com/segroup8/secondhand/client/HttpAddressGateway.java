@@ -21,9 +21,19 @@ public class HttpAddressGateway implements AddressGateway {
 
     @Override
     public AddressSnapshot requireOwnedAddress(long userId, long addressId, String requestId) {
+        return lookup("/internal/users/{userId}/addresses/{addressId}", userId, addressId, requestId);
+    }
+
+    @Override
+    public AddressSnapshot requireDefaultAddress(long userId, String requestId) {
+        return lookup("/internal/users/{userId}/shipping-address", userId, null, requestId);
+    }
+
+    private AddressSnapshot lookup(String path, long userId, Long addressId, String requestId) {
         try {
-            AddressEnvelope envelope = client.get()
-                    .uri("/internal/users/{userId}/addresses/{addressId}", userId, addressId)
+            var requestSpec = client.get();
+            var uri = addressId == null ? requestSpec.uri(path, userId) : requestSpec.uri(path, userId, addressId);
+            AddressEnvelope envelope = uri
                     .header("X-Internal-Service-Token", internalToken)
                     .header("X-Request-Id", requestId + ":address")
                     .retrieve()
