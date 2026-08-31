@@ -13,6 +13,36 @@ spec:
       {{- end }}
       http:
         paths:
+          {{ if .Values.order.enabled }}
+          - path: /api/order
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-order
+                port:
+                  name: http
+          - path: /api/review
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-order
+                port:
+                  name: http
+          - path: /api/logistics
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-order
+                port:
+                  name: http
+          - path: /api/admin/orders
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Release.Name }}-order
+                port:
+                  name: http
+          {{ end }}
           - path: /
             pathType: Prefix
             backend:
