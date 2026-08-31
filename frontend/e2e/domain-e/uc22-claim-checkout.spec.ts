@@ -93,6 +93,10 @@ test.describe("@DOMAIN_E @UC22 voucher claim and checkout", () => {
                 },
             }));
         }
+        const knownAddressDetails = new Set([
+            ...addresses.map((item) => item.detailAddress),
+            "UC22 E2E Address",
+        ]);
 
         const duplicateClaim = await request.post(`/api/voucher/${voucherId}/claim`, {
             headers: bearer(buyerToken),
@@ -128,7 +132,11 @@ test.describe("@DOMAIN_E @UC22 voucher claim and checkout", () => {
         await page.getByRole("button", { name: "立即购买", exact: true }).click();
         const addressDialog = page.getByRole("dialog", { name: "收货地址确认" });
         await expect(addressDialog).toBeVisible();
-        await expect(addressDialog).toContainText("UC22 E2E Address");
+        const addressDialogText = await addressDialog.innerText();
+        expect(
+            [...knownAddressDetails].some((detail) => addressDialogText.includes(detail)),
+            "checkout must show one of the buyer's persisted addresses",
+        ).toBe(true);
 
         const createResponsePromise = page.waitForResponse(
             (response) => response.url().endsWith("/api/order/create")

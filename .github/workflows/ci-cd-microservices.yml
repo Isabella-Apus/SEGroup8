@@ -284,17 +284,27 @@ jobs:
         run: |
           set -Eeuo pipefail
           helm lint deploy/helm/segroup8 \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-test \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-test \
             --set benefitsFinance.enabled=true \
             --set-string benefitsFinance.image.repository=registry.example/segroup8/benefits-finance \
             --set-string benefitsFinance.image.tag=sha-test \
             --set-string benefitsFinance.image.commit=$GITHUB_SHA \
-            --set-string benefitsFinance.image.buildTime=ci
+            --set-string benefitsFinance.image.buildTime=ci \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql
           helm template segroup8 deploy/helm/segroup8 --namespace segroup8 \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-test \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-test \
             --set benefitsFinance.enabled=true \
             --set-string benefitsFinance.image.repository=registry.example/segroup8/benefits-finance \
             --set-string benefitsFinance.image.tag=sha-test \
             --set-string benefitsFinance.image.commit=$GITHUB_SHA \
-            --set-string benefitsFinance.image.buildTime=ci > benefits-finance-rendered.yaml
+            --set-string benefitsFinance.image.buildTime=ci \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql > benefits-finance-rendered.yaml
           grep -q '^kind: Deployment$' benefits-finance-rendered.yaml
           grep -q '^kind: Service$' benefits-finance-rendered.yaml
           grep -q 'startupProbe:' benefits-finance-rendered.yaml
@@ -402,8 +412,8 @@ jobs:
           archive=$1; namespace=$2; repository=$3; tag=$4; git_sha=$5
           trap 'rm -f -- "$archive"' EXIT
           kubectl -n "$namespace" get secret benefits-finance-secrets >/dev/null
-          kubectl -n "$namespace" get service mysql >/dev/null
-          helm upgrade --install segroup8 "$archive" --namespace "$namespace" --create-namespace \
+          helm -n "$namespace" status segroup8 >/dev/null
+          helm upgrade --install segroup8 "$archive" --namespace "$namespace" --reuse-values \
             --atomic --cleanup-on-fail --wait --timeout 5m --history-max 10 \
             --set benefitsFinance.enabled=true \
             --set-string benefitsFinance.image.repository="$repository" \
