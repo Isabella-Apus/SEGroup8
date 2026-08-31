@@ -148,7 +148,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   getMyProducts,
@@ -158,6 +158,7 @@ import {
 import { toAssetUrl } from '@/utils/url'
 
 const router = useRouter()
+const route = useRoute()
 const loading = ref(false)
 const products = ref([])
 const total = ref(0)
@@ -165,7 +166,9 @@ const page = ref(1)
 const pageSize = ref(10)
 
 const searchForm = reactive({
-  keyword: '',
+  // Returning from the edit page preserves the saved product as the visible
+  // result instead of dropping the seller into an unrelated first page.
+  keyword: typeof route.query.keyword === 'string' ? route.query.keyword : '',
   status: null
 })
 

@@ -281,7 +281,9 @@ async function handleSubmit() {
         await createProduct(payload)
         ElMessage.success('发布成功')
       }
-      router.push('/merchant/seller-products')
+      // Carry the persisted name to the list so the seller immediately sees
+      // the created/updated product, even when their catalogue spans pages.
+      router.push({ path: '/merchant/seller-products', query: { keyword: form.name } })
     } catch (e) {
       ElMessage.error(isEdit.value ? '修改失败' : '发布失败')
     } finally {
