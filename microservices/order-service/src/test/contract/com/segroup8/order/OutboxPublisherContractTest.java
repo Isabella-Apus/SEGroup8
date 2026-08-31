@@ -22,9 +22,10 @@ class OutboxPublisherContractTest {
     @Test
     void sendsTheSharedEventEnvelopeAndMarksOnlySuccessfulDeliveryPublished() {
         OrderRepository repository = mock(OrderRepository.class);
-        var event = new OrderRepository.OutboxMessage("event-1", "OrderCreated.v1", "ORDER", "42",
-                "{\"buyerId\":7}", Instant.parse("2026-08-31T12:00:00Z"));
+        var event = new OrderRepository.OutboxMessage("event-1", "ReviewSubmitted.v1", "ORDER", "42",
+                "{\"orderId\":42,\"productId\":8}", Instant.parse("2026-08-31T12:00:00Z"));
         when(repository.pendingOutbox()).thenReturn(List.of(event));
+        when(repository.notificationRecipients("42", "ReviewSubmitted.v1")).thenReturn(List.of(7L));
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
         server.expect(once(), requestTo("http://messaging.test/internal/events"))
@@ -34,7 +35,8 @@ class OutboxPublisherContractTest {
                 .andExpect(jsonPath("$.producer").value("order-service"))
                 .andExpect(jsonPath("$.aggregateType").value("ORDER"))
                 .andExpect(jsonPath("$.aggregateId").value("42"))
-                .andExpect(jsonPath("$.payload.buyerId").value(7))
+                .andExpect(jsonPath("$.payload.recipientUserIds[0]").value(7))
+                .andExpect(jsonPath("$.payload.dedupeKey").value("event-1"))
                 .andRespond(withSuccess());
 
         new OutboxPublisher(repository, builder, new ObjectMapper(), "http://messaging.test", "internal-token")

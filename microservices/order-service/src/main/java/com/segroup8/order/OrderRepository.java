@@ -352,6 +352,15 @@ class OrderRepository {
                 Timestamp.from(Instant.now().plusSeconds(30)),eventId);
     }
 
+    List<Long> notificationRecipients(String aggregateId,String eventType) {
+        long orderId=Long.parseLong(aggregateId);
+        if ("OrderStatusChanged.v1".equals(eventType)||"OrderRefundStatusChanged.v1".equals(eventType)) {
+            return List.of(db.queryForObject("select buyer_user_id from order_info where id=?",Long.class,orderId));
+        }
+        return db.query("select distinct seller_user_id from order_item where order_id=? and seller_user_id is not null",
+                (rs,n)->rs.getLong(1),orderId);
+    }
+
     record OutboxMessage(String eventId,String eventType,String aggregateType,String aggregateId,
             String payload,Instant createdAt) {}
     private static PageView<ReviewView> pageReviews(List<ReviewView> all,long page,long size) {
