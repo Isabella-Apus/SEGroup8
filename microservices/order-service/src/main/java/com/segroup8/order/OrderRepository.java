@@ -336,8 +336,11 @@ class OrderRepository {
     }
 
     List<OutboxMessage> pendingOutbox() {
-        return db.query("select event_id,event_type,payload from outbox_event where status='PENDING' and available_at<=current_timestamp order by id limit 50",
-                (rs,n)->new OutboxMessage(rs.getString(1),rs.getString(2),rs.getString(3)));
+        return db.query("select event_id,event_type,aggregate_type,aggregate_id,payload,create_time "
+                        + "from outbox_event where status='PENDING' and available_at<=current_timestamp order by id limit 50",
+                (rs,n)->new OutboxMessage(rs.getString("event_id"),rs.getString("event_type"),
+                        rs.getString("aggregate_type"),rs.getString("aggregate_id"),rs.getString("payload"),
+                        rs.getTimestamp("create_time").toInstant()));
     }
 
     void markPublished(String eventId) {
@@ -349,7 +352,8 @@ class OrderRepository {
                 Timestamp.from(Instant.now().plusSeconds(30)),eventId);
     }
 
-    record OutboxMessage(String eventId,String eventType,String payload) {}
+    record OutboxMessage(String eventId,String eventType,String aggregateType,String aggregateId,
+            String payload,Instant createdAt) {}
     private static PageView<ReviewView> pageReviews(List<ReviewView> all,long page,long size) {
         int from=(int)Math.min(all.size(),(page-1)*size), to=(int)Math.min(all.size(),from+size);
         return new PageView<>(all.size(),page,size,all.subList(from,to));
