@@ -22,7 +22,7 @@ catalog-shop:
   reservation-ttl-seconds: ${RESERVATION_TTL_SECONDS:900}
   internal-token: ${INTERNAL_SERVICE_TOKEN:local-internal-token}
   risk-llm-api-key: ${RISK_AUDIT_LLM_API_KEY:}
-  messaging-event-url: ${MESSAGING_EVENT_URL:http://messaging-service:8084}
+  messaging-event-url: ${MESSAGING_EVENT_URL:http://messaging:8084}
   order-event-url: ${ORDER_EVENT_URL:}
   outbox-publish-ms: ${OUTBOX_PUBLISH_MS:5000}
   http:
