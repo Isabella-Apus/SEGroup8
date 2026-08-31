@@ -270,6 +270,14 @@ jobs:
         env:
           MESSAGING_IMAGE: segroup8/messaging:candidate-${{ github.sha }}
           E2E_OUTPUT_DIR: ${{ runner.temp }}/messaging-system-e2e
+          E2E_ADMIN_USERNAME: admin
+          E2E_ADMIN_PASSWORD: admin123
+          E2E_OFFICIAL_SELLER_USERNAME: seller
+          E2E_OFFICIAL_SELLER_PASSWORD: seller123
+          E2E_BUYER_USERNAME: user
+          E2E_BUYER_PASSWORD: user123
+          E2E_THIRD_PARTY_USERNAME: third
+          E2E_THIRD_PARTY_PASSWORD: third123
           E2E_USERNAME: user
           E2E_PASSWORD: user123
           E2E_BASE_URL: http://127.0.0.1:8088
