@@ -28,6 +28,7 @@ spec:
         runAsNonRoot: true
         runAsUser: 10001
         runAsGroup: 10001
+        fsGroup: 10001
         seccompProfile:
           type: RuntimeDefault
       imagePullSecrets:
@@ -57,9 +58,13 @@ spec:
               value: Asia/Shanghai
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities:
               drop:
                 - ALL
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
           startupProbe:
             httpGet:
               path: /actuator/health/liveness
@@ -83,4 +88,7 @@ spec:
             failureThreshold: 3
           resources:
             {{- toYaml .Values.messaging.resources | nindent 12 }}
+      volumes:
+        - name: tmp
+          emptyDir: {}
 {{- end }}

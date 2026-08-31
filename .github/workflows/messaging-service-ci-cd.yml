@@ -25,6 +25,8 @@ on:
       - "frontend/Dockerfile.runtime"
       - "frontend/docker/nginx.conf"
       - "frontend/docker/nginx.compose.conf"
+      - "frontend/src/**"
+      - "frontend/vite.config.js"
       - "frontend/e2e/domain-e/**"
       - "frontend/package.json"
       - "frontend/package-lock.json"
@@ -67,6 +69,8 @@ on:
       - "frontend/Dockerfile.runtime"
       - "frontend/docker/nginx.conf"
       - "frontend/docker/nginx.compose.conf"
+      - "frontend/src/**"
+      - "frontend/vite.config.js"
       - "frontend/e2e/domain-e/**"
       - "frontend/package.json"
       - "frontend/package-lock.json"
@@ -320,12 +324,34 @@ jobs:
             --set-string frontend.image.repository=registry.example/segroup8/frontend \
             --set-string frontend.image.tag=sha-test \
             --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
-            >/dev/null
+            --show-only templates/messaging-deployment.yaml \
+            > messaging-rendered.yaml
+          grep -q 'runAsUser: 10001' messaging-rendered.yaml
+          grep -q 'runAsGroup: 10001' messaging-rendered.yaml
+          grep -q 'readOnlyRootFilesystem: true' messaging-rendered.yaml
+          grep -q 'mountPath: /tmp' messaging-rendered.yaml
+
+  acceptance-summary:
+    name: Current revision acceptance summary
+    needs: [messaging-verify, messaging-mysql, messaging-independent-e2e, messaging-system-e2e, delivery-config]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record current-SHA acceptance result
+        run: |
+          jq -n --arg revision "$GITHUB_SHA" \
+            '{revision:$revision,maven:"PASS",mysqlIntegration:"PASS",publicApiCoverage:"PASS",independentServiceE2E:"PASS",fullSystemUseCaseE2E:"PASS",candidateImage:"PASS",helmStatic:"PASS",registryDigest:"PENDING_MAIN",kubernetesRollout:"NOT_RUN_ON_PULL_REQUEST"}' \
+            > messaging-acceptance-summary.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: messaging-acceptance-summary-${{ github.sha }}
+          path: messaging-acceptance-summary.json
+          if-no-files-found: error
+          retention-days: 30
 
   publish-messaging-image:
     name: Publish immutable messaging-service image
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [messaging-verify, messaging-mysql, messaging-independent-e2e, messaging-system-e2e, delivery-config]
+    needs: [messaging-verify, messaging-mysql, messaging-independent-e2e, messaging-system-e2e, delivery-config, acceptance-summary]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production

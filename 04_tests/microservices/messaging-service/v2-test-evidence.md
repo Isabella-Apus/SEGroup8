@@ -1,6 +1,6 @@
 # MS-06 V2 test evidence
 
-Execution date: 2026-08-30  
+Execution date: 2026-08-30
 Runtime: Java 21.0.8
 
 | Command / suite | Result | Passed | Failed | Skipped | Notes |

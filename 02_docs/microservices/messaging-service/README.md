@@ -44,3 +44,8 @@ failure-drill execution require the configured cluster and remain manual
 actions. See the V3 evidence directory.
 
 Issue, PR, and review evidence: **MANUAL ACTION REQUIRED**. No synthetic management evidence was created.
+
+Final acceptance uses the shared
+[`service-acceptance-checklist.md`](../service-acceptance-checklist.md). The
+service-specific change boundary is recorded in
+[`before-after-code-diff.md`](before-after-code-diff.md).

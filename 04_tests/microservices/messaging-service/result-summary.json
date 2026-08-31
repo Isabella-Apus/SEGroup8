@@ -1,15 +1,19 @@
 {
-  "revision": "next-ci-run",
-  "maven": "PASS",
-  "mysqlIntegration": "PASS",
-  "publicApiCoverage": {
-    "covered": 12,
-    "total": 12
+  "service": "messaging-service",
+  "source": "historical-local-snapshot",
+  "authoritativeCurrentHeadEvidence": "Messaging Service CI/CD messaging-acceptance-summary artifact at the same GitHub SHA",
+  "historical": {
+    "maven": "PASS",
+    "mysqlIntegration": "PASS",
+    "publicApiCovered": 12,
+    "publicApiTotal": 12,
+    "candidateImage": "PASS",
+    "helmStatic": "PASS"
   },
-  "independentServiceE2E": "CI_GATE_DEFINED",
-  "fullSystemUseCaseE2E": "NOT_RUN",
-  "candidateImage": "PASS",
-  "helmStatic": "PASS",
-  "registryDigest": "PENDING",
-  "kubernetesRollout": "NOT_RUN"
+  "requiredCurrentChecks": {
+    "independentServiceE2E": "PR_CI",
+    "fullSystemUseCaseE2E": "PR_CI",
+    "registryDigest": "MAIN_ONLY",
+    "kubernetesRollout": "MAIN_ONLY_WHEN_ENABLED"
+  }
 }

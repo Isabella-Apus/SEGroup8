@@ -71,6 +71,6 @@ The demo seed file is intentionally excluded from production.
 `helm upgrade --install --atomic --wait` waits for MySQL and the enabled
 application Deployments to become ready. The shared platform pipeline keeps
 Messaging disabled; `messaging-service-ci-cd.yml` enables and deploys it with
-`--reuse-values`. A failed upgrade is rolled back automatically.
+`--reset-then-reuse-values`. A failed upgrade is rolled back automatically.
 Images use `sha-<full Git SHA>` tags so every release is traceable and
 rollback-safe.
