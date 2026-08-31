@@ -1,7 +1,7 @@
 {
   "service": "catalog-shop-service",
-  "generatedAt": "2026-08-31T11:18:47+08:00",
-  "sourceCommit": "recorded-by-ci",
-  "automated": {"command": "mvn -B -f microservices/pom.xml -pl catalog-shop-service -am clean verify", "tests": 11, "passed": 10, "failures": 0, "errors": 0, "skipped": 1, "status": "passed", "note": "MySQL Testcontainers test skipped locally because Docker daemon is unavailable"},
-  "environmentRequired": {"mysql8": "covered-by-pr-ci", "e2e": "pending", "deployment": "pending", "hpa": "pending"}
+  "generatedAt": "2026-08-31T16:05:47+08:00",
+  "sourceCommit": "working-tree-before-pr-update",
+  "automated": {"command": "mvn -B -f microservices/pom.xml -pl catalog-shop-service -am clean verify", "tests": 14, "passed": 13, "failures": 0, "errors": 0, "skipped": 1, "status": "local-partial", "note": "本机无 Docker，MySQL Testcontainers 被跳过；PR CI 对该必需测试设置 skipped=0 门禁。JWT/越权/伪造身份头、OpenAPI/运行时一致性、幂等冲突和 EventEnvelope/retry 已在本地自动化测试覆盖。"},
+  "environmentRequired": {"mysql8": "required-in-pr-ci", "independentComposeBrowserE2e": "required-in-pr-ci", "fullSystemE2e": "required-in-pr-ci", "deployment": "required-in-pr-ci", "hpa": "pending"}
 }

@@ -7,6 +7,12 @@ on:
       - 'microservices/security-contract/**'
       - 'microservices/pom.xml'
       - 'frontend/e2e/domain-b/**'
+      - 'frontend/src/**'
+      - 'frontend/docker/**'
+      - 'frontend/Dockerfile*'
+      - 'frontend/vite.config.js'
+      - 'compose.yml'
+      - 'docker/catalog-shop/**'
       - '02_docs/microservices/catalog-shop-service/**'
       - '03_devops/microservices/catalog-shop-service/**'
       - '04_tests/microservices/catalog-shop-service/**'
@@ -38,8 +44,21 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with: {distribution: temurin, java-version: '17', cache: maven}
+      - uses: actions/setup-node@v4
+        with: {node-version: '20', cache: npm, cache-dependency-path: frontend/package-lock.json}
       - name: Unit, API, contract and migration tests
         run: mvn -B --no-transfer-progress -f microservices/pom.xml -pl catalog-shop-service -am clean verify
+      - name: Require the MySQL ownership test to execute
+        shell: bash
+        run: |
+          report=microservices/catalog-shop-service/target/surefire-reports/TEST-com.segroup8.catalogshop.MySqlSchemaOwnershipIntegrationTest.xml
+          test -f "$report"
+          python - "$report" <<'PY'
+          import sys, xml.etree.ElementTree as ET
+          suite = ET.parse(sys.argv[1]).getroot()
+          if int(suite.attrib.get("tests", "0")) < 1 or int(suite.attrib.get("skipped", "0")) != 0:
+              raise SystemExit("required MySQL integration test was skipped")
+          PY
       - name: Reject cross-domain persistence imports
         shell: bash
         run: |
@@ -54,15 +73,37 @@ jobs:
           docker build --build-arg GIT_SHA="$GITHUB_SHA" --build-arg JAR_SHA256="$jar_sha" --tag "$CANDIDATE_IMAGE" microservices/catalog-shop-service
           test "$(docker image inspect "$CANDIDATE_IMAGE" --format '{{.Config.User}}')" = '10001:10001'
           test "$(docker image inspect "$CANDIDATE_IMAGE" --format '{{index .Config.Labels "org.opencontainers.image.revision"}}')" = "$GITHUB_SHA"
+      - name: Build frontend acceptance image and install browser
+        shell: bash
+        run: |
+          npm ci --prefix frontend
+          npm run build:real --prefix frontend
+          docker build --tag "catalog-shop-frontend:${GITHUB_SHA}" -f frontend/Dockerfile.runtime frontend
+          cd frontend
+          npx playwright install --with-deps chromium
       - name: Independent MySQL acceptance smoke
         shell: bash
         working-directory: microservices/catalog-shop-service
-        env: {APP_VERSION: '${{ env.IMAGE_TAG }}', GIT_COMMIT: '${{ github.sha }}'}
+        env: {APP_VERSION: '${{ env.IMAGE_TAG }}', GIT_COMMIT: '${{ github.sha }}', ACCEPTANCE_FRONTEND_IMAGE: 'catalog-shop-frontend:${{ github.sha }}'}
         run: |
           docker compose -f compose.acceptance.yml up -d --wait
           curl --fail --silent --show-error http://127.0.0.1:18080/actuator/health/readiness
           curl --fail --silent --show-error http://127.0.0.1:18080/actuator/prometheus >/dev/null
           curl --fail --silent --show-error http://127.0.0.1:18080/api/category/tree >/dev/null
+          token="$(python - <<'PY'
+          import base64, hashlib, hmac, json, time
+          enc=lambda value: base64.urlsafe_b64encode(json.dumps(value,separators=(',',':')).encode()).rstrip(b'=').decode()
+          head=enc({'alg':'HS256','typ':'JWT'}); body=enc({'uid':7,'username':'seller','role':'OFFICIAL_SELLER','exp':int(time.time())+300})
+          sig=base64.urlsafe_b64encode(hmac.new(b'acceptance-jwt-secret-must-have-at-least-thirty-two-bytes',f'{head}.{body}'.encode(),hashlib.sha256).digest()).rstrip(b'=').decode()
+          print(f'{head}.{body}.{sig}')
+          PY
+          )"
+          curl --fail --silent --show-error -H "Authorization: Bearer $token" http://127.0.0.1:18080/api/product/seller/list >/dev/null
+          curl --fail --silent --show-error http://127.0.0.1:18088/health
+      - name: Independent Compose browser E2E
+        working-directory: frontend
+        env: {E2E_BASE_URL: 'http://127.0.0.1:18088', E2E_OUTPUT_DIR: '../04_tests/microservices/catalog-shop-service/independent-e2e', CI: 'true'}
+        run: npx playwright test e2e/domain-b/uc06-catalog.spec.ts --workers=1
       - name: Acceptance diagnostics
         if: failure()
         working-directory: microservices/catalog-shop-service

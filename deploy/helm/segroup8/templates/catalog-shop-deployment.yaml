@@ -31,9 +31,14 @@ spec:
               valueFrom: {secretKeyRef: {name: {{ .Values.catalogShop.secretName }}, key: DB_PASSWORD}}
             - name: INTERNAL_SERVICE_TOKEN
               valueFrom: {secretKeyRef: {name: {{ .Values.catalogShop.secretName }}, key: INTERNAL_SERVICE_TOKEN}}
+            - name: JWT_SECRET
+              valueFrom: {secretKeyRef: {name: {{ .Values.catalogShop.secretName }}, key: JWT_SECRET}}
             - name: RISK_AUDIT_LLM_API_KEY
               valueFrom: {secretKeyRef: {name: {{ .Values.catalogShop.secretName }}, key: RISK_AUDIT_LLM_API_KEY, optional: true}}
-            - {name: OUTBOX_TARGET_URL, value: {{ .Values.catalogShop.outboxTargetUrl | quote }}}
+            - {name: IDENTITY_STATUS_CHECK_URL, value: {{ .Values.catalogShop.identityStatusCheckUrl | quote }}}
+            - {name: IDENTITY_STATUS_CHECK_MODE, value: "introspect"}
+            - {name: MESSAGING_EVENT_URL, value: {{ .Values.catalogShop.messagingEventUrl | quote }}}
+            - {name: ORDER_EVENT_URL, value: {{ .Values.catalogShop.orderEventUrl | quote }}}
             - {name: APP_VERSION, value: {{ .Values.deployment.version | quote }}}
             - {name: GIT_COMMIT, value: {{ .Values.deployment.commit | quote }}}
           startupProbe: {httpGet: {path: /actuator/health/liveness, port: http}, failureThreshold: 30, periodSeconds: 5}

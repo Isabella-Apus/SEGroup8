@@ -1,4 +1,17 @@
 services:
+  identity-stub:
+    image: python:3.13-alpine
+    command: ["python", "/stub/identity-stub.py"]
+    volumes:
+      - ./docker/identity-stub.py:/stub/identity-stub.py:ro
+    networks:
+      default:
+        aliases: [backend]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/profile >/dev/null || test $$? -eq 8"]
+      interval: 3s
+      timeout: 2s
+      retries: 20
   mysql:
     image: mysql:8.4.6
     environment:
@@ -16,11 +29,18 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      identity-stub:
+        condition: service_healthy
     environment:
       DB_URL: jdbc:mysql://mysql:3306/catalog_shop_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       DB_USERNAME: catalog_shop_app
       DB_PASSWORD: catalog_shop_app
       INTERNAL_SERVICE_TOKEN: acceptance-token
+      JWT_SECRET: acceptance-jwt-secret-must-have-at-least-thirty-two-bytes
+      IDENTITY_STATUS_CHECK_URL: http://identity-stub:8080/profile
+      IDENTITY_STATUS_CHECK_MODE: profile
+      MESSAGING_EVENT_URL: ""
+      ORDER_EVENT_URL: ""
       APP_VERSION: ${APP_VERSION:-acceptance}
       GIT_COMMIT: ${GIT_COMMIT:-unknown}
     ports:
@@ -30,3 +50,20 @@ services:
       interval: 5s
       timeout: 3s
       retries: 30
+  catalog-seed:
+    image: mysql:8.4.6
+    depends_on:
+      catalog-shop:
+        condition: service_healthy
+    environment:
+      MYSQL_PWD: acceptance-root
+    volumes:
+      - ../../docker/catalog-shop/catalog-shop.sql:/seed/catalog-shop.sql:ro
+    command: ["sh", "-c", "mysql -hmysql -uroot catalog_shop_db < /seed/catalog-shop.sql"]
+  frontend:
+    image: ${ACCEPTANCE_FRONTEND_IMAGE:-catalog-shop-frontend:acceptance}
+    depends_on:
+      catalog-seed:
+        condition: service_completed_successfully
+    ports:
+      - "18088:80"

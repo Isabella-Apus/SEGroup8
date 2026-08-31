@@ -74,7 +74,9 @@ catalogShop:
     tag: ""
     pullPolicy: IfNotPresent
   secretName: segroup8-catalog-shop-secret
-  outboxTargetUrl: ""
+  identityStatusCheckUrl: http://segroup8-identity-governance:8091/internal/auth/introspect
+  messagingEventUrl: http://segroup8-messaging:8084
+  orderEventUrl: ""
   resources:
     requests: {cpu: 200m, memory: 256Mi}
     limits: {cpu: "1", memory: 768Mi}

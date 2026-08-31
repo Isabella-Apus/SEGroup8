@@ -3,6 +3,7 @@ package com.segroup8.catalogshop;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -31,12 +32,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController @RequestMapping("/api/shop")
 class ShopController {
     private final ShopModule service; ShopController(ShopModule service){this.service=service;}
-    @GetMapping("/public/{id}") ShopView publicView(@PathVariable long id){return service.publicView(id);}
-    @GetMapping("/seller/current") Shop mine(@RequestHeader("X-Seller-Id") long sellerId){return service.mine(sellerId);}
-    @PutMapping("/seller/current/settings") Shop settings(@RequestHeader("X-Seller-Id") long sellerId,@Valid @RequestBody SettingsRequest r){return service.settings(sellerId,r);}
-    @PutMapping("/seller/current/decoration") Shop decorate(@RequestHeader("X-Seller-Id") long sellerId,@Valid @RequestBody DecorationRequest r){return service.decorate(sellerId,r);}
+    @GetMapping("/public/{id}") ApiResult<Shop> publicView(@PathVariable long id){return ApiResult.success(service.publicShop(id));}
+    @GetMapping("/public/{id}/products") ApiResult<PageResult<Product>> publicProducts(@PathVariable long id,@org.springframework.web.bind.annotation.RequestParam(defaultValue="1") int pageNum,@org.springframework.web.bind.annotation.RequestParam(defaultValue="20") int pageSize){return ApiResult.success(service.publicProducts(id,pageNum,pageSize));}
+    @GetMapping("/seller/current") ApiResult<Shop> mine(HttpServletRequest request){long seller=AuthenticationSupport.require(request).requireRole("SELLER","OFFICIAL_SELLER").userId();return ApiResult.success(service.mine(seller));}
+    @PutMapping("/seller/current/settings") ApiResult<Shop> settings(HttpServletRequest request,@Valid @RequestBody SettingsRequest r){long seller=AuthenticationSupport.require(request).requireRole("SELLER","OFFICIAL_SELLER").userId();return ApiResult.success(service.settings(seller,r));}
+    @PutMapping({"/seller/current/decoration","/seller/decoration"}) ApiResult<Shop> decorate(HttpServletRequest request,@Valid @RequestBody DecorationRequest r){long seller=AuthenticationSupport.require(request).requireRole("SELLER","OFFICIAL_SELLER").userId();return ApiResult.success(service.decorate(seller,r));}
     record SettingsRequest(@NotBlank @Size(max=80) String name,@Size(max=500) String announcement,boolean open){}
-    record DecorationRequest(@NotBlank String template,@NotBlank @Size(max=20000) String contentJson){}
+    record DecorationRequest(String template,@NotBlank @Size(max=20000) String decorationJson){}
 }
 
 @RestController @RequestMapping("/internal/events")
@@ -52,10 +54,12 @@ class CatalogShopEventController {
 class ShopModule {
     private final JdbcClient db;private final SimpleJdbcInsert insert;private final ObjectMapper json;
     ShopModule(JdbcClient db,DataSource ds,ObjectMapper json){this.db=db;this.json=json;this.insert=new SimpleJdbcInsert(ds).withTableName("shop").usingGeneratedKeyColumns("id");}
-    ShopView publicView(long id){Shop shop=db.sql("select * from shop where id=:id and status='OPEN'").param("id",id).query(Shop.class).optional().orElseThrow(()->new ApiException("SHOP_NOT_FOUND","公开店铺不存在或已关闭",HttpStatus.NOT_FOUND));List<Product> products=db.sql("select * from product where shop_id=:id and status='ON_SALE' order by updated_at desc").param("id",id).query(Product.class).list();return new ShopView(shop,products);}
+    Shop publicShop(long id){return db.sql("select * from shop where id=:id and status='OPEN'").param("id",id).query(Shop.class).optional().orElseThrow(()->new ApiException("SHOP_NOT_FOUND","公开店铺不存在或已关闭",HttpStatus.NOT_FOUND));}
+    ShopView publicView(long id){Shop shop=publicShop(id);List<Product> products=db.sql("select * from product where shop_id=:id and status='ON_SALE' order by updated_at desc").param("id",id).query(Product.class).list();return new ShopView(shop,products);}
+    PageResult<Product> publicProducts(long id,int page,int size){List<Product> all=publicView(id).products();if(page<1||size<1||size>100)throw new ApiException("INVALID_PAGE","分页参数非法",HttpStatus.BAD_REQUEST);int from=Math.min((page-1)*size,all.size()),to=Math.min(from+size,all.size());return new PageResult<>(all.size(),page,size,all.subList(from,to));}
     Shop mine(long seller){return db.sql("select * from shop where seller_id=:seller").param("seller",seller).query(Shop.class).optional().orElseThrow(()->new ApiException("SHOP_NOT_FOUND","当前卖家没有店铺",HttpStatus.NOT_FOUND));}
     Shop settings(long seller,ShopController.SettingsRequest r){mine(seller);db.sql("update shop set name=:name,announcement=:announcement,status=:status,updated_at=CURRENT_TIMESTAMP where seller_id=:seller").params(Map.of("name",r.name().trim(),"announcement",r.announcement()==null?"":r.announcement(),"status",r.open()?"OPEN":"CLOSED","seller",seller)).update();return mine(seller);}
-    Shop decorate(long seller,ShopController.DecorationRequest r){mine(seller);if(!Set.of("CLASSIC","GRID","STORY").contains(r.template()))throw new ApiException("INVALID_TEMPLATE","装修模板只允许 CLASSIC、GRID、STORY",HttpStatus.BAD_REQUEST);try{if(!json.readTree(r.contentJson()).isObject())throw new ApiException("INVALID_DECORATION","装修内容必须是 JSON 对象",HttpStatus.BAD_REQUEST);}catch(JsonProcessingException e){throw new ApiException("INVALID_DECORATION","装修内容必须是合法 JSON",HttpStatus.BAD_REQUEST);}db.sql("update shop set decoration_template=:template,decoration_json=:json,updated_at=CURRENT_TIMESTAMP where seller_id=:seller").params(Map.of("template",r.template(),"json",r.contentJson(),"seller",seller)).update();return mine(seller);}
+    Shop decorate(long seller,ShopController.DecorationRequest r){mine(seller);String template=r.template()==null||r.template().isBlank()?"GRID":r.template();if(!Set.of("CLASSIC","GRID","STORY").contains(template))throw new ApiException("INVALID_TEMPLATE","装修模板只允许 CLASSIC、GRID、STORY",HttpStatus.BAD_REQUEST);try{if(!json.readTree(r.decorationJson()).isObject())throw new ApiException("INVALID_DECORATION","装修内容必须是 JSON 对象",HttpStatus.BAD_REQUEST);}catch(JsonProcessingException e){throw new ApiException("INVALID_DECORATION","装修内容必须是合法 JSON",HttpStatus.BAD_REQUEST);}db.sql("update shop set decoration_template=:template,decoration_json=:json,updated_at=CURRENT_TIMESTAMP where seller_id=:seller").params(Map.of("template",template,"json",r.decorationJson(),"seller",seller)).update();return mine(seller);}
     @Transactional Shop onMerchantApproved(CatalogShopEventController.MerchantApproved e){
         Shop existing=db.sql("select * from shop where merchant_application_id=:id").param("id",e.applicationId()).query(Shop.class).optional().orElse(null);if(existing!=null)return existing;
         if(db.sql("select count(*) from idempotency_record where scope='MerchantApproved.v1' and idempotency_key=:key").param("key",e.eventId()).query(Integer.class).single()>0)return mine(e.sellerId());

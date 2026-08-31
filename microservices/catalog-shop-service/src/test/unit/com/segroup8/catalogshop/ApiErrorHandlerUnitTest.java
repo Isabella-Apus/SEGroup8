@@ -12,6 +12,6 @@ class ApiErrorHandlerUnitTest {
     void preservesDomainErrorContract() {
         var response = new ApiErrorHandler().domain(new ApiException("PRODUCT_NOT_FOUND", "商品不存在", HttpStatus.NOT_FOUND));
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("PRODUCT_NOT_FOUND", response.getBody().get("code"));
+        assertEquals("PRODUCT_NOT_FOUND", response.getBody().error());
     }
 }

@@ -22,5 +22,15 @@ catalog-shop:
   reservation-ttl-seconds: ${RESERVATION_TTL_SECONDS:900}
   internal-token: ${INTERNAL_SERVICE_TOKEN:local-internal-token}
   risk-llm-api-key: ${RISK_AUDIT_LLM_API_KEY:}
-  outbox-target-url: ${OUTBOX_TARGET_URL:}
+  messaging-event-url: ${MESSAGING_EVENT_URL:http://messaging-service:8084}
+  order-event-url: ${ORDER_EVENT_URL:}
   outbox-publish-ms: ${OUTBOX_PUBLISH_MS:5000}
+  http:
+    connect-timeout-ms: ${HTTP_CONNECT_TIMEOUT_MS:1500}
+    read-timeout-ms: ${HTTP_READ_TIMEOUT_MS:2500}
+  identity:
+    status-check-url: ${IDENTITY_STATUS_CHECK_URL:http://identity-governance-service:8091/internal/auth/introspect}
+    status-check-mode: ${IDENTITY_STATUS_CHECK_MODE:introspect}
+security:
+  jwt:
+    secret: ${JWT_SECRET:SEGROUP8_LOCAL_DEVELOPMENT_SECRET_CHANGE_ME_2026}

@@ -9,6 +9,7 @@ RUN npm run build:real
 FROM nginx:1.27.4-alpine
 
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY docker/proxy_params /etc/nginx/proxy_params
 COPY --from=build /workspace/dist /usr/share/nginx/html
 
 EXPOSE 80

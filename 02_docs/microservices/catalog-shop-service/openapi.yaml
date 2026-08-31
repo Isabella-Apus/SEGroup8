@@ -1,72 +1,50 @@
 openapi: 3.0.3
-info: {title: catalog-shop-service, version: 1.0.0}
-servers: [{url: /}]
+info:
+  title: catalog-shop-service
+  version: 1.0.0
+security:
+  - bearerAuth: []
 paths:
-  /api/category/tree: {get: {operationId: categoryTree, responses: {'200': {description: 分类树}}}}
-  /api/product/list: {get: {$ref: '#/components/x-search'}}
-  /api/product/search: {get: {$ref: '#/components/x-search'}}
-  /api/product/detail/{productId}:
-    get: {operationId: productDetail, parameters: [{$ref: '#/components/parameters/ProductId'}], responses: {'200': {description: 商品详情}, '404': {$ref: '#/components/responses/NotFound'}}}
-  /api/product/seller/list: {get: {operationId: sellerProducts, parameters: [{$ref: '#/components/parameters/SellerId'}], responses: {'200': {description: 卖家商品}}}}
-  /api/product/seller:
-    post: {operationId: createProduct, parameters: [{$ref: '#/components/parameters/SellerId'}], requestBody: {$ref: '#/components/requestBodies/Product'}, responses: {'201': {description: 待审核商品}}}
+  /api/category/tree: {get: {operationId: categories, security: [], responses: {'200': {description: 分类树}}}}
+  /api/product/list: {get: {operationId: list, security: [], responses: {'200': {description: 分页商品}}}}
+  /api/product/search: {get: {operationId: search_1, security: [], responses: {'200': {description: 分页搜索}}}}
+  /api/product/detail/{productId}: {get: {operationId: detail, security: [], responses: {'200': {description: 商品详情}}}}
+  /api/product/seller/list: {get: {operationId: mine_1, responses: {'200': {description: 卖家商品}}}}
+  /api/product/seller: {post: {operationId: create, responses: {'201': {description: 新商品}}}}
   /api/product/seller/{id}:
-    get: {operationId: sellerProduct, parameters: [{$ref: '#/components/parameters/SellerId'}, {name: id, in: path, required: true, schema: {type: integer, format: int64}}], responses: {'200': {description: 商品}}}
-    put: {operationId: updateProduct, parameters: [{$ref: '#/components/parameters/SellerId'}, {name: id, in: path, required: true, schema: {type: integer}}], requestBody: {$ref: '#/components/requestBodies/Product'}, responses: {'200': {description: 待审核商品}}}
-    delete: {operationId: offShelfProduct, parameters: [{$ref: '#/components/parameters/SellerId'}, {name: id, in: path, required: true, schema: {type: integer}}], responses: {'204': {description: 已下架}}}
-  /api/shop/public/{id}: {get: {operationId: publicShop, parameters: [{name: id, in: path, required: true, schema: {type: integer}}], responses: {'200': {description: 店铺}}}}
-  /api/shop/seller/current: {get: {operationId: currentShop, parameters: [{$ref: '#/components/parameters/SellerId'}], responses: {'200': {description: 店铺}}}}
-  /api/shop/seller/current/settings: {put: {operationId: updateShopSettings, parameters: [{$ref: '#/components/parameters/SellerId'}], responses: {'200': {description: 店铺}}}}
-  /api/shop/seller/current/decoration: {put: {operationId: updateShopDecoration, parameters: [{$ref: '#/components/parameters/SellerId'}], responses: {'200': {description: 店铺}}}}
-  /api/admin/product-risk-audits: {get: {operationId: riskAudits, responses: {'200': {description: 审核列表}}}}
-  /api/admin/product-risk-audits/{id}/decision: {post: {operationId: riskDecision, parameters: [{name: id, in: path, required: true, schema: {type: integer}}], responses: {'200': {description: 审核结果}}}}
+    get: {operationId: sellerDetail, responses: {'200': {description: 商品}}}
+    put: {operationId: update, responses: {'200': {description: 商品}}}
+    delete: {operationId: delete_1, responses: {'200': {description: 已删除}}}
+  /api/product/seller/{id}/status: {post: {operationId: status, responses: {'200': {description: 状态已更新}}}}
+  /api/product/seller/{id}/stock/adjust: {post: {operationId: stock, responses: {'200': {description: 库存已更新}}}}
+  /api/shop/public/{id}: {get: {operationId: publicView, security: [], responses: {'200': {description: 店铺}}}}
+  /api/shop/public/{id}/products: {get: {operationId: publicProducts, security: [], responses: {'200': {description: 店铺商品}}}}
+  /api/shop/seller/current: {get: {operationId: mine, responses: {'200': {description: 当前店铺}}}}
+  /api/shop/seller/current/settings: {put: {operationId: settings, responses: {'200': {description: 店铺设置}}}}
+  /api/shop/seller/current/decoration: {put: {operationId: decorate, responses: {'200': {description: 店铺装修}}}}
+  /api/shop/seller/decoration: {put: {operationId: decorate_1, responses: {'200': {description: 店铺装修兼容路径}}}}
+  /api/admin/product-risk-audits: {get: {operationId: list_1, responses: {'200': {description: 审核列表}}}}
+  /api/admin/product-risk-audits/{id}: {get: {operationId: detail_1, responses: {'200': {description: 审核详情}}}}
+  /api/admin/product-risk-audits/{id}/decision: {post: {operationId: decide, responses: {'200': {description: 审核决定}}}}
   /api/user/browse-history:
-    get: {operationId: browseHistory, responses: {'200': {description: 浏览历史}}}
-    post: {operationId: recordBrowse, responses: {'201': {description: 已记录}}}
-    delete: {operationId: clearBrowse, responses: {'204': {description: 已清空}}}
+    get: {operationId: browseList, responses: {'200': {description: 浏览历史}}}
+    post: {operationId: browse, responses: {'201': {description: 已记录}}}
+    delete: {operationId: clear_1, responses: {'200': {description: 已清空}}}
+  /api/user/browse-history/{id}: {delete: {operationId: delete, responses: {'200': {description: 已删除}}}}
+  /api/user/browse-history/delete-batch: {post: {operationId: deleteBatch, responses: {'200': {description: 已批量删除}}}}
+  /api/user/browse-history/all: {delete: {operationId: clear, responses: {'200': {description: 已清空}}}}
   /api/search/history:
-    get: {operationId: searchHistory, responses: {'200': {description: 搜索历史}}}
-    post: {operationId: recordSearch, responses: {'201': {description: 已记录}}}
-    delete: {operationId: clearSearchHistory, responses: {'204': {description: 已清空}}}
-  /api/search/hot: {get: {operationId: hotKeywords, responses: {'200': {description: 热词}}}}
-  /internal/inventory/reservations:
-    post: {operationId: reserveInventory, parameters: [{$ref: '#/components/parameters/InternalToken'}, {$ref: '#/components/parameters/IdempotencyKey'}], responses: {'201': {description: 预留}}}
-  /internal/inventory/reservations/{id}: {get: {operationId: getReservation, parameters: [{$ref: '#/components/parameters/InternalToken'}, {name: id, in: path, required: true, schema: {type: integer}}], responses: {'200': {description: 预留}}}}
-  /internal/inventory/reservations/{id}/confirm:
-    post: {operationId: confirmReservation, parameters: [{$ref: '#/components/parameters/InternalToken'}, {$ref: '#/components/parameters/ResourceId'}], responses: {'200': {description: 幂等确认}}}
-  /internal/inventory/reservations/{id}/release:
-    post: {operationId: releaseReservation, parameters: [{$ref: '#/components/parameters/InternalToken'}, {$ref: '#/components/parameters/ResourceId'}], responses: {'200': {description: 幂等释放}}}
-  /internal/products/{id}/snapshot:
-    get: {operationId: productSnapshot, parameters: [{$ref: '#/components/parameters/InternalToken'}, {$ref: '#/components/parameters/ResourceId'}], responses: {'200': {description: 订单稳定快照}}}
-  /internal/events/merchant-approved:
-    post:
-      operationId: merchantApproved
-      parameters: [{$ref: '#/components/parameters/InternalToken'}]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [eventId, applicationId, sellerId, shopName]
-              properties:
-                eventId: {type: string}
-                applicationId: {type: string}
-                sellerId: {type: integer, format: int64}
-                shopName: {type: string}
-      responses: {'202': {description: 事件已幂等消费}}
+    get: {operationId: searches, responses: {'200': {description: 搜索历史}}}
+    post: {operationId: search, responses: {'201': {description: 已记录}}}
+    delete: {operationId: clearSearches, responses: {'200': {description: 已清空}}}
+  /api/search/hot: {get: {operationId: hot, security: [], responses: {'200': {description: 热词}}}}
+  /internal/inventory/reservations: {post: {operationId: reserve, security: [{internalToken: []}], responses: {'201': {description: 原子预留}}}}
+  /internal/inventory/reservations/{id}: {get: {operationId: get, security: [{internalToken: []}], responses: {'200': {description: 预留}}}}
+  /internal/inventory/reservations/{id}/confirm: {post: {operationId: confirm, security: [{internalToken: []}], responses: {'200': {description: 幂等确认}}}}
+  /internal/inventory/reservations/{id}/release: {post: {operationId: release, security: [{internalToken: []}], responses: {'200': {description: 幂等释放}}}}
+  /internal/products/{id}/snapshot: {get: {operationId: snapshot, security: [{internalToken: []}], responses: {'200': {description: 商品快照}}}}
+  /internal/events/merchant-approved: {post: {operationId: merchantApproved, security: [{internalToken: []}], responses: {'202': {description: 事件已消费}}}}
 components:
-  x-search:
-    operationId: searchProducts
-    parameters: [{name: keyword, in: query, schema: {type: string}}, {name: categoryId, in: query, schema: {type: integer}}, {name: shopId, in: query, schema: {type: integer}}, {name: minPrice, in: query, schema: {type: number}}, {name: maxPrice, in: query, schema: {type: number}}, {name: sort, in: query, schema: {type: string, enum: [newest, priceAsc, priceDesc]}}]
-    responses: {'200': {description: 商品列表}}
-  parameters:
-    ProductId: {name: productId, in: path, required: true, schema: {type: integer, format: int64}}
-    SellerId: {name: X-Seller-Id, in: header, required: true, schema: {type: integer, format: int64}}
-    InternalToken: {name: X-Internal-Service-Token, in: header, required: true, schema: {type: string}}
-    IdempotencyKey: {name: X-Idempotency-Key, in: header, required: true, schema: {type: string, maxLength: 128}}
-    ResourceId: {name: id, in: path, required: true, schema: {type: integer, format: int64}}
-  requestBodies:
-    Product: {required: true, content: {application/json: {schema: {type: object, required: [shopId, categoryId, name, price, stock], properties: {shopId: {type: integer}, categoryId: {type: integer}, name: {type: string}, description: {type: string}, price: {type: number}, stock: {type: integer}}}}}}
-  responses:
-    NotFound: {description: 不存在}
+  securitySchemes:
+    bearerAuth: {type: http, scheme: bearer, bearerFormat: JWT}
+    internalToken: {type: apiKey, in: header, name: X-Internal-Service-Token}

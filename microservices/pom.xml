@@ -14,10 +14,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>security-contract</module>
-        <module>catalog-service</module>
-        <module>shop-service</module>
-        <module>risk-service</module>
-        <module>behavior-service</module>
         <module>catalog-shop-service</module>
     </modules>
     <properties>

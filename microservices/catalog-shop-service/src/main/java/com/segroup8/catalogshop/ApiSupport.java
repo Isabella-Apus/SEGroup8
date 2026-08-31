@@ -15,17 +15,21 @@ class ApiException extends RuntimeException {
     ApiException(String code, String message, HttpStatus status) { super(message); this.code=code; this.status=status; }
 }
 
+record ApiResult<T>(int code, String message, T data, String error) {
+    static <T> ApiResult<T> success(T data) { return new ApiResult<>(0, "success", data, null); }
+}
+
 @RestControllerAdvice
 class ApiErrorHandler {
     @ExceptionHandler(ApiException.class)
-    ResponseEntity<Map<String,Object>> domain(ApiException e) {
-        return ResponseEntity.status(e.status).body(Map.of("code",e.code,"message",e.getMessage()));
+    ResponseEntity<ApiResult<Void>> domain(ApiException e) {
+        return ResponseEntity.status(e.status).body(new ApiResult<>(e.status.value(),e.getMessage(),null,e.code));
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    Map<String,Object> validation(MethodArgumentNotValidException e) {
+    ApiResult<Map<String,String>> validation(MethodArgumentNotValidException e) {
         var fields=new LinkedHashMap<String,String>();
         e.getBindingResult().getFieldErrors().forEach(error -> fields.putIfAbsent(error.getField(),error.getDefaultMessage()));
-        return Map.of("code","VALIDATION_FAILED","message","请求参数校验失败","fields",fields);
+        return new ApiResult<>(400,"请求参数校验失败",fields,"VALIDATION_FAILED");
     }
 }

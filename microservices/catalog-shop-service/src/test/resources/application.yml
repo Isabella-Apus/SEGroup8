@@ -9,8 +9,14 @@ catalog-shop:
   internal-token: test-token
   reservation-ttl-seconds: 900
   expiration-scan-ms: 3600000
-  outbox-target-url: http://127.0.0.1:1
+  messaging-event-url: http://127.0.0.1:1
+  order-event-url: http://127.0.0.1:1
   outbox-publish-ms: 3600000
+  identity:
+    status-check-url: http://127.0.0.1:1/internal/auth/introspect
+security:
+  jwt:
+    secret: SEGROUP8_TEST_SECRET_MUST_BE_AT_LEAST_32_BYTES_LONG
 management:
   endpoints.web.exposure.include: health,info
   endpoint.health.probes.enabled: true

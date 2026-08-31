@@ -13,6 +13,13 @@ export default defineConfig({
         port: 5174,
         host: '0.0.0.0',
         proxy: {
+            ...Object.fromEntries([
+                '/api/category', '/api/product', '/api/shop',
+                '/api/admin/product-risk-audits', '/api/user/browse-history', '/api/search'
+            ].map((path) => [path, {
+                target: process.env.VITE_CATALOG_SHOP_TARGET || 'http://localhost:8086',
+                changeOrigin: true
+            }])),
             '/api': {
                 target: 'http://localhost:8080',
                 changeOrigin: true
