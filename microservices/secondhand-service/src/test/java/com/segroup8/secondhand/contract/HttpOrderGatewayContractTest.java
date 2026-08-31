@@ -32,7 +32,9 @@ class HttpOrderGatewayContractTest {
         server.expect(once(), requestTo("http://order.test/internal/orders/secondhand"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header("X-Internal-Service-Token", "internal-test-token"))
+                .andExpect(header("X-Request-Id", "SECONDHAND:BARGAIN:88"))
                 .andExpect(header("Idempotency-Key", "SECONDHAND:BARGAIN:88"))
+                .andExpect(header("X-Idempotency-Key", "SECONDHAND:BARGAIN:88"))
                 .andExpect(jsonPath("$.tradeType").value("BARGAIN"))
                 .andExpect(jsonPath("$.tradeId").value("88"))
                 .andExpect(jsonPath("$.buyerUserId").value(20))
@@ -61,6 +63,7 @@ class HttpOrderGatewayContractTest {
                         "http://order.test/internal/orders/by-business-key/SECONDHAND%3ABARGAIN%3A88"))
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header("X-Internal-Service-Token", "internal-test-token"))
+                .andExpect(header("X-Request-Id", "SECONDHAND:BARGAIN:88"))
                 .andRespond(withSuccess("{\"id\":901,\"orderNo\":\"ORD901\",\"orderStatus\":\"PENDING_PAY\"}",
                         MediaType.APPLICATION_JSON));
 

@@ -52,7 +52,7 @@
 
 ## 3. 六个服务当前 Flyway 物理表
 
-以下清单以六个微服务分支当前迁移脚本为准，共 55 张物理表。相比 33 张单体逻辑表，增加的是服务自治所需的预留、Saga、Inbox/Outbox、幂等、投影、报价和支付请求等表。
+以下清单以六个微服务合并后的迁移脚本为准。2026-08-31 重新扫描全部 `CREATE TABLE` 后，六个服务分别为 10、10、8、11、8、8 张，共 55 张物理表，与本表逐项一致。相比 33 张单体逻辑表，增加的是服务自治所需的预留、Saga、Inbox/Outbox、幂等、投影、报价和支付请求等表。
 
 | 服务 / schema | 当前物理表 | 归属结论 |
 |---|---|---|
@@ -85,7 +85,7 @@
 | 商家审核建店 | identity 提交审核与 Outbox；catalog 幂等消费 | 有界重试，超限 `DEAD`，保留 `last_error` 对账 | applicationId、eventId、店铺结果 |
 | 普通订单库存 | order 用幂等键调用 catalog 预留；双方各自提交 | 不确定结果先查状态；预留过期/释放事件进入 order `inbox_event`，仅取消仍待支付订单 | reservationId、requestId、补偿日志 |
 | 二手订单地址 | secondhand 调 identity 校验 buyer/address，再把完整快照发给 order | identity 不可用时建单重试/最终失败；禁止占位地址和跨库读取 | buyerId、addressId、冻结后的地址快照 |
-| 二手建单 | secondhand 冻结交易资格；order 按 `tradeType:tradeId` 幂等创建 | 超时先按 business key 查询，再决定是否重试；最终失败解除冻结 | tradeId、orderId、恢复测试 |
+| 二手建单 | secondhand 冻结交易资格；order 强校验 `Idempotency-Key=tradeType:tradeId` 后幂等创建 | 超时先按 business key 查询；只有查询明确返回不存在才进入有上限重试，查询本身不可用时保持冻结与 `RETRY`，禁止把不确定结果误判为失败 | tradeId、orderId、稳定幂等头、恢复测试 |
 | 支付/退款 | finance 原子更新余额、流水、用券和 payment_request | 按 paymentRequestId 查询不确定结果，禁止重复扣款 | 唯一请求号、正反流水、余额版本 |
 | 用户封禁传播 | identity 状态与 Outbox 同事务；messaging 维护版本投影 | 高风险写操作在投影不确定时失败关闭，事件按 accessVersion 去旧留新 | accessVersion、Inbox、重放记录 |
 | 通知投递 | 各生产者发送完整 `EventEnvelope`；messaging Inbox 去重 | 通知失败不回滚已完成业务；Outbox 重试并记录错误 | eventId、producer、dedupeKey |

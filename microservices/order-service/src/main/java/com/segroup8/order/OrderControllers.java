@@ -282,7 +282,15 @@ class InternalOrderController {
     }
 
     @PostMapping("/secondhand")
-    OrderView secondhand(@Valid @RequestBody SecondhandOrderRequest request) { return service.createSecondhand(request); }
+    OrderView secondhand(@RequestHeader("Idempotency-Key") String idempotencyKey,
+            @Valid @RequestBody SecondhandOrderRequest request) {
+        String expectedKey = request.tradeType() + ":" + request.tradeId();
+        if (!expectedKey.equals(idempotencyKey)) {
+            throw new OrderException("IDEMPOTENCY_KEY_MISMATCH",
+                    "Idempotency-Key must equal tradeType:tradeId", 400);
+        }
+        return service.createSecondhand(request);
+    }
 
     @GetMapping("/by-business-key/{key}")
     OrderView byKey(@PathVariable String key) {

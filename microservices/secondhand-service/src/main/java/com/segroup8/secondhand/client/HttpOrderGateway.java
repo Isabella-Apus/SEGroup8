@@ -31,7 +31,9 @@ public class HttpOrderGateway implements OrderGateway {
                             request.orderBusinessKey());
             OrderData order = client.post().uri("/internal/orders/secondhand")
                     .header("X-Internal-Service-Token", internalToken)
+                    .header("X-Request-Id", request.orderBusinessKey())
                     .header("Idempotency-Key", request.orderBusinessKey())
+                    .header("X-Idempotency-Key", request.orderBusinessKey())
                     .body(CreateOrderCommand.from(request, address))
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, (httpRequest, response) -> {
@@ -55,6 +57,7 @@ public class HttpOrderGateway implements OrderGateway {
             OrderData order = client.get()
                     .uri(uriBuilder -> uriBuilder.path("/internal/orders/by-business-key/{key}").build(businessKey))
                     .header("X-Internal-Service-Token", internalToken)
+                    .header("X-Request-Id", businessKey)
                     .retrieve()
                     .onStatus(status -> status.value() == 404, (request, response) -> {
                         throw new OrderNotFoundException();

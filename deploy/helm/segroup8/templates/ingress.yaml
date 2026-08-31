@@ -13,6 +13,66 @@ spec:
       {{- end }}
       http:
         paths:
+          {{ if .Values.catalogShop.enabled }}
+          - path: /api/user/browse-history
+            pathType: Prefix
+            backend:
+              service: { name: {{ .Release.Name }}-catalog-shop, port: { name: http } }
+          - path: /api/admin/product-risk-audits
+            pathType: Prefix
+            backend:
+              service: { name: {{ .Release.Name }}-catalog-shop, port: { name: http } }
+          - path: /api/category
+            pathType: Prefix
+            backend:
+              service: { name: {{ .Release.Name }}-catalog-shop, port: { name: http } }
+          - path: /api/product
+            pathType: Prefix
+            backend:
+              service: { name: {{ .Release.Name }}-catalog-shop, port: { name: http } }
+          - path: /api/shop
+            pathType: Prefix
+            backend:
+              service: { name: {{ .Release.Name }}-catalog-shop, port: { name: http } }
+          - path: /api/search
+            pathType: Prefix
+            backend:
+              service: { name: {{ .Release.Name }}-catalog-shop, port: { name: http } }
+          {{ end }}
+          {{ if .Values.identityGovernance.enabled }}
+          - path: /api/admin/merchant-applications
+            pathType: Prefix
+            backend:
+              service: { name: identity-governance-service, port: { name: http } }
+          - path: /api/admin/audit-logs
+            pathType: Prefix
+            backend:
+              service: { name: identity-governance-service, port: { name: http } }
+          - path: /api/admin/reports
+            pathType: Prefix
+            backend:
+              service: { name: identity-governance-service, port: { name: http } }
+          - path: /api/admin/users
+            pathType: Prefix
+            backend:
+              service: { name: identity-governance-service, port: { name: http } }
+          - path: /api/auth
+            pathType: Prefix
+            backend:
+              service: { name: identity-governance-service, port: { name: http } }
+          - path: /api/report-block
+            pathType: Prefix
+            backend:
+              service: { name: identity-governance-service, port: { name: http } }
+          - path: /api/credit
+            pathType: Prefix
+            backend:
+              service: { name: identity-governance-service, port: { name: http } }
+          - path: /api/user
+            pathType: Prefix
+            backend:
+              service: { name: identity-governance-service, port: { name: http } }
+          {{ end }}
           {{ if .Values.order.enabled }}
           - path: /api/order
             pathType: Prefix
@@ -42,6 +102,36 @@ spec:
                 name: {{ .Release.Name }}-order
                 port:
                   name: http
+          {{ end }}
+          {{ if .Values.secondhand.enabled }}
+          - path: /api/secondhand
+            pathType: Prefix
+            backend:
+              service: { name: secondhand-service, port: { name: http } }
+          {{ end }}
+          {{ if .Values.messaging.enabled }}
+          - path: /api/chat
+            pathType: Prefix
+            backend:
+              service: { name: messaging, port: { name: http } }
+          - path: /api/notifications
+            pathType: Prefix
+            backend:
+              service: { name: messaging, port: { name: http } }
+          - path: /ws/realtime
+            pathType: Prefix
+            backend:
+              service: { name: messaging, port: { name: http } }
+          {{ end }}
+          {{ if .Values.benefitsFinance.enabled }}
+          - path: /api/finance
+            pathType: Prefix
+            backend:
+              service: { name: benefits-finance, port: { name: http } }
+          - path: /api/voucher
+            pathType: Prefix
+            backend:
+              service: { name: benefits-finance, port: { name: http } }
           {{ end }}
           - path: /
             pathType: Prefix

@@ -70,4 +70,27 @@ class OrderFailureRecoveryIntegrationTest extends SecondhandIntegrationSupport {
         assertThat(db.queryForObject("select count(*) from outbox_event where event_type='SecondhandTradeOrderFailed.v1'",
                 Integer.class)).isEqualTo(1);
     }
+
+    @Test
+    void inconclusiveLookupNeverReleasesFrozenProductAtRetryThreshold() {
+        long productId = seedApprovedProduct(10, "结果不确定教材", "58.00", false);
+        doThrow(new OrderServiceUnavailableException("create response lost"))
+                .when(orderGateway).createSecondhandOrder(any());
+        doThrow(new OrderServiceUnavailableException("lookup offline"))
+                .when(orderGateway).findByBusinessKey(anyString());
+
+        var processing = trades.buy(20, productId, 1, null);
+        for (int attempt = 0; attempt < 4; attempt++) {
+            db.update("update trade_order_request set next_retry_at=CURRENT_TIMESTAMP where order_business_key=?",
+                    processing.orderBusinessKey());
+            coordinator.recoverPending(10);
+        }
+
+        assertThat(db.queryForObject("select request_status from trade_order_request where order_business_key=?",
+                String.class, processing.orderBusinessKey())).isEqualTo("RETRY");
+        assertThat(db.queryForObject("select status from secondhand_product where id=?", Integer.class, productId))
+                .isEqualTo(4);
+        assertThat(db.queryForObject("select count(*) from outbox_event where event_type='SecondhandTradeOrderFailed.v1'",
+                Integer.class)).isZero();
+    }
 }
