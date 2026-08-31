@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="520" viewBox="0 0 1100 520" role="img" aria-labelledby="title desc">
+  <title id="title">benefits-finance-service 服务划分图</title>
+  <desc id="desc">网关和订单服务调用资金服务，资金服务独占数据库并通过 Outbox 向订单与消息服务发布事件。</desc>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#475569"/></marker></defs>
+  <rect width="1100" height="520" fill="#f8fafc"/>
+  <g font-family="Arial, sans-serif" font-size="16" text-anchor="middle">
+    <g fill="#e0f2fe" stroke="#0284c7" stroke-width="2"><rect x="390" y="190" width="320" height="100" rx="14"/><text x="550" y="245" fill="#0c4a6e" font-weight="700">benefits-finance-service</text></g>
+    <g fill="#fff" stroke="#64748b" stroke-width="2">
+      <rect x="40" y="60" width="180" height="64" rx="10"/><text x="130" y="99">Gateway</text>
+      <rect x="40" y="220" width="180" height="64" rx="10"/><text x="130" y="259">order-service</text>
+      <rect x="40" y="380" width="180" height="64" rx="10"/><text x="130" y="419">catalog / identity</text>
+      <rect x="850" y="60" width="200" height="64" rx="10"/><text x="950" y="99">benefits_finance_db</text>
+      <rect x="850" y="220" width="200" height="64" rx="10"/><text x="950" y="259">outbox_event</text>
+      <rect x="850" y="380" width="200" height="64" rx="10"/><text x="950" y="410">order / messaging</text><text x="950" y="430" font-size="13">event consumers</text>
+    </g>
+  </g>
+  <g stroke="#475569" stroke-width="2" fill="none" marker-end="url(#a)">
+    <path d="M220 92 L430 190"/><path d="M220 252 L390 242"/><path d="M220 412 L430 290"/>
+    <path d="M710 215 L850 110"/><path d="M710 252 L850 252"/><path d="M950 284 L950 380"/>
+  </g>
+</svg>

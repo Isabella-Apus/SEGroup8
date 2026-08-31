@@ -1,0 +1,263 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\Jerry\\Desktop\\SEGroup8\\.codex-worktrees\\benefits-finance-pr\\frontend\\playwright.config.ts",
+    "rootDir": "C:/Users/Jerry/Desktop/SEGroup8/.codex-worktrees/benefits-finance-pr/frontend/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "C:\\Users\\Jerry\\Desktop\\SEGroup8\\.codex-worktrees\\benefits-finance-pr\\04_tests\\microservices\\benefits-finance-service\\evidence\\compose-e2e\\playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "C:\\Users\\Jerry\\Desktop\\SEGroup8\\.codex-worktrees\\benefits-finance-pr\\04_tests\\microservices\\benefits-finance-service\\evidence\\compose-e2e\\playwright-results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "C:\\Users\\Jerry\\Desktop\\SEGroup8\\.codex-worktrees\\benefits-finance-pr\\04_tests\\microservices\\benefits-finance-service\\evidence\\compose-e2e\\playwright-results.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/Jerry/Desktop/SEGroup8/.codex-worktrees/benefits-finance-pr/04_tests/microservices/benefits-finance-service/evidence/compose-e2e/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/Jerry/Desktop/SEGroup8/.codex-worktrees/benefits-finance-pr/frontend/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "domain-e\\uc21-voucher-lifecycle.spec.ts",
+      "file": "domain-e/uc21-voucher-lifecycle.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_E @UC21 voucher lifecycle",
+          "file": "domain-e/uc21-voucher-lifecycle.spec.ts",
+          "line": 18,
+          "column": 6,
+          "specs": [
+            {
+              "title": "seller creates, edits and closes a voucher through the real UI",
+              "ok": true,
+              "tags": [
+                "DOMAIN_E",
+                "UC21"
+              ],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6044,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-31T08:20:09.719Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "uc21-voucher-closed-after-refresh",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Jerry\\Desktop\\SEGroup8\\.codex-worktrees\\benefits-finance-pr\\04_tests\\microservices\\benefits-finance-service\\evidence\\compose-e2e\\test-results\\domain-e-uc21-voucher-life-90344-voucher-through-the-real-UI\\attachments\\uc21-voucher-closed-after-refresh-167e7c84089c096ef9c0438b17f3ad4e38b50939.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c2a2c42b7495e3293c01-f884dd5f89d740211937",
+              "file": "domain-e/uc21-voucher-lifecycle.spec.ts",
+              "line": 22,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "domain-e\\uc22-claim-checkout.spec.ts",
+      "file": "domain-e/uc22-claim-checkout.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_E @UC22 voucher claim and checkout",
+          "file": "domain-e/uc22-claim-checkout.spec.ts",
+          "line": 22,
+          "column": 6,
+          "specs": [
+            {
+              "title": "buyer claims and uses a voucher in a paid order through the real UI",
+              "ok": true,
+              "tags": [
+                "DOMAIN_E",
+                "UC22"
+              ],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3869,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-31T08:20:15.882Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "uc22-voucher-used-after-paid-order-refresh",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Jerry\\Desktop\\SEGroup8\\.codex-worktrees\\benefits-finance-pr\\04_tests\\microservices\\benefits-finance-service\\evidence\\compose-e2e\\test-results\\domain-e-uc22-claim-checko-77076-d-order-through-the-real-UI\\attachments\\uc22-voucher-used-after-paid-order-refresh-ccf374df56aaf3341d40c9cce4d852a5d2c8756a.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "dcc50922f80149026aaa-4e913fe925e09842170c",
+              "file": "domain-e/uc22-claim-checkout.spec.ts",
+              "line": 26,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "domain-e\\uc23-wallet-settlement.spec.ts",
+      "file": "domain-e/uc23-wallet-settlement.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_E @UC23 wallet and settlement",
+          "file": "domain-e/uc23-wallet-settlement.spec.ts",
+          "line": 6,
+          "column": 6,
+          "specs": [
+            {
+              "title": "buyer recharges and seller receives one persisted business settlement",
+              "ok": true,
+              "tags": [
+                "DOMAIN_E",
+                "UC23"
+              ],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4469,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-31T08:20:19.769Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "uc23-business-settlement-after-refresh",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\Jerry\\Desktop\\SEGroup8\\.codex-worktrees\\benefits-finance-pr\\04_tests\\microservices\\benefits-finance-service\\evidence\\compose-e2e\\test-results\\domain-e-uc23-wallet-settl-dfc90-rsisted-business-settlement\\attachments\\uc23-business-settlement-after-refresh-fe7a31f3beb96d354c8a5a421ffc3feb883da05e.png"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "c8cd3c071eab198830e3-7bef6946f23843d8b474",
+              "file": "domain-e/uc23-wallet-settlement.spec.ts",
+              "line": 10,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-08-31T08:20:09.174Z",
+    "duration": 15289.499,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

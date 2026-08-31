@@ -223,3 +223,31 @@ catalogShop:
     minReplicas: 2
     maxReplicas: 8
     targetCPUUtilizationPercentage: 65
+
+benefitsFinance:
+  enabled: false
+  replicas: 2
+  image:
+    repository: segroup8/benefits-finance
+    tag: dev
+    commit: unknown
+    buildTime: unknown
+    pullPolicy: IfNotPresent
+  service:
+    port: 8085
+  secretName: benefits-finance-secrets
+  config:
+    currency: CNY
+    orderServiceUrl: http://segroup8-order:8085
+    quoteTtlSeconds: "300"
+    reservationTtlSeconds: "900"
+    outboxEventSinkUrl: http://messaging:8084/internal/events
+    outboxPollMs: "5000"
+    outboxBatchSize: "50"
+    outboxMaxAttempts: "8"
+    httpConnectTimeoutMs: "1000"
+    httpReadTimeoutMs: "3000"
+    javaToolOptions: "-Djava.io.tmpdir=/tmp"
+  resources:
+    requests: { cpu: 100m, memory: 256Mi }
+    limits: { cpu: 500m, memory: 512Mi }
