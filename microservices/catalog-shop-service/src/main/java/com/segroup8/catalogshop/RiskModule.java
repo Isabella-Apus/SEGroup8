@@ -36,7 +36,7 @@ class RiskController {
 
 @Service
 class RiskModule {
-    private static final List<String> FORBIDDEN=List.of("违禁","枪支","毒品","假证","赌博");
+    private static final List<String> FORBIDDEN=List.of("违禁","枪支","毒品","假证","赌博","高仿","假冒");
     private final JdbcClient db;private final SimpleJdbcInsert insert;private final boolean llmConfigured;
     RiskModule(JdbcClient db,DataSource ds,@Value("${catalog-shop.risk-llm-api-key:}") String key){this.db=db;this.insert=new SimpleJdbcInsert(ds).withTableName("product_risk_audit").usingGeneratedKeyColumns("id");this.llmConfigured=key!=null&&!key.isBlank();}
     void submit(long productId,String name,String description){String text=(name+" "+description).toLowerCase(Locale.ROOT);List<String> hits=FORBIDDEN.stream().filter(text::contains).toList();String level=hits.isEmpty()?"LOW":"HIGH";String status=hits.isEmpty()?"APPROVED":"PENDING";String reason=hits.isEmpty()?"DETERMINISTIC_RULES_AUTO_APPROVED":(llmConfigured?"RULES_AND_LLM":"DETERMINISTIC_RULES_NO_LLM_KEY");insert.execute(Map.of("product_id",productId,"snapshot_name",name,"snapshot_description",description,"risk_level",level,"rule_hits",String.join(",",hits),"status",status,"decision_reason",reason,"created_at",java.sql.Timestamp.from(Instant.now()),"updated_at",java.sql.Timestamp.from(Instant.now())));if(hits.isEmpty())db.sql("update product set status='ON_SALE',updated_at=CURRENT_TIMESTAMP where id=:id").param("id",productId).update();}

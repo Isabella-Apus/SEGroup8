@@ -1,5 +1,5 @@
 INSERT INTO category(id,parent_id,name,sort_order,active) VALUES
-  (1,NULL,'Digital Products',1,true),(101,1,'Mobile Devices',1,true)
+  (1,NULL,'数码产品',1,true),(101,1,'手机',1,true)
 ON DUPLICATE KEY UPDATE name=VALUES(name),parent_id=VALUES(parent_id),active=VALUES(active);
 INSERT INTO shop(id,seller_id,merchant_application_id,name,announcement,status,decoration_template,decoration_json) VALUES
   (1,2,'compose-seller-2','Container Demo Store','Seed shop for full-system E2E','OPEN','GRID','{"components":[]}')
