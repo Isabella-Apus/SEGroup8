@@ -1,0 +1,9 @@
+2026-08-31T14:34:08+08:00
+command=mvn -B --no-transfer-progress -f microservices/pom.xml -pl benefits-finance-service -am clean verify
+testcontainers.version=1.21.4
+docker.host=npipe:////./pipe/docker_engine
+docker.server=29.3.1 api=1.54
+mysql.image=mysql:8.4.6
+flyway.migration=PASS
+tests=4 failures=0 errors=0 skipped=0
+reactor=BUILD SUCCESS

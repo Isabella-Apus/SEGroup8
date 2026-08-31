@@ -1,0 +1,14 @@
+<testsuites id="" name="" tests="3" failures="0" skipped="0" errors="0" time="6.597003000000001">
+<testsuite name="domain-e\uc21-voucher-lifecycle.spec.ts" timestamp="2026-08-31T06:35:33.804Z" hostname="" tests="1" failures="0" skipped="0" time="1.816" errors="0">
+<testcase name="@DOMAIN_E @UC21 voucher lifecycle › seller creates, updates, lists and closes a voucher in the extracted service" classname="domain-e\uc21-voucher-lifecycle.spec.ts" time="1.816">
+</testcase>
+</testsuite>
+<testsuite name="domain-e\uc22-claim-checkout.spec.ts" timestamp="2026-08-31T06:35:33.804Z" hostname="" tests="1" failures="0" skipped="0" time="1.823" errors="0">
+<testcase name="@DOMAIN_E @UC22 claim and checkout eligibility › claimed voucher is quoted, reserved and consumed by the extracted service" classname="domain-e\uc22-claim-checkout.spec.ts" time="1.823">
+</testcase>
+</testsuite>
+<testsuite name="domain-e\uc23-wallet-settlement.spec.ts" timestamp="2026-08-31T06:35:33.804Z" hostname="" tests="1" failures="0" skipped="0" time="1.462" errors="0">
+<testcase name="@DOMAIN_E @UC23 @UC12 @UC14 wallet, payment, refund and settlement › money movements persist once and seller receives the settlement" classname="domain-e\uc23-wallet-settlement.spec.ts" time="1.462">
+</testcase>
+</testsuite>
+</testsuites>

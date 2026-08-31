@@ -1,0 +1,63 @@
+{
+  "service": "benefits-finance-service",
+  "generatedAt": "2026-08-31T06:49:27Z",
+  "revision": "4979221bfdff0fa3d76f32c7c643cd2ddf3ee90c",
+  "command": "mvn -B --no-transfer-progress -f microservices/pom.xml -pl benefits-finance-service -am clean verify",
+  "status": "LOCAL_CANDIDATE_ACCEPTANCE_PASS_EXTERNAL_RELEASE_NOT_RUN",
+  "maven": "PASS",
+  "mysqlIntegration": "PASS",
+  "publicApiCoverage": { "covered": 15, "total": 15 },
+  "tests": { "run": 25, "failures": 0, "errors": 0, "skipped": 0 },
+  "securityContractTests": { "run": 5, "failures": 0, "errors": 0, "skipped": 0 },
+  "independentServiceE2E": "PASS",
+  "fullSystemUseCaseE2E": "PASS",
+  "e2e": {
+    "run": 3,
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0,
+    "scope": "CANDIDATE_IMAGE_DOMAIN_E_COMPOSE",
+    "benefitsFinanceServiceRouted": true
+  },
+  "executions": [
+    {
+      "kind": "mavenCleanVerify",
+      "completedAt": "2026-08-31T06:34:08Z",
+      "result": "PASS",
+      "tests": { "run": 25, "failures": 0, "errors": 0, "skipped": 0 }
+    },
+    {
+      "kind": "mysqlTestcontainers",
+      "completedAt": "2026-08-31T06:34:08Z",
+      "result": "PASS",
+      "image": "mysql:8.4.6",
+      "tests": { "run": 4, "failures": 0, "errors": 0, "skipped": 0 }
+    },
+    {
+      "kind": "independentCandidateServiceE2E",
+      "completedAt": "2026-08-31T06:40:00Z",
+      "result": "PASS",
+      "tests": { "run": 3, "failures": 0, "errors": 0, "skipped": 0 }
+    },
+    {
+      "kind": "candidateDomainEComposePlaywright",
+      "completedAt": "2026-08-31T06:36:00Z",
+      "result": "PASS",
+      "tests": { "run": 3, "failures": 0, "errors": 0, "skipped": 0 }
+    }
+  ],
+  "candidateImage": "PASS",
+  "candidateImageId": "sha256:9d4d6a96a181b64b7544d090d2bfaacdecec310c1ace88c987d38ab278b1d778",
+  "jarSha256": "f00b91f15da4e84a1c9ebc0f7b827f240c82161f20e82846a0cd18a6b930e8a7",
+  "helmStatic": "PASS",
+  "registryDigest": "PENDING",
+  "kubernetesRollout": "NOT_RUN",
+  "faultInjectionOnKubernetes": "NOT_RUN",
+  "environments": {
+    "mysqlTestcontainers": "PASS_MYSQL_8_4_6",
+    "independentServiceE2E": "PASS",
+    "browserCompose": "PASS_CANDIDATE_IMAGE_DOMAIN_E",
+    "microserviceRoutedBrowserE2E": "PASS",
+    "kubernetes": "NOT_RUN"
+  }
+}

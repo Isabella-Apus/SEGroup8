@@ -1,0 +1,6 @@
+gitSha=4979221bfdff0fa3d76f32c7c643cd2ddf3ee90c
+appVersion=local-acceptance
+appCommit=4979221bfdff0fa3d76f32c7c643cd2ddf3ee90c
+appBuildTime=2026-08-31T06:34:08Z
+jarSha256=f00b91f15da4e84a1c9ebc0f7b827f240c82161f20e82846a0cd18a6b930e8a7
+financeImage=segroup8/benefits-finance:e2e

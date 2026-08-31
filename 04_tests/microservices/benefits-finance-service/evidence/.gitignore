@@ -1,0 +1,8 @@
+# Keep compact JSON/XML and selected logs; CI stores bulky browser artifacts temporarily.
+**/playwright-report/
+**/test-results/
+**/traces/
+**/trace.zip
+**/videos/
+**/*.webm
+**/screenshots/

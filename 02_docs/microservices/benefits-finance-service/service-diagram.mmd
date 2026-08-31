@@ -1,0 +1,9 @@
+flowchart LR
+    Gateway --> Finance[benefits-finance-service]
+    Finance --> FDB[(benefits_finance_db)]
+    Order[order-service] -->|quote / reserve / debit / refund / settle| Finance
+    Finance -->|PaymentCompleted / RefundCompleted / SettlementCompleted| Outbox[(outbox_event)]
+    Outbox --> Order
+    Outbox --> Messaging[messaging-service]
+    Catalog[catalog-shop-service] -->|stable shopId/productId| Finance
+    Identity[identity-governance-service] -->|signed JWT| Finance

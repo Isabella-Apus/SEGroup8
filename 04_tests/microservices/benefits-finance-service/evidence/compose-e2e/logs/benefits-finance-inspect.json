@@ -1,0 +1,42 @@
+{
+  "id": "1141f7ac9e04d694bf9a7a5cd6f43ecc90f384655c26ee9bf7247651e7a1106c",
+  "name": "/segroup8-benefits-finance-e2e",
+  "image": "segroup8/benefits-finance:e2e",
+  "state": {
+    "status": "running",
+    "running": true,
+    "exitCode": 0,
+    "startedAt": "2026-08-31T06:34:41.338624912Z",
+    "finishedAt": "0001-01-01T00:00:00Z",
+    "health": {
+      "Status": "healthy",
+      "FailingStreak": 0,
+      "Log": [
+        {
+          "Start": "2026-08-31T06:34:46.486264062Z",
+          "End": "2026-08-31T06:34:46.535122557Z",
+          "ExitCode": 0,
+          "Output": ""
+        },
+        {
+          "Start": "2026-08-31T06:35:01.53585149Z",
+          "End": "2026-08-31T06:35:01.607917635Z",
+          "ExitCode": 0,
+          "Output": ""
+        },
+        {
+          "Start": "2026-08-31T06:35:16.708536659Z",
+          "End": "2026-08-31T06:35:16.755684946Z",
+          "ExitCode": 0,
+          "Output": ""
+        },
+        {
+          "Start": "2026-08-31T06:35:32.480550609Z",
+          "End": "2026-08-31T06:35:32.522303399Z",
+          "ExitCode": 0,
+          "Output": ""
+        }
+      ]
+    }
+  }
+}

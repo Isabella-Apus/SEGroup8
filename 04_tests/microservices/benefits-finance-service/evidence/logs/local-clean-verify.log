@@ -1,0 +1,9 @@
+2026-08-31T14:34:08+08:00
+command=mvn -B --no-transfer-progress -f microservices/pom.xml -pl benefits-finance-service -am clean verify
+reactor=BUILD SUCCESS
+security-contract.tests=5 failures=0 errors=0 skipped=0
+benefits-finance-service.tests=25 failures=0 errors=0 skipped=0
+testcontainers.version=1.21.4
+docker.server=29.3.1 api=1.54
+mysql.contract=PASS tests=4 failures=0 errors=0 skipped=0 image=mysql:8.4.6
+jar=microservices/benefits-finance-service/target/benefits-finance-service-1.0.0.jar

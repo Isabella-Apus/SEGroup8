@@ -1,0 +1,459 @@
+name: Benefits Finance Service CI/CD
+
+on:
+  pull_request:
+    paths:
+      - "microservices/benefits-finance-service/**"
+      - "microservices/security-contract/**"
+      - "microservices/pom.xml"
+      - "frontend/e2e/domain-e/**"
+      - "frontend/e2e/microservices/benefits-finance-service-api.spec.ts"
+      - "frontend/playwright.config.ts"
+      - "frontend/package.json"
+      - "frontend/package-lock.json"
+      - "scripts/e2e/stubs/benefits-finance-event-stub.mjs"
+      - "compose.yml"
+      - "02_docs/microservices/benefits-finance-service/**"
+      - "03_devops/microservices/benefits-finance-service/**"
+      - "04_tests/microservices/benefits-finance-service/**"
+      - "05_management/microservices/benefits-finance-service/**"
+      - "deploy/helm/segroup8/templates/benefits-finance-*.yaml"
+      - "deploy/helm/segroup8/values.yaml"
+      - ".github/workflows/ci-cd-microservices.yml"
+  push:
+    branches: [main]
+    paths:
+      - "microservices/benefits-finance-service/**"
+      - "microservices/security-contract/**"
+      - "microservices/pom.xml"
+      - "frontend/e2e/domain-e/**"
+      - "frontend/e2e/microservices/benefits-finance-service-api.spec.ts"
+      - "frontend/playwright.config.ts"
+      - "frontend/package.json"
+      - "frontend/package-lock.json"
+      - "scripts/e2e/stubs/benefits-finance-event-stub.mjs"
+      - "compose.yml"
+      - "02_docs/microservices/benefits-finance-service/**"
+      - "03_devops/microservices/benefits-finance-service/**"
+      - "04_tests/microservices/benefits-finance-service/**"
+      - "05_management/microservices/benefits-finance-service/**"
+      - "deploy/helm/segroup8/templates/benefits-finance-*.yaml"
+      - "deploy/helm/segroup8/values.yaml"
+      - ".github/workflows/ci-cd-microservices.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: benefits-finance-service-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  benefits-finance-verify:
+    name: Boundary, API, contract and real MySQL gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: microservices/**/pom.xml
+      - name: Reject forbidden cross-domain persistence
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if grep -R -n -E \
+            'OrderMapper|ProductMapper|ShopMapper|NotificationMapper|INSERT[[:space:]]+INTO[[:space:]]+(order_info|product|shop|notification)|UPDATE[[:space:]]+(order_info|product|shop|notification)' \
+            microservices/benefits-finance-service/src/main; then
+            echo "benefits-finance-service contains forbidden cross-domain persistence"
+            exit 1
+          fi
+          if grep -R -n -E 'com\.segroup8\.(order|catalog|shop|messaging)\..*(Mapper|Repository|Entity)' \
+            microservices/benefits-finance-service/src/main; then
+            echo "benefits-finance-service imports another domain persistence model"
+            exit 1
+          fi
+      - name: Run clean verification with required MySQL Testcontainers
+        run: mvn -B --no-transfer-progress -f microservices/pom.xml -pl benefits-finance-service -am clean verify
+      - name: Reject missing or skipped required tests
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          report="microservices/benefits-finance-service/target/surefire-reports/TEST-com.segroup8.finance.MySqlContractIntegrationTest.xml"
+          test -s "$report"
+          python3 - "$report" <<'PY'
+          import sys
+          import xml.etree.ElementTree as ET
+          suite = ET.parse(sys.argv[1]).getroot()
+          result = {key: int(suite.attrib.get(key, "0")) for key in ("tests", "failures", "errors", "skipped")}
+          if result["tests"] < 4 or any(result[key] for key in ("failures", "errors", "skipped")):
+              raise SystemExit(f"required MySQL gate failed: {result}")
+          print(f"required MySQL gate passed: {result}")
+          PY
+          if grep -R -E 'skipped="[1-9][0-9]*"' microservices/benefits-finance-service/target/surefire-reports/TEST-*.xml; then
+            echo "benefits-finance-service verification skipped a test"
+            exit 1
+          fi
+      - name: Build one candidate image from the verified Boot JAR
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p release-candidate
+          mapfile -t jars < <(find microservices/benefits-finance-service/target -maxdepth 1 -type f \
+            -name 'benefits-finance-service-*.jar' ! -name '*.jar.original' -print)
+          test "${#jars[@]}" -eq 1
+          jar_sha="$(sha256sum "${jars[0]}" | cut -d ' ' -f 1)"
+          build_time="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          candidate="segroup8/benefits-finance:candidate-${GITHUB_SHA}"
+          docker build --pull=false \
+            --build-arg "VCS_REF=${GITHUB_SHA}" \
+            --build-arg "BUILD_TIME=${build_time}" \
+            --build-arg "JAR_SHA256=${jar_sha}" \
+            -t "$candidate" microservices/benefits-finance-service
+          test "$(docker image inspect "$candidate" --format '{{.Config.User}}')" = "10001:10001"
+          test "$(docker image inspect "$candidate" --format '{{index .Config.Labels "org.opencontainers.image.revision"}}')" = "$GITHUB_SHA"
+          test "$(docker image inspect "$candidate" --format '{{index .Config.Labels "com.segroup8.jar.sha256"}}')" = "$jar_sha"
+          docker image inspect "$candidate" --format '{{json .Config.Healthcheck}}' | grep -q 'liveness'
+          image_id="$(docker image inspect "$candidate" --format '{{.Id}}')"
+          printf '%s  %s\n' "$jar_sha" "$(basename "${jars[0]}")" > release-candidate/benefits-finance-jar.sha256
+          jq -n --arg gitSha "$GITHUB_SHA" --arg buildTime "$build_time" \
+            --arg jarSha256 "$jar_sha" --arg candidateImage "$candidate" --arg candidateImageId "$image_id" \
+            '{gitSha:$gitSha,buildTime:$buildTime,jarSha256:$jarSha256,candidateImage:$candidateImage,candidateImageId:$candidateImageId}' \
+            > release-candidate/release-metadata.json
+          docker image save "$candidate" | gzip -1 > release-candidate/benefits-finance-image.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benefits-finance-candidate-${{ github.sha }}
+          path: |
+            microservices/benefits-finance-service/target/benefits-finance-service-*.jar
+            release-candidate/**
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload raw Maven reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benefits-finance-surefire-${{ github.sha }}
+          path: microservices/benefits-finance-service/target/surefire-reports/**
+          if-no-files-found: warn
+          retention-days: 14
+
+  benefits-finance-independent-e2e:
+    name: UC21-UC23 candidate image API E2E
+    needs: benefits-finance-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CI: "true"
+      COMPOSE_PROJECT_NAME: segroup8-benefits-finance-acceptance
+      FINANCE_ACCEPTANCE_IMAGE: segroup8/benefits-finance:candidate-${{ github.sha }}
+      E2E_FINANCE_BASE_URL: http://127.0.0.1:18085
+      E2E_FINANCE_EVENT_STUB_URL: http://127.0.0.1:18087
+      JWT_SECRET: benefits-finance-acceptance-jwt-secret-at-least-32-bytes
+      E2E_INTERNAL_SERVICE_TOKEN: benefits-finance-acceptance-internal-token
+      APP_COMMIT: ${{ github.sha }}
+      APP_BUILD_TIME: ci
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: actions/download-artifact@v4
+        with:
+          name: benefits-finance-candidate-${{ github.sha }}
+          path: candidate-bundle
+      - name: Load and verify the exact candidate image
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          metadata="candidate-bundle/release-candidate/release-metadata.json"
+          docker image load --input candidate-bundle/release-candidate/benefits-finance-image.tar.gz
+          test "$(jq -r '.gitSha' "$metadata")" = "$GITHUB_SHA"
+          test "$(docker image inspect "$FINANCE_ACCEPTANCE_IMAGE" --format '{{.Id}}')" = "$(jq -r '.candidateImageId' "$metadata")"
+          test "$(docker image inspect "$FINANCE_ACCEPTANCE_IMAGE" --format '{{index .Config.Labels "com.segroup8.jar.sha256"}}')" = "$(jq -r '.jarSha256' "$metadata")"
+          cp "$metadata" "$RUNNER_TEMP/benefits-finance-candidate-metadata.json"
+      - name: Start strict event stub and independent service stack
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          node scripts/e2e/stubs/benefits-finance-event-stub.mjs >"$RUNNER_TEMP/benefits-finance-event-stub.log" 2>&1 &
+          echo $! >"$RUNNER_TEMP/benefits-finance-event-stub.pid"
+          for _ in $(seq 1 30); do
+            curl --fail --silent http://127.0.0.1:18087/health | grep -q '"status":"UP"' && break
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:18087/health | grep -q '"status":"UP"'
+          docker compose -f microservices/benefits-finance-service/compose.acceptance.yml up -d --no-build --wait
+          curl --fail --silent http://127.0.0.1:18085/actuator/health/readiness | grep -q '"status":"UP"'
+      - name: Run independent candidate acceptance
+        working-directory: frontend
+        env:
+          E2E_OUTPUT_DIR: ${{ runner.temp }}/benefits-finance-independent-e2e
+        run: |
+          npm ci
+          npx playwright test e2e/microservices/benefits-finance-service-api.spec.ts --workers=1
+      - name: Collect and stop independent stack
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/benefits-finance-independent-e2e/logs"
+          docker compose -f microservices/benefits-finance-service/compose.acceptance.yml ps --all \
+            >"$RUNNER_TEMP/benefits-finance-independent-e2e/logs/compose-ps.txt" 2>&1 || true
+          docker compose -f microservices/benefits-finance-service/compose.acceptance.yml logs --no-color --timestamps \
+            >"$RUNNER_TEMP/benefits-finance-independent-e2e/logs/compose.log" 2>&1 || true
+          cp "$RUNNER_TEMP/benefits-finance-event-stub.log" \
+            "$RUNNER_TEMP/benefits-finance-independent-e2e/logs/event-stub.log" 2>/dev/null || true
+          cp "$RUNNER_TEMP/benefits-finance-candidate-metadata.json" \
+            "$RUNNER_TEMP/benefits-finance-independent-e2e/release-metadata.json" 2>/dev/null || true
+          curl --silent --show-error http://127.0.0.1:18085/v3/api-docs \
+            >"$RUNNER_TEMP/benefits-finance-independent-e2e/runtime-openapi.json" || true
+          docker compose -f microservices/benefits-finance-service/compose.acceptance.yml down -v --remove-orphans || true
+          test ! -f "$RUNNER_TEMP/benefits-finance-event-stub.pid" || kill "$(cat "$RUNNER_TEMP/benefits-finance-event-stub.pid")" || true
+      - name: Upload independent API E2E evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benefits-finance-independent-e2e-${{ github.sha }}
+          path: ${{ runner.temp }}/benefits-finance-independent-e2e/**
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 14
+
+  benefits-finance-domain-e2e:
+    name: UC21-UC23 platform-auth Compose regression
+    needs: benefits-finance-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CI: "true"
+      FINANCE_IMAGE: segroup8/benefits-finance:candidate-${{ github.sha }}
+      SKIP_MAVEN_VERIFY: "true"
+      SKIP_FINANCE_IMAGE_BUILD: "true"
+      APP_VERSION: sha-${{ github.sha }}
+      APP_COMMIT: ${{ github.sha }}
+      E2E_EVIDENCE_ROOT: ${{ runner.temp }}/benefits-finance-domain-e2e
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - uses: actions/download-artifact@v4
+        with:
+          name: benefits-finance-candidate-${{ github.sha }}
+          path: candidate-bundle
+      - name: Load and verify the exact candidate image
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          metadata="candidate-bundle/release-candidate/release-metadata.json"
+          docker image load --input candidate-bundle/release-candidate/benefits-finance-image.tar.gz
+          test "$(docker image inspect "$FINANCE_IMAGE" --format '{{.Id}}')" = "$(jq -r '.candidateImageId' "$metadata")"
+      - name: Run Domain E through platform authentication and candidate service
+        shell: bash
+        run: |
+          chmod +x 04_tests/microservices/benefits-finance-service/run-compose-e2e.sh
+          04_tests/microservices/benefits-finance-service/run-compose-e2e.sh
+      - name: Upload Domain E evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benefits-finance-domain-e2e-${{ github.sha }}
+          path: ${{ runner.temp }}/benefits-finance-domain-e2e/**
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 14
+
+  benefits-finance-delivery-config:
+    name: Lint and render benefits-finance Helm delivery
+    needs: benefits-finance-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - name: Lint and render chart
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          helm lint deploy/helm/segroup8 \
+            --set benefitsFinance.enabled=true \
+            --set-string benefitsFinance.image.repository=registry.example/segroup8/benefits-finance \
+            --set-string benefitsFinance.image.tag=sha-test \
+            --set-string benefitsFinance.image.commit=$GITHUB_SHA \
+            --set-string benefitsFinance.image.buildTime=ci
+          helm template segroup8 deploy/helm/segroup8 --namespace segroup8 \
+            --set benefitsFinance.enabled=true \
+            --set-string benefitsFinance.image.repository=registry.example/segroup8/benefits-finance \
+            --set-string benefitsFinance.image.tag=sha-test \
+            --set-string benefitsFinance.image.commit=$GITHUB_SHA \
+            --set-string benefitsFinance.image.buildTime=ci > benefits-finance-rendered.yaml
+          grep -q '^kind: Deployment$' benefits-finance-rendered.yaml
+          grep -q '^kind: Service$' benefits-finance-rendered.yaml
+          grep -q 'startupProbe:' benefits-finance-rendered.yaml
+          grep -q 'readOnlyRootFilesystem: true' benefits-finance-rendered.yaml
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benefits-finance-rendered-helm-${{ github.sha }}
+          path: benefits-finance-rendered.yaml
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-benefits-finance-image:
+    name: Publish exact E2E-tested SHA image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [benefits-finance-verify, benefits-finance-independent-e2e, benefits-finance-domain-e2e, benefits-finance-delivery-config]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    outputs:
+      image: ${{ steps.publish.outputs.image }}
+      digest: ${{ steps.publish.outputs.digest }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: benefits-finance-candidate-${{ github.sha }}
+          path: candidate-bundle
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      - name: Push candidate without rebuilding
+        id: publish
+        shell: bash
+        env:
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+        run: |
+          set -Eeuo pipefail
+          test -n "$ACR_REGISTRY"; test -n "$ACR_NAMESPACE"
+          metadata="candidate-bundle/release-candidate/release-metadata.json"
+          candidate="segroup8/benefits-finance:candidate-${GITHUB_SHA}"
+          target="${ACR_REGISTRY}/${ACR_NAMESPACE}/benefits-finance:sha-${GITHUB_SHA}"
+          docker image load --input candidate-bundle/release-candidate/benefits-finance-image.tar.gz
+          test "$(docker image inspect "$candidate" --format '{{.Id}}')" = "$(jq -r '.candidateImageId' "$metadata")"
+          docker image tag "$candidate" "$target"
+          docker image push "$target" | tee benefits-finance-image-push.log
+          digest="$(docker image inspect "$target" --format '{{join .RepoDigests "\n"}}' | head -n 1)"
+          test -n "$digest"
+          printf '%s\n' "$digest" > benefits-finance-image-digest.txt
+          jq --arg publishedImage "$target" --arg repositoryDigest "$digest" \
+            '. + {publishedImage:$publishedImage,repositoryDigest:$repositoryDigest}' "$metadata" \
+            > benefits-finance-release-metadata.json
+          echo "image=$target" >> "$GITHUB_OUTPUT"
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benefits-finance-image-digest-${{ github.sha }}
+          path: |
+            benefits-finance-image-digest.txt
+            benefits-finance-image-push.log
+            benefits-finance-release-metadata.json
+          if-no-files-found: error
+          retention-days: 30
+
+  deploy-benefits-finance:
+    name: Atomic Helm deploy benefits-finance-service
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ENABLE_PRODUCTION_DEPLOY == 'true'
+    needs: publish-benefits-finance-image
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: production
+    concurrency:
+      group: segroup8-production-helm
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package Helm chart
+        run: tar -czf "benefits-finance-chart-$GITHUB_SHA.tar.gz" deploy/helm/segroup8
+      - name: Configure SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+      - name: Upload, deploy and smoke
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          IMAGE: ${{ needs.publish-benefits-finance-image.outputs.image }}
+          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          archive="/tmp/benefits-finance-$GITHUB_SHA.tgz"
+          scp "benefits-finance-chart-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$archive"
+          repository="${IMAGE%:*}"; tag="${IMAGE##*:}"
+          ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=10 "$DEPLOY_USER@$DEPLOY_HOST" bash -s -- \
+            "$archive" "$K8S_NAMESPACE" "$repository" "$tag" "$GITHUB_SHA" <<'REMOTE' | tee benefits-finance-deployment.log
+          set -Eeuo pipefail
+          archive=$1; namespace=$2; repository=$3; tag=$4; git_sha=$5
+          trap 'rm -f -- "$archive"' EXIT
+          kubectl -n "$namespace" get secret benefits-finance-secrets >/dev/null
+          kubectl -n "$namespace" get service mysql >/dev/null
+          helm upgrade --install segroup8 "$archive" --namespace "$namespace" --create-namespace \
+            --atomic --cleanup-on-fail --wait --timeout 5m --history-max 10 \
+            --set benefitsFinance.enabled=true \
+            --set-string benefitsFinance.image.repository="$repository" \
+            --set-string benefitsFinance.image.tag="$tag" \
+            --set-string benefitsFinance.image.commit="$git_sha" \
+            --set-string benefitsFinance.image.buildTime="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          kubectl -n "$namespace" rollout status deployment/benefits-finance --timeout=180s
+          for endpoint in liveness readiness; do
+            kubectl get --raw "/api/v1/namespaces/${namespace}/services/http:benefits-finance:8085/proxy/actuator/health/${endpoint}" \
+              | grep -q '"status":"UP"'
+          done
+          kubectl get --raw "/api/v1/namespaces/${namespace}/services/http:benefits-finance:8085/proxy/actuator/info" \
+            | grep -Fq "\"commit\":\"$git_sha\""
+          kubectl get --raw "/api/v1/namespaces/${namespace}/services/http:benefits-finance:8085/proxy/api/finance/dashboard" \
+            2>/dev/null | grep -q 'AUTH_REQUIRED'
+          helm -n "$namespace" status segroup8
+          helm -n "$namespace" history segroup8
+          REMOTE
+      - name: Collect failure diagnostics
+        if: always()
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
+        shell: bash
+        run: |
+          if test -f "$HOME/.ssh/id_ed25519"; then
+            ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=3 "$DEPLOY_USER@$DEPLOY_HOST" bash -s -- \
+              "$K8S_NAMESPACE" > benefits-finance-diagnostics.log 2>&1 <<'REMOTE' || true
+          namespace=$1
+          helm -n "$namespace" status segroup8 || true
+          helm -n "$namespace" history segroup8 || true
+          kubectl -n "$namespace" get pods,svc,ingress -o wide || true
+          kubectl -n "$namespace" get events --sort-by=.lastTimestamp || true
+          kubectl -n "$namespace" describe deployment/benefits-finance || true
+          kubectl -n "$namespace" logs deployment/benefits-finance --all-containers --tail=300 || true
+          for pod in $(kubectl -n "$namespace" get pods -l app.kubernetes.io/name=benefits-finance -o name 2>/dev/null); do
+            kubectl -n "$namespace" logs "$pod" --all-containers --previous --tail=300 || true
+          done
+          REMOTE
+          else
+            printf '%s\n' 'SSH setup unavailable; remote diagnostics were not collected.' > benefits-finance-diagnostics.log
+          fi
+      - name: Upload deployment and rollback diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benefits-finance-deployment-${{ github.sha }}
+          path: |
+            benefits-finance-deployment.log
+            benefits-finance-diagnostics.log
+          if-no-files-found: warn
+          retention-days: 30

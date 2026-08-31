@@ -1,0 +1,783 @@
+openapi: 3.0.3
+info:
+  title: Benefits Finance Service API
+  version: 1.0.0
+  description: |
+    UC21-UC23 public API and the UC12/UC14 order-service collaboration contract.
+
+    Public `/api/**` operations require a Bearer JWT. Internal `/internal/**`
+    operations require `X-Internal-Service-Token`; a browser JWT is not a
+    substitute for service identity. Callers should propagate `X-Request-Id`
+    and `X-Trace-Id`. Money values use decimal notation and CNY by default.
+servers:
+  - url: http://benefits-finance-service:8085
+tags:
+  - name: Voucher Public
+    description: UC21 and UC22 voucher lifecycle endpoints.
+  - name: Finance Public
+    description: UC23 wallet and business-account endpoints.
+  - name: Internal
+    description: Service-authenticated order collaboration endpoints.
+
+x-event-contracts:
+  transport: HTTP outbox relay
+  delivery: at-least-once
+  deduplication: Consumers must deduplicate by X-Event-Id.
+  headers:
+    X-Event-Id: Unique event identifier.
+    X-Event-Type: PaymentCompleted, RefundCompleted, SettlementCompleted, or RechargeCompleted.
+    X-Internal-Service-Token: Cluster service credential.
+  body:
+    $ref: '#/components/schemas/FinancialEventPayload'
+  events:
+    PaymentCompleted: Emitted after a debit, ledger record, and payment request commit atomically.
+    RefundCompleted: Emitted after a refund, reversal ledger record, and refund request commit atomically.
+    SettlementCompleted: Emitted after a seller business balance and settlement ledger record commit atomically.
+    RechargeCompleted: Emitted after a wallet recharge and ledger record commit atomically.
+
+x-error-code-catalog:
+  INVALID_ARGUMENT: HTTP 400; body validation, malformed JSON, or parameter type failure.
+  SHOP_REQUIRED: HTTP 400; a seller voucher has no shopId.
+  ADMIN_SCOPE_INVALID: HTTP 400; an administrator voucher is not platform scoped.
+  VOUCHER_TIME_INVALID: HTTP 400; voucher endTime is not after startTime.
+  VOUCHER_QUANTITY_INVALID: HTTP 400; totalCount is below the received count.
+  VOUCHER_DISCOUNT_INVALID: HTTP 400; discount fields violate the selected discount type.
+  VOUCHER_SCOPE_INVALID: HTTP 400; seller scope is neither SHOP nor PRODUCT.
+  AUTH_REQUIRED: HTTP 401; Bearer JWT is missing, invalid, or expired.
+  ROLE_FORBIDDEN: HTTP 403; authenticated user lacks the required role.
+  SERVICE_IDENTITY_FORBIDDEN: HTTP 403; internal service token is missing or invalid.
+  VOUCHER_NOT_OWNED: HTTP 403 or 409; issuer ownership check or user-voucher availability check failed.
+  VOUCHER_NOT_FOUND: HTTP 404; voucher does not exist.
+  PAYMENT_REQUEST_NOT_FOUND: HTTP 404; payment request does not exist.
+  DATA_CONFLICT: HTTP 409; a database uniqueness or integrity constraint rejected the request.
+  IDEMPOTENCY_KEY_REUSED: HTTP 409; the same business key was supplied with different parameters.
+  VOUCHER_CONCURRENT_UPDATE: HTTP 409; voucher version changed concurrently.
+  VOUCHER_ALREADY_CLAIMED: HTTP 409; voucher cannot be claimed twice or deleted after being claimed.
+  VOUCHER_SOLD_OUT: HTTP 409; voucher inventory is exhausted.
+  VOUCHER_NOT_RESERVABLE: HTTP 409; voucher is unavailable, expired, or held by another request.
+  VOUCHER_NOT_RESERVED: HTTP 409; consume did not match an active reservation.
+  VOUCHER_ALREADY_USED: HTTP 409; a consumed voucher cannot be released.
+  VOUCHER_RELEASE_CONFLICT: HTTP 409; release lost a conditional state transition.
+  VOUCHER_NOT_USABLE: HTTP 409; voucher is closed or outside its validity period.
+  VOUCHER_THRESHOLD_NOT_MET: HTTP 409; eligible amount is below the threshold.
+  VOUCHER_SCOPE_MISMATCH: HTTP 409; order snapshot does not contain the required shop or product.
+  VOUCHER_CLOSED: HTTP 409; a closed voucher cannot be edited.
+  VOUCHER_NOT_CLAIMABLE: HTTP 409; voucher is not currently claimable.
+  PAYMENT_NOT_REFUNDABLE: HTTP 409; referenced debit is absent or incomplete.
+  PAYMENT_REFERENCE_MISMATCH: HTTP 409; refund order or user does not match the debit.
+  REFUND_EXCEEDS_PAYMENT: HTTP 409; cumulative refund would exceed the debit.
+  INSUFFICIENT_BALANCE: HTTP 409; debit would make the wallet negative.
+  BALANCE_CONCURRENT_UPDATE: HTTP 409; optimistic balance update lost a race.
+  INTERNAL_ERROR: HTTP 500; unexpected failure; use requestId for investigation and result lookup.
+
+paths:
+  /api/voucher/list:
+    get:
+      operationId: listClaimableVouchers
+      tags: [Voucher Public]
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Claimable vouchers.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Voucher' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/voucher/{id}/claim:
+    post:
+      operationId: claimVoucher
+      tags: [Voucher Public]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/VoucherId'
+      responses:
+        '201':
+          description: Voucher claimed.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ClaimResult' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/voucher/my:
+    get:
+      operationId: listMyVouchers
+      tags: [Voucher Public]
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Current user's vouchers.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Voucher' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/voucher/seller/list:
+    get:
+      operationId: listSellerVouchers
+      tags: [Voucher Public]
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Vouchers issued by the authenticated seller.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Voucher' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/voucher/seller:
+    post:
+      operationId: createSellerVoucher
+      tags: [Voucher Public]
+      security: [{ bearerAuth: [] }]
+      requestBody: { $ref: '#/components/requestBodies/VoucherSave' }
+      responses:
+        '201':
+          description: Seller voucher created.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Voucher' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/voucher/seller/{id}:
+    parameters:
+      - $ref: '#/components/parameters/VoucherId'
+    put:
+      operationId: updateSellerVoucher
+      tags: [Voucher Public]
+      security: [{ bearerAuth: [] }]
+      requestBody: { $ref: '#/components/requestBodies/VoucherSave' }
+      responses:
+        '200':
+          description: Seller voucher updated.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Voucher' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    delete:
+      operationId: deleteSellerVoucher
+      tags: [Voucher Public]
+      security: [{ bearerAuth: [] }]
+      responses:
+        '204':
+          description: Unclaimed seller voucher deleted; no response body.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/voucher/seller/{id}/close:
+    post:
+      operationId: closeSellerVoucher
+      tags: [Voucher Public]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/VoucherId'
+      responses:
+        '204':
+          description: Seller voucher closed; no response body.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/voucher/admin/list:
+    get:
+      operationId: listAllVouchersForAdmin
+      tags: [Voucher Public]
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: All vouchers visible to an administrator.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/Voucher' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/voucher/admin:
+    post:
+      operationId: createAdminVoucher
+      tags: [Voucher Public]
+      security: [{ bearerAuth: [] }]
+      requestBody: { $ref: '#/components/requestBodies/VoucherSave' }
+      responses:
+        '201':
+          description: Platform voucher created.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Voucher' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/voucher/admin/{id}:
+    parameters:
+      - $ref: '#/components/parameters/VoucherId'
+    put:
+      operationId: updateAdminVoucher
+      tags: [Voucher Public]
+      security: [{ bearerAuth: [] }]
+      requestBody: { $ref: '#/components/requestBodies/VoucherSave' }
+      responses:
+        '200':
+          description: Platform voucher updated.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Voucher' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    delete:
+      operationId: deleteAdminVoucher
+      tags: [Voucher Public]
+      security: [{ bearerAuth: [] }]
+      responses:
+        '204':
+          description: Unclaimed platform voucher deleted; no response body.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/voucher/admin/{id}/close:
+    post:
+      operationId: closeAdminVoucher
+      tags: [Voucher Public]
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - $ref: '#/components/parameters/VoucherId'
+      responses:
+        '204':
+          description: Platform voucher closed; no response body.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/finance/dashboard:
+    get:
+      operationId: getFinanceDashboard
+      tags: [Finance Public]
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Personal and business balances for the authenticated user.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content: { application/json: { schema: { $ref: '#/components/schemas/Wallet' } } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/finance/recharge:
+    post:
+      operationId: rechargeWallet
+      tags: [Finance Public]
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/Recharge' } } }
+      responses:
+        '200':
+          description: Idempotent recharge result.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content: { application/json: { schema: { $ref: '#/components/schemas/PaymentResult' } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/finance/my-wallet/records:
+    get:
+      operationId: listPersonalWalletRecords
+      tags: [Finance Public]
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Up to 100 latest personal wallet ledger records.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Transaction' } } } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /api/finance/business/records:
+    get:
+      operationId: listBusinessRecords
+      tags: [Finance Public]
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Up to 100 latest business-account ledger records for the authenticated seller.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Transaction' } } } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /internal/checkout/quote:
+    post:
+      operationId: createCheckoutQuote
+      tags: [Internal]
+      security: [{ internalServiceToken: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/QuoteRequest' } } }
+      responses:
+        '200':
+          description: Versioned, expiring checkout quote.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content: { application/json: { schema: { $ref: '#/components/schemas/QuoteResult' } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /internal/vouchers/reserve:
+    post:
+      operationId: reserveVoucher
+      tags: [Internal]
+      security: [{ internalServiceToken: [] }]
+      requestBody: { $ref: '#/components/requestBodies/VoucherAction' }
+      responses:
+        '200': { $ref: '#/components/responses/VoucherActionResult' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /internal/vouchers/consume:
+    post:
+      operationId: consumeVoucher
+      tags: [Internal]
+      security: [{ internalServiceToken: [] }]
+      requestBody: { $ref: '#/components/requestBodies/VoucherAction' }
+      responses:
+        '200': { $ref: '#/components/responses/VoucherActionResult' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /internal/vouchers/release:
+    post:
+      operationId: releaseVoucher
+      tags: [Internal]
+      security: [{ internalServiceToken: [] }]
+      requestBody: { $ref: '#/components/requestBodies/VoucherAction' }
+      responses:
+        '200': { $ref: '#/components/responses/VoucherActionResult' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /internal/payments/debit:
+    post:
+      operationId: debitWallet
+      tags: [Internal]
+      security: [{ internalServiceToken: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/DebitRequest' } } }
+      responses:
+        '200':
+          description: Debit result; an exact repeated request returns the original result.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content: { application/json: { schema: { $ref: '#/components/schemas/PaymentResult' } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /internal/payments/{paymentRequestId}:
+    get:
+      operationId: getPaymentResult
+      tags: [Internal]
+      security: [{ internalServiceToken: [] }]
+      parameters:
+        - name: paymentRequestId
+          in: path
+          required: true
+          schema: { $ref: '#/components/schemas/BusinessRequestId' }
+      responses:
+        '200':
+          description: Persisted payment, refund, recharge, or settlement result.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content: { application/json: { schema: { $ref: '#/components/schemas/PaymentResult' } } }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /internal/payments/refund:
+    post:
+      operationId: refundPayment
+      tags: [Internal]
+      security: [{ internalServiceToken: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/RefundRequest' } } }
+      responses:
+        '200':
+          description: Refund result with reversal-ledger reference.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content: { application/json: { schema: { $ref: '#/components/schemas/PaymentResult' } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /internal/settlements:
+    post:
+      operationId: settleSeller
+      tags: [Internal]
+      security: [{ internalServiceToken: [] }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/SettlementRequest' } } }
+      responses:
+        '200':
+          description: Seller settlement result, unique by orderId and sellerId.
+          headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+          content: { application/json: { schema: { $ref: '#/components/schemas/PaymentResult' } } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT issued by identity-governance-service.
+    internalServiceToken:
+      type: apiKey
+      in: header
+      name: X-Internal-Service-Token
+      description: Cluster service credential injected from Kubernetes Secret.
+
+  headers:
+    RequestId:
+      description: Validated caller request ID or a generated UUID.
+      schema: { type: string, maxLength: 80, pattern: '^[A-Za-z0-9._:-]+$' }
+
+  parameters:
+    VoucherId:
+      name: id
+      in: path
+      required: true
+      schema: { type: integer, format: int64, minimum: 1 }
+
+  requestBodies:
+    VoucherSave:
+      required: true
+      content: { application/json: { schema: { $ref: '#/components/schemas/VoucherSave' } } }
+    VoucherAction:
+      required: true
+      content: { application/json: { schema: { $ref: '#/components/schemas/VoucherAction' } } }
+
+  responses:
+    VoucherActionResult:
+      description: Idempotent voucher state result.
+      headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+      content: { application/json: { schema: { $ref: '#/components/schemas/VoucherActionResult' } } }
+    BadRequest:
+      description: Request body, business validation, or parameter type is invalid.
+      headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { code: INVALID_ARGUMENT, message: '参数不合法: amount', requestId: 7522356e-3d4f-4b89-8a0d-a70d199cb118, timestamp: '2026-08-29T09:00:00Z' }
+    Unauthorized:
+      description: Bearer JWT is missing, invalid, or expired.
+      headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { code: AUTH_REQUIRED, message: '缺少、无效或过期的 Bearer JWT', requestId: 7522356e-3d4f-4b89-8a0d-a70d199cb118, timestamp: '2026-08-29T09:00:00Z' }
+    Forbidden:
+      description: User role or internal service identity is forbidden.
+      headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          examples:
+            role:
+              value: { code: ROLE_FORBIDDEN, message: 当前身份无权执行该操作, requestId: 7522356e-3d4f-4b89-8a0d-a70d199cb118, timestamp: '2026-08-29T09:00:00Z' }
+            serviceIdentity:
+              value: { code: SERVICE_IDENTITY_FORBIDDEN, message: 内部接口仅允许受信任的集群服务调用, requestId: 7522356e-3d4f-4b89-8a0d-a70d199cb118, timestamp: '2026-08-29T09:00:00Z' }
+    NotFound:
+      description: Referenced voucher or payment request does not exist.
+      headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { code: PAYMENT_REQUEST_NOT_FOUND, message: 资金请求不存在, requestId: 7522356e-3d4f-4b89-8a0d-a70d199cb118, timestamp: '2026-08-29T09:00:00Z' }
+    Conflict:
+      description: Idempotency key, balance, voucher state, refund, or database constraint conflict.
+      headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { code: IDEMPOTENCY_KEY_REUSED, message: 同一请求 ID 不能用于不同的业务参数, requestId: 7522356e-3d4f-4b89-8a0d-a70d199cb118, timestamp: '2026-08-29T09:00:00Z' }
+    InternalError:
+      description: Unexpected failure. Retain requestId and query a known business request before retrying.
+      headers: { X-Request-Id: { $ref: '#/components/headers/RequestId' } }
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+          example: { code: INTERNAL_ERROR, message: 服务暂时不可用，请携带 requestId 重试或查询结果, requestId: 7522356e-3d4f-4b89-8a0d-a70d199cb118, timestamp: '2026-08-29T09:00:00Z' }
+
+  schemas:
+    BusinessRequestId:
+      type: string
+      minLength: 1
+      maxLength: 80
+      pattern: '^[A-Za-z0-9._:-]+$'
+      example: pay-9001-1
+    Money:
+      type: number
+      format: double
+      multipleOf: 0.01
+      example: 12.34
+    NonNegativeMoney:
+      allOf:
+        - $ref: '#/components/schemas/Money'
+        - { type: number, minimum: 0 }
+    PositiveMoney:
+      allOf:
+        - $ref: '#/components/schemas/Money'
+        - { type: number, minimum: 0.01 }
+    Currency: { type: string, minLength: 3, maxLength: 3, example: CNY }
+
+    VoucherSave:
+      type: object
+      required: [name, discountType, minAmount, totalCount, startTime, endTime]
+      description: discountAmount is required for AMOUNT; discountRate is required for RATE. endTime must be future and later than startTime.
+      properties:
+        name: { type: string, minLength: 1, maxLength: 100 }
+        discountType: { type: string, enum: [AMOUNT, RATE] }
+        discountAmount:
+          allOf: [{ $ref: '#/components/schemas/PositiveMoney' }]
+          nullable: true
+        discountRate: { type: number, format: double, minimum: 0.0001, maximum: 1, exclusiveMaximum: true, nullable: true }
+        minAmount: { $ref: '#/components/schemas/NonNegativeMoney' }
+        totalCount: { type: integer, minimum: 1 }
+        startTime: { type: string, format: date-time }
+        endTime: { type: string, format: date-time }
+        shopId: { type: integer, format: int64, minimum: 1, nullable: true }
+        productId: { type: integer, format: int64, minimum: 1, nullable: true }
+        scopeType: { type: string, enum: [SHOP, PRODUCT, PLATFORM], nullable: true }
+
+    Voucher:
+      type: object
+      required: [id, issuerType, voucherType, issuerUserId, scopeType, name, discountType, minAmount, totalCount, receivedCount, usedCount, startTime, endTime, status]
+      properties:
+        id: { type: integer, format: int64 }
+        issuerType: { type: string, enum: [SELLER, ADMIN] }
+        voucherType: { type: string, enum: [SELLER, PLATFORM] }
+        issuerUserId: { type: integer, format: int64 }
+        scopeType: { type: string, enum: [SHOP, PRODUCT, PLATFORM] }
+        shopId: { type: integer, format: int64, nullable: true }
+        productId: { type: integer, format: int64, nullable: true }
+        name: { type: string }
+        discountType: { type: string, enum: [AMOUNT, RATE] }
+        discountAmount:
+          allOf: [{ $ref: '#/components/schemas/PositiveMoney' }]
+          nullable: true
+        discountRate: { type: number, format: double, nullable: true }
+        minAmount: { $ref: '#/components/schemas/NonNegativeMoney' }
+        totalCount: { type: integer }
+        receivedCount: { type: integer }
+        usedCount: { type: integer }
+        startTime: { type: string, format: date-time }
+        endTime: { type: string, format: date-time }
+        status: { type: string, enum: [SCHEDULED, ACTIVE, CLOSED] }
+
+    ClaimResult:
+      type: object
+      required: [userVoucherId, voucherId, status, expiresAt]
+      properties:
+        userVoucherId: { type: integer, format: int64 }
+        voucherId: { type: integer, format: int64 }
+        status: { type: string, enum: [AVAILABLE] }
+        expiresAt: { type: string, format: date-time }
+
+    Wallet:
+      type: object
+      required: [personalBalance, businessBalance, currency, version]
+      properties:
+        personalBalance: { $ref: '#/components/schemas/NonNegativeMoney' }
+        businessBalance: { $ref: '#/components/schemas/NonNegativeMoney' }
+        currency: { $ref: '#/components/schemas/Currency' }
+        version: { type: integer, minimum: 0 }
+
+    Recharge:
+      type: object
+      required: [requestId, amount, channel]
+      properties:
+        requestId: { type: string, minLength: 1, maxLength: 48, pattern: '^[A-Za-z0-9._:-]+$' }
+        amount: { $ref: '#/components/schemas/PositiveMoney' }
+        channel: { type: string, enum: [WECHAT, ALIPAY, BANK] }
+
+    Transaction:
+      type: object
+      required: [transactionId, userId, accountType, tradeType, amount, balanceAfter, currency, createdAt]
+      properties:
+        transactionId: { type: string, maxLength: 80 }
+        orderId: { type: integer, format: int64, nullable: true }
+        userId: { type: integer, format: int64 }
+        accountType: { type: string, enum: [PERSONAL, BUSINESS] }
+        tradeType: { type: string, enum: [RECHARGE, DEBIT, REFUND, SETTLEMENT] }
+        amount: { $ref: '#/components/schemas/Money' }
+        balanceAfter: { $ref: '#/components/schemas/NonNegativeMoney' }
+        currency: { $ref: '#/components/schemas/Currency' }
+        reversalOf: { type: string, maxLength: 80, nullable: true }
+        remark: { type: string, maxLength: 255, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    QuoteRequest:
+      type: object
+      required: [orderRequestId, userId, amount]
+      properties:
+        orderRequestId: { $ref: '#/components/schemas/BusinessRequestId' }
+        userId: { type: integer, format: int64, minimum: 1 }
+        amount: { $ref: '#/components/schemas/PositiveMoney' }
+        voucherId: { type: integer, format: int64, minimum: 1, nullable: true }
+        shopIds: { type: array, items: { type: integer, format: int64, minimum: 1 } }
+        productIds: { type: array, items: { type: integer, format: int64, minimum: 1 } }
+
+    QuoteResult:
+      type: object
+      required: [quoteId, quoteVersion, originalAmount, discountAmount, payableAmount, currency, expiresAt]
+      properties:
+        quoteId: { type: string, format: uuid }
+        quoteVersion: { type: integer, minimum: 1 }
+        originalAmount: { $ref: '#/components/schemas/PositiveMoney' }
+        discountAmount: { $ref: '#/components/schemas/NonNegativeMoney' }
+        payableAmount: { $ref: '#/components/schemas/NonNegativeMoney' }
+        currency: { $ref: '#/components/schemas/Currency' }
+        expiresAt: { type: string, format: date-time }
+        voucherId: { type: integer, format: int64, nullable: true }
+
+    VoucherAction:
+      type: object
+      required: [orderRequestId, userId, voucherId]
+      properties:
+        orderRequestId: { $ref: '#/components/schemas/BusinessRequestId' }
+        userId: { type: integer, format: int64, minimum: 1 }
+        voucherId: { type: integer, format: int64, minimum: 1 }
+        orderId: { type: integer, format: int64, minimum: 1, nullable: true, description: Required by consume; optional for reserve and release. }
+
+    VoucherActionResult:
+      type: object
+      required: [voucherId, orderRequestId, status]
+      properties:
+        voucherId: { type: integer, format: int64 }
+        orderRequestId: { $ref: '#/components/schemas/BusinessRequestId' }
+        status: { type: string, enum: [AVAILABLE, RESERVED, USED] }
+
+    DebitRequest:
+      type: object
+      required: [paymentRequestId, orderId, userId, amount]
+      properties:
+        paymentRequestId: { $ref: '#/components/schemas/BusinessRequestId' }
+        orderId: { type: integer, format: int64, minimum: 1 }
+        userId: { type: integer, format: int64, minimum: 1 }
+        amount: { $ref: '#/components/schemas/PositiveMoney' }
+
+    RefundRequest:
+      type: object
+      required: [refundRequestId, paymentRequestId, orderId, userId, amount]
+      properties:
+        refundRequestId: { $ref: '#/components/schemas/BusinessRequestId' }
+        paymentRequestId: { $ref: '#/components/schemas/BusinessRequestId' }
+        orderId: { type: integer, format: int64, minimum: 1 }
+        userId: { type: integer, format: int64, minimum: 1 }
+        amount: { $ref: '#/components/schemas/PositiveMoney' }
+
+    SettlementRequest:
+      type: object
+      required: [orderId, sellerId, amount]
+      properties:
+        orderId: { type: integer, format: int64, minimum: 1 }
+        sellerId: { type: integer, format: int64, minimum: 1 }
+        amount: { $ref: '#/components/schemas/PositiveMoney' }
+
+    PaymentResult:
+      type: object
+      required: [requestId, requestType, orderId, amount, currency, status]
+      properties:
+        requestId: { $ref: '#/components/schemas/BusinessRequestId' }
+        requestType: { type: string, enum: [RECHARGE, DEBIT, REFUND, SETTLEMENT] }
+        orderId: { type: integer, format: int64 }
+        userId: { type: integer, format: int64, nullable: true }
+        sellerId: { type: integer, format: int64, nullable: true }
+        amount: { $ref: '#/components/schemas/PositiveMoney' }
+        currency: { $ref: '#/components/schemas/Currency' }
+        status: { type: string, enum: [PROCESSING, COMPLETED] }
+        transactionId: { type: string, maxLength: 80, nullable: true }
+        originalRequestId: { type: string, maxLength: 80, nullable: true }
+        completedAt: { type: string, format: date-time, nullable: true }
+
+    FinancialEventPayload:
+      type: object
+      required: [requestId, orderId, transactionId]
+      description: JSON body sent by the outbox relay. Event identity and type are carried in HTTP headers.
+      properties:
+        requestId: { type: string, maxLength: 80 }
+        orderId: { type: integer, format: int64, description: Zero for a recharge event. }
+        transactionId: { type: string, maxLength: 80 }
+
+    Error:
+      type: object
+      required: [code, message, requestId, timestamp]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        requestId: { type: string }
+        timestamp: { type: string, format: date-time }

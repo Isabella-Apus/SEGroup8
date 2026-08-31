@@ -1,0 +1,17 @@
+
+Running 3 tests using 1 worker
+
+(node:24736) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:24736) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 e2e\domain-e\uc21-voucher-lifecycle.spec.ts:4:3 › @DOMAIN_E @UC21 voucher lifecycle › seller creates, updates, lists and closes a voucher in the extracted service (1.8s)
+  ok 2 e2e\domain-e\uc22-claim-checkout.spec.ts:4:3 › @DOMAIN_E @UC22 claim and checkout eligibility › claimed voucher is quoted, reserved and consumed by the extracted service (1.8s)
+  ok 3 e2e\domain-e\uc23-wallet-settlement.spec.ts:4:3 › @DOMAIN_E @UC23 @UC12 @UC14 wallet, payment, refund and settlement › money movements persist once and seller receives the settlement (1.5s)
+
+  3 passed (6.6s)
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report ..\04_tests\microservices\benefits-finance-service\evidence\compose-e2e\playwright-report[39m
+[36m[39m
