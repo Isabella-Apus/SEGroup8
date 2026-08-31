@@ -1,0 +1,5 @@
+CREATE DATABASE IF NOT EXISTS order_db;
+CREATE TABLE IF NOT EXISTS order_db.order_info (
+    id BIGINT NOT NULL PRIMARY KEY,
+    status VARCHAR(20) NOT NULL
+);

@@ -33,6 +33,37 @@ frontend:
       cpu: 250m
       memory: 256Mi
 
+identityGovernance:
+  # The component is enabled by its own service pipeline after the shared
+  # segroup8 release exists. This keeps platform-only releases installable.
+  enabled: false
+  replicaCount: 1
+  image:
+    repository: ""
+    tag: ""
+    pullPolicy: IfNotPresent
+  secretName: identity-governance-secret
+  service:
+    port: 8091
+  deployment:
+    version: ""
+    commit: ""
+    buildTime: ""
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 768Mi
+  # The HPA manifest is delivered for the later course experiment but remains
+  # disabled until the team runs and records the autoscaling experiment.
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 70
+
 mysql:
   image:
     repository: mysql

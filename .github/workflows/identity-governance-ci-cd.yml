@@ -1,0 +1,390 @@
+name: Identity Governance Service CI/CD
+
+on:
+  pull_request:
+    paths:
+      - "microservices/identity-governance-service/**"
+      - "microservices/security-contract/**"
+      - "microservices/pom.xml"
+      - "frontend/e2e/domain-a/**"
+      - "frontend/playwright.config.ts"
+      - "02_docs/microservices/identity-governance-service/**"
+      - "03_devops/microservices/identity-governance-service/**"
+      - "04_tests/microservices/identity-governance-service/**"
+      - "05_management/microservices/identity-governance-service/**"
+      - "deploy/helm/segroup8/templates/identity-governance-*.yaml"
+      - "deploy/helm/segroup8/values.yaml"
+      - ".github/scripts/deploy-identity-governance-k3s.sh"
+      - ".github/workflows/identity-governance-ci-cd.yml"
+  push:
+    branches: [main]
+    paths:
+      - "microservices/identity-governance-service/**"
+      - "microservices/security-contract/**"
+      - "microservices/pom.xml"
+      - "frontend/e2e/domain-a/**"
+      - "frontend/playwright.config.ts"
+      - "02_docs/microservices/identity-governance-service/**"
+      - "03_devops/microservices/identity-governance-service/**"
+      - "04_tests/microservices/identity-governance-service/**"
+      - "05_management/microservices/identity-governance-service/**"
+      - "deploy/helm/segroup8/templates/identity-governance-*.yaml"
+      - "deploy/helm/segroup8/values.yaml"
+      - ".github/scripts/deploy-identity-governance-k3s.sh"
+      - ".github/workflows/identity-governance-ci-cd.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: identity-governance-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  verify:
+    name: API, MySQL, contract, image and Helm gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Java 17 and Maven cache
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+          cache-dependency-path: |
+            microservices/pom.xml
+            microservices/security-contract/pom.xml
+            microservices/identity-governance-service/pom.xml
+      - name: Unit, API, contract and real MySQL integration tests
+        run: mvn -B --no-transfer-progress -f microservices/pom.xml -pl identity-governance-service -am clean verify
+      - name: Reject forbidden cross-domain persistence
+        shell: bash
+        run: |
+          if grep -R -n -E \
+            'OrderMapper|ProductMapper|BalanceMapper|VoucherMapper|NotificationMapper|INSERT[[:space:]]+INTO[[:space:]]+order_info' \
+            microservices/identity-governance-service/src/main/java; then
+            echo "identity-governance-service contains forbidden cross-domain persistence"
+            exit 1
+          fi
+      - name: Build candidate image from the tested JAR
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          mkdir -p release-candidate
+          mapfile -t jars < <(find microservices/identity-governance-service/target -maxdepth 1 -type f -name 'identity-governance-service-*.jar' ! -name '*.original' -print)
+          test "${#jars[@]}" -eq 1
+          jar_sha="$(sha256sum "${jars[0]}" | cut -d ' ' -f 1)"
+          candidate="segroup8/identity-governance:candidate-${GITHUB_SHA}"
+          docker build \
+            --label "org.opencontainers.image.revision=${GITHUB_SHA}" \
+            --label "org.opencontainers.image.source=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --label "com.segroup8.identity-governance.jar-sha256=${jar_sha}" \
+            -t "$candidate" \
+            microservices/identity-governance-service
+          test "$(docker image inspect "$candidate" --format '{{.Config.User}}')" = "10001:10001"
+          test "$(docker image inspect "$candidate" --format '{{index .Config.Labels "com.segroup8.identity-governance.jar-sha256"}}')" = "$jar_sha"
+          image_id="$(docker image inspect "$candidate" --format '{{.Id}}')"
+          printf '%s  %s\n' "$jar_sha" "$(basename "${jars[0]}")" > release-candidate/identity-governance-jar.sha256
+          jq -n \
+            --arg gitSha "$GITHUB_SHA" \
+            --arg jarSha256 "$jar_sha" \
+            --arg candidateImage "$candidate" \
+            --arg candidateImageId "$image_id" \
+            '{gitSha:$gitSha,jarSha256:$jarSha256,candidateImage:$candidateImage,candidateImageId:$candidateImageId}' \
+            > release-candidate/release-metadata.json
+          docker image save "$candidate" | gzip -1 > release-candidate/identity-governance-image.tar.gz
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+      - name: Lint and render identity-governance deployment
+        run: |
+          helm lint deploy/helm/segroup8 \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-existing \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-existing \
+            --set identityGovernance.enabled=true \
+            --set-string identityGovernance.image.repository=registry.example/segroup8/identity-governance \
+            --set-string identityGovernance.image.tag=sha-test \
+            --set-string identityGovernance.deployment.version=sha-test \
+            --set-string identityGovernance.deployment.commit=$GITHUB_SHA \
+            --set-string identityGovernance.deployment.buildTime=ci \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql
+          deployment_render="$(mktemp)"
+          helm template segroup8 deploy/helm/segroup8 \
+            --namespace segroup8 \
+            --show-only templates/identity-governance-deployment.yaml \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-existing \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-existing \
+            --set identityGovernance.enabled=true \
+            --set-string identityGovernance.image.repository=registry.example/segroup8/identity-governance \
+            --set-string identityGovernance.image.tag=sha-test \
+            --set-string identityGovernance.deployment.version=sha-test \
+            --set-string identityGovernance.deployment.commit=$GITHUB_SHA \
+            --set-string identityGovernance.deployment.buildTime=ci \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
+            >"$deployment_render"
+          grep -q 'runAsUser: 10001' "$deployment_render"
+          grep -q 'runAsGroup: 10001' "$deployment_render"
+          grep -q 'readOnlyRootFilesystem: true' "$deployment_render"
+          grep -q 'allowPrivilegeEscalation: false' "$deployment_render"
+          grep -q 'mountPath: /tmp' "$deployment_render"
+          hpa_render="$(mktemp)"
+          helm template segroup8 deploy/helm/segroup8 \
+            --namespace segroup8 \
+            --show-only templates/identity-governance-hpa.yaml \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-existing \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-existing \
+            --set identityGovernance.enabled=true \
+            --set identityGovernance.autoscaling.enabled=true \
+            --set-string identityGovernance.image.repository=registry.example/segroup8/identity-governance \
+            --set-string identityGovernance.image.tag=sha-test \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
+            >"$hpa_render"
+          grep -q '^kind: HorizontalPodAutoscaler$' "$hpa_render"
+          grep -q '^  minReplicas: 1$' "$hpa_render"
+          grep -q '^  maxReplicas: 4$' "$hpa_render"
+          grep -q '^          averageUtilization: 70$' "$hpa_render"
+      - name: Upload tested Boot JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-governance-jar
+          path: |
+            microservices/identity-governance-service/target/identity-governance-service-*.jar
+            release-candidate/identity-governance-jar.sha256
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload tested candidate image and trace metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-governance-candidate-${{ github.sha }}
+          path: release-candidate/**
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload raw test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-governance-surefire-${{ github.sha }}
+          path: |
+            microservices/identity-governance-service/target/surefire-reports/**
+            microservices/identity-governance-service/target/failsafe-reports/**
+          if-no-files-found: warn
+          retention-days: 14
+
+  identity-domain-a-e2e:
+    name: UC01-UC05 independent identity-service browser E2E
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      CI: "true"
+      COMPOSE_PROJECT_NAME: identity-governance-e2e
+      IDENTITY_MYSQL_ROOT_PASSWORD: identity-e2e-root
+      IDENTITY_DB_PASSWORD: identity-e2e-password
+      JWT_SECRET: identity-e2e-jwt-secret-with-at-least-32-bytes
+      INTERNAL_SERVICE_TOKEN: identity-e2e-internal-token
+      BOOTSTRAP_ADMIN_PASSWORD: admin123
+      APP_VERSION: sha-${{ github.sha }}
+      APP_COMMIT: ${{ github.sha }}
+      E2E_BASE_URL: http://127.0.0.1:8089
+      E2E_OUTPUT_DIR: /tmp/identity-domain-a-e2e
+      IDENTITY_ACCEPTANCE_IMAGE: segroup8/identity-governance:candidate-${{ github.sha }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js and npm cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Download the tested candidate image
+        uses: actions/download-artifact@v4
+        with:
+          name: identity-governance-candidate-${{ github.sha }}
+          path: release-candidate
+      - name: Load and verify the exact candidate image
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          docker image load --input release-candidate/identity-governance-image.tar.gz
+          test "$(jq -r '.gitSha' release-candidate/release-metadata.json)" = "$GITHUB_SHA"
+          test "$(docker image inspect "$IDENTITY_ACCEPTANCE_IMAGE" --format '{{.Id}}')" = "$(jq -r '.candidateImageId' release-candidate/release-metadata.json)"
+          test "$(docker image inspect "$IDENTITY_ACCEPTANCE_IMAGE" --format '{{index .Config.Labels "com.segroup8.identity-governance.jar-sha256"}}')" = "$(jq -r '.jarSha256' release-candidate/release-metadata.json)"
+          cp release-candidate/release-metadata.json "$RUNNER_TEMP/identity-candidate-metadata.json"
+      - name: Build the real frontend and install Chromium
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build:real
+          npx playwright install --with-deps chromium
+      - name: Start the independent identity-service stack
+        run: |
+          docker compose \
+            -f microservices/identity-governance-service/compose.local.yml \
+            --profile e2e build identity-e2e-frontend
+          docker compose \
+            -f microservices/identity-governance-service/compose.local.yml \
+            --profile e2e up -d --no-build
+          for attempt in $(seq 1 90); do
+            if curl --fail --silent http://127.0.0.1:8091/actuator/health/readiness | grep -q '"status":"UP"' \
+              && curl --fail --silent http://127.0.0.1:8089/ >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose -f microservices/identity-governance-service/compose.local.yml --profile e2e ps
+          docker compose -f microservices/identity-governance-service/compose.local.yml --profile e2e logs --no-color
+          exit 1
+      - name: Run UC01-UC05 against the independent service
+        working-directory: frontend
+        run: npx playwright test e2e/domain-a --workers=1
+      - name: Collect independent stack diagnostics
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/identity-domain-a-e2e/logs"
+          docker compose -f microservices/identity-governance-service/compose.local.yml --profile e2e ps --all \
+            >"$RUNNER_TEMP/identity-domain-a-e2e/logs/compose-ps.txt" 2>&1 || true
+          docker compose -f microservices/identity-governance-service/compose.local.yml --profile e2e logs --no-color --timestamps \
+            >"$RUNNER_TEMP/identity-domain-a-e2e/logs/compose.log" 2>&1 || true
+          cp "$RUNNER_TEMP/identity-candidate-metadata.json" \
+            "$RUNNER_TEMP/identity-domain-a-e2e/release-metadata.json" || true
+          curl --silent --show-error http://127.0.0.1:8091/v3/api-docs \
+            >"$RUNNER_TEMP/identity-domain-a-e2e/runtime-openapi.json" || true
+      - name: Stop the independent identity-service stack
+        if: always()
+        run: docker compose -f microservices/identity-governance-service/compose.local.yml --profile e2e down -v --remove-orphans || true
+      - name: Upload Domain A browser and service evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-domain-a-e2e-${{ github.sha }}
+          path: ${{ runner.temp }}/identity-domain-a-e2e/**
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish immutable identity-governance image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [verify, identity-domain-a-e2e]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Download the E2E-tested candidate image
+        uses: actions/download-artifact@v4
+        with:
+          name: identity-governance-candidate-${{ github.sha }}
+          path: release-candidate
+      - name: Validate ACR configuration
+        env:
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+          ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+        run: |
+          test -n "$ACR_REGISTRY"
+          test -n "$ACR_NAMESPACE"
+          test -n "$ACR_USERNAME"
+          test -n "$ACR_PASSWORD"
+      - name: Log in to ACR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.ACR_REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      - name: Push the exact candidate image without rebuilding
+        shell: bash
+        env:
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+        run: |
+          set -Eeuo pipefail
+          candidate="segroup8/identity-governance:candidate-${GITHUB_SHA}"
+          target="${ACR_REGISTRY}/${ACR_NAMESPACE}/identity-governance:sha-${GITHUB_SHA}"
+          docker image load --input release-candidate/identity-governance-image.tar.gz
+          test "$(docker image inspect "$candidate" --format '{{.Id}}')" = "$(jq -r '.candidateImageId' release-candidate/release-metadata.json)"
+          test "$(docker image inspect "$candidate" --format '{{index .Config.Labels "com.segroup8.identity-governance.jar-sha256"}}')" = "$(jq -r '.jarSha256' release-candidate/release-metadata.json)"
+          docker image tag "$candidate" "$target"
+          docker image push "$target" | tee identity-governance-image-push.log
+          repo_digest="$(docker image inspect "$target" --format '{{join .RepoDigests "\n"}}' | head -n 1)"
+          test -n "$repo_digest"
+          mkdir -p release-metadata
+          printf '%s\n' "$repo_digest" > release-metadata/identity-governance-image-digest.txt
+          jq \
+            --arg publishedImage "$target" \
+            --arg repositoryDigest "$repo_digest" \
+            '. + {publishedImage:$publishedImage,repositoryDigest:$repositoryDigest}' \
+            release-candidate/release-metadata.json > release-metadata/identity-governance-release-metadata.json
+      - name: Upload image digest and release metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-governance-image-digest-${{ github.sha }}
+          path: |
+            release-metadata/identity-governance-image-digest.txt
+            release-metadata/identity-governance-release-metadata.json
+            identity-governance-image-push.log
+          if-no-files-found: error
+          retention-days: 30
+
+  deploy:
+    name: Helm atomic deploy identity-governance-service
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ENABLE_PRODUCTION_DEPLOY == 'true'
+    needs: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment: production
+    concurrency:
+      group: segroup8-production-helm
+      cancel-in-progress: false
+    steps:
+      - name: Check out deployment configuration
+        uses: actions/checkout@v4
+      - name: Package Helm chart
+        run: tar -czf "identity-governance-chart-$GITHUB_SHA.tar.gz" deploy/helm/segroup8
+      - name: Configure SSH
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+      - name: Upload and deploy identity-governance-service
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
+        run: |
+          set -o pipefail
+          remote_archive="/tmp/identity-governance-$GITHUB_SHA.tar.gz"
+          scp "identity-governance-chart-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$remote_archive"
+          ssh \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=10 \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            "bash -s -- '$GITHUB_SHA' '$remote_archive' '$ACR_REGISTRY' '$ACR_NAMESPACE' 'sha-$GITHUB_SHA' '$K8S_NAMESPACE'" \
+            < .github/scripts/deploy-identity-governance-k3s.sh | tee identity-governance-deployment.log
+      - name: Upload deployment and rollback diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: identity-governance-deployment-${{ github.sha }}
+          path: identity-governance-deployment.log
+          if-no-files-found: warn
+          retention-days: 30

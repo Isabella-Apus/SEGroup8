@@ -1,0 +1,92 @@
+{{- if .Values.identityGovernance.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: segroup8-identity-governance
+  labels:
+    {{- include "segroup8.labels" . | nindent 4 }}
+    app.kubernetes.io/component: identity-governance
+spec:
+  replicas: {{ .Values.identityGovernance.replicaCount }}
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      {{- include "segroup8.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: identity-governance
+  template:
+    metadata:
+      labels:
+        {{- include "segroup8.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: identity-governance
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+      imagePullSecrets:
+        {{- toYaml .Values.imagePullSecrets | nindent 8 }}
+      containers:
+        - name: identity-governance
+          image: "{{ required "identityGovernance.image.repository is required" .Values.identityGovernance.image.repository }}:{{ required "identityGovernance.image.tag is required" .Values.identityGovernance.image.tag }}"
+          imagePullPolicy: {{ .Values.identityGovernance.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          ports:
+            - name: http
+              containerPort: 8091
+          envFrom:
+            - secretRef:
+                name: {{ .Values.identityGovernance.secretName }}
+          env:
+            - name: APP_VERSION
+              value: {{ .Values.identityGovernance.deployment.version | quote }}
+            - name: APP_COMMIT
+              value: {{ .Values.identityGovernance.deployment.commit | quote }}
+            - name: APP_BUILD_TIME
+              value: {{ .Values.identityGovernance.deployment.buildTime | quote }}
+            - name: CATALOG_SHOP_SERVICE_URL
+              value: "http://segroup8-catalog-shop:8080"
+            - name: MESSAGING_SERVICE_URL
+              value: "http://messaging:8084"
+            - name: TZ
+              value: Asia/Shanghai
+          startupProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 24
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.identityGovernance.resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+{{- end }}
