@@ -29,8 +29,8 @@ ON DUPLICATE KEY UPDATE update_time = CURRENT_TIMESTAMP;
 
 INSERT INTO notification
     (id, user_id, title, content, target_path, scope, is_read, notification_type,
-     business_type, business_id, dedupe_key, trace_id)
+     business_type, business_id, event_id, dedupe_key, trace_id)
 VALUES
     (9001, 1001, 'Audit notification', 'Seed notification', '/chat', 'buyer', 0,
-     'AUDIT', 'TEST', 'seed-9001', 'seed-9001')
+     'AUDIT', 'TEST', 'seed-9001', 'seed-9001', 'seed-9001', 'seed-9001')
 ON DUPLICATE KEY UPDATE is_read = 0;
