@@ -17,10 +17,30 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+@Testcontainers(disabledWithoutDocker = true)
 @Tag("DOMAIN_D")
 @Tag("UC19")
 class AuctionSettlementIntegrationTest extends SecondhandIntegrationSupport {
+    @Container
+    static final MySQLContainer<?> MYSQL = new MySQLContainer<>("mysql:8.4.6")
+            .withDatabaseName("secondhand_auction_test")
+            .withUsername("secondhand_app")
+            .withPassword("secondhand-test-password");
+
+    @DynamicPropertySource
+    static void useRealMySql(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", MYSQL::getJdbcUrl);
+        registry.add("spring.datasource.username", MYSQL::getUsername);
+        registry.add("spring.datasource.password", MYSQL::getPassword);
+        registry.add("spring.datasource.driver-class-name", MYSQL::getDriverClassName);
+    }
+
     @Autowired TradeApplicationService trades;
 
     @Test

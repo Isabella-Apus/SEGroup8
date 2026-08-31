@@ -188,7 +188,6 @@ jobs:
       APP_VERSION: sha-${{ github.sha }}
       APP_COMMIT: ${{ github.sha }}
       E2E_BASE_URL: http://127.0.0.1:8089
-      E2E_OUTPUT_DIR: ${{ runner.temp }}/identity-domain-a-e2e
       IDENTITY_ACCEPTANCE_IMAGE: segroup8/identity-governance:candidate-${{ github.sha }}
     steps:
       - name: Check out repository
@@ -239,6 +238,8 @@ jobs:
           exit 1
       - name: Run UC01-UC05 against the independent service
         working-directory: frontend
+        env:
+          E2E_OUTPUT_DIR: ${{ runner.temp }}/identity-domain-a-e2e
         run: npx playwright test e2e/domain-a --workers=1
       - name: Collect independent stack diagnostics
         if: always()
