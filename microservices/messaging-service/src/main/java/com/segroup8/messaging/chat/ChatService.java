@@ -22,11 +22,15 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ChatService {
+    private static final Logger log = LoggerFactory.getLogger(ChatService.class);
     private static final Set<String> SOURCE_TYPES = Set.of("DIRECT", "PRODUCT", "SECONDHAND");
     private final JdbcTemplate jdbc;
     private final AccessPolicy access;
@@ -104,11 +108,14 @@ public class ChatService {
         String targetPath = "OFFICIAL_SELLER".equalsIgnoreCase(participant(conversation, receiverId).role())
                 ? "/merchant/messages?conversationId=" + conversationId : "/messages?conversationId=" + conversationId;
         notifications.create(receiverId, "新消息", senderName + " 给你发送了新消息", targetPath, null);
-        String traceId = UUID.randomUUID().toString();
+        String traceId = MDC.get("traceId");
+        if (traceId == null || traceId.isBlank()) traceId = UUID.randomUUID().toString();
         delivery.enqueueWebSocket(null, "delivery:chat:" + messageId + ":" + senderId,
                 senderId, "CHAT_MESSAGE", message, traceId);
         delivery.enqueueWebSocket(null, "delivery:chat:" + messageId + ":" + receiverId,
                 receiverId, "CHAT_MESSAGE", message, traceId);
+        log.info("messaging chat persisted conversationId={} messageId={} traceId={}",
+                conversationId, messageId, traceId);
         return message;
     }
 

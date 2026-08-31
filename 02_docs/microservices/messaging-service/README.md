@@ -1,4 +1,4 @@
-# messaging-service V2
+# messaging-service V2/V3 delivery
 
 `messaging-service` owns chat conversations, messages, durable notifications, access/block projections, `/ws/realtime`, event Inbox/idempotency state, and its delivery Outbox. V2 keeps the V1 REST/recovery contract and adds reliable event-driven notification delivery without Kafka/RabbitMQ/Redis.
 
@@ -14,7 +14,7 @@ mvn -B -f microservices/pom.xml -pl messaging-service -am spring-boot:run
 
 Flyway applies V1 and `V2__reliable_event_messaging.sql`. Public APIs use JWTs from `security-contract`; internal APIs reject user JWTs and require environment-injected service credentials. Replay additionally requires the operations credential. Tokens and notification/message bodies are not application-log fields.
 
-The Vite development proxy keeps `/api/chat/**`, `/api/notifications/**`, and `/ws/realtime` stable while forwarding them to port 8084. Other `/api/**` paths continue to use the monolith on port 8080. Production Nginx/container routing remains V3 work.
+The Vite development proxy keeps `/api/chat/**`, `/api/notifications/**`, and `/ws/realtime` stable while forwarding them to port 8084. Other `/api/**` paths continue to use the monolith on port 8080. Production Nginx now applies the same split: the frontend container sends only these paths to the `messaging` Service and keeps other APIs on `backend`.
 
 ## V2 event and recovery model
 
@@ -35,5 +35,12 @@ Current: the monolith chat implementation reads `user`, `product`, `shop`, `seco
 Target: messaging reads only its five owned tables; resolved participant IDs and source snapshots enter through the conversation request/projections.
 
 Migration strategy: retain the V1 data transfer and monolith rollback tables, apply V2 Flyway migration, enable producer Outbox as the default notification path, then run relay and Messaging workers. The old local Notification implementation is available only when `app.messaging.event-notifications-enabled=false` and is **LEGACY ROLLBACK ONLY**.
+
+V3 adds an immutable SHA-tagged Dockerfile, Helm Deployment/Service/ConfigMap,
+atomic rollout, health groups, version info, Micrometer metrics, correlation
+logging, and CI gates in the existing pipeline. The Docker build and Helm
+lint/template checks pass locally; Kubernetes rollout, production smoke, and
+failure-drill execution require the configured cluster and remain manual
+actions. See the V3 evidence directory.
 
 Issue, PR, and review evidence: **MANUAL ACTION REQUIRED**. No synthetic management evidence was created.

@@ -1,0 +1,151 @@
+name: Messaging Service CI/CD
+
+on:
+  pull_request:
+    paths:
+      - 'microservices/messaging-service/**'
+      - 'microservices/security-contract/**'
+      - 'scripts/ci/verify-messaging-*.mjs'
+      - 'scripts/ci/run-messaging-*.mjs'
+      - '04_tests/microservices/messaging-service/**'
+      - '02_docs/microservices/messaging-service/**'
+      - '03_devops/microservices/messaging-service/**'
+      - 'deploy/helm/segroup8/templates/messaging-*.yaml'
+      - 'deploy/helm/segroup8/values.yaml'
+      - 'deploy/helm/segroup8/Chart.yaml'
+      - '.github/scripts/deploy-k3s.sh'
+      - '.github/workflows/messaging-service-ci-cd.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'microservices/messaging-service/**'
+      - 'microservices/security-contract/**'
+      - 'scripts/ci/verify-messaging-*.mjs'
+      - 'scripts/ci/run-messaging-*.mjs'
+      - '04_tests/microservices/messaging-service/**'
+      - '02_docs/microservices/messaging-service/**'
+      - '03_devops/microservices/messaging-service/**'
+      - 'deploy/helm/segroup8/templates/messaging-*.yaml'
+      - 'deploy/helm/segroup8/values.yaml'
+      - 'deploy/helm/segroup8/Chart.yaml'
+      - '.github/scripts/deploy-k3s.sh'
+      - '.github/workflows/messaging-service-ci-cd.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: messaging-service-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  boundary:
+    name: Messaging source boundary gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: node scripts/ci/verify-messaging-boundary.mjs
+      - run: node scripts/ci/verify-messaging-routes.mjs
+
+  maven:
+    name: Messaging Maven verification
+    needs: boundary
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          cache-dependency-path: |
+            microservices/pom.xml
+            microservices/security-contract/pom.xml
+            microservices/messaging-service/pom.xml
+      - run: mvn -B --no-transfer-progress -f microservices/pom.xml -pl messaging-service -am clean verify
+      - uses: actions/upload-artifact@v4
+        with:
+          name: messaging-service-${{ github.sha }}-jar
+          path: microservices/messaging-service/target/messaging-service-1.0.0.jar
+          retention-days: 7
+
+  real-mysql:
+    name: Messaging real MySQL migration
+    needs: maven
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4.6
+        env:
+          MYSQL_ROOT_PASSWORD: audit-root
+          MYSQL_DATABASE: messaging_db
+          MYSQL_USER: messaging_app
+          MYSQL_PASSWORD: audit-app
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -paudit-root"
+          --health-interval=5s --health-timeout=3s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - run: >-
+          mvn -B --no-transfer-progress -f microservices/pom.xml -pl messaging-service
+          -Dmessaging.mysql.test=true
+          -Dmessaging.mysql.root-url=jdbc:mysql://127.0.0.1:3306/
+          -Dmessaging.mysql.root-user=root -Dmessaging.mysql.root-password=audit-root
+          -Dtest=MySqlMigrationTest -Dsurefire.failIfNoSpecifiedTests=false test
+
+  candidate-image:
+    name: Candidate image from verified JAR
+    needs: maven
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: messaging-service-${{ github.sha }}-jar
+          path: microservices/messaging-service/target
+      - name: Build immutable candidate image
+        run: |
+          jar_sha="$(sha256sum microservices/messaging-service/target/messaging-service-1.0.0.jar | cut -d' ' -f1)"
+          docker build --pull --file microservices/messaging-service/Dockerfile \
+            --build-arg GIT_SHA="${{ github.sha }}" \
+            --build-arg JAR_SHA256="$jar_sha" \
+            --build-arg IMAGE_SOURCE="${{ github.server_url }}/${{ github.repository }}" \
+            --tag "segroup8/messaging:sha-${{ github.sha }}" microservices
+          docker image inspect "segroup8/messaging:sha-${{ github.sha }}" \
+            --format '{{json .Config.Labels}}'
+
+  helm-static:
+    name: Messaging Helm lint/template
+    needs: boundary
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - run: |
+          helm lint deploy/helm/segroup8 \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-test \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-test \
+            --set-string messaging.image.repository=registry.example/segroup8/messaging \
+            --set-string messaging.image.tag=sha-test \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql
+          helm template segroup8 deploy/helm/segroup8 --namespace segroup8 \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-test \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-test \
+            --set-string messaging.image.repository=registry.example/segroup8/messaging \
+            --set-string messaging.image.tag=sha-test \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql >/dev/null

@@ -19,6 +19,29 @@ backend:
       cpu: "1"
       memory: 1536Mi
 
+messaging:
+  replicaCount: 1
+  image:
+    repository: ""
+    # CI supplies an immutable sha-<git-sha> tag; no latest fallback is allowed.
+    tag: ""
+    pullPolicy: IfNotPresent
+  secretName: segroup8-messaging-secret
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 768Mi
+  config:
+    identityServiceUrl: ""
+    realtimeAllowedOriginPatterns: ""
+    inboxPollDelayMs: "1000"
+    inboxMaxRetries: "5"
+    deliveryPollDelayMs: "1000"
+    deliveryMaxRetries: "5"
+
 frontend:
   replicaCount: 1
   image:

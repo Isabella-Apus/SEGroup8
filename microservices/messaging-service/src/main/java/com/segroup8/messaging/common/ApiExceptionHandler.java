@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -20,6 +21,12 @@ public class ApiExceptionHandler {
                 && invalid.getBindingResult().getFieldError() != null
                 ? invalid.getBindingResult().getFieldError().getDefaultMessage() : "Invalid request";
         return ResponseEntity.badRequest().body(ApiResult.failure(400, message));
+    }
+
+    /** Keep unmapped actuator/static paths as a normal 404 instead of wrapping them as 500. */
+    @ExceptionHandler(NoResourceFoundException.class)
+    ResponseEntity<ApiResult<Void>> notFound(NoResourceFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResult.failure(404, "Resource not found"));
     }
 
     @ExceptionHandler(Exception.class)

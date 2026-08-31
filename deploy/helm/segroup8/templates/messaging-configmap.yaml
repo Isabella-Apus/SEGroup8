@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: segroup8-messaging-config
+  labels:
+    {{- include "segroup8.labels" . | nindent 4 }}
+    app.kubernetes.io/component: messaging
+data:
+  IDENTITY_SERVICE_URL: {{ .Values.messaging.config.identityServiceUrl | quote }}
+  GOVERNANCE_BASE_URL: {{ .Values.messaging.config.identityServiceUrl | quote }}
+  REALTIME_ALLOWED_ORIGIN_PATTERNS: {{ .Values.messaging.config.realtimeAllowedOriginPatterns | quote }}
+  INBOX_POLL_DELAY_MS: {{ .Values.messaging.config.inboxPollDelayMs | quote }}
+  INBOX_MAX_RETRIES: {{ .Values.messaging.config.inboxMaxRetries | quote }}
+  DELIVERY_POLL_DELAY_MS: {{ .Values.messaging.config.deliveryPollDelayMs | quote }}
+  DELIVERY_MAX_RETRIES: {{ .Values.messaging.config.deliveryMaxRetries | quote }}

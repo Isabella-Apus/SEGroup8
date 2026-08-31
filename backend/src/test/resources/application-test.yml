@@ -29,3 +29,6 @@ app:
     event-notifications-enabled: false
   outbox:
     relay-delay-ms: 3600000
+  risk-audit:
+    llm:
+      enabled: false

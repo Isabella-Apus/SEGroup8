@@ -78,6 +78,21 @@ class ReliableMessagingIntegrationTest {
     }
 
     @Test
+    void internalDeliveryStatusRequiresServiceToken() throws Exception {
+        mvc.perform(get("/internal/delivery/lookup-key")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/internal/delivery/lookup-key").header("X-Internal-Service-Token", "wrong-token"))
+                .andExpect(status().isUnauthorized());
+
+        mvc.perform(post("/internal/notifications").headers(internal()).contentType(MediaType.APPLICATION_JSON)
+                        .content(internalNotification("delivery-status-check", "trace-delivery-status", "Delivery access check")))
+                .andExpect(status().isOk());
+
+        mvc.perform(get("/internal/delivery/delivery-status-check").headers(internal()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.persisted").value(true));
+    }
+
+    @Test
     void allSevenContractsUseOneEnvelopeAndSnapshotWithoutSourceQueries() throws Exception {
         int index = 0;
         for (String type : EventTypes.ALL) {

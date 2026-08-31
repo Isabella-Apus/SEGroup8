@@ -1,0 +1,14 @@
+[
+  "GET /api/chat/conversations",
+  "POST /api/chat/conversations",
+  "GET /api/chat/conversations/{conversationId}/messages",
+  "POST /api/chat/conversations/{conversationId}/messages",
+  "GET /api/notifications",
+  "POST /api/notifications/{notificationId}/read",
+  "POST /api/notifications/read-all",
+  "POST /internal/events",
+  "POST /internal/notifications",
+  "POST /internal/events/replay/{eventId}",
+  "GET /internal/delivery/{dedupeKey}",
+  "GET /ws/realtime"
+]

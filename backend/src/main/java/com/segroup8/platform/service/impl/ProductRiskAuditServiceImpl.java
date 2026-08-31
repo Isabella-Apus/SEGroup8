@@ -19,6 +19,7 @@ import com.segroup8.platform.entity.ProductRiskAudit;
 import com.segroup8.platform.entity.SecondhandProduct;
 import com.segroup8.platform.entity.Shop;
 import com.segroup8.platform.entity.User;
+import com.segroup8.platform.event.ProducerOutboxService;
 import com.segroup8.platform.mapper.ProductMapper;
 import com.segroup8.platform.mapper.ProductRiskAuditMapper;
 import com.segroup8.platform.mapper.SecondhandProductMapper;
@@ -31,8 +32,11 @@ import com.segroup8.platform.service.ProductRiskAuditService;
 import com.segroup8.platform.vo.PageVO;
 import com.segroup8.platform.vo.ProductRiskAuditVO;
 import jakarta.annotation.PreDestroy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
@@ -78,6 +82,12 @@ public class ProductRiskAuditServiceImpl implements ProductRiskAuditService {
     private final AdminAuditLogService adminAuditLogService;
     private final NotificationService notificationService;
     private final UploadProperties uploadProperties;
+
+    @Autowired(required = false)
+    private ProducerOutboxService producerOutboxService;
+
+    @Value("${app.messaging.event-notifications-enabled:true}")
+    private boolean eventNotificationsEnabled = false;
     private final HttpClient httpClient = HttpClient.newBuilder()
             .connectTimeout(Duration.ofSeconds(DEFAULT_LLM_TIMEOUT_SECONDS))
             .build();
@@ -314,10 +324,25 @@ public class ProductRiskAuditServiceImpl implements ProductRiskAuditService {
 
     private void saveAudit(String productType, Long productId, Long sellerUserId, String productName,
             RiskEvaluation evaluation, boolean resetAuditStatus) {
-        ProductRiskAudit audit = productRiskAuditMapper.selectOne(new LambdaQueryWrapper<ProductRiskAudit>()
+        if (productType == null || productId == null) {
+            return;
+        }
+        List<ProductRiskAudit> existingRows = productRiskAuditMapper.selectList(new LambdaQueryWrapper<ProductRiskAudit>()
                 .eq(ProductRiskAudit::getProductType, productType)
                 .eq(ProductRiskAudit::getProductId, productId)
-                .last("limit 1"));
+                .orderByDesc(ProductRiskAudit::getId));
+        ProductRiskAudit audit = existingRows.isEmpty() ? null : existingRows.get(0);
+        if (existingRows.size() > 1) {
+            List<Long> idsToDelete = existingRows.stream()
+                    .skip(1)
+                    .map(ProductRiskAudit::getId)
+                    .filter(Objects::nonNull)
+                    .toList();
+            if (!idsToDelete.isEmpty()) {
+                productRiskAuditMapper.delete(new LambdaQueryWrapper<ProductRiskAudit>()
+                        .in(ProductRiskAudit::getId, idsToDelete));
+            }
+        }
         boolean exists = audit != null;
         if (!resetAuditStatus && exists && audit.getAdminUserId() != null) {
             return;
@@ -873,7 +898,33 @@ public class ProductRiskAuditServiceImpl implements ProductRiskAuditService {
         } else {
             content.append("如需继续出售，请在卖家工作台调整商品描述、图片或其他信息后联系管理员复核。");
         }
-        notificationService.createNotification(sellerUserId, title, content.toString());
+        String notificationContent = content.toString();
+        String dedupeKey = "product-risk-audit:" + audit.getId() + ":" + decision;
+        if (eventNotificationsEnabled && producerOutboxService != null) {
+            producerOutboxService.notification("risk-monolith", "PRODUCT_RISK_AUDIT", audit.getId(),
+                    List.of(sellerUserId), title, notificationContent,
+                    "/seller/products/" + audit.getProductId(),
+                    "PRODUCT_RISK", "PRODUCT", dedupeKey);
+            return;
+        }
+        Runnable legacy = () -> {
+            try {
+                notificationService.createNotification(sellerUserId, title, notificationContent);
+            } catch (RuntimeException ignored) {
+                // Legacy notification is a best-effort compatibility path.
+            }
+        };
+        if (TransactionSynchronizationManager.isActualTransactionActive()
+                && TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    legacy.run();
+                }
+            });
+        } else {
+            legacy.run();
+        }
     }
 
     private Long resolveAuditSellerUserId(ProductRiskAudit audit) {

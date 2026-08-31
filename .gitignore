@@ -9,8 +9,16 @@ frontend/test-results/
 !04_tests/platform-e2e/evidence/.gitkeep
 frontend/playwright-report/
 frontend/blob-report/
+**/playwright-report/
+**/test-results/
+*.zip
+*.trace.zip
+*.webm
+04_tests/**/acceptance-*
+04_tests/**/evidence/**/trace-artifacts/
 .ci/
 05_management/archive/test-assets/runtime-reports/
+.ms06-v1-checkpoint/
 
 # backend
 backend/target/

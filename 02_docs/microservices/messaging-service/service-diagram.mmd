@@ -1,0 +1,14 @@
+flowchart LR
+  ClientREST[Client REST] --> Messaging[messaging-service]
+  ClientWS[Client WebSocket] -->|/ws/realtime| Messaging
+  Producers[Backend domain producers] --> ProducerOutbox[(Producer outbox_event)]
+  ProducerOutbox --> Relay[ProducerOutboxRelay]
+  Relay -->|authenticated event ingress| Inbox[(messaging_db inbox_event)]
+  Inbox --> Handler[Inbox worker + event handlers]
+  Handler --> Notification[(notification)]
+  Notification --> Delivery[(messaging_db outbox_event)]
+  Delivery --> Worker[Delivery worker]
+  Worker --> ClientWS
+  Messaging --> Projections[(access/block projections)]
+  Messaging --> DB[(messaging_db)]
+  Governance[Governance API fallback] -. fail-close block check .-> Messaging

@@ -56,6 +56,19 @@ abstract class DomainEIntegrationTestBase {
         db.update("delete from transaction_record");
         db.update("delete from balance");
         db.update("delete from address");
+        db.update("delete from product_auction");
+        db.update("delete from secondhand_product");
+        db.update("delete from product");
+        db.update("delete from shop");
+        db.update("delete from user");
+
+        db.update("insert into user(id, username, password, nickname, role, status, create_time, update_time) "
+                + "values(1, 'buyer1', 'x', '买家1', 'USER', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
+        db.update("insert into user(id, username, password, nickname, role, status, create_time, update_time) "
+                + "values(2, 'admin1', 'x', '管理员1', 'ADMIN', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
+        db.update("insert into user(id, username, password, nickname, role, status, create_time, update_time) "
+                + "values(3, 'seller1', 'x', 'seller1', 'OFFICIAL_SELLER', 'ACTIVE', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
+
         db.update("insert into balance(user_id, personal_balance, business_balance, version) "
                 + "values(1, 100.00, 0.00, 0)");
         db.update("insert into balance(user_id, personal_balance, business_balance, version) "
@@ -63,6 +76,16 @@ abstract class DomainEIntegrationTestBase {
         db.update("insert into address(user_id, receiver_name, receiver_phone, province, city, "
                 + "detail_address, is_default) values(1, '测试买家', '13800000000', "
                 + "'北京市', '北京市', '测试路1号', 1)");
+        db.update("insert into shop(id, owner_user_id, name, status, create_time, update_time) "
+                + "values(100, 3, 'test shop', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
+        db.update("insert into product(id, shop_id, name, price, stock, status, create_time, update_time) "
+                + "values(1001, 100, 'test product', 99.00, 100, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
+        db.update("insert into secondhand_product(id, seller_user_id, name, origin_price, sale_price, category_id, sub_category_id, condition_level, is_negotiable, status, create_time, update_time) "
+                + "values(5, 3, 'test secondhand product', 120.00, 80.00, 1, 101, 'LIKE_NEW', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
+        db.update("insert into secondhand_product(id, seller_user_id, name, origin_price, sale_price, category_id, sub_category_id, condition_level, is_negotiable, status, create_time, update_time) "
+                + "values(6, 3, 'relisted secondhand product', 150.00, 90.00, 1, 101, 'LIKE_NEW', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)");
+        db.update("insert into product_auction(id, product_id, seller_user_id, start_price, increment_amount, current_price, start_time, end_time, status, version, create_time, update_time) "
+                + "values(10, 6, 3, 50.00, 5.00, 50.00, DATEADD('DAY', -2, CURRENT_TIMESTAMP), DATEADD('DAY', -1, CURRENT_TIMESTAMP), 'FLOW', 0, DATEADD('DAY', -2, CURRENT_TIMESTAMP), DATEADD('DAY', -1, CURRENT_TIMESTAMP))");
 
         buyerToken = jwtUtils.createToken(1L, "buyer1", "USER");
         adminToken = jwtUtils.createToken(2L, "admin1", "ADMIN");

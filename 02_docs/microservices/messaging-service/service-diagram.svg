@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="420" viewBox="0 0 1100 420" role="img" aria-labelledby="title desc">
+  <title id="title">Kinda Goods messaging V3 event delivery</title>
+  <desc id="desc">Business producers write an outbox, a relay sends events to the messaging inbox, handlers create notifications, and a delivery outbox pushes WebSocket messages.</desc>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L10,3 L0,6 z" fill="#334155"/></marker></defs>
+  <style>text{font:14px sans-serif;fill:#0f172a}.box{fill:#e0f2fe;stroke:#0284c7;stroke-width:2}.db{fill:#fef3c7;stroke:#d97706;stroke-width:2}.line{stroke:#334155;stroke-width:2;marker-end:url(#arrow)}</style>
+  <rect class="box" x="20" y="70" width="150" height="54" rx="8"/><text x="95" y="102" text-anchor="middle">Domain producers</text>
+  <rect class="db" x="220" y="70" width="150" height="54" rx="8"/><text x="295" y="102" text-anchor="middle">Producer outbox</text>
+  <rect class="box" x="420" y="70" width="120" height="54" rx="8"/><text x="480" y="102" text-anchor="middle">Relay</text>
+  <rect class="db" x="590" y="70" width="150" height="54" rx="8"/><text x="665" y="102" text-anchor="middle">Inbox event</text>
+  <rect class="box" x="790" y="70" width="150" height="54" rx="8"/><text x="865" y="102" text-anchor="middle">Event handler</text>
+  <rect class="db" x="790" y="220" width="150" height="54" rx="8"/><text x="865" y="252" text-anchor="middle">Notification</text>
+  <rect class="db" x="590" y="220" width="150" height="54" rx="8"/><text x="665" y="252" text-anchor="middle">Delivery outbox</text>
+  <rect class="box" x="390" y="330" width="150" height="54" rx="8"/><text x="465" y="362" text-anchor="middle">WebSocket client</text>
+  <rect class="db" x="20" y="220" width="180" height="54" rx="8"/><text x="110" y="252" text-anchor="middle">messaging_db projections</text>
+  <path class="line" d="M170 97H220"/><path class="line" d="M370 97H420"/><path class="line" d="M540 97H590"/><path class="line" d="M740 97H790"/><path class="line" d="M865 124V220"/><path class="line" d="M790 247H740"/><path class="line" d="M590 274L520 330"/>
+  <path class="line" d="M200 247H280V145H420" stroke-dasharray="6 5"/>
+</svg>

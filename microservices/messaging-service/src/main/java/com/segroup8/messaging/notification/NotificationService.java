@@ -13,11 +13,15 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class NotificationService {
+    private static final Logger log = LoggerFactory.getLogger(NotificationService.class);
     private final JdbcTemplate jdbc;
     private final DeliveryOutboxService delivery;
     public NotificationService(JdbcTemplate jdbc, DeliveryOutboxService delivery) {
@@ -51,8 +55,10 @@ public class NotificationService {
     @Transactional
     public NotificationView create(long userId, String title, String content, String targetPath, String scope) {
         String id = UUID.randomUUID().toString();
+        String traceId = MDC.get("traceId");
+        if (traceId == null || traceId.isBlank()) traceId = id;
         return createReliable(userId, title, content, targetPath, scope, "CHAT_MESSAGE",
-                "CHAT", null, null, "chat-notification:" + id, id);
+                "CHAT", null, null, "chat-notification:" + id, traceId);
     }
 
     @Transactional
@@ -83,6 +89,8 @@ public class NotificationService {
                 title.trim(), content.trim(), targetPath, actualScope, 0, now);
         delivery.enqueueWebSocket(eventId, "delivery:notification:" + dedupeKey, userId,
                 "NOTIFICATION_CREATED", value, traceId);
+        log.info("messaging notification persisted notificationId={} eventId={} dedupeKey={} traceId={}",
+                value.id(), eventId, dedupeKey, traceId);
         return value;
     }
 

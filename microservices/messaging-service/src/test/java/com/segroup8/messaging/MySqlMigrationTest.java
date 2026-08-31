@@ -31,7 +31,7 @@ class MySqlMigrationTest {
             statement.execute("create user if not exists '" + APP_USER + "'@'%' identified by '" + APP_PASSWORD + "'");
             statement.execute("grant all privileges on " + TEST_DB + ".* to '" + APP_USER + "'@'%'");
         }
-        String appUrl = "jdbc:mysql://127.0.0.1:3306/" + TEST_DB + "?useSSL=false&allowPublicKeyRetrieval=true";
+        String appUrl = jdbcUrlForDatabase(rootUrl, TEST_DB);
         try {
             Flyway.configure().dataSource(appUrl, APP_USER, APP_PASSWORD)
                     .locations("classpath:db/migration").load().migrate();
@@ -94,5 +94,12 @@ class MySqlMigrationTest {
             result.next();
             return result.getString(1);
         }
+    }
+
+    private String jdbcUrlForDatabase(String rootUrl, String database) {
+        int schemeEnd = rootUrl.indexOf("://");
+        int pathStart = schemeEnd < 0 ? -1 : rootUrl.indexOf('/', schemeEnd + 3);
+        String authority = pathStart < 0 ? rootUrl : rootUrl.substring(0, pathStart);
+        return authority + "/" + database + "?useSSL=false&allowPublicKeyRetrieval=true";
     }
 }

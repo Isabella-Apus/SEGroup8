@@ -19,6 +19,7 @@ public class OptionalJwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        UserContext.clear();
         String auth = request.getHeader("Authorization");
         if (auth == null || !auth.startsWith("Bearer ")) {
             return true;
@@ -30,6 +31,7 @@ public class OptionalJwtInterceptor implements HandlerInterceptor {
             Long uid = uidObj instanceof Number ? ((Number) uidObj).longValue() : Long.valueOf(uidObj.toString());
             UserContext.setUserId(uid);
         } catch (Exception ignored) {
+            UserContext.clear();
             // Public endpoints should not fail when token is absent/invalid.
         }
         return true;

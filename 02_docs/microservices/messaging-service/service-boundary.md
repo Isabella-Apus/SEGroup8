@@ -19,7 +19,7 @@
 
 Messaging does not query or own users, products, shops, secondhand products, orders, payments, refunds, merchant applications, or the governance block fact table. Product/shop/secondhand resolution is performed by the caller; the core receives `targetUserId`, `sourceType`, `sourceId`, and optional `sourceTitle` snapshot. The compatibility block adapter calls APIs, never a foreign schema.
 
-Producers never insert into `messaging_db`; Messaging never selects producer/identity schemas or producer Outbox. The monolith owns a separate producer `outbox_event` in `segroup8_platform` and relays envelopes over authenticated HTTP. Event payload snapshots carry recipient, business/source identifiers, historical display text/title, target path, and dedupe key, so consumers do not call source services. Docker, Helm, production routing, CI/CD, final metrics/probes, and deployment drills remain V3.
+Producers never insert into `messaging_db`; Messaging never selects producer/identity schemas or producer Outbox. The monolith owns a separate producer `outbox_event` in `segroup8_platform` and relays envelopes over authenticated HTTP. Event payload snapshots carry recipient, business/source identifiers, historical display text/title, target path, and dedupe key, so consumers do not call source services. V3 delivery uses the existing Docker/Helm/CI pipeline, health probes, metrics, and atomic rollback; no second deployment system or broker is introduced.
 
 ## Ban handling
 

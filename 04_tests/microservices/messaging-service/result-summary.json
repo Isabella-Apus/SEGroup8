@@ -1,0 +1,15 @@
+{
+  "revision": "0bafb9d6a82276f57e4fb6a66d5e50e4ce146ea5",
+  "maven": "PASS",
+  "mysqlIntegration": "PASS",
+  "publicApiCoverage": {
+    "covered": 12,
+    "total": 12
+  },
+  "independentServiceE2E": "PASS",
+  "fullSystemUseCaseE2E": "NOT_RUN",
+  "candidateImage": "PASS",
+  "helmStatic": "PASS",
+  "registryDigest": "PENDING",
+  "kubernetesRollout": "NOT_RUN"
+}

@@ -10,6 +10,7 @@ import com.segroup8.platform.entity.Product;
 import com.segroup8.platform.entity.SecondhandProduct;
 import com.segroup8.platform.entity.Shop;
 import com.segroup8.platform.entity.User;
+import com.segroup8.platform.event.ProducerOutboxService;
 import com.segroup8.platform.mapper.ChatConversationMapper;
 import com.segroup8.platform.mapper.ChatMessageMapper;
 import com.segroup8.platform.mapper.ProductMapper;
@@ -22,6 +23,8 @@ import com.segroup8.platform.service.NotificationService;
 import com.segroup8.platform.vo.ChatConversationVO;
 import com.segroup8.platform.vo.ChatMessageVO;
 import com.segroup8.platform.vo.ChatParticipantVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -46,6 +49,12 @@ public class ChatServiceImpl implements ChatService {
     private final SecondhandProductMapper secondhandProductMapper;
     private final UserBlockMapper userBlockMapper;
     private final NotificationService notificationService;
+
+    @Autowired(required = false)
+    private ProducerOutboxService producerOutboxService;
+
+    @Value("${app.messaging.event-notifications-enabled:true}")
+    private boolean eventNotificationsEnabled = false;
 
     public ChatServiceImpl(ChatConversationMapper chatConversationMapper,
             ChatMessageMapper chatMessageMapper,
@@ -187,7 +196,17 @@ public class ChatServiceImpl implements ChatService {
                 : sender != null && StringUtils.hasText(sender.getUsername())
                         ? sender.getUsername().trim()
                         : "用户" + senderUserId;
-        notificationService.createNotification(
+        String title = "New message";
+        String content = "User " + senderName + " sent you a message";
+        String targetPath = buildMessageTargetPath(receiver, conversationId);
+        String dedupeKey = "chat-message:" + conversationId + ":" + senderUserId + ":" + receiverUserId;
+        if (eventNotificationsEnabled && producerOutboxService != null) {
+            producerOutboxService.notification("backend-monolith", "CHAT", conversationId,
+                    List.of(receiverUserId), title, content, targetPath,
+                    "CHAT_MESSAGE", "CHAT", dedupeKey);
+            return;
+        }
+        notifyMessageLegacy(
                 receiverUserId,
                 "新消息",
                 "用户" + senderName + "给你发了一条消息",
@@ -198,6 +217,14 @@ public class ChatServiceImpl implements ChatService {
         String role = receiver != null && StringUtils.hasText(receiver.getRole()) ? receiver.getRole().trim() : "";
         String basePath = RoleEnum.OFFICIAL_SELLER.name().equals(role) ? "/merchant/messages" : "/messages";
         return basePath + "?conversationId=" + conversationId;
+    }
+
+    private void notifyMessageLegacy(Long receiverUserId, String title, String content, String targetPath) {
+        try {
+            notificationService.createNotification(receiverUserId, title, content, targetPath);
+        } catch (RuntimeException ignored) {
+            // Legacy notification is a best-effort compatibility path.
+        }
     }
 
     private ChatConversation requireConversationParticipant(Long currentUserId, Long conversationId) {

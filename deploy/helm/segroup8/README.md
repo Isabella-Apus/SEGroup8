@@ -7,12 +7,12 @@ the chart.
 
 ## One-time cluster prerequisites
 
-Create the namespace and the three required secrets before enabling CD:
+Create the namespace and the required secrets before enabling CD:
 
 ```bash
 kubectl create namespace segroup8
 kubectl -n segroup8 get secret \
-  acr-pull-secret segroup8-backend-secret segroup8-mysql-secret
+  acr-pull-secret segroup8-backend-secret segroup8-messaging-secret segroup8-mysql-secret
 ```
 
 The secrets must contain these keys:
@@ -23,6 +23,14 @@ The secrets must contain these keys:
 - `segroup8-backend-secret`: `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`,
   `JWT_SECRET`, and `REALTIME_ALLOWED_ORIGIN_PATTERNS`. Optional LLM settings
   may be added to the same secret.
+- `segroup8-messaging-secret`: `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`,
+  `JWT_SECRET`, and `INTERNAL_SERVICE_TOKEN`; add
+  `INTERNAL_OPERATIONS_TOKEN` for the replay endpoint.
+
+`REALTIME_ALLOWED_ORIGIN_PATTERNS` must be supplied as an explicit
+non-wildcard production allow-list. The deployment script rejects an empty
+value or `*`. `IDENTITY_SERVICE_URL` is an optional non-secret variable for the
+governance fallback endpoint.
 
 Use `mysql:3306` as the database host in `DB_URL`. Do not expose MySQL with a
 NodePort or cloud security-group rule.
@@ -33,10 +41,11 @@ The `production` GitHub Environment must provide:
 
 - Secrets: `ACR_USERNAME`, `ACR_PASSWORD`, `DEPLOY_HOST`, `DEPLOY_USER`,
   `DEPLOY_SSH_KEY`, and `DEPLOY_KNOWN_HOSTS`.
-- Variables: `ACR_REGISTRY`, `ACR_NAMESPACE`, and
-  `ENABLE_PRODUCTION_DEPLOY=true`.
+- Variables: `ACR_REGISTRY`, `ACR_NAMESPACE`, `ENABLE_PRODUCTION_DEPLOY=true`,
+  and `TEST=true`.
 - Optional variables: `K8S_NAMESPACE` (defaults to `segroup8`) and
-  `PRODUCTION_URL` (enables an external `/health` check).
+  `PRODUCTION_URL` (enables an external `/health` check),
+  `REALTIME_ALLOWED_ORIGIN_PATTERNS`, and `IDENTITY_SERVICE_URL`.
 
 The SSH user needs `helm`, `kubectl`, `curl`, and a working
 `$HOME/.kube/config` for the local K3s cluster.
