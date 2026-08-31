@@ -8,7 +8,7 @@ spring:
 app:
   jwt.secret: TEST_ONLY_MESSAGING_SECRET_12345678901234567890
   realtime.allowed-origin-patterns: http://localhost:5174
-  governance.base-url: ''
+  governance.identity-base-url: ''
   internal-service.token: test-internal-service-token
   internal-service.operations-token: test-internal-operations-token
   inbox.poll-delay-ms: 3600000

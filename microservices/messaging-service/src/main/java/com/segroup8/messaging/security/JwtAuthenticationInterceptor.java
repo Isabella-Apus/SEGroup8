@@ -24,7 +24,7 @@ public class JwtAuthenticationInterceptor implements HandlerInterceptor {
             JwtPrincipal jwt = verifier.verifyAuthorizationHeader(header);
             accessPolicy.requireActive(jwt.userId());
             request.setAttribute(PRINCIPAL_ATTRIBUTE,
-                    new MessagingPrincipal(jwt, header.substring("Bearer ".length()).trim()));
+                    new MessagingPrincipal(jwt));
             return true;
         } catch (JwtVerificationException ex) {
             throw new ApiException(401, "Invalid or expired JWT");

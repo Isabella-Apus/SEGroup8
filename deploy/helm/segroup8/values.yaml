@@ -40,6 +40,10 @@ messaging:
   config:
     identityServiceUrl: ""
     realtimeAllowedOriginPatterns: ""
+    identityConnectTimeoutMs: "2000"
+    identityReadTimeoutMs: "3000"
+    identityMaxAttempts: "3"
+    identityRetryBackoffMs: "100"
     inboxPollDelayMs: "1000"
     inboxMaxRetries: "5"
     deliveryPollDelayMs: "1000"

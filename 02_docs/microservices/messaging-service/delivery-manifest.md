@@ -13,14 +13,17 @@ is used by `.github/scripts/deploy-k3s.sh` so a failed rollout is rolled back.
 Production deployment requires the non-secret GitHub variable
 `REALTIME_ALLOWED_ORIGIN_PATTERNS`; the deployment script rejects an empty
 value or `*`. `IDENTITY_SERVICE_URL` may be supplied for the governance
-fallback.
+fallback. The corresponding `IDENTITY_SERVICE_TOKEN` is a service-only
+credential injected through the Messaging Secret; user Bearer tokens are
+never forwarded.
 
 This manifest is configuration evidence, not a claim that a production cluster
 was reached from this workstation.
 
 The service also has an independently named workflow at
 `.github/workflows/messaging-service-ci-cd.yml` for boundary, Maven, real
-MySQL, candidate-image, and Helm-static gates. Existing production publishing
-and deployment remains in the repository's unified workflow to avoid two
-competing deployment pipelines; its production deployment job uses the shared
+MySQL, independent API/WebSocket E2E, full-system UC24/UC25 E2E,
+candidate-image, and Helm-static gates. Production publishing and deployment
+are performed by this dedicated workflow; the shared platform workflow keeps
+Messaging disabled. The deployment job uses the shared
 `segroup8-production-helm` concurrency lock.

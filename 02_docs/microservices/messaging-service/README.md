@@ -4,7 +4,7 @@
 
 ## Run locally
 
-Provision `messaging_db` and `messaging_app`, then set `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, explicit `REALTIME_ALLOWED_ORIGIN_PATTERNS`, `INTERNAL_SERVICE_TOKEN`, and the separately scoped `INTERNAL_OPERATIONS_TOKEN`. Configure the monolith relay with the same service token and `MESSAGING_SERVICE_URL`. Run:
+Provision `messaging_db` and `messaging_app`, then set `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, explicit `REALTIME_ALLOWED_ORIGIN_PATTERNS`, `INTERNAL_SERVICE_TOKEN`, and the separately scoped `INTERNAL_OPERATIONS_TOKEN`. For governance fallback, set `IDENTITY_SERVICE_URL` and the service-only `IDENTITY_SERVICE_TOKEN` (the latter must never be a user JWT). Configure the monolith relay with its service token and `MESSAGING_SERVICE_URL`. Run:
 
 ```powershell
 $env:JAVA_HOME='D:\java\IntelliJ IDEA 2025.2.1\jbr'
@@ -24,7 +24,7 @@ The current monolith producers write a complete v1 envelope into their own `outb
 
 ## Governance compatibility
 
-Access status is fail-close from `user_access_projection`. Block checks first require two authoritative directional rows in `user_block_projection`. A migrated `source_version=0` inactive row is only a bootstrap snapshot and is not treated as authoritative permission. When a row is missing or non-authoritative, the explicit governance Port calls the current monolith block-check APIs with the actor's already-verified bearer token. If the compatibility source is unavailable or inconclusive, conversation creation and message sending return 503 and remain denied.
+Access status is fail-close from `user_access_projection`. Block checks first require two authoritative directional rows in `user_block_projection`. A migrated `source_version=0` inactive row is only a bootstrap snapshot and is not treated as authoritative permission. When a row is missing or non-authoritative, the explicit governance Port calls identity-governance's `POST /internal/blocks/check` with both directional pairs, `X-Internal-Service-Token`, request identity headers, explicit connect/read timeouts, and bounded retry. The authenticated user's JWT is never forwarded to identity. If the compatibility source is unavailable or inconclusive, conversation creation and message sending return 503 and remain denied.
 
 `UserAccessChanged.v1` updates `user_access_projection` by source version. BANNED/DISABLED commits trigger `disconnectUser`; subsequent REST and WebSocket handshakes remain fail-close. Block behavior stays on the V1 projection plus governance fallback because MS-06 defines no new block event.
 

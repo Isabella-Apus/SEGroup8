@@ -6,9 +6,33 @@ on:
       - "microservices/messaging-service/**"
       - "microservices/security-contract/**"
       - "microservices/pom.xml"
+      - "backend/pom.xml"
+      - "backend/Dockerfile"
+      - "backend/Dockerfile.runtime"
+      - "backend/src/main/java/com/segroup8/platform/event/**"
+      - "backend/src/main/java/com/segroup8/platform/internal/**"
+      - "backend/src/main/java/com/segroup8/platform/interceptor/InternalServiceInterceptor.java"
+      - "backend/src/main/java/com/segroup8/platform/service/impl/**"
+      - "backend/src/main/resources/schema.sql"
+      - "backend/src/test/resources/schema-test.sql"
+      - "microservices/messaging-service/src/main/resources/db/migration/**"
+      - "docker/mysql/02-seed.sql"
+      - "compose.yml"
+      - "compose.e2e.yml"
+      - "compose.messaging-service-e2e.yml"
+      - "compose.messaging-system-e2e.yml"
+      - "frontend/Dockerfile"
+      - "frontend/Dockerfile.runtime"
+      - "frontend/docker/nginx.conf"
+      - "frontend/docker/nginx.compose.conf"
+      - "frontend/e2e/domain-e/**"
+      - "frontend/package.json"
+      - "frontend/package-lock.json"
+      - "frontend/playwright.config.ts"
       - "scripts/ci/verify-messaging-*.mjs"
       - "scripts/ci/run-messaging-*.mjs"
       - "scripts/ci/strict-downstream-stub.mjs"
+      - "scripts/e2e/run-messaging-*.sh"
       - "02_docs/microservices/messaging-service/**"
       - "03_devops/microservices/messaging-service/**"
       - "04_tests/microservices/messaging-service/**"
@@ -24,9 +48,33 @@ on:
       - "microservices/messaging-service/**"
       - "microservices/security-contract/**"
       - "microservices/pom.xml"
+      - "backend/pom.xml"
+      - "backend/Dockerfile"
+      - "backend/Dockerfile.runtime"
+      - "backend/src/main/java/com/segroup8/platform/event/**"
+      - "backend/src/main/java/com/segroup8/platform/internal/**"
+      - "backend/src/main/java/com/segroup8/platform/interceptor/InternalServiceInterceptor.java"
+      - "backend/src/main/java/com/segroup8/platform/service/impl/**"
+      - "backend/src/main/resources/schema.sql"
+      - "backend/src/test/resources/schema-test.sql"
+      - "microservices/messaging-service/src/main/resources/db/migration/**"
+      - "docker/mysql/02-seed.sql"
+      - "compose.yml"
+      - "compose.e2e.yml"
+      - "compose.messaging-service-e2e.yml"
+      - "compose.messaging-system-e2e.yml"
+      - "frontend/Dockerfile"
+      - "frontend/Dockerfile.runtime"
+      - "frontend/docker/nginx.conf"
+      - "frontend/docker/nginx.compose.conf"
+      - "frontend/e2e/domain-e/**"
+      - "frontend/package.json"
+      - "frontend/package-lock.json"
+      - "frontend/playwright.config.ts"
       - "scripts/ci/verify-messaging-*.mjs"
       - "scripts/ci/run-messaging-*.mjs"
       - "scripts/ci/strict-downstream-stub.mjs"
+      - "scripts/e2e/run-messaging-*.sh"
       - "02_docs/microservices/messaging-service/**"
       - "03_devops/microservices/messaging-service/**"
       - "04_tests/microservices/messaging-service/**"
@@ -168,6 +216,73 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+  messaging-independent-e2e:
+    name: messaging-service independent API and WebSocket E2E
+    needs: messaging-verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: messaging-service-candidate-${{ github.sha }}
+          path: release-candidate
+      - name: Load the exact tested candidate image
+        run: docker image load --input release-candidate/messaging-service-image.tar.gz
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Run independent service API, internal-auth and WebSocket E2E
+        env:
+          MESSAGING_IMAGE: segroup8/messaging:candidate-${{ github.sha }}
+          E2E_OUTPUT_DIR: ${{ runner.temp }}/messaging-service-e2e
+        run: bash scripts/e2e/run-messaging-service-e2e.sh
+      - name: Upload full independent E2E report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: messaging-service-independent-e2e-${{ github.sha }}
+          path: ${{ runner.temp }}/messaging-service-e2e/**
+          if-no-files-found: warn
+          retention-days: 14
+
+  messaging-system-e2e:
+    name: full system UC24 and UC25 E2E with messaging-service
+    needs: [messaging-verify, messaging-independent-e2e]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: messaging-service-candidate-${{ github.sha }}
+          path: release-candidate
+      - name: Load the exact tested candidate image
+        run: docker image load --input release-candidate/messaging-service-image.tar.gz
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Run full system Compose E2E through production routing
+        env:
+          MESSAGING_IMAGE: segroup8/messaging:candidate-${{ github.sha }}
+          E2E_OUTPUT_DIR: ${{ runner.temp }}/messaging-system-e2e
+          E2E_USERNAME: user
+          E2E_PASSWORD: user123
+          E2E_BASE_URL: http://127.0.0.1:8088
+        run: bash scripts/e2e/run-messaging-system-e2e.sh
+      - name: Upload full system Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: messaging-service-system-e2e-${{ github.sha }}
+          path: ${{ runner.temp }}/messaging-system-e2e/**
+          if-no-files-found: warn
+          retention-days: 14
+
   delivery-config:
     name: Lint messaging-service Helm delivery
     needs: messaging-verify
@@ -202,7 +317,7 @@ jobs:
   publish-messaging-image:
     name: Publish immutable messaging-service image
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [messaging-verify, messaging-mysql, delivery-config]
+    needs: [messaging-verify, messaging-mysql, messaging-independent-e2e, messaging-system-e2e, delivery-config]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production

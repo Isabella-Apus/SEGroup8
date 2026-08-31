@@ -9,9 +9,6 @@
     "raw-reports/TEST-com.segroup8.platform.integration.VoucherClaimUc22IntegrationTest.xml",
     "raw-reports/TEST-com.segroup8.platform.service.UC22VoucherThresholdTest.xml",
     "raw-reports/TEST-com.segroup8.platform.service.VoucherServiceTest.xml",
-    "raw-reports/playwright/playwright-results.json",
-    "raw-reports/playwright/playwright-results.xml",
-    "raw-reports/playwright/playwright-report/index.html",
     "screenshots/uc22-voucher-used-after-paid-order-refresh.png",
     "logs/runtime-health.txt",
     "../../../02_docs/UC22/test-report.md"

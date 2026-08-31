@@ -20,7 +20,7 @@ public class ChatController {
     }
     @PostMapping("/conversations") public ApiResult<ChatModels.Conversation> create(
             @Valid @RequestBody CreateConversationRequest body, HttpServletRequest req) {
-        MessagingPrincipal p = principal(req); return ApiResult.success(service.createOrGet(p.userId(), body, p.token()));
+        MessagingPrincipal p = principal(req); return ApiResult.success(service.createOrGet(p.userId(), body));
     }
     @GetMapping("/conversations/{id}/messages") public ApiResult<List<ChatModels.Message>> messages(
             @PathVariable long id, HttpServletRequest req) {
@@ -28,7 +28,7 @@ public class ChatController {
     }
     @PostMapping("/conversations/{id}/messages") public ApiResult<ChatModels.Message> send(
             @PathVariable long id, @Valid @RequestBody SendMessageRequest body, HttpServletRequest req) {
-        MessagingPrincipal p = principal(req); return ApiResult.success(service.send(p.userId(), id, body.content(), p.token()));
+        MessagingPrincipal p = principal(req); return ApiResult.success(service.send(p.userId(), id, body.content()));
     }
     private MessagingPrincipal principal(HttpServletRequest request) {
         return (MessagingPrincipal) request.getAttribute(JwtAuthenticationInterceptor.PRINCIPAL_ATTRIBUTE);

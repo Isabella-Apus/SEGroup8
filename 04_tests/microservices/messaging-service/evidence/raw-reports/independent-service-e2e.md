@@ -1,6 +1,8 @@
 # Independent service API E2E
 
-Status: **PASS** for the local candidate image against an isolated MySQL 8.4 database.
+Historical status: **PASS** for the previous local candidate image against an isolated MySQL 8.4 database.
+The current source of truth is the dedicated workflow, which re-runs this contract on every relevant change
+and uploads the complete runner-only report as an Actions artifact.
 
 - Run date: `2026-08-31` (Java 21 host, Docker Desktop Linux engine)
 
@@ -9,7 +11,7 @@ Status: **PASS** for the local candidate image against an isolated MySQL 8.4 dat
 - Database: isolated `mysql:8.4.6`, not the monolith schema.
 - Service API checks: route contract, actuator contract, JWT/API authorization, internal service authentication, idempotent notification endpoint, replay endpoint, delivery status endpoint, and WebSocket handshake.
 - Projection rows were supplied locally for the main path; no producer database or monolith backend was used by the candidate service.
-- Strict downstream stub `scripts/ci/strict-downstream-stub.mjs` was run on host port 18085. With one block projection row removed, the candidate called exactly `GET /api/report-block/block/check/1002` and `GET /api/report-block/block/blocked-by/1002`; the stub validated method, path, and Bearer credential and returned `{code:0,data:false}`. Three request pairs were observed during the API audit.
+- The dedicated CI E2E fixture uses `scripts/ci/strict-downstream-stub.mjs` as the identity-governance boundary. With bootstrap block rows at `source_version=0`, the candidate must call exactly `POST /internal/blocks/check` with both directional pairs, `X-Internal-Service-Token`, `X-Request-Id`, and `X-Idempotency-Key`; the stub rejects any `Authorization: Bearer` header.
 - The API audit then completed the conversation fallback path with HTTP 200. No request accepted an arbitrary method/path or missing credential.
 - Public API audit result: 12/12 reviewed operations returned the expected success response; negative probes returned 401 (missing/invalid JWT and missing internal credential), 403 (non-participant), 400 (empty content), and 404 (missing notification).
 - WebSocket audit result: valid JWT + allowed Origin handshook successfully; missing/invalid JWT and disallowed Origin were rejected.

@@ -45,11 +45,11 @@ public class ChatService {
     }
 
     @Transactional
-    public Conversation createOrGet(long actorId, CreateConversationRequest request, String token) {
+    public Conversation createOrGet(long actorId, CreateConversationRequest request) {
         if (actorId == request.targetUserId()) throw new ApiException(400, "Cannot create a conversation with yourself");
         AccessSnapshot actor = access.requireActive(actorId);
         AccessSnapshot target = access.requireActive(request.targetUserId());
-        blocks.requireCommunicationAllowed(actorId, request.targetUserId(), token);
+        blocks.requireCommunicationAllowed(actorId, request.targetUserId());
         String type = normalizeType(request.sourceType());
         long sourceId = normalizeSourceId(type, request.sourceId());
         String title = normalizeTitle(type, request.sourceTitle());
@@ -91,12 +91,12 @@ public class ChatService {
     }
 
     @Transactional
-    public Message send(long senderId, long conversationId, String content, String token) {
+    public Message send(long senderId, long conversationId, String content) {
         ConversationRow conversation = requireConversationRow(senderId, conversationId);
         long receiverId = conversation.buyerId() == senderId ? conversation.sellerId() : conversation.buyerId();
         access.requireActive(senderId);
         access.requireActive(receiverId);
-        blocks.requireCommunicationAllowed(senderId, receiverId, token);
+        blocks.requireCommunicationAllowed(senderId, receiverId);
         String normalized = normalizeContent(content);
         LocalDateTime now = LocalDateTime.now();
         long messageId = insertMessage(conversationId, senderId, receiverId, normalized, now);

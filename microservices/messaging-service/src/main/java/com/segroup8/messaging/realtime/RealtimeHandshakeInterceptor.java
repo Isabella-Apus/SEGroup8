@@ -19,7 +19,6 @@ import org.springframework.web.socket.server.HandshakeInterceptor;
 @Component
 public class RealtimeHandshakeInterceptor implements HandshakeInterceptor {
     public static final String USER_ID = "uid";
-    public static final String TOKEN = "verifiedToken";
     private final JwtTokenVerifier verifier;
     private final AccessPolicy access;
     public RealtimeHandshakeInterceptor(JwtTokenVerifier verifier, AccessPolicy access) {
@@ -32,7 +31,6 @@ public class RealtimeHandshakeInterceptor implements HandshakeInterceptor {
             JwtPrincipal principal = verifier.verifyToken(token);
             access.requireActive(principal.userId());
             attributes.put(USER_ID, principal.userId());
-            attributes.put(TOKEN, token);
             return true;
         } catch (JwtVerificationException ex) {
             response.setStatusCode(HttpStatus.UNAUTHORIZED); return false;

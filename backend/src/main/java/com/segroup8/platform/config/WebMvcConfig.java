@@ -2,6 +2,7 @@ package com.segroup8.platform.config;
 
 import com.segroup8.platform.interceptor.JwtAuthInterceptor;
 import com.segroup8.platform.interceptor.IdempotencyInterceptor;
+import com.segroup8.platform.interceptor.InternalServiceInterceptor;
 import com.segroup8.platform.interceptor.OptionalJwtInterceptor;
 import com.segroup8.platform.interceptor.TraceIdInterceptor;
 import org.springframework.context.annotation.Configuration;
@@ -17,19 +18,24 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final @NonNull OptionalJwtInterceptor optionalJwtInterceptor;
     private final @NonNull TraceIdInterceptor traceIdInterceptor;
     private final @NonNull IdempotencyInterceptor idempotencyInterceptor;
+    private final @NonNull InternalServiceInterceptor internalServiceInterceptor;
 
     public WebMvcConfig(@NonNull JwtAuthInterceptor jwtAuthInterceptor,
             @NonNull OptionalJwtInterceptor optionalJwtInterceptor,
             @NonNull TraceIdInterceptor traceIdInterceptor,
-            @NonNull IdempotencyInterceptor idempotencyInterceptor) {
+            @NonNull IdempotencyInterceptor idempotencyInterceptor,
+            @NonNull InternalServiceInterceptor internalServiceInterceptor) {
         this.jwtAuthInterceptor = jwtAuthInterceptor;
         this.optionalJwtInterceptor = optionalJwtInterceptor;
         this.traceIdInterceptor = traceIdInterceptor;
         this.idempotencyInterceptor = idempotencyInterceptor;
+        this.internalServiceInterceptor = internalServiceInterceptor;
     }
 
     @Override
     public void addInterceptors(@NonNull InterceptorRegistry registry) {
+        registry.addInterceptor(internalServiceInterceptor)
+                .addPathPatterns("/internal/blocks/**");
         registry.addInterceptor(traceIdInterceptor)
                 .addPathPatterns("/api/**");
 

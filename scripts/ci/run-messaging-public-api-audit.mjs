@@ -24,6 +24,10 @@ async function call(name, method, path, options = {}) {
   const text = await response.text();
   let body; try { body = JSON.parse(text); } catch { body = {}; }
   result.push({ name, method, path, status: response.status, code: body.code ?? null });
+  const expectedStatus = options.expectedStatus ?? 200;
+  if (response.status !== expectedStatus) {
+    throw new Error(`${name}: expected HTTP ${expectedStatus}, received ${response.status}`);
+  }
   return { response, body };
 }
 
@@ -41,11 +45,11 @@ const httpDedupe = `final-audit-http-${Date.now()}`;
 await call('internal-notification', 'POST', '/internal/notifications', { service: serviceToken, body: { recipientUserId: 1001, title: 'Audit internal', content: 'Audit internal content', notificationType: 'AUDIT', businessType: 'TEST', businessId: eventId, targetPath: '/chat', scope: 'buyer', dedupeKey: httpDedupe, traceId: 'final-audit-http' } });
 await call('internal-delivery', 'GET', `/internal/delivery/${httpDedupe}`, { service: serviceToken });
 await call('internal-replay', 'POST', `/internal/events/replay/${eventId}?reason=final-audit`, { service: operationsToken });
-await call('unauthenticated', 'GET', '/api/chat/conversations');
-await call('invalid-jwt', 'GET', '/api/chat/conversations', { auth: 'not-a-jwt' });
-await call('nonparticipant', 'GET', '/api/chat/conversations/9001/messages', { auth: jwt(1003, 'outsider') });
-await call('invalid-message', 'POST', '/api/chat/conversations/9001/messages', { auth: buyer, body: { content: '' } });
-await call('missing-notification', 'POST', '/api/notifications/999999/read', { auth: buyer });
-await call('internal-missing-auth', 'POST', '/internal/notifications', { body: { recipientUserId: 1001, title: 'x', content: 'x', dedupeKey: 'bad', traceId: 'bad' } });
-await call('replay-wrong-token-type', 'POST', `/internal/events/replay/${eventId}`, { service: serviceToken });
+await call('unauthenticated', 'GET', '/api/chat/conversations', { expectedStatus: 401 });
+await call('invalid-jwt', 'GET', '/api/chat/conversations', { auth: 'not-a-jwt', expectedStatus: 401 });
+await call('nonparticipant', 'GET', '/api/chat/conversations/9001/messages', { auth: jwt(1003, 'outsider'), expectedStatus: 403 });
+await call('invalid-message', 'POST', '/api/chat/conversations/9001/messages', { auth: buyer, body: { content: '' }, expectedStatus: 400 });
+await call('missing-notification', 'POST', '/api/notifications/999999/read', { auth: buyer, expectedStatus: 404 });
+await call('internal-missing-auth', 'POST', '/internal/notifications', { body: { recipientUserId: 1001, title: 'x', content: 'x', dedupeKey: 'bad', traceId: 'bad' }, expectedStatus: 401 });
+await call('replay-wrong-token-type', 'POST', `/internal/events/replay/${eventId}`, { service: serviceToken, expectedStatus: 401 });
 console.log(JSON.stringify({ base, results: result }, null, 2));

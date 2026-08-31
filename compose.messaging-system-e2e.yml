@@ -1,0 +1,68 @@
+services:
+  backend:
+    environment:
+      APP_MESSAGING_EVENT_NOTIFICATIONS_ENABLED: "true"
+      MESSAGING_SERVICE_URL: http://messaging:8084
+      INTERNAL_SERVICE_TOKEN: e2e-internal-token
+
+  frontend:
+    volumes:
+      - ./frontend/docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      messaging:
+        condition: service_healthy
+
+  messaging-db:
+    image: mysql:8.4.6
+    environment:
+      MYSQL_DATABASE: messaging_db
+      MYSQL_USER: messaging_app
+      MYSQL_PASSWORD: messaging_password
+      MYSQL_ROOT_PASSWORD: messaging_root_password
+      TZ: Asia/Shanghai
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -pmessaging_root_password --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    networks: [platform]
+
+  messaging:
+    image: ${MESSAGING_IMAGE:-segroup8/messaging:candidate-local}
+    environment:
+      DB_URL: jdbc:mysql://messaging-db:3306/messaging_db?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+      DB_USERNAME: messaging_app
+      DB_PASSWORD: messaging_password
+      JWT_SECRET: ${JWT_SECRET:-SEGROUP8_DOCKER_DEMO_SECRET_CHANGE_ME_2026}
+      REALTIME_ALLOWED_ORIGIN_PATTERNS: "*"
+      IDENTITY_SERVICE_URL: http://backend:8080
+      IDENTITY_SERVICE_TOKEN: e2e-internal-token
+      INTERNAL_SERVICE_TOKEN: e2e-internal-token
+      INTERNAL_OPERATIONS_TOKEN: e2e-operations-token
+      SERVER_PORT: 8084
+      TZ: Asia/Shanghai
+    ports:
+      - "${MESSAGING_HOST_PORT:-18084}:8084"
+    depends_on:
+      backend:
+        condition: service_healthy
+      messaging-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8084/actuator/health/readiness | grep -q 'UP'"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
+    networks: [platform]
+
+  messaging-seed:
+    image: mysql:8.4.6
+    depends_on:
+      messaging:
+        condition: service_healthy
+    volumes:
+      - ./04_tests/microservices/messaging-service/e2e/messaging-e2e-seed.sql:/seed.sql:ro
+    entrypoint: ["sh", "-c"]
+    command: ["mysql --protocol=TCP -hmessaging-db -umessaging_app -pmessaging_password messaging_db < /seed.sql"]
+    networks: [platform]

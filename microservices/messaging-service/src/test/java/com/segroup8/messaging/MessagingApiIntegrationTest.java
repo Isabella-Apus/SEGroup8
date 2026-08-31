@@ -2,7 +2,6 @@ package com.segroup8.messaging;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -144,7 +143,7 @@ class MessagingApiIntegrationTest {
     void migratedInactiveProjectionUsesGovernanceFallbackAndFailsClosedOnBlock() throws Exception {
         jdbc.update("update user_block_projection set source_version=0 where "
                 + "(blocker_user_id=1 and blocked_user_id=2) or (blocker_user_id=2 and blocked_user_id=1)");
-        when(governanceBlocks.isCommunicationBlocked(anyLong(), anyLong(), anyString()))
+        when(governanceBlocks.isCommunicationBlocked(anyLong(), anyLong()))
                 .thenReturn(Optional.of(true));
         mvc.perform(post("/api/chat/conversations/10/messages").header("Authorization", bearer(token(1, 3600)))
                         .contentType(MediaType.APPLICATION_JSON).content("{\"content\":\"stale allowed state\"}"))

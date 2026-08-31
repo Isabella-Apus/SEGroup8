@@ -36,8 +36,7 @@ public class RealtimeWebSocketHandler extends TextWebSocketHandler {
             if (!"CHAT_SEND".equalsIgnoreCase(type)) return;
             JsonNode payload = root.path("payload");
             if (!payload.path("conversationId").canConvertToLong()) throw new ApiException(400, "conversationId is required");
-            String token = String.valueOf(session.getAttributes().get(RealtimeHandshakeInterceptor.TOKEN));
-            chat.send(number.longValue(), payload.path("conversationId").asLong(), payload.path("content").asText(), token);
+            chat.send(number.longValue(), payload.path("conversationId").asLong(), payload.path("content").asText());
         } catch (ApiException ex) {
             sendError(session, ex.getMessage());
         } catch (IOException ex) {

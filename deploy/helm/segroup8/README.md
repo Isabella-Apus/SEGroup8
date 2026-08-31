@@ -28,12 +28,14 @@ The secrets must contain these keys:
 - `segroup8-messaging-secret`: required by the Messaging service pipeline;
   `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, and
   `INTERNAL_SERVICE_TOKEN`; add `INTERNAL_OPERATIONS_TOKEN` for the replay
-  endpoint.
+  endpoint and `IDENTITY_SERVICE_TOKEN` for the governance fallback. This is a
+  service-to-service token, never an end-user Bearer token.
 
 `REALTIME_ALLOWED_ORIGIN_PATTERNS` must be supplied as an explicit
 non-wildcard production allow-list. The deployment script rejects an empty
 value or `*`. `IDENTITY_SERVICE_URL` is an optional non-secret variable for the
-governance fallback endpoint.
+governance fallback endpoint. The ConfigMap also carries bounded identity
+timeout/retry settings.
 
 Use `mysql:3306` as the database host in `DB_URL`. Do not expose MySQL with a
 NodePort or cloud security-group rule.

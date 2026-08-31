@@ -4,7 +4,7 @@
 |---|---|---|---|
 | Monolith domain producer | `POST /internal/events` | `X-Internal-Service-Token` + service identity | Versioned event envelope and historical snapshot |
 | Messaging replay operator | `POST /internal/events/replay/{eventId}` | Separate operations token | event id, reason, trace id |
-| Messaging block adapter | governance compatibility API | verified user bearer token | directional block decision only |
+| Messaging block adapter | `POST /internal/blocks/check` | `X-Internal-Service-Token` + request identity headers | two directional block pairs and decisions |
 | Client | `/api/chat/**`, `/api/notifications/**` | `security-contract` JWT | owned resource request |
 
 No producer writes messaging tables and Messaging does not select producer,

@@ -1,12 +1,12 @@
 {
-  "revision": "684aff9e87664ebb41d9844cacbfd8bdf2dc60b3",
+  "revision": "next-ci-run",
   "maven": "PASS",
   "mysqlIntegration": "PASS",
   "publicApiCoverage": {
     "covered": 12,
     "total": 12
   },
-  "independentServiceE2E": "PASS",
+  "independentServiceE2E": "CI_GATE_DEFINED",
   "fullSystemUseCaseE2E": "NOT_RUN",
   "candidateImage": "PASS",
   "helmStatic": "PASS",

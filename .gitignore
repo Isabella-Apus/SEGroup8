@@ -11,6 +11,9 @@ frontend/playwright-report/
 frontend/blob-report/
 **/playwright-report/
 **/test-results/
+**/blob-report/
+**/playwright-results.json
+**/playwright-results.xml
 *.zip
 *.trace.zip
 *.webm
