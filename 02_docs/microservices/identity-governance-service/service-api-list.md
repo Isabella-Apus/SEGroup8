@@ -1,6 +1,6 @@
 # 服务接口清单与 API 测试映射
 
-运行时 Springdoc 与 `openapi.yaml` 一致：共 34 个 method-path，其中公开接口 31 个、内部接口 3 个。下面每个公开接口都有成功路径断言；除注册/登录自身的输入与凭据异常测试外，其余 29 个接口统一经过匿名拒绝、失效账户 JWT 拒绝，管理员接口还经过普通用户越权拒绝。
+运行时 Springdoc 与 `openapi.yaml` 一致：共 35 个 method-path，其中公开接口 31 个、内部接口 4 个。下面每个公开接口都有成功路径断言；除注册/登录自身的输入与凭据异常测试外，其余 29 个接口统一经过匿名拒绝、失效账户 JWT 拒绝，管理员接口还经过普通用户越权拒绝。
 
 | 方法 | 路径 | UC | 成功路径测试 |
 |---|---|---|---|
@@ -50,6 +50,7 @@
 |---|---|---|---|
 | POST | `/internal/auth/introspect` | Gateway/高风险服务 | 服务 Token、Request ID、幂等键 |
 | GET | `/internal/users/{userId}/summary` | 业务服务 | 服务 Token、Request ID、最小字段 |
+| GET | `/internal/users/{userId}/address-snapshot?addressId={id}` | order/secondhand | 服务 Token、Request ID、地址所有权；省略 addressId 时返回默认/首个地址 |
 | POST | `/internal/blocks/check` | messaging | 服务 Token、Request ID、幂等键、批量输入 |
 
 机器可读契约仍以 `openapi.yaml` 为准；本文件用于课程检查和 PR 人工评审。

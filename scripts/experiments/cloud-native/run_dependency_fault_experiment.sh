@@ -10,6 +10,15 @@ if [[ ! "$OUT_NAME" =~ ^[a-zA-Z0-9._-]+$ ]]; then
 fi
 OUT="$HOST_ROOT/evidence/$OUT_NAME"
 mkdir -p "$OUT"
+{
+  echo "run_id=$RUN_ID"
+  echo "namespace=$NAMESPACE"
+  echo "git_commit=$GIT_COMMIT"
+  echo "secondhand_jar_sha256=$SECONDHAND_JAR_SHA256"
+  echo "order_jar_sha256=$ORDER_JAR_SHA256"
+  echo "identity_jar_sha256=$IDENTITY_JAR_SHA256"
+  echo "started_at=$(date --iso-8601=seconds)"
+} > "$OUT/00-run-metadata.env"
 MYSQL_POD="$(kubectl -n "$NAMESPACE" get pod -l app=mysql -o jsonpath='{.items[0].metadata.name}')"
 MYSQL_ROOT_PASSWORD="$(kubectl -n "$NAMESPACE" get secret experiment-secrets -o jsonpath='{.data.MYSQL_ROOT_PASSWORD}' | base64 -d)"
 JWT_SECRET="$(kubectl -n "$NAMESPACE" get secret experiment-secrets -o jsonpath='{.data.JWT_SECRET}' | base64 -d)"
@@ -97,6 +106,7 @@ kubectl -n "$NAMESPACE" logs deployment/order-service --since-time="$RECOVERY_ST
 kubectl -n "$NAMESPACE" get deployment,pod -o wide > "$OUT/16-after-recovery.txt"
 kubectl -n "$NAMESPACE" get events --sort-by=.lastTimestamp > "$OUT/17-events.txt"
 
+echo "Dependency fault evidence: $OUT"
 python3 - "$OUT" "$HTTP_CODE" "$REPEAT_CODE" "$state" "$IDENTITY_CODE" <<'PY'
 import json, os, sys
 root, first_code, repeat_code, state, identity_code = sys.argv[1:]
@@ -139,6 +149,5 @@ with open(os.path.join(root, "summary.json"), "w", encoding="utf-8") as stream:
     json.dump(summary, stream, ensure_ascii=False, indent=2)
     stream.write("\n")
 print(json.dumps(summary, ensure_ascii=False))
+raise SystemExit(0 if summary["automaticRecoveryPassed"] else 1)
 PY
-
-echo "Dependency fault evidence: $OUT"

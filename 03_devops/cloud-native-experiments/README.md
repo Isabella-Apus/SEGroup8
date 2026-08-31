@@ -2,8 +2,9 @@
 
 ## 1. 结论与验收边界
 
-本次实验在分支 `experiment/cloud-native-performance` 上完成，运行编号为
-`20260830-2300-ef71f1fe`。实验使用一台 4 vCPU、7.1 GiB 内存的 K3s
+本次实验在分支 `experiment/cloud-native-performance` 上完成。初始 HPA、性能和故障轮次
+编号为 `20260830-2300-ef71f1fe`，自动恢复修复复验编号为
+`20260831-recovery-d6eee99b`。实验使用一台 4 vCPU、7.1 GiB 内存的 K3s
 v1.36.3 单节点服务器，并在独立命名空间
 `segroup8-cloud-exp-20260830-2300-ef71f1fe` 中运行。原有 `segroup8`
 命名空间未被替换、扩容或写入实验数据。
@@ -14,11 +15,11 @@ v1.36.3 单节点服务器，并在独立命名空间
 |---|---|---|
 | HPA 扩缩容 | **通过** | 调优轮次完整观察到 `1→4→2→1`；资源、时间线和请求指标齐全 |
 | 依赖故障最低课程要求 | **通过** | 停止订单服务后，二手购买返回 HTTP 202/`RETRY`；二手服务存活、就绪和无关查询保持可用 |
-| 依赖恢复增强目标 | **未通过** | 订单恢复后 180 秒内仍为 `RETRY`，没有生成订单；已保留原始失败证据和根因分析 |
+| 依赖恢复增强目标 | **通过** | 保留首次 `RETRY` 失败证据；统一数据库时钟后，订单依赖恢复时后台自动推进 `CREATED`，恰好生成 1 单并保存地址快照 |
 | 改造前后性能 | **完成** | 3 个公开接口、单体/微服务各 3 轮、相同数据和压力脚本；包含吞吐、平均、P95、错误率、CPU、内存 |
 
-这里有意把“课程要求通过”和“增强恢复失败”分开。不能因为健康检查为 UP
-就声称业务恢复成功，也不能用探索性过载结果代替稳定态性能结果。
+这里有意保留“课程最低要求先通过、增强恢复首次失败、修复后通过”的完整过程。不能因为健康检查为 UP
+就声称业务恢复成功，也不能删除失败证据只保留最终成功结果。
 
 ## 2. 实验拓扑与公平性控制
 
@@ -91,19 +92,35 @@ Pod，缩容稳定窗口 60 秒、每 15 秒最多减少 50%。调优后的正�
 3. 得到 HTTP 202，业务状态为 `RETRY`；这是受控降级，不是 500 或连接异常透传。
 4. 同期 `/actuator/health/liveness` 和 `/actuator/health/readiness` 均为 UP，
    无关二手列表接口仍返回业务数据。
-5. 恢复订单服务到 1/1，轮询 180 秒；请求始终停在 `RETRY`，重复购买仍为 202，
-   订单库匹配记录为 0。
+5. 首次复验恢复订单服务到 1/1 后轮询 180 秒，请求始终停在 `RETRY`；人工重复同一购买请求才创建 1 单。
+6. 查询 MySQL 时发现 `CURRENT_TIMESTAMP` 为 UTC 约 `02:16`，而 `next_retry_at` 被应用按
+   Asia/Shanghai 写成约 `10:01`，记录要约 8 小时后才满足重试筛选条件。
+7. 将重试时间写入改为 `TIMESTAMPADD(SECOND, delay, CURRENT_TIMESTAMP)`，让写入和到期判断使用同一个
+   数据库时钟；重新构建候选 JAR 并保持其余实验条件不变。
+8. 第二次复验中，故障期间仍返回 HTTP 202/`RETRY` 且探针均 UP；订单服务恢复后，时间线在 9 秒内从
+   `RETRY` 进入 `CREATED`，无需人工重发。随后重复购买返回 200，数据库仍恰好 1 单。
 
-因此，课程要求的“停止一个依赖、采用超时/受控返回、其他服务不崩”已经满足；
-增强目标“依赖恢复后自动补偿并且恰好生成一单”没有满足。
+因此，课程要求的“停止一个依赖、采用超时/受控返回、其他服务不崩”和增强目标
+“依赖恢复后自动补偿且恰好生成一单”均已满足。最终订单包含身份治理服务返回的
+`Experiment Buyer / 13800008000 / Zhejiang / Hangzhou / West Lake Road 1` 快照。
 
-根因证据显示当前两个独立实现的内部契约没有真正对齐：二手侧发送轻量交易命令并
-期待 `{code,message,data}` 信封，订单侧内部接口仍要求收货人/商品快照字段并直接
-返回 `OrderView`；此外本实验设置了 1 秒读取超时。单元级 Mock 契约测试只模拟了
-二手侧期望的响应，没有用真实订单服务做 provider/consumer 联合契约，因此之前未
-发现。修复应作为独立业务改造：先冻结一份共享 OpenAPI/DTO，订单 provider contract
-和二手 consumer contract 共用该文件，再补真实双服务恢复测试；不能在实验报告里用
-手工改库伪造恢复成功。
+本实验共修复了两层真实问题。第一层是二手消费者与订单提供者契约不一致：请求补齐固定
+`orderBusinessKey`、商品和收货地址快照，响应统一为 `{code,message,data}`，并增加 provider/consumer
+契约测试。第二层是容器环境才暴露的跨时区双时钟问题：应用时钟写入、数据库时钟筛选导致
+自动恢复延迟 8 小时。最终代码用数据库单一时钟计算重试到期点，且实验脚本在
+`automaticRecoveryPassed=false` 时返回非零退出码，流水线不能再把失败实验显示为绿色。
+
+### 课程范围
+
+课程原文要求的是小组完成“两项云原生实验”，故障实验表述为主动停止“一个依赖服务”，
+现场演示也要求停止一个依赖。因此不需要把每一对微服务依赖都完整停机演练一次。推荐验收口径是：
+
+- 所有真实跨服务调用都必须有接口清单、数据归属、超时、鉴权、幂等/补偿策略和自动契约测试；
+- 选择一条最能体现跨服务写链路的典型链路做完整故障注入、恢复、日志和数据库证据；
+- 本系统最合适的典型链路就是 `secondhand-service → order-service`，因为可同时验证受控降级、
+  重试、状态查询、幂等建单、地址快照和非相关浏览不被拖垮；
+- 后续新服务只需通过统一基础治理清单。除非其故障模型不同（例如支付未知结果、消息队列积压），
+  才增加专项实验，而不是机械重复本次演练。
 
 ## 5. 改造前后性能
 
@@ -145,7 +162,9 @@ Pod，缩容稳定窗口 60 秒、每 15 秒最多减少 50%。调优后的正�
 
 ## 7. 证据导航与复现
 
-原始证据入口：`04_tests/cloud-native-experiments/20260830-2300-ef71f1fe/`。
+初始实验原始证据入口：`04_tests/cloud-native-experiments/20260830-2300-ef71f1fe/`。
+自动恢复修复前后复验证据入口：
+`04_tests/cloud-native-experiments/20260831-recovery-d6eee99b/`。
 
 | 目录 | 内容 |
 |---|---|
@@ -157,14 +176,22 @@ Pod，缩容稳定窗口 60 秒、每 15 秒最多减少 50%。调优后的正�
 | `hpa-overload-60/` | 三轮过载边界实验 |
 | `dependency-fault/` | 故障响应、健康检查、数据库状态、恢复时间线、两侧日志与事件 |
 
-复现脚本位于 `scripts/experiments/cloud-native/`。在 K3s 节点准备好两个 JAR 并放到
+复验目录：
+
+| 目录 | 内容 |
+|---|---|
+| `dependency-fault-recovery-success/` | 首次增强复验，实际 `automaticRecoveryPassed=false`；180 秒时间线、手工重发和根因证据 |
+| `dependency-fault-database-clock-success/` | 数据库时钟修复后正式通过轮次；自动恢复、唯一订单、地址快照和调度日志 |
+| `environment/` | 复验环境、Kubernetes 资源和制品元数据 |
+
+复现脚本位于 `scripts/experiments/cloud-native/`。在 K3s 节点准备好身份治理、订单、二手三个 JAR 并放到
 `$HOST_ROOT/jars/` 后依次执行：
 
 ```bash
 GIT_COMMIT=<commit> bash scripts/experiments/cloud-native/prepare_environment.sh <run-id> <host-root>
 CONCURRENCY=5 DURATION=20 WARMUP=3 bash scripts/experiments/cloud-native/run_performance_comparison.sh <host-root>/state.env
 ROUNDS=1 CONCURRENCY=10 DURATION=90 WARMUP=3 bash scripts/experiments/cloud-native/run_hpa_experiment.sh <host-root>/state.env
-bash scripts/experiments/cloud-native/run_dependency_fault_experiment.sh <host-root>/state.env
+bash scripts/experiments/cloud-native/run_dependency_fault_experiment.sh <host-root>/state.env <evidence-name>
 bash scripts/experiments/cloud-native/cleanup_environment.sh <host-root>/state.env
 ```
 
@@ -176,9 +203,11 @@ bash scripts/experiments/cloud-native/cleanup_environment.sh <host-root>/state.e
 - `bash -n scripts/experiments/cloud-native/*.sh`：通过。
 - `python -m py_compile scripts/experiments/cloud-native/http_benchmark.py`：通过。
 - 164 个仓库内证据文件均写入 `sha256-manifest.txt`；所有 JSON 均可解析。
-- `mvn -B --no-transfer-progress -f microservices/pom.xml -pl order-service,secondhand-service -am clean test`：
-  非沙箱运行 BUILD SUCCESS；security-contract 5、secondhand-service 20、
-  order-service 14，共 39 个测试，0 failure、0 error、0 skipped。
+- `mvn -B --no-transfer-progress -f microservices/pom.xml -pl identity-governance-service,order-service,secondhand-service -am clean test`：
+  非沙箱运行 BUILD SUCCESS；当前报告统计 security-contract 5、identity-governance-service 17、
+  secondhand-service 22、order-service 14，共 58 个测试，0 failure、0 error、0 skipped。
+- 修复候选提交 `d6eee99b9c178d1b5a5cb7c4e11655c960dd8f7b`；二手 JAR SHA-256 为
+  `e096a85fcda1c846d18e8ef5cc85a58fc6f223d9967b9e42bbf3390fd9d96bf6`。
 - 同一 Maven 命令在受限沙箱内曾因 Windows `Access is denied` 导致 testCompile
   看不到已生成 class；非沙箱重跑成功，故归类为执行环境问题，不归类为代码测试失败。
 - 实验命名空间清理后，服务器只剩原 `segroup8` 业务命名空间；原后端、前端、

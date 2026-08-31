@@ -1,0 +1,84 @@
+2026-08-31T09:58:59+08:00
+Linux iZbp1fcr5ltsng9ra8gt84Z 5.15.0-187-generic #197-Ubuntu SMP Fri Jul 17 19:17:01 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+Architecture:                            x86_64
+CPU op-mode(s):                          32-bit, 64-bit
+Address sizes:                           46 bits physical, 48 bits virtual
+Byte Order:                              Little Endian
+CPU(s):                                  4
+On-line CPU(s) list:                     0-3
+Vendor ID:                               GenuineIntel
+Model name:                              Intel(R) Xeon(R) Platinum
+CPU family:                              6
+Model:                                   85
+Thread(s) per core:                      2
+Core(s) per socket:                      2
+Socket(s):                               1
+Stepping:                                4
+BogoMIPS:                                4999.99
+Flags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch invpcid_single pti fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid avx512f avx512dq rdseed adx smap clflushopt clwb avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves arat
+Hypervisor vendor:                       KVM
+Virtualization type:                     full
+L1d cache:                               64 KiB (2 instances)
+L1i cache:                               64 KiB (2 instances)
+L2 cache:                                2 MiB (2 instances)
+L3 cache:                                33 MiB (1 instance)
+NUMA node(s):                            1
+NUMA node0 CPU(s):                       0-3
+Vulnerability Gather data sampling:      Unknown: Dependent on hypervisor status
+Vulnerability Indirect target selection: Mitigation; Aligned branch/return thunks
+Vulnerability Itlb multihit:             KVM: Mitigation: VMX unsupported
+Vulnerability L1tf:                      Mitigation; PTE Inversion
+Vulnerability Mds:                       Vulnerable: Clear CPU buffers attempted, no microcode; SMT Host state unknown
+Vulnerability Meltdown:                  Mitigation; PTI
+Vulnerability Mmio stale data:           Vulnerable: Clear CPU buffers attempted, no microcode; SMT Host state unknown
+Vulnerability Reg file data sampling:    Not affected
+Vulnerability Retbleed:                  Vulnerable
+Vulnerability Spec rstack overflow:      Not affected
+Vulnerability Spec store bypass:         Vulnerable
+Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:                Mitigation; Retpolines; STIBP disabled; RSB filling; PBRSB-eIBRS Not affected; BHI Retpoline
+Vulnerability Srbds:                     Not affected
+Vulnerability Tsa:                       Not affected
+Vulnerability Tsx async abort:           Not affected
+Vulnerability Vmscape:                   Not affected
+               total        used        free      shared  buff/cache   available
+Mem:           7.1Gi       3.1Gi       533Mi       4.0Mi       3.5Gi       3.7Gi
+Swap:             0B          0B          0B
+Client Version: v1.36.3+k3s1
+Kustomize Version: v5.8.1
+Server Version: v1.36.3+k3s1
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)   
+izbp1fcr5ltsng9ra8gt84z   2231m        55%      4507Mi          62%         
+NAME                                          READY   UP-TO-DATE   AVAILABLE   AGE    CONTAINERS                    IMAGES                                                                                                                     SELECTOR
+deployment.apps/identity-governance-service   1/1     1            1           104s   identity-governance-service   crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323   app=identity-governance-service
+deployment.apps/monolith                      1/1     1            1           105s   monolith                      crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323   app=monolith
+deployment.apps/mysql                         1/1     1            1           105s   mysql                         crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/mysql:8.4.6                                            app=mysql
+deployment.apps/order-service                 1/1     1            1           104s   order-service                 crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323   app=order-service
+deployment.apps/secondhand-service            1/1     1            1           104s   secondhand-service            crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323   app=secondhand-service
+
+NAME                                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE    SELECTOR
+service/identity-governance-service   ClusterIP   10.43.251.92    <none>        8091/TCP   104s   app=identity-governance-service
+service/monolith                      ClusterIP   10.43.195.54    <none>        8080/TCP   104s   app=monolith
+service/mysql                         ClusterIP   10.43.106.177   <none>        3306/TCP   105s   app=mysql
+service/order-service                 ClusterIP   10.43.45.186    <none>        8085/TCP   104s   app=order-service
+service/secondhand-service            ClusterIP   10.43.152.43    <none>        8080/TCP   104s   app=secondhand-service
+
+NAME                                                     REFERENCE                       TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/secondhand-service   Deployment/secondhand-service   cpu: <unknown>/60%   1         4         1          104s
+
+NAME                                              READY   STATUS    RESTARTS   AGE    IP           NODE                      NOMINATED NODE   READINESS GATES
+pod/identity-governance-service-5fc97c7db-dkbg2   1/1     Running   0          104s   10.42.0.67   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/monolith-86f5d4c556-wbsf4                     1/1     Running   0          104s   10.42.0.69   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/mysql-67cd695757-2m79q                        1/1     Running   0          104s   10.42.0.66   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/order-service-5956c57d95-5j22r                1/1     Running   0          104s   10.42.0.68   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/secondhand-service-6bcd4b6789-cwfgp           1/1     Running   0          104s   10.42.0.70   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+NAME                                          CPU(cores)   MEMORY(bytes)   
+identity-governance-service-5fc97c7db-dkbg2   500m         156Mi           
+monolith-86f5d4c556-wbsf4                     502m         164Mi           
+mysql-67cd695757-2m79q                        20m          468Mi           
+order-service-5956c57d95-5j22r                499m         151Mi           
+secondhand-service-6bcd4b6789-cwfgp           499m         186Mi           
+mysql: [Warning] Using a password on the command line interface can be insecure.
+monolith_count=500
+mysql: [Warning] Using a password on the command line interface can be insecure.
+microservice_count=500

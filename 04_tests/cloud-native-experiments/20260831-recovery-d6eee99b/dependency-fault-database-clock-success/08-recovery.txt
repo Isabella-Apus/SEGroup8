@@ -1,0 +1,3 @@
+deployment.apps/order-service scaled
+Waiting for deployment "order-service" rollout to finish: 0 of 1 updated replicas are available...
+deployment "order-service" successfully rolled out
