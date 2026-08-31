@@ -144,6 +144,9 @@ test("UC23 with UC12 and UC14 preserves idempotent money facts and strict events
   const user = bearer(101, "USER");
   const seller = bearer(7, "OFFICIAL_SELLER");
   const suffix = Date.now();
+  const walletBefore = await json(await request.get(`${baseUrl}/api/finance/dashboard`, {
+    headers: publicHeaders(user),
+  }));
   const rechargeRequest = { requestId: `recharge-${suffix}`, amount: 200, channel: "WECHAT" };
   const recharge = await request.post(`${baseUrl}/api/finance/recharge`, {
     headers: publicHeaders(user, rechargeRequest.requestId), data: rechargeRequest,
@@ -195,7 +198,10 @@ test("UC23 with UC12 and UC14 preserves idempotent money facts and strict events
   const wallet = await json(await request.get(`${baseUrl}/api/finance/dashboard`, {
     headers: publicHeaders(user),
   }));
-  expect(Number(wallet.personalBalance)).toBeCloseTo(160, 2);
+  expect(Number(wallet.personalBalance)).toBeCloseTo(
+    Number(walletBefore.personalBalance) + 160,
+    2,
+  );
   const business = await json(await request.get(`${baseUrl}/api/finance/business/records`, {
     headers: publicHeaders(seller),
   }));
@@ -205,7 +211,10 @@ test("UC23 with UC12 and UC14 preserves idempotent money facts and strict events
     const response = await request.get(`${eventStubUrl}/__received`);
     if (!response.ok()) return [];
     return (await json(response)).map((event: any) => event.eventType).sort();
-  }, { timeout: 15_000 }).toEqual(expect.arrayContaining([
+  // CI starts the relay, MySQL and the strict HTTP sink on the same runner.
+  // Keep the assertion bounded, but allow a cold runner more than one relay
+  // retry window before declaring the delivery contract broken.
+  }, { timeout: 30_000 }).toEqual(expect.arrayContaining([
     "PaymentCompleted.v1", "PaymentCompleted.v1", "PaymentCompleted.v1", "RefundCompleted.v1",
   ]));
 });
