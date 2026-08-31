@@ -21,13 +21,22 @@ cd "${repository_root}"
 : "${E2E_BASE_URL:=http://127.0.0.1:8088}"
 export E2E_USERNAME E2E_PASSWORD E2E_BASE_URL
 
+pushd backend >/dev/null
+mvn -B --no-transfer-progress -DskipTests package
+cp target/platform-backend-*.jar target/app.jar
+popd >/dev/null
+
+pushd frontend >/dev/null
+npm ci
+npm run build:real
+popd >/dev/null
+
 "${compose[@]}" config --quiet
 "${compose[@]}" build backend frontend
 "${compose[@]}" up -d --wait database backend messaging-db messaging frontend
 "${compose[@]}" run --rm messaging-seed
 
 pushd frontend >/dev/null
-npm ci
 npx playwright install --with-deps chromium
 E2E_OUTPUT_DIR="${evidence_root}" \
   npx playwright test e2e/domain-e/uc24-chat.spec.ts e2e/domain-e/uc25-notification.spec.ts \
