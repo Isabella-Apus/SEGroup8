@@ -1,5 +1,6 @@
 package com.segroup8.catalogshop;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -33,11 +34,16 @@ class InventoryController {
     private final InventoryModule service;private final InternalTokenPolicy tokens;
     InventoryController(InventoryModule service,InternalTokenPolicy tokens){this.service=service;this.tokens=tokens;}
     @PostMapping @ResponseStatus(HttpStatus.CREATED)
-    Reservation reserve(@RequestHeader("X-Internal-Service-Token") String token,@RequestHeader("X-Idempotency-Key") String key,@Valid @RequestBody ReserveRequest r){tokens.require(token);return service.reserve(key,r);}
-    @GetMapping("/{id}") Reservation get(@RequestHeader("X-Internal-Service-Token") String token,@PathVariable long id){tokens.require(token);return service.get(id);}
-    @PostMapping("/{id}/confirm") Reservation confirm(@RequestHeader("X-Internal-Service-Token") String token,@PathVariable long id){tokens.require(token);return service.confirm(id);}
-    @PostMapping("/{id}/release") Reservation release(@RequestHeader("X-Internal-Service-Token") String token,@PathVariable long id){tokens.require(token);return service.release(id,"RELEASED");}
-    record ReserveRequest(@NotBlank String orderId,@NotEmpty List<@Valid Item> items){}
+    ExternalReservation reserve(@RequestHeader("X-Internal-Service-Token") String token,
+            @RequestHeader(value="Idempotency-Key",required=false) String standardKey,
+            @RequestHeader(value="X-Idempotency-Key",required=false) String legacyKey,
+            @Valid @RequestBody ReserveRequest r){tokens.require(token);String key=standardKey==null?legacyKey:standardKey;return service.external(service.reserve(key,r));}
+    @GetMapping("/{id}") ExternalReservation get(@RequestHeader("X-Internal-Service-Token") String token,@PathVariable String id){tokens.require(token);return service.external(service.byExternalId(id));}
+    @PostMapping("/{id}/confirm") ExternalReservation confirm(@RequestHeader("X-Internal-Service-Token") String token,@PathVariable String id){tokens.require(token);return service.external(service.confirm(service.internalId(id)));}
+    @PostMapping("/{id}/release") ExternalReservation release(@RequestHeader("X-Internal-Service-Token") String token,@PathVariable String id){tokens.require(token);return service.external(service.release(service.internalId(id),"RELEASED"));}
+    record ReserveRequest(@JsonAlias("reservationId") @NotBlank String orderId,Long buyerUserId,@NotEmpty List<@Valid Item> items){
+        ReserveRequest(String orderId,List<Item> items){this(orderId,null,items);}
+    }
     record Item(@Min(1) long productId,@Min(1) int quantity){}
 }
 
@@ -56,6 +62,16 @@ class InventoryModule {
         return get(id);
     }
     Reservation get(long id){ReservationRow row=db.sql("select * from inventory_reservation where id=:id").param("id",id).query(ReservationRow.class).optional().orElseThrow(()->new ApiException("RESERVATION_NOT_FOUND","库存预留不存在",HttpStatus.NOT_FOUND));return assemble(row);}
+    Reservation byExternalId(String id){return get(internalId(id));}
+    long internalId(String externalId){
+        if(externalId==null||externalId.isBlank())throw new ApiException("RESERVATION_NOT_FOUND","库存预留不存在",HttpStatus.NOT_FOUND);
+        try{return Long.parseLong(externalId);}catch(NumberFormatException ignored){return db.sql("select id from inventory_reservation where idempotency_key=:key").param("key",externalId).query(Long.class).optional().orElseThrow(()->new ApiException("RESERVATION_NOT_FOUND","库存预留不存在",HttpStatus.NOT_FOUND));}
+    }
+    ExternalReservation external(Reservation reservation){
+        List<ExternalReservation.ProductSnapshot> snapshots=db.sql("select p.id as product_id,p.name as product_name,p.price,ri.quantity,p.seller_id as seller_user_id,p.shop_id as shop_id from inventory_reservation_item ri join product p on p.id=ri.product_id where ri.reservation_id=:id order by p.id")
+                .param("id",reservation.id()).query(ExternalReservation.ProductSnapshot.class).list();
+        return new ExternalReservation(reservation.id(),reservation.idempotencyKey(),reservation.idempotencyKey(),reservation.orderId(),reservation.status(),reservation.expiresAt(),snapshots);
+    }
     @Transactional Reservation confirm(long id){ReservationRow row=locked(id);if("CONFIRMED".equals(row.status()))return assemble(row);if(!"RESERVED".equals(row.status()))throw new ApiException("INVALID_RESERVATION_STATE","只有 RESERVED 可确认");if(row.expiresAt().isBefore(Instant.now())){releaseLocked(row,"EXPIRED");throw new ApiException("RESERVATION_EXPIRED","库存预留已过期");}for(var item:items(id)){db.sql("update product set stock=stock-:quantity,reserved_stock=reserved_stock-:quantity where id=:product").params(Map.of("quantity",item.quantity(),"product",item.productId())).update();}setStatus(id,"CONFIRMED");return get(id);}
     @Transactional Reservation release(long id,String target){ReservationRow row=locked(id);if(target.equals(row.status())||"RELEASED".equals(row.status())||"EXPIRED".equals(row.status()))return assemble(row);if("CONFIRMED".equals(row.status()))throw new ApiException("INVALID_RESERVATION_STATE","已确认预留不能释放");releaseLocked(row,target);return get(id);}
     @Scheduled(fixedDelayString="${catalog-shop.expiration-scan-ms:30000}")
@@ -72,3 +88,8 @@ record ProductStock(long id,int stock,int reservedStock,String status){}
 record ReservationRow(long id,String idempotencyKey,String requestHash,String orderId,String status,Instant expiresAt,Instant createdAt,Instant updatedAt){}
 record ReservationItem(long productId,int quantity){}
 record Reservation(long id,String idempotencyKey,String orderId,String status,Instant expiresAt,List<ReservationItem> items){}
+record ExternalReservation(long id,String reservationId,String idempotencyKey,String orderId,String status,
+        Instant expiresAt,List<ProductSnapshot> items){
+    record ProductSnapshot(long productId,String productName,java.math.BigDecimal price,int quantity,
+            long sellerUserId,Long shopId){}
+}
