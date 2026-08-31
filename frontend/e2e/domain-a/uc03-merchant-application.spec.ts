@@ -50,6 +50,10 @@ test.describe("@DOMAIN_A @UC03 real merchant application flow", () => {
         expect(approvedProfile.data.shopName).toBe("E2E Approved Shop");
         expect(profile.data.role).toBe("USER");
 
+        // Approval changes the role claim issued in the JWT.  The browser was
+        // authenticated before the admin action, so refresh the session before
+        // exercising catalog/shop routes that must enforce the new role.
+        await login(page, applicant);
         await page.goto("/profile");
         await page.reload();
         const refreshedApprovedProfile = await apiGet(request, "/api/user/profile", applicantToken);
