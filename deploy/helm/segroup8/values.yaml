@@ -48,9 +48,9 @@ order:
   service:
     port: 8085
   downstream:
-    catalogUrl: http://catalog-shop-service:8080
-    financeUrl: http://benefits-finance-service:8080
-    messagingUrl: http://messaging-service:8080
+    catalogUrl: http://segroup8-catalog-shop:8080
+    financeUrl: http://benefits-finance:8085
+    messagingUrl: http://messaging:8084
   resources:
     requests:
       cpu: 100m

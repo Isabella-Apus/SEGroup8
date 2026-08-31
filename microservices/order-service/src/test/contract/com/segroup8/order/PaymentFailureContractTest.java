@@ -28,7 +28,7 @@ class PaymentFailureContractTest {
         when(downstream.reserve(anyString(),anyLong(),anyList())).thenReturn(new Reservation("r",
                 List.of(new ProductSnapshot(1,"p",BigDecimal.TEN,1,2,null))));
         when(downstream.quote(anyString(),anyLong(),any(),any())).thenReturn(new Quote(BigDecimal.TEN,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO));
-        when(downstream.debit(anyString(),anyLong(),any(),any(),any())).thenReturn(RemoteResult.UNKNOWN);
+        when(downstream.debit(anyString(),anyLong(),anyLong(),any(),any(),any())).thenReturn(RemoteResult.UNKNOWN);
         when(downstream.paymentResult(anyString())).thenReturn(RemoteResult.UNKNOWN,RemoteResult.SUCCEEDED);
         String body="{\"items\":[{\"productId\":1,\"quantity\":1}],\"receiverName\":\"b\",\"receiverPhone\":\"13800008000\",\"receiverProvince\":\"p\",\"receiverCity\":\"c\",\"receiverDetailAddress\":\"d\"}";
         var user=new org.springframework.http.HttpHeaders();user.set("X-User-Id","41");user.set("X-User-Role","USER");
@@ -41,6 +41,6 @@ class PaymentFailureContractTest {
                 .andExpect(jsonPath("$.data.orderStatus").value(0)).andExpect(jsonPath("$.data.orderStatusKey").value("PAYMENT_PENDING"));
         mvc.perform(post("/api/order/{id}/pay",id).headers(user).header("Idempotency-Key","outage-pay").contentType("application/json").content("{}"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.data.orderStatus").value(1));
-        verify(downstream,times(1)).debit(anyString(),anyLong(),any(),any(),any());
+        verify(downstream,times(1)).debit(anyString(),anyLong(),anyLong(),any(),any(),any());
     }
 }

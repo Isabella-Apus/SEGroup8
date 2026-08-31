@@ -47,9 +47,10 @@ class OrderApiTest {
                 List.of(new ProductSnapshot(10,"Snapshot phone",new BigDecimal("100.00"),1,2,20L))));
         when(downstream.quote(anyString(),anyLong(),any(),any())).thenReturn(new Quote(new BigDecimal("90.00"),
                 new BigDecimal("10.00"),new BigDecimal("5.00"),new BigDecimal("5.00")));
-        when(downstream.debit(anyString(),anyLong(),any(),any(),any())).thenReturn(RemoteResult.SUCCEEDED);
+        when(downstream.debit(anyString(),anyLong(),anyLong(),any(),any(),any())).thenReturn(RemoteResult.SUCCEEDED);
         when(downstream.paymentResult(anyString())).thenReturn(RemoteResult.SUCCEEDED);
-        when(downstream.refund(anyString(),anyLong(),anyLong(),any())).thenReturn(RemoteResult.SUCCEEDED);
+        when(downstream.refund(anyString(),nullable(String.class),anyLong(),anyLong(),any()))
+                .thenReturn(RemoteResult.SUCCEEDED);
         when(downstream.refundResult(anyString())).thenReturn(RemoteResult.SUCCEEDED);
         when(downstream.settle(anyString(),anyLong(),anyLong(),any())).thenReturn(RemoteResult.SUCCEEDED);
         when(downstream.settlementResult(anyString())).thenReturn(RemoteResult.UNKNOWN);
