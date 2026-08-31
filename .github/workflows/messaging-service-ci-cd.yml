@@ -98,7 +98,7 @@ jobs:
           java-version: '17'
           cache: maven
       - run: >-
-          mvn -B --no-transfer-progress -f microservices/pom.xml -pl messaging-service
+          mvn -B --no-transfer-progress -f microservices/pom.xml -pl messaging-service -am
           -Dmessaging.mysql.test=true
           -Dmessaging.mysql.root-url=jdbc:mysql://127.0.0.1:3306/
           -Dmessaging.mysql.root-user=root -Dmessaging.mysql.root-password=audit-root
