@@ -281,7 +281,7 @@ async function handleSubmit() {
         await createProduct(payload)
         ElMessage.success('发布成功')
       }
-      router.push('/merchant')
+      router.push('/merchant/seller-products')
     } catch (e) {
       ElMessage.error(isEdit.value ? '修改失败' : '发布失败')
     } finally {
