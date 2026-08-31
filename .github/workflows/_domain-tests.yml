@@ -50,7 +50,7 @@ jobs:
           "-Dgroups=DOMAIN_A" clean test
       - name: Run Domain B (UC06-UC10) microservice tests
         if: inputs.domain == 'B'
-        run: mvn -B --no-transfer-progress -f microservices/pom.xml -Pdomain-b clean test
+        run: mvn -B --no-transfer-progress -f microservices/pom.xml -Pdomain-b clean verify
       - name: Require Domain B MySQL integration test to execute
         if: inputs.domain == 'B'
         shell: bash

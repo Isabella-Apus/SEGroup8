@@ -45,6 +45,9 @@ class Handler(BaseHTTPRequestHandler):
         self.respond(200, {"code": 0, "message": "success", "data": {"token": token_for(username, user_id, role), "role": role, "user": user}})
 
     def do_GET(self):
+        if self.path == "/health":
+            self.respond(200, {"status": "UP"})
+            return
         try:
             token = self.headers.get("Authorization", "").split(" ", 1)[1]
             payload = token.split(".")[1]
