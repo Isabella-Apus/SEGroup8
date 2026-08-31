@@ -1,0 +1,553 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\playwright.config.ts",
+    "rootDir": "C:/Users/isabe/Desktop/SE/SEGroup8/frontend/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\playwright-report",
+          "open": "never"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\playwright-results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\playwright-results.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/Users/isabe/Desktop/SE/SEGroup8/04_tests/microservices/identity-governance-service/evidence/domain-a-playwright/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "C:/Users/isabe/Desktop/SE/SEGroup8/frontend/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.ts"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "domain-a\\uc01-auth.spec.ts",
+      "file": "domain-a/uc01-auth.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_A @UC01 real auth and identity flow",
+          "file": "domain-a/uc01-auth.spec.ts",
+          "line": 12,
+          "column": 6,
+          "specs": [
+            {
+              "title": "register, login, role boundary, ban and refresh persistence",
+              "ok": false,
+              "tags": [
+                "DOMAIN_A",
+                "UC01"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 2688,
+                      "error": {
+                        "message": "SyntaxError: Unexpected token '<', \"<html>\r\n<h\"... is not valid JSON",
+                        "stack": "SyntaxError: Unexpected token '<', \"<html>\r\n<h\"... is not valid JSON\n    at json (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts:29:18)\n    at registerAccount (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts:49:18)\n    at C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc01-auth.spec.ts:14:22",
+                        "location": {
+                          "file": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts",
+                          "column": 18,
+                          "line": 29
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers\\domain-a.ts:29\n\n\u001b[0m \u001b[90m 27 |\u001b[39m\n \u001b[90m 28 |\u001b[39m \u001b[36mexport\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m json(response\u001b[33m:\u001b[39m \u001b[33mAPIResponse\u001b[39m)\u001b[33m:\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m<\u001b[39m\u001b[33many\u001b[39m\u001b[33m>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 29 |\u001b[39m     \u001b[36mconst\u001b[39m body \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m response\u001b[33m.\u001b[39mjson()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 30 |\u001b[39m     \u001b[36mif\u001b[39m (\u001b[36mtypeof\u001b[39m body\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mcode \u001b[33m!==\u001b[39m \u001b[32m\"number\"\u001b[39m) {\n \u001b[90m 31 |\u001b[39m         \u001b[36mthrow\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m`[E2E] unexpected API response: ${JSON.stringify(body)}`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 32 |\u001b[39m     }\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts",
+                            "column": 18,
+                            "line": 29
+                          },
+                          "message": "SyntaxError: Unexpected token '<', \"<html>\r\n<h\"... is not valid JSON\n\n   at helpers\\domain-a.ts:29\n\n  27 |\n  28 | export async function json(response: APIResponse): Promise<any> {\n> 29 |     const body = await response.json();\n     |                  ^\n  30 |     if (typeof body?.code !== \"number\") {\n  31 |         throw new Error(`[E2E] unexpected API response: ${JSON.stringify(body)}`);\n  32 |     }\n    at json (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts:29:18)\n    at registerAccount (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts:49:18)\n    at C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc01-auth.spec.ts:14:22"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-29T10:08:40.943Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\test-results\\domain-a-uc01-auth--DOMAIN-0e36c-ban-and-refresh-persistence\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\test-results\\domain-a-uc01-auth--DOMAIN-0e36c-ban-and-refresh-persistence\\video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\test-results\\domain-a-uc01-auth--DOMAIN-0e36c-ban-and-refresh-persistence\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts",
+                        "column": 18,
+                        "line": 29
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "e391467a18de3133f62a-0fe1de53fb8516fe73a0",
+              "file": "domain-a/uc01-auth.spec.ts",
+              "line": 13,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "domain-a\\uc02-profile-address.spec.ts",
+      "file": "domain-a/uc02-profile-address.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_A @UC02 real profile and address flow",
+          "file": "domain-a/uc02-profile-address.spec.ts",
+          "line": 13,
+          "column": 6,
+          "specs": [
+            {
+              "title": "updates profile, maintains one default address and isolates ownership",
+              "ok": false,
+              "tags": [
+                "DOMAIN_A",
+                "UC02"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1107,
+                      "error": {
+                        "message": "SyntaxError: Unexpected token '<', \"<html>\r\n<h\"... is not valid JSON",
+                        "stack": "SyntaxError: Unexpected token '<', \"<html>\r\n<h\"... is not valid JSON\n    at json (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts:29:18)\n    at registerAccount (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts:49:18)\n    at C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc02-profile-address.spec.ts:15:23",
+                        "location": {
+                          "file": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts",
+                          "column": 18,
+                          "line": 29
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers\\domain-a.ts:29\n\n\u001b[0m \u001b[90m 27 |\u001b[39m\n \u001b[90m 28 |\u001b[39m \u001b[36mexport\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m json(response\u001b[33m:\u001b[39m \u001b[33mAPIResponse\u001b[39m)\u001b[33m:\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m<\u001b[39m\u001b[33many\u001b[39m\u001b[33m>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 29 |\u001b[39m     \u001b[36mconst\u001b[39m body \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m response\u001b[33m.\u001b[39mjson()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 30 |\u001b[39m     \u001b[36mif\u001b[39m (\u001b[36mtypeof\u001b[39m body\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mcode \u001b[33m!==\u001b[39m \u001b[32m\"number\"\u001b[39m) {\n \u001b[90m 31 |\u001b[39m         \u001b[36mthrow\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m`[E2E] unexpected API response: ${JSON.stringify(body)}`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 32 |\u001b[39m     }\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts",
+                            "column": 18,
+                            "line": 29
+                          },
+                          "message": "SyntaxError: Unexpected token '<', \"<html>\r\n<h\"... is not valid JSON\n\n   at helpers\\domain-a.ts:29\n\n  27 |\n  28 | export async function json(response: APIResponse): Promise<any> {\n> 29 |     const body = await response.json();\n     |                  ^\n  30 |     if (typeof body?.code !== \"number\") {\n  31 |         throw new Error(`[E2E] unexpected API response: ${JSON.stringify(body)}`);\n  32 |     }\n    at json (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts:29:18)\n    at registerAccount (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts:49:18)\n    at C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc02-profile-address.spec.ts:15:23"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-29T10:08:47.333Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\test-results\\domain-a-uc02-profile-addr-cf703-ress-and-isolates-ownership\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\test-results\\domain-a-uc02-profile-addr-cf703-ress-and-isolates-ownership\\video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\test-results\\domain-a-uc02-profile-addr-cf703-ress-and-isolates-ownership\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts",
+                        "column": 18,
+                        "line": 29
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "68158a7a5f9141eea067-1ba9e0156e66a30905a8",
+              "file": "domain-a/uc02-profile-address.spec.ts",
+              "line": 14,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "domain-a\\uc03-merchant-application.spec.ts",
+      "file": "domain-a/uc03-merchant-application.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_A @UC03 real merchant application flow",
+          "file": "domain-a/uc03-merchant-application.spec.ts",
+          "line": 28,
+          "column": 6,
+          "specs": [
+            {
+              "title": "submit, review, role/shop upgrade and rejection persistence",
+              "ok": false,
+              "tags": [
+                "DOMAIN_A",
+                "UC03"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1510,
+                      "error": {
+                        "message": "SyntaxError: Unexpected token '<', \"<html>\r\n<h\"... is not valid JSON",
+                        "stack": "SyntaxError: Unexpected token '<', \"<html>\r\n<h\"... is not valid JSON\n    at json (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts:29:18)\n    at loginApi (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts:63:18)\n    at C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc03-merchant-application.spec.ts:30:23",
+                        "location": {
+                          "file": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts",
+                          "column": 18,
+                          "line": 29
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers\\domain-a.ts:29\n\n\u001b[0m \u001b[90m 27 |\u001b[39m\n \u001b[90m 28 |\u001b[39m \u001b[36mexport\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m json(response\u001b[33m:\u001b[39m \u001b[33mAPIResponse\u001b[39m)\u001b[33m:\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m<\u001b[39m\u001b[33many\u001b[39m\u001b[33m>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 29 |\u001b[39m     \u001b[36mconst\u001b[39m body \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m response\u001b[33m.\u001b[39mjson()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 30 |\u001b[39m     \u001b[36mif\u001b[39m (\u001b[36mtypeof\u001b[39m body\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mcode \u001b[33m!==\u001b[39m \u001b[32m\"number\"\u001b[39m) {\n \u001b[90m 31 |\u001b[39m         \u001b[36mthrow\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m`[E2E] unexpected API response: ${JSON.stringify(body)}`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 32 |\u001b[39m     }\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts",
+                            "column": 18,
+                            "line": 29
+                          },
+                          "message": "SyntaxError: Unexpected token '<', \"<html>\r\n<h\"... is not valid JSON\n\n   at helpers\\domain-a.ts:29\n\n  27 |\n  28 | export async function json(response: APIResponse): Promise<any> {\n> 29 |     const body = await response.json();\n     |                  ^\n  30 |     if (typeof body?.code !== \"number\") {\n  31 |         throw new Error(`[E2E] unexpected API response: ${JSON.stringify(body)}`);\n  32 |     }\n    at json (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts:29:18)\n    at loginApi (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts:63:18)\n    at C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc03-merchant-application.spec.ts:30:23"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-29T10:08:51.702Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\test-results\\domain-a-uc03-merchant-app-8440d-e-and-rejection-persistence\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\test-results\\domain-a-uc03-merchant-app-8440d-e-and-rejection-persistence\\video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\test-results\\domain-a-uc03-merchant-app-8440d-e-and-rejection-persistence\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts",
+                        "column": 18,
+                        "line": 29
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "908a4bd0b3977ad5ade7-e5003f6f9d273ece0f74",
+              "file": "domain-a/uc03-merchant-application.spec.ts",
+              "line": 29,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "domain-a\\uc04-ban-unban.spec.ts",
+      "file": "domain-a/uc04-ban-unban.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_A @UC04 real ban and unban flow",
+          "file": "domain-a/uc04-ban-unban.spec.ts",
+          "line": 12,
+          "column": 6,
+          "specs": [
+            {
+              "title": "ban blocks login, unban restores login and audit is queryable",
+              "ok": false,
+              "tags": [
+                "DOMAIN_A",
+                "UC04"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 1232,
+                      "error": {
+                        "message": "SyntaxError: Unexpected token '<', \"<html>\r\n<h\"... is not valid JSON",
+                        "stack": "SyntaxError: Unexpected token '<', \"<html>\r\n<h\"... is not valid JSON\n    at json (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts:29:18)\n    at registerAccount (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts:49:18)\n    at C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc04-ban-unban.spec.ts:14:22",
+                        "location": {
+                          "file": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts",
+                          "column": 18,
+                          "line": 29
+                        },
+                        "snippet": "\u001b[90m   at \u001b[39mhelpers\\domain-a.ts:29\n\n\u001b[0m \u001b[90m 27 |\u001b[39m\n \u001b[90m 28 |\u001b[39m \u001b[36mexport\u001b[39m \u001b[36masync\u001b[39m \u001b[36mfunction\u001b[39m json(response\u001b[33m:\u001b[39m \u001b[33mAPIResponse\u001b[39m)\u001b[33m:\u001b[39m \u001b[33mPromise\u001b[39m\u001b[33m<\u001b[39m\u001b[33many\u001b[39m\u001b[33m>\u001b[39m {\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 29 |\u001b[39m     \u001b[36mconst\u001b[39m body \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m response\u001b[33m.\u001b[39mjson()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 30 |\u001b[39m     \u001b[36mif\u001b[39m (\u001b[36mtypeof\u001b[39m body\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mcode \u001b[33m!==\u001b[39m \u001b[32m\"number\"\u001b[39m) {\n \u001b[90m 31 |\u001b[39m         \u001b[36mthrow\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mError\u001b[39m(\u001b[32m`[E2E] unexpected API response: ${JSON.stringify(body)}`\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 32 |\u001b[39m     }\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts",
+                            "column": 18,
+                            "line": 29
+                          },
+                          "message": "SyntaxError: Unexpected token '<', \"<html>\r\n<h\"... is not valid JSON\n\n   at helpers\\domain-a.ts:29\n\n  27 |\n  28 | export async function json(response: APIResponse): Promise<any> {\n> 29 |     const body = await response.json();\n     |                  ^\n  30 |     if (typeof body?.code !== \"number\") {\n  31 |         throw new Error(`[E2E] unexpected API response: ${JSON.stringify(body)}`);\n  32 |     }\n    at json (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts:29:18)\n    at registerAccount (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts:49:18)\n    at C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc04-ban-unban.spec.ts:14:22"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-29T10:08:58.666Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\test-results\\domain-a-uc04-ban-unban--D-ecbed-ogin-and-audit-is-queryable\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\test-results\\domain-a-uc04-ban-unban--D-ecbed-ogin-and-audit-is-queryable\\video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\test-results\\domain-a-uc04-ban-unban--D-ecbed-ogin-and-audit-is-queryable\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\helpers\\domain-a.ts",
+                        "column": 18,
+                        "line": 29
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "4bfc9f78690f82f04370-d10b8dbed199e9670815",
+              "file": "domain-a/uc04-ban-unban.spec.ts",
+              "line": 13,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "domain-a\\uc05-governance.spec.ts",
+      "file": "domain-a/uc05-governance.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@DOMAIN_A @UC05 real report block credit governance",
+          "file": "domain-a/uc05-governance.spec.ts",
+          "line": 51,
+          "column": 6,
+          "specs": [
+            {
+              "title": "report, bilateral block state, credit audit and refresh persistence",
+              "ok": false,
+              "tags": [
+                "DOMAIN_A",
+                "UC05"
+              ],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 899,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at apiJson (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc05-governance.spec.ts:21:27)\n    at register (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc05-governance.spec.ts:26:21)\n    at C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc05-governance.spec.ts:57:9",
+                        "location": {
+                          "file": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc05-governance.spec.ts",
+                          "column": 27,
+                          "line": 21
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 19 |\u001b[39m         data\u001b[33m:\u001b[39m body\u001b[33m,\u001b[39m\n \u001b[90m 20 |\u001b[39m     })\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 21 |\u001b[39m     expect(response\u001b[33m.\u001b[39mok())\u001b[33m.\u001b[39mtoBeTruthy()\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                           \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 22 |\u001b[39m     \u001b[36mreturn\u001b[39m response\u001b[33m.\u001b[39mjson()\u001b[33m;\u001b[39m\n \u001b[90m 23 |\u001b[39m }\n \u001b[90m 24 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc05-governance.spec.ts",
+                            "column": 27,
+                            "line": 21
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n\n  19 |         data: body,\n  20 |     });\n> 21 |     expect(response.ok()).toBeTruthy();\n     |                           ^\n  22 |     return response.json();\n  23 | }\n  24 |\n    at apiJson (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc05-governance.spec.ts:21:27)\n    at register (C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc05-governance.spec.ts:26:21)\n    at C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc05-governance.spec.ts:57:9"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-08-29T10:09:03.458Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\test-results\\domain-a-uc05-governance---c9cf8-dit-and-refresh-persistence\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\test-results\\domain-a-uc05-governance---c9cf8-dit-and-refresh-persistence\\video.webm"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\04_tests\\microservices\\identity-governance-service\\evidence\\domain-a-playwright\\test-results\\domain-a-uc05-governance---c9cf8-dit-and-refresh-persistence\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\Users\\isabe\\Desktop\\SE\\SEGroup8\\frontend\\e2e\\domain-a\\uc05-governance.spec.ts",
+                        "column": 27,
+                        "line": 21
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "d96935ec92f0237bc134-d7b4d06b0e92e5c15e3b",
+              "file": "domain-a/uc05-governance.spec.ts",
+              "line": 52,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-08-29T10:08:38.542Z",
+    "duration": 27350.782999999996,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 5,
+    "flaky": 0
+  }
+}

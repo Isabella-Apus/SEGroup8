@@ -330,9 +330,9 @@ jobs:
           labels: |
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-
   deploy-production:
     name: Deploy images to production K3s
+    if: vars.ENABLE_PRODUCTION_DEPLOY == 'true'
     needs: publish-images
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -363,6 +363,7 @@ jobs:
           ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
         run: |
+          set -o pipefail
           remote_archive="/tmp/segroup8-k3s-$GITHUB_SHA.tar.gz"
           scp "k3s-release-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$remote_archive"
           ssh \
@@ -370,7 +371,15 @@ jobs:
             -o ServerAliveCountMax=10 \
             "$DEPLOY_USER@$DEPLOY_HOST" \
             "bash -s -- '$GITHUB_SHA' '$remote_archive' '$ACR_REGISTRY' '$ACR_NAMESPACE' 'sha-$GITHUB_SHA' '$K8S_NAMESPACE'" \
-            < .github/scripts/deploy-k3s.sh
+            < .github/scripts/deploy-k3s.sh | tee k3s-deployment.log
+      - name: Upload deployment and rollback diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k3s-deployment-${{ github.sha }}
+          path: k3s-deployment.log
+          if-no-files-found: warn
+          retention-days: 30
       - name: Verify public production endpoint
         if: vars.PRODUCTION_URL != ''
         env:

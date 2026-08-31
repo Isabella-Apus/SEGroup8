@@ -39,7 +39,27 @@ cleanup() {
   rm -rf -- "$work_dir"
   rm -f -- "$archive"
 }
-trap cleanup EXIT
+
+diagnostics() {
+  set +e
+  echo "::group::Helm and platform failure diagnostics"
+  helm --namespace "$k8s_namespace" status segroup8
+  helm --namespace "$k8s_namespace" history segroup8
+  kubectl --namespace "$k8s_namespace" get pods,service,ingress -o wide
+  kubectl --namespace "$k8s_namespace" describe deployment/segroup8-backend
+  kubectl --namespace "$k8s_namespace" logs deployment/segroup8-backend --all-containers --tail=200
+  echo "::endgroup::"
+  set -e
+}
+
+on_exit() {
+  status=$?
+  if [[ $status -ne 0 ]]; then
+    diagnostics
+  fi
+  cleanup
+}
+trap on_exit EXIT
 
 tar -xzf "$archive" -C "$work_dir"
 chart_dir="$work_dir/deploy/helm/segroup8"
@@ -56,6 +76,8 @@ build_time="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 helm upgrade --install segroup8 "$chart_dir" \
   --namespace "$k8s_namespace" \
+  --reuse-values \
+  --atomic \
   --cleanup-on-fail \
   --wait \
   --timeout 10m \

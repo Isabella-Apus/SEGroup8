@@ -12,6 +12,7 @@ frontend/blob-report/
 # Full Playwright HTML reports, traces, videos and success screenshots belong in
 # GitHub Actions artifacts. Keep compact JSON/XML and selected failure evidence.
 04_tests/**/evidence/**/playwright-report/
+04_tests/**/evidence/**/test-results/
 04_tests/**/evidence/screenshots/
 04_tests/**/evidence/**/*.zip
 04_tests/**/evidence/**/*.webm

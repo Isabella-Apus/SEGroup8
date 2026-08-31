@@ -1,0 +1,23 @@
+{{- if and .Values.identityGovernance.enabled .Values.identityGovernance.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: segroup8-identity-governance
+  labels:
+    {{- include "segroup8.labels" . | nindent 4 }}
+    app.kubernetes.io/component: identity-governance
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: segroup8-identity-governance
+  minReplicas: {{ .Values.identityGovernance.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.identityGovernance.autoscaling.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.identityGovernance.autoscaling.targetCPUUtilizationPercentage }}
+{{- end }}

@@ -1,0 +1,12 @@
+flowchart LR
+    Client[Web / Admin] --> Gateway[Gateway / Nginx]
+    Gateway --> Identity[identity-governance-service :8091]
+    Identity --> IDB[(identity_governance_db)]
+    Identity -->|MerchantApproved.v1| Outbox[(outbox_event)]
+    Identity -->|UserAccessChanged.v1| Outbox
+    Outbox --> Catalog[catalog-shop-service]
+    Outbox --> Order[order-service]
+    Outbox --> Messaging[messaging-service]
+    Messaging -->|POST /internal/blocks/check| Identity
+    Business[Other business services] -->|GET /internal/users/id/summary| Identity
+    Shared[security-contract local JWT verifier] -. embedded .-> Business
