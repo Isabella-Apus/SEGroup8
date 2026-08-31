@@ -113,8 +113,10 @@ jobs:
             --set-string identityGovernance.deployment.commit=$GITHUB_SHA \
             --set-string identityGovernance.deployment.buildTime=ci \
             --set-file mysql.initSchema=backend/src/main/resources/schema.sql
+          deployment_render="$(mktemp)"
           helm template segroup8 deploy/helm/segroup8 \
             --namespace segroup8 \
+            --show-only templates/identity-governance-deployment.yaml \
             --set-string backend.image.repository=registry.example/segroup8/backend \
             --set-string backend.image.tag=sha-existing \
             --set-string frontend.image.repository=registry.example/segroup8/frontend \
@@ -126,7 +128,12 @@ jobs:
             --set-string identityGovernance.deployment.commit=$GITHUB_SHA \
             --set-string identityGovernance.deployment.buildTime=ci \
             --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
-            >/dev/null
+            >"$deployment_render"
+          grep -q 'runAsUser: 10001' "$deployment_render"
+          grep -q 'runAsGroup: 10001' "$deployment_render"
+          grep -q 'readOnlyRootFilesystem: true' "$deployment_render"
+          grep -q 'allowPrivilegeEscalation: false' "$deployment_render"
+          grep -q 'mountPath: /tmp' "$deployment_render"
           hpa_render="$(mktemp)"
           helm template segroup8 deploy/helm/segroup8 \
             --namespace segroup8 \
@@ -188,7 +195,7 @@ jobs:
       APP_VERSION: sha-${{ github.sha }}
       APP_COMMIT: ${{ github.sha }}
       E2E_BASE_URL: http://127.0.0.1:8089
-      E2E_OUTPUT_DIR: ${{ runner.temp }}/identity-domain-a-e2e
+      E2E_OUTPUT_DIR: /tmp/identity-domain-a-e2e
       IDENTITY_ACCEPTANCE_IMAGE: segroup8/identity-governance:candidate-${{ github.sha }}
     steps:
       - name: Check out repository

@@ -35,6 +35,12 @@ spec:
         - name: identity-governance
           image: "{{ required "identityGovernance.image.repository is required" .Values.identityGovernance.image.repository }}:{{ required "identityGovernance.image.tag is required" .Values.identityGovernance.image.tag }}"
           imagePullPolicy: {{ .Values.identityGovernance.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           ports:
             - name: http
               containerPort: 8091
@@ -73,4 +79,10 @@ spec:
             failureThreshold: 3
           resources:
             {{- toYaml .Values.identityGovernance.resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
 {{- end }}

@@ -11,6 +11,7 @@
 
 ## 文件导航
 
+- `../service-acceptance-checklist.md`：六个微服务共同使用的最终验收清单
 - `service-boundary.md`：职责与迁移边界
 - `service-diagram.mmd` / `service-diagram.svg`：可编辑源图与可查看图
 - `openapi.yaml`：公开和内部 API 契约

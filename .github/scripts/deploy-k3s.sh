@@ -76,7 +76,7 @@ build_time="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 helm upgrade --install segroup8 "$chart_dir" \
   --namespace "$k8s_namespace" \
-  --reuse-values \
+  --reset-then-reuse-values \
   --atomic \
   --cleanup-on-fail \
   --wait \

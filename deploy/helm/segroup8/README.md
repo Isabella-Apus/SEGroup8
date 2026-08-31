@@ -64,9 +64,10 @@ The demo seed file is intentionally excluded from production.
 ## Deployment behavior
 
 The platform workflow installs the base `segroup8` release. The identity
-pipeline then uses `helm upgrade --install --reuse-values --atomic --wait` to
-enable or upgrade only its component without replacing image values owned by
-other services. All service deployment jobs must share the
+pipeline then uses `helm upgrade --install --reset-then-reuse-values --atomic --wait`.
+This loads keys newly introduced by the current chart, then preserves explicit
+values owned by the existing release and upgrades only the selected component.
+All service deployment jobs must share the
 `segroup8-production-helm` concurrency group. A failed upgrade is rolled back
 automatically.
 Images use `sha-<full Git SHA>` tags so every release is traceable and
