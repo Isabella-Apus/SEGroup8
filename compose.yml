@@ -61,6 +61,72 @@ services:
       start_period: 50s
     networks: [platform]
 
+  catalog-database:
+    image: mysql:8.4.6
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: catalog_shop_db
+      MYSQL_USER: catalog_shop_app
+      MYSQL_PASSWORD: ${CATALOG_MYSQL_PASSWORD:-catalog_shop_dev_password}
+      MYSQL_ROOT_PASSWORD: ${CATALOG_MYSQL_ROOT_PASSWORD:-catalog_shop_root_password}
+      TZ: Asia/Shanghai
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_general_ci"]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    volumes:
+      - catalog_mysql_data:/var/lib/mysql
+    networks: [platform]
+
+  catalog-shop:
+    build:
+      context: ./microservices/catalog-shop-service
+      dockerfile: Dockerfile
+    image: segroup8/catalog-shop:1.0.0
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:mysql://catalog-database:3306/catalog_shop_db?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+      DB_USERNAME: catalog_shop_app
+      DB_PASSWORD: ${CATALOG_MYSQL_PASSWORD:-catalog_shop_dev_password}
+      JWT_SECRET: ${JWT_SECRET:-SEGROUP8_DOCKER_DEMO_SECRET_CHANGE_ME_2026}
+      INTERNAL_SERVICE_TOKEN: ${INTERNAL_SERVICE_TOKEN:-segroup8-compose-internal-token}
+      IDENTITY_STATUS_CHECK_URL: http://backend:8080/api/user/profile
+      IDENTITY_STATUS_CHECK_MODE: profile
+      MESSAGING_EVENT_URL: ""
+      ORDER_EVENT_URL: ""
+      RISK_AUDIT_LLM_API_KEY: ""
+      TZ: Asia/Shanghai
+    ports:
+      - "${CATALOG_SHOP_HOST_PORT:-8086}:8080"
+    depends_on:
+      catalog-database:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/actuator/health/readiness"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 30s
+    networks: [platform]
+
+  catalog-seed:
+    image: mysql:8.4.6
+    restart: "no"
+    environment:
+      MYSQL_PWD: ${CATALOG_MYSQL_PASSWORD:-catalog_shop_dev_password}
+    command: ["sh", "-c", "mysql -h catalog-database -ucatalog_shop_app catalog_shop_db < /seed/catalog-shop.sql"]
+    volumes:
+      - ./docker/catalog-shop/catalog-shop.sql:/seed/catalog-shop.sql:ro
+    depends_on:
+      catalog-shop:
+        condition: service_healthy
+    networks: [platform]
+
   frontend:
     build:
       context: ./frontend
@@ -72,6 +138,8 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+      catalog-seed:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/health"]
       interval: 10s
@@ -87,3 +155,5 @@ networks:
 volumes:
   mysql_data:
     name: segroup8-platform-mysql-data
+  catalog_mysql_data:
+    name: segroup8-catalog-shop-mysql-data

@@ -1,0 +1,50 @@
+openapi: 3.0.3
+info:
+  title: catalog-shop-service
+  version: 1.0.0
+security:
+  - bearerAuth: []
+paths:
+  /api/category/tree: {get: {operationId: categories, security: [], responses: {'200': {description: 分类树}}}}
+  /api/product/list: {get: {operationId: list, security: [], responses: {'200': {description: 分页商品}}}}
+  /api/product/search: {get: {operationId: search_1, security: [], responses: {'200': {description: 分页搜索}}}}
+  /api/product/detail/{productId}: {get: {operationId: detail, security: [], responses: {'200': {description: 商品详情}}}}
+  /api/product/seller/list: {get: {operationId: mine_1, responses: {'200': {description: 卖家商品}}}}
+  /api/product/seller: {post: {operationId: create, responses: {'201': {description: 新商品}}}}
+  /api/product/seller/{id}:
+    get: {operationId: sellerDetail, responses: {'200': {description: 商品}}}
+    put: {operationId: update, responses: {'200': {description: 商品}}}
+    delete: {operationId: delete_1, responses: {'200': {description: 已删除}}}
+  /api/product/seller/{id}/status: {post: {operationId: status, responses: {'200': {description: 状态已更新}}}}
+  /api/product/seller/{id}/stock/adjust: {post: {operationId: stock, responses: {'200': {description: 库存已更新}}}}
+  /api/shop/public/{id}: {get: {operationId: publicView, security: [], responses: {'200': {description: 店铺}}}}
+  /api/shop/public/{id}/products: {get: {operationId: publicProducts, security: [], responses: {'200': {description: 店铺商品}}}}
+  /api/shop/seller/current: {get: {operationId: mine, responses: {'200': {description: 当前店铺}}}}
+  /api/shop/seller/current/settings: {put: {operationId: settings, responses: {'200': {description: 店铺设置}}}}
+  /api/shop/seller/current/decoration: {put: {operationId: decorate, responses: {'200': {description: 店铺装修}}}}
+  /api/shop/seller/decoration: {put: {operationId: decorate_1, responses: {'200': {description: 店铺装修兼容路径}}}}
+  /api/admin/product-risk-audits: {get: {operationId: list_1, responses: {'200': {description: 审核列表}}}}
+  /api/admin/product-risk-audits/{id}: {get: {operationId: detail_1, responses: {'200': {description: 审核详情}}}}
+  /api/admin/product-risk-audits/{id}/decision: {post: {operationId: decide, responses: {'200': {description: 审核决定}}}}
+  /api/user/browse-history:
+    get: {operationId: browseList, responses: {'200': {description: 浏览历史}}}
+    post: {operationId: browse, responses: {'201': {description: 已记录}}}
+    delete: {operationId: clear_1, responses: {'200': {description: 已清空}}}
+  /api/user/browse-history/{id}: {delete: {operationId: delete, responses: {'200': {description: 已删除}}}}
+  /api/user/browse-history/delete-batch: {post: {operationId: deleteBatch, responses: {'200': {description: 已批量删除}}}}
+  /api/user/browse-history/all: {delete: {operationId: clear, responses: {'200': {description: 已清空}}}}
+  /api/search/history:
+    get: {operationId: searches, responses: {'200': {description: 搜索历史}}}
+    post: {operationId: search, responses: {'201': {description: 已记录}}}
+    delete: {operationId: clearSearches, responses: {'200': {description: 已清空}}}
+  /api/search/hot: {get: {operationId: hot, security: [], responses: {'200': {description: 热词}}}}
+  /internal/inventory/reservations: {post: {operationId: reserve, security: [{internalToken: []}], responses: {'201': {description: 原子预留}}}}
+  /internal/inventory/reservations/{id}: {get: {operationId: get, security: [{internalToken: []}], responses: {'200': {description: 预留}}}}
+  /internal/inventory/reservations/{id}/confirm: {post: {operationId: confirm, security: [{internalToken: []}], responses: {'200': {description: 幂等确认}}}}
+  /internal/inventory/reservations/{id}/release: {post: {operationId: release, security: [{internalToken: []}], responses: {'200': {description: 幂等释放}}}}
+  /internal/products/{id}/snapshot: {get: {operationId: snapshot, security: [{internalToken: []}], responses: {'200': {description: 商品快照}}}}
+  /internal/events/merchant-approved: {post: {operationId: merchantApproved, security: [{internalToken: []}], responses: {'202': {description: 事件已消费}}}}
+components:
+  securitySchemes:
+    bearerAuth: {type: http, scheme: bearer, bearerFormat: JWT}
+    internalToken: {type: apiKey, in: header, name: X-Internal-Service-Token}

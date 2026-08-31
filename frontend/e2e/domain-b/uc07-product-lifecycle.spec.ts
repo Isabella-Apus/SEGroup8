@@ -13,11 +13,11 @@ test.describe("@DOMAIN_B @UC07 real seller product lifecycle", () => {
     await page.getByRole("spinbutton", { name: /价格/ }).fill("88.50");
     await page.getByRole("spinbutton", { name: /库存/ }).fill("6");
     await page.getByRole("group", { name: /商品分类/ }).locator(".el-select").click();
-    await page.getByRole("option", { name: "手机" }).click();
+    await page.locator(".el-select-dropdown:visible .el-select-dropdown__item").first().click();
     await page.locator("input[type=file]").setInputFiles(path.resolve("e2e/domain-b/fixtures/product.svg"));
     await expect(page.getByText("图片上传成功")).toBeVisible();
     await page.getByRole("main").getByRole("button", { name: "发布商品", exact: true }).click();
-    await expect(page).toHaveURL(/\/merchant(?:\/seller-products)?$/);
+    await expect(page).toHaveURL(/\/merchant(?:\/seller-products)?(?:\?.*)?$/);
 
     const row = page.locator(".el-table__row").filter({ hasText: productName });
     await expect(row).toBeVisible();

@@ -89,7 +89,9 @@ test.describe("@DOMAIN_D @UC18 secondhand bargain", () => {
             const orderId = Number(confirmed.orderId);
             expect(confirmed.status).toBe("USED");
             expect(orderId).toBeGreaterThan(0);
-            await expect(sellerPage.getByText("已生成订单").first()).toBeVisible();
+            // The seller's confirmation message is rendered as "已确认";
+            // the buyer-side message carries the generated-order action.
+            await expect(sellerPage.getByText("议价已确认").first()).toBeVisible();
             await capture(sellerPage, testInfo, "uc18-seller-confirmed-order");
 
             await page.reload();

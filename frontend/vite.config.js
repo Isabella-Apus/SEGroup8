@@ -17,6 +17,13 @@ export default defineConfig({
             '/api/review': { target: 'http://localhost:8085', changeOrigin: true },
             '/api/logistics': { target: 'http://localhost:8085', changeOrigin: true },
             '/api/admin/orders': { target: 'http://localhost:8085', changeOrigin: true },
+            ...Object.fromEntries([
+                '/api/category', '/api/product', '/api/shop',
+                '/api/admin/product-risk-audits', '/api/user/browse-history', '/api/search'
+            ].map((path) => [path, {
+                target: process.env.VITE_CATALOG_SHOP_TARGET || 'http://localhost:8086',
+                changeOrigin: true
+            }])),
             '/api': {
                 target: 'http://localhost:8080',
                 changeOrigin: true
