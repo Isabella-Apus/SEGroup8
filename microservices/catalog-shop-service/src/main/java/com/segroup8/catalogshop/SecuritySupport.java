@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Set;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -66,8 +67,11 @@ class IdentityAccessVerifier {
                 root=client.get().uri(url).header(HttpHeaders.AUTHORIZATION,authorization).retrieve().body(JsonNode.class);
             } else {
                 String token=authorization.substring("Bearer ".length()).trim();
+                String requestId="catalog-introspect-"+UUID.randomUUID();
                 root=client.post().uri(url).contentType(MediaType.APPLICATION_JSON)
                     .header("X-Internal-Service-Token",internalToken)
+                    .header("X-Request-Id",requestId)
+                    .header("X-Idempotency-Key",requestId)
                     .body(json.createObjectNode().put("token",token)).retrieve().body(JsonNode.class);
             }
             JsonNode data=root==null?null:root.path("data");
