@@ -22,6 +22,9 @@ security:
   internal-token: ${INTERNAL_SERVICE_TOKEN:local-internal-service-token}
 
 clients:
+  messaging:
+    base-url: ${MESSAGING_SERVICE_URL:http://messaging:8084}
+    publish-delay-ms: ${OUTBOX_PUBLISH_DELAY_MS:2000}
   identity:
     base-url: ${IDENTITY_SERVICE_URL:http://identity-governance-service:8091}
     connect-timeout: ${IDENTITY_CONNECT_TIMEOUT:1s}

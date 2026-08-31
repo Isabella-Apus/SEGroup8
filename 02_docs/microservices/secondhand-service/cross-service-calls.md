@@ -36,10 +36,14 @@
 
 | 事件 | 方向 | 幂等键 |
 |---|---|---|
-| `ProductSubmitted.v1` | secondhand → catalog/risk | eventId |
-| `SecondhandOrderRequested.v1` | secondhand outbox | tradeType + tradeId |
+| `ProductSubmitted.v1` | secondhand 本地 Outbox；catalog/risk 消费端尚未接入 | eventId |
+| `SecondhandOrderRequested.v1` | secondhand 本地恢复审计 | tradeType + tradeId |
 | `SecondhandTradeSettled.v1` | secondhand → order/messaging | business key |
 | `NotificationRequested.v1` | secondhand → messaging | dedupeKey |
 | `OrderStatusChanged.v1` | order → secondhand | eventId |
 
-通知投递失败不回滚商品成交。业务事务只写本地 Outbox；`NEW` 表示待投递，不能宣称已送达。消费端必须按 `eventId` 或业务幂等键去重。
+通知投递失败不回滚商品成交。业务事务只写本地 Outbox；内置发布器只投递
+`NotificationRequested.v1` 和 `SecondhandTradeSettled.v1` 到 `http://messaging:8084/internal/events`，
+补齐统一 `EventEnvelope`、收件人快照和幂等头，成功后才标记 `PUBLISHED`，失败按有界指数退避重试。
+其余 `NEW` 事件仍是本地审计事实，在 catalog/risk 消费端实现前不得宣称已送达。消费端必须按
+`eventId` 或业务幂等键去重。
