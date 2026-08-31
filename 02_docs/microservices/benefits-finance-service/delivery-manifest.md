@@ -6,7 +6,7 @@
 | 架构与 OpenAPI | `02_docs/microservices/benefits-finance-service/` | 已交付 |
 | 运维 Runbook | `03_devops/microservices/benefits-finance-service/` | 已交付 |
 | Helm | `deploy/helm/segroup8/` | 已交付 |
-| CI/CD | `.github/workflows/ci-cd-microservices.yml` | 独立命名工作流已交付，远端运行待 PR |
+| CI/CD | `.github/workflows/benefits-finance-service-ci-cd.yml` | 独立命名工作流已交付，远端运行待 PR |
 | 独立服务 E2E | `microservices/benefits-finance-service/compose.acceptance.yml`、`frontend/e2e/microservices/benefits-finance-service-api.spec.ts` | 候选镜像 + 独立 MySQL 8.4.6 + 严格 messaging-compatible event stub，3/3 PASS |
 | Domain E E2E | `frontend/e2e/domain-e/` | 旧平台 frontend/backend/database 兼容回归 3/3 PASS；当前根 Compose 未含 order/messaging/finance 切流，归属 UC 的真实 finance 路由 E2E 为 `NOT_RUN` |
 | 测试证据 | `04_tests/microservices/benefits-finance-service/` | 服务 26/26、安全契约 5/5、MySQL Testcontainers 4/4、独立候选 Playwright 3/3 PASS；完整微服务路由 E2E `NOT_RUN` |

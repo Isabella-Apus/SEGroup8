@@ -1,10 +1,11 @@
 {
   "service": "benefits-finance-service",
   "generatedAt": "2026-08-31T08:18:00Z",
-  "testedRevision": "cbc1ab300d0bf3c78669d1c0ac9f72fd5a390e3a",
+  "testedRevision": "historical-cbc1ab300d0bf3c78669d1c0ac9f72fd5a390e3a",
+  "authoritativeCurrentHeadEvidence": "Benefits Finance Service CI/CD benefits-finance-acceptance-summary artifact at the same GitHub SHA",
   "baselineRevision": "bb72290cff96c78ab189468b82db1f8ba3cd9323",
   "command": "mvn -B --no-transfer-progress -f microservices/pom.xml -pl benefits-finance-service -am clean verify",
-  "status": "BLOCKED_NOT_READY_FOR_FINAL_ACCEPTANCE",
+  "status": "HISTORICAL_PARTIAL_NOT_CURRENT_HEAD_EVIDENCE",
   "blockers": [
     "Current root Compose has only the legacy backend; order-service and messaging-service are not in this PR runtime stack.",
     "Finance-routed browser E2E, registry digest, and Kubernetes rollout are NOT_RUN."

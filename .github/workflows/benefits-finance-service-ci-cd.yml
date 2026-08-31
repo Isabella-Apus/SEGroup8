@@ -11,6 +11,9 @@ on:
       - "frontend/playwright.config.ts"
       - "frontend/package.json"
       - "frontend/package-lock.json"
+      - "frontend/src/**"
+      - "frontend/docker/**"
+      - "frontend/vite.config.js"
       - "scripts/e2e/stubs/benefits-finance-event-stub.mjs"
       - "compose.yml"
       - "02_docs/microservices/benefits-finance-service/**"
@@ -19,7 +22,7 @@ on:
       - "05_management/microservices/benefits-finance-service/**"
       - "deploy/helm/segroup8/templates/benefits-finance-*.yaml"
       - "deploy/helm/segroup8/values.yaml"
-      - ".github/workflows/ci-cd-microservices.yml"
+      - ".github/workflows/benefits-finance-service-ci-cd.yml"
   push:
     branches: [main]
     paths:
@@ -31,6 +34,9 @@ on:
       - "frontend/playwright.config.ts"
       - "frontend/package.json"
       - "frontend/package-lock.json"
+      - "frontend/src/**"
+      - "frontend/docker/**"
+      - "frontend/vite.config.js"
       - "scripts/e2e/stubs/benefits-finance-event-stub.mjs"
       - "compose.yml"
       - "02_docs/microservices/benefits-finance-service/**"
@@ -39,7 +45,7 @@ on:
       - "05_management/microservices/benefits-finance-service/**"
       - "deploy/helm/segroup8/templates/benefits-finance-*.yaml"
       - "deploy/helm/segroup8/values.yaml"
-      - ".github/workflows/ci-cd-microservices.yml"
+      - ".github/workflows/benefits-finance-service-ci-cd.yml"
   workflow_dispatch:
 
 permissions:
@@ -237,7 +243,7 @@ jobs:
       SKIP_FINANCE_IMAGE_BUILD: "true"
       APP_VERSION: sha-${{ github.sha }}
       APP_COMMIT: ${{ github.sha }}
-      E2E_EVIDENCE_ROOT: ${{ runner.temp }}/benefits-finance-domain-e2e
+      E2E_EVIDENCE_ROOT: /tmp/benefits-finance-domain-e2e
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -308,7 +314,10 @@ jobs:
           grep -q '^kind: Deployment$' benefits-finance-rendered.yaml
           grep -q '^kind: Service$' benefits-finance-rendered.yaml
           grep -q 'startupProbe:' benefits-finance-rendered.yaml
+          grep -q 'runAsUser: 10001' benefits-finance-rendered.yaml
+          grep -q 'runAsGroup: 10001' benefits-finance-rendered.yaml
           grep -q 'readOnlyRootFilesystem: true' benefits-finance-rendered.yaml
+          grep -q 'mountPath: /tmp' benefits-finance-rendered.yaml
       - uses: actions/upload-artifact@v4
         with:
           name: benefits-finance-rendered-helm-${{ github.sha }}
@@ -316,10 +325,27 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  acceptance-summary:
+    name: Current revision acceptance summary
+    needs: [benefits-finance-verify, benefits-finance-independent-e2e, benefits-finance-domain-e2e, benefits-finance-delivery-config]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record current-SHA evidence boundary
+        run: |
+          jq -n --arg revision "$GITHUB_SHA" \
+            '{revision:$revision,maven:"PASS",mysqlIntegration:"PASS",publicApiCoverage:"PASS",independentServiceE2E:"PASS",platformCompatibilityE2E:"PASS",financeRoutedBrowserE2E:"NOT_RUN",candidateImage:"PASS",helmStatic:"PASS",registryDigest:"PENDING_MAIN",kubernetesRollout:"NOT_RUN_ON_PULL_REQUEST"}' \
+            > benefits-finance-acceptance-summary.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benefits-finance-acceptance-summary-${{ github.sha }}
+          path: benefits-finance-acceptance-summary.json
+          if-no-files-found: error
+          retention-days: 30
+
   publish-benefits-finance-image:
     name: Publish exact E2E-tested SHA image
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [benefits-finance-verify, benefits-finance-independent-e2e, benefits-finance-domain-e2e, benefits-finance-delivery-config]
+    needs: [benefits-finance-verify, benefits-finance-independent-e2e, benefits-finance-domain-e2e, benefits-finance-delivery-config, acceptance-summary]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
@@ -413,7 +439,7 @@ jobs:
           trap 'rm -f -- "$archive"' EXIT
           kubectl -n "$namespace" get secret benefits-finance-secrets >/dev/null
           helm -n "$namespace" status segroup8 >/dev/null
-          helm upgrade --install segroup8 "$archive" --namespace "$namespace" --reuse-values \
+          helm upgrade --install segroup8 "$archive" --namespace "$namespace" --reset-then-reuse-values \
             --atomic --cleanup-on-fail --wait --timeout 5m --history-max 10 \
             --set benefitsFinance.enabled=true \
             --set-string benefitsFinance.image.repository="$repository" \

@@ -9,7 +9,7 @@
 
 ```powershell
 git diff --stat bb72290cff96c78ab189468b82db1f8ba3cd9323...HEAD
-git diff -- microservices/benefits-finance-service deploy/helm/segroup8 .github/workflows/ci-cd-microservices.yml
+git diff -- microservices/benefits-finance-service deploy/helm/segroup8 .github/workflows/benefits-finance-service-ci-cd.yml
 ```
 
 ## 目录和模块
