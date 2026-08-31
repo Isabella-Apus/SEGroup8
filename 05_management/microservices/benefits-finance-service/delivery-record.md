@@ -8,8 +8,8 @@
 
 ## Pull Request
 
-- URL：PENDING
-- Source/target branch：PENDING
+- URL：https://github.com/Isabella-Apus/SEGroup8/pull/218
+- Source/target branch：`codex/benefits-finance-service` → `main`
 - merge SHA：PENDING
 - CI delivery metadata artifact（image/digest/Helm revision）：PENDING
 
