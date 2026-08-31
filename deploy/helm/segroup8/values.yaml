@@ -50,8 +50,8 @@ order:
   downstream:
     catalogUrl: http://segroup8-catalog-shop:8080
     financeUrl: http://benefits-finance:8085
-      messagingUrl: http://messaging:8084
-      secondhandUrl: http://secondhand-service:8080
+    messagingUrl: http://messaging:8084
+    secondhandUrl: http://secondhand-service:8080
   resources:
     requests:
       cpu: 100m
