@@ -36,20 +36,18 @@ const server = createServer(async (request, response) => {
       response.writeHead(204);
       return response.end();
     }
-    if (request.method === "POST" && url.pathname === "/internal/finance/quotes") {
+    if (request.method === "POST" && url.pathname === "/internal/checkout/quote") {
       const body = await readJson(request);
       return json(response, 200, {
-        payableAmount: body.totalAmount,
-        voucherDiscountAmount: 0,
-        sellerBearAmount: 0,
-        platformBearAmount: 0,
+        payableAmount: body.amount,
+        discountAmount: 0,
       });
     }
-    if (request.method === "POST" && /^\/internal\/finance\/(debits|refunds|settlements|vouchers\/releases)$/.test(url.pathname)) {
+    if (request.method === "POST" && /^\/internal\/(payments\/(debit|refund)|settlements|vouchers\/release)$/.test(url.pathname)) {
       await readJson(request);
       return json(response, 200, { status: "SUCCEEDED" });
     }
-    if (request.method === "GET" && /^\/internal\/finance\/(debits|refunds|settlements)\//.test(url.pathname)) {
+    if (request.method === "GET" && /^\/internal\/payments\/[^/]+$/.test(url.pathname)) {
       return json(response, 200, { status: "SUCCEEDED" });
     }
     return json(response, 404, { error: `unstubbed ${request.method} ${url.pathname}` });
