@@ -31,21 +31,22 @@ class IdempotencyKeyService {
     <T> T execute(String scope, String key, Object request, Class<T> resultType, Supplier<T> action) {
         String normalizedKey = normalize(key);
         if (normalizedKey == null) return action.get();
+        String normalizedScope = scopeKey(scope);
         String fingerprint = fingerprint(request);
-        Optional<Row> existing = lookup(scope, normalizedKey);
-        if (existing.isPresent()) return replay(existing.get(), scope, normalizedKey, fingerprint, resultType);
+        Optional<Row> existing = lookup(normalizedScope, normalizedKey);
+        if (existing.isPresent()) return replay(existing.get(), normalizedScope, normalizedKey, fingerprint, resultType);
         try {
             db.sql("insert into idempotency_record(scope,request_key,request_fingerprint,response_type) "
                             + "values(:scope,:key,:fingerprint,:type)")
-                    .param("scope", scope).param("key", normalizedKey).param("fingerprint", fingerprint)
+                    .param("scope", normalizedScope).param("key", normalizedKey).param("fingerprint", fingerprint)
                     .param("type", resultType.getName()).update();
         } catch (DataIntegrityViolationException concurrent) {
-            return replay(lookup(scope, normalizedKey).orElseThrow(() -> concurrent), scope, normalizedKey,
+            return replay(lookup(normalizedScope, normalizedKey).orElseThrow(() -> concurrent), normalizedScope, normalizedKey,
                     fingerprint, resultType);
         }
         T result = action.get();
         db.sql("update idempotency_record set response_body=:response where scope=:scope and request_key=:key")
-                .param("scope", scope).param("key", normalizedKey).param("response", serialize(result)).update();
+                .param("scope", normalizedScope).param("key", normalizedKey).param("response", serialize(result)).update();
         return result;
     }
 
@@ -86,6 +87,10 @@ class IdempotencyKeyService {
         } catch (NoSuchAlgorithmException | JsonProcessingException error) {
             throw new IllegalStateException("cannot fingerprint idempotency request", error);
         }
+    }
+
+    private String scopeKey(String scope) {
+        return fingerprint(scope).substring(0, 40);
     }
 
     private String serialize(Object result) {

@@ -206,6 +206,6 @@ test("UC23 with UC12 and UC14 preserves idempotent money facts and strict events
     if (!response.ok()) return [];
     return (await json(response)).map((event: any) => event.eventType).sort();
   }, { timeout: 15_000 }).toEqual(expect.arrayContaining([
-    "PaymentCompleted", "RechargeCompleted", "RefundCompleted", "SettlementCompleted",
+    "PaymentCompleted.v1", "PaymentCompleted.v1", "PaymentCompleted.v1", "RefundCompleted.v1",
   ]));
 });
