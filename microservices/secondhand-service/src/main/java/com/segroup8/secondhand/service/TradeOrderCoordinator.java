@@ -12,7 +12,6 @@ import com.segroup8.secondhand.repository.NegotiationRepository;
 import com.segroup8.secondhand.repository.OutboxRepository;
 import com.segroup8.secondhand.repository.ProductRepository;
 import com.segroup8.secondhand.repository.TradeOrderRequestRepository;
-import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -155,7 +154,7 @@ public class TradeOrderCoordinator {
     private void failOrRetry(TradeOrderRequest request, String error) {
         int nextAttempt = request.attempts() + 1;
         if (nextAttempt < maxAttempts) {
-            requests.markRetry(request.id(), error, LocalDateTime.now().plusSeconds(nextAttempt * 2L));
+            requests.markRetry(request.id(), error, nextAttempt * 2L);
             return;
         }
         fail(request, error);

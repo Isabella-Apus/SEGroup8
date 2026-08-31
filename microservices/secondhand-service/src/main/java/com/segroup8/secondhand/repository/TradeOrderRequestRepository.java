@@ -83,11 +83,13 @@ public class TradeOrderRequestRepository {
                         .addValue("orderStatus", orderStatus).addValue("id", id));
     }
 
-    public int markRetry(long id, String error, LocalDateTime nextRetryAt) {
+    public int markRetry(long id, String error, long retryDelaySeconds) {
         return db.update("update trade_order_request set request_status='RETRY',attempts=attempts+1,last_error=:error,"
-                        + "next_retry_at=:retry,version=version+1,update_time=CURRENT_TIMESTAMP "
+                        + "next_retry_at=TIMESTAMPADD(SECOND,:retryDelay,CURRENT_TIMESTAMP),"
+                        + "version=version+1,update_time=CURRENT_TIMESTAMP "
                         + "where id=:id and request_status in ('PENDING','RETRY')",
-                new MapSqlParameterSource().addValue("error", truncate(error)).addValue("retry", nextRetryAt)
+                new MapSqlParameterSource().addValue("error", truncate(error))
+                        .addValue("retryDelay", Math.max(0L, retryDelaySeconds))
                         .addValue("id", id));
     }
 
