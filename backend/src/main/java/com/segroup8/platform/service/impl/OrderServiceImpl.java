@@ -44,6 +44,7 @@ import com.segroup8.platform.mapper.UserBlockMapper;
 import com.segroup8.platform.realtime.RealtimePushService;
 import com.segroup8.platform.service.OrderService;
 import com.segroup8.platform.service.LogisticsService;
+import com.segroup8.platform.service.NotificationService;
 import com.segroup8.platform.service.VoucherService;
 import com.segroup8.platform.service.settlement.EscrowSettlementService;
 import com.segroup8.platform.vo.OrderItemVO;
@@ -51,6 +52,8 @@ import com.segroup8.platform.vo.OrderVO;
 import com.segroup8.platform.vo.PageVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -92,6 +95,11 @@ public class OrderServiceImpl implements OrderService {
     private final EscrowSettlementService escrowSettlementService;
     private final VoucherService voucherService;
     private final ProducerOutboxService outbox;
+    @Autowired(required = false)
+    private NotificationService notificationService;
+
+    @Value("${app.messaging.event-notifications-enabled:true}")
+    private boolean eventNotificationsEnabled = true;
 
     public OrderServiceImpl(OrderInfoMapper orderInfoMapper, OrderItemMapper orderItemMapper,
             ProductMapper productMapper, ReviewMapper reviewMapper, SecondhandProductMapper secondhandProductMapper,
@@ -1577,6 +1585,10 @@ public class OrderServiceImpl implements OrderService {
 
     private void publishOrderNotification(OrderInfo order, List<Long> recipients, String title,
             String content, String targetPath, String forcedEventType) {
+        if (!eventNotificationsEnabled) {
+            publishLegacyOrderNotifications(recipients, title, content, targetPath);
+            return;
+        }
         String eventType;
         String producer;
         String result;
@@ -1610,6 +1622,25 @@ public class OrderServiceImpl implements OrderService {
         payload.put("dedupeKey", eventType + ":" + order.getId() + ":" + recipients.get(0) + ":" + result
                 + ":" + Integer.toHexString((title + "|" + content).hashCode()));
         outbox.publish(eventType, producer, "ORDER", order.getId(), payload);
+    }
+
+    /**
+     * Compatibility path for the monolith-only Compose/E2E stack. Production
+     * keeps eventNotificationsEnabled=true and uses the producer outbox above.
+     */
+    private void publishLegacyOrderNotifications(List<Long> recipients, String title,
+            String content, String targetPath) {
+        if (notificationService == null || recipients == null) {
+            return;
+        }
+        for (Long recipient : recipients.stream().filter(Objects::nonNull).distinct().toList()) {
+            try {
+                notificationService.createNotification(recipient, title, content, targetPath);
+            } catch (RuntimeException exception) {
+                log.warn("Legacy notification persistence failed for recipient={}: {}",
+                        recipient, exception.getMessage());
+            }
+        }
     }
 
     private void runAfterCommitBestEffort(String actionName, Runnable action) {

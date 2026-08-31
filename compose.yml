@@ -45,6 +45,10 @@ services:
       # the container; Compose supplies the database settings above.
       SPRING_CONFIG_IMPORT: optional:file:/run/segroup8-compose-local.yml
       JWT_SECRET: ${JWT_SECRET:-SEGROUP8_DOCKER_DEMO_SECRET_CHANGE_ME_2026}
+      # The shared Compose/E2E stack runs the monolith without messaging-service.
+      # Keep this compatibility mode explicit so domain tests persist notifications
+      # locally; production deployments leave the event-driven default enabled.
+      APP_MESSAGING_EVENT_NOTIFICATIONS_ENABLED: "false"
       APP_RISK_AUDIT_LLM_ENABLED: "false"
       REALTIME_ALLOWED_ORIGIN_PATTERNS: "*"
       TZ: Asia/Shanghai

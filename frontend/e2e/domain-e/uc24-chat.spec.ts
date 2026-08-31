@@ -5,6 +5,7 @@ import {
     bearer,
     captureDomainEEvidence,
     domainEToken,
+    expectBusinessFailure,
     expectBusinessSuccess,
     loginAsDomainE,
     uniqueName,
@@ -107,12 +108,14 @@ test.describe("@DOMAIN_E @UC24 chat authorization and delivery", () => {
             `/api/chat/conversations/${conversationId}/messages`,
             { headers: bearer(outsiderToken) },
         );
-        expect(outsiderRead.status()).toBe(403);
+        const outsiderReadFailure = await expectBusinessFailure(outsiderRead);
+        expect(Number(outsiderReadFailure?.code)).toBe(403);
         const outsiderSend = await request.post(
             `/api/chat/conversations/${conversationId}/messages`,
             { headers: bearer(outsiderToken), data: { content: "outsider message" } },
         );
-        expect(outsiderSend.status()).toBe(403);
+        const outsiderSendFailure = await expectBusinessFailure(outsiderSend);
+        expect(Number(outsiderSendFailure?.code)).toBe(403);
 
         const historyBeforeBlock = await messages(request, buyerToken, conversationId);
         const blockResponse = page.waitForResponse(
@@ -130,7 +133,8 @@ test.describe("@DOMAIN_E @UC24 chat authorization and delivery", () => {
             `/api/chat/conversations/${conversationId}/messages`,
             { headers: bearer(sellerToken), data: { content: blockedMessage } },
         );
-        expect(blockedSend.status()).toBe(403);
+        const blockedSendFailure = await expectBusinessFailure(blockedSend);
+        expect(Number(blockedSendFailure?.code)).toBe(403);
         const historyAfterBlock = await messages(request, buyerToken, conversationId);
         expect(historyAfterBlock).toHaveLength(historyBeforeBlock.length);
         expect(historyAfterBlock.some((message) => message.content === blockedMessage)).toBeFalsy();
