@@ -29,6 +29,7 @@ class PublicApiTest {
     @BeforeEach
     void reset() {
         db.update("delete from outbox_event");
+        db.update("delete from idempotency_record");
         db.update("delete from transaction_record");
         db.update("delete from payment_request");
         db.update("delete from checkout_quote");
@@ -121,6 +122,30 @@ class PublicApiTest {
         mvc.perform(get("/api/finance/business/records")
                         .header("Authorization", TestJwt.bearer(7, "OFFICIAL_SELLER")))
                 .andExpect(status().isOk()).andExpect(jsonPath("$[0].tradeType").value("SETTLEMENT"));
+    }
+
+    @Test
+    void idempotencyHeaderReplaysSameWriteAndRejectsDifferentBody() throws Exception {
+        String token = TestJwt.bearer(101, "USER");
+        String body = "{\"requestId\":\"header-key-recharge\",\"amount\":12.50,\"channel\":\"WECHAT\"}";
+        String first = mvc.perform(post("/api/finance/recharge").header("Authorization", token)
+                        .header("Idempotency-Key", "recharge-header-key-1")
+                        .contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String second = mvc.perform(post("/api/finance/recharge").header("Authorization", token)
+                        .header("Idempotency-Key", "recharge-header-key-1")
+                        .contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        org.junit.jupiter.api.Assertions.assertEquals(first, second);
+        mvc.perform(post("/api/finance/recharge").header("Authorization", token)
+                        .header("Idempotency-Key", "recharge-header-key-1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body.replace("12.50", "13.50")))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("IDEMPOTENCY_KEY_REUSED"));
+        mvc.perform(post("/api/finance/recharge").header("Authorization", token)
+                        .header("Idempotency-Key", "invalid idempotency key")
+                        .contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("IDEMPOTENCY_KEY_INVALID"));
     }
 
     @Test

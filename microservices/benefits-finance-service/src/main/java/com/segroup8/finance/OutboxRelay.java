@@ -1,5 +1,7 @@
 package com.segroup8.finance;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -22,18 +24,20 @@ class OutboxRelay {
     private final String serviceToken;
     private final int batchSize;
     private final int maxAttempts;
+    private final ObjectMapper json;
 
     OutboxRelay(JdbcClient db, @Qualifier("outboxRestClient") RestClient http,
             @Value("${app.outbox-event-sink-url:}") String sinkUrl,
             @Value("${app.internal-service-token}") String serviceToken,
             @Value("${app.outbox-batch-size:50}") int batchSize,
-            @Value("${app.outbox-max-attempts:8}") int maxAttempts) {
+            @Value("${app.outbox-max-attempts:8}") int maxAttempts, ObjectMapper json) {
         this.db = db;
         this.http = http;
         this.sinkUrl = sinkUrl;
         this.serviceToken = serviceToken;
         this.batchSize = batchSize;
         this.maxAttempts = maxAttempts;
+        this.json = json;
     }
 
     @Scheduled(fixedDelayString="${app.outbox-poll-ms:5000}")
@@ -55,15 +59,19 @@ class OutboxRelay {
                 .param("now", now).param("id", event.id()).param("stale", stale).update();
         if (claimed == 0) return;
         try {
+            JsonNode envelope = json.readTree(event.payload());
+            String traceId = required(envelope, "traceId", event.id());
+            String requestId = envelope.path("payload").path("requestId").asText(event.id());
             http.post().uri(sinkUrl).contentType(MediaType.APPLICATION_JSON)
                     .header("X-Internal-Service-Token", serviceToken)
                     .header("X-Event-Id", event.id()).header("X-Event-Type", event.type())
-                    .body(event.payload()).retrieve().toBodilessEntity();
+                    .header("X-Request-Id", requestId).header("X-Trace-Id", traceId)
+                    .body(envelope).retrieve().toBodilessEntity();
             db.sql("update outbox_event set status='PUBLISHED',published_at=current_timestamp,locked_at=null "
                             + "where event_id=:id and status='SENDING'")
                     .param("id", event.id()).update();
             LOG.info("outbox_event_published eventId={} eventType={}", event.id(), event.type());
-        } catch (RuntimeException failure) {
+        } catch (Exception failure) {
             int nextAttempt = event.attempts() + 1;
             if (nextAttempt >= maxAttempts) {
                 db.sql("update outbox_event set status='DEAD',attempts=attempts+1,locked_at=null "
@@ -80,6 +88,11 @@ class OutboxRelay {
             LOG.warn("outbox_event_retry_scheduled eventId={} eventType={} attempt={}",
                     event.id(), event.type(), nextAttempt);
         }
+    }
+
+    private static String required(JsonNode envelope, String field, String fallback) {
+        String value = envelope.path(field).asText();
+        return value == null || value.isBlank() ? fallback : value;
     }
 
     private record Event(String id, String type, String payload, int attempts) {}

@@ -78,10 +78,10 @@ benefitsFinance:
   secretName: benefits-finance-secrets
   config:
     currency: CNY
-    orderServiceUrl: http://order-service:8084
+    orderServiceUrl: http://segroup8-order:8085
     quoteTtlSeconds: "300"
     reservationTtlSeconds: "900"
-    outboxEventSinkUrl: http://messaging-service:8086/internal/events
+    outboxEventSinkUrl: http://messaging:8084/internal/events
     outboxPollMs: "5000"
     outboxBatchSize: "50"
     outboxMaxAttempts: "8"

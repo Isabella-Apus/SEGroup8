@@ -43,9 +43,12 @@ final class RequestSecurityFilter extends OncePerRequestFilter {
         long startedAt = System.nanoTime();
         String path = request.getRequestURI();
         String requestId = normalizeRequestId(request.getHeader("X-Request-Id"));
+        String traceId = normalizeRequestId(request.getHeader("X-Trace-Id"));
         response.setHeader("X-Request-Id", requestId);
+        response.setHeader("X-Trace-Id", traceId);
         MDC.put("requestId", requestId);
-        MDC.put("traceId", normalizeRequestId(request.getHeader("X-Trace-Id")));
+        MDC.put("traceId", traceId);
+        RequestContext.setTraceId(traceId);
         try {
             if (path.startsWith("/internal/")) {
                 byte[] provided = value(request.getHeader("X-Internal-Service-Token"))

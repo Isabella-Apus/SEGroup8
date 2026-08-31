@@ -7,6 +7,8 @@ import com.segroup8.finance.ApiModels.DebitRequest;
 import com.segroup8.finance.ApiModels.RefundRequest;
 import com.segroup8.finance.ApiModels.SettlementRequest;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -34,12 +36,19 @@ class MySqlContractIntegrationTest {
             .withPassword("test-only");
 
     @DynamicPropertySource
-    static void database(DynamicPropertyRegistry properties) {
+    static void database(DynamicPropertyRegistry properties) throws Exception {
+        MYSQL.start();
+        var principals = MYSQL.execInContainer("mysql", "--protocol=socket", "-uroot", "-p" + MYSQL.getPassword(),
+                "-e", "create user if not exists 'benefits_finance_migrator'@'%' identified by 'migrator-only'; "
+                        + "revoke all privileges, grant option from 'benefits_finance_app'@'%'; "
+                        + "grant select,insert,update,delete on benefits_finance_db.* to 'benefits_finance_app'@'%'; "
+                        + "grant all privileges on benefits_finance_db.* to 'benefits_finance_migrator'@'%'; flush privileges;");
+        if (principals.getExitCode() != 0) throw new IllegalStateException(principals.getStderr());
         properties.add("spring.datasource.url", MYSQL::getJdbcUrl);
         properties.add("spring.datasource.username", MYSQL::getUsername);
         properties.add("spring.datasource.password", MYSQL::getPassword);
-        properties.add("spring.flyway.user", MYSQL::getUsername);
-        properties.add("spring.flyway.password", MYSQL::getPassword);
+        properties.add("spring.flyway.user", () -> "benefits_finance_migrator");
+        properties.add("spring.flyway.password", () -> "migrator-only");
     }
 
     @Autowired JdbcTemplate db;
@@ -48,6 +57,7 @@ class MySqlContractIntegrationTest {
     @BeforeEach
     void reset() {
         db.update("delete from outbox_event");
+        db.update("delete from idempotency_record");
         db.update("delete from transaction_record");
         db.update("delete from payment_request");
         db.update("delete from checkout_quote");
@@ -58,13 +68,20 @@ class MySqlContractIntegrationTest {
     }
 
     @Test
-    void flywaySchemaEnforcesBalanceConstraintAndApplicationUserCannotWriteOrderSchema() throws Exception {
+    void flywayUsesMigratorWhileRuntimeApplicationUserHasOnlyDmlAndNoCrossSchemaAccess() throws Exception {
         assertThat(db.queryForObject("select count(*) from information_schema.tables where table_schema=database() "
                 + "and table_name in ('voucher','user_voucher','balance','transaction_record','checkout_quote',"
                 + "'payment_request','idempotency_record','outbox_event')", Integer.class)).isEqualTo(8);
         assertThatThrownBy(() -> db.update(
                 "insert into balance(user_id,personal_balance,business_balance,version) values(2,-0.01,0,0)"))
                 .isInstanceOf(DataAccessException.class);
+        assertThat(db.queryForObject("select current_user()", String.class)).startsWith("benefits_finance_app@");
+        assertThatThrownBy(() -> db.execute("create table runtime_must_not_ddl(id bigint)"))
+                .isInstanceOf(DataAccessException.class);
+        try (Connection migrator = DriverManager.getConnection(MYSQL.getJdbcUrl(), "benefits_finance_migrator", "migrator-only")) {
+            migrator.createStatement().execute("create table migrator_proof(id bigint primary key)");
+            migrator.createStatement().execute("drop table migrator_proof");
+        }
 
         var setup = MYSQL.execInContainer("mysql", "--protocol=socket", "-uroot", "-p" + MYSQL.getPassword(),
                 "-e", "create database if not exists order_db; "
@@ -150,7 +167,7 @@ class MySqlContractIntegrationTest {
             assertThat(db.queryForObject(
                     "select count(*) from transaction_record where trade_type='REFUND'", Integer.class)).isOne();
             assertThat(db.queryForObject(
-                    "select count(*) from outbox_event where event_type='RefundCompleted'", Integer.class)).isOne();
+                    "select count(*) from outbox_event where event_type='RefundCompleted.v1'", Integer.class)).isOne();
         } finally {
             pool.shutdownNow();
         }

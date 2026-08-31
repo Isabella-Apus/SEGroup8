@@ -4,9 +4,13 @@ import com.segroup8.finance.ApiModels.DebitRequest;
 import com.segroup8.finance.ApiModels.PaymentResult;
 import com.segroup8.finance.ApiModels.RefundRequest;
 import com.segroup8.finance.ApiModels.SettlementRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +24,12 @@ class FinanceTransactionWorker {
     private static final Logger LOG = LoggerFactory.getLogger(FinanceTransactionWorker.class);
     private final JdbcClient db;
     private final String currency;
+    private final ObjectMapper json;
 
-    FinanceTransactionWorker(JdbcClient db, @Value("${app.currency}") String currency) {
+    FinanceTransactionWorker(JdbcClient db, @Value("${app.currency}") String currency, ObjectMapper json) {
         this.db = db;
         this.currency = currency;
+        this.json = json;
     }
 
     @Transactional
@@ -32,7 +38,8 @@ class FinanceTransactionWorker {
         insertRequest(request.paymentRequestId(), "DEBIT", request.orderId(), request.userId(), null, amount, null);
         String transactionId = changeBalance(request.paymentRequestId(), request.orderId(), request.userId(),
                 "PERSONAL", "DEBIT", amount.negate(), null, "订单扣款");
-        complete(request.paymentRequestId(), transactionId, "PaymentCompleted", request.orderId());
+        complete(request.paymentRequestId(), transactionId, "PaymentCompleted.v1", request.orderId(), request.userId(),
+                "支付成功", "订单支付已完成", "/orders/" + request.orderId());
         return completed(request.paymentRequestId());
     }
 
@@ -54,7 +61,8 @@ class FinanceTransactionWorker {
                 request.paymentRequestId());
         String transactionId = changeBalance(request.refundRequestId(), request.orderId(), request.userId(),
                 "PERSONAL", "REFUND", amount, original.transactionId(), "订单退款");
-        complete(request.refundRequestId(), transactionId, "RefundCompleted", request.orderId());
+        complete(request.refundRequestId(), transactionId, "RefundCompleted.v1", request.orderId(), request.userId(),
+                "退款成功", "订单退款已到账", "/orders/" + request.orderId());
         return completed(request.refundRequestId());
     }
 
@@ -65,7 +73,8 @@ class FinanceTransactionWorker {
         insertRequest(requestId, "SETTLEMENT", request.orderId(), null, request.sellerId(), amount, null);
         String transactionId = changeBalance(requestId, request.orderId(), request.sellerId(),
                 "BUSINESS", "SETTLEMENT", amount, null, "订单结算入账");
-        complete(requestId, transactionId, "SettlementCompleted", request.orderId());
+        complete(requestId, transactionId, "PaymentCompleted.v1", request.orderId(), request.sellerId(),
+                "订单结算完成", "订单结算金额已入账", "/merchant/finance");
         return completed(requestId);
     }
 
@@ -76,7 +85,8 @@ class FinanceTransactionWorker {
         insertRequest(requestId, "RECHARGE", 0L, userId, null, amount, null);
         String transactionId = changeBalance(requestId, null, userId, "PERSONAL", "RECHARGE", amount, null,
                 "模拟充值-" + (channel == null || channel.isBlank() ? "WECHAT" : channel));
-        complete(requestId, transactionId, "RechargeCompleted", 0L);
+        complete(requestId, transactionId, "PaymentCompleted.v1", 0L, userId,
+                "充值成功", "钱包充值已到账", "/wallet");
         return completed(requestId);
     }
 
@@ -121,17 +131,50 @@ class FinanceTransactionWorker {
                 .param("id", userId).update();
     }
 
-    private void complete(String requestId, String transactionId, String eventType, long orderId) {
+    private void complete(String requestId, String transactionId, String eventType, long orderId, long recipientUserId,
+            String displayTitle, String displayText, String targetPath) {
         db.sql("update payment_request set status='COMPLETED',transaction_id=:transactionId,completed_at=current_timestamp "
                         + "where request_id=:id")
                 .param("transactionId", transactionId).param("id", requestId).update();
         String eventId = UUID.randomUUID().toString();
-        String payload = "{\"requestId\":\"" + requestId + "\",\"orderId\":" + orderId
-                + ",\"transactionId\":\"" + transactionId + "\"}";
+        String traceId = RequestContext.traceId() == null ? "finance-" + eventId : RequestContext.traceId();
+        String requestTrace = RequestContext.requireUserOrRequestId();
+        Map<String, Object> notification = new LinkedHashMap<>();
+        notification.put("requestId", requestTrace);
+        notification.put("recipientUserId", recipientUserId);
+        notification.put("displayTitle", displayTitle);
+        notification.put("displayText", displayText);
+        notification.put("dedupeKey", "finance:" + requestId + ":" + eventType);
+        notification.put("businessId", requestId);
+        notification.put("businessType", "PAYMENT");
+        notification.put("notificationType", eventType);
+        notification.put("targetPath", targetPath);
+        notification.put("traceId", traceId);
+        notification.put("transactionId", transactionId);
+        notification.put("orderId", orderId);
+        String payload = envelope(eventId, eventType, requestId, traceId, notification);
         db.sql("insert into outbox_event(event_id,aggregate_type,aggregate_id,event_type,payload,status) "
                         + "values(:eventId,'PAYMENT',:aggregateId,:eventType,:payload,'PENDING')")
                 .param("eventId", eventId).param("aggregateId", requestId).param("eventType", eventType)
                 .param("payload", payload).update();
+    }
+
+    private String envelope(String eventId, String eventType, String aggregateId, String traceId,
+            Map<String, Object> payload) {
+        try {
+            return json.writeValueAsString(Map.of(
+                    "eventId", eventId,
+                    "eventType", eventType,
+                    "eventVersion", 1,
+                    "producer", "benefits-finance-service",
+                    "aggregateType", "PAYMENT",
+                    "aggregateId", aggregateId,
+                    "occurredAt", Instant.now().toString(),
+                    "traceId", traceId,
+                    "payload", payload));
+        } catch (JsonProcessingException error) {
+            throw new IllegalStateException("cannot serialize finance event envelope", error);
+        }
     }
 
     private PaymentResult find(String requestId) {

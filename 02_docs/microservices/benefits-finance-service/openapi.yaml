@@ -10,7 +10,7 @@ info:
     substitute for service identity. Callers should propagate `X-Request-Id`
     and `X-Trace-Id`. Money values use decimal notation and CNY by default.
 servers:
-  - url: http://benefits-finance-service:8085
+  - url: http://benefits-finance:8085
 tags:
   - name: Voucher Public
     description: UC21 and UC22 voucher lifecycle endpoints.
@@ -25,15 +25,15 @@ x-event-contracts:
   deduplication: Consumers must deduplicate by X-Event-Id.
   headers:
     X-Event-Id: Unique event identifier.
-    X-Event-Type: PaymentCompleted, RefundCompleted, SettlementCompleted, or RechargeCompleted.
+    X-Event-Type: PaymentCompleted.v1 or RefundCompleted.v1.
+    X-Request-Id: Original caller request identifier propagated to consumers.
+    X-Trace-Id: End-to-end trace identifier propagated to consumers.
     X-Internal-Service-Token: Cluster service credential.
   body:
     $ref: '#/components/schemas/FinancialEventPayload'
   events:
-    PaymentCompleted: Emitted after a debit, ledger record, and payment request commit atomically.
-    RefundCompleted: Emitted after a refund, reversal ledger record, and refund request commit atomically.
-    SettlementCompleted: Emitted after a seller business balance and settlement ledger record commit atomically.
-    RechargeCompleted: Emitted after a wallet recharge and ledger record commit atomically.
+    PaymentCompleted.v1: Emitted after a debit, recharge, or settlement commits atomically.
+    RefundCompleted.v1: Emitted after a refund and reversal ledger record commit atomically.
 
 x-error-code-catalog:
   INVALID_ARGUMENT: HTTP 400; body validation, malformed JSON, or parameter type failure.
@@ -50,7 +50,9 @@ x-error-code-catalog:
   VOUCHER_NOT_FOUND: HTTP 404; voucher does not exist.
   PAYMENT_REQUEST_NOT_FOUND: HTTP 404; payment request does not exist.
   DATA_CONFLICT: HTTP 409; a database uniqueness or integrity constraint rejected the request.
-  IDEMPOTENCY_KEY_REUSED: HTTP 409; the same business key was supplied with different parameters.
+  IDEMPOTENCY_KEY_INVALID: HTTP 400; supplied Idempotency-Key does not match the accepted format.
+  IDEMPOTENCY_KEY_REUSED: HTTP 409; the same Idempotency-Key or business key was supplied with different parameters.
+  IDEMPOTENCY_REQUEST_IN_PROGRESS: HTTP 409; the same Idempotency-Key is still being processed.
   VOUCHER_CONCURRENT_UPDATE: HTTP 409; voucher version changed concurrently.
   VOUCHER_ALREADY_CLAIMED: HTTP 409; voucher cannot be claimed twice or deleted after being claimed.
   VOUCHER_SOLD_OUT: HTTP 409; voucher inventory is exhausted.

@@ -11,6 +11,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -24,12 +25,19 @@ import org.springframework.web.client.RestClient;
 class OutboxRelayIntegrationTest {
     @Autowired JdbcTemplate jdbc;
     @Autowired javax.sql.DataSource dataSource;
+    @Autowired ObjectMapper json;
 
     @BeforeEach
     void reset() {
         jdbc.update("delete from outbox_event");
         jdbc.update("insert into outbox_event(event_id,aggregate_type,aggregate_id,event_type,payload,status,available_at) "
-                + "values('event-1','PAYMENT','pay-1','PaymentCompleted','{\"requestId\":\"pay-1\"}','PENDING',current_timestamp)");
+                + "values('event-1','PAYMENT','pay-1','PaymentCompleted.v1',"
+                + "'{\"eventId\":\"event-1\",\"eventType\":\"PaymentCompleted.v1\",\"eventVersion\":1,"
+                + "\"producer\":\"benefits-finance-service\",\"aggregateType\":\"PAYMENT\",\"aggregateId\":\"pay-1\","
+                + "\"occurredAt\":\"2026-08-31T00:00:00Z\",\"traceId\":\"trace-1\","
+                + "\"payload\":{\"requestId\":\"request-1\",\"recipientUserId\":101,\"displayTitle\":\"支付成功\","
+                + "\"displayText\":\"订单支付已完成\",\"dedupeKey\":\"finance:pay-1\",\"transactionId\":\"tx-1\",\"orderId\":9001}}',"
+                + "'PENDING',current_timestamp)");
     }
 
     @Test
@@ -37,14 +45,16 @@ class OutboxRelayIntegrationTest {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
         OutboxRelay relay = new OutboxRelay(JdbcClient.create(dataSource), builder.build(), "http://event-sink/internal/events",
-                "test-internal-token", 10, 8);
+                "test-internal-token", 10, 8, json);
 
         server.expect(once(), requestTo("http://event-sink/internal/events"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header("X-Internal-Service-Token", "test-internal-token"))
                 .andExpect(header("X-Event-Id", "event-1"))
-                .andExpect(header("X-Event-Type", "PaymentCompleted"))
-                .andExpect(content().json("{\"requestId\":\"pay-1\"}"))
+                .andExpect(header("X-Event-Type", "PaymentCompleted.v1"))
+                .andExpect(header("X-Request-Id", "request-1"))
+                .andExpect(header("X-Trace-Id", "trace-1"))
+                .andExpect(content().json("{\"eventId\":\"event-1\",\"eventType\":\"PaymentCompleted.v1\",\"traceId\":\"trace-1\"}"))
                 .andRespond(withStatus(HttpStatus.SERVICE_UNAVAILABLE));
         relay.publishPending();
         assertThat(jdbc.queryForObject("select status from outbox_event where event_id='event-1'", String.class))
@@ -58,8 +68,10 @@ class OutboxRelayIntegrationTest {
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header("X-Internal-Service-Token", "test-internal-token"))
                 .andExpect(header("X-Event-Id", "event-1"))
-                .andExpect(header("X-Event-Type", "PaymentCompleted"))
-                .andExpect(content().json("{\"requestId\":\"pay-1\"}"))
+                .andExpect(header("X-Event-Type", "PaymentCompleted.v1"))
+                .andExpect(header("X-Request-Id", "request-1"))
+                .andExpect(header("X-Trace-Id", "trace-1"))
+                .andExpect(content().json("{\"eventId\":\"event-1\",\"eventType\":\"PaymentCompleted.v1\",\"traceId\":\"trace-1\"}"))
                 .andRespond(withSuccess());
         relay.publishPending();
         assertThat(jdbc.queryForObject("select status from outbox_event where event_id='event-1'", String.class))
@@ -73,7 +85,7 @@ class OutboxRelayIntegrationTest {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
         OutboxRelay relay = new OutboxRelay(JdbcClient.create(dataSource), builder.build(),
-                "http://event-sink/internal/events", "test-internal-token", 10, 3);
+                "http://event-sink/internal/events", "test-internal-token", 10, 3, json);
 
         server.expect(once(), requestTo("http://event-sink/internal/events"))
                 .andExpect(method(HttpMethod.POST))

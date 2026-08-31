@@ -18,9 +18,10 @@ class DeliveryArtifactsTest {
         Path architecture = root.resolve("02_docs/microservices/benefits-finance-service");
         for (String file : List.of("README.md", "service-boundary.md", "service-diagram.mmd",
                 "service-diagram.svg", "openapi.yaml", "database-ownership.md", "cross-service-calls.md",
-                "migration-version-report.md", "traceability.md", "delivery-manifest.md")) {
+                "migration-version-report.md", "before-after-code-diff.md", "traceability.md", "delivery-manifest.md")) {
             assertThat(architecture.resolve(file)).exists().isRegularFile();
         }
+        assertThat(root.resolve("02_docs/microservices/service-acceptance-checklist.md")).exists().isRegularFile();
         for (String file : List.of("README.md", "operations-runbook.md", "deployment-failure-drill.md",
                 "reconciliation-runbook.md")) {
             assertThat(root.resolve("03_devops/microservices/benefits-finance-service").resolve(file)).exists();

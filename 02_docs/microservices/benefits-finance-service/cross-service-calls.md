@@ -2,16 +2,17 @@
 
 | 调用 | 幂等键 | 成功事实 | 超时/失败处理 |
 |---|---|---|---|
-| 报价 | `orderRequestId` | 固化 quoteVersion、金额和有效期 | 返回原报价；缺少快照时报明确不可结算原因 |
+| 报价 | `Idempotency-Key` + `orderRequestId` | 固化 quoteVersion、金额和有效期 | 返回原报价；缺少快照时报明确不可结算原因 |
 | 券预占/核销/释放 | `orderRequestId` | `user_voucher` 条件状态迁移 | 订单失败幂等释放；超时任务回收 |
-| 扣款 | `paymentRequestId` | 余额、负流水、请求、Outbox 同事务 | order-service 先 GET 查询，禁止盲重试新 ID |
-| 退款 | `refundRequestId` | 正向反向流水、余额、Outbox 同事务 | 重复返回原结果；累计退款不得超付 |
+| 扣款 | `Idempotency-Key` + `paymentRequestId` | 余额、负流水、请求、Outbox 同事务 | order-service 先 GET 查询，禁止盲重试新 ID |
+| 退款 | `Idempotency-Key` + `refundRequestId` | 正向反向流水、余额、Outbox 同事务 | 重复返回原结果；累计退款不得超付 |
 | 结算 | `orderId + sellerId` | 商家余额与结算流水同事务 | 并发只有一笔入账 |
 
 内部调用必须设置：
 
 - `X-Internal-Service-Token`：由 Kubernetes Secret 注入。
 - `X-Request-Id`、`X-Trace-Id`：贯穿 order、finance 和消息消费端。
+- 写操作可带 `Idempotency-Key`：同一调用方和路由下，同键同请求重放已持久化响应；同键不同请求返回 `409 IDEMPOTENCY_KEY_REUSED`。业务请求 ID 仍用于资金事实查询与超时恢复。
 - 超时建议：连接 1 秒、读取 3 秒；超时后按业务请求 ID 查询结果。
 
 Outbox 发布失败只影响事件可见性，不回滚已经提交的资金事实；发布器以 1–300 秒
@@ -34,8 +35,9 @@ Outbox 发布失败只影响事件可见性，不回滚已经提交的资金事�
 | 请求头 | 含义 |
 |---|---|
 | `X-Event-Id` | 全局唯一事件 ID；消费方以此去重 |
-| `X-Event-Type` | `PaymentCompleted`、`RefundCompleted`、`SettlementCompleted` 或 `RechargeCompleted` |
+| `X-Event-Type` | `PaymentCompleted.v1` 或 `RefundCompleted.v1`；结算与充值使用 `PaymentCompleted.v1` 及不同通知文本 |
 | `X-Internal-Service-Token` | 集群服务身份 |
+| `X-Request-Id`、`X-Trace-Id` | 与 envelope 中的 request/trace ID 一致，供消费端日志关联 |
 
 契约测试严格校验 HTTP `POST`、内部服务令牌、`X-Event-Id`、`X-Event-Type` 和关键
 JSON 请求体，不使用“任意请求都返回 200”的宽松 stub。
@@ -44,9 +46,14 @@ JSON 请求体，不使用“任意请求都返回 200”的宽松 stub。
 
 ```json
 {
-  "requestId": "pay-9001-1",
-  "orderId": 9001,
-  "transactionId": "5d2c2d1c-233c-4fe2-96c6-a24d1b4c6852"
+  "eventId": "...", "eventType": "PaymentCompleted.v1", "eventVersion": 1,
+  "producer": "benefits-finance-service", "aggregateType": "PAYMENT", "aggregateId": "pay-9001-1",
+  "occurredAt": "2026-08-31T00:00:00Z", "traceId": "trace-...",
+  "payload": {
+    "requestId": "request-...", "recipientUserId": 101, "displayTitle": "支付成功",
+    "displayText": "订单支付已完成", "dedupeKey": "finance:pay-9001-1:PaymentCompleted.v1",
+    "transactionId": "...", "orderId": 9001
+  }
 }
 ```
 
@@ -82,7 +89,8 @@ JSON 请求体，不使用“任意请求都返回 200”的宽松 stub。
 | `CURRENCY` | ConfigMap | `CNY` | 金额币种 |
 | `QUOTE_TTL_SECONDS` | ConfigMap | `300` | 报价有效期 |
 | `RESERVATION_TTL_SECONDS` | ConfigMap | `900` | 券预占有效期 |
-| `OUTBOX_EVENT_SINK_URL` | ConfigMap | 应为集群内事件接收端 | 空值会暂停发布但保留 Outbox；部署验收必须核对非空 |
+| `ORDER_SERVICE_URL` | ConfigMap | `http://segroup8-order:8085` | 订单服务 Kubernetes DNS；当前 finance 仅保留调用契约，未在本 PR 中部署 order 服务 |
+| `OUTBOX_EVENT_SINK_URL` | ConfigMap | `http://messaging:8084/internal/events` | messaging Kubernetes DNS；空值会暂停发布但保留 Outbox |
 | `OUTBOX_POLL_MS`、`OUTBOX_BATCH_SIZE` | ConfigMap | `5000`、`50` | Relay 扫描周期和批量 |
 | `HTTP_CONNECT_TIMEOUT_MS`、`HTTP_READ_TIMEOUT_MS` | ConfigMap | `1000`、`3000` | Outbox HTTP 连接/读取超时 |
 | `APP_VERSION` | ConfigMap | 本地为 `dev`，部署应为不可变镜像 SHA 标签 | `/actuator/info` 版本 |

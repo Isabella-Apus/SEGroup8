@@ -37,10 +37,23 @@ const server = createServer(async (request, response) => {
       return json(response, 400, { code: "EVENT_HEADERS_REQUIRED" });
     }
     const body = await readJson(request);
-    if (typeof body.requestId !== "string" || !body.requestId || typeof body.transactionId !== "string") {
+    if (body.eventId !== eventId || body.eventType !== eventType || body.eventVersion !== 1 ||
+      body.producer !== "benefits-finance-service" || body.aggregateType !== "PAYMENT" ||
+      typeof body.aggregateId !== "string" || !body.aggregateId || typeof body.traceId !== "string" || !body.traceId ||
+      typeof body.occurredAt !== "string" || !body.payload || typeof body.payload !== "object") {
       return json(response, 400, { code: "EVENT_BODY_INVALID" });
     }
-    if (!Number.isSafeInteger(Number(body.orderId))) {
+    const payload = body.payload;
+    if (request.headers["x-trace-id"] !== body.traceId || request.headers["x-request-id"] !== payload.requestId) {
+      return json(response, 400, { code: "EVENT_TRACE_HEADERS_INVALID" });
+    }
+    if (typeof payload.requestId !== "string" || !payload.requestId || typeof payload.transactionId !== "string" ||
+      !payload.transactionId || !Number.isSafeInteger(Number(payload.recipientUserId)) ||
+      typeof payload.displayTitle !== "string" || !payload.displayTitle || typeof payload.displayText !== "string" ||
+      !payload.displayText || typeof payload.dedupeKey !== "string" || !payload.dedupeKey) {
+      return json(response, 400, { code: "EVENT_NOTIFICATION_PAYLOAD_INVALID" });
+    }
+    if (!Number.isSafeInteger(Number(payload.orderId))) {
       return json(response, 400, { code: "EVENT_ORDER_ID_INVALID" });
     }
     received.push({ eventId, eventType, body });
