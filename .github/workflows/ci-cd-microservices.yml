@@ -1,0 +1,66 @@
+name: Catalog Shop Microservice CI/CD
+on:
+  pull_request:
+    paths: ['microservices/catalog-shop-service/**', 'microservices/pom.xml', 'deploy/helm/segroup8/**']
+  push:
+    branches: [main]
+    paths: ['microservices/catalog-shop-service/**', 'microservices/pom.xml', 'deploy/helm/segroup8/**']
+  workflow_dispatch:
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17', cache: maven}
+      - name: Unit, API and migration tests
+        run: mvn -B --no-transfer-progress -f microservices/pom.xml -pl catalog-shop-service -am clean verify
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: {name: catalog-shop-test-reports, path: microservices/catalog-shop-service/target/surefire-reports/**, if-no-files-found: error}
+      - uses: azure/setup-helm@v4
+      - name: Helm lint and render
+        run: |
+          helm lint deploy/helm/segroup8 --set catalogShop.enabled=true --set-string backend.image.repository=test/backend --set-string backend.image.tag=test --set-string frontend.image.repository=test/frontend --set-string frontend.image.tag=test --set-string catalogShop.image.repository=test/catalog-shop --set-string catalogShop.image.tag=test
+          helm template segroup8 deploy/helm/segroup8 --set catalogShop.enabled=true --set-string backend.image.repository=test/backend --set-string backend.image.tag=test --set-string frontend.image.repository=test/frontend --set-string frontend.image.tag=test --set-string catalogShop.image.repository=test/catalog-shop --set-string catalogShop.image.tag=test >/dev/null
+      - uses: actions/upload-artifact@v4
+        with: {name: catalog-shop-jar, path: microservices/catalog-shop-service/target/catalog-shop-service-1.0.0.jar, if-no-files-found: error}
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {name: catalog-shop-jar, path: microservices/catalog-shop-service/target}
+      - uses: docker/login-action@v3
+        with: {registry: '${{ vars.ACR_REGISTRY }}', username: '${{ secrets.ACR_USERNAME }}', password: '${{ secrets.ACR_PASSWORD }}'}
+      - uses: docker/build-push-action@v6
+        with:
+          context: microservices/catalog-shop-service
+          push: true
+          provenance: false
+          sbom: false
+          tags: '${{ vars.ACR_REGISTRY }}/${{ vars.ACR_NAMESPACE }}/catalog-shop:sha-${{ github.sha }}'
+  deploy:
+    if: vars.ENABLE_PRODUCTION_DEPLOY == 'true'
+    needs: publish
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure SSH
+        env: {DEPLOY_SSH_KEY: '${{ secrets.DEPLOY_SSH_KEY }}', DEPLOY_KNOWN_HOSTS: '${{ secrets.DEPLOY_KNOWN_HOSTS }}'}
+        run: |
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+      - name: Atomic Helm upgrade and smoke
+        env: {DEPLOY_HOST: '${{ secrets.DEPLOY_HOST }}', DEPLOY_USER: '${{ secrets.DEPLOY_USER }}', REGISTRY: '${{ vars.ACR_REGISTRY }}', NAMESPACE: '${{ vars.ACR_NAMESPACE }}'}
+        run: |
+          tar -czf /tmp/catalog-shop-chart.tgz deploy/helm/segroup8
+          scp /tmp/catalog-shop-chart.tgz "$DEPLOY_USER@$DEPLOY_HOST:/tmp/catalog-shop-chart.tgz"
+          ssh "$DEPLOY_USER@$DEPLOY_HOST" "tar -xzf /tmp/catalog-shop-chart.tgz -C /tmp && helm upgrade --install segroup8 /tmp/deploy/helm/segroup8 --namespace segroup8 --create-namespace --reuse-values --atomic --wait --timeout 10m --set catalogShop.enabled=true --set-string catalogShop.image.repository=$REGISTRY/$NAMESPACE/catalog-shop --set-string catalogShop.image.tag=sha-$GITHUB_SHA && kubectl -n segroup8 rollout status deployment/segroup8-catalog-shop"

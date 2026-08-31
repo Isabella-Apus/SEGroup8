@@ -1,0 +1,7 @@
+{
+  "service": "catalog-shop-service",
+  "generatedAt": "2026-08-31T09:48:21+08:00",
+  "sourceCommit": "recorded-by-ci",
+  "automated": {"command": "mvn -B -f microservices/pom.xml -pl catalog-shop-service -am clean verify", "tests": 8, "failures": 0, "errors": 0, "skipped": 0, "status": "passed"},
+  "environmentRequired": {"mysql8": "pending", "e2e": "pending", "deployment": "pending", "hpa": "pending"}
+}

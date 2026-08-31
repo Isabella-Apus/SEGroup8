@@ -63,3 +63,23 @@ deployment:
   version: ""
   commit: ""
   buildTime: ""
+
+catalogShop:
+  # Enabled explicitly by the catalog-shop release workflow so the existing
+  # monolith release is not changed before its database Secret is provisioned.
+  enabled: false
+  replicaCount: 2
+  image:
+    repository: ""
+    tag: ""
+    pullPolicy: IfNotPresent
+  secretName: segroup8-catalog-shop-secret
+  outboxTargetUrl: ""
+  resources:
+    requests: {cpu: 200m, memory: 256Mi}
+    limits: {cpu: "1", memory: 768Mi}
+  hpa:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 65
