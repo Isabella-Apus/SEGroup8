@@ -38,7 +38,7 @@ messaging:
       cpu: 500m
       memory: 768Mi
   config:
-    identityServiceUrl: ""
+    identityServiceUrl: http://identity-governance-service:8091
     realtimeAllowedOriginPatterns: ""
     identityConnectTimeoutMs: "2000"
     identityReadTimeoutMs: "3000"

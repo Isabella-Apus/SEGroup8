@@ -33,7 +33,7 @@ springdoc.swagger-ui.path: /swagger-ui.html
 app:
   jwt.secret: ${JWT_SECRET:}
   realtime.allowed-origin-patterns: ${REALTIME_ALLOWED_ORIGIN_PATTERNS:http://localhost:5174}
-  governance.identity-base-url: ${IDENTITY_SERVICE_URL:${GOVERNANCE_BASE_URL:http://127.0.0.1:8080}}
+  governance.identity-base-url: ${IDENTITY_SERVICE_URL:${GOVERNANCE_BASE_URL:http://identity-governance-service:8091}}
   governance.service-token: ${IDENTITY_SERVICE_TOKEN:${INTERNAL_SERVICE_TOKEN:}}
   governance.connect-timeout-ms: ${IDENTITY_CONNECT_TIMEOUT_MS:2000}
   governance.read-timeout-ms: ${IDENTITY_READ_TIMEOUT_MS:3000}
