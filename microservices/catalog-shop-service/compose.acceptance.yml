@@ -1,0 +1,32 @@
+services:
+  mysql:
+    image: mysql:8.4.6
+    environment:
+      MYSQL_DATABASE: catalog_shop_db
+      MYSQL_USER: catalog_shop_app
+      MYSQL_PASSWORD: catalog_shop_app
+      MYSQL_ROOT_PASSWORD: acceptance-root
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+  catalog-shop:
+    image: ${CANDIDATE_IMAGE:-catalog-shop:acceptance}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/catalog_shop_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USERNAME: catalog_shop_app
+      DB_PASSWORD: catalog_shop_app
+      INTERNAL_SERVICE_TOKEN: acceptance-token
+      APP_VERSION: ${APP_VERSION:-acceptance}
+      GIT_COMMIT: ${GIT_COMMIT:-unknown}
+    ports:
+      - "18080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/actuator/health/readiness"]
+      interval: 5s
+      timeout: 3s
+      retries: 30

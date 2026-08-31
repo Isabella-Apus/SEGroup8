@@ -2,9 +2,9 @@
 
 ## 发布
 
-1. 确认 CI 的 Maven、API、migration 和 Helm lint 全部通过。
+1. 确认 CI 的 Maven、分层测试、MySQL Compose smoke 和 Helm lint 全部通过。
 2. 创建 Secret `segroup8-catalog-shop-secret`，键为 `DB_URL`、`DB_USERNAME`、`DB_PASSWORD`、`INTERNAL_SERVICE_TOKEN`；可选注入 `RISK_AUDIT_LLM_API_KEY`，但默认不需要。
-3. 使用不可变 `sha-<git-sha>` 镜像标签执行 `helm upgrade --install segroup8 deploy/helm/segroup8 -n segroup8 --atomic --wait --timeout 10m`。
+3. 使用不可变 `sha-<git-sha>` 镜像标签执行 `.github/scripts/deploy-catalog-shop-k3s.sh`；脚本统一执行原子 Helm upgrade、失败诊断、rollout 和版本/健康/API smoke。
 4. 检查 rollout、readiness、`/actuator/info` 中 commit，并执行分类、搜索、内部快照 smoke。
 
 ## 诊断

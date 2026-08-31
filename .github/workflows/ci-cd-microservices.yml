@@ -1,54 +1,117 @@
-name: Catalog Shop Microservice CI/CD
+name: Catalog Shop Service CI/CD
+
 on:
   pull_request:
-    paths: ['microservices/catalog-shop-service/**', 'microservices/pom.xml', 'deploy/helm/segroup8/**']
+    paths: &catalog-shop-paths
+      - 'microservices/catalog-shop-service/**'
+      - 'microservices/security-contract/**'
+      - 'microservices/pom.xml'
+      - 'frontend/e2e/domain-b/**'
+      - '02_docs/microservices/catalog-shop-service/**'
+      - '03_devops/microservices/catalog-shop-service/**'
+      - '04_tests/microservices/catalog-shop-service/**'
+      - '05_management/microservices/catalog-shop-service/**'
+      - 'deploy/helm/segroup8/**'
+      - '.github/scripts/deploy-catalog-shop-k3s.sh'
+      - '.github/workflows/ci-cd-microservices.yml'
   push:
     branches: [main]
-    paths: ['microservices/catalog-shop-service/**', 'microservices/pom.xml', 'deploy/helm/segroup8/**']
+    paths: *catalog-shop-paths
   workflow_dispatch:
-permissions: {contents: read}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: catalog-shop-service-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  CANDIDATE_IMAGE: catalog-shop:candidate-${{ github.sha }}
+  IMAGE_TAG: sha-${{ github.sha }}
+
 jobs:
   verify:
+    name: Maven, image, Helm and independent smoke
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with: {distribution: temurin, java-version: '17', cache: maven}
-      - name: Unit, API and migration tests
+      - name: Unit, API, contract and migration tests
         run: mvn -B --no-transfer-progress -f microservices/pom.xml -pl catalog-shop-service -am clean verify
-      - uses: actions/upload-artifact@v4
+      - name: Reject cross-domain persistence imports
+        shell: bash
+        run: |
+          if grep -RInE 'identity_governance_db|com\.segroup8\.(identity|order|secondhand|messaging)\..*(Repository|Mapper)' microservices/catalog-shop-service/src/main/java; then
+            echo 'catalog-shop-service must use contracts instead of cross-domain persistence' >&2
+            exit 1
+          fi
+      - name: Build the tested candidate image
+        shell: bash
+        run: |
+          jar_sha="$(sha256sum microservices/catalog-shop-service/target/catalog-shop-service-1.0.0.jar | cut -d' ' -f1)"
+          docker build --build-arg GIT_SHA="$GITHUB_SHA" --build-arg JAR_SHA256="$jar_sha" --tag "$CANDIDATE_IMAGE" microservices/catalog-shop-service
+          test "$(docker image inspect "$CANDIDATE_IMAGE" --format '{{.Config.User}}')" = '10001:10001'
+          test "$(docker image inspect "$CANDIDATE_IMAGE" --format '{{index .Config.Labels "org.opencontainers.image.revision"}}')" = "$GITHUB_SHA"
+      - name: Independent MySQL acceptance smoke
+        shell: bash
+        working-directory: microservices/catalog-shop-service
+        env: {APP_VERSION: '${{ env.IMAGE_TAG }}', GIT_COMMIT: '${{ github.sha }}'}
+        run: |
+          docker compose -f compose.acceptance.yml up -d --wait
+          curl --fail --silent --show-error http://127.0.0.1:18080/actuator/health/readiness
+          curl --fail --silent --show-error http://127.0.0.1:18080/actuator/prometheus >/dev/null
+          curl --fail --silent --show-error http://127.0.0.1:18080/api/category/tree >/dev/null
+      - name: Acceptance diagnostics
+        if: failure()
+        working-directory: microservices/catalog-shop-service
+        run: docker compose -f compose.acceptance.yml logs --no-color
+      - name: Stop acceptance environment
         if: always()
-        with: {name: catalog-shop-test-reports, path: microservices/catalog-shop-service/target/surefire-reports/**, if-no-files-found: error}
+        working-directory: microservices/catalog-shop-service
+        run: docker compose -f compose.acceptance.yml down -v --remove-orphans
       - uses: azure/setup-helm@v4
       - name: Helm lint and render
+        shell: bash
         run: |
-          helm lint deploy/helm/segroup8 --set catalogShop.enabled=true --set-string backend.image.repository=test/backend --set-string backend.image.tag=test --set-string frontend.image.repository=test/frontend --set-string frontend.image.tag=test --set-string catalogShop.image.repository=test/catalog-shop --set-string catalogShop.image.tag=test --set-file mysql.initSchema=backend/src/main/resources/schema.sql
-          helm template segroup8 deploy/helm/segroup8 --set catalogShop.enabled=true --set-string backend.image.repository=test/backend --set-string backend.image.tag=test --set-string frontend.image.repository=test/frontend --set-string frontend.image.tag=test --set-string catalogShop.image.repository=test/catalog-shop --set-string catalogShop.image.tag=test --set-file mysql.initSchema=backend/src/main/resources/schema.sql >/dev/null
+          helm_args=(--set catalogShop.enabled=true --set-string backend.image.repository=test/backend --set-string backend.image.tag=test --set-string frontend.image.repository=test/frontend --set-string frontend.image.tag=test --set-string catalogShop.image.repository=test/catalog-shop --set-string catalogShop.image.tag="$IMAGE_TAG" --set-file mysql.initSchema=backend/src/main/resources/schema.sql)
+          helm lint deploy/helm/segroup8 "${helm_args[@]}"
+          helm template segroup8 deploy/helm/segroup8 "${helm_args[@]}" >/dev/null
+      - name: Save the exact candidate image
+        run: docker save "$CANDIDATE_IMAGE" | gzip > /tmp/catalog-shop-candidate.tar.gz
       - uses: actions/upload-artifact@v4
-        with: {name: catalog-shop-jar, path: microservices/catalog-shop-service/target/catalog-shop-service-1.0.0.jar, if-no-files-found: error}
+        if: always()
+        with: {name: catalog-shop-test-reports, path: 'microservices/catalog-shop-service/target/surefire-reports/**', if-no-files-found: error}
+      - uses: actions/upload-artifact@v4
+        with: {name: catalog-shop-candidate-image, path: /tmp/catalog-shop-candidate.tar.gz, if-no-files-found: error, retention-days: 3}
+
   publish:
+    name: Publish immutable tested image
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: verify
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
-        with: {name: catalog-shop-jar, path: microservices/catalog-shop-service/target}
+        with: {name: catalog-shop-candidate-image, path: /tmp}
+      - run: gunzip -c /tmp/catalog-shop-candidate.tar.gz | docker load
       - uses: docker/login-action@v3
         with: {registry: '${{ vars.ACR_REGISTRY }}', username: '${{ secrets.ACR_USERNAME }}', password: '${{ secrets.ACR_PASSWORD }}'}
-      - uses: docker/build-push-action@v6
-        with:
-          context: microservices/catalog-shop-service
-          push: true
-          provenance: false
-          sbom: false
-          tags: '${{ vars.ACR_REGISTRY }}/${{ vars.ACR_NAMESPACE }}/catalog-shop:sha-${{ github.sha }}'
+      - name: Push the exact verified candidate
+        env: {REGISTRY: '${{ vars.ACR_REGISTRY }}', REGISTRY_NAMESPACE: '${{ vars.ACR_NAMESPACE }}'}
+        run: |
+          target="$REGISTRY/$REGISTRY_NAMESPACE/catalog-shop:$IMAGE_TAG"
+          docker tag "$CANDIDATE_IMAGE" "$target"
+          docker push "$target"
+
   deploy:
-    if: vars.ENABLE_PRODUCTION_DEPLOY == 'true'
+    name: Atomic K3s deployment and smoke
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ENABLE_PRODUCTION_DEPLOY == 'true'
     needs: publish
     runs-on: ubuntu-latest
     environment: production
+    concurrency: {group: segroup8-production-helm, cancel-in-progress: false}
     steps:
       - uses: actions/checkout@v4
       - name: Configure SSH
@@ -58,9 +121,12 @@ jobs:
           printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/id_ed25519"
           chmod 600 "$HOME/.ssh/id_ed25519"
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
-      - name: Atomic Helm upgrade and smoke
-        env: {DEPLOY_HOST: '${{ secrets.DEPLOY_HOST }}', DEPLOY_USER: '${{ secrets.DEPLOY_USER }}', REGISTRY: '${{ vars.ACR_REGISTRY }}', NAMESPACE: '${{ vars.ACR_NAMESPACE }}'}
+      - name: Upload chart and deployment script
+        env: {DEPLOY_HOST: '${{ secrets.DEPLOY_HOST }}', DEPLOY_USER: '${{ secrets.DEPLOY_USER }}'}
         run: |
-          tar -czf /tmp/catalog-shop-chart.tgz deploy/helm/segroup8
-          scp /tmp/catalog-shop-chart.tgz "$DEPLOY_USER@$DEPLOY_HOST:/tmp/catalog-shop-chart.tgz"
-          ssh "$DEPLOY_USER@$DEPLOY_HOST" "tar -xzf /tmp/catalog-shop-chart.tgz -C /tmp && helm upgrade --install segroup8 /tmp/deploy/helm/segroup8 --namespace segroup8 --create-namespace --reuse-values --atomic --wait --timeout 10m --set catalogShop.enabled=true --set-string catalogShop.image.repository=$REGISTRY/$NAMESPACE/catalog-shop --set-string catalogShop.image.tag=sha-$GITHUB_SHA && kubectl -n segroup8 rollout status deployment/segroup8-catalog-shop"
+          tar -czf "/tmp/catalog-shop-chart-${GITHUB_SHA}.tgz" deploy/helm/segroup8
+          scp "/tmp/catalog-shop-chart-${GITHUB_SHA}.tgz" "$DEPLOY_USER@$DEPLOY_HOST:/tmp/catalog-shop-chart-${GITHUB_SHA}.tgz"
+          scp .github/scripts/deploy-catalog-shop-k3s.sh "$DEPLOY_USER@$DEPLOY_HOST:/tmp/deploy-catalog-shop-${GITHUB_SHA}.sh"
+      - name: Atomic Helm upgrade and post-deploy smoke
+        env: {DEPLOY_HOST: '${{ secrets.DEPLOY_HOST }}', DEPLOY_USER: '${{ secrets.DEPLOY_USER }}', REGISTRY: '${{ vars.ACR_REGISTRY }}', REGISTRY_NAMESPACE: '${{ vars.ACR_NAMESPACE }}'}
+        run: ssh "$DEPLOY_USER@$DEPLOY_HOST" "bash /tmp/deploy-catalog-shop-${GITHUB_SHA}.sh ${GITHUB_SHA} /tmp/catalog-shop-chart-${GITHUB_SHA}.tgz ${REGISTRY} ${REGISTRY_NAMESPACE} ${IMAGE_TAG} segroup8"
