@@ -8,7 +8,7 @@
 | Helm | `deploy/helm/segroup8/` | 已交付 |
 | CI/CD | `.github/workflows/ci-cd-microservices.yml` | 独立命名工作流已交付，远端运行待 PR |
 | 独立服务 E2E | `microservices/benefits-finance-service/compose.acceptance.yml`、`frontend/e2e/microservices/benefits-finance-service-api.spec.ts` | 候选镜像 + 独立 MySQL 8.4.6 + 严格事件 stub，3/3 PASS |
-| Domain E E2E | `frontend/e2e/domain-e/` | 候选镜像接入健康的 frontend/backend/database Compose，UC21–UC23 及 UC12/14 协作 3/3 PASS |
+| Domain E E2E | `frontend/e2e/domain-e/` | 健康的最新主线 frontend/backend/database Compose，UC21–UC23 及 UC12/14 协作 3/3 PASS；作为平台兼容性回归，不声称其浏览器流量路由到候选服务 |
 | 测试证据 | `04_tests/microservices/benefits-finance-service/` | 服务 25/25、安全契约 5/5、MySQL Testcontainers 4/4、两组 Playwright 各 3/3 PASS |
 | 管理证据 | `05_management/microservices/benefits-finance-service/` | 模板已交付，负责人/PR/Review 待团队填写 |
 

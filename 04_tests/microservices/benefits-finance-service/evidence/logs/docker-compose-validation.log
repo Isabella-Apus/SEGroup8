@@ -1,17 +1,20 @@
-2026-08-31T14:40:00+08:00
+2026-08-31T15:31:00+08:00
 docker.desktop=4.67.0
 docker.engine=29.3.1
 docker.api=1.54
 candidate.image=segroup8/benefits-finance:e2e
-candidate.image.id=sha256:9d4d6a96a181b64b7544d090d2bfaacdecec310c1ace88c987d38ab278b1d778
-candidate.jar.sha256=f00b91f15da4e84a1c9ebc0f7b827f240c82161f20e82846a0cd18a6b930e8a7
+candidate.revision=eca9b25a2c0ad6a17ad813446b67a23fcd72fcb0
+candidate.image.id=sha256:98a5553e4aa4942d0160d1315706a455739486bd8ffb35d6e8745d86a4c3d426
+candidate.jar.sha256=29e926346b399e2fc40073fc1c40779180cda535aecb515eca4b027c570821b9
 candidate.user=10001:10001
 independent.compose=benefits-finance+mysql:8.4.6
-independent.e2e.tests=3 passed=3 failed=0 skipped=0 duration=1.9s
+independent.e2e.tests=3 passed=3 failed=0 skipped=0 duration=1.5s
 platform.compose.project=segroup8-platform
 compose.frontend=healthy port=8088
 compose.backend=healthy port=8089
 compose.database=healthy port=3307
 e2e.baseUrl=http://127.0.0.1:8088
 e2e.command=npx playwright test e2e/domain-e/uc21-voucher-lifecycle.spec.ts e2e/domain-e/uc22-claim-checkout.spec.ts e2e/domain-e/uc23-wallet-settlement.spec.ts --workers=1
-e2e.tests=3 passed=3 failed=0 skipped=0 duration=6.6s
+e2e.scope=full-system UI regression; candidate is independently accepted above and is not browser-routed by this Compose stack
+e2e.tests=3 passed=3 failed=0 skipped=0 duration=16.4s
+helm.static=PASS lint=1/1 template=PASS

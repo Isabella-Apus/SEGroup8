@@ -1,10 +1,10 @@
-<testsuites id="" name="" tests="3" failures="0" skipped="0" errors="0" time="1.873599">
-<testsuite name="microservices\benefits-finance-service-api.spec.ts" timestamp="2026-08-31T06:37:34.629Z" hostname="" tests="3" failures="0" skipped="0" time="1.178" errors="0">
-<testcase name="runtime, contract and security gates are enforced by the candidate image" classname="microservices\benefits-finance-service-api.spec.ts" time="0.391">
+<testsuites id="" name="" tests="3" failures="0" skipped="0" errors="0" time="1.5365419999999999">
+<testsuite name="microservices\benefits-finance-service-api.spec.ts" timestamp="2026-08-31T07:31:44.246Z" hostname="" tests="3" failures="0" skipped="0" time="0.985" errors="0">
+<testcase name="runtime, contract and security gates are enforced by the candidate image" classname="microservices\benefits-finance-service-api.spec.ts" time="0.427">
 </testcase>
-<testcase name="UC21 and UC22 voucher lifecycle runs against the independent candidate" classname="microservices\benefits-finance-service-api.spec.ts" time="0.267">
+<testcase name="UC21 and UC22 voucher lifecycle runs against the independent candidate" classname="microservices\benefits-finance-service-api.spec.ts" time="0.304">
 </testcase>
-<testcase name="UC23 with UC12 and UC14 preserves idempotent money facts and strict events" classname="microservices\benefits-finance-service-api.spec.ts" time="0.52">
+<testcase name="UC23 with UC12 and UC14 preserves idempotent money facts and strict events" classname="microservices\benefits-finance-service-api.spec.ts" time="0.254">
 </testcase>
 </testsuite>
 </testsuites>

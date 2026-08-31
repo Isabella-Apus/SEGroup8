@@ -1,3 +1,3 @@
-NAME                                                      IMAGE                           COMMAND                  SERVICE            CREATED              STATUS                        PORTS
-segroup8-benefits-finance-acceptance-benefits-finance-1   segroup8/benefits-finance:e2e   "java -XX:MaxRAMPerc…"   benefits-finance   About a minute ago   Up About a minute (healthy)   0.0.0.0:18085->8085/tcp, [::]:18085->8085/tcp
-segroup8-benefits-finance-acceptance-database-1           mysql:8.4.6                     "docker-entrypoint.s…"   database           About a minute ago   Up About a minute (healthy)   3306/tcp, 33060/tcp
+NAME                                                      IMAGE                           COMMAND                  SERVICE            CREATED          STATUS                    PORTS
+segroup8-benefits-finance-acceptance-benefits-finance-1   segroup8/benefits-finance:e2e   "java -XX:MaxRAMPerc…"   benefits-finance   17 seconds ago   Up 5 seconds (healthy)    0.0.0.0:18085->8085/tcp, [::]:18085->8085/tcp
+segroup8-benefits-finance-acceptance-database-1           mysql:8.4.6                     "docker-entrypoint.s…"   database           17 seconds ago   Up 16 seconds (healthy)   3306/tcp, 33060/tcp

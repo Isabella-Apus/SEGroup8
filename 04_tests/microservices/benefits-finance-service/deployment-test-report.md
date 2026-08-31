@@ -2,7 +2,7 @@
 
 本地完成：Dockerfile、Helm 模板、liveness/readiness/info 配置和原子发布工作流静态交付；`DeliveryArtifactsTest` 已解析 OpenAPI、Chart、values、CI YAML 与 SVG。CI 还会执行 `helm lint`、`helm template`，并把渲染结果作为镜像构建前门禁和原始 artifact。
 
-本地候选镜像验证状态：`PASS`。Docker Desktop 4.67.0 / Engine 29.3.1 可用；镜像用户 `10001:10001`，healthcheck、revision/source/JAR hash 标签和 `/actuator/info` 均已检查。独立候选镜像 Compose（服务 + MySQL 8.4.6）与平台 Compose（frontend/backend/database 均 healthy）两条路径均完成，Playwright 各 3/3 PASS。原始证据位于 `evidence/{independent-e2e,compose-e2e}/`。
+本地候选镜像验证状态：`PASS`。Docker Desktop 4.67.0 / Engine 29.3.1 可用；镜像用户 `10001:10001`，healthcheck、revision/source/JAR hash 标签和 `/actuator/info` 均已检查。候选镜像独立 Compose（服务 + MySQL 8.4.6 + 严格事件 stub）API E2E 为 3/3 PASS；平台 Compose（frontend/backend/database 均 healthy）Domain E UI 回归也为 3/3 PASS。后者是共用平台兼容性回归，不声称浏览器流量已路由到候选服务。`helm lint` 和带共享 values 的 `helm template` 均已本地实际通过。原始证据位于 `evidence/{independent-e2e,compose-e2e}/`。
 
 Helm 静态验证由本地自动化测试解析 Chart/values/template；迁移到最新 main 后将再次执行 `helm lint`/`helm template`。真实 Kubernetes 集群状态：`NOT_RUN`。待 CI/测试集群记录：
 

@@ -1,4 +1,4 @@
-2026-08-31T14:34:08+08:00
+2026-08-31T15:28:16+08:00
 command=mvn -B --no-transfer-progress -f microservices/pom.xml -pl benefits-finance-service -am clean verify
 testcontainers.version=1.21.4
 docker.host=npipe:////./pipe/docker_engine

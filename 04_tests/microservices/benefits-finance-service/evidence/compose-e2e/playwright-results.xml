@@ -1,14 +1,29 @@
-<testsuites id="" name="" tests="3" failures="0" skipped="0" errors="0" time="6.597003000000001">
-<testsuite name="domain-e\uc21-voucher-lifecycle.spec.ts" timestamp="2026-08-31T06:35:33.804Z" hostname="" tests="1" failures="0" skipped="0" time="1.816" errors="0">
-<testcase name="@DOMAIN_E @UC21 voucher lifecycle › seller creates, updates, lists and closes a voucher in the extracted service" classname="domain-e\uc21-voucher-lifecycle.spec.ts" time="1.816">
+<testsuites id="" name="" tests="3" failures="0" skipped="0" errors="0" time="17.717381">
+<testsuite name="domain-e\uc21-voucher-lifecycle.spec.ts" timestamp="2026-08-31T07:29:28.657Z" hostname="" tests="1" failures="0" skipped="0" time="7.209" errors="0">
+<testcase name="@DOMAIN_E @UC21 voucher lifecycle › seller creates, edits and closes a voucher through the real UI" classname="domain-e\uc21-voucher-lifecycle.spec.ts" time="7.209">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-e-uc21-voucher-life-90344-voucher-through-the-real-UI\attachments\uc21-voucher-closed-after-refresh-167e7c84089c096ef9c0438b17f3ad4e38b50939.png]]
+]]>
+</system-out>
 </testcase>
 </testsuite>
-<testsuite name="domain-e\uc22-claim-checkout.spec.ts" timestamp="2026-08-31T06:35:33.804Z" hostname="" tests="1" failures="0" skipped="0" time="1.823" errors="0">
-<testcase name="@DOMAIN_E @UC22 claim and checkout eligibility › claimed voucher is quoted, reserved and consumed by the extracted service" classname="domain-e\uc22-claim-checkout.spec.ts" time="1.823">
+<testsuite name="domain-e\uc22-claim-checkout.spec.ts" timestamp="2026-08-31T07:29:28.657Z" hostname="" tests="1" failures="0" skipped="0" time="4.669" errors="0">
+<testcase name="@DOMAIN_E @UC22 voucher claim and checkout › buyer claims and uses a voucher in a paid order through the real UI" classname="domain-e\uc22-claim-checkout.spec.ts" time="4.669">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-e-uc22-claim-checko-77076-d-order-through-the-real-UI\attachments\uc22-voucher-used-after-paid-order-refresh-ccf374df56aaf3341d40c9cce4d852a5d2c8756a.png]]
+]]>
+</system-out>
 </testcase>
 </testsuite>
-<testsuite name="domain-e\uc23-wallet-settlement.spec.ts" timestamp="2026-08-31T06:35:33.804Z" hostname="" tests="1" failures="0" skipped="0" time="1.462" errors="0">
-<testcase name="@DOMAIN_E @UC23 @UC12 @UC14 wallet, payment, refund and settlement › money movements persist once and seller receives the settlement" classname="domain-e\uc23-wallet-settlement.spec.ts" time="1.462">
+<testsuite name="domain-e\uc23-wallet-settlement.spec.ts" timestamp="2026-08-31T07:29:28.657Z" hostname="" tests="1" failures="0" skipped="0" time="3.778" errors="0">
+<testcase name="@DOMAIN_E @UC23 wallet and settlement › buyer recharges and seller receives one persisted business settlement" classname="domain-e\uc23-wallet-settlement.spec.ts" time="3.778">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\domain-e-uc23-wallet-settl-dfc90-rsisted-business-settlement\attachments\uc23-business-settlement-after-refresh-fe7a31f3beb96d354c8a5a421ffc3feb883da05e.png]]
+]]>
+</system-out>
 </testcase>
 </testsuite>
 </testsuites>
