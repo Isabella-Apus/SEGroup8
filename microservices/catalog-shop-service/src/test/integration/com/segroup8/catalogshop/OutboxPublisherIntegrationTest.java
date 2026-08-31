@@ -24,10 +24,16 @@ class OutboxPublisherIntegrationTest {
     @Test
     void sendsMessagingEnvelopeWithInternalToken() throws Exception {
         AtomicReference<String> token=new AtomicReference<>();
+        AtomicReference<String> requestId=new AtomicReference<>();
+        AtomicReference<String> standardIdempotency=new AtomicReference<>();
+        AtomicReference<String> legacyIdempotency=new AtomicReference<>();
         AtomicReference<JsonNode> received=new AtomicReference<>();
         HttpServer server=HttpServer.create(new InetSocketAddress("127.0.0.1",0),0);
         server.createContext("/internal/events",exchange->{
             token.set(exchange.getRequestHeaders().getFirst("X-Internal-Service-Token"));
+            requestId.set(exchange.getRequestHeaders().getFirst("X-Request-Id"));
+            standardIdempotency.set(exchange.getRequestHeaders().getFirst("Idempotency-Key"));
+            legacyIdempotency.set(exchange.getRequestHeaders().getFirst("X-Idempotency-Key"));
             received.set(json.readTree(exchange.getRequestBody()));
             exchange.sendResponseHeaders(204,-1);exchange.close();
         });
@@ -38,6 +44,9 @@ class OutboxPublisherIntegrationTest {
             JsonNode envelope=received.get();
             assertNotNull(envelope);
             assertEquals("service-secret",token.get());
+            assertEquals("evt-envelope",requestId.get());
+            assertEquals("evt-envelope",standardIdempotency.get());
+            assertEquals("evt-envelope",legacyIdempotency.get());
             assertEquals("evt-envelope",envelope.path("eventId").asText());
             assertEquals("NotificationRequested.v1",envelope.path("eventType").asText());
             assertEquals(1,envelope.path("eventVersion").asInt());

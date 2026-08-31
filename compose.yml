@@ -139,17 +139,14 @@ services:
     restart: unless-stopped
     ports:
       - "${FRONTEND_HOST_PORT:-8088}:80"
-    # The shared Compose E2E stack still runs the monolith as its only API
-    # service. Production images keep the messaging upstream from the image;
-    # this mount provides the explicit local/CI compatibility routing so nginx
-    # does not resolve a service that this stack does not create.
+    # The shared Compose E2E stack is the monolith compatibility baseline.
+    # Service-specific candidate routing is exercised by each service's own
+    # acceptance Compose file; production split routing is owned by Ingress.
     volumes:
       - ./frontend/docker/nginx.compose.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       backend:
         condition: service_healthy
-      catalog-seed:
-        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1/health"]
       interval: 10s
@@ -164,6 +161,6 @@ networks:
 
 volumes:
   mysql_data:
-    name: segroup8-platform-mysql-data
+    name: ${PLATFORM_MYSQL_VOLUME_NAME:-segroup8-platform-mysql-data}
   catalog_mysql_data:
-    name: segroup8-catalog-shop-mysql-data
+    name: ${CATALOG_MYSQL_VOLUME_NAME:-segroup8-catalog-shop-mysql-data}

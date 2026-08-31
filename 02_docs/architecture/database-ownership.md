@@ -52,7 +52,7 @@
 
 ## 3. 六个服务当前 Flyway 物理表
 
-以下清单以六个微服务合并后的迁移脚本为准。2026-08-31 重新扫描全部 `CREATE TABLE` 后，六个服务分别为 10、10、8、11、8、8 张，共 55 张物理表，与本表逐项一致。相比 33 张单体逻辑表，增加的是服务自治所需的预留、Saga、Inbox/Outbox、幂等、投影、报价和支付请求等表。
+以下清单以六个微服务合并后的迁移脚本为准。2026-09-01 在合并后主线重新扫描全部 `CREATE TABLE`，六个服务分别为 10、10、8、11、8、8 张，共 55 张物理表，与本表逐项一致；同时扫描六个服务的生产源码，未发现其他五个 schema 的限定名引用。相比 33 张单体逻辑表，增加的是服务自治所需的预留、Saga、Inbox/Outbox、幂等、投影、报价和支付请求等表。
 
 | 服务 / schema | 当前物理表 | 归属结论 |
 |---|---|---|
@@ -91,6 +91,8 @@
 | 通知投递 | 各生产者发送完整 `EventEnvelope`；messaging Inbox 去重 | 通知失败不回滚已完成业务；Outbox 重试并记录错误 | eventId、producer、dedupeKey |
 
 统一事件信封至少包含 `eventId`、`eventType`、`eventVersion`、`producer`、`aggregateType`、`aggregateId`、`occurredAt`、`traceId` 和对象型 `payload`。HTTP 内部调用统一携带 `X-Internal-Service-Token`、`X-Request-Id`；写操作同时携带 `X-Idempotency-Key`（兼容阶段可并发发送 `Idempotency-Key`）。
+
+2026-09-01 合并后契约审计已统一 producer 侧行为：Order→Catalog/Finance、Catalog/Finance/Secondhand/Identity→Messaging 的写请求同时发送标准与兼容幂等头；Messaging→Identity 的同一逻辑调用在有界重试期间复用同一个请求 ID 和幂等键。二手建单仍以 `tradeType:tradeId` 为唯一业务键，查询失败代表结果不确定，不能解冻商品或发布失败事件。
 
 ## 6. 数据关系图
 

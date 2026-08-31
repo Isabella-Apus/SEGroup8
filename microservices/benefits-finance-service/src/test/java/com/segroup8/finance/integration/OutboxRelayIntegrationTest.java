@@ -54,6 +54,8 @@ class OutboxRelayIntegrationTest {
                 .andExpect(header("X-Event-Type", "PaymentCompleted.v1"))
                 .andExpect(header("X-Request-Id", "request-1"))
                 .andExpect(header("X-Trace-Id", "trace-1"))
+                .andExpect(header("Idempotency-Key", "event-1"))
+                .andExpect(header("X-Idempotency-Key", "event-1"))
                 .andExpect(content().json("{\"eventId\":\"event-1\",\"eventType\":\"PaymentCompleted.v1\",\"traceId\":\"trace-1\"}"))
                 .andRespond(withStatus(HttpStatus.SERVICE_UNAVAILABLE));
         relay.publishPending();
@@ -71,6 +73,8 @@ class OutboxRelayIntegrationTest {
                 .andExpect(header("X-Event-Type", "PaymentCompleted.v1"))
                 .andExpect(header("X-Request-Id", "request-1"))
                 .andExpect(header("X-Trace-Id", "trace-1"))
+                .andExpect(header("Idempotency-Key", "event-1"))
+                .andExpect(header("X-Idempotency-Key", "event-1"))
                 .andExpect(content().json("{\"eventId\":\"event-1\",\"eventType\":\"PaymentCompleted.v1\",\"traceId\":\"trace-1\"}"))
                 .andRespond(withSuccess());
         relay.publishPending();

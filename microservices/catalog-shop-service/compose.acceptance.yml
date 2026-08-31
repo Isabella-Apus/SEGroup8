@@ -62,6 +62,8 @@ services:
     command: ["sh", "-c", "mysql -hmysql -uroot catalog_shop_db < /seed/catalog-shop.sql"]
   frontend:
     image: ${ACCEPTANCE_FRONTEND_IMAGE:-catalog-shop-frontend:acceptance}
+    volumes:
+      - ../../frontend/docker/nginx.catalog-shop.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       catalog-seed:
         condition: service_completed_successfully

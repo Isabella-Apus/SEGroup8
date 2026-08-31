@@ -50,15 +50,15 @@ class DownstreamHttpContractTest {
             gateway.releaseVoucher("voucher-release:cancel-1", 7L, 3L, 1L);
 
             assertThat(calls).contains(
-                    "POST /internal/inventory/reservations reservation:create-1 contract-token",
-                    "POST /internal/checkout/quote quote:create-1 contract-token",
-                    "POST /internal/payments/debit payment:pay-1 contract-token",
-                    "GET /internal/payments/payment:pay-1 - contract-token",
-                    "POST /internal/payments/refund refund:refund-1 contract-token",
-                    "GET /internal/payments/refund:refund-1 - contract-token",
-                    "POST /internal/settlements settlement:receive-1:2 contract-token",
-                    "GET /internal/payments/settlement:receive-1:2 - contract-token",
-                    "POST /internal/vouchers/release voucher-release:cancel-1 contract-token");
+                    "POST /internal/inventory/reservations reservation:create-1 reservation:create-1 reservation:create-1 contract-token",
+                    "POST /internal/checkout/quote quote:create-1 quote:create-1 quote:create-1 contract-token",
+                    "POST /internal/payments/debit payment:pay-1 payment:pay-1 payment:pay-1 contract-token",
+                    "GET /internal/payments/payment:pay-1 - - payment:pay-1 contract-token",
+                    "POST /internal/payments/refund refund:refund-1 refund:refund-1 refund:refund-1 contract-token",
+                    "GET /internal/payments/refund:refund-1 - - refund:refund-1 contract-token",
+                    "POST /internal/settlements settlement:receive-1:2 settlement:receive-1:2 settlement:receive-1:2 contract-token",
+                    "GET /internal/payments/settlement:receive-1:2 - - settlement:receive-1:2 contract-token",
+                    "POST /internal/vouchers/release voucher-release:cancel-1 voucher-release:cancel-1 voucher-release:cancel-1 contract-token");
         } finally {
             server.stop(0);
         }
@@ -66,9 +66,13 @@ class DownstreamHttpContractTest {
 
     private static void respond(HttpExchange exchange, List<String> calls, String body) throws IOException {
         String idempotencyKey = exchange.getRequestHeaders().getFirst("Idempotency-Key");
+        String legacyIdempotencyKey = exchange.getRequestHeaders().getFirst("X-Idempotency-Key");
+        String requestId = exchange.getRequestHeaders().getFirst("X-Request-Id");
         String internalToken = exchange.getRequestHeaders().getFirst("X-Internal-Service-Token");
         calls.add(exchange.getRequestMethod() + " " + exchange.getRequestURI().getPath() + " "
-                + (idempotencyKey == null ? "-" : idempotencyKey) + " " + internalToken);
+                + (idempotencyKey == null ? "-" : idempotencyKey) + " "
+                + (legacyIdempotencyKey == null ? "-" : legacyIdempotencyKey) + " "
+                + (requestId == null ? "-" : requestId) + " " + internalToken);
         exchange.getRequestBody().readAllBytes();
         byte[] bytes = body.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().set("Content-Type", "application/json");

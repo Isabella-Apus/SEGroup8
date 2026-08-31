@@ -8,6 +8,9 @@ mkdir -p "${evidence_root}"
 
 cleanup() {
   local status=$?
+  # Playwright runs from frontend/. Return to the repository before invoking
+  # relative Compose files so failure diagnostics and cleanup always work.
+  cd "${repository_root}" || true
   "${compose[@]}" logs --no-color --timestamps >"${evidence_root}/compose.log" 2>&1 || true
   "${compose[@]}" down --remove-orphans >"${evidence_root}/compose-down.log" 2>&1 || true
   exit "${status}"

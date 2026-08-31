@@ -31,7 +31,9 @@ class HttpDownstreamGateway implements DownstreamGateway {
         try {
             Reservation response = catalog.post().uri("/internal/inventory/reservations")
                     .header("X-Internal-Service-Token", internalToken)
+                    .header("X-Request-Id", reservationId)
                     .header("Idempotency-Key", reservationId)
+                    .header("X-Idempotency-Key", reservationId)
                     .body(Map.of("reservationId", reservationId, "buyerUserId", buyerUserId, "items", items))
                     .retrieve().onStatus(HttpStatusCode::isError, (req, res) -> {
                         throw new OrderException("INVENTORY_RESERVATION_FAILED", "Inventory could not be reserved", 409);
@@ -51,8 +53,12 @@ class HttpDownstreamGateway implements DownstreamGateway {
     @Override public void releaseReservation(String key) { inventoryCommand(key, "release"); }
 
     private void inventoryCommand(String key, String action) {
+        String operationKey = key + ":" + action;
         catalog.post().uri("/internal/inventory/reservations/{id}/" + action, key)
-                .header("X-Internal-Service-Token", internalToken).header("Idempotency-Key", key + ":" + action)
+                .header("X-Internal-Service-Token", internalToken)
+                .header("X-Request-Id", operationKey)
+                .header("Idempotency-Key", operationKey)
+                .header("X-Idempotency-Key", operationKey)
                 .retrieve().toBodilessEntity();
     }
 
@@ -63,7 +69,10 @@ class HttpDownstreamGateway implements DownstreamGateway {
             body.put("orderRequestId", key); body.put("userId", buyerUserId);
             body.put("amount", totalAmount); if (voucherId != null) body.put("voucherId", voucherId);
             FinanceQuote result = finance.post().uri("/internal/checkout/quote")
-                    .header("X-Internal-Service-Token", internalToken).header("Idempotency-Key", key)
+                    .header("X-Internal-Service-Token", internalToken)
+                    .header("X-Request-Id", key)
+                    .header("Idempotency-Key", key)
+                    .header("X-Idempotency-Key", key)
                     .body(body).retrieve().body(FinanceQuote.class);
             return result == null ? new Quote(totalAmount, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)
                     : new Quote(result.payableAmount(), result.discountAmount(), BigDecimal.ZERO,
@@ -101,7 +110,10 @@ class HttpDownstreamGateway implements DownstreamGateway {
     private RemoteResult financeWrite(String uri, String key, Object body) {
         try {
             Map<?, ?> response = finance.post().uri(uri).header("X-Internal-Service-Token", internalToken)
-                    .header("Idempotency-Key", key).body(body).retrieve().body(Map.class);
+                    .header("X-Request-Id", key)
+                    .header("Idempotency-Key", key)
+                    .header("X-Idempotency-Key", key)
+                    .body(body).retrieve().body(Map.class);
             return parse(response);
         } catch (RestClientException ex) {
             return RemoteResult.UNKNOWN;
@@ -111,6 +123,7 @@ class HttpDownstreamGateway implements DownstreamGateway {
     private RemoteResult financeQuery(String uri, String key) {
         try {
             return parse(finance.get().uri(uri, key).header("X-Internal-Service-Token", internalToken)
+                    .header("X-Request-Id", key)
                     .retrieve().body(Map.class));
         } catch (RestClientException ex) {
             return RemoteResult.UNKNOWN;

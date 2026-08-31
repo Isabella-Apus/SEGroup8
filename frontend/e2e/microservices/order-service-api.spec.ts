@@ -89,7 +89,7 @@ test("UC11-UC15 independent order-service acceptance flow", async ({ request }) 
 
 test("UC20 secondhand order uses the same independently deployed fulfillment state machine", async ({ request }) => {
   const createdResponse = await request.post("/internal/orders/secondhand", {
-    headers: internal,
+    headers: { ...internal, "Idempotency-Key": "DIRECT:acceptance-uc20" },
     data: {
       tradeType: "DIRECT",
       tradeId: "acceptance-uc20",
@@ -109,7 +109,7 @@ test("UC20 secondhand order uses the same independently deployed fulfillment sta
   const orderId = Number((await createdResponse.json()).id);
 
   const replay = await request.post("/internal/orders/secondhand", {
-    headers: internal,
+    headers: { ...internal, "Idempotency-Key": "DIRECT:acceptance-uc20" },
     data: {
       tradeType: "DIRECT",
       tradeId: "acceptance-uc20",

@@ -55,6 +55,8 @@ public class MonolithGovernanceBlockAdapter implements GovernanceBlockPort {
         List<Map<String, Object>> pairs = List.of(
                 Map.of("blockerId", actorUserId, "blockedId", targetUserId),
                 Map.of("blockerId", targetUserId, "blockedId", actorUserId));
+        String requestId = UUID.randomUUID().toString();
+        String idempotencyKey = "messaging-block-check-" + requestId;
         RuntimeException lastFailure = null;
         for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
@@ -62,8 +64,9 @@ public class MonolithGovernanceBlockAdapter implements GovernanceBlockPort {
                         .uri("/internal/blocks/check")
                         .header("X-Internal-Service-Token", serviceToken)
                         .header("X-Service-Identity", "messaging-service")
-                        .header("X-Request-Id", UUID.randomUUID().toString())
-                        .header("X-Idempotency-Key", "messaging-block-check-" + UUID.randomUUID())
+                        .header("X-Request-Id", requestId)
+                        .header("Idempotency-Key", idempotencyKey)
+                        .header("X-Idempotency-Key", idempotencyKey)
                         .body(Map.of("pairs", pairs))
                         .retrieve()
                         .body(Map.class);

@@ -66,6 +66,7 @@ class OutboxRelay {
                     .header("X-Internal-Service-Token", serviceToken)
                     .header("X-Event-Id", event.id()).header("X-Event-Type", event.type())
                     .header("X-Request-Id", requestId).header("X-Trace-Id", traceId)
+                    .header("Idempotency-Key", event.id()).header("X-Idempotency-Key", event.id())
                     .body(envelope).retrieve().toBodilessEntity();
             db.sql("update outbox_event set status='PUBLISHED',published_at=current_timestamp,locked_at=null "
                             + "where event_id=:id and status='SENDING'")
