@@ -3,6 +3,7 @@ package com.segroup8.secondhand.service;
 import com.segroup8.secondhand.api.TradeOrderView;
 import com.segroup8.secondhand.client.OrderGateway;
 import com.segroup8.secondhand.client.OrderGateway.OrderReceipt;
+import com.segroup8.secondhand.client.OrderContractException;
 import com.segroup8.secondhand.domain.SecondhandProduct;
 import com.segroup8.secondhand.domain.TradeOrderRequest;
 import com.segroup8.secondhand.repository.AuctionRepository;
@@ -58,6 +59,11 @@ public class TradeOrderCoordinator {
         try {
             OrderReceipt receipt = orderGateway.createSecondhandOrder(request);
             complete(request, receipt);
+        } catch (OrderContractException contractFailure) {
+            log.error("order contract rejected productId={} tradeType={} tradeId={} orderBusinessKey={}",
+                    request.productId(), request.tradeType(), request.tradeId(), request.orderBusinessKey(),
+                    contractFailure);
+            fail(request, rootMessage(contractFailure));
         } catch (RuntimeException createFailure) {
             log.warn("order create failed productId={} tradeType={} tradeId={} orderBusinessKey={}",
                     request.productId(), request.tradeType(), request.tradeId(), request.orderBusinessKey(), createFailure);
@@ -71,15 +77,27 @@ public class TradeOrderCoordinator {
         return requests.findById(requestId).orElseThrow();
     }
 
-    public void recoverPending(int limit) {
-        for (TradeOrderRequest request : requests.findRetryable(limit)) {
+    public RecoverySummary recoverPending(int limit) {
+        var due = requests.findRetryable(limit);
+        int created = 0;
+        int retrying = 0;
+        int failed = 0;
+        for (TradeOrderRequest request : due) {
             try {
-                dispatch(request.id());
+                TradeOrderRequest result = dispatch(request.id());
+                if ("CREATED".equals(result.requestStatus())) created++;
+                else if ("FAILED".equals(result.requestStatus())) failed++;
+                else retrying++;
             } catch (RuntimeException exception) {
+                retrying++;
                 log.error("trade recovery failed productId={} tradeType={} tradeId={} orderBusinessKey={}",
                         request.productId(), request.tradeType(), request.tradeId(), request.orderBusinessKey(), exception);
             }
         }
+        return new RecoverySummary(due.size(), created, retrying, failed);
+    }
+
+    public record RecoverySummary(int scanned, int created, int retrying, int failed) {
     }
 
     public TradeOrderView toView(TradeOrderRequest request) {
@@ -140,6 +158,10 @@ public class TradeOrderCoordinator {
             requests.markRetry(request.id(), error, LocalDateTime.now().plusSeconds(nextAttempt * 2L));
             return;
         }
+        fail(request, error);
+    }
+
+    private void fail(TradeOrderRequest request, String error) {
         transactions.executeWithoutResult(status -> {
             if (requests.markFailed(request.id(), error) == 0) {
                 return;

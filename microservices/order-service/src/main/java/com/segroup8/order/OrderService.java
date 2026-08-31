@@ -76,7 +76,7 @@ class OrderService {
     }
 
     OrderView createSecondhand(SecondhandOrderRequest request) {
-        String businessKey = request.tradeType() + ":" + request.tradeId();
+        String businessKey = request.orderBusinessKey();
         var existing = repository.byBusinessKey(businessKey);
         if (existing.isPresent()) return existing.get();
         try {

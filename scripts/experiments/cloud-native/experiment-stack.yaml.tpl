@@ -136,6 +136,75 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: identity-governance-service
+  namespace: __NAMESPACE__
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: identity-governance-service }
+  template:
+    metadata:
+      labels: { app: identity-governance-service }
+      annotations:
+        experiment.segroup8/jar-sha256: __IDENTITY_JAR_SHA256__
+    spec:
+      securityContext: { runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, fsGroup: 10001 }
+      containers:
+        - name: identity-governance-service
+          image: __BASE_IMAGE__
+          imagePullPolicy: IfNotPresent
+          command: ["java", "-XX:MaxRAMPercentage=75", "-jar", "/app/app.jar"]
+          ports:
+            - { name: http, containerPort: 8091 }
+          env:
+            - { name: SERVER_PORT, value: "8091" }
+            - { name: DB_URL, value: "jdbc:mysql://mysql:3306/identity_governance_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai" }
+            - { name: DB_USERNAME, value: identity_governance_app }
+            - name: DB_PASSWORD
+              valueFrom: { secretKeyRef: { name: experiment-secrets, key: DB_PASSWORD } }
+            - name: JWT_SECRET
+              valueFrom: { secretKeyRef: { name: experiment-secrets, key: JWT_SECRET } }
+            - name: INTERNAL_SERVICE_TOKEN
+              valueFrom: { secretKeyRef: { name: experiment-secrets, key: INTERNAL_SERVICE_TOKEN } }
+            - { name: APP_VERSION, value: "experiment-__RUN_ID__" }
+            - { name: APP_COMMIT, value: "__GIT_COMMIT__" }
+            - { name: TZ, value: Asia/Shanghai }
+          startupProbe:
+            httpGet: { path: /actuator/health/liveness, port: http }
+            periodSeconds: 5
+            failureThreshold: 36
+          readinessProbe:
+            httpGet: { path: /actuator/health/readiness, port: http }
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /actuator/health/liveness, port: http }
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { cpu: 500m, memory: 768Mi }
+          volumeMounts:
+            - name: identity-jar
+              mountPath: /app/app.jar
+              readOnly: true
+      volumes:
+        - name: identity-jar
+          hostPath:
+            path: __HOST_ROOT__/jars/identity-governance-service-1.0.0.jar
+            type: File
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity-governance-service
+  namespace: __NAMESPACE__
+spec:
+  selector: { app: identity-governance-service }
+  ports:
+    - { name: http, port: 8091, targetPort: http }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: order-service
   namespace: __NAMESPACE__
 spec:
@@ -237,10 +306,14 @@ spec:
             - name: INTERNAL_SERVICE_TOKEN
               valueFrom: { secretKeyRef: { name: experiment-secrets, key: INTERNAL_SERVICE_TOKEN } }
             - { name: ORDER_SERVICE_URL, value: "http://order-service:8085" }
+            - { name: IDENTITY_SERVICE_URL, value: "http://identity-governance-service:8091" }
             - { name: ORDER_CONNECT_TIMEOUT, value: "500ms" }
-            - { name: ORDER_READ_TIMEOUT, value: "1s" }
-            - { name: ORDER_MAX_ATTEMPTS, value: "5" }
+            - { name: ORDER_READ_TIMEOUT, value: "3s" }
+            - { name: ORDER_MAX_ATTEMPTS, value: "30" }
+            - { name: IDENTITY_CONNECT_TIMEOUT, value: "500ms" }
+            - { name: IDENTITY_READ_TIMEOUT, value: "3s" }
             - { name: TRADE_RECOVERY_DELAY_MS, value: "2000" }
+            - { name: SCHEDULING_POOL_SIZE, value: "2" }
             - { name: APP_VERSION, value: "experiment-__RUN_ID__" }
             - { name: APP_COMMIT, value: "__GIT_COMMIT__" }
             - { name: TZ, value: Asia/Shanghai }

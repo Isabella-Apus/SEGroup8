@@ -8,6 +8,11 @@ import com.segroup8.secondhand.api.NegotiationView;
 import com.segroup8.secondhand.api.TradeOrderView;
 import com.segroup8.secondhand.common.DomainException;
 import com.segroup8.secondhand.common.PageResponse;
+import com.segroup8.secondhand.client.IdentityAddressNotFoundException;
+import com.segroup8.secondhand.client.IdentityGateway;
+import com.segroup8.secondhand.client.IdentityGateway.AddressSnapshot;
+import com.segroup8.secondhand.client.IdentityServiceUnavailableException;
+import com.segroup8.secondhand.domain.OrderCreationSnapshot;
 import com.segroup8.secondhand.domain.ProductAuction;
 import com.segroup8.secondhand.domain.ProductNegotiation;
 import com.segroup8.secondhand.domain.SecondhandProduct;
@@ -38,12 +43,14 @@ public class TradeApplicationService {
     private final IdempotencyRepository idempotency;
     private final OutboxRepository outbox;
     private final TradeOrderCoordinator coordinator;
+    private final IdentityGateway identityGateway;
     private final TransactionTemplate transactions;
 
     public TradeApplicationService(ProductRepository products, NegotiationRepository negotiations,
             AuctionRepository auctions, TradeOrderRequestRepository requests,
             IdempotencyRepository idempotency, OutboxRepository outbox,
-            TradeOrderCoordinator coordinator, TransactionTemplate transactions) {
+            TradeOrderCoordinator coordinator, IdentityGateway identityGateway,
+            TransactionTemplate transactions) {
         this.products = products;
         this.negotiations = negotiations;
         this.auctions = auctions;
@@ -51,6 +58,7 @@ public class TradeApplicationService {
         this.idempotency = idempotency;
         this.outbox = outbox;
         this.coordinator = coordinator;
+        this.identityGateway = identityGateway;
         this.transactions = transactions;
     }
 
@@ -75,7 +83,7 @@ public class TradeApplicationService {
             String tradeId = productId + "-v" + (product.version() + 1);
             TradeOrderRequest created = requests.createOrFind("DIRECT_BUY", tradeId,
                     businessKey("DIRECT_BUY", tradeId), productId, buyerId, product.sellerUserId(),
-                    product.salePrice(), addressId, remark);
+                    product.salePrice(), orderSnapshot(product, buyerId, addressId), remark);
             appendOrderRequested(created);
             return created;
         });
@@ -140,7 +148,8 @@ public class TradeApplicationService {
             }
             String tradeId = String.valueOf(negotiation.id());
             TradeOrderRequest created = requests.createOrFind("BARGAIN", tradeId, businessKey("BARGAIN", tradeId),
-                    product.id(), negotiation.buyerUserId(), sellerId, command.confirmedPrice(), null,
+                    product.id(), negotiation.buyerUserId(), sellerId, command.confirmedPrice(),
+                    orderSnapshot(product, negotiation.buyerUserId(), null),
                     "议价确认生成二手待付款订单");
             appendOrderRequested(created);
             return created;
@@ -311,6 +320,7 @@ public class TradeApplicationService {
             if (auctions.beginSettlement(auction) == 0) {
                 throw DomainException.conflict("AUCTION_CONFLICT", "拍卖状态已变化");
             }
+            SecondhandProduct product = requireProduct(auction.productId());
             if (products.compareAndSetStatus(auction.productId(), SecondhandProduct.ON_SHELF,
                     SecondhandProduct.TRADE_PENDING) == 0) {
                 throw DomainException.conflict("PRODUCT_STATE_CONFLICT", "商品状态已变化，不能结算拍卖");
@@ -318,7 +328,8 @@ public class TradeApplicationService {
             String tradeId = String.valueOf(auction.id());
             TradeOrderRequest created = requests.createOrFind("AUCTION", tradeId, businessKey("AUCTION", tradeId),
                     auction.productId(), auction.currentBidderUserId(), auction.sellerUserId(),
-                    auction.currentPrice(), null, "拍卖成交生成二手待付款订单");
+                    auction.currentPrice(), orderSnapshot(product, auction.currentBidderUserId(), null),
+                    "拍卖成交生成二手待付款订单");
             appendOrderRequested(created);
             return created;
         });
@@ -337,6 +348,22 @@ public class TradeApplicationService {
                 negotiation.sellerUserId(), negotiation.proposedPrice(), negotiation.confirmedPrice(),
                 negotiation.status(), negotiation.effectiveFrom(), negotiation.effectiveUntil(),
                 negotiation.usedOrderId(), request == null ? null : request.requestStatus());
+    }
+
+    private OrderCreationSnapshot orderSnapshot(SecondhandProduct product, long buyerId, Long addressId) {
+        try {
+            AddressSnapshot address = identityGateway.resolveAddress(buyerId, addressId);
+            if (address.userId() != buyerId) {
+                throw new IdentityAddressNotFoundException("address ownership mismatch");
+            }
+            return new OrderCreationSnapshot(address.addressId(), product.name(), address.receiverName(),
+                    address.receiverPhone(), address.province(), address.city(), address.detailAddress());
+        } catch (IdentityAddressNotFoundException notFound) {
+            throw DomainException.badRequest("ADDRESS_INVALID", "收货地址不存在或不属于当前买家");
+        } catch (IdentityServiceUnavailableException unavailable) {
+            throw DomainException.unavailable("IDENTITY_SERVICE_UNAVAILABLE",
+                    "收货地址暂时无法确认，请稍后重试");
+        }
     }
 
     private AuctionView toAuctionView(ProductAuction auction) {

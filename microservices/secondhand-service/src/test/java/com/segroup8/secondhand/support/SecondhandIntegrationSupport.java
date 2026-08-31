@@ -1,11 +1,14 @@
 package com.segroup8.secondhand.support;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import com.segroup8.secondhand.client.OrderGateway;
 import com.segroup8.secondhand.client.OrderGateway.OrderReceipt;
+import com.segroup8.secondhand.client.IdentityGateway;
+import com.segroup8.secondhand.client.IdentityGateway.AddressSnapshot;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +25,7 @@ public abstract class SecondhandIntegrationSupport {
     @Autowired protected MockMvc mvc;
     @Autowired protected JdbcTemplate db;
     @MockBean protected OrderGateway orderGateway;
+    @MockBean protected IdentityGateway identityGateway;
     private final AtomicLong orderSequence = new AtomicLong(1000);
 
     @BeforeEach
@@ -34,6 +38,12 @@ public abstract class SecondhandIntegrationSupport {
         db.update("delete from idempotency_record");
         db.update("delete from secondhand_product");
         when(orderGateway.findByBusinessKey(anyString())).thenReturn(Optional.empty());
+        when(identityGateway.resolveAddress(anyLong(), any())).thenAnswer(invocation -> {
+            long userId = invocation.getArgument(0);
+            Long addressId = invocation.getArgument(1);
+            return new AddressSnapshot(addressId == null ? 1L : addressId, userId, "Buyer",
+                    "13800008000", "Zhejiang", "Hangzhou", "West Lake Road 1");
+        });
         when(orderGateway.createSecondhandOrder(any())).thenAnswer(invocation -> {
             long id = orderSequence.incrementAndGet();
             return new OrderReceipt(id, "ORD" + id, "PENDING_PAY");

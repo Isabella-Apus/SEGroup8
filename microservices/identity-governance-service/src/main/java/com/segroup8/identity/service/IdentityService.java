@@ -118,6 +118,16 @@ public class IdentityService {
                 + "FROM address WHERE user_id=? ORDER BY is_default DESC,id", CurrentUser.require().userId());
     }
 
+    public Map<String, Object> addressSnapshot(long userId, Long addressId) {
+        String columns = "SELECT id,user_id,receiver_name,receiver_phone,province,city,detail_address "
+                + "FROM address WHERE user_id=? ";
+        Optional<Map<String, Object>> address = addressId == null
+                ? one(columns + "ORDER BY is_default DESC,id LIMIT 1", userId)
+                : one(columns + "AND id=? LIMIT 1", userId, addressId);
+        return address.orElseThrow(() -> new ApiException(404,
+                addressId == null ? "用户没有可用收货地址" : "收货地址不存在或不属于该用户"));
+    }
+
     @Transactional
     public void addAddress(Map<String, Object> request) {
         long userId = CurrentUser.require().userId();

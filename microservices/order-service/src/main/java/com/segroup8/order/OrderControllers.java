@@ -282,12 +282,15 @@ class InternalOrderController {
     }
 
     @PostMapping("/secondhand")
-    OrderView secondhand(@Valid @RequestBody SecondhandOrderRequest request) { return service.createSecondhand(request); }
+    ApiResponse<SecondhandOrderReceipt> secondhand(@Valid @RequestBody SecondhandOrderRequest request) {
+        return ApiResponse.success(ApiModels.secondhandReceipt(service.createSecondhand(request)));
+    }
 
     @GetMapping("/by-business-key/{key}")
-    OrderView byKey(@PathVariable String key) {
-        return repository.byBusinessKey(key)
+    ApiResponse<SecondhandOrderReceipt> byKey(@PathVariable String key) {
+        OrderView order = repository.byBusinessKey(key)
                 .orElseThrow(() -> new OrderException("ORDER_NOT_FOUND", "Order does not exist", 404));
+        return ApiResponse.success(ApiModels.secondhandReceipt(order));
     }
 
     @GetMapping("/{id}/snapshot")

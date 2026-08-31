@@ -33,6 +33,7 @@ services:
       JWT_SECRET: test-jwt-secret-must-have-at-least-thirty-two-bytes
       INTERNAL_SERVICE_TOKEN: acceptance-internal-token
       ORDER_SERVICE_URL: http://host.docker.internal:18085
+      IDENTITY_SERVICE_URL: http://host.docker.internal:18085
       APP_VERSION: acceptance
       APP_COMMIT: acceptance
       APP_BUILD_TIME: acceptance

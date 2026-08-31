@@ -27,10 +27,15 @@ public class HttpOrderGateway implements OrderGateway {
                     .header("X-Internal-Service-Token", internalToken)
                     .header("X-Idempotency-Key", request.orderBusinessKey())
                     .body(new CreateOrderCommand(request.tradeType(), request.tradeId(), request.orderBusinessKey(),
-                            request.productId(), request.buyerUserId(), request.sellerUserId(), request.price(),
-                            request.addressId(), request.remark()))
+                            request.buyerUserId(), request.sellerUserId(), request.productId(), request.productName(),
+                            request.price(), request.receiverName(), request.receiverPhone(), request.receiverProvince(),
+                            request.receiverCity(), request.receiverDetailAddress(), request.remark()))
                     .retrieve()
-                    .onStatus(HttpStatusCode::isError, (httpRequest, response) -> {
+                    .onStatus(HttpStatusCode::is4xxClientError, (httpRequest, response) -> {
+                        throw new OrderContractException("order-service rejected secondhand contract with HTTP "
+                                + response.getStatusCode());
+                    })
+                    .onStatus(HttpStatusCode::is5xxServerError, (httpRequest, response) -> {
                         throw new OrderServiceUnavailableException("order-service returned HTTP " + response.getStatusCode());
                     })
                     .body(OrderEnvelope.class);
@@ -38,7 +43,7 @@ public class HttpOrderGateway implements OrderGateway {
                 throw new OrderServiceUnavailableException("order-service returned an incomplete response");
             }
             return envelope.data().toReceipt();
-        } catch (OrderServiceUnavailableException exception) {
+        } catch (OrderContractException | OrderServiceUnavailableException exception) {
             throw exception;
         } catch (RestClientException exception) {
             throw new OrderServiceUnavailableException("order-service create request failed", exception);
@@ -70,8 +75,10 @@ public class HttpOrderGateway implements OrderGateway {
         }
     }
 
-    record CreateOrderCommand(String tradeType, String tradeId, String orderBusinessKey, long productId,
-            long buyerId, long sellerId, java.math.BigDecimal price, Long addressId, String remark) {
+    record CreateOrderCommand(String tradeType, String tradeId, String orderBusinessKey,
+            long buyerUserId, long sellerUserId, long productId, String productName,
+            java.math.BigDecimal price, String receiverName, String receiverPhone,
+            String receiverProvince, String receiverCity, String receiverDetailAddress, String remark) {
     }
 
     record OrderEnvelope(Integer code, String message, OrderData data) {

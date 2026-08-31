@@ -29,6 +29,7 @@ public final class ApiModels {
     public record SecondhandOrderRequest(
             @NotBlank String tradeType,
             @NotBlank String tradeId,
+            @NotBlank String orderBusinessKey,
             @NotNull Long buyerUserId,
             @NotNull Long sellerUserId,
             @NotNull Long productId,
@@ -40,6 +41,8 @@ public final class ApiModels {
             @NotBlank String receiverCity,
             @NotBlank String receiverDetailAddress,
             @Size(max = 255) String remark) {}
+
+    public record SecondhandOrderReceipt(long orderId, String orderNo, String status) {}
 
     public record PayRequest(String payMode, String payChannel) {}
     public record ShipRequest(String deliveryNo, String originProvince, String originCity, String originDetail) {}
@@ -131,5 +134,9 @@ public final class ApiModels {
     static PageView<PublicOrderView> publicOrders(PageView<OrderView> page) {
         return new PageView<>(page.total(), page.pageNum(), page.pageSize(),
                 page.records().stream().map(ApiModels::publicOrder).toList());
+    }
+
+    static SecondhandOrderReceipt secondhandReceipt(OrderView order) {
+        return new SecondhandOrderReceipt(order.id(), order.orderNo(), order.orderStatus().name());
     }
 }

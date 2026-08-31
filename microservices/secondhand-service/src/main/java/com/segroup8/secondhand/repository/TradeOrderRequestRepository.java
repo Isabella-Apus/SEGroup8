@@ -1,6 +1,7 @@
 package com.segroup8.secondhand.repository;
 
 import com.segroup8.secondhand.domain.TradeOrderRequest;
+import com.segroup8.secondhand.domain.OrderCreationSnapshot;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,16 +27,26 @@ public class TradeOrderRequestRepository {
     }
 
     public TradeOrderRequest createOrFind(String tradeType, String tradeId, String businessKey,
-            long productId, long buyerId, long sellerId, BigDecimal price, Long addressId, String remark) {
+            long productId, long buyerId, long sellerId, BigDecimal price,
+            OrderCreationSnapshot snapshot, String remark) {
         try {
             var keyHolder = new GeneratedKeyHolder();
             db.update("insert into trade_order_request(trade_type,trade_id,order_business_key,product_id,buyer_user_id,"
-                            + "seller_user_id,price,address_id,remark,request_status,next_retry_at) "
-                            + "values(:type,:tradeId,:businessKey,:product,:buyer,:seller,:price,:address,:remark,'PENDING',CURRENT_TIMESTAMP)",
+                            + "seller_user_id,price,address_id,product_name,receiver_name,receiver_phone,"
+                            + "receiver_province,receiver_city,receiver_detail_address,remark,request_status,next_retry_at) "
+                            + "values(:type,:tradeId,:businessKey,:product,:buyer,:seller,:price,:address,:productName,"
+                            + ":receiverName,:receiverPhone,:receiverProvince,:receiverCity,:receiverDetailAddress,"
+                            + ":remark,'PENDING',CURRENT_TIMESTAMP)",
                     new MapSqlParameterSource().addValue("type", tradeType).addValue("tradeId", tradeId)
                             .addValue("businessKey", businessKey).addValue("product", productId)
                             .addValue("buyer", buyerId).addValue("seller", sellerId).addValue("price", price)
-                            .addValue("address", addressId).addValue("remark", remark),
+                            .addValue("address", snapshot.addressId()).addValue("productName", snapshot.productName())
+                            .addValue("receiverName", snapshot.receiverName())
+                            .addValue("receiverPhone", snapshot.receiverPhone())
+                            .addValue("receiverProvince", snapshot.receiverProvince())
+                            .addValue("receiverCity", snapshot.receiverCity())
+                            .addValue("receiverDetailAddress", snapshot.receiverDetailAddress())
+                            .addValue("remark", remark),
                     keyHolder, new String[] {"id"});
             return findById(keyHolder.getKey().longValue()).orElseThrow();
         } catch (DuplicateKeyException duplicate) {
@@ -109,7 +120,10 @@ public class TradeOrderRequestRepository {
         return new TradeOrderRequest(rs.getLong("id"), rs.getString("trade_type"), rs.getString("trade_id"),
                 rs.getString("order_business_key"), rs.getLong("product_id"), rs.getLong("buyer_user_id"),
                 rs.getLong("seller_user_id"), rs.getBigDecimal("price"), nullableLong(rs, "address_id"),
-                rs.getString("remark"), rs.getString("request_status"), nullableLong(rs, "order_id"),
+                rs.getString("product_name"), rs.getString("receiver_name"), rs.getString("receiver_phone"),
+                rs.getString("receiver_province"), rs.getString("receiver_city"),
+                rs.getString("receiver_detail_address"), rs.getString("remark"),
+                rs.getString("request_status"), nullableLong(rs, "order_id"),
                 rs.getString("order_no"), rs.getString("order_status"), rs.getInt("attempts"),
                 rs.getString("last_error"), time(rs, "next_retry_at"), rs.getInt("version"),
                 time(rs, "create_time"), time(rs, "update_time"));

@@ -34,6 +34,10 @@ class HttpOrderGatewayContractTest {
                 .andExpect(jsonPath("$.tradeType").value("BARGAIN"))
                 .andExpect(jsonPath("$.tradeId").value("88"))
                 .andExpect(jsonPath("$.orderBusinessKey").value("SECONDHAND:BARGAIN:88"))
+                .andExpect(jsonPath("$.buyerUserId").value(20))
+                .andExpect(jsonPath("$.sellerUserId").value(10))
+                .andExpect(jsonPath("$.productName").value("Used book"))
+                .andExpect(jsonPath("$.receiverPhone").value("13800008000"))
                 .andRespond(withSuccess("{\"code\":0,\"message\":\"success\",\"data\":{"
                         + "\"orderId\":901,\"orderNo\":\"ORD901\",\"status\":\"PENDING_PAY\"}}",
                         MediaType.APPLICATION_JSON));
@@ -66,7 +70,8 @@ class HttpOrderGatewayContractTest {
     private TradeOrderRequest request() {
         LocalDateTime now = LocalDateTime.now();
         return new TradeOrderRequest(1, "BARGAIN", "88", "SECONDHAND:BARGAIN:88", 7, 20, 10,
-                new BigDecimal("75.00"), null, "议价订单", "PENDING", null, null, null,
+                new BigDecimal("75.00"), 3L, "Used book", "Buyer", "13800008000", "Zhejiang",
+                "Hangzhou", "West Lake Road 1", "议价订单", "PENDING", null, null, null,
                 0, null, now, 0, now, now);
     }
 }

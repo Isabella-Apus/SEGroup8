@@ -22,6 +22,18 @@ const server = createServer(async (request, response) => {
         return;
     }
 
+    const addressLookup = new URL(request.url || "/", "http://stub")
+        .pathname.match(/^\/internal\/users\/(\d+)\/address-snapshot$/);
+    if (request.method === "GET" && addressLookup) {
+        const userId = Number(addressLookup[1]);
+        const addressId = Number(new URL(request.url, "http://stub").searchParams.get("addressId") || 1);
+        send(response, 200, { code: 0, message: "success", data: {
+            id: addressId, userId, receiverName: "Acceptance Buyer", receiverPhone: "13800008000",
+            province: "Zhejiang", city: "Hangzhou", detailAddress: "Acceptance Road 1"
+        }});
+        return;
+    }
+
     if (request.method === "POST" && request.url === "/internal/orders/secondhand") {
         const body = await readJson(request);
         const key = String(request.headers["x-idempotency-key"] || body.orderBusinessKey || "");

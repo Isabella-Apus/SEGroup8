@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -29,6 +30,12 @@ public class InternalController {
     @GetMapping("/users/{id}/summary")
     public ApiResult<Map<String, Object>> summary(@PathVariable long id) {
         return ApiResult.success(service.userSummary(id));
+    }
+
+    @GetMapping("/users/{id}/address-snapshot")
+    public ApiResult<Map<String, Object>> addressSnapshot(@PathVariable long id,
+            @RequestParam(required = false) Long addressId) {
+        return ApiResult.success(service.addressSnapshot(id, addressId));
     }
 
     @SuppressWarnings("unchecked")

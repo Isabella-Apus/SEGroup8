@@ -16,6 +16,7 @@ if [[ ! "$NAMESPACE" =~ ^segroup8-cloud-exp-[a-z0-9-]+$ ]]; then
   exit 2
 fi
 for artifact in \
+  "$HOST_ROOT/jars/identity-governance-service-1.0.0.jar" \
   "$HOST_ROOT/jars/secondhand-service-1.0.0.jar" \
   "$HOST_ROOT/jars/order-service-1.0.0.jar"; do
   test -f "$artifact" || { echo "Missing artifact: $artifact" >&2; exit 3; }
@@ -45,6 +46,7 @@ cp "$SCRIPT_DIR/sql/03-seed-monolith-performance.sql" "$HOST_ROOT/mysql-init/03-
 
 SECONDHAND_SHA="$(sha256sum "$HOST_ROOT/jars/secondhand-service-1.0.0.jar" | awk '{print $1}')"
 ORDER_SHA="$(sha256sum "$HOST_ROOT/jars/order-service-1.0.0.jar" | awk '{print $1}')"
+IDENTITY_SHA="$(sha256sum "$HOST_ROOT/jars/identity-governance-service-1.0.0.jar" | awk '{print $1}')"
 GIT_COMMIT="${GIT_COMMIT:-$(git -C "$REPO_ROOT" rev-parse HEAD 2>/dev/null || echo unknown)}"
 MONOLITH_DIGEST="$(k3s ctr images list | awk -v image="$BASE_IMAGE" '$1==image {digest=$3} END {print digest}')"
 
@@ -58,6 +60,7 @@ sed \
   -e "s|__GIT_COMMIT__|$GIT_COMMIT|g" \
   -e "s|__SECONDHAND_JAR_SHA256__|$SECONDHAND_SHA|g" \
   -e "s|__ORDER_JAR_SHA256__|$ORDER_SHA|g" \
+  -e "s|__IDENTITY_JAR_SHA256__|$IDENTITY_SHA|g" \
   -e "s|__MONOLITH_IMAGE_DIGEST__|$MONOLITH_DIGEST|g" \
   -e "s|__MYSQL_ROOT_PASSWORD__|$MYSQL_ROOT_PASSWORD|g" \
   -e "s|__DB_PASSWORD__|$DB_PASSWORD|g" \
@@ -69,12 +72,15 @@ chmod 600 "$RENDERED"
 kubectl apply -f "$RENDERED"
 kubectl -n "$NAMESPACE" rollout status deployment/mysql --timeout=300s
 kubectl -n "$NAMESPACE" rollout status deployment/monolith --timeout=300s
+kubectl -n "$NAMESPACE" rollout status deployment/identity-governance-service --timeout=300s
 kubectl -n "$NAMESPACE" rollout status deployment/order-service --timeout=300s
 kubectl -n "$NAMESPACE" rollout status deployment/secondhand-service --timeout=300s
 
 MYSQL_POD="$(kubectl -n "$NAMESPACE" get pod -l app=mysql -o jsonpath='{.items[0].metadata.name}')"
 kubectl -n "$NAMESPACE" exec -i "$MYSQL_POD" -- \
   mysql -uroot -p"$MYSQL_ROOT_PASSWORD" < "$SCRIPT_DIR/sql/04-seed-secondhand-performance.sql"
+kubectl -n "$NAMESPACE" exec -i "$MYSQL_POD" -- \
+  mysql -uroot -p"$MYSQL_ROOT_PASSWORD" < "$SCRIPT_DIR/sql/05-seed-identity-fault.sql"
 
 cat > "$HOST_ROOT/state.env" <<STATE
 RUN_ID=$RUN_ID
@@ -85,6 +91,7 @@ MYSQL_IMAGE=$MYSQL_IMAGE
 GIT_COMMIT=$GIT_COMMIT
 SECONDHAND_JAR_SHA256=$SECONDHAND_SHA
 ORDER_JAR_SHA256=$ORDER_SHA
+IDENTITY_JAR_SHA256=$IDENTITY_SHA
 MONOLITH_IMAGE_DIGEST=$MONOLITH_DIGEST
 STATE
 

@@ -79,7 +79,7 @@ class OrderRepository {
     }
 
     long insertSecondhand(ApiModels.SecondhandOrderRequest request) {
-        String businessKey = request.tradeType() + ":" + request.tradeId();
+        String businessKey = request.orderBusinessKey();
         List<Long> existing = db.query("select id from order_info where business_key=?",
                 (rs, n) -> rs.getLong(1), businessKey);
         if (!existing.isEmpty()) return existing.get(0);

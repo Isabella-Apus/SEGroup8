@@ -12,6 +12,7 @@ import java.util.Map;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -48,5 +49,32 @@ class InternalApiContractTest extends IdentityTestSupport {
                         .header("X-Request-Id", "contract-3").header("X-Idempotency-Key", "idem-1")
                         .contentType("application/json").content(json.writeValueAsBytes(Map.of("token", user.token()))))
                 .andExpect(jsonPath("$.code").value(0)).andExpect(jsonPath("$.data.active").value(true));
+    }
+
+    @Test
+    void addressSnapshotValidatesOwnershipAndSupportsDefaultSelection() throws Exception {
+        register("address-owner");
+        Login owner = login("address-owner", "User12345");
+        register("other-user");
+        Login other = login("other-user", "User12345");
+        db.update("INSERT INTO address(user_id,receiver_name,receiver_phone,province,city,detail_address,is_default) "
+                        + "VALUES(?,?,?,?,?,?,1)",
+                owner.userId(), "Receiver", "13800008000", "Zhejiang", "Hangzhou", "West Lake Road 1");
+        long addressId = db.queryForObject("SELECT id FROM address WHERE user_id=?", Long.class, owner.userId());
+
+        mvc.perform(get("/internal/users/{id}/address-snapshot", owner.userId())
+                        .header("X-Internal-Service-Token", "test-internal-service-token")
+                        .header("X-Request-Id", "address-default"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.id").value(addressId))
+                .andExpect(jsonPath("$.data.receiverName").value("Receiver"));
+
+        mvc.perform(get("/internal/users/{id}/address-snapshot", other.userId())
+                        .param("addressId", String.valueOf(addressId))
+                        .header("X-Internal-Service-Token", "test-internal-service-token")
+                        .header("X-Request-Id", "address-cross-user"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(404));
     }
 }

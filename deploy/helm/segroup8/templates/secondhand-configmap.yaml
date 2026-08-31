@@ -8,11 +8,15 @@ metadata:
     app.kubernetes.io/component: secondhand-service
 data:
   ORDER_SERVICE_URL: {{ .Values.secondhand.orderServiceUrl | quote }}
+  IDENTITY_SERVICE_URL: {{ .Values.secondhand.identityServiceUrl | quote }}
   CATALOG_SHOP_SERVICE_URL: {{ .Values.secondhand.catalogShopServiceUrl | quote }}
   ORDER_CONNECT_TIMEOUT: {{ .Values.secondhand.orderConnectTimeout | quote }}
   ORDER_READ_TIMEOUT: {{ .Values.secondhand.orderReadTimeout | quote }}
   ORDER_MAX_ATTEMPTS: {{ .Values.secondhand.orderMaxAttempts | quote }}
+  IDENTITY_CONNECT_TIMEOUT: {{ .Values.secondhand.identityConnectTimeout | quote }}
+  IDENTITY_READ_TIMEOUT: {{ .Values.secondhand.identityReadTimeout | quote }}
   TRADE_RECOVERY_DELAY_MS: {{ .Values.secondhand.tradeRecoveryDelayMs | quote }}
   TRADE_RECOVERY_BATCH_SIZE: {{ .Values.secondhand.tradeRecoveryBatchSize | quote }}
+  SCHEDULING_POOL_SIZE: {{ .Values.secondhand.schedulingPoolSize | quote }}
   AUCTION_SETTLEMENT_DELAY_MS: {{ .Values.secondhand.auctionSettlementDelayMs | quote }}
 {{- end }}
