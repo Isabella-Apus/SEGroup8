@@ -24,25 +24,23 @@ const server = createServer(async (request, response) => {
 
     if (request.method === "POST" && request.url === "/internal/orders/secondhand") {
         const body = await readJson(request);
-        const key = String(request.headers["x-idempotency-key"] || body.orderBusinessKey || "");
+        const key = String(request.headers["idempotency-key"] || body.tradeId || "");
         if (!key) {
-            send(response, 400, { code: 400, message: "missing idempotency key", data: null });
+            send(response, 400, { error: "missing idempotency key" });
             return;
         }
         if (!orders.has(key)) {
             sequence += 1;
-            orders.set(key, { orderId: sequence, orderNo: `E2E${sequence}`, status: "PENDING_PAY" });
+            orders.set(key, { id: sequence, orderNo: `E2E${sequence}`, orderStatus: "PENDING_PAY" });
         }
-        send(response, 200, { code: 0, message: "success", data: orders.get(key) });
+        send(response, 200, orders.get(key));
         return;
     }
 
     const lookup = request.url?.match(/^\/internal\/orders\/by-business-key\/(.+)$/);
     if (request.method === "GET" && lookup) {
         const order = orders.get(decodeURIComponent(lookup[1]));
-        send(response, order ? 200 : 404,
-            order ? { code: 0, message: "success", data: order }
-                : { code: 404, message: "not found", data: null });
+        send(response, order ? 200 : 404, order || { error: "not found" });
         return;
     }
 
