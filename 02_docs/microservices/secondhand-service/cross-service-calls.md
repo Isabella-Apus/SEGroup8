@@ -2,30 +2,39 @@
 
 ## 创建二手订单
 
-`POST /internal/orders/secondhand` 请求至少包含：
+Secondhand 调用 `POST http://segroup8-order:8085/internal/orders/secondhand`，携带
+`X-Internal-Service-Token` 和稳定的 `Idempotency-Key`。请求与 Order 服务的
+`SecondhandOrderRequest` 完全一致：
 
 ```json
 {
   "tradeType": "DIRECT_BUY|BARGAIN|AUCTION",
   "tradeId": "业务内唯一值",
-  "orderBusinessKey": "SECONDHAND:<tradeType>:<tradeId>",
+  "buyerUserId": 20,
+  "sellerUserId": 10,
   "productId": 1,
-  "buyerId": 20,
-  "sellerId": 10,
+  "productName": "Secondhand product #1",
   "price": 75.00,
-  "addressId": 3,
+  "receiverName": "Buyer",
+  "receiverPhone": "00000000000",
+  "receiverProvince": "PENDING",
+  "receiverCity": "PENDING",
+  "receiverDetailAddress": "address-id:3",
   "remark": "可选"
 }
 ```
 
-order-service 必须对 `tradeType + tradeId` 和 `orderBusinessKey` 唯一。正常响应中的初始订单状态为 `PENDING_PAY`。
+响应是 Order 服务实际返回的原始 `OrderView`，Secondhand 读取 `id`、`orderNo`
+和 `orderStatus`。Order 以 `tradeType + ':' + tradeId` 作为唯一业务键；重复请求
+返回同一订单。当前接口保留地址 ID 的可追踪占位快照，最终发货前应由订单域通过
+用户地址契约固化完整脱敏快照，不能跨库读取地址表。
 
 ## 超时与补偿顺序
 
-1. 本地事务将商品从 `ON_SHELF` CAS 为 `TRADE_PENDING`，同时写 `trade_order_request`。
+1. 本地事务将商品从 `ON_SHELF` CAS 为 `TRADE_PENDING`，并写入 `trade_order_request`。
 2. 调用订单创建接口。
-3. 调用异常时先执行 `GET /internal/orders/by-business-key/{key}`，防止“响应丢失但订单已创建”造成重复订单。
-4. 查询无结果才把请求置为 `RETRY`；恢复任务按相同 business key 重试。
+3. 调用异常时，先执行 `GET /internal/orders/by-business-key/{key}`，处理“订单已创建但响应丢失”。
+4. 查询无结果才将请求置为 `RETRY`，恢复任务使用同一 business key 重试。
 5. 达到 `ORDER_MAX_ATTEMPTS` 后置为 `FAILED` 并解除商品冻结。
 
 ## 事件
@@ -38,8 +47,6 @@ order-service 必须对 `tradeType + tradeId` 和 `orderBusinessKey` 唯一。�
 | `NotificationRequested.v1` | secondhand → messaging | dedupeKey |
 | `OrderStatusChanged.v1` | order → secondhand | eventId |
 
-通知事件失败不回滚商品成交。readiness 只检查本地数据库和 migration，不依赖 order-service。
-
-本服务只负责在业务事务内写入 `outbox_event`。事件的实际发送由全队统一的 relay/CDC 组件读取
-`event_status=NEW` 的记录并投递；在共享投递组件接入前，`NEW` 记录积压是待集成状态，不能据此宣称
-消息已经送达下游。消费端继续以 `eventId` 或表中列出的业务幂等键去重。
+通知投递失败不回滚商品成交。readiness 只检查本地数据库与迁移，不把下游可用性
+作为自身就绪条件。业务事务仅写本地 Outbox；共享 relay/CDC 接入前，`NEW` 记录
+表示待投递，不能宣称已送达。消费端必须按 `eventId` 或表中业务幂等键去重。

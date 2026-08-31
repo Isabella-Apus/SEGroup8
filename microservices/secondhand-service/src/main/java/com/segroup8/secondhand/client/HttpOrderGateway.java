@@ -23,21 +23,19 @@ public class HttpOrderGateway implements OrderGateway {
     @Override
     public OrderReceipt createSecondhandOrder(TradeOrderRequest request) {
         try {
-            OrderEnvelope envelope = client.post().uri("/internal/orders/secondhand")
+            OrderData order = client.post().uri("/internal/orders/secondhand")
                     .header("X-Internal-Service-Token", internalToken)
-                    .header("X-Idempotency-Key", request.orderBusinessKey())
-                    .body(new CreateOrderCommand(request.tradeType(), request.tradeId(), request.orderBusinessKey(),
-                            request.productId(), request.buyerUserId(), request.sellerUserId(), request.price(),
-                            request.addressId(), request.remark()))
+                    .header("Idempotency-Key", request.orderBusinessKey())
+                    .body(CreateOrderCommand.from(request))
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, (httpRequest, response) -> {
                         throw new OrderServiceUnavailableException("order-service returned HTTP " + response.getStatusCode());
                     })
-                    .body(OrderEnvelope.class);
-            if (envelope == null || envelope.data() == null || envelope.data().orderId() == null) {
+                    .body(OrderData.class);
+            if (order == null || order.id() == null) {
                 throw new OrderServiceUnavailableException("order-service returned an incomplete response");
             }
-            return envelope.data().toReceipt();
+            return order.toReceipt();
         } catch (OrderServiceUnavailableException exception) {
             throw exception;
         } catch (RestClientException exception) {
@@ -48,7 +46,7 @@ public class HttpOrderGateway implements OrderGateway {
     @Override
     public Optional<OrderReceipt> findByBusinessKey(String businessKey) {
         try {
-            OrderEnvelope envelope = client.get()
+            OrderData order = client.get()
                     .uri(uriBuilder -> uriBuilder.path("/internal/orders/by-business-key/{key}").build(businessKey))
                     .header("X-Internal-Service-Token", internalToken)
                     .retrieve()
@@ -58,9 +56,8 @@ public class HttpOrderGateway implements OrderGateway {
                     .onStatus(HttpStatusCode::isError, (request, response) -> {
                         throw new OrderServiceUnavailableException("order-service lookup returned HTTP " + response.getStatusCode());
                     })
-                    .body(OrderEnvelope.class);
-            return envelope == null || envelope.data() == null || envelope.data().orderId() == null
-                    ? Optional.empty() : Optional.of(envelope.data().toReceipt());
+                    .body(OrderData.class);
+            return order == null || order.id() == null ? Optional.empty() : Optional.of(order.toReceipt());
         } catch (OrderNotFoundException notFound) {
             return Optional.empty();
         } catch (OrderServiceUnavailableException exception) {
@@ -70,16 +67,22 @@ public class HttpOrderGateway implements OrderGateway {
         }
     }
 
-    record CreateOrderCommand(String tradeType, String tradeId, String orderBusinessKey, long productId,
-            long buyerId, long sellerId, java.math.BigDecimal price, Long addressId, String remark) {
+    record CreateOrderCommand(String tradeType, String tradeId, long buyerUserId, long sellerUserId,
+            long productId, String productName, java.math.BigDecimal price, String receiverName,
+            String receiverPhone, String receiverProvince, String receiverCity,
+            String receiverDetailAddress, String remark) {
+        static CreateOrderCommand from(TradeOrderRequest request) {
+            String address = "address-id:" + request.addressId();
+            return new CreateOrderCommand(request.tradeType(), request.tradeId(), request.buyerUserId(),
+                    request.sellerUserId(), request.productId(), "Secondhand product #" + request.productId(),
+                    request.price(), "Buyer", "00000000000", "PENDING", "PENDING", address,
+                    request.remark());
+        }
     }
 
-    record OrderEnvelope(Integer code, String message, OrderData data) {
-    }
-
-    record OrderData(Long orderId, String orderNo, String status) {
+    record OrderData(Long id, String orderNo, String orderStatus) {
         OrderReceipt toReceipt() {
-            return new OrderReceipt(orderId, orderNo, status == null ? "PENDING_PAY" : status);
+            return new OrderReceipt(id, orderNo, orderStatus == null ? "PENDING_PAY" : orderStatus);
         }
     }
 
