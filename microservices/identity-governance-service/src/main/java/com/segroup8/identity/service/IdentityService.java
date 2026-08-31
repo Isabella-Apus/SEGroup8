@@ -118,6 +118,25 @@ public class IdentityService {
                 + "FROM address WHERE user_id=? ORDER BY is_default DESC,id", CurrentUser.require().userId());
     }
 
+    public Map<String, Object> addressSnapshot(long userId, long addressId) {
+        List<Map<String, Object>> matches = jdbc.query(
+                "SELECT id,user_id,receiver_name,receiver_phone,province,city,detail_address "
+                        + "FROM address WHERE id=? AND user_id=?",
+                (rs, row) -> {
+                    Map<String, Object> snapshot = new LinkedHashMap<>();
+                    snapshot.put("addressId", rs.getLong("id"));
+                    snapshot.put("userId", rs.getLong("user_id"));
+                    snapshot.put("receiverName", rs.getString("receiver_name"));
+                    snapshot.put("receiverPhone", rs.getString("receiver_phone"));
+                    snapshot.put("province", rs.getString("province"));
+                    snapshot.put("city", rs.getString("city"));
+                    snapshot.put("detailAddress", rs.getString("detail_address"));
+                    return snapshot;
+                }, addressId, userId);
+        if (matches.isEmpty()) throw new ApiException(404, "address not found");
+        return matches.get(0);
+    }
+
     @Transactional
     public void addAddress(Map<String, Object> request) {
         long userId = CurrentUser.require().userId();
@@ -227,8 +246,11 @@ public class IdentityService {
             throw new ApiException(404, "用户不存在");
         }
         String action = banned ? "BAN_USER" : "UNBAN_USER";
+        UserAccount changed = findUser(userId).orElseThrow(() -> new ApiException(404, "用户不存在"));
         outbox("UserAccessChanged.v1", "user", userId,
-                Map.of("userId", userId, "status", banned ? "BANNED" : "NORMAL"));
+                Map.of("userId", userId, "status", banned ? "BANNED" : "NORMAL",
+                        "version", changed.accessVersion(), "role", changed.role(),
+                        "displayName", safe(changed.nickname()), "avatarUrl", safe(changed.avatar())));
         audit(action, "USER", userId, banned ? "管理员封禁用户" : "管理员解禁用户");
     }
 

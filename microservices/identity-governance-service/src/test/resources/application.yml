@@ -9,6 +9,8 @@ spring:
     banner-mode: off
 
 app:
+  outbox:
+    enabled: false
   jwt-secret: test-jwt-secret-with-at-least-32-bytes-2026
   access-token-minutes: 30
   internal-service-token: test-internal-service-token

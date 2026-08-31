@@ -22,6 +22,14 @@ app:
   jwt-secret: ${JWT_SECRET}
   access-token-minutes: ${ACCESS_TOKEN_MINUTES:30}
   internal-service-token: ${INTERNAL_SERVICE_TOKEN}
+  outbox:
+    enabled: ${OUTBOX_PUBLISHER_ENABLED:true}
+    catalog-url: ${CATALOG_SHOP_SERVICE_URL:http://segroup8-catalog-shop:8080}
+    messaging-url: ${MESSAGING_SERVICE_URL:http://messaging:8084}
+    publish-ms: ${OUTBOX_PUBLISH_MS:5000}
+    max-attempts: ${OUTBOX_MAX_ATTEMPTS:10}
+    connect-timeout-ms: ${OUTBOX_CONNECT_TIMEOUT_MS:1500}
+    read-timeout-ms: ${OUTBOX_READ_TIMEOUT_MS:2500}
   bootstrap-admin:
     username: ${BOOTSTRAP_ADMIN_USERNAME:admin}
     password: ${BOOTSTRAP_ADMIN_PASSWORD:}

@@ -54,6 +54,10 @@ spec:
               value: {{ .Values.identityGovernance.deployment.commit | quote }}
             - name: APP_BUILD_TIME
               value: {{ .Values.identityGovernance.deployment.buildTime | quote }}
+            - name: CATALOG_SHOP_SERVICE_URL
+              value: "http://segroup8-catalog-shop:8080"
+            - name: MESSAGING_SERVICE_URL
+              value: "http://messaging:8084"
             - name: TZ
               value: Asia/Shanghai
           startupProbe:

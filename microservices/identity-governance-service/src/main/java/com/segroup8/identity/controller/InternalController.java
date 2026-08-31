@@ -31,6 +31,12 @@ public class InternalController {
         return ApiResult.success(service.userSummary(id));
     }
 
+    @GetMapping("/users/{userId}/addresses/{addressId}")
+    public ApiResult<Map<String, Object>> addressSnapshot(@PathVariable long userId,
+            @PathVariable long addressId) {
+        return ApiResult.success(service.addressSnapshot(userId, addressId));
+    }
+
     @SuppressWarnings("unchecked")
     @PostMapping("/blocks/check")
     public ApiResult<List<Map<String, Object>>> check(@RequestBody Map<String, Object> request) {

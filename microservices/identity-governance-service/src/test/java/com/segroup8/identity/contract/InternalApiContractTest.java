@@ -38,6 +38,17 @@ class InternalApiContractTest extends IdentityTestSupport {
                 .andExpect(jsonPath("$.code").value(0))
                 .andExpect(jsonPath("$.data.username").value("internal-user"));
 
+        db.update("INSERT INTO address(user_id,receiver_name,receiver_phone,province,city,detail_address,is_default) "
+                        + "VALUES(?,?,?,?,?,?,?)", user.userId(), "Receiver", "13800138000", "Guangdong",
+                "Shenzhen", "Nanshan Road", 1);
+        long addressId = db.queryForObject("SELECT id FROM address WHERE user_id=?", Long.class, user.userId());
+        mvc.perform(get("/internal/users/{userId}/addresses/{addressId}", user.userId(), addressId)
+                        .header("X-Internal-Service-Token", "test-internal-service-token")
+                        .header("X-Request-Id", "contract-address-1"))
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.receiverName").value("Receiver"))
+                .andExpect(jsonPath("$.data.detailAddress").value("Nanshan Road"));
+
         mvc.perform(post("/internal/auth/introspect")
                         .header("X-Internal-Service-Token", "test-internal-service-token")
                         .header("X-Request-Id", "contract-2")
