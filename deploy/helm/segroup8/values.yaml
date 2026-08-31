@@ -48,6 +48,7 @@ secondhand:
     commit: ""
     buildTime: ""
   orderServiceUrl: http://segroup8-order:8085
+  identityServiceUrl: http://identity-governance-service:8091
   catalogShopServiceUrl: http://segroup8-catalog-shop:8080
   orderConnectTimeout: 1s
   orderReadTimeout: 2s

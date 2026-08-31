@@ -13,20 +13,27 @@ import org.springframework.web.client.RestClientException;
 public class HttpOrderGateway implements OrderGateway {
     private final RestClient client;
     private final String internalToken;
+    private final AddressGateway addresses;
 
     public HttpOrderGateway(@Qualifier("orderRestClient") RestClient client,
-            @Value("${security.internal-token}") String internalToken) {
+            @Value("${security.internal-token}") String internalToken, AddressGateway addresses) {
         this.client = client;
         this.internalToken = internalToken;
+        this.addresses = addresses;
     }
 
     @Override
     public OrderReceipt createSecondhandOrder(TradeOrderRequest request) {
         try {
+            if (request.addressId() == null) {
+                throw new OrderServiceUnavailableException("addressId is required for secondhand order");
+            }
+            AddressGateway.AddressSnapshot address = addresses.requireOwnedAddress(
+                    request.buyerUserId(), request.addressId(), request.orderBusinessKey());
             OrderData order = client.post().uri("/internal/orders/secondhand")
                     .header("X-Internal-Service-Token", internalToken)
                     .header("Idempotency-Key", request.orderBusinessKey())
-                    .body(CreateOrderCommand.from(request))
+                    .body(CreateOrderCommand.from(request, address))
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, (httpRequest, response) -> {
                         throw new OrderServiceUnavailableException("order-service returned HTTP " + response.getStatusCode());
@@ -71,11 +78,11 @@ public class HttpOrderGateway implements OrderGateway {
             long productId, String productName, java.math.BigDecimal price, String receiverName,
             String receiverPhone, String receiverProvince, String receiverCity,
             String receiverDetailAddress, String remark) {
-        static CreateOrderCommand from(TradeOrderRequest request) {
-            String address = "address-id:" + request.addressId();
+        static CreateOrderCommand from(TradeOrderRequest request, AddressGateway.AddressSnapshot address) {
             return new CreateOrderCommand(request.tradeType(), request.tradeId(), request.buyerUserId(),
                     request.sellerUserId(), request.productId(), "Secondhand product #" + request.productId(),
-                    request.price(), "Buyer", "00000000000", "PENDING", "PENDING", address,
+                    request.price(), address.receiverName(), address.receiverPhone(), address.province(),
+                    address.city(), address.detailAddress(),
                     request.remark());
         }
     }

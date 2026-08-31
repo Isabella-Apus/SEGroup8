@@ -22,6 +22,16 @@ const server = createServer(async (request, response) => {
         return;
     }
 
+    const address = request.url?.match(/^\/internal\/users\/(\d+)\/addresses\/(\d+)$/);
+    if (request.method === "GET" && address) {
+        send(response, 200, { code: 0, message: "success", data: {
+            addressId: Number(address[2]), userId: Number(address[1]), receiverName: "Acceptance Buyer",
+            receiverPhone: "13800138000", province: "Guangdong", city: "Shenzhen",
+            detailAddress: "Nanshan Acceptance Road"
+        }});
+        return;
+    }
+
     if (request.method === "POST" && request.url === "/internal/orders/secondhand") {
         const body = await readJson(request);
         const key = String(request.headers["idempotency-key"] || body.tradeId || "");

@@ -2,9 +2,15 @@
 
 ## 创建二手订单
 
-Secondhand 调用 `POST http://segroup8-order:8085/internal/orders/secondhand`，携带
-`X-Internal-Service-Token` 和稳定的 `Idempotency-Key`。请求与 Order 服务的
-`SecondhandOrderRequest` 完全一致：
+二手服务不读取身份库或订单库。创建订单前按以下固定顺序调用：
+
+1. `GET http://identity-governance-service:8091/internal/users/{buyerId}/addresses/{addressId}`，携带 `X-Internal-Service-Token` 和 `X-Request-Id`。身份治理服务校验地址属于买家，并返回收件人、电话、省、市、详细地址。
+2. `POST http://segroup8-order:8085/internal/orders/secondhand`，携带同一内部 Token，以及稳定的 `Idempotency-Key=tradeType:tradeId`。请求中写入第 1 步取得的完整地址快照，不传地址表 ID，不使用占位姓名、电话或地址。
+3. 调用结果不确定时，以相同业务键请求 `GET /internal/orders/by-business-key/{key}`。只在确定订单不存在时重试创建；达到 `ORDER_MAX_ATTEMPTS` 后解除商品冻结并记录失败事件。
+
+身份服务不可用或地址不属于买家时，本次建单保持 `RETRY`/最终 `FAILED`，不会用虚假地址继续。这是业务依赖降级，不影响二手服务自身 readiness；恢复任务会继续用相同业务键重试。
+
+## 订单请求契约
 
 ```json
 {
@@ -15,27 +21,16 @@ Secondhand 调用 `POST http://segroup8-order:8085/internal/orders/secondhand`�
   "productId": 1,
   "productName": "Secondhand product #1",
   "price": 75.00,
-  "receiverName": "Buyer",
-  "receiverPhone": "00000000000",
-  "receiverProvince": "PENDING",
-  "receiverCity": "PENDING",
-  "receiverDetailAddress": "address-id:3",
+  "receiverName": "Receiver",
+  "receiverPhone": "13800138000",
+  "receiverProvince": "Guangdong",
+  "receiverCity": "Shenzhen",
+  "receiverDetailAddress": "Nanshan Road",
   "remark": "可选"
 }
 ```
 
-响应是 Order 服务实际返回的原始 `OrderView`，Secondhand 读取 `id`、`orderNo`
-和 `orderStatus`。Order 以 `tradeType + ':' + tradeId` 作为唯一业务键；重复请求
-返回同一订单。当前接口保留地址 ID 的可追踪占位快照，最终发货前应由订单域通过
-用户地址契约固化完整脱敏快照，不能跨库读取地址表。
-
-## 超时与补偿顺序
-
-1. 本地事务将商品从 `ON_SHELF` CAS 为 `TRADE_PENDING`，并写入 `trade_order_request`。
-2. 调用订单创建接口。
-3. 调用异常时，先执行 `GET /internal/orders/by-business-key/{key}`，处理“订单已创建但响应丢失”。
-4. 查询无结果才将请求置为 `RETRY`，恢复任务使用同一 business key 重试。
-5. 达到 `ORDER_MAX_ATTEMPTS` 后置为 `FAILED` 并解除商品冻结。
+订单服务返回原始 `OrderView`；二手服务读取 `id`、`orderNo` 和 `orderStatus`。订单服务以 `tradeType + ':' + tradeId` 作为唯一业务键，重复请求必须返回同一订单。
 
 ## 事件
 
@@ -47,6 +42,4 @@ Secondhand 调用 `POST http://segroup8-order:8085/internal/orders/secondhand`�
 | `NotificationRequested.v1` | secondhand → messaging | dedupeKey |
 | `OrderStatusChanged.v1` | order → secondhand | eventId |
 
-通知投递失败不回滚商品成交。readiness 只检查本地数据库与迁移，不把下游可用性
-作为自身就绪条件。业务事务仅写本地 Outbox；共享 relay/CDC 接入前，`NEW` 记录
-表示待投递，不能宣称已送达。消费端必须按 `eventId` 或表中业务幂等键去重。
+通知投递失败不回滚商品成交。业务事务只写本地 Outbox；`NEW` 表示待投递，不能宣称已送达。消费端必须按 `eventId` 或业务幂等键去重。
