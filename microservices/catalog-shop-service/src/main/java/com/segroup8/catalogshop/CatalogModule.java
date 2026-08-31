@@ -3,6 +3,8 @@ package com.segroup8.catalogshop;
 import jakarta.validation.Valid;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -75,9 +77,9 @@ class CatalogController {
 
 @Service
 class CatalogModule {
-    private final JdbcClient db; private final SimpleJdbcInsert productInsert; private final RiskModule risk; private final InternalTokenPolicy tokens;
-    CatalogModule(JdbcClient db,DataSource ds,RiskModule risk,InternalTokenPolicy tokens) {
-        this.db=db;this.risk=risk;this.tokens=tokens;
+    private final JdbcClient db; private final SimpleJdbcInsert productInsert; private final RiskModule risk; private final InternalTokenPolicy tokens; private final ObjectMapper json;
+    CatalogModule(JdbcClient db,DataSource ds,RiskModule risk,InternalTokenPolicy tokens,ObjectMapper json) {
+        this.db=db;this.risk=risk;this.tokens=tokens;this.json=json;
         this.productInsert=new SimpleJdbcInsert(ds).withTableName("product").usingGeneratedKeyColumns("id");
     }
     List<CategoryNode> categories() {
@@ -101,15 +103,15 @@ class CatalogModule {
     @Transactional Product create(long sellerId,CatalogController.ProductRequest r) {
         long shop=resolveShop(sellerId,r.shopId());long category=resolveCategory(r);Long sub=resolveSubCategory(r);verifyShop(sellerId,shop);verifyCategory(category);if(sub!=null)verifyCategory(sub);
         var now=java.sql.Timestamp.from(Instant.now());
-        var values=new java.util.HashMap<String,Object>();values.put("seller_id",sellerId);values.put("shop_id",shop);values.put("category_id",category);values.put("sub_category_id",sub);values.put("name",r.name().trim());values.put("description",safe(r.description()));values.put("price",r.price());values.put("stock",r.stock());values.put("reserved_stock",0);values.put("status","PENDING_REVIEW");values.put("updated_at",now);long id=productInsert.executeAndReturnKey(values).longValue();
+        var values=new java.util.HashMap<String,Object>();values.put("seller_id",sellerId);values.put("shop_id",shop);values.put("category_id",category);values.put("sub_category_id",sub);values.put("name",r.name().trim());values.put("description",safe(r.description()));values.put("price",r.price());values.put("stock",r.stock());values.put("reserved_stock",0);values.put("status","PENDING_REVIEW");values.put("cover",safe(r.cover()));values.put("images",imagesJson(r.images()));values.put("updated_at",now);long id=productInsert.executeAndReturnKey(values).longValue();
         risk.submit(id,r.name(),safe(r.description()));
         return owned(sellerId,id);
     }
     @Transactional Product update(long sellerId,long id,CatalogController.ProductRequest r) {
         Product old=owned(sellerId,id); if(old.reservedStock()>r.stock()) throw new ApiException("STOCK_BELOW_RESERVED","库存不能低于已预留数量");
         long shop=resolveShop(sellerId,r.shopId());long category=resolveCategory(r);Long sub=resolveSubCategory(r);verifyShop(sellerId,shop);verifyCategory(category);if(sub!=null)verifyCategory(sub);
-        db.sql("update product set shop_id=:shop,category_id=:category,sub_category_id=:sub,name=:name,description=:description,price=:price,stock=:stock,status='PENDING_REVIEW',updated_at=CURRENT_TIMESTAMP where id=:id")
-                .params(Map.of("shop",shop,"category",category,"sub",sub,"name",r.name().trim(),"description",safe(r.description()),"price",r.price(),"stock",r.stock(),"id",id)).update();
+        db.sql("update product set shop_id=:shop,category_id=:category,sub_category_id=:sub,name=:name,description=:description,price=:price,stock=:stock,cover=:cover,images=:images,status='PENDING_REVIEW',updated_at=CURRENT_TIMESTAMP where id=:id")
+                .params(Map.of("shop",shop,"category",category,"sub",sub,"name",r.name().trim(),"description",safe(r.description()),"price",r.price(),"stock",r.stock(),"cover",safe(r.cover()),"images",imagesJson(r.images()),"id",id)).update();
         risk.submit(id,r.name(),safe(r.description())); return owned(sellerId,id);
     }
     void delete(long sellerId,long id) { Product p=owned(sellerId,id);if(p.reservedStock()>0)throw new ApiException("PRODUCT_RESERVED","存在库存预留，不能删除");db.sql("delete from product_risk_audit where product_id=:id").param("id",id).update();db.sql("delete from product where id=:id").param("id",id).update(); }
@@ -125,14 +127,18 @@ class CatalogModule {
     private Long resolveSubCategory(CatalogController.ProductRequest r){return r.subCategoryId()!=null?r.subCategoryId():r.categoryId();}
     private <T> PageResult<T> page(List<T> all,int page,int size){if(page<1||size<1||size>100)throw new ApiException("INVALID_PAGE","pageNum 必须大于 0 且 pageSize 为 1-100",HttpStatus.BAD_REQUEST);int from=Math.min((page-1)*size,all.size());int to=Math.min(from+size,all.size());return new PageResult<>(all.size(),page,size,all.subList(from,to));}
     private String safe(String value){return value==null?"":value;}
+    private String imagesJson(List<String> images){try{return json.writeValueAsString(images==null?List.of():images);}catch(Exception e){throw new ApiException("INVALID_IMAGES","商品图片格式非法",HttpStatus.BAD_REQUEST);}}
 }
 
 record CategoryRow(long id,Long parentId,String name,int sortOrder) {}
 record CategoryNode(long id,String name,List<CategoryNode> children) {}
-record Product(long id,long sellerId,long shopId,long categoryId,Long subCategoryId,String name,String description,BigDecimal price,int stock,int reservedStock,@JsonIgnore String status,Instant updatedAt) {
+record Product(long id,long sellerId,long shopId,long categoryId,Long subCategoryId,String name,String description,BigDecimal price,int stock,int reservedStock,String cover,@JsonIgnore String images,@JsonIgnore String status,Instant updatedAt) {
     @JsonProperty("status") int statusCode(){return "ON_SALE".equals(status)?1:0;}
     @JsonProperty String statusName(){return switch(status){case "ON_SALE"->"在售";case "PENDING_REVIEW"->"待审核";case "REJECTED"->"审核驳回";default->"已下架";};}
-    @JsonProperty String cover(){return "";}@JsonProperty List<String> images(){return List.of();}
+    @JsonProperty("images") List<String> imageList(){
+        if(images==null||images.isBlank()) return cover==null||cover.isBlank()?List.of():List.of(cover);
+        try{return new ObjectMapper().readValue(images,new TypeReference<List<String>>(){});}catch(Exception ignored){return cover==null||cover.isBlank()?List.of():List.of(cover);}
+    }
 }
 record ProductSnapshot(long productId,String name,BigDecimal unitPrice,long shopId,int availableStock) {}
 record PageResult<T>(int total,int pageNum,int pageSize,List<T> records){}
