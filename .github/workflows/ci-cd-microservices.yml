@@ -22,8 +22,8 @@ jobs:
       - uses: azure/setup-helm@v4
       - name: Helm lint and render
         run: |
-          helm lint deploy/helm/segroup8 --set catalogShop.enabled=true --set-string backend.image.repository=test/backend --set-string backend.image.tag=test --set-string frontend.image.repository=test/frontend --set-string frontend.image.tag=test --set-string catalogShop.image.repository=test/catalog-shop --set-string catalogShop.image.tag=test
-          helm template segroup8 deploy/helm/segroup8 --set catalogShop.enabled=true --set-string backend.image.repository=test/backend --set-string backend.image.tag=test --set-string frontend.image.repository=test/frontend --set-string frontend.image.tag=test --set-string catalogShop.image.repository=test/catalog-shop --set-string catalogShop.image.tag=test >/dev/null
+          helm lint deploy/helm/segroup8 --set catalogShop.enabled=true --set-string backend.image.repository=test/backend --set-string backend.image.tag=test --set-string frontend.image.repository=test/frontend --set-string frontend.image.tag=test --set-string catalogShop.image.repository=test/catalog-shop --set-string catalogShop.image.tag=test --set-file mysql.initSchema=backend/src/main/resources/schema.sql
+          helm template segroup8 deploy/helm/segroup8 --set catalogShop.enabled=true --set-string backend.image.repository=test/backend --set-string backend.image.tag=test --set-string frontend.image.repository=test/frontend --set-string frontend.image.tag=test --set-string catalogShop.image.repository=test/catalog-shop --set-string catalogShop.image.tag=test --set-file mysql.initSchema=backend/src/main/resources/schema.sql >/dev/null
       - uses: actions/upload-artifact@v4
         with: {name: catalog-shop-jar, path: microservices/catalog-shop-service/target/catalog-shop-service-1.0.0.jar, if-no-files-found: error}
   publish:
