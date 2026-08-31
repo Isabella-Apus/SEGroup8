@@ -10,5 +10,6 @@
 | finance settlement | `settlement:<client-key>:<sellerId>` | 确认收货前按 requestId 查询未知结果；成功后才提交 `RECEIVED`，重复请求不重复结算 |
 | finance voucher release | `voucher-release:<client-key>` | 与库存分别补偿，全部成功后取消完成 |
 | messaging | outbox eventId | 异步投递失败不回滚订单 |
+| catalog inventory event → order `/internal/events` | catalog `eventId` | `inbox_event` 去重；仅将仍为 `PENDING_PAY` 的对应订单转为 `CANCELLED`，已支付或已取消订单不回退 |
 
-端点和请求/响应字段以 [openapi.yaml](openapi.yaml) 与消费者契约测试为准。`DownstreamHttpContractTest` 使用真实本地 HTTP Server 校验 catalog、finance 的路径、内部 token、幂等头与响应解析；secondhand 入站契约由 `OrderApiTest` 校验。HTTP 客户端没有支付、退款或结算自动重试器。
+端点和请求/响应字段以 [openapi.yaml](openapi.yaml) 与消费者契约测试为准。`DownstreamHttpContractTest` 使用真实本地 HTTP Server 校验 catalog、finance 的路径、内部 token、幂等头与响应解析；secondhand 入站契约及 catalog 库存过期/释放事件的幂等恢复由 `OrderApiTest` 校验。HTTP 客户端没有支付、退款或结算自动重试器。

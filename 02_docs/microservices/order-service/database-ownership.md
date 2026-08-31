@@ -9,5 +9,6 @@
 | `logistics_path_template` / `logistics_trace` | order_db 独占读写 | 路径模板和轨迹 |
 | `idempotency_record` | order_db 独占读写 | 请求哈希与稳定结果 |
 | `order_saga` / `outbox_event` | order_db 独占读写 | 补偿、恢复和可靠事件 |
+| `inbox_event` | order_db 独占读写 | Catalog 库存释放/过期事件去重；只保存事件事实，不查询 Catalog 表 |
 
 生产账号仅授予 `order_db.*`。`CrossSchemaPermissionTest` 使用真实 MySQL 创建 `benefits_finance_db.balance`，验证 `order_app` 查询被拒绝；没有 Docker 时跳过而不是用 H2 伪造权限结果。

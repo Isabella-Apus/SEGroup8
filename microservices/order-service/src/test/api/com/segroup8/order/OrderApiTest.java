@@ -41,7 +41,7 @@ class OrderApiTest {
     @MockBean DownstreamGateway downstream;
 
     @BeforeEach void clean() {
-        for (String table : List.of("outbox_event","order_saga","idempotency_record","logistics_trace","review",
+        for (String table : List.of("inbox_event","outbox_event","order_saga","idempotency_record","logistics_trace","review",
                 "order_after_sale_log","order_item","order_info")) db.update("delete from " + table);
         when(downstream.reserve(anyString(),anyLong(),anyList())).thenAnswer(inv -> new Reservation(inv.getArgument(0),
                 List.of(new ProductSnapshot(10,"Snapshot phone",new BigDecimal("100.00"),1,2,20L))));
@@ -127,6 +127,24 @@ class OrderApiTest {
                 .andExpect(status().isForbidden());
         mvc.perform(post("/api/admin/orders/{id}/refund/approve",id).headers(admin()).header("Idempotency-Key","refund-decision-1"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.data.refundStatus").value(2));
+    }
+
+    @Test void catalogReservationExpiryClosesPendingOrderExactlyOnce() throws Exception {
+        String created=mvc.perform(post("/api/order/create").headers(user(1)).header("Idempotency-Key","expiry-order")
+                .contentType("application/json").content(createBody())).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        long id=json.readTree(created).path("data").path("id").asLong();
+        String event="{\"eventId\":\"inventory-expired-1\",\"eventType\":\"InventoryReservationExpired.v1\","
+                + "\"producer\":\"catalog-shop-service\",\"payload\":{\"orderId\":\"reservation:expiry-order\","
+                + "\"reservationId\":1,\"status\":\"EXPIRED\"}}";
+        mvc.perform(post("/internal/events").header("X-Internal-Service-Token","test-internal-token")
+                .contentType("application/json").content(event)).andExpect(status().isNoContent());
+        mvc.perform(post("/internal/events").header("X-Internal-Service-Token","test-internal-token")
+                .contentType("application/json").content(event)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/order/detail/{id}",id).headers(user(1)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.orderStatusKey").value("CANCELLED"));
+        assertThat(db.queryForObject("select count(*) from inbox_event where event_id='inventory-expired-1'",Integer.class))
+                .isEqualTo(1);
     }
 
     @Test void remainingPublicWriteEndpointsEnforceRolesAndState() throws Exception {

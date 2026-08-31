@@ -39,7 +39,8 @@ test("UC11-UC15 independent order-service acceptance flow", async ({ request }) 
     (count: number, pathItem: any) => count + Object.keys(pathItem).filter((key) => methods.has(key)).length,
     0,
   );
-  expect(operationCount).toBe(36);
+  expect(operationCount).toBe(37);
+  expect(runtimeDocument.paths["/internal/events"]?.post).toBeTruthy();
   expect(runtimeDocument.paths["/internal/orders/secondhand"]?.post).toBeTruthy();
   expect(runtimeDocument.paths["/api/admin/orders/{id}"]?.get).toBeTruthy();
 
