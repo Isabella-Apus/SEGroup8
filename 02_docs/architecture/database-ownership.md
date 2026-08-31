@@ -1,128 +1,73 @@
 # 数据库表归属方案
 
-## 1. 当前事实与目标规则
+## 1. 规则与当前状态
 
-当前生产路径仍由单体 `backend/src/main/resources/schema.sql` 初始化一个 MySQL schema。下面的“目标 owner”用于微服务迁移；在真正拆库、独立启动和回归通过之前，不得宣称已经实现物理隔离。
+六个微服务各自拥有独立 schema 和应用账号。允许课程环境在同一个 MySQL 8 实例中承载多个 schema，但必须满足：
 
-冻结规则：
+1. 一张业务表只有一个写入 owner，其他服务不得直接查询或修改其明细。
+2. 跨服务只传稳定 ID、必要快照，或使用带版本的内部 API/事件；禁止跨 schema JOIN、外键和共享 Repository。
+3. 每个账号只获得自身 schema 权限，CI 必须用真实 MySQL 反例证明跨库访问被拒绝。
+4. 本地事务只覆盖本服务数据；跨服务流程用幂等键、Outbox/Inbox、状态查询、重试和补偿。
+5. `idempotency_record`、`outbox_event` 等同名技术表分别存在于各自 schema，不是共享表。
 
-1. 一张业务表只有一个写入服务，也只有该服务可以直接查询其明细；
-2. 其他服务只保存稳定 ID、必要快照或通过版本化 API/事件获取数据；
-3. 跨服务不建立数据库外键，不共享 Mapper/Repository，不执行跨 schema JOIN；
-4. 一个 MySQL 实例可以承载多个 schema，但账号权限必须限制到本服务 schema；
-5. 资金、余额、资金流水必须由同一个服务在本地事务中更新；
-6. 跨服务流程使用幂等、outbox、补偿和状态查询，不使用分布式数据库事务伪装原子性。
-
-`identity-governance-service` 单独拆出后可以满足这些规则：它是 `user` 等身份治理表的唯一 owner，其他服务既不连接 `identity_governance_db`，也不复制一份可写用户表。其他服务需要用户信息时只能使用 JWT、内部 API、版本化事件或由事件生成的最小只读投影。
+单体 `backend/src/main/resources/schema.sql` 仍是兼容回退路径。下表同时记录单体 33 张逻辑业务表的目标 owner，以及六个独立服务当前 Flyway 已创建的物理表；“已建表”不等于流量已全部切换。
 
 ## 2. 单体 33 张逻辑业务表的唯一归属
 
-| 当前表 | 目标 owner/schema | 主要 UC | 跨服务使用方式 |
-|---|---|---|---|
-| `user` | identity-governance / `identity_governance_db` | UC01-UC05 | JWT claims、用户摘要 API、`UserAccessChanged`；禁止其他服务读表 |
-| `address` | identity-governance / `identity_governance_db` | UC02 | 下单时由用户选择并复制为订单地址快照 |
-| `merchant_application` | identity-governance / `identity_governance_db` | UC03 | 审核成功发布事件给 catalog-shop/messaging |
-| `admin_audit_log` | identity-governance / `identity_governance_db` | UC04/05/09/14/21/23 | 其他服务发送审计事件；身份治理服务集中持久化 |
-| `credit_score_log` | identity-governance / `identity_governance_db` | UC05 | 查询走身份治理 API |
-| `user_report` | identity-governance / `identity_governance_db` | UC05 | 用户 ID 为同服务引用 |
-| `user_block` | identity-governance / `identity_governance_db` | UC05/24 | messaging 在建会话前调用批量 block-check 或消费缓存事件 |
-| `report` | identity-governance / `identity_governance_db` | 旧管理举报兼容 | 迁移后合并规则或只读归档，不能与 `user_report` 双写 |
-| `product_risk_audit` | catalog-shop / `catalog_shop_db` | UC09 | 与商品同一服务不同模块，禁止跨模块绕过 service 层写表 |
-| `category` | catalog-shop / `catalog_shop_db` | UC06/07/16 | secondhand 只保存 categoryId 并使用目录 API 校验 |
-| `product` | catalog-shop / `catalog_shop_db` | UC06/07/11 | order 保存名称、单价等成交快照；库存通过预留 API |
-| `shop` | catalog-shop / `catalog_shop_db` | UC03/08 | product 可在同服务内引用；order 只保存 shopId 和快照 |
-| `browse_history` | catalog-shop / `catalog_shop_db` | UC10 | behavior 模块拥有；productId 是同服务逻辑引用 |
-| `user_search_history` | catalog-shop / `catalog_shop_db` | UC10 | userId 是外部标识 |
-| `search_keyword_stat` | catalog-shop / `catalog_shop_db` | UC10 | 只由 behavior 模块更新 |
-| `order_info` | order / `order_db` | UC11-UC14/20 | secondhand、finance 通过 orderId/API/事件协作 |
-| `order_item` | order / `order_db` | UC11/15/20 | 保存商品类型、ID、名称、价格快照 |
-| `order_after_sale_log` | order / `order_db` | UC14 | 退款完成事件引用 orderId，不由 finance 改表 |
-| `review` | order / `order_db` | UC15 | 商品/店铺显示可订阅评价汇总事件，不直接读评价表 |
-| `logistics_path_template` | order / `order_db` | UC13/20 | 当前规模不单拆 logistics-service |
-| `logistics_trace` | order / `order_db` | UC13/20 | 轨迹随订单边界维护 |
-| `idempotency_record` | 每服务各自 schema | 全局 | 不是共享表；各服务拥有自己的幂等记录表 |
-| `secondhand_product` | secondhand / `secondhand_db` | UC16/17/19 | order 保存成交快照；状态通过交易 API/事件改变 |
-| `product_negotiation` | secondhand / `secondhand_db` | UC18 | `used_order_id` 是外部引用，不建跨库 FK |
-| `product_auction` | secondhand / `secondhand_db` | UC19 | `settled_order_id` 是外部引用；按 tradeId 幂等恢复 |
-| `auction_log` | secondhand / `secondhand_db` | UC19 | 仅 secondhand 写入 |
-| `voucher` | benefits-finance / `benefits_finance_db` | UC21/22 | shopId/productId 是适用范围标识，不跨库读 |
-| `user_voucher` | benefits-finance / `benefits_finance_db` | UC22 | 使用和核销与券规则同一服务事务 |
-| `balance` | benefits-finance / `benefits_finance_db` | UC23 | 唯一余额真相；禁止 order 直接更新 |
-| `transaction_record` | benefits-finance / `benefits_finance_db` | UC12/14/23 | 与余额更新同事务，orderId 为外部引用 |
-| `chat_conversation` | messaging / `messaging_db` | UC24 | 参与者 ID 来自 JWT；必要时调用治理 block-check |
-| `chat_message` | messaging / `messaging_db` | UC24 | 仅 messaging 读写 |
-| `notification` | messaging / `messaging_db` | UC25 | 由事件或幂等内部 API 创建 |
+| 逻辑表 | 唯一 owner / schema | 跨服务使用方式 |
+|---|---|---|
+| `user` | identity-governance / `identity_governance_db` | JWT、用户摘要 API、`UserAccessChanged.v1` |
+| `address` | identity-governance / `identity_governance_db` | 建单前校验 owner，并复制完整地址快照 |
+| `merchant_application` | identity-governance / `identity_governance_db` | 审核事件通知 catalog-shop / messaging |
+| `admin_audit_log` | identity-governance / `identity_governance_db` | 其他服务发布审计事件，禁止直写 |
+| `credit_score_log` | identity-governance / `identity_governance_db` | 身份治理 API |
+| `user_report` | identity-governance / `identity_governance_db` | 本服务内用户 ID 引用 |
+| `user_block` | identity-governance / `identity_governance_db` | messaging 调用 block-check 或消费版本事件 |
+| `report` | identity-governance / `identity_governance_db` | 旧举报兼容表；不可与 `user_report` 双写同一事实 |
+| `category` | catalog-shop / `catalog_shop_db` | 目录 API；secondhand 只保存 categoryId |
+| `shop` | catalog-shop / `catalog_shop_db` | 订单保存 shopId/必要快照 |
+| `product` | catalog-shop / `catalog_shop_db` | 商品快照和库存预留 API |
+| `product_risk_audit` | catalog-shop / `catalog_shop_db` | catalog-shop 内部模块使用 |
+| `browse_history` | catalog-shop / `catalog_shop_db` | 本服务行为模块写入 |
+| `user_search_history` | catalog-shop / `catalog_shop_db` | userId 仅为外部标识 |
+| `search_keyword_stat` | catalog-shop / `catalog_shop_db` | 本服务行为模块聚合 |
+| `order_info` | order / `order_db` | secondhand、finance 使用 orderId/API/事件 |
+| `order_item` | order / `order_db` | 保存商品类型、ID、名称、价格快照 |
+| `order_after_sale_log` | order / `order_db` | finance 只处理资金，不修改售后日志 |
+| `review` | order / `order_db` | catalog-shop 订阅评价汇总，不读明细表 |
+| `logistics_path_template` | order / `order_db` | 当前阶段归订单域 |
+| `logistics_trace` | order / `order_db` | 当前阶段归订单域 |
+| `idempotency_record` | 每个服务各自 schema | 同名独立技术表，绝非共享表 |
+| `secondhand_product` | secondhand / `secondhand_db` | order 保存成交快照 |
+| `product_negotiation` | secondhand / `secondhand_db` | orderId 是外部引用，无跨库 FK |
+| `product_auction` | secondhand / `secondhand_db` | orderId 是外部引用，按 tradeId 恢复 |
+| `auction_log` | secondhand / `secondhand_db` | 仅 secondhand 写入 |
+| `voucher` | benefits-finance / `benefits_finance_db` | shopId/productId 仅为适用范围标识 |
+| `user_voucher` | benefits-finance / `benefits_finance_db` | 用券核销和规则同事务 |
+| `balance` | benefits-finance / `benefits_finance_db` | 唯一余额真相，order 禁止直接更新 |
+| `transaction_record` | benefits-finance / `benefits_finance_db` | orderId 为外部引用 |
+| `chat_conversation` | messaging / `messaging_db` | 参与者来自 JWT/最小用户投影 |
+| `chat_message` | messaging / `messaging_db` | 仅 messaging 读写 |
+| `notification` | messaging / `messaging_db` | 由幂等事件/内部 API 创建 |
 
-注意：`schema.sql` 中 `credit_score_log`、`user_report`、`user_block` 存在兼容性重复 `CREATE TABLE IF NOT EXISTS` 片段。迁移前应先整理成单一版本化 migration；本方案按逻辑表只计一次。
+## 3. 六个服务当前 Flyway 物理表
 
-## 3. 当前已实现微服务的物理表
+以下清单以六个微服务分支当前迁移脚本为准，共 55 张物理表。相比 33 张单体逻辑表，增加的是服务自治所需的预留、Saga、Inbox/Outbox、幂等、投影、报价和支付请求等表。
 
-| 模块 | 当前独立 schema 表 | 目标归属 | 迁移注意事项 |
-|---|---|---|---|
-| `catalog-service` | `products` | catalog-shop 的 catalog 模块 | 与单体 `product` 字段/命名不一致，需要一次性迁移和契约适配，不能长期双写 |
-| `shop-service` | `shops` | catalog-shop 的 shop 模块 | 与单体 `shop` 字段不完全一致，切流前做数据校验 |
-| `risk-service` | `risk_audits`, `integration_outbox` | catalog-shop 的 risk 模块 | outbox 仍由该模块写入，统一部署后使用 `catalog_shop_db` |
-| `behavior-service` | `browse_history`, `search_history`, `keyword_stats` | catalog-shop 的 behavior 模块 | 对应单体 `browse_history`, `user_search_history`, `search_keyword_stat` |
+| 服务 / schema | 当前物理表 | 归属结论 |
+|---|---|---|
+| identity-governance / `identity_governance_db` | `user`, `address`, `merchant_application`, `report`, `user_report`, `user_block`, `credit_score_log`, `admin_audit_log`, `idempotency_record`, `outbox_event` | 全部归身份治理；`outbox_event.last_error` 仅用于投递诊断 |
+| order / `order_db` | `order_info`, `order_item`, `order_after_sale_log`, `review`, `logistics_path_template`, `logistics_trace`, `idempotency_record`, `order_saga`, `outbox_event`, `inbox_event` | 全部归订单；`inbox_event` 去重 catalog 库存事件 |
+| secondhand / `secondhand_db` | `secondhand_product`, `category_projection`, `product_negotiation`, `product_auction`, `auction_log`, `trade_order_request`, `idempotency_record`, `outbox_event` | `category_projection` 是只读最小投影；地址不落本地明细表 |
+| catalog-shop / `catalog_shop_db` | `category`, `shop`, `product`, `product_risk_audit`, `browse_history`, `user_search_history`, `search_keyword_stat`, `inventory_reservation`, `inventory_reservation_item`, `idempotency_record`, `outbox_event` | 库存预留及其明细只由 catalog-shop 写入 |
+| messaging / `messaging_db` | `chat_conversation`, `chat_message`, `notification`, `user_access_projection`, `user_block_projection`, `inbox_event`, `idempotency_record`, `outbox_event` | 两张用户投影只读且可由版本事件重建 |
+| benefits-finance / `benefits_finance_db` | `voucher`, `user_voucher`, `balance`, `transaction_record`, `checkout_quote`, `payment_request`, `idempotency_record`, `outbox_event` | 余额、流水、支付请求在本地事务中一致更新 |
 
-现有 H2/MockMvc 集成测试证明模块局部契约，不等于 MySQL 数据已经从单体迁移或流量已经切换。
+旧 `catalog-service`、`shop-service`、`risk-service`、`behavior-service` 的复数表名原型只为切流兼容保留；最终 owner 是合并后的 `catalog-shop-service`。在完整回归和数据校验前不从父 POM 强行删除，切流完成后单独清理，禁止长期双写。
 
-## 4. 跨服务数据关系
+## 4. 服务账号权限
 
-```mermaid
-erDiagram
-    IDENTITY_USER ||--o{ ORDER_INFO : "userId only / no FK"
-    IDENTITY_USER ||--o{ SECONDHAND_PRODUCT : "sellerUserId only / no FK"
-    SHOP ||--o{ PRODUCT : "shopId contract / no cross-schema FK"
-    PRODUCT ||--o{ ORDER_ITEM : "product snapshot"
-    SECONDHAND_PRODUCT ||--o{ ORDER_ITEM : "secondhand snapshot"
-    ORDER_INFO ||--o{ TRANSACTION_RECORD : "orderId event/API reference"
-    ORDER_INFO ||--o{ USER_VOUCHER : "usedOrderId reference"
-    IDENTITY_USER ||--o{ CHAT_CONVERSATION : "participant IDs"
-```
-
-图中的关系是业务引用，不是数据库外键。真实外键只允许出现在同一 owner 的 schema 内，例如 `order_item.order_id -> order_info.id`、`chat_message.conversation_id -> chat_conversation.id`。
-
-## 5. 关键业务的数据流
-
-### 下单与库存
-
-1. order 使用幂等键请求 catalog 预留库存；
-2. catalog 在本地事务写预留记录并返回 reservationId；
-3. order 保存商品和收货地址快照并创建订单；
-4. 成功后确认预留，失败则释放；超时由定时任务和状态查询补偿。
-
-### 支付、优惠券和退款
-
-1. order 请求 benefits-finance 生成带版本和有效期的结算报价；
-2. benefits-finance 在同一事务核销券、更新余额、写 `transaction_record`；
-3. 结果通过幂等响应和事件交给 order 更新状态；
-4. 退款由 benefits-finance 写反向流水，order 不直接操作余额表。
-
-### 二手成交
-
-1. secondhand 在本地事务冻结商品/议价/拍卖成交资格；
-2. 以 `tradeType + tradeId` 调用 order 的幂等创建接口；
-3. order 返回 orderId，secondhand 保存外部引用；
-4. 任一步骤超时均通过查询幂等结果恢复，不能跨库回滚另一服务。
-
-## 6. 物理部署与权限
-
-第一版可在同一 MySQL 8 实例创建多个 schema，以降低课程环境成本：
-
-```text
-identity_governance_db
-catalog_shop_db
-order_db
-secondhand_db
-benefits_finance_db
-messaging_db
-```
-
-每个服务使用独立数据库账号，仅授予本 schema 的 DML/DDL 权限。CI 应为每个服务从空 schema 执行 migration、运行集成测试，并用权限测试证明跨 schema 查询被拒绝。
-
-## 7. 每个服务允许的数据库权限
-
-| 服务账号 | 允许访问 | 必须拒绝的示例 |
+| 应用账号 | 允许访问 | CI 必须拒绝的反例 |
 |---|---|---|
 | `identity_governance_app` | `identity_governance_db.*` | `SELECT * FROM order_db.order_info` |
 | `catalog_shop_app` | `catalog_shop_db.*` | `SELECT * FROM identity_governance_db.user` |
@@ -131,18 +76,34 @@ messaging_db
 | `benefits_finance_app` | `benefits_finance_db.*` | `UPDATE order_db.order_info ...` |
 | `messaging_app` | `messaging_db.*` | `SELECT * FROM identity_governance_db.user_block` |
 
-CI 权限测试必须使用真实服务账号执行上述反例并确认被 MySQL 拒绝；仅在文档中声明“不会跨库”不算完成。
+六个分支均应在真实 MySQL 测试中创建外部 schema/表，再使用本服务应用账号验证访问被 MySQL 拒绝。H2、MockMvc 或只读文档不能替代这项证据。
 
-## 8. 跨服务失败处理矩阵
+## 5. 跨服务一致性与失败恢复
 
-| 操作 | 本地事务 owner | 远端失败时的处理 | 一致性证据 |
+| 流程 | 本地真相与调用 | 失败处理 | 一致性证据 |
 |---|---|---|---|
-| 商家审核后创建店铺 | identity-governance | 本地提交审核和 outbox；catalog-shop 幂等消费，失败重试/DLQ/对账 | applicationId 唯一、outbox 状态、店铺创建结果 |
-| 下单预留库存 | catalog-shop + order 各自事务 | 预留成功但订单失败时释放；超时按 idempotency key 查询后再决定，不盲重试 | reservationId、订单请求 ID、补偿日志 |
-| 二手成交创建订单 | secondhand + order 各自事务 | secondhand 冻结成交；order 以 tradeId 幂等创建；失败重试或解除冻结 | tradeId 唯一、orderId 外部引用、恢复测试 |
-| 支付/退款 | benefits-finance | 余额和流水同事务；调用超时按 paymentRequestId 查询，禁止重复扣款 | 唯一请求号、正反流水、余额版本 |
-| 用户封禁传播 | identity-governance | 用户状态与 outbox 同事务；消费者重试，权限缓存不确定的高风险写操作失败关闭 | accessVersion、DLQ、重放记录 |
-| 通知/实时推送 | messaging | 业务事件已完成则不回滚；消息消费重试，WebSocket 失败保留持久通知 | dedupeKey、通知记录、重试日志 |
-| 管理审计汇聚 | 各源服务 outbox → identity-governance | 核心业务提交后异步汇聚；积压告警和重放，禁止其他服务直写审计表 | eventId、来源服务、审计消费偏移 |
+| 商家审核建店 | identity 提交审核与 Outbox；catalog 幂等消费 | 有界重试，超限 `DEAD`，保留 `last_error` 对账 | applicationId、eventId、店铺结果 |
+| 普通订单库存 | order 用幂等键调用 catalog 预留；双方各自提交 | 不确定结果先查状态；预留过期/释放事件进入 order `inbox_event`，仅取消仍待支付订单 | reservationId、requestId、补偿日志 |
+| 二手订单地址 | secondhand 调 identity 校验 buyer/address，再把完整快照发给 order | identity 不可用时建单重试/最终失败；禁止占位地址和跨库读取 | buyerId、addressId、冻结后的地址快照 |
+| 二手建单 | secondhand 冻结交易资格；order 按 `tradeType:tradeId` 幂等创建 | 超时先按 business key 查询，再决定是否重试；最终失败解除冻结 | tradeId、orderId、恢复测试 |
+| 支付/退款 | finance 原子更新余额、流水、用券和 payment_request | 按 paymentRequestId 查询不确定结果，禁止重复扣款 | 唯一请求号、正反流水、余额版本 |
+| 用户封禁传播 | identity 状态与 Outbox 同事务；messaging 维护版本投影 | 高风险写操作在投影不确定时失败关闭，事件按 accessVersion 去旧留新 | accessVersion、Inbox、重放记录 |
+| 通知投递 | 各生产者发送完整 `EventEnvelope`；messaging Inbox 去重 | 通知失败不回滚已完成业务；Outbox 重试并记录错误 | eventId、producer、dedupeKey |
 
-每个服务可以拥有同名的技术表，如 `outbox_event`、`idempotency_record`、`schema_version`，但它们分别位于本服务 schema，由本服务独占，不是跨服务共享表。
+统一事件信封至少包含 `eventId`、`eventType`、`eventVersion`、`producer`、`aggregateType`、`aggregateId`、`occurredAt`、`traceId` 和对象型 `payload`。HTTP 内部调用统一携带 `X-Internal-Service-Token`、`X-Request-Id`；写操作同时携带 `X-Idempotency-Key`（兼容阶段可并发发送 `Idempotency-Key`）。
+
+## 6. 数据关系图
+
+```mermaid
+erDiagram
+    IDENTITY_USER ||--o{ ORDER_INFO : "userId and immutable address snapshot"
+    IDENTITY_USER ||--o{ SECONDHAND_PRODUCT : "sellerUserId only"
+    SHOP ||--o{ PRODUCT : "same owner"
+    PRODUCT ||--o{ ORDER_ITEM : "product snapshot"
+    SECONDHAND_PRODUCT ||--o{ ORDER_ITEM : "trade snapshot"
+    ORDER_INFO ||--o{ TRANSACTION_RECORD : "orderId event or API reference"
+    ORDER_INFO ||--o{ USER_VOUCHER : "usedOrderId reference"
+    IDENTITY_USER ||--o{ CHAT_CONVERSATION : "participant IDs"
+```
+
+图中的跨服务关系都是业务引用，不是数据库外键。真实外键只允许出现在同一 owner/schema 内，例如 `order_item.order_id → order_info.id`、`chat_message.conversation_id → chat_conversation.id`。
