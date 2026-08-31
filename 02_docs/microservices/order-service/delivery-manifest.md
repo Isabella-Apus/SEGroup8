@@ -1,7 +1,7 @@
 # 交付清单
 
 - 源码：`microservices/order-service/`（唯一 Boot 入口、Flyway、Dockerfile、四类测试目录）。
-- 架构：本目录固定十个文件。
+- 架构：边界、图、接口、表归属、跨服务调用、改造前后差异和追踪表均位于本目录，并引用统一验收清单。
 - 运维：`03_devops/microservices/order-service/`。
 - Helm：`deploy/helm/segroup8/templates/order-*.yaml` 与 `values.yaml`。
 - CI/CD：`.github/workflows/order-service-ci-cd.yml`，复用仓库 Variables/Secrets，不保存明文；测试 JAR 的 SHA-256 写入候选镜像 label 和 release metadata，同一候选 Image ID 经过独立 UC11-UC15/UC20 E2E 后原样推送；生产 Helm job 与其他服务共享 `segroup8-production-helm` 串行锁。

@@ -10,6 +10,10 @@ on:
       - "frontend/e2e/domain-d/uc20-fulfillment.spec.ts"
       - "frontend/e2e/microservices/order-service-api.spec.ts"
       - "frontend/playwright.config.ts"
+      - "frontend/src/**"
+      - "frontend/vite.config.js"
+      - "frontend/docker/nginx.conf"
+      - "compose*.yml"
       - "scripts/e2e/stubs/order-downstream-contract-stub.mjs"
       - "02_docs/microservices/order-service/**"
       - "03_devops/microservices/order-service/**"
@@ -30,6 +34,10 @@ on:
       - "frontend/e2e/domain-d/uc20-fulfillment.spec.ts"
       - "frontend/e2e/microservices/order-service-api.spec.ts"
       - "frontend/playwright.config.ts"
+      - "frontend/src/**"
+      - "frontend/vite.config.js"
+      - "frontend/docker/nginx.conf"
+      - "compose*.yml"
       - "scripts/e2e/stubs/order-downstream-contract-stub.mjs"
       - "02_docs/microservices/order-service/**"
       - "03_devops/microservices/order-service/**"
@@ -280,7 +288,12 @@ jobs:
       - name: Lint and render order-service
         run: |
           helm lint deploy/helm/segroup8 --set order.enabled=true --set-string order.image.repository=registry.example/segroup8/order --set-string order.image.tag=sha-test --set-string backend.image.repository=registry.example/segroup8/backend --set-string backend.image.tag=sha-test --set-string frontend.image.repository=registry.example/segroup8/frontend --set-string frontend.image.tag=sha-test --set-file mysql.initSchema=backend/src/main/resources/schema.sql
-          helm template segroup8 deploy/helm/segroup8 --namespace segroup8 --set order.enabled=true --set-string order.image.repository=registry.example/segroup8/order --set-string order.image.tag=sha-test --set-string backend.image.repository=registry.example/segroup8/backend --set-string backend.image.tag=sha-test --set-string frontend.image.repository=registry.example/segroup8/frontend --set-string frontend.image.tag=sha-test --set-file mysql.initSchema=backend/src/main/resources/schema.sql >/dev/null
+          render="$(mktemp)"
+          helm template segroup8 deploy/helm/segroup8 --namespace segroup8 --show-only templates/order-deployment.yaml --set order.enabled=true --set-string order.image.repository=registry.example/segroup8/order --set-string order.image.tag=sha-test --set-string backend.image.repository=registry.example/segroup8/backend --set-string backend.image.tag=sha-test --set-string frontend.image.repository=registry.example/segroup8/frontend --set-string frontend.image.tag=sha-test --set-file mysql.initSchema=backend/src/main/resources/schema.sql >"$render"
+          grep -q 'runAsUser: 10001' "$render"
+          grep -q 'runAsGroup: 10001' "$render"
+          grep -q 'readOnlyRootFilesystem: true' "$render"
+          grep -q 'mountPath: /tmp' "$render"
 
   publish-order-image:
     name: Publish immutable order-service image

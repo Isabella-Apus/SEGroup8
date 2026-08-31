@@ -4,6 +4,8 @@
 
 - [服务边界与状态机](service-boundary.md)
 - [服务图](service-diagram.mmd) / [SVG](service-diagram.svg)
+- [六服务共同验收清单](../service-acceptance-checklist.md)
+- [改造前后代码差异](before-after-code-diff.md)
 - [OpenAPI](openapi.yaml)
 - [数据库归属](database-ownership.md)
 - [跨服务调用](cross-service-calls.md)
