@@ -16,6 +16,9 @@ security:
     secret: test-jwt-secret-must-have-at-least-thirty-two-bytes
   internal-token: test-internal-token
 clients:
+  messaging:
+    base-url: http://127.0.0.1:9
+    publish-delay-ms: 600000
   identity:
     base-url: http://127.0.0.1:9
     connect-timeout: 100ms
