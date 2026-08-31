@@ -12,7 +12,7 @@
 | Snapshot/no source queries | `EventHandler` payload-only processing | seven-contract historical snapshot test; boundary scan | PASS |
 | Database boundary | owned migrations and authenticated APIs | BoundaryTest and MySQL permission denial | PASS |
 | Failure isolation Scenario C | Producer relay → Messaging restart → Inbox → Notification | `evidence/raw-reports/scenario-c-live.md`: order/payment success, same event PROCESSED, notification count 1 | PASS |
-| Immutable Docker image | messaging Dockerfile and CI SHA tag | final local candidate `segroup8/messaging:sha-0bafb9d6a82276f57e4fb6a66d5e50e4ce146ea5`, image ID `sha256:00da458d9e1622f6df8fcad691268b64c470e22e5ceea40d356f2db85299238a`, JAR SHA `3a874f2fe2e7fe16370dd7b6836047f7abd2fea419d97592bd3648803aca910b` | PASS |
+| Immutable Docker image | messaging Dockerfile and CI SHA tag | final local candidate `segroup8/messaging:sha-684aff9e87664ebb41d9844cacbfd8bdf2dc60b3`, image ID `sha256:b0c0bf155725efdd0c6ceff3a98ce1bbddca9f288c3f478f34cd197ad27821d6`, JAR SHA `0467c321fc551b2024a6e18f112faf96912094a7f0b78609a579e0ca18d4c165` | PASS |
 | Helm/atomic rollback | messaging templates and `deploy-k3s.sh --atomic` | local `helm lint` and `helm template` pass; cluster rollout not run | MANUAL ACTION REQUIRED |
 | Health/info/metrics/logging | application health groups, `MessagingMetrics`, `TraceContextFilter` | messaging Maven verification | PASS |
 | Deployment failure drill | wrong-origin procedure documented | no local Kubernetes runtime | MANUAL ACTION REQUIRED |

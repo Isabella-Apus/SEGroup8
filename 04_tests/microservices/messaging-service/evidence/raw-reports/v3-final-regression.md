@@ -1,6 +1,6 @@
 # V3 final regression evidence
 
-Date: 2026-08-31. Output is intentionally summarized to exclude credentials,
+Date: 2026-08-31. Candidate revision: `684aff9e87664ebb41d9844cacbfd8bdf2dc60b3`. Output is intentionally summarized to exclude credentials,
 JWTs, event payloads, notification text, and message bodies.
 
 | Command | Result | Observed |

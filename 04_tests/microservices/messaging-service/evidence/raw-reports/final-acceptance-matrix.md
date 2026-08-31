@@ -1,6 +1,6 @@
 # Final acceptance fixed-checklist matrix (0–13)
 
-Revision: `0bafb9d6a82276f57e4fb6a66d5e50e4ce146ea5`
+Revision: `684aff9e87664ebb41d9844cacbfd8bdf2dc60b3`
 
 | Requirement | Command | Actual result | Evidence | Status |
 |---|---|---|---|---|

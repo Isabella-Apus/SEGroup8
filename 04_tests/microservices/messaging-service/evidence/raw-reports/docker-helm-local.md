@@ -4,11 +4,11 @@ Date: 2026-08-31
 
 ## Docker
 
-- Command: `docker build --file microservices/messaging-service/Dockerfile --tag segroup8/messaging:sha-0bafb9d6a82276f57e4fb6a66d5e50e4ce146ea5 microservices`
+- Command: `docker build --file microservices/messaging-service/Dockerfile --tag segroup8/messaging:sha-684aff9e87664ebb41d9844cacbfd8bdf2dc60b3 microservices`
 - Result: PASS
-- Image: `segroup8/messaging:sha-0bafb9d6a82276f57e4fb6a66d5e50e4ce146ea5`
-- Image ID: `sha256:00da458d9e1622f6df8fcad691268b64c470e22e5ceea40d356f2db85299238a`
-- Candidate JAR SHA: `3a874f2fe2e7fe16370dd7b6836047f7abd2fea419d97592bd3648803aca910b`
+- Image: `segroup8/messaging:sha-684aff9e87664ebb41d9844cacbfd8bdf2dc60b3`
+- Image ID: `sha256:b0c0bf155725efdd0c6ceff3a98ce1bbddca9f288c3f478f34cd197ad27821d6`
+- Candidate JAR SHA: `0467c321fc551b2024a6e18f112faf96912094a7f0b78609a579e0ca18d4c165`
 - Final audit rerun: `docker run --rm alpine/helm:3.15.4` executed `helm lint` and `helm template` against the current tree; lint reported `1 chart(s) linted, 0 chart(s) failed`.
 - Local `docker image ls --no-trunc` confirms the same immutable image ID and
   220 MB artifact; image history contains only the application JAR and runtime

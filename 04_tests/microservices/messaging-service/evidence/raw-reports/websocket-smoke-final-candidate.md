@@ -1,6 +1,6 @@
 # WebSocket smoke evidence
 
-Candidate endpoint: `ws://127.0.0.1:18084/ws/realtime`.
+Candidate revision: `684aff9e87664ebb41d9844cacbfd8bdf2dc60b3`; endpoint: `ws://127.0.0.1:18084/ws/realtime`.
 
 | Case | Origin | Result |
 |---|---|---|

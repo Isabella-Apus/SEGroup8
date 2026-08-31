@@ -1,6 +1,6 @@
 # Public/API route contract audit
 
-Revision: `0bafb9d6a82276f57e4fb6a66d5e50e4ce146ea5`
+Revision: `684aff9e87664ebb41d9844cacbfd8bdf2dc60b3`
 
 Runtime controller/OpenAPI/reviewed manifest gate: **PASS**, 12 normalized operations matched.
 

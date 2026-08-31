@@ -8,12 +8,12 @@ variables. No backend process was required for these probes.
 |---|---:|---|
 | `/actuator/health/liveness` | 200 | `UP` |
 | `/actuator/health/readiness` | 200 | `UP` |
-| `/actuator/info` | 200 | service `messaging-service`, version `v3-local`, commit `0bafb9d6` |
+| `/actuator/info` | 200 | service `messaging-service`, version `v3-final-candidate`, commit `684aff9e87664ebb41d9844cacbfd8bdf2dc60b3` |
 | `/actuator/metrics/messaging.websocket.connections.active` | 200 | meter available |
 | `/actuator/metrics/messaging.events.backlog` | 200 | meter available |
 | `/actuator/metrics/messaging.events.consume.failures` | 200 | meter available |
 | `/actuator/metrics/messaging.websocket.push.failures` | 200 | meter available |
 | `/actuator/metrics/messaging.events.retry.count` | 200 | meter available |
 
-The process was stopped after the smoke checks. This evidence contains no JWT,
+The final candidate image was stopped after the smoke checks. This evidence contains no JWT,
 password, internal token, or message body.
