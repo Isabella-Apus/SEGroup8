@@ -159,6 +159,7 @@ jobs:
       FINANCE_ACCEPTANCE_IMAGE: segroup8/benefits-finance:candidate-${{ github.sha }}
       E2E_FINANCE_BASE_URL: http://127.0.0.1:18085
       E2E_FINANCE_EVENT_STUB_URL: http://127.0.0.1:18087
+      FINANCE_EVENT_STUB_HOST: 0.0.0.0
       JWT_SECRET: benefits-finance-acceptance-jwt-secret-at-least-32-bytes
       E2E_INTERNAL_SERVICE_TOKEN: benefits-finance-acceptance-internal-token
       APP_COMMIT: ${{ github.sha }}
