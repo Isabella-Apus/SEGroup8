@@ -7,8 +7,6 @@ registry="${3:?ACR registry is required}"
 registry_namespace="${4:?ACR namespace is required}"
 image_tag="${5:?image tag is required}"
 k8s_namespace="${6:-segroup8}"
-realtime_allowed_origins="${7:?REALTIME_ALLOWED_ORIGIN_PATTERNS is required}"
-identity_service_url="${8:-}"
 
 if [[ ! "$release_id" =~ ^[0-9a-f]{40}$ ]]; then
   echo "Release id must be a full Git commit SHA" >&2
@@ -27,11 +25,6 @@ fi
 
 if [[ ! "$k8s_namespace" =~ ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$ ]]; then
   echo "Kubernetes namespace is invalid" >&2
-  exit 2
-fi
-
-if [[ -z "$realtime_allowed_origins" || "$realtime_allowed_origins" == "*" ]]; then
-  echo "REALTIME_ALLOWED_ORIGIN_PATTERNS must be an explicit non-wildcard allow-list" >&2
   exit 2
 fi
 
@@ -55,7 +48,7 @@ test -f "$chart_dir/Chart.yaml"
 test -s "$schema_file"
 
 kubectl get namespace "$k8s_namespace" >/dev/null
-for secret_name in acr-pull-secret segroup8-backend-secret segroup8-mysql-secret segroup8-messaging-secret; do
+for secret_name in acr-pull-secret segroup8-backend-secret segroup8-mysql-secret; do
   kubectl --namespace "$k8s_namespace" get secret "$secret_name" >/dev/null
 done
 
@@ -63,6 +56,7 @@ build_time="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 helm upgrade --install segroup8 "$chart_dir" \
   --namespace "$k8s_namespace" \
+  --reuse-values \
   --atomic \
   --cleanup-on-fail \
   --wait \
@@ -72,10 +66,6 @@ helm upgrade --install segroup8 "$chart_dir" \
   --set-string "backend.image.tag=$image_tag" \
   --set-string "frontend.image.repository=$registry/$registry_namespace/frontend" \
   --set-string "frontend.image.tag=$image_tag" \
-  --set-string "messaging.image.repository=$registry/$registry_namespace/messaging" \
-  --set-string "messaging.image.tag=$image_tag" \
-  --set-string "messaging.config.realtimeAllowedOriginPatterns=$realtime_allowed_origins" \
-  --set-string "messaging.config.identityServiceUrl=$identity_service_url" \
   --set-string "mysql.image.repository=$registry/$registry_namespace/mysql" \
   --set-string "deployment.version=$image_tag" \
   --set-string "deployment.commit=$release_id" \
@@ -84,7 +74,6 @@ helm upgrade --install segroup8 "$chart_dir" \
 
 kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-backend --timeout=5m
 kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-frontend --timeout=5m
-kubectl --namespace "$k8s_namespace" rollout status deployment/messaging --timeout=5m
 kubectl --namespace "$k8s_namespace" get pods,service,ingress
 
 # K3s installs Traefik by default, so this verifies the public routing path from

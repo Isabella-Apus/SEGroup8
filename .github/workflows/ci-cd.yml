@@ -90,50 +90,6 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-  messaging-service:
-    name: Messaging service tests and package
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    defaults:
-      run:
-        working-directory: microservices
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-      - name: Set up Java and Maven cache
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-          cache: maven
-          cache-dependency-path: |
-            microservices/pom.xml
-            microservices/security-contract/pom.xml
-            microservices/messaging-service/pom.xml
-      - name: Verify messaging service and security contract
-        run: mvn -B --no-transfer-progress -pl messaging-service -am clean verify
-      - name: Enforce messaging source boundary
-        run: cd .. && node scripts/ci/verify-messaging-boundary.mjs
-      - name: Enforce messaging route contract
-        run: cd .. && node scripts/ci/verify-messaging-routes.mjs
-      - name: Upload messaging reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: messaging-service-test-reports
-          path: |
-            microservices/messaging-service/target/surefire-reports/**
-            microservices/security-contract/target/surefire-reports/**
-          if-no-files-found: warn
-          retention-days: 14
-      - name: Upload verified messaging JAR
-        uses: actions/upload-artifact@v4
-        with:
-          name: messaging-service-jar
-          path: microservices/messaging-service/target/messaging-service-1.0.0.jar
-          if-no-files-found: error
-          retention-days: 7
-
   # Level 2: every domain uses the same reusable workflow and Maven cache.
   domain-a:
     name: Domain A (UC01-05)
@@ -293,8 +249,6 @@ jobs:
             --set-string backend.image.tag=sha-test \
             --set-string frontend.image.repository=registry.example/segroup8/frontend \
             --set-string frontend.image.tag=sha-test \
-            --set-string messaging.image.repository=registry.example/segroup8/messaging \
-            --set-string messaging.image.tag=sha-test \
             --set-file mysql.initSchema=backend/src/main/resources/schema.sql
           helm template segroup8 deploy/helm/segroup8 \
             --namespace segroup8 \
@@ -302,63 +256,21 @@ jobs:
             --set-string backend.image.tag=sha-test \
             --set-string frontend.image.repository=registry.example/segroup8/frontend \
             --set-string frontend.image.tag=sha-test \
-            --set-string messaging.image.repository=registry.example/segroup8/messaging \
-            --set-string messaging.image.tag=sha-test \
             --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
             >/dev/null
-
-  messaging-image:
-    name: Build immutable messaging image
-    needs: messaging-service
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-      - name: Download verified messaging JAR
-        uses: actions/download-artifact@v4
-        with:
-          name: messaging-service-jar
-          path: microservices/messaging-service/target
-      - name: Build messaging image (no push on pull requests)
-        run: |
-          jar_sha="$(sha256sum microservices/messaging-service/target/messaging-service-1.0.0.jar | cut -d' ' -f1)"
-          docker build --pull \
-            --file microservices/messaging-service/Dockerfile \
-            --build-arg GIT_SHA="${{ github.sha }}" \
-            --build-arg JAR_SHA256="$jar_sha" \
-            --build-arg IMAGE_SOURCE="${{ github.server_url }}/${{ github.repository }}" \
-            --tag segroup8/messaging:sha-${{ github.sha }} microservices
-          docker save segroup8/messaging:sha-${{ github.sha }} > messaging-image.tar
-          docker image inspect segroup8/messaging:sha-${{ github.sha }} \
-            --format 'jar-sha256={{index .Config.Labels "com.segroup8.messaging.jar-sha256"}}' > messaging-image-metadata.txt
-      - name: Upload the single candidate image
-        uses: actions/upload-artifact@v4
-        with:
-          name: messaging-image-candidate
-          path: |
-            messaging-image.tar
-            messaging-image-metadata.txt
-          if-no-files-found: error
-          retention-days: 7
 
   publish-images:
     name: Publish verified images to ACR
     if: >-
       github.event_name == 'push' &&
       github.ref == 'refs/heads/main' 
-    needs: [playwright, delivery-config, messaging-service, messaging-image]
+    needs: [playwright, delivery-config]
     runs-on: ubuntu-latest
     timeout-minutes: 20
     environment: production
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-      - name: Download the single verified messaging candidate
-        uses: actions/download-artifact@v4
-        with:
-          name: messaging-image-candidate
-          path: .ci/messaging-image
       - name: Download tested backend JAR
         uses: actions/download-artifact@v4
         with:
@@ -418,15 +330,6 @@ jobs:
           labels: |
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-      - name: Push the same verified messaging candidate
-        env:
-          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
-          ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
-        run: |
-          docker load --input .ci/messaging-image/messaging-image.tar
-          docker tag "segroup8/messaging:sha-${GITHUB_SHA}" \
-            "$ACR_REGISTRY/$ACR_NAMESPACE/messaging:sha-${GITHUB_SHA}"
-          docker push "$ACR_REGISTRY/$ACR_NAMESPACE/messaging:sha-${GITHUB_SHA}"
 
   deploy-production:
     name: Deploy images to production K3s
@@ -462,8 +365,6 @@ jobs:
           ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
           ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
-          REALTIME_ALLOWED_ORIGIN_PATTERNS: ${{ vars.REALTIME_ALLOWED_ORIGIN_PATTERNS }}
-          IDENTITY_SERVICE_URL: ${{ vars.IDENTITY_SERVICE_URL }}
         run: |
           remote_archive="/tmp/segroup8-k3s-$GITHUB_SHA.tar.gz"
           scp "k3s-release-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$remote_archive"
@@ -471,7 +372,7 @@ jobs:
             -o ServerAliveInterval=30 \
             -o ServerAliveCountMax=10 \
             "$DEPLOY_USER@$DEPLOY_HOST" \
-            "bash -s -- '$GITHUB_SHA' '$remote_archive' '$ACR_REGISTRY' '$ACR_NAMESPACE' 'sha-$GITHUB_SHA' '$K8S_NAMESPACE' '$REALTIME_ALLOWED_ORIGIN_PATTERNS' '$IDENTITY_SERVICE_URL'" \
+            "bash -s -- '$GITHUB_SHA' '$remote_archive' '$ACR_REGISTRY' '$ACR_NAMESPACE' 'sha-$GITHUB_SHA' '$K8S_NAMESPACE'" \
             < .github/scripts/deploy-k3s.sh
       - name: Verify public production endpoint
         if: vars.PRODUCTION_URL != ''

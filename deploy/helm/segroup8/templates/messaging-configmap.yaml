@@ -1,3 +1,4 @@
+{{- if .Values.messaging.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -13,3 +14,4 @@ data:
   INBOX_MAX_RETRIES: {{ .Values.messaging.config.inboxMaxRetries | quote }}
   DELIVERY_POLL_DELAY_MS: {{ .Values.messaging.config.deliveryPollDelayMs | quote }}
   DELIVERY_MAX_RETRIES: {{ .Values.messaging.config.deliveryMaxRetries | quote }}
+{{- end }}

@@ -1,3 +1,4 @@
+{{- if .Values.messaging.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -82,3 +83,4 @@ spec:
             failureThreshold: 3
           resources:
             {{- toYaml .Values.messaging.resources | nindent 12 }}
+{{- end }}

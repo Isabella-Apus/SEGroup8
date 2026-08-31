@@ -20,6 +20,9 @@ backend:
       memory: 1536Mi
 
 messaging:
+  # The messaging service is delivered by its own pipeline. Keep the shared
+  # platform release installable without a messaging image or secret.
+  enabled: false
   replicaCount: 1
   image:
     repository: ""

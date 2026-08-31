@@ -1,0 +1,1275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.segroup8.platform.integration.OrderCreateUc11IntegrationTest(domain-c-domain_c-20260831040627329)" time="1.287" tests="7" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="GBK"/>
+    <property name="java.class.path" value="C:\Users\34267\Desktop\code\SEGroup8\backend\target\test-classes;C:\Users\34267\Desktop\code\SEGroup8\backend\target\classes;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.3.4\spring-boot-starter-web-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter\3.3.4\spring-boot-starter-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot\3.3.4\spring-boot-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.3.4\spring-boot-starter-logging-3.3.4.jar;C:\Users\34267\.m2\repository\ch\qos\logback\logback-classic\1.5.8\logback-classic-1.5.8.jar;C:\Users\34267\.m2\repository\ch\qos\logback\logback-core\1.5.8\logback-core-1.5.8.jar;C:\Users\34267\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.23.1\log4j-to-slf4j-2.23.1.jar;C:\Users\34267\.m2\repository\org\apache\logging\log4j\log4j-api\2.23.1\log4j-api-2.23.1.jar;C:\Users\34267\.m2\repository\org\slf4j\jul-to-slf4j\2.0.16\jul-to-slf4j-2.0.16.jar;C:\Users\34267\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\34267\.m2\repository\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.3.4\spring-boot-starter-json-3.3.4.jar;C:\Users\34267\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.17.2\jackson-datatype-jdk8-2.17.2.jar;C:\Users\34267\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.17.2\jackson-datatype-jsr310-2.17.2.jar;C:\Users\34267\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.17.2\jackson-module-parameter-names-2.17.2.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.3.4\spring-boot-starter-tomcat-3.3.4.jar;C:\Users\34267\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.30\tomcat-embed-core-10.1.30.jar;C:\Users\34267\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.30\tomcat-embed-websocket-10.1.30.jar;C:\Users\34267\.m2\repository\org\springframework\spring-web\6.1.13\spring-web-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-beans\6.1.13\spring-beans-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-webmvc\6.1.13\spring-webmvc-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-aop\6.1.13\spring-aop-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-context\6.1.13\spring-context-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-expression\6.1.13\spring-expression-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-validation\3.3.4\spring-boot-starter-validation-3.3.4.jar;C:\Users\34267\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.30\tomcat-embed-el-10.1.30.jar;C:\Users\34267\.m2\repository\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\34267\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\34267\.m2\repository\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;C:\Users\34267\.m2\repository\com\fasterxml\classmate\1.7.0\classmate-1.7.0.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-websocket\3.3.4\spring-boot-starter-websocket-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\spring-messaging\6.1.13\spring-messaging-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-websocket\6.1.13\spring-websocket-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-actuator\3.3.4\spring-boot-starter-actuator-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-actuator-autoconfigure\3.3.4\spring-boot-actuator-autoconfigure-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-actuator\3.3.4\spring-boot-actuator-3.3.4.jar;C:\Users\34267\.m2\repository\io\micrometer\micrometer-observation\1.13.4\micrometer-observation-1.13.4.jar;C:\Users\34267\.m2\repository\io\micrometer\micrometer-commons\1.13.4\micrometer-commons-1.13.4.jar;C:\Users\34267\.m2\repository\io\micrometer\micrometer-jakarta9\1.13.4\micrometer-jakarta9-1.13.4.jar;C:\Users\34267\.m2\repository\io\micrometer\micrometer-core\1.13.4\micrometer-core-1.13.4.jar;C:\Users\34267\.m2\repository\org\hdrhistogram\HdrHistogram\2.2.2\HdrHistogram-2.2.2.jar;C:\Users\34267\.m2\repository\org\latencyutils\LatencyUtils\2.0.3\LatencyUtils-2.0.3.jar;C:\Users\34267\.m2\repository\org\springframework\security\spring-security-crypto\6.3.3\spring-security-crypto-6.3.3.jar;C:\Users\34267\.m2\repository\com\baomidou\mybatis-plus-spring-boot3-starter\3.5.7\mybatis-plus-spring-boot3-starter-3.5.7.jar;C:\Users\34267\.m2\repository\com\baomidou\mybatis-plus\3.5.7\mybatis-plus-3.5.7.jar;C:\Users\34267\.m2\repository\com\baomidou\mybatis-plus-core\3.5.7\mybatis-plus-core-3.5.7.jar;C:\Users\34267\.m2\repository\com\baomidou\mybatis-plus-annotation\3.5.7\mybatis-plus-annotation-3.5.7.jar;C:\Users\34267\.m2\repository\com\baomidou\mybatis-plus-extension\3.5.7\mybatis-plus-extension-3.5.7.jar;C:\Users\34267\.m2\repository\org\mybatis\mybatis\3.5.16\mybatis-3.5.16.jar;C:\Users\34267\.m2\repository\com\github\jsqlparser\jsqlparser\4.9\jsqlparser-4.9.jar;C:\Users\34267\.m2\repository\org\mybatis\mybatis-spring\3.0.3\mybatis-spring-3.0.3.jar;C:\Users\34267\.m2\repository\com\baomidou\mybatis-plus-spring-boot-autoconfigure\3.5.7\mybatis-plus-spring-boot-autoconfigure-3.5.7.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.3.4\spring-boot-autoconfigure-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\3.3.4\spring-boot-starter-jdbc-3.3.4.jar;C:\Users\34267\.m2\repository\com\zaxxer\HikariCP\5.1.0\HikariCP-5.1.0.jar;C:\Users\34267\.m2\repository\org\springframework\spring-jdbc\6.1.13\spring-jdbc-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-tx\6.1.13\spring-tx-6.1.13.jar;C:\Users\34267\.m2\repository\com\mysql\mysql-connector-j\8.3.0\mysql-connector-j-8.3.0.jar;C:\Users\34267\.m2\repository\org\projectlombok\lombok\1.18.34\lombok-1.18.34.jar;C:\Users\34267\.m2\repository\io\jsonwebtoken\jjwt-api\0.12.6\jjwt-api-0.12.6.jar;C:\Users\34267\.m2\repository\io\jsonwebtoken\jjwt-impl\0.12.6\jjwt-impl-0.12.6.jar;C:\Users\34267\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.12.6\jjwt-jackson-0.12.6.jar;C:\Users\34267\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;C:\Users\34267\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;C:\Users\34267\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.17.2\jackson-core-2.17.2.jar;C:\Users\34267\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.6.0\springdoc-openapi-starter-webmvc-ui-2.6.0.jar;C:\Users\34267\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-api\2.6.0\springdoc-openapi-starter-webmvc-api-2.6.0.jar;C:\Users\34267\.m2\repository\org\springdoc\springdoc-openapi-starter-common\2.6.0\springdoc-openapi-starter-common-2.6.0.jar;C:\Users\34267\.m2\repository\io\swagger\core\v3\swagger-core-jakarta\2.2.22\swagger-core-jakarta-2.2.22.jar;C:\Users\34267\.m2\repository\org\apache\commons\commons-lang3\3.14.0\commons-lang3-3.14.0.jar;C:\Users\34267\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.22\swagger-annotations-jakarta-2.2.22.jar;C:\Users\34267\.m2\repository\io\swagger\core\v3\swagger-models-jakarta\2.2.22\swagger-models-jakarta-2.2.22.jar;C:\Users\34267\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.17.2\jackson-dataformat-yaml-2.17.2.jar;C:\Users\34267\.m2\repository\org\webjars\swagger-ui\5.17.14\swagger-ui-5.17.14.jar;C:\Users\34267\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.3.4\spring-boot-starter-test-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-test\3.3.4\spring-boot-test-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.3.4\spring-boot-test-autoconfigure-3.3.4.jar;C:\Users\34267\.m2\repository\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\34267\.m2\repository\org\slf4j\slf4j-api\2.0.16\slf4j-api-2.0.16.jar;C:\Users\34267\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\34267\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\34267\.m2\repository\net\minidev\json-smart\2.5.1\json-smart-2.5.1.jar;C:\Users\34267\.m2\repository\net\minidev\accessors-smart\2.5.1\accessors-smart-2.5.1.jar;C:\Users\34267\.m2\repository\org\ow2\asm\asm\9.6\asm-9.6.jar;C:\Users\34267\.m2\repository\org\assertj\assertj-core\3.25.3\assertj-core-3.25.3.jar;C:\Users\34267\.m2\repository\net\bytebuddy\byte-buddy\1.14.19\byte-buddy-1.14.19.jar;C:\Users\34267\.m2\repository\org\awaitility\awaitility\4.2.2\awaitility-4.2.2.jar;C:\Users\34267\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\34267\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.3\junit-jupiter-5.10.3.jar;C:\Users\34267\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.3\junit-jupiter-api-5.10.3.jar;C:\Users\34267\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\34267\.m2\repository\org\junit\platform\junit-platform-commons\1.10.3\junit-platform-commons-1.10.3.jar;C:\Users\34267\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\34267\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.3\junit-jupiter-params-5.10.3.jar;C:\Users\34267\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.3\junit-jupiter-engine-5.10.3.jar;C:\Users\34267\.m2\repository\org\junit\platform\junit-platform-engine\1.10.3\junit-platform-engine-1.10.3.jar;C:\Users\34267\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\34267\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.19\byte-buddy-agent-1.14.19.jar;C:\Users\34267\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\34267\.m2\repository\org\mockito\mockito-junit-jupiter\5.11.0\mockito-junit-jupiter-5.11.0.jar;C:\Users\34267\.m2\repository\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\34267\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\34267\.m2\repository\org\springframework\spring-core\6.1.13\spring-core-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-jcl\6.1.13\spring-jcl-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-test\6.1.13\spring-test-6.1.13.jar;C:\Users\34267\.m2\repository\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;C:\Users\34267\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;C:\Users\34267\.m2\repository\org\testcontainers\mysql\1.21.4\mysql-1.21.4.jar;C:\Users\34267\.m2\repository\org\testcontainers\jdbc\1.21.4\jdbc-1.21.4.jar;C:\Users\34267\.m2\repository\org\testcontainers\database-commons\1.21.4\database-commons-1.21.4.jar;C:\Users\34267\.m2\repository\org\testcontainers\junit-jupiter\1.21.4\junit-jupiter-1.21.4.jar;C:\Users\34267\.m2\repository\org\testcontainers\testcontainers\1.21.4\testcontainers-1.21.4.jar;C:\Users\34267\.m2\repository\junit\junit\4.13.2\junit-4.13.2.jar;C:\Users\34267\.m2\repository\org\hamcrest\hamcrest-core\2.2\hamcrest-core-2.2.jar;C:\Users\34267\.m2\repository\org\apache\commons\commons-compress\1.24.0\commons-compress-1.24.0.jar;C:\Users\34267\.m2\repository\org\rnorth\duct-tape\duct-tape\1.0.8\duct-tape-1.0.8.jar;C:\Users\34267\.m2\repository\org\jetbrains\annotations\17.0.0\annotations-17.0.0.jar;C:\Users\34267\.m2\repository\com\github\docker-java\docker-java-api\3.4.2\docker-java-api-3.4.2.jar;C:\Users\34267\.m2\repository\com\github\docker-java\docker-java-transport-zerodep\3.4.2\docker-java-transport-zerodep-3.4.2.jar;C:\Users\34267\.m2\repository\com\github\docker-java\docker-java-transport\3.4.2\docker-java-transport-3.4.2.jar;C:\Users\34267\.m2\repository\net\java\dev\jna\jna\5.13.0\jna-5.13.0.jar;"/>
+    <property name="java.vm.vendor" value="JetBrains s.r.o."/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://openjdk.org/"/>
+    <property name="user.timezone" value="Asia/Shanghai"/>
+    <property name="org.jboss.logging.provider" value="slf4j"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="CN"/>
+    <property name="sun.boot.library.path" value="D:\java\IntelliJ IDEA 2025.2.1\jbr\bin"/>
+    <property name="sun.java.command" value="C:\Users\34267\AppData\Local\Temp\surefire4297433712793006952\surefirebooter-20260831120702673_3.jar C:\Users\34267\AppData\Local\Temp\surefire4297433712793006952 2026-08-31T12-07-02_337-jvmRun1 surefire-20260831120702673_1tmp surefire_0-20260831120702673_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="C:\Users\34267\Desktop\code\SEGroup8\backend\target\test-classes;C:\Users\34267\Desktop\code\SEGroup8\backend\target\classes;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-web\3.3.4\spring-boot-starter-web-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter\3.3.4\spring-boot-starter-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot\3.3.4\spring-boot-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-logging\3.3.4\spring-boot-starter-logging-3.3.4.jar;C:\Users\34267\.m2\repository\ch\qos\logback\logback-classic\1.5.8\logback-classic-1.5.8.jar;C:\Users\34267\.m2\repository\ch\qos\logback\logback-core\1.5.8\logback-core-1.5.8.jar;C:\Users\34267\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.23.1\log4j-to-slf4j-2.23.1.jar;C:\Users\34267\.m2\repository\org\apache\logging\log4j\log4j-api\2.23.1\log4j-api-2.23.1.jar;C:\Users\34267\.m2\repository\org\slf4j\jul-to-slf4j\2.0.16\jul-to-slf4j-2.0.16.jar;C:\Users\34267\.m2\repository\jakarta\annotation\jakarta.annotation-api\2.1.1\jakarta.annotation-api-2.1.1.jar;C:\Users\34267\.m2\repository\org\yaml\snakeyaml\2.2\snakeyaml-2.2.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-json\3.3.4\spring-boot-starter-json-3.3.4.jar;C:\Users\34267\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.17.2\jackson-datatype-jdk8-2.17.2.jar;C:\Users\34267\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.17.2\jackson-datatype-jsr310-2.17.2.jar;C:\Users\34267\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.17.2\jackson-module-parameter-names-2.17.2.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\3.3.4\spring-boot-starter-tomcat-3.3.4.jar;C:\Users\34267\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\10.1.30\tomcat-embed-core-10.1.30.jar;C:\Users\34267\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\10.1.30\tomcat-embed-websocket-10.1.30.jar;C:\Users\34267\.m2\repository\org\springframework\spring-web\6.1.13\spring-web-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-beans\6.1.13\spring-beans-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-webmvc\6.1.13\spring-webmvc-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-aop\6.1.13\spring-aop-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-context\6.1.13\spring-context-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-expression\6.1.13\spring-expression-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-validation\3.3.4\spring-boot-starter-validation-3.3.4.jar;C:\Users\34267\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\10.1.30\tomcat-embed-el-10.1.30.jar;C:\Users\34267\.m2\repository\org\hibernate\validator\hibernate-validator\8.0.1.Final\hibernate-validator-8.0.1.Final.jar;C:\Users\34267\.m2\repository\jakarta\validation\jakarta.validation-api\3.0.2\jakarta.validation-api-3.0.2.jar;C:\Users\34267\.m2\repository\org\jboss\logging\jboss-logging\3.5.3.Final\jboss-logging-3.5.3.Final.jar;C:\Users\34267\.m2\repository\com\fasterxml\classmate\1.7.0\classmate-1.7.0.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-websocket\3.3.4\spring-boot-starter-websocket-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\spring-messaging\6.1.13\spring-messaging-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-websocket\6.1.13\spring-websocket-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-actuator\3.3.4\spring-boot-starter-actuator-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-actuator-autoconfigure\3.3.4\spring-boot-actuator-autoconfigure-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-actuator\3.3.4\spring-boot-actuator-3.3.4.jar;C:\Users\34267\.m2\repository\io\micrometer\micrometer-observation\1.13.4\micrometer-observation-1.13.4.jar;C:\Users\34267\.m2\repository\io\micrometer\micrometer-commons\1.13.4\micrometer-commons-1.13.4.jar;C:\Users\34267\.m2\repository\io\micrometer\micrometer-jakarta9\1.13.4\micrometer-jakarta9-1.13.4.jar;C:\Users\34267\.m2\repository\io\micrometer\micrometer-core\1.13.4\micrometer-core-1.13.4.jar;C:\Users\34267\.m2\repository\org\hdrhistogram\HdrHistogram\2.2.2\HdrHistogram-2.2.2.jar;C:\Users\34267\.m2\repository\org\latencyutils\LatencyUtils\2.0.3\LatencyUtils-2.0.3.jar;C:\Users\34267\.m2\repository\org\springframework\security\spring-security-crypto\6.3.3\spring-security-crypto-6.3.3.jar;C:\Users\34267\.m2\repository\com\baomidou\mybatis-plus-spring-boot3-starter\3.5.7\mybatis-plus-spring-boot3-starter-3.5.7.jar;C:\Users\34267\.m2\repository\com\baomidou\mybatis-plus\3.5.7\mybatis-plus-3.5.7.jar;C:\Users\34267\.m2\repository\com\baomidou\mybatis-plus-core\3.5.7\mybatis-plus-core-3.5.7.jar;C:\Users\34267\.m2\repository\com\baomidou\mybatis-plus-annotation\3.5.7\mybatis-plus-annotation-3.5.7.jar;C:\Users\34267\.m2\repository\com\baomidou\mybatis-plus-extension\3.5.7\mybatis-plus-extension-3.5.7.jar;C:\Users\34267\.m2\repository\org\mybatis\mybatis\3.5.16\mybatis-3.5.16.jar;C:\Users\34267\.m2\repository\com\github\jsqlparser\jsqlparser\4.9\jsqlparser-4.9.jar;C:\Users\34267\.m2\repository\org\mybatis\mybatis-spring\3.0.3\mybatis-spring-3.0.3.jar;C:\Users\34267\.m2\repository\com\baomidou\mybatis-plus-spring-boot-autoconfigure\3.5.7\mybatis-plus-spring-boot-autoconfigure-3.5.7.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\3.3.4\spring-boot-autoconfigure-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\3.3.4\spring-boot-starter-jdbc-3.3.4.jar;C:\Users\34267\.m2\repository\com\zaxxer\HikariCP\5.1.0\HikariCP-5.1.0.jar;C:\Users\34267\.m2\repository\org\springframework\spring-jdbc\6.1.13\spring-jdbc-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-tx\6.1.13\spring-tx-6.1.13.jar;C:\Users\34267\.m2\repository\com\mysql\mysql-connector-j\8.3.0\mysql-connector-j-8.3.0.jar;C:\Users\34267\.m2\repository\org\projectlombok\lombok\1.18.34\lombok-1.18.34.jar;C:\Users\34267\.m2\repository\io\jsonwebtoken\jjwt-api\0.12.6\jjwt-api-0.12.6.jar;C:\Users\34267\.m2\repository\io\jsonwebtoken\jjwt-impl\0.12.6\jjwt-impl-0.12.6.jar;C:\Users\34267\.m2\repository\io\jsonwebtoken\jjwt-jackson\0.12.6\jjwt-jackson-0.12.6.jar;C:\Users\34267\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.17.2\jackson-databind-2.17.2.jar;C:\Users\34267\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.17.2\jackson-annotations-2.17.2.jar;C:\Users\34267\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.17.2\jackson-core-2.17.2.jar;C:\Users\34267\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-ui\2.6.0\springdoc-openapi-starter-webmvc-ui-2.6.0.jar;C:\Users\34267\.m2\repository\org\springdoc\springdoc-openapi-starter-webmvc-api\2.6.0\springdoc-openapi-starter-webmvc-api-2.6.0.jar;C:\Users\34267\.m2\repository\org\springdoc\springdoc-openapi-starter-common\2.6.0\springdoc-openapi-starter-common-2.6.0.jar;C:\Users\34267\.m2\repository\io\swagger\core\v3\swagger-core-jakarta\2.2.22\swagger-core-jakarta-2.2.22.jar;C:\Users\34267\.m2\repository\org\apache\commons\commons-lang3\3.14.0\commons-lang3-3.14.0.jar;C:\Users\34267\.m2\repository\io\swagger\core\v3\swagger-annotations-jakarta\2.2.22\swagger-annotations-jakarta-2.2.22.jar;C:\Users\34267\.m2\repository\io\swagger\core\v3\swagger-models-jakarta\2.2.22\swagger-models-jakarta-2.2.22.jar;C:\Users\34267\.m2\repository\com\fasterxml\jackson\dataformat\jackson-dataformat-yaml\2.17.2\jackson-dataformat-yaml-2.17.2.jar;C:\Users\34267\.m2\repository\org\webjars\swagger-ui\5.17.14\swagger-ui-5.17.14.jar;C:\Users\34267\.m2\repository\com\google\code\findbugs\jsr305\3.0.2\jsr305-3.0.2.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-starter-test\3.3.4\spring-boot-starter-test-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-test\3.3.4\spring-boot-test-3.3.4.jar;C:\Users\34267\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\3.3.4\spring-boot-test-autoconfigure-3.3.4.jar;C:\Users\34267\.m2\repository\com\jayway\jsonpath\json-path\2.9.0\json-path-2.9.0.jar;C:\Users\34267\.m2\repository\org\slf4j\slf4j-api\2.0.16\slf4j-api-2.0.16.jar;C:\Users\34267\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\4.0.2\jakarta.xml.bind-api-4.0.2.jar;C:\Users\34267\.m2\repository\jakarta\activation\jakarta.activation-api\2.1.3\jakarta.activation-api-2.1.3.jar;C:\Users\34267\.m2\repository\net\minidev\json-smart\2.5.1\json-smart-2.5.1.jar;C:\Users\34267\.m2\repository\net\minidev\accessors-smart\2.5.1\accessors-smart-2.5.1.jar;C:\Users\34267\.m2\repository\org\ow2\asm\asm\9.6\asm-9.6.jar;C:\Users\34267\.m2\repository\org\assertj\assertj-core\3.25.3\assertj-core-3.25.3.jar;C:\Users\34267\.m2\repository\net\bytebuddy\byte-buddy\1.14.19\byte-buddy-1.14.19.jar;C:\Users\34267\.m2\repository\org\awaitility\awaitility\4.2.2\awaitility-4.2.2.jar;C:\Users\34267\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\34267\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.3\junit-jupiter-5.10.3.jar;C:\Users\34267\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.3\junit-jupiter-api-5.10.3.jar;C:\Users\34267\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\34267\.m2\repository\org\junit\platform\junit-platform-commons\1.10.3\junit-platform-commons-1.10.3.jar;C:\Users\34267\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\34267\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.3\junit-jupiter-params-5.10.3.jar;C:\Users\34267\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.3\junit-jupiter-engine-5.10.3.jar;C:\Users\34267\.m2\repository\org\junit\platform\junit-platform-engine\1.10.3\junit-platform-engine-1.10.3.jar;C:\Users\34267\.m2\repository\org\mockito\mockito-core\5.11.0\mockito-core-5.11.0.jar;C:\Users\34267\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.19\byte-buddy-agent-1.14.19.jar;C:\Users\34267\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\34267\.m2\repository\org\mockito\mockito-junit-jupiter\5.11.0\mockito-junit-jupiter-5.11.0.jar;C:\Users\34267\.m2\repository\org\skyscreamer\jsonassert\1.5.3\jsonassert-1.5.3.jar;C:\Users\34267\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\34267\.m2\repository\org\springframework\spring-core\6.1.13\spring-core-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-jcl\6.1.13\spring-jcl-6.1.13.jar;C:\Users\34267\.m2\repository\org\springframework\spring-test\6.1.13\spring-test-6.1.13.jar;C:\Users\34267\.m2\repository\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;C:\Users\34267\.m2\repository\com\h2database\h2\2.2.224\h2-2.2.224.jar;C:\Users\34267\.m2\repository\org\testcontainers\mysql\1.21.4\mysql-1.21.4.jar;C:\Users\34267\.m2\repository\org\testcontainers\jdbc\1.21.4\jdbc-1.21.4.jar;C:\Users\34267\.m2\repository\org\testcontainers\database-commons\1.21.4\database-commons-1.21.4.jar;C:\Users\34267\.m2\repository\org\testcontainers\junit-jupiter\1.21.4\junit-jupiter-1.21.4.jar;C:\Users\34267\.m2\repository\org\testcontainers\testcontainers\1.21.4\testcontainers-1.21.4.jar;C:\Users\34267\.m2\repository\junit\junit\4.13.2\junit-4.13.2.jar;C:\Users\34267\.m2\repository\org\hamcrest\hamcrest-core\2.2\hamcrest-core-2.2.jar;C:\Users\34267\.m2\repository\org\apache\commons\commons-compress\1.24.0\commons-compress-1.24.0.jar;C:\Users\34267\.m2\repository\org\rnorth\duct-tape\duct-tape\1.0.8\duct-tape-1.0.8.jar;C:\Users\34267\.m2\repository\org\jetbrains\annotations\17.0.0\annotations-17.0.0.jar;C:\Users\34267\.m2\repository\com\github\docker-java\docker-java-api\3.4.2\docker-java-api-3.4.2.jar;C:\Users\34267\.m2\repository\com\github\docker-java\docker-java-transport-zerodep\3.4.2\docker-java-transport-zerodep-3.4.2.jar;C:\Users\34267\.m2\repository\com\github\docker-java\docker-java-transport\3.4.2\docker-java-transport-3.4.2.jar;C:\Users\34267\.m2\repository\net\java\dev\jna\jna\5.13.0\jna-5.13.0.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\34267"/>
+    <property name="user.language" value="zh"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2025-07-15"/>
+    <property name="java.home" value="D:\java\IntelliJ IDEA 2025.2.1\jbr"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="C:\Users\34267\Desktop\code\SEGroup8\backend"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="intellij.os.virtualization" value="none"/>
+    <property name="FILE_LOG_CHARSET" value="UTF-8"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="jbr.virtualization.information" value="Hyper-V role"/>
+    <property name="surefire.reportNameSuffix" value="domain-c-domain_c-20260831040627329"/>
+    <property name="surefire.real.class.path" value="C:\Users\34267\AppData\Local\Temp\surefire4297433712793006952\surefirebooter-20260831120702673_3.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.8+1-b1038.71"/>
+    <property name="user.name" value="34267"/>
+    <property name="stdout.encoding" value="GBK"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="JBR-21.0.8+1-1038.71-jcef"/>
+    <property name="localRepository" value="C:\Users\34267\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
+    <property name="java.io.tmpdir" value="C:\Users\34267\AppData\Local\Temp\"/>
+    <property name="com.zaxxer.hikari.pool_number" value="2"/>
+    <property name="java.version" value="21.0.8"/>
+    <property name="user.dir" value="C:\Users\34267\Desktop\code\SEGroup8\backend"/>
+    <property name="domain.c.tags" value="DOMAIN_C"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="PID" value="32744"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
+    <property name="native.encoding" value="GBK"/>
+    <property name="java.library.path" value="D:\java\IntelliJ IDEA 2025.2.1\jbr\bin;C:\Windows\Sun\Java\bin;C:\Windows\system32;C:\Windows;D:\java\IntelliJ IDEA 2025.2.1\jbr\bin;C:\Users\34267\.codex\tmp\arg0\codex-arg06btpbH;C:\Program Files\Common Files\Oracle\Java\javapath;D:\dev\python\python.3.13.1\Scripts\;D:\dev\python\python.3.13.1\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\dotnet\;D:\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\Windows Kits\8.1\Windows Performance Toolkit\;D:\mingw\MinGW\bin;D:\Git\cmd;D:\Program Files\MATLAB\R2023b\runtime\win64;D:\Program Files\MATLAB\R2023b\bin;D:\texlive\2025\bin\windows;D:\nodejs\;C:\Program Files\Arduino CLI\;C:\Program Files\Docker\Docker\resources\bin;C:\Users\34267\AppData\Local\Programs\Python\Python38\Scripts\;C:\Users\34267\AppData\Local\Programs\Python\Python38\;C:\Users\34267\AppData\Local\Programs\Python\Python310\Scripts\;C:\Users\34267\AppData\Local\Programs\Python\Python310\;C:\Program Files\MySQL\MySQL Shell 8.0\bin\;C:\Users\34267\AppData\Local\Microsoft\WindowsApps;D:\pycharm\PyCharm 2024.3.1\bin;;C:\Users\34267\.dotnet\tools;D:\TDM-GCC-64\bin;D:\VScode\Microsoft VS Code\bin;C:\Users\34267\AppData\Roaming\npm;D:\nodejs;D:\Git\bin;D:\cursor\resources\app\bin;C:\Users\34267\tools\apache-maven-3.9.9\bin;C:\Users\34267\tools\apache-maven-3.9.11\bin;C:\Users\34267\.qoder\bin\qodercli;c:\Users\34267\.vscode\extensions\openai.chatgpt-26.825.51511-win32-x64\bin\windows-x86_64;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="GBK"/>
+    <property name="java.vendor" value="JetBrains s.r.o."/>
+    <property name="java.vm.version" value="21.0.8+1-b1038.71"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+    <property name="LOGGED_APPLICATION_NAME" value="[segroup8-platform] "/>
+  </properties>
+  <testcase name="createsOrderFromServerPrice_mergesItems_andPersistsResponseConsistently" classname="com.segroup8.platform.integration.OrderCreateUc11IntegrationTest(domain-c-domain_c-20260831040627329)" time="0.365">
+    <system-out><![CDATA[2026-08-31T12:08:07.422+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .b.t.c.SpringBootTestContextBootstrapper : Neither @ContextConfiguration nor @ContextHierarchy found for test class [OrderCreateUc11IntegrationTest]: using SpringBootContextLoader
+2026-08-31T12:08:07.425+08:00  INFO 32744 --- [segroup8-platform] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.segroup8.platform.integration.OrderCreateUc11IntegrationTest]: OrderCreateUc11IntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-08-31T12:08:07.427+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .b.t.c.SpringBootTestContextBootstrapper : Using ContextCustomizerFactory implementations for test class [OrderCreateUc11IntegrationTest]: [ImportsContextCustomizerFactory, ExcludeFilterContextCustomizerFactory, HttpGraphQlTesterContextCustomizerFactory, DuplicateJsonObjectContextCustomizerFactory, MockitoContextCustomizerFactory, TestRestTemplateContextCustomizerFactory, WebTestClientContextCustomizerFactory, DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory, OverrideAutoConfigurationContextCustomizerFactory, ObservabilityContextCustomizerFactory, TypeExcludeFiltersContextCustomizerFactory, PropertyMappingContextCustomizerFactory, WebDriverContextCustomizerFactory, MockServerContainerContextCustomizerFactory, DynamicPropertiesContextCustomizerFactory]
+2026-08-31T12:08:07.432+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .b.t.c.SpringBootTestContextBootstrapper : Using ContextCustomizers for test class [OrderCreateUc11IntegrationTest]: [ImportsContextCustomizer, ExcludeFilterContextCustomizer, DuplicateJsonObjectContextCustomizer, MockitoContextCustomizer, TestRestTemplateContextCustomizer, DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer, DisableObservabilityContextCustomizer, PropertyMappingContextCustomizer, WebDriverContextCustomizer]
+2026-08-31T12:08:07.434+08:00  INFO 32744 --- [segroup8-platform] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.segroup8.platform.PlatformApplication for test class com.segroup8.platform.integration.OrderCreateUc11IntegrationTest
+2026-08-31T12:08:07.438+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .b.t.c.SpringBootTestContextBootstrapper : Using TestExecutionListeners for test class [OrderCreateUc11IntegrationTest]: [ServletTestExecutionListener, DirtiesContextBeforeModesTestExecutionListener, ApplicationEventsTestExecutionListener, MockitoTestExecutionListener, DependencyInjectionTestExecutionListener, DirtiesContextTestExecutionListener, TransactionalTestExecutionListener, SqlScriptsTestExecutionListener, EventPublishingTestExecutionListener, ResetMocksTestExecutionListener, RestDocsTestExecutionListener, MockRestServiceServerResetTestExecutionListener, MockMvcPrintOnlyOnFailureTestExecutionListener, WebDriverTestExecutionListener, MockWebServiceServerTestExecutionListener]
+2026-08-31T12:08:07.486+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@295af3a1] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@607897311 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-success(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@295af3a1]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@35ae7e38] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@648997577 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-success(String), 0(Integer), 2026-08-31T12:08:17.500302700(LocalDateTime), 2026-08-31T12:08:07.500302700(LocalDateTime), 2026-08-31T12:08:07.500302700(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@35ae7e38]
+2026-08-31T12:08:07.523+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.CreateOrderRequest@77ea2f8a]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61]
+JDBC Connection [HikariProxyConnection@1780840867 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1101, 1101, UC11 Server Price Product, null, null, null, 19.90, null, null, 10, 1, 2026-08-31 12:08:07.469009, 2026-08-31 12:08:07.469009
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1101, 1102, UC11 Seller Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1101(Long), 1102(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1102(Long), 1101(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61] from current transaction
+==>  Preparing: UPDATE product SET shop_id=?, name=?, price=?, stock=?, status=?, create_time=?, update_time=? WHERE id=?
+==> Parameters: 1101(Long), UC11 Server Price Product(String), 19.90(BigDecimal), 7(Integer), 1(Integer), 2026-08-31T12:08:07.469009(LocalDateTime), 2026-08-31T12:08:07.469009(LocalDateTime), 1101(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61] from current transaction
+==>  Preparing: SELECT id,user_id,receiver_name,receiver_phone,province,city,detail_address,is_default,create_time,update_time FROM address WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, user_id, receiver_name, receiver_phone, province, city, detail_address, is_default, create_time, update_time
+<==        Row: 1101, 1101, UC11 Buyer, 13800001101, Guangdong, Guangzhou, UC11 Test Address, 1, 2026-08-31 12:08:07.470212, 2026-08-31 12:08:07.470212
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61] from current transaction
+==>  Preparing: INSERT INTO order_info ( order_no, buyer_user_id, total_amount, pay_status, order_status, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, remark, create_time, logistics_status, logistics_current_index, can_refund, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: ORD2026083112080711011D5EC3E7(String), 1101(Long), 59.70(BigDecimal), 0(Integer), 0(Integer), UC11 Buyer(String), 13800001101(String), Guangdong(String), Guangzhou(String), UC11 Test Address(String), 余额支付(String), UC11 checkout(String), 2026-08-31T12:08:07.683597100(LocalDateTime), PENDING(String), 0(Integer), 1(Integer), 0(BigDecimal), 0(BigDecimal), 0(BigDecimal), 59.70(BigDecimal)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61] from current transaction
+==>  Preparing: INSERT INTO order_item ( order_id, product_type, product_id, product_name, price, quantity, status ) VALUES ( ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 102(Long), NEW(String), 1101(Long), UC11 Server Price Product(String), 19.90(BigDecimal), 3(Integer), 1(Integer)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@44b73b61]
+2026-08-31T12:08:07.707+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@23c0d01c] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@932741520 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: UPDATE idempotency_record SET status=?,http_status=?,response_body=?,update_time=? WHERE (id = ?)
+==> Parameters: 1(Integer), 200(Integer), {"code":0,"message":"success","data":{"id":102,"orderNo":"ORD2026083112080711011D5EC3E7","buyerUserId":1101,"totalAmount":59.70,"payStatus":0,"orderStatus":0,"orderStatusName":"待付款","refundStatus":0,"refundStatusName":"无","refundReason":null,"refundProofUrls":null,"receiverName":"UC11 Buyer","receiverPhone":"13800001101","receiverProvince":"Guangdong","receiverCity":"Guangzhou","receiverDetailAddress":"UC11 Test Address","payMethod":"余额支付","deliveryNo":null,"remark":"UC11 checkout","tradeMode":"邮寄","createTime":"2026-08-31T12:08:07.6835971","paidTime":null,"shippedTime":null,"receivedTime":null,"completedTime":null,"closedTime":null,"refundApplyTime":null,"refundDecisionTime":null,"refundDecisionUserId":null,"refundDecisionUserName":null,"refundDecisionRemark":null,"refundDecisionSource":null,"logisticsTemplateId":null,"logisticsStatus":"PENDING","logisticsCurrentIndex":0,"canRefund":1,"afterSalesDeadline":null,"deliveryTime":null,"arrivalTime":null,"autoConfirmDeadline":null,"refundMode":null,"voucherId":null,"voucherDiscountAmount":0,"sellerBearAmount":0,"platformBearAmount":0,"payableAmount":59.70,"items":[{"id":2,"productId":1101,"sellerUserId":null,"sellerName":null,"productName":"UC11 Server Price Product","productType":"NEW","conditionLevel":null,"price":19.90,"quantity":3}]}}(String), 2026-08-31T12:08:07.709918100(LocalDateTime), 1(Long)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@23c0d01c]
+2026-08-31T12:08:07.714+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@7b37fcee]
+2026-08-31T12:08:07.716+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=bdd58dd7780e44e696b695a17cbf6b75 method=POST path=/api/order/create status=200
+2026-08-31T12:08:07.739+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:07.741+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_info WHERE id = ? AND buyer_user_id = ?]
+2026-08-31T12:08:07.748+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:07.748+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT total_amount FROM order_info WHERE id = ?]
+2026-08-31T12:08:07.749+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:07.749+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT payable_amount FROM order_info WHERE id = ?]
+2026-08-31T12:08:07.750+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:07.750+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_item WHERE order_id = ?]
+2026-08-31T12:08:07.751+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:07.751+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT quantity FROM order_item WHERE order_id = ?]
+2026-08-31T12:08:07.753+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:07.754+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT price FROM order_item WHERE order_id = ?]
+2026-08-31T12:08:07.755+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:07.755+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT stock FROM product WHERE id = ?]
+2026-08-31T12:08:07.757+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#detail(Long)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@64110f88] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1919993873 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,order_no,buyer_user_id,total_amount,pay_status,order_status,refund_status,refund_reason,refund_proof_urls,receiver_name,receiver_phone,receiver_province,receiver_city,receiver_detail_address,pay_method,delivery_no,remark,create_time,paid_time,shipped_time,received_time,completed_time,closed_time,refund_apply_time,refund_decision_time,refund_decision_user_id,refund_decision_remark,refund_decision_source,logistics_template_id,logistics_status,logistics_current_index,can_refund,after_sales_deadline,delivery_time,arrival_time,auto_confirm_deadline,refund_mode,voucher_id,voucher_discount_amount,seller_bear_amount,platform_bear_amount,payable_amount,version,update_time FROM order_info WHERE id=?
+==> Parameters: 102(Long)
+<==    Columns: id, order_no, buyer_user_id, total_amount, pay_status, order_status, refund_status, refund_reason, refund_proof_urls, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, delivery_no, remark, create_time, paid_time, shipped_time, received_time, completed_time, closed_time, refund_apply_time, refund_decision_time, refund_decision_user_id, refund_decision_remark, refund_decision_source, logistics_template_id, logistics_status, logistics_current_index, can_refund, after_sales_deadline, delivery_time, arrival_time, auto_confirm_deadline, refund_mode, voucher_id, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount, version, update_time
+<==        Row: 102, ORD2026083112080711011D5EC3E7, 1101, 59.70, 0, 0, null, null, null, UC11 Buyer, 13800001101, Guangdong, Guangzhou, UC11 Test Address, 余额支付, null, UC11 checkout, 2026-08-31 12:08:07.683597, null, null, null, null, null, null, null, null, null, null, null, PENDING, 0, 1, null, null, null, null, null, null, 0.00, 0.00, 0.00, 59.70, 0, null
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@64110f88]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1dae615d] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1746455806 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,order_id,product_type,product_id,product_name,price,quantity,status,create_time,update_time FROM order_item WHERE (order_id = ?) ORDER BY id ASC
+==> Parameters: 102(Long)
+<==    Columns: id, order_id, product_type, product_id, product_name, price, quantity, status, create_time, update_time
+<==        Row: 2, 102, NEW, 1101, UC11 Server Price Product, 19.90, 3, 1, null, null
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1dae615d]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@499f33a] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1893565432 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1101, 1101, UC11 Server Price Product, null, null, null, 19.90, null, null, 7, 1, 2026-08-31 12:08:07.469009, 2026-08-31 12:08:07.469009
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@499f33a]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1e97a037] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@818343975 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1101, 1102, UC11 Seller Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1e97a037]
+2026-08-31T12:08:07.788+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-31T12:08:07.788+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@7b0dc526]
+2026-08-31T12:08:07.789+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=6b88c1fb302a49f8b7cacd3fe4ec0589 method=GET path=/api/order/detail/102 status=200
+]]></system-out>
+  </testcase>
+  <testcase name="laterItemPersistenceFailure_rollsBackOrderInventoryAndOccupiedVoucher" classname="com.segroup8.platform.integration.OrderCreateUc11IntegrationTest(domain-c-domain_c-20260831040627329)" time="0.112">
+    <system-out><![CDATA[2026-08-31T12:08:07.841+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL update
+2026-08-31T12:08:07.842+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [UPDATE product SET name = ? WHERE id = 1102]
+2026-08-31T12:08:07.846+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@23e2bcbe] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@274059243 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-transaction-rollback(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@23e2bcbe]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2e8a3f87] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@268882838 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-transaction-rollback(String), 0(Integer), 2026-08-31T12:08:17.854453200(LocalDateTime), 2026-08-31T12:08:07.854453200(LocalDateTime), 2026-08-31T12:08:07.854453200(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2e8a3f87]
+2026-08-31T12:08:07.859+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.CreateOrderRequest@26378a64]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+JDBC Connection [HikariProxyConnection@1866546631 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1101, 1101, UC11 Server Price Product, null, null, null, 19.90, null, null, 10, 1, 2026-08-31 12:08:07.829853, 2026-08-31 12:08:07.829853
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1101, 1102, UC11 Seller Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1101(Long), 1102(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1102(Long), 1101(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6] from current transaction
+==>  Preparing: UPDATE product SET shop_id=?, name=?, price=?, stock=?, status=?, create_time=?, update_time=? WHERE id=?
+==> Parameters: 1101(Long), UC11 Server Price Product(String), 19.90(BigDecimal), 8(Integer), 1(Integer), 2026-08-31T12:08:07.829853(LocalDateTime), 2026-08-31T12:08:07.829853(LocalDateTime), 1101(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6] from current transaction
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1102(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1102, 1101, XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX, null, null, null, 5.00, null, null, 8, 1, 2026-08-31 12:08:07.829853, 2026-08-31 12:08:07.829853
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1101, 1102, UC11 Seller Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1101(Long), 1102(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1102(Long), 1101(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6] from current transaction
+==>  Preparing: UPDATE product SET shop_id=?, name=?, price=?, stock=?, status=?, create_time=?, update_time=? WHERE id=?
+==> Parameters: 1101(Long), XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX(String), 5.00(BigDecimal), 6(Integer), 1(Integer), 2026-08-31T12:08:07.829853(LocalDateTime), 2026-08-31T12:08:07.829853(LocalDateTime), 1102(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6] from current transaction
+==>  Preparing: SELECT id,user_id,receiver_name,receiver_phone,province,city,detail_address,is_default,create_time,update_time FROM address WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, user_id, receiver_name, receiver_phone, province, city, detail_address, is_default, create_time, update_time
+<==        Row: 1101, 1101, UC11 Buyer, 13800001101, Guangdong, Guangzhou, UC11 Test Address, 1, 2026-08-31 12:08:07.831365, 2026-08-31 12:08:07.831365
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6] from current transaction
+==>  Preparing: INSERT INTO order_info ( order_no, buyer_user_id, total_amount, pay_status, order_status, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, create_time, logistics_status, logistics_current_index, can_refund, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: ORD2026083112080711011EEDA44D(String), 1101(Long), 49.80(BigDecimal), 0(Integer), 0(Integer), UC11 Buyer(String), 13800001101(String), Guangdong(String), Guangzhou(String), UC11 Test Address(String), 余额支付(String), 2026-08-31T12:08:07.882227(LocalDateTime), PENDING(String), 0(Integer), 1(Integer), 0(BigDecimal), 0(BigDecimal), 0(BigDecimal), 49.80(BigDecimal)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6] from current transaction
+==>  Preparing: SELECT id,issuer_type,voucher_type,issuer_user_id,scope_type,shop_id,product_id,can_stack,name,type,discount_amount,discount_rate,min_amount,total_count,received_count,used_count,grab_start_time,grab_end_time,start_time,end_time,status,create_time,update_time FROM voucher WHERE id=?
+==> Parameters: 1110(Long)
+<==    Columns: id, issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, product_id, can_stack, name, type, discount_amount, discount_rate, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time
+<==        Row: 1110, 1, 1, 1102, 1, 1101, null, 0, UC11 Valid Shop Voucher, 1, 10.00, null, 50.00, 100, 1, 0, null, null, 2026-08-30 12:08:07.833476, 2026-09-01 12:08:07.833476, 1, 2026-08-31 12:08:07.833476, 2026-08-31 12:08:07.833476
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6] from current transaction
+==>  Preparing: SELECT id,user_id,voucher_id,status,received_time,used_order_id,used_time,expire_time,create_time,update_time FROM user_voucher WHERE (user_id = ? AND voucher_id = ?) limit 1
+==> Parameters: 1101(Long), 1110(Long)
+<==    Columns: id, user_id, voucher_id, status, received_time, used_order_id, used_time, expire_time, create_time, update_time
+<==        Row: 1110, 1101, 1110, 1, 2026-08-31 12:08:07.834477, null, null, 2026-09-01 12:08:07.834477, 2026-08-31 12:08:07.834477, 2026-08-31 12:08:07.834477
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5be872b6]
+2026-08-31T12:08:07.903+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler com.segroup8.platform.common.GlobalExceptionHandler#handleBusiness(BusinessException)
+2026-08-31T12:08:07.904+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-31T12:08:07.905+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@714bd7ad]
+2026-08-31T12:08:07.906+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.segroup8.platform.common.BusinessException: 当前商品金额未达到优惠券使用门槛]
+2026-08-31T12:08:07.907+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=dcf06bbb12af44deb88d14c0ff5f56d9 method=POST path=/api/order/create status=200
+2026-08-31T12:08:07.910+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:07.910+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_info WHERE buyer_user_id = ?]
+2026-08-31T12:08:07.912+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:07.912+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_item WHERE order_id IN (SELECT id FROM order_info WHERE buyer_user_id = ?)]
+2026-08-31T12:08:07.914+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:07.915+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT stock FROM product WHERE id = 1101]
+2026-08-31T12:08:07.916+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:07.916+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT stock FROM product WHERE id = 1102]
+2026-08-31T12:08:07.917+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [SELECT used_order_id FROM user_voucher WHERE id = 1110]
+]]></system-out>
+  </testcase>
+  <testcase name="duplicateIdempotencyKey_replaysResponseAndCreatesOnlyOneOrder" classname="com.segroup8.platform.integration.OrderCreateUc11IntegrationTest(domain-c-domain_c-20260831040627329)" time="0.112">
+    <system-out><![CDATA[2026-08-31T12:08:07.964+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@356feae3] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@808118426 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-idempotent(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@356feae3]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2ea4fa04] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@406966291 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-idempotent(String), 0(Integer), 2026-08-31T12:08:17.973228400(LocalDateTime), 2026-08-31T12:08:07.973228400(LocalDateTime), 2026-08-31T12:08:07.973228400(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2ea4fa04]
+2026-08-31T12:08:07.978+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.CreateOrderRequest@5233090a]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344]
+JDBC Connection [HikariProxyConnection@131328138 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1102(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1102, 1101, UC11 Additional Product, null, null, null, 5.00, null, null, 8, 1, 2026-08-31 12:08:07.945713, 2026-08-31 12:08:07.945713
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1101, 1102, UC11 Seller Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1101(Long), 1102(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1102(Long), 1101(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344] from current transaction
+==>  Preparing: UPDATE product SET shop_id=?, name=?, price=?, stock=?, status=?, create_time=?, update_time=? WHERE id=?
+==> Parameters: 1101(Long), UC11 Additional Product(String), 5.00(BigDecimal), 6(Integer), 1(Integer), 2026-08-31T12:08:07.945713(LocalDateTime), 2026-08-31T12:08:07.945713(LocalDateTime), 1102(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344] from current transaction
+==>  Preparing: SELECT id,user_id,receiver_name,receiver_phone,province,city,detail_address,is_default,create_time,update_time FROM address WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, user_id, receiver_name, receiver_phone, province, city, detail_address, is_default, create_time, update_time
+<==        Row: 1101, 1101, UC11 Buyer, 13800001101, Guangdong, Guangzhou, UC11 Test Address, 1, 2026-08-31 12:08:07.945713, 2026-08-31 12:08:07.945713
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344] from current transaction
+==>  Preparing: INSERT INTO order_info ( order_no, buyer_user_id, total_amount, pay_status, order_status, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, create_time, logistics_status, logistics_current_index, can_refund, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: ORD2026083112080711019796713D(String), 1101(Long), 10.00(BigDecimal), 0(Integer), 0(Integer), UC11 Buyer(String), 13800001101(String), Guangdong(String), Guangzhou(String), UC11 Test Address(String), 余额支付(String), 2026-08-31T12:08:07.993194800(LocalDateTime), PENDING(String), 0(Integer), 1(Integer), 0(BigDecimal), 0(BigDecimal), 0(BigDecimal), 10.00(BigDecimal)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344] from current transaction
+==>  Preparing: INSERT INTO order_item ( order_id, product_type, product_id, product_name, price, quantity, status ) VALUES ( ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 104(Long), NEW(String), 1102(Long), UC11 Additional Product(String), 5.00(BigDecimal), 2(Integer), 1(Integer)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2a906344]
+2026-08-31T12:08:08.004+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@47312528] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@120346047 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: UPDATE idempotency_record SET status=?,http_status=?,response_body=?,update_time=? WHERE (id = ?)
+==> Parameters: 1(Integer), 200(Integer), {"code":0,"message":"success","data":{"id":104,"orderNo":"ORD2026083112080711019796713D","buyerUserId":1101,"totalAmount":10.00,"payStatus":0,"orderStatus":0,"orderStatusName":"待付款","refundStatus":0,"refundStatusName":"无","refundReason":null,"refundProofUrls":null,"receiverName":"UC11 Buyer","receiverPhone":"13800001101","receiverProvince":"Guangdong","receiverCity":"Guangzhou","receiverDetailAddress":"UC11 Test Address","payMethod":"余额支付","deliveryNo":null,"remark":null,"tradeMode":"邮寄","createTime":"2026-08-31T12:08:07.9931948","paidTime":null,"shippedTime":null,"receivedTime":null,"completedTime":null,"closedTime":null,"refundApplyTime":null,"refundDecisionTime":null,"refundDecisionUserId":null,"refundDecisionUserName":null,"refundDecisionRemark":null,"refundDecisionSource":null,"logisticsTemplateId":null,"logisticsStatus":"PENDING","logisticsCurrentIndex":0,"canRefund":1,"afterSalesDeadline":null,"deliveryTime":null,"arrivalTime":null,"autoConfirmDeadline":null,"refundMode":null,"voucherId":null,"voucherDiscountAmount":0,"sellerBearAmount":0,"platformBearAmount":0,"payableAmount":10.00,"items":[{"id":3,"productId":1102,"sellerUserId":null,"sellerName":null,"productName":"UC11 Additional Product","productType":"NEW","conditionLevel":null,"price":5.00,"quantity":2}]}}(String), 2026-08-31T12:08:08.005386600(LocalDateTime), 3(Long)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@47312528]
+2026-08-31T12:08:08.008+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@68e66fff]
+2026-08-31T12:08:08.008+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=7d12436c811c4f7190af375dcd7a95fb method=POST path=/api/order/create status=200
+2026-08-31T12:08:08.013+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@9b64076] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1825733970 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-idempotent(String)
+<==    Columns: id, user_id, request_method, request_path, idempotency_key, status, http_status, response_body, expire_time, create_time, update_time
+<==        Row: 3, 1101, POST, /api/order/create, uc11-idempotent, 1, 200, {"code":0,"message":"success","data":{"id":104,"orderNo":"ORD2026083112080711019796713D","buyerUserId":1101,"totalAmount":10.00,"payStatus":0,"orderStatus":0,"orderStatusName":"待付款","refundStatus":0,"refundStatusName":"无","refundReason":null,"refundProofUrls":null,"receiverName":"UC11 Buyer","receiverPhone":"13800001101","receiverProvince":"Guangdong","receiverCity":"Guangzhou","receiverDetailAddress":"UC11 Test Address","payMethod":"余额支付","deliveryNo":null,"remark":null,"tradeMode":"邮寄","createTime":"2026-08-31T12:08:07.9931948","paidTime":null,"shippedTime":null,"receivedTime":null,"completedTime":null,"closedTime":null,"refundApplyTime":null,"refundDecisionTime":null,"refundDecisionUserId":null,"refundDecisionUserName":null,"refundDecisionRemark":null,"refundDecisionSource":null,"logisticsTemplateId":null,"logisticsStatus":"PENDING","logisticsCurrentIndex":0,"canRefund":1,"afterSalesDeadline":null,"deliveryTime":null,"arrivalTime":null,"autoConfirmDeadline":null,"refundMode":null,"voucherId":null,"voucherDiscountAmount":0,"sellerBearAmount":0,"platformBearAmount":0,"payableAmount":10.00,"items":[{"id":3,"productId":1102,"sellerUserId":null,"sellerName":null,"productName":"UC11 Additional Product","productType":"NEW","conditionLevel":null,"price":5.00,"quantity":2}]}}, 2026-08-31 12:08:17.973228, 2026-08-31 12:08:07.973228, 2026-08-31 12:08:08.005387
+<==      Total: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@9b64076]
+2026-08-31T12:08:08.023+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=69f95d3bacf04691925443e43d80a641 method=POST path=/api/order/create status=200
+2026-08-31T12:08:08.028+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.028+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_info WHERE buyer_user_id = ?]
+2026-08-31T12:08:08.031+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.031+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_item WHERE order_id IN (SELECT id FROM order_info WHERE buyer_user_id = ?)]
+2026-08-31T12:08:08.033+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.033+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT stock FROM product WHERE id = 1102]
+2026-08-31T12:08:08.034+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.034+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM idempotency_record WHERE user_id = ? AND idempotency_key = 'uc11-idempotent' AND status = 1]
+]]></system-out>
+  </testcase>
+  <testcase name="appliesEligibleVoucher_andKeepsOrderInventoryAndVoucherConsistent" classname="com.segroup8.platform.integration.OrderCreateUc11IntegrationTest(domain-c-domain_c-20260831040627329)" time="0.118">
+    <system-out><![CDATA[2026-08-31T12:08:08.069+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58c92c02] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@491026571 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-voucher(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@58c92c02]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@78bc7456] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1761934975 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-voucher(String), 0(Integer), 2026-08-31T12:08:18.078721600(LocalDateTime), 2026-08-31T12:08:08.078721600(LocalDateTime), 2026-08-31T12:08:08.078721600(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@78bc7456]
+2026-08-31T12:08:08.082+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.CreateOrderRequest@573a43f4]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128]
+JDBC Connection [HikariProxyConnection@976610921 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1101, 1101, UC11 Server Price Product, null, null, null, 19.90, null, null, 10, 1, 2026-08-31 12:08:08.059851, 2026-08-31 12:08:08.059851
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1101, 1102, UC11 Seller Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1101(Long), 1102(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1102(Long), 1101(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128] from current transaction
+==>  Preparing: UPDATE product SET shop_id=?, name=?, price=?, stock=?, status=?, create_time=?, update_time=? WHERE id=?
+==> Parameters: 1101(Long), UC11 Server Price Product(String), 19.90(BigDecimal), 7(Integer), 1(Integer), 2026-08-31T12:08:08.059851(LocalDateTime), 2026-08-31T12:08:08.059851(LocalDateTime), 1101(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128] from current transaction
+==>  Preparing: SELECT id,user_id,receiver_name,receiver_phone,province,city,detail_address,is_default,create_time,update_time FROM address WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, user_id, receiver_name, receiver_phone, province, city, detail_address, is_default, create_time, update_time
+<==        Row: 1101, 1101, UC11 Buyer, 13800001101, Guangdong, Guangzhou, UC11 Test Address, 1, 2026-08-31 12:08:08.061128, 2026-08-31 12:08:08.061128
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128] from current transaction
+==>  Preparing: INSERT INTO order_info ( order_no, buyer_user_id, total_amount, pay_status, order_status, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, create_time, logistics_status, logistics_current_index, can_refund, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: ORD202608311208081101E562F3CA(String), 1101(Long), 59.70(BigDecimal), 0(Integer), 0(Integer), UC11 Buyer(String), 13800001101(String), Guangdong(String), Guangzhou(String), UC11 Test Address(String), 余额支付(String), 2026-08-31T12:08:08.099137(LocalDateTime), PENDING(String), 0(Integer), 1(Integer), 0(BigDecimal), 0(BigDecimal), 0(BigDecimal), 59.70(BigDecimal)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128] from current transaction
+==>  Preparing: SELECT id,issuer_type,voucher_type,issuer_user_id,scope_type,shop_id,product_id,can_stack,name,type,discount_amount,discount_rate,min_amount,total_count,received_count,used_count,grab_start_time,grab_end_time,start_time,end_time,status,create_time,update_time FROM voucher WHERE id=?
+==> Parameters: 1110(Long)
+<==    Columns: id, issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, product_id, can_stack, name, type, discount_amount, discount_rate, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time
+<==        Row: 1110, 1, 1, 1102, 1, 1101, null, 0, UC11 Valid Shop Voucher, 1, 10.00, null, 50.00, 100, 1, 0, null, null, 2026-08-30 12:08:08.062419, 2026-09-01 12:08:08.062419, 1, 2026-08-31 12:08:08.062419, 2026-08-31 12:08:08.062419
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128] from current transaction
+==>  Preparing: SELECT id,user_id,voucher_id,status,received_time,used_order_id,used_time,expire_time,create_time,update_time FROM user_voucher WHERE (user_id = ? AND voucher_id = ?) limit 1
+==> Parameters: 1101(Long), 1110(Long)
+<==    Columns: id, user_id, voucher_id, status, received_time, used_order_id, used_time, expire_time, create_time, update_time
+<==        Row: 1110, 1101, 1110, 1, 2026-08-31 12:08:08.063432, null, null, 2026-09-01 12:08:08.063432, 2026-08-31 12:08:08.063432, 2026-08-31 12:08:08.063432
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128] from current transaction
+==>  Preparing: UPDATE user_voucher SET used_order_id=?,update_time=? WHERE (id = ? AND status = ? AND used_order_id IS NULL)
+==> Parameters: 105(Long), 2026-08-31T12:08:08.106510800(LocalDateTime), 1110(Long), 1(Integer)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128] from current transaction
+==>  Preparing: UPDATE order_info SET order_no=?, buyer_user_id=?, total_amount=?, pay_status=?, order_status=?, receiver_name=?, receiver_phone=?, receiver_province=?, receiver_city=?, receiver_detail_address=?, pay_method=?, create_time=?, logistics_status=?, logistics_current_index=?, can_refund=?, voucher_id=?, voucher_discount_amount=?, seller_bear_amount=?, platform_bear_amount=?, payable_amount=? WHERE id=?
+==> Parameters: ORD202608311208081101E562F3CA(String), 1101(Long), 59.70(BigDecimal), 0(Integer), 0(Integer), UC11 Buyer(String), 13800001101(String), Guangdong(String), Guangzhou(String), UC11 Test Address(String), 余额支付(String), 2026-08-31T12:08:08.099137(LocalDateTime), PENDING(String), 0(Integer), 1(Integer), 1110(Long), 10.00(BigDecimal), 10.00(BigDecimal), 0(BigDecimal), 49.70(BigDecimal), 105(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128] from current transaction
+==>  Preparing: INSERT INTO order_item ( order_id, product_type, product_id, product_name, price, quantity, status ) VALUES ( ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 105(Long), NEW(String), 1101(Long), UC11 Server Price Product(String), 19.90(BigDecimal), 3(Integer), 1(Integer)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128]
+Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5bf17128]
+2026-08-31T12:08:08.140+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@314ba270] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1222583046 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: UPDATE idempotency_record SET status=?,http_status=?,response_body=?,update_time=? WHERE (id = ?)
+==> Parameters: 1(Integer), 200(Integer), {"code":0,"message":"success","data":{"id":105,"orderNo":"ORD202608311208081101E562F3CA","buyerUserId":1101,"totalAmount":59.70,"payStatus":0,"orderStatus":0,"orderStatusName":"待付款","refundStatus":0,"refundStatusName":"无","refundReason":null,"refundProofUrls":null,"receiverName":"UC11 Buyer","receiverPhone":"13800001101","receiverProvince":"Guangdong","receiverCity":"Guangzhou","receiverDetailAddress":"UC11 Test Address","payMethod":"余额支付","deliveryNo":null,"remark":null,"tradeMode":"邮寄","createTime":"2026-08-31T12:08:08.099137","paidTime":null,"shippedTime":null,"receivedTime":null,"completedTime":null,"closedTime":null,"refundApplyTime":null,"refundDecisionTime":null,"refundDecisionUserId":null,"refundDecisionUserName":null,"refundDecisionRemark":null,"refundDecisionSource":null,"logisticsTemplateId":null,"logisticsStatus":"PENDING","logisticsCurrentIndex":0,"canRefund":1,"afterSalesDeadline":null,"deliveryTime":null,"arrivalTime":null,"autoConfirmDeadline":null,"refundMode":null,"voucherId":1110,"voucherDiscountAmount":10.00,"sellerBearAmount":10.00,"platformBearAmount":0,"payableAmount":49.70,"items":[{"id":4,"productId":1101,"sellerUserId":null,"sellerName":null,"productName":"UC11 Server Price Product","productType":"NEW","conditionLevel":null,"price":19.90,"quantity":3}]}}(String), 2026-08-31T12:08:08.142276800(LocalDateTime), 4(Long)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@314ba270]
+2026-08-31T12:08:08.146+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@54bb5dd0]
+2026-08-31T12:08:08.147+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=9c614480fb11496bb995237a17e111ba method=POST path=/api/order/create status=200
+2026-08-31T12:08:08.151+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.151+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT payable_amount FROM order_info WHERE id = ?]
+2026-08-31T12:08:08.152+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.153+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT stock FROM product WHERE id = ?]
+2026-08-31T12:08:08.154+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.154+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT status FROM user_voucher WHERE id = 1110]
+2026-08-31T12:08:08.155+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.155+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT used_order_id FROM user_voucher WHERE id = 1110]
+]]></system-out>
+  </testcase>
+  <testcase name="rejectsInvalidRequestParameters_beforeWritingBusinessData" classname="com.segroup8.platform.integration.OrderCreateUc11IntegrationTest(domain-c-domain_c-20260831040627329)" time="0.078">
+    <system-out><![CDATA[2026-08-31T12:08:08.188+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@74269203] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@362253485 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-empty(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@74269203]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@26327339] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1728318296 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-empty(String), 0(Integer), 2026-08-31T12:08:18.196436400(LocalDateTime), 2026-08-31T12:08:08.196436400(LocalDateTime), 2026-08-31T12:08:08.196436400(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@26327339]
+2026-08-31T12:08:08.201+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.CreateOrderRequest@27f23b31]
+2026-08-31T12:08:08.207+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler com.segroup8.platform.common.GlobalExceptionHandler#handleValid(MethodArgumentNotValidException)
+2026-08-31T12:08:08.209+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-31T12:08:08.209+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@42e62465]
+2026-08-31T12:08:08.210+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public com.segroup8.platform.common.Result<com.segroup8.platform.vo.OrderVO> com.segroup8.platform.controller.OrderController.create(com.segroup8.platform.dto.CreateOrderRequest): [Field error in object 'createOrderRequest' on field 'items': rejected value [[]]; codes [NotEmpty.createOrderRequest.items,NotEmpty.items,NotEmpty.java.util.List,NotEmpty]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [createOrderRequest.items,items]; arguments []; default message [items]]; default message [订单商品不能为空]] ]
+2026-08-31T12:08:08.210+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=9bba7f96c0c64903bd3dd2419895e1ac method=POST path=/api/order/create status=200
+2026-08-31T12:08:08.213+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1e3d947d] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@805196940 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-zero-quantity(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1e3d947d]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5c48981a] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1629145657 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-zero-quantity(String), 0(Integer), 2026-08-31T12:08:18.220510700(LocalDateTime), 2026-08-31T12:08:08.220510700(LocalDateTime), 2026-08-31T12:08:08.220510700(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5c48981a]
+2026-08-31T12:08:08.224+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.CreateOrderRequest@13f6341b]
+2026-08-31T12:08:08.227+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler com.segroup8.platform.common.GlobalExceptionHandler#handleValid(MethodArgumentNotValidException)
+2026-08-31T12:08:08.228+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-31T12:08:08.228+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@5aeedcfb]
+2026-08-31T12:08:08.229+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public com.segroup8.platform.common.Result<com.segroup8.platform.vo.OrderVO> com.segroup8.platform.controller.OrderController.create(com.segroup8.platform.dto.CreateOrderRequest): [Field error in object 'createOrderRequest' on field 'items[0].quantity': rejected value [0]; codes [Min.createOrderRequest.items[0].quantity,Min.createOrderRequest.items.quantity,Min.items[0].quantity,Min.items.quantity,Min.quantity,Min.java.lang.Integer,Min]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [createOrderRequest.items[0].quantity,items[0].quantity]; arguments []; default message [items[0].quantity],1]; default message [购买数量最少为1]] ]
+2026-08-31T12:08:08.229+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=c82f601f7e574d6d9151127c7844a9d3 method=POST path=/api/order/create status=200
+2026-08-31T12:08:08.231+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.232+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_info WHERE buyer_user_id = ?]
+2026-08-31T12:08:08.233+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.233+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_item WHERE order_id IN (SELECT id FROM order_info WHERE buyer_user_id = ?)]
+2026-08-31T12:08:08.235+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.235+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT stock FROM product WHERE id = ?]
+]]></system-out>
+  </testcase>
+  <testcase name="rejectsUnclaimedThresholdAndShopMismatchVouchers_andRollsBackEverything" classname="com.segroup8.platform.integration.OrderCreateUc11IntegrationTest(domain-c-domain_c-20260831040627329)" time="0.229">
+    <system-out><![CDATA[2026-08-31T12:08:08.270+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@168cffde] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@814554816 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-invalid-voucher-1111(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@168cffde]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@127cbd8b] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@2041365337 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-invalid-voucher-1111(String), 0(Integer), 2026-08-31T12:08:18.279878(LocalDateTime), 2026-08-31T12:08:08.279878(LocalDateTime), 2026-08-31T12:08:08.279878(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@127cbd8b]
+2026-08-31T12:08:08.284+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.CreateOrderRequest@8afb1bd]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6]
+JDBC Connection [HikariProxyConnection@2072294651 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1101, 1101, UC11 Server Price Product, null, null, null, 19.90, null, null, 10, 1, 2026-08-31 12:08:08.258829, 2026-08-31 12:08:08.258829
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1101, 1102, UC11 Seller Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1101(Long), 1102(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1102(Long), 1101(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6] from current transaction
+==>  Preparing: UPDATE product SET shop_id=?, name=?, price=?, stock=?, status=?, create_time=?, update_time=? WHERE id=?
+==> Parameters: 1101(Long), UC11 Server Price Product(String), 19.90(BigDecimal), 7(Integer), 1(Integer), 2026-08-31T12:08:08.258829(LocalDateTime), 2026-08-31T12:08:08.258829(LocalDateTime), 1101(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6] from current transaction
+==>  Preparing: SELECT id,user_id,receiver_name,receiver_phone,province,city,detail_address,is_default,create_time,update_time FROM address WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, user_id, receiver_name, receiver_phone, province, city, detail_address, is_default, create_time, update_time
+<==        Row: 1101, 1101, UC11 Buyer, 13800001101, Guangdong, Guangzhou, UC11 Test Address, 1, 2026-08-31 12:08:08.259845, 2026-08-31 12:08:08.259845
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6] from current transaction
+==>  Preparing: INSERT INTO order_info ( order_no, buyer_user_id, total_amount, pay_status, order_status, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, create_time, logistics_status, logistics_current_index, can_refund, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: ORD20260831120808110101F16D14(String), 1101(Long), 59.70(BigDecimal), 0(Integer), 0(Integer), UC11 Buyer(String), 13800001101(String), Guangdong(String), Guangzhou(String), UC11 Test Address(String), 余额支付(String), 2026-08-31T12:08:08.298844500(LocalDateTime), PENDING(String), 0(Integer), 1(Integer), 0(BigDecimal), 0(BigDecimal), 0(BigDecimal), 59.70(BigDecimal)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6] from current transaction
+==>  Preparing: SELECT id,issuer_type,voucher_type,issuer_user_id,scope_type,shop_id,product_id,can_stack,name,type,discount_amount,discount_rate,min_amount,total_count,received_count,used_count,grab_start_time,grab_end_time,start_time,end_time,status,create_time,update_time FROM voucher WHERE id=?
+==> Parameters: 1111(Long)
+<==    Columns: id, issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, product_id, can_stack, name, type, discount_amount, discount_rate, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time
+<==        Row: 1111, 1, 1, 1102, 1, 1101, null, 0, UC11 Unclaimed Voucher, 1, 5.00, null, 10.00, 100, 0, 0, null, null, 2026-08-30 12:08:08.260845, 2026-09-01 12:08:08.260845, 1, 2026-08-31 12:08:08.260845, 2026-08-31 12:08:08.260845
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6] from current transaction
+==>  Preparing: SELECT id,user_id,voucher_id,status,received_time,used_order_id,used_time,expire_time,create_time,update_time FROM user_voucher WHERE (user_id = ? AND voucher_id = ?) limit 1
+==> Parameters: 1101(Long), 1111(Long)
+<==      Total: 0
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@38c203a6]
+2026-08-31T12:08:08.312+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler com.segroup8.platform.common.GlobalExceptionHandler#handleBusiness(BusinessException)
+2026-08-31T12:08:08.313+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-31T12:08:08.313+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@29b29e5d]
+2026-08-31T12:08:08.315+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.segroup8.platform.common.BusinessException: 优惠券未领取、已使用或已过期]
+2026-08-31T12:08:08.315+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=844121d6e9754adba609b3f3c21bb3e1 method=POST path=/api/order/create status=200
+2026-08-31T12:08:08.317+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.318+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_info WHERE buyer_user_id = ?]
+2026-08-31T12:08:08.319+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.319+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_item WHERE order_id IN (SELECT id FROM order_info WHERE buyer_user_id = ?)]
+2026-08-31T12:08:08.320+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.320+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT stock FROM product WHERE id = ?]
+2026-08-31T12:08:08.323+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c60dee] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@993931092 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-invalid-voucher-1112(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11c60dee]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6431e18] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@330416885 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-invalid-voucher-1112(String), 0(Integer), 2026-08-31T12:08:18.330674300(LocalDateTime), 2026-08-31T12:08:08.330674300(LocalDateTime), 2026-08-31T12:08:08.330674300(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6431e18]
+2026-08-31T12:08:08.335+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.CreateOrderRequest@32b90410]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10]
+JDBC Connection [HikariProxyConnection@1199520637 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1101, 1101, UC11 Server Price Product, null, null, null, 19.90, null, null, 10, 1, 2026-08-31 12:08:08.258829, 2026-08-31 12:08:08.258829
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1101, 1102, UC11 Seller Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1101(Long), 1102(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1102(Long), 1101(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10] from current transaction
+==>  Preparing: UPDATE product SET shop_id=?, name=?, price=?, stock=?, status=?, create_time=?, update_time=? WHERE id=?
+==> Parameters: 1101(Long), UC11 Server Price Product(String), 19.90(BigDecimal), 7(Integer), 1(Integer), 2026-08-31T12:08:08.258829(LocalDateTime), 2026-08-31T12:08:08.258829(LocalDateTime), 1101(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10] from current transaction
+==>  Preparing: SELECT id,user_id,receiver_name,receiver_phone,province,city,detail_address,is_default,create_time,update_time FROM address WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, user_id, receiver_name, receiver_phone, province, city, detail_address, is_default, create_time, update_time
+<==        Row: 1101, 1101, UC11 Buyer, 13800001101, Guangdong, Guangzhou, UC11 Test Address, 1, 2026-08-31 12:08:08.259845, 2026-08-31 12:08:08.259845
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10] from current transaction
+==>  Preparing: INSERT INTO order_info ( order_no, buyer_user_id, total_amount, pay_status, order_status, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, create_time, logistics_status, logistics_current_index, can_refund, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: ORD2026083112080811011FC52F84(String), 1101(Long), 59.70(BigDecimal), 0(Integer), 0(Integer), UC11 Buyer(String), 13800001101(String), Guangdong(String), Guangzhou(String), UC11 Test Address(String), 余额支付(String), 2026-08-31T12:08:08.349905800(LocalDateTime), PENDING(String), 0(Integer), 1(Integer), 0(BigDecimal), 0(BigDecimal), 0(BigDecimal), 59.70(BigDecimal)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10] from current transaction
+==>  Preparing: SELECT id,issuer_type,voucher_type,issuer_user_id,scope_type,shop_id,product_id,can_stack,name,type,discount_amount,discount_rate,min_amount,total_count,received_count,used_count,grab_start_time,grab_end_time,start_time,end_time,status,create_time,update_time FROM voucher WHERE id=?
+==> Parameters: 1112(Long)
+<==    Columns: id, issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, product_id, can_stack, name, type, discount_amount, discount_rate, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time
+<==        Row: 1112, 1, 1, 1102, 1, 1101, null, 0, UC11 Threshold Voucher, 1, 10.00, null, 100.00, 100, 1, 0, null, null, 2026-08-30 12:08:08.260845, 2026-09-01 12:08:08.260845, 1, 2026-08-31 12:08:08.260845, 2026-08-31 12:08:08.260845
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10] from current transaction
+==>  Preparing: SELECT id,user_id,voucher_id,status,received_time,used_order_id,used_time,expire_time,create_time,update_time FROM user_voucher WHERE (user_id = ? AND voucher_id = ?) limit 1
+==> Parameters: 1101(Long), 1112(Long)
+<==    Columns: id, user_id, voucher_id, status, received_time, used_order_id, used_time, expire_time, create_time, update_time
+<==        Row: 1112, 1101, 1112, 1, 2026-08-31 12:08:08.261861, null, null, 2026-09-01 12:08:08.261861, 2026-08-31 12:08:08.261861, 2026-08-31 12:08:08.261861
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7b216b10]
+2026-08-31T12:08:08.365+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler com.segroup8.platform.common.GlobalExceptionHandler#handleBusiness(BusinessException)
+2026-08-31T12:08:08.366+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-31T12:08:08.366+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@485b4ef]
+2026-08-31T12:08:08.367+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.segroup8.platform.common.BusinessException: 当前商品金额未达到优惠券使用门槛]
+2026-08-31T12:08:08.367+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=82179294a2414d6d878f508926a1ed8e method=POST path=/api/order/create status=200
+2026-08-31T12:08:08.369+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.370+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_info WHERE buyer_user_id = ?]
+2026-08-31T12:08:08.370+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.370+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_item WHERE order_id IN (SELECT id FROM order_info WHERE buyer_user_id = ?)]
+2026-08-31T12:08:08.371+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.371+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT stock FROM product WHERE id = ?]
+2026-08-31T12:08:08.375+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2880a58b] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1037920398 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-invalid-voucher-1113(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2880a58b]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@14568116] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1418427930 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-invalid-voucher-1113(String), 0(Integer), 2026-08-31T12:08:18.381726(LocalDateTime), 2026-08-31T12:08:08.381726(LocalDateTime), 2026-08-31T12:08:08.381726(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@14568116]
+2026-08-31T12:08:08.386+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.CreateOrderRequest@790a35fd]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6]
+JDBC Connection [HikariProxyConnection@719297606 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1101, 1101, UC11 Server Price Product, null, null, null, 19.90, null, null, 10, 1, 2026-08-31 12:08:08.258829, 2026-08-31 12:08:08.258829
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1101, 1102, UC11 Seller Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1101(Long), 1102(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1102(Long), 1101(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6] from current transaction
+==>  Preparing: UPDATE product SET shop_id=?, name=?, price=?, stock=?, status=?, create_time=?, update_time=? WHERE id=?
+==> Parameters: 1101(Long), UC11 Server Price Product(String), 19.90(BigDecimal), 7(Integer), 1(Integer), 2026-08-31T12:08:08.258829(LocalDateTime), 2026-08-31T12:08:08.258829(LocalDateTime), 1101(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6] from current transaction
+==>  Preparing: SELECT id,user_id,receiver_name,receiver_phone,province,city,detail_address,is_default,create_time,update_time FROM address WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, user_id, receiver_name, receiver_phone, province, city, detail_address, is_default, create_time, update_time
+<==        Row: 1101, 1101, UC11 Buyer, 13800001101, Guangdong, Guangzhou, UC11 Test Address, 1, 2026-08-31 12:08:08.259845, 2026-08-31 12:08:08.259845
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6] from current transaction
+==>  Preparing: INSERT INTO order_info ( order_no, buyer_user_id, total_amount, pay_status, order_status, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, create_time, logistics_status, logistics_current_index, can_refund, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: ORD202608311208081101A5704ECB(String), 1101(Long), 59.70(BigDecimal), 0(Integer), 0(Integer), UC11 Buyer(String), 13800001101(String), Guangdong(String), Guangzhou(String), UC11 Test Address(String), 余额支付(String), 2026-08-31T12:08:08.397031(LocalDateTime), PENDING(String), 0(Integer), 1(Integer), 0(BigDecimal), 0(BigDecimal), 0(BigDecimal), 59.70(BigDecimal)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6] from current transaction
+==>  Preparing: SELECT id,issuer_type,voucher_type,issuer_user_id,scope_type,shop_id,product_id,can_stack,name,type,discount_amount,discount_rate,min_amount,total_count,received_count,used_count,grab_start_time,grab_end_time,start_time,end_time,status,create_time,update_time FROM voucher WHERE id=?
+==> Parameters: 1113(Long)
+<==    Columns: id, issuer_type, voucher_type, issuer_user_id, scope_type, shop_id, product_id, can_stack, name, type, discount_amount, discount_rate, min_amount, total_count, received_count, used_count, grab_start_time, grab_end_time, start_time, end_time, status, create_time, update_time
+<==        Row: 1113, 1, 1, 1103, 1, 1103, null, 0, UC11 Other Shop Voucher, 1, 5.00, null, 10.00, 100, 1, 0, null, null, 2026-08-30 12:08:08.260845, 2026-09-01 12:08:08.260845, 1, 2026-08-31 12:08:08.260845, 2026-08-31 12:08:08.260845
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6] from current transaction
+==>  Preparing: SELECT id,user_id,voucher_id,status,received_time,used_order_id,used_time,expire_time,create_time,update_time FROM user_voucher WHERE (user_id = ? AND voucher_id = ?) limit 1
+==> Parameters: 1101(Long), 1113(Long)
+<==    Columns: id, user_id, voucher_id, status, received_time, used_order_id, used_time, expire_time, create_time, update_time
+<==        Row: 1113, 1101, 1113, 1, 2026-08-31 12:08:08.261861, null, null, 2026-09-01 12:08:08.261861, 2026-08-31 12:08:08.261861, 2026-08-31 12:08:08.261861
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@cf15d6]
+2026-08-31T12:08:08.409+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler com.segroup8.platform.common.GlobalExceptionHandler#handleBusiness(BusinessException)
+2026-08-31T12:08:08.409+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-31T12:08:08.409+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@3a09c65]
+2026-08-31T12:08:08.410+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.segroup8.platform.common.BusinessException: 优惠券不适用于当前店铺商品]
+2026-08-31T12:08:08.411+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=76563109cf1446249a91933c76960028 method=POST path=/api/order/create status=200
+2026-08-31T12:08:08.412+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.412+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_info WHERE buyer_user_id = ?]
+2026-08-31T12:08:08.414+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.414+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_item WHERE order_id IN (SELECT id FROM order_info WHERE buyer_user_id = ?)]
+2026-08-31T12:08:08.415+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.415+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT stock FROM product WHERE id = ?]
+2026-08-31T12:08:08.417+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6e5d2207] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1601106546 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-invalid-voucher-999999(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6e5d2207]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@582a1e4e] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1438021852 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-invalid-voucher-999999(String), 0(Integer), 2026-08-31T12:08:18.425361(LocalDateTime), 2026-08-31T12:08:08.425361(LocalDateTime), 2026-08-31T12:08:08.425361(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@582a1e4e]
+2026-08-31T12:08:08.431+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.CreateOrderRequest@52fc2577]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56]
+JDBC Connection [HikariProxyConnection@278199192 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1101, 1101, UC11 Server Price Product, null, null, null, 19.90, null, null, 10, 1, 2026-08-31 12:08:08.258829, 2026-08-31 12:08:08.258829
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1101, 1102, UC11 Seller Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1101(Long), 1102(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1102(Long), 1101(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56] from current transaction
+==>  Preparing: UPDATE product SET shop_id=?, name=?, price=?, stock=?, status=?, create_time=?, update_time=? WHERE id=?
+==> Parameters: 1101(Long), UC11 Server Price Product(String), 19.90(BigDecimal), 7(Integer), 1(Integer), 2026-08-31T12:08:08.258829(LocalDateTime), 2026-08-31T12:08:08.258829(LocalDateTime), 1101(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56] from current transaction
+==>  Preparing: SELECT id,user_id,receiver_name,receiver_phone,province,city,detail_address,is_default,create_time,update_time FROM address WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, user_id, receiver_name, receiver_phone, province, city, detail_address, is_default, create_time, update_time
+<==        Row: 1101, 1101, UC11 Buyer, 13800001101, Guangdong, Guangzhou, UC11 Test Address, 1, 2026-08-31 12:08:08.259845, 2026-08-31 12:08:08.259845
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56] from current transaction
+==>  Preparing: INSERT INTO order_info ( order_no, buyer_user_id, total_amount, pay_status, order_status, receiver_name, receiver_phone, receiver_province, receiver_city, receiver_detail_address, pay_method, create_time, logistics_status, logistics_current_index, can_refund, voucher_discount_amount, seller_bear_amount, platform_bear_amount, payable_amount ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: ORD20260831120808110157BD64FE(String), 1101(Long), 59.70(BigDecimal), 0(Integer), 0(Integer), UC11 Buyer(String), 13800001101(String), Guangdong(String), Guangzhou(String), UC11 Test Address(String), 余额支付(String), 2026-08-31T12:08:08.443487600(LocalDateTime), PENDING(String), 0(Integer), 1(Integer), 0(BigDecimal), 0(BigDecimal), 0(BigDecimal), 59.70(BigDecimal)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56] from current transaction
+==>  Preparing: SELECT id,issuer_type,voucher_type,issuer_user_id,scope_type,shop_id,product_id,can_stack,name,type,discount_amount,discount_rate,min_amount,total_count,received_count,used_count,grab_start_time,grab_end_time,start_time,end_time,status,create_time,update_time FROM voucher WHERE id=?
+==> Parameters: 999999(Long)
+<==      Total: 0
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@146fff56]
+2026-08-31T12:08:08.457+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler com.segroup8.platform.common.GlobalExceptionHandler#handleBusiness(BusinessException)
+2026-08-31T12:08:08.457+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-31T12:08:08.459+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@416374ec]
+2026-08-31T12:08:08.460+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.segroup8.platform.common.BusinessException: 优惠券不存在]
+2026-08-31T12:08:08.460+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=dbe0997b2e7448e3ab76f46157132e1b method=POST path=/api/order/create status=200
+2026-08-31T12:08:08.461+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.461+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_info WHERE buyer_user_id = ?]
+2026-08-31T12:08:08.462+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.463+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_item WHERE order_id IN (SELECT id FROM order_info WHERE buyer_user_id = ?)]
+2026-08-31T12:08:08.464+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.465+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT stock FROM product WHERE id = ?]
+2026-08-31T12:08:08.466+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.466+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM user_voucher WHERE used_order_id IS NOT NULL AND user_id = ?]
+]]></system-out>
+  </testcase>
+  <testcase name="rejectsInvalidProductAddressSelfPurchaseAndBlockRelationships_withoutSideEffects" classname="com.segroup8.platform.integration.OrderCreateUc11IntegrationTest(domain-c-domain_c-20260831040627329)" time="0.226">
+    <system-out><![CDATA[2026-08-31T12:08:08.511+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d589727] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@212013332 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-off-shelf(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5d589727]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@71a69653] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1167916756 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-off-shelf(String), 0(Integer), 2026-08-31T12:08:18.520228800(LocalDateTime), 2026-08-31T12:08:08.520228800(LocalDateTime), 2026-08-31T12:08:08.520228800(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@71a69653]
+2026-08-31T12:08:08.526+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.CreateOrderRequest@5ce4b8ef]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2fc21fab]
+JDBC Connection [HikariProxyConnection@1193082848 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1103(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1103, 1101, UC11 Off Shelf Product, null, null, null, 12.00, null, null, 5, 0, 2026-08-31 12:08:08.496389, 2026-08-31 12:08:08.496389
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2fc21fab]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2fc21fab]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2fc21fab]
+2026-08-31T12:08:08.532+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler com.segroup8.platform.common.GlobalExceptionHandler#handleBusiness(BusinessException)
+2026-08-31T12:08:08.533+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-31T12:08:08.534+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@1b1e93a9]
+2026-08-31T12:08:08.535+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.segroup8.platform.common.BusinessException: 商品已下架: UC11 Off Shelf Product]
+2026-08-31T12:08:08.535+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=0798d2ce7fe04467aaaa2bcd0490bb87 method=POST path=/api/order/create status=200
+2026-08-31T12:08:08.539+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@355ca6c0] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@362785908 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-stock(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@355ca6c0]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7a73e6b5] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@704605717 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-stock(String), 0(Integer), 2026-08-31T12:08:18.549575200(LocalDateTime), 2026-08-31T12:08:08.549575200(LocalDateTime), 2026-08-31T12:08:08.549575200(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7a73e6b5]
+2026-08-31T12:08:08.554+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.CreateOrderRequest@79c5a74c]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@262f1580]
+JDBC Connection [HikariProxyConnection@1770950314 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1104(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1104, 1101, UC11 Low Stock Product, null, null, null, 8.00, null, null, 1, 1, 2026-08-31 12:08:08.496389, 2026-08-31 12:08:08.496389
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@262f1580]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@262f1580] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1101, 1102, UC11 Seller Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@262f1580]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@262f1580] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1101(Long), 1102(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@262f1580]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@262f1580] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1102(Long), 1101(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@262f1580]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@262f1580]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@262f1580]
+2026-08-31T12:08:08.566+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler com.segroup8.platform.common.GlobalExceptionHandler#handleBusiness(BusinessException)
+2026-08-31T12:08:08.567+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-31T12:08:08.568+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@f8cddfc]
+2026-08-31T12:08:08.569+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.segroup8.platform.common.BusinessException: 库存不足: UC11 Low Stock Product]
+2026-08-31T12:08:08.569+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=1c94f388f4004229bc6a3f78f088a78f method=POST path=/api/order/create status=200
+2026-08-31T12:08:08.572+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2485325] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@531523096 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-address-owner(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2485325]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@76242b2c] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@771406570 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-address-owner(String), 0(Integer), 2026-08-31T12:08:18.580661900(LocalDateTime), 2026-08-31T12:08:08.580661900(LocalDateTime), 2026-08-31T12:08:08.580661900(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@76242b2c]
+2026-08-31T12:08:08.584+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.CreateOrderRequest@6deb050b]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2ee6cb8a]
+JDBC Connection [HikariProxyConnection@1396783642 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1101, 1101, UC11 Server Price Product, null, null, null, 19.90, null, null, 10, 1, 2026-08-31 12:08:08.496389, 2026-08-31 12:08:08.496389
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2ee6cb8a]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2ee6cb8a] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1101, 1102, UC11 Seller Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2ee6cb8a]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2ee6cb8a] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1101(Long), 1102(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2ee6cb8a]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2ee6cb8a] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1102(Long), 1101(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2ee6cb8a]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2ee6cb8a] from current transaction
+==>  Preparing: UPDATE product SET shop_id=?, name=?, price=?, stock=?, status=?, create_time=?, update_time=? WHERE id=?
+==> Parameters: 1101(Long), UC11 Server Price Product(String), 19.90(BigDecimal), 9(Integer), 1(Integer), 2026-08-31T12:08:08.496389(LocalDateTime), 2026-08-31T12:08:08.496389(LocalDateTime), 1101(Long)
+<==    Updates: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2ee6cb8a]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2ee6cb8a] from current transaction
+==>  Preparing: SELECT id,user_id,receiver_name,receiver_phone,province,city,detail_address,is_default,create_time,update_time FROM address WHERE id=?
+==> Parameters: 1102(Long)
+<==    Columns: id, user_id, receiver_name, receiver_phone, province, city, detail_address, is_default, create_time, update_time
+<==        Row: 1102, 1103, Other User, 13800001103, Guangdong, Shenzhen, Other User Address, 1, 2026-08-31 12:08:08.496389, 2026-08-31 12:08:08.496389
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2ee6cb8a]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2ee6cb8a]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2ee6cb8a]
+2026-08-31T12:08:08.602+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler com.segroup8.platform.common.GlobalExceptionHandler#handleBusiness(BusinessException)
+2026-08-31T12:08:08.603+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-31T12:08:08.603+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@52ce568]
+2026-08-31T12:08:08.604+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.segroup8.platform.common.BusinessException: 收货地址不存在或不属于当前用户]
+2026-08-31T12:08:08.604+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=713ed1371a854c17ae60dc4eaf4e42e5 method=POST path=/api/order/create status=200
+2026-08-31T12:08:08.609+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@466ecdf9] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@758477563 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-self-purchase(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@466ecdf9]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f50d590] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@2129168426 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-self-purchase(String), 0(Integer), 2026-08-31T12:08:18.617123100(LocalDateTime), 2026-08-31T12:08:08.617123100(LocalDateTime), 2026-08-31T12:08:08.617123100(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f50d590]
+2026-08-31T12:08:08.621+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.CreateOrderRequest@4e59830b]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3bdb5380]
+JDBC Connection [HikariProxyConnection@1573849496 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1105(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1105, 1102, UC11 Buyer Owned Product, null, null, null, 7.00, null, null, 5, 1, 2026-08-31 12:08:08.496389, 2026-08-31 12:08:08.496389
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3bdb5380]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3bdb5380] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1102(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1102, 1101, UC11 Buyer Own Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3bdb5380]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3bdb5380]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3bdb5380]
+2026-08-31T12:08:08.632+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler com.segroup8.platform.common.GlobalExceptionHandler#handleBusiness(BusinessException)
+2026-08-31T12:08:08.633+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-31T12:08:08.634+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@3ce906f2]
+2026-08-31T12:08:08.635+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.segroup8.platform.common.BusinessException: 不能购买本人店铺的商品]
+2026-08-31T12:08:08.635+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=c0a74e0d663b4953a4e884c06721a245 method=POST path=/api/order/create status=200
+2026-08-31T12:08:08.637+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL update
+2026-08-31T12:08:08.637+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [INSERT INTO user_block (blocker_id, blocked_id) VALUES (?, ?)]
+2026-08-31T12:08:08.641+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@526c0134] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@642143005 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-buyer-blocks(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@526c0134]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1a73b0f9] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1060171806 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-buyer-blocks(String), 0(Integer), 2026-08-31T12:08:18.649623300(LocalDateTime), 2026-08-31T12:08:08.649623300(LocalDateTime), 2026-08-31T12:08:08.649623300(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@1a73b0f9]
+2026-08-31T12:08:08.652+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.CreateOrderRequest@de7336d]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@26566b06]
+JDBC Connection [HikariProxyConnection@1635496737 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1101, 1101, UC11 Server Price Product, null, null, null, 19.90, null, null, 10, 1, 2026-08-31 12:08:08.496389, 2026-08-31 12:08:08.496389
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@26566b06]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@26566b06] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1101, 1102, UC11 Seller Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@26566b06]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@26566b06] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1101(Long), 1102(Long)
+<==    Columns: COUNT(*)
+<==        Row: 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@26566b06]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@26566b06]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@26566b06]
+2026-08-31T12:08:08.661+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler com.segroup8.platform.common.GlobalExceptionHandler#handleBusiness(BusinessException)
+2026-08-31T12:08:08.662+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-31T12:08:08.662+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@1c1023e1]
+2026-08-31T12:08:08.662+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.segroup8.platform.common.BusinessException: 您已拉黑该卖家，无法购买其商品]
+2026-08-31T12:08:08.662+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=2aea72bd049b444d90f180e8658a636b method=POST path=/api/order/create status=200
+2026-08-31T12:08:08.664+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL update
+2026-08-31T12:08:08.664+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [DELETE FROM user_block WHERE blocker_id = ? AND blocked_id = ?]
+2026-08-31T12:08:08.665+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL update
+2026-08-31T12:08:08.665+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [INSERT INTO user_block (blocker_id, blocked_id) VALUES (?, ?)]
+2026-08-31T12:08:08.668+08:00 DEBUG 32744 --- [segroup8-platform] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.segroup8.platform.controller.OrderController#create(CreateOrderRequest)
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4077b71e] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@311592722 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: SELECT id,user_id,request_method,request_path,idempotency_key,status,http_status,response_body,expire_time,create_time,update_time FROM idempotency_record WHERE (user_id = ? AND request_method = ? AND request_path = ? AND idempotency_key = ?) limit 1
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-seller-blocks(String)
+<==      Total: 0
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4077b71e]
+Creating a new SqlSession
+SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@f00b18a] was not registered for synchronization because synchronization is not active
+JDBC Connection [HikariProxyConnection@1016260610 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will not be managed by Spring
+==>  Preparing: INSERT INTO idempotency_record ( user_id, request_method, request_path, idempotency_key, status, expire_time, create_time, update_time ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ? )
+==> Parameters: 1101(Long), POST(String), /api/order/create(String), uc11-seller-blocks(String), 0(Integer), 2026-08-31T12:08:18.676126400(LocalDateTime), 2026-08-31T12:08:08.676126400(LocalDateTime), 2026-08-31T12:08:08.676126400(LocalDateTime)
+<==    Updates: 1
+Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@f00b18a]
+2026-08-31T12:08:08.681+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [com.segroup8.platform.dto.CreateOrderRequest@478cd2e8]
+Creating a new SqlSession
+Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@24af2901]
+JDBC Connection [HikariProxyConnection@498905609 wrapping conn1: url=jdbc:h2:mem:segroup8_test user=SA] will be managed by Spring
+==>  Preparing: SELECT id,shop_id,name,cover,images,description,price,category_id,sub_category_id,stock,status,create_time,update_time FROM product WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, shop_id, name, cover, images, description, price, category_id, sub_category_id, stock, status, create_time, update_time
+<==        Row: 1101, 1101, UC11 Server Price Product, null, null, null, 19.90, null, null, 10, 1, 2026-08-31 12:08:08.496389, 2026-08-31 12:08:08.496389
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@24af2901]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@24af2901] from current transaction
+==>  Preparing: SELECT id,owner_user_id,name,logo,description,region,contact_name,contact_phone,id_card_no_masked,warehouse_addr,decoration_json,status FROM shop WHERE id=?
+==> Parameters: 1101(Long)
+<==    Columns: id, owner_user_id, name, logo, description, region, contact_name, contact_phone, id_card_no_masked, warehouse_addr, decoration_json, status
+<==        Row: 1101, 1102, UC11 Seller Shop, null, null, null, null, null, null, null, null, 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@24af2901]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@24af2901] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1101(Long), 1102(Long)
+<==    Columns: COUNT(*)
+<==        Row: 0
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@24af2901]
+Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@24af2901] from current transaction
+==>  Preparing: SELECT COUNT(*) FROM user_block WHERE blocker_id = ? AND blocked_id = ?
+==> Parameters: 1102(Long), 1101(Long)
+<==    Columns: COUNT(*)
+<==        Row: 1
+<==      Total: 1
+Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@24af2901]
+Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@24af2901]
+Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@24af2901]
+2026-08-31T12:08:08.693+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Using @ExceptionHandler com.segroup8.platform.common.GlobalExceptionHandler#handleBusiness(BusinessException)
+2026-08-31T12:08:08.693+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-08-31T12:08:08.693+08:00 DEBUG 32744 --- [segroup8-platform] [           main] m.m.a.RequestResponseBodyMethodProcessor : Writing [com.segroup8.platform.common.Result@3a2ef599]
+2026-08-31T12:08:08.694+08:00 DEBUG 32744 --- [segroup8-platform] [           main] .m.m.a.ExceptionHandlerExceptionResolver : Resolved [com.segroup8.platform.common.BusinessException: 该卖家已拉黑您，无法购买其商品]
+2026-08-31T12:08:08.695+08:00  INFO 32744 --- [segroup8-platform] [           main] c.s.p.interceptor.TraceIdInterceptor     : api_request traceId=119544b1c1894ce1aa8f75f711878fc0 method=POST path=/api/order/create status=200
+2026-08-31T12:08:08.696+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.697+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_info WHERE buyer_user_id = ?]
+2026-08-31T12:08:08.697+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.697+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT COUNT(*) FROM order_item WHERE order_id IN (SELECT id FROM order_info WHERE buyer_user_id = ?)]
+2026-08-31T12:08:08.699+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL query
+2026-08-31T12:08:08.699+08:00 DEBUG 32744 --- [segroup8-platform] [           main] o.s.jdbc.core.JdbcTemplate               : Executing prepared SQL statement [SELECT stock FROM product WHERE id = ?]
+]]></system-out>
+  </testcase>
+</testsuite>

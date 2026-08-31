@@ -7,12 +7,14 @@ the chart.
 
 ## One-time cluster prerequisites
 
-Create the namespace and the required secrets before enabling CD:
+Create the namespace and the platform secrets before enabling CD. The
+Messaging secret is required when the Messaging service pipeline enables that
+component:
 
 ```bash
 kubectl create namespace segroup8
 kubectl -n segroup8 get secret \
-  acr-pull-secret segroup8-backend-secret segroup8-messaging-secret segroup8-mysql-secret
+  acr-pull-secret segroup8-backend-secret segroup8-mysql-secret
 ```
 
 The secrets must contain these keys:
@@ -23,9 +25,10 @@ The secrets must contain these keys:
 - `segroup8-backend-secret`: `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`,
   `JWT_SECRET`, and `REALTIME_ALLOWED_ORIGIN_PATTERNS`. Optional LLM settings
   may be added to the same secret.
-- `segroup8-messaging-secret`: `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`,
-  `JWT_SECRET`, and `INTERNAL_SERVICE_TOKEN`; add
-  `INTERNAL_OPERATIONS_TOKEN` for the replay endpoint.
+- `segroup8-messaging-secret`: required by the Messaging service pipeline;
+  `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, and
+  `INTERNAL_SERVICE_TOKEN`; add `INTERNAL_OPERATIONS_TOKEN` for the replay
+  endpoint.
 
 `REALTIME_ALLOWED_ORIGIN_PATTERNS` must be supplied as an explicit
 non-wildcard production allow-list. The deployment script rejects an empty
@@ -63,7 +66,9 @@ The demo seed file is intentionally excluded from production.
 
 ## Deployment behavior
 
-`helm upgrade --install --atomic --wait` waits for MySQL and both application
-Deployments to become ready. A failed upgrade is rolled back automatically.
+`helm upgrade --install --atomic --wait` waits for MySQL and the enabled
+application Deployments to become ready. The shared platform pipeline keeps
+Messaging disabled; `messaging-service-ci-cd.yml` enables and deploys it with
+`--reuse-values`. A failed upgrade is rolled back automatically.
 Images use `sha-<full Git SHA>` tags so every release is traceable and
 rollback-safe.
