@@ -12,4 +12,4 @@
 - 内部扣款、结果查询、退款与结算重复请求返回原结果。
 - Outbox 首次投递失败后保留事件并退避重试，后续成功时标记为已发布。
 
-原始结果以 `evidence/raw-reports/` 的 Surefire XML/TXT 为准。运行时与仓库 OpenAPI 共 25 个操作（17 个公开操作、8 个内部操作），方法+规范化路径精确相等；公开操作成功路径以及 401/403/400/404/幂等边界均有自动化覆盖。写接口支持 `Idempotency-Key`：同键同请求重放同一响应，同键不同请求返回 `409 IDEMPOTENCY_KEY_REUSED`。MySQL Testcontainers 使用独立 Flyway migrator 和运行 DML 用户，覆盖运行账号不能 DDL/跨 schema 写入的负向断言。当前提交的完整计数、commit 和耗时以刷新后的 `result-summary.json` 为准。
+原始结果以 `evidence/raw-reports/` 的 Surefire XML/TXT 为准。运行时与仓库 OpenAPI 共 25 个操作（17 个公开操作、8 个内部操作），方法+规范化路径精确相等；公开操作成功路径以及 401/403/400/404/幂等边界均有自动化覆盖。写接口支持 `Idempotency-Key`：同键同请求重放同一响应，同键不同请求返回 `409 IDEMPOTENCY_KEY_REUSED`。MySQL Testcontainers 使用独立 Flyway migrator 和运行 DML 用户，覆盖运行账号不能 DDL/跨 schema 写入的负向断言。tested revision `cbc1ab300d0bf3c78669d1c0ac9f72fd5a390e3a` 的 `clean verify`：服务 26/26、安全契约 5/5、MySQL 4/4，均为 0 失败、0 错误、0 跳过；完整计数、镜像和耗时以 `result-summary.json` 为准。

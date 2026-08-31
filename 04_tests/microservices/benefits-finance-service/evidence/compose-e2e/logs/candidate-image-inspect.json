@@ -1,15 +1,15 @@
 {
-  "id": "sha256:98a5553e4aa4942d0160d1315706a455739486bd8ffb35d6e8745d86a4c3d426",
+  "id": "sha256:2a60df31818f68f28b40471b9f69d55fa1d2537dbf5cbcab879df8a2516b1e9c",
   "repoTags": [
     "segroup8/benefits-finance:e2e"
   ],
   "repoDigests": [
-    "segroup8/benefits-finance@sha256:98a5553e4aa4942d0160d1315706a455739486bd8ffb35d6e8745d86a4c3d426"
+    "segroup8/benefits-finance@sha256:2a60df31818f68f28b40471b9f69d55fa1d2537dbf5cbcab879df8a2516b1e9c"
   ],
-  "created": "2026-08-31T07:28:56.396376174Z",
+  "created": "2026-08-31T08:17:21.13551482Z",
   "architecture": "amd64",
   "os": "linux",
-  "size": 124997172,
+  "size": 125009746,
   "user": "10001:10001",
   "healthcheck": {
     "Test": [
@@ -26,8 +26,8 @@
   "labels": {
     "title": "benefits-finance-service",
     "source": "https://github.com/Isabella-Apus/SEGroup8",
-    "revision": "eca9b25a2c0ad6a17ad813446b67a23fcd72fcb0",
-    "created": "2026-08-31T07:28:35Z",
-    "jarSha256": "29e926346b399e2fc40073fc1c40779180cda535aecb515eca4b027c570821b9"
+    "revision": "cbc1ab300d0bf3c78669d1c0ac9f72fd5a390e3a",
+    "created": "2026-08-31T08:17:17Z",
+    "jarSha256": "c8dc7f93525fb8778adfa7b46d9adb55d08cd62caf488339b8a9842d362c957d"
   }
 }

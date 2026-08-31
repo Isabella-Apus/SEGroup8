@@ -92,12 +92,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 427,
+                  "duration": 487,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-31T07:31:44.731Z",
+                  "startTime": "2026-08-31T08:18:13.881Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -126,12 +126,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 304,
+                  "duration": 335,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-08-31T07:31:45.170Z",
+                  "startTime": "2026-08-31T08:18:14.382Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -160,7 +160,7 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 254,
+                  "duration": 285,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
@@ -168,10 +168,10 @@
                   "steps": [
                     {
                       "title": "Expect \"poll toEqual\"",
-                      "duration": 112
+                      "duration": 126
                     }
                   ],
-                  "startTime": "2026-08-31T07:31:45.481Z",
+                  "startTime": "2026-08-31T08:18:14.723Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -189,8 +189,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-08-31T07:31:44.229Z",
-    "duration": 1536.542,
+    "startTime": "2026-08-31T08:18:13.226Z",
+    "duration": 1811.18,
     "expected": 3,
     "skipped": 0,
     "unexpected": 0,
