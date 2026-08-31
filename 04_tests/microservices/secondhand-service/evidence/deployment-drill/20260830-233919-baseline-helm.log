@@ -1,0 +1,8 @@
+Release "segroup8-rollback" has been upgraded. Happy Helming!
+NAME: segroup8-rollback
+LAST DEPLOYED: Sun Aug 30 23:41:35 2026
+NAMESPACE: segroup8-rollback-20260830-233919
+STATUS: deployed
+REVISION: 2
+DESCRIPTION: Upgrade complete
+TEST SUITE: None

@@ -1,5 +1,9 @@
 [CmdletBinding()]
 param(
+    [ValidateSet("preexperiment", "formal")]
+    [string]$ExperimentType = "preexperiment",
+    [ValidateRange(1, 10)]
+    [int]$RunNumber = 1,
     [string]$Namespace = "",
     [ValidateRange(1, 10)]
     [int]$MinReplicas = 1,
@@ -38,7 +42,7 @@ if ($MaxReplicas -lt $MinReplicas) {
 New-Item -ItemType Directory -Force -Path $evidenceDir | Out-Null
 $snapshotPath = Join-Path $evidenceDir "$runId-hpa-snapshots.csv"
 $resourceLogPath = Join-Path $evidenceDir "$runId-kubectl-resources.log"
-$summaryPath = Join-Path $evidenceDir "$runId-preexperiment-summary.json"
+$summaryPath = Join-Path $evidenceDir "$runId-$ExperimentType-summary.json"
 $k6SummaryPath = Join-Path $evidenceDir "$runId-k6-summary.json"
 $k6StdoutPath = Join-Path $evidenceDir "$runId-k6-console.log"
 $k6StderrPath = Join-Path $evidenceDir "$runId-k6-error.log"
@@ -47,7 +51,15 @@ $portForwardStderrPath = Join-Path $env:TEMP "$runId-port-forward-error.log"
 $renderedPath = Join-Path $env:TEMP "$runId-secondhand-hpa.yaml"
 $metricsManifestPath = Join-Path $env:TEMP "metrics-server-v0.9.0.yaml"
 $metricsPatchPath = Join-Path $env:TEMP "metrics-server-docker-desktop-patch.json"
-$image = "segroup8/secondhand:hpa-local"
+if ($SkipImageBuild) {
+    $imageTag = "hpa-local"
+} else {
+    $imageTag = "hpa-$runId"
+}
+$image = "segroup8/secondhand:$imageTag"
+$localImageId = ""
+$deployedImageId = ""
+$imageImportedToNode = $false
 $namespaceCreated = $false
 $portForward = $null
 $loadJob = $null
@@ -69,6 +81,69 @@ function Invoke-Checked {
     & $Command @Arguments
     if ($LASTEXITCODE -ne 0) {
         throw "$Command failed with exit code $LASTEXITCODE"
+    }
+}
+
+function Import-LocalImageForDockerDesktop {
+    param([Parameter(Mandatory = $true)][string]$Image)
+
+    $context = (& kubectl config current-context).Trim()
+    if ($context -ne "docker-desktop") {
+        return $false
+    }
+
+    $nodeName = (& kubectl get nodes -o "jsonpath={.items[0].metadata.name}").Trim()
+    if ($LASTEXITCODE -ne 0 -or -not $nodeName) {
+        throw "Unable to identify the Docker Desktop Kubernetes node."
+    }
+
+    $archiveName = "$runId-secondhand-image.tar"
+    $archivePath = Join-Path $env:TEMP $archiveName
+    $loaderPod = ""
+    try {
+        $debugOutput = @(& kubectl debug "node/$nodeName" --image=busybox:1.36 `
+            --profile=sysadmin -- sleep 600)
+        if ($LASTEXITCODE -ne 0) {
+            throw "Unable to create the Docker Desktop image loader pod."
+        }
+        $podMatch = [regex]::Match(($debugOutput -join "`n"), "Creating debugging pod ([a-z0-9-]+)")
+        if (-not $podMatch.Success) {
+            throw "Unable to parse the image loader pod name from kubectl debug output."
+        }
+        $loaderPod = $podMatch.Groups[1].Value
+        Invoke-Checked kubectl @("wait", "--for=condition=Ready", "pod/$loaderPod", "--timeout=60s") |
+            Out-Null
+        Invoke-Checked docker @("save", "--output", $archivePath, $Image) | Out-Null
+
+        Push-Location $env:TEMP
+        try {
+            Invoke-Checked kubectl @(
+                "cp", ".\$archiveName", "default/$loaderPod`:/host/tmp/$archiveName"
+            ) | Out-Null
+        } finally {
+            Pop-Location
+        }
+        Invoke-Checked kubectl @(
+            "exec", $loaderPod, "--", "chroot", "/host", "ctr", "-n", "k8s.io",
+            "images", "import", "/tmp/$archiveName"
+        ) | Out-Null
+        $imported = @(& kubectl exec $loaderPod -- chroot /host ctr -n k8s.io `
+            images ls "name==docker.io/$Image") -join "`n"
+        if ($LASTEXITCODE -ne 0 -or $imported -notmatch [regex]::Escape("docker.io/$Image")) {
+            throw "The exact image tag was not imported into the Kubernetes container runtime: $Image"
+        }
+        return $true
+    } finally {
+        $previousPreference = $ErrorActionPreference
+        $ErrorActionPreference = "Continue"
+        if ($loaderPod) {
+            & kubectl exec $loaderPod -- rm -f "/host/tmp/$archiveName" *> $null
+            & kubectl delete pod $loaderPod --wait=false *> $null
+        }
+        if (Test-Path -LiteralPath $archivePath) {
+            Remove-Item -LiteralPath $archivePath -Force
+        }
+        $ErrorActionPreference = $previousPreference
     }
 }
 
@@ -230,6 +305,13 @@ try {
             (Join-Path $repoRoot "microservices\secondhand-service")
         )
     }
+    $localImageId = (& docker image inspect $image --format "{{.Id}}").Trim()
+    if ($LASTEXITCODE -ne 0 -or -not $localImageId) {
+        throw "Unable to resolve the exact local image ID for $image."
+    }
+    if (-not $SkipImageBuild) {
+        $imageImportedToNode = Import-LocalImageForDockerDesktop -Image $image
+    }
 
     $rootPassword = [Guid]::NewGuid().ToString("N")
     $dbPassword = [Guid]::NewGuid().ToString("N")
@@ -281,8 +363,9 @@ try {
         "--set", "secondhand.autoscaling.targetCPUUtilizationPercentage=$TargetCpuUtilization",
         "--set", "secondhand.autoscaling.behavior.scaleDown.stabilizationWindowSeconds=60",
         "--set-string", "secondhand.image.repository=segroup8/secondhand",
-        "--set-string", "secondhand.image.tag=hpa-local",
-        "--set-string", "secondhand.deployment.version=hpa-preexperiment",
+        "--set-string", "secondhand.image.tag=$imageTag",
+        "--set-string", "secondhand.image.pullPolicy=Never",
+        "--set-string", "secondhand.deployment.version=hpa-$ExperimentType",
         "--set-string", "secondhand.deployment.commit=$(& git -C $repoRoot rev-parse HEAD)",
         "--set-string", "secondhand.deployment.buildTime=$((Get-Date).ToString('o'))",
         "--set-file", "mysql.initSchema=$schemaPath"
@@ -294,6 +377,14 @@ try {
     [System.IO.File]::WriteAllLines($renderedPath, [string[]]$rendered)
     Invoke-Checked kubectl @("-n", $Namespace, "apply", "-f", $renderedPath)
     Invoke-Checked kubectl @("-n", $Namespace, "rollout", "status", "deployment/segroup8-secondhand", "--timeout=240s")
+    $deployedImage = (& kubectl -n $Namespace get deployment segroup8-secondhand `
+        -o "jsonpath={.spec.template.spec.containers[0].image}").Trim()
+    if ($deployedImage -ne $image) {
+        throw "Deployment image mismatch: expected $image, got $deployedImage."
+    }
+    $deployedImageId = (& kubectl -n $Namespace get pods `
+        -l "app.kubernetes.io/component=secondhand-service" `
+        -o "jsonpath={.items[0].status.containerStatuses[0].imageID}").Trim()
 
     $portForwardOptions = @{
         FilePath = "kubectl.exe"
@@ -376,6 +467,16 @@ try {
     if ($loadExitCode -ne 0) {
         throw "k6 load failed with exit code $loadExitCode."
     }
+    $k6Summary = Get-Content -LiteralPath $k6SummaryPath -Raw | ConvertFrom-Json
+    $httpSummary = [ordered]@{
+        requests = [int]$k6Summary.metrics.http_reqs.count
+        requestsPerSecond = [math]::Round([double]$k6Summary.metrics.http_reqs.rate, 3)
+        averageDurationMs = [math]::Round([double]$k6Summary.metrics.http_req_duration.avg, 2)
+        p95DurationMs = [math]::Round([double]$k6Summary.metrics.http_req_duration.'p(95)', 2)
+        failedRate = [double]$k6Summary.metrics.http_req_failed.value
+        businessSuccessRate = [double]$k6Summary.metrics.business_success.value
+        serverErrorRate = [double]$k6Summary.metrics.server_error.value
+    }
     Record-Snapshot "load-complete"
 
     $scaleDownDeadline = (Get-Date).AddSeconds($ScaleDownTimeoutSeconds)
@@ -394,6 +495,8 @@ try {
 
     $summary = [ordered]@{
         executedAt = (Get-Date).ToString("o")
+        experimentType = $ExperimentType
+        runNumber = $RunNumber
         status = if (
             $peakReplicas -gt $initialReplicas -and
             $peakReadyReplicas -gt $initialReadyReplicas -and
@@ -405,6 +508,9 @@ try {
         metricsServer = "v0.9.0"
         namespace = $Namespace
         serviceImage = $image
+        localImageId = $localImageId
+        deployedImageId = $deployedImageId
+        imageImportedToNode = $imageImportedToNode
         gitCommit = (& git -C $repoRoot rev-parse HEAD)
         hpa = [ordered]@{
             minReplicas = $MinReplicas
@@ -414,6 +520,7 @@ try {
             initialReadyReplicas = $initialReadyReplicas
             peakReplicas = $peakReplicas
             peakReadyReplicas = $peakReadyReplicas
+            allPeakReplicasReady = ($peakReadyReplicas -ge $peakReplicas)
             finalReplicas = $finalReplicas
             finalReadyReplicas = $finalReadyReplicas
         }
@@ -422,6 +529,7 @@ try {
             duration = $Duration
             summary = (Split-Path $k6SummaryPath -Leaf)
         }
+        http = $httpSummary
         evidence = @(
             (Split-Path $snapshotPath -Leaf),
             (Split-Path $resourceLogPath -Leaf),
@@ -443,7 +551,7 @@ try {
     if ($finalReadyReplicas -gt $MinReplicas) {
         throw "Ready secondhand-service pods did not return to MinReplicas within $ScaleDownTimeoutSeconds seconds."
     }
-    Write-Host "HPA pre-experiment passed. Evidence: $summaryPath"
+    Write-Host "HPA $ExperimentType run $RunNumber passed. Evidence: $summaryPath"
 } finally {
     if ($loadJob) {
         if ($loadJob.State -eq "Running") {

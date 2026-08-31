@@ -53,6 +53,49 @@ class AuctionSettlementIntegrationTest extends SecondhandIntegrationSupport {
         verify(orderGateway, times(1)).createSecondhandOrder(org.mockito.ArgumentMatchers.any());
     }
 
+    @Test
+    void independentAuctionsDoNotDeadlockOnLeadingBidHistory() throws Exception {
+        List<Long> auctionIds = new ArrayList<>();
+        for (int index = 0; index < 10; index++) {
+            long productId = seedApprovedProduct(10, "并发拍卖教材-" + index, "120.00", false);
+            auctionIds.add(trades.createAuction(10,
+                    new AuctionCreateRequest(productId, new BigDecimal("50.00"),
+                            new BigDecimal("5.00"), 60)).id());
+        }
+
+        var start = new CountDownLatch(1);
+        List<Throwable> failures = Collections.synchronizedList(new ArrayList<>());
+        var executor = Executors.newFixedThreadPool(10);
+        try {
+            for (int index = 0; index < auctionIds.size(); index++) {
+                final int slot = index;
+                executor.submit(() -> {
+                    try {
+                        start.await();
+                        for (int round = 0; round < 20; round++) {
+                            long bidderId = 1000L + slot * 2L + round % 2;
+                            trades.placeBid(bidderId, "bidder-" + bidderId, auctionIds.get(slot),
+                                    new BigDecimal("50.00").add(new BigDecimal(round * 5L)));
+                        }
+                    } catch (Throwable failure) {
+                        failures.add(failure);
+                        if (failure instanceof InterruptedException) Thread.currentThread().interrupt();
+                    }
+                });
+            }
+            start.countDown();
+            executor.shutdown();
+            assertThat(executor.awaitTermination(30, TimeUnit.SECONDS)).isTrue();
+        } finally {
+            executor.shutdownNow();
+        }
+
+        assertThat(failures).isEmpty();
+        assertThat(db.queryForObject("select count(*) from auction_log", Integer.class)).isEqualTo(200);
+        assertThat(db.queryForObject("select count(*) from auction_log where status='LEADING'", Integer.class))
+                .isEqualTo(10);
+    }
+
     private Void bid(CountDownLatch start, List<String> outcomes, long userId, String name, long auctionId) {
         try {
             start.await();

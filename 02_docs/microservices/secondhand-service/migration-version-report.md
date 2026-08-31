@@ -34,6 +34,7 @@ rg -n "POST /internal/orders/secondhand|OrderStatusChanged.v1|NotificationReques
 | 版本 | 文件 | 内容 | 回滚策略 |
 |---|---|---|---|
 | V1 | `V1__secondhand_owned_schema.sql` | 7 张业务/技术表和本地分类投影 | 新服务首次部署可删除独立 schema；已写入业务数据后采用前向修复迁移 |
+| V2 | `V2__auction_leading_bid_index.sql` | 为领先出价查询增加确定性索引，配合按主键更新避免不同拍卖间范围锁死锁 | 不回退已生效索引；如需调整，以新 Flyway 版本前向迁移 |
 
 Flyway 在启动时执行并校验校验和。Kubernetes readiness 只在应用启动及 migration 成功后可用。
 

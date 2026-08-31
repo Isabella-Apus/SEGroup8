@@ -1,0 +1,33 @@
+{
+    "executedAt":  "2026-08-30T23:01:59.0630398+08:00",
+    "status":  "PASSED",
+    "environment":  "Docker Compose / real secondhand-service / MySQL 8.4.6 / process-level order stub",
+    "dependencyEndpoint":  "http://host.docker.internal:18085",
+    "readiness":  {
+                      "before":  "UP",
+                      "whileDependencyDown":  "UP"
+                  },
+    "recovery":  {
+                     "finalStatus":  "CREATED",
+                     "orderId":  9001,
+                     "firstStatus":  "RETRY",
+                     "orderBusinessKey":  "SECONDHAND:DIRECT_BUY:991001-v1",
+                     "orderNo":  "E2E9001",
+                     "storedAttemptsBeforeRecovery":  1,
+                     "repeatedRequestCount":  1,
+                     "finalProductStatus":  "SOLD"
+                 },
+    "exhaustion":  {
+                       "storedRetryAttempts":  2,
+                       "finalStatus":  "FAILED",
+                       "finalProductStatus":  "ON_SHELF",
+                       "firstStatus":  "RETRY",
+                       "failedOutboxCount":  1,
+                       "requestCount":  1
+                   },
+    "evidence":  {
+                     "apiResponses":  "20260830-230030-api-responses.json",
+                     "composeLog":  "20260830-230030-compose.log",
+                     "orderStubLog":  "20260830-230030-order-stub.log"
+                 }
+}

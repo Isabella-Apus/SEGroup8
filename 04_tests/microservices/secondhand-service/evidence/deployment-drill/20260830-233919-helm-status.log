@@ -1,0 +1,42 @@
+NAME: segroup8-rollback
+LAST DEPLOYED: Sun Aug 30 23:45:17 2026
+NAMESPACE: segroup8-rollback-20260830-233919
+STATUS: deployed
+REVISION: 4
+DESCRIPTION: Rollback to 2
+RESOURCES:
+==> v1/ConfigMap
+NAME                  DATA   AGE
+segroup8-mysql-init   1      5m57s
+segroup8-secondhand-config   8     4m15s
+
+==> v1/PersistentVolumeClaim
+NAME               STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+segroup8-uploads   Bound    pvc-e158865c-4aae-4b0e-9e6d-5f3bbab7de08   5Gi        RWO            hostpath       <unset>                 5m57s
+
+==> v1/Service
+NAME      TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+backend   ClusterIP   10.96.182.192   <none>        8080/TCP   5m57s
+frontend   ClusterIP   10.96.220.215   <none>   80/TCP   5m57s
+mysql   ClusterIP   None   <none>   3306/TCP   5m57s
+secondhand-service   ClusterIP   10.96.50.160   <none>   8080/TCP   4m14s
+
+==> v1/Deployment
+NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+segroup8-backend   1/1     1            1           5m57s
+segroup8-frontend   1/1   1     1     5m57s
+segroup8-secondhand   1/1   1     1     4m14s
+
+==> v1/Pod(related)
+NAME                                READY   STATUS    RESTARTS   AGE
+segroup8-backend-689795bfd4-vhjjd   1/1     Running   0          5m57s
+segroup8-frontend-74df4884d8-pjnpb   1/1   Running   0     5m57s
+segroup8-secondhand-bcdd8766-7s5r7   1/1   Running   0     4m14s
+mysql-0   1/1   Running   0     5m57s
+
+==> v1/StatefulSet
+NAME    READY   AGE
+mysql   1/1     5m57s
+
+
+TEST SUITE: None

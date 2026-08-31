@@ -1,0 +1,27 @@
+{
+    "executedAt":  "2026-08-30T22:51:33.2619361+08:00",
+    "scenario":  "secondhand-auction-bid",
+    "targetVersion":  "feature/ms-secondhand",
+    "targetCommit":  "137f2293edd24eb07ad6a7ec229082b1f4940d0d",
+    "baseUrl":  "http://host.docker.internal:18080/api",
+    "vus":  10,
+    "duration":  "30s",
+    "k6Image":  "grafana/k6:latest",
+    "k6ImageId":  "sha256:5221b620a4f874faff6e32ba597aa667c058391fe4898b1c6f6377f062c6cdec",
+    "k6Version":  "k6 v2.2.0 (commit/00a9a1b7f5, go1.26.5, linux/amd64)",
+    "environment":  {
+                        "BASE_URL":  "http://host.docker.internal:18080/api",
+                        "VUS":  10,
+                        "DURATION":  "30s",
+                        "SLEEP":  "0.2",
+                        "BID_STEP":  "5",
+                        "AUCTION_FIRST_ID":  "999001",
+                        "BID_BASE_AMOUNT":  "1000",
+                        "BUYER_TOKENS":  "\u003credacted\u003e",
+                        "AUCTION_COUNT":  "10"
+                    },
+    "exitCode":  0,
+    "summary":  "20260830-224711-formal-secondhand-service-secondhand-auction-bid-run1-summary.json",
+    "rawOutput":  "20260830-224711-formal-secondhand-service-secondhand-auction-bid-run1-raw.json.gz",
+    "consoleLog":  "20260830-224711-formal-secondhand-service-secondhand-auction-bid-run1-console.log"
+}

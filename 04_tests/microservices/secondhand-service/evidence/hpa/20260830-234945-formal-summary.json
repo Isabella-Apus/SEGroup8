@@ -1,0 +1,47 @@
+{
+    "executedAt":  "2026-08-30T23:57:28.9835901+08:00",
+    "experimentType":  "formal",
+    "runNumber":  1,
+    "status":  "PASS",
+    "clusterContext":  "docker-desktop",
+    "kubernetesVersion":  "v1.34.3",
+    "metricsServer":  "v0.9.0",
+    "namespace":  "segroup8-hpa-20260830-234945",
+    "serviceImage":  "segroup8/secondhand:hpa-20260830-234945",
+    "localImageId":  "sha256:1c71b3396277d3b40cacebeeff02eddf7a13f0eae12b5a4f505ca714dbb582e9",
+    "deployedImageId":  "sha256:e352a2c43d10cf7c5f8ab9e4f249351c9f963c32d690b96ec1585d4e58f5dbae",
+    "imageImportedToNode":  true,
+    "gitCommit":  "137f2293edd24eb07ad6a7ec229082b1f4940d0d",
+    "hpa":  {
+                "minReplicas":  1,
+                "maxReplicas":  4,
+                "targetCpuUtilizationPercentage":  70,
+                "initialReplicas":  1,
+                "initialReadyReplicas":  1,
+                "peakReplicas":  4,
+                "peakReadyReplicas":  3,
+                "allPeakReplicasReady":  false,
+                "finalReplicas":  1,
+                "finalReadyReplicas":  1
+            },
+    "load":  {
+                 "vus":  15,
+                 "duration":  "150s",
+                 "summary":  "20260830-234945-k6-summary.json"
+             },
+    "http":  {
+                 "requests":  10692,
+                 "requestsPerSecond":  71.564,
+                 "averageDurationMs":  208.57,
+                 "p95DurationMs":  413.30,
+                 "failedRate":  0.0,
+                 "businessSuccessRate":  1.0,
+                 "serverErrorRate":  0.0
+             },
+    "evidence":  [
+                     "20260830-234945-hpa-snapshots.csv",
+                     "20260830-234945-kubectl-resources.log",
+                     "20260830-234945-k6-console.log",
+                     "20260830-234945-k6-error.log"
+                 ]
+}

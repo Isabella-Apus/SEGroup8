@@ -18,8 +18,11 @@
 | Contract | order-service 请求契约、架构边界 | `src/test/java/**/contract/` | business key 幂等且无跨域 Mapper/接口 |
 | Integration | 直购、议价、拍卖并发与恢复 | `src/test/java/**/integration/` | 单一成交、无重复订单、失败可恢复 |
 | MySQL | Flyway、表归属、跨库权限 | `MySqlSchemaOwnershipIntegrationTest` | 7 张自有表存在，跨库插入被拒绝 |
-| E2E | UC16-UC20 浏览器真实流程 | `frontend/e2e/domain-d/` | 5 个 spec 全部通过 |
+| 独立 E2E | 真实镜像、MySQL 和订单 HTTP 契约 | `frontend/e2e/microservices/secondhand-service-api.spec.ts` | UC16-UC19 4 个场景全部通过 |
+| 完整 E2E | UC16-UC20 浏览器真实流程 | `frontend/e2e/domain-d/` | 5 个 spec 全部通过 |
 | Delivery | Docker、Helm、CI 门禁 | Dockerfile、Helm、workflow | 镜像非 root，模板有效，失败阻断发布 |
+| Resilience | order 停止/恢复、错误镜像与回滚 | DevOps drill 脚本和隔离 Kubernetes | readiness 不级联失败、无重复请求、Helm 恢复基线 |
+| Performance | HPA 与单体/微服务拍卖三轮对比 | `04_tests/performance/` | 扩缩容有证据、每轮保留原始结果且错误门限通过 |
 
 ## 执行命令
 
@@ -37,4 +40,5 @@ npx playwright test e2e/domain-d
 
 - Maven 原始 XML/TXT 放在 `evidence/raw-reports/surefire/`。
 - Git 长期只保留 Playwright JSON、JUnit XML、摘要和关键失败截图/上下文；完整 HTML、重复截图、trace、video 与 Compose 日志由 Actions artifact 保存。
-- 只报告实际执行结果；GitHub Actions、ACR digest、真实 Kubernetes revision 和回滚截图必须在对应环境执行后补录。
+- 故障、HPA、性能与回滚只提交最终有效运行前缀；调试失败文件不作为验收证据。
+- 只报告实际执行结果；本地 Kubernetes 与生产 Kubernetes 分开标注。GitHub Actions、ACR digest、生产 revision 和线上截图必须在对应环境执行后补录。
