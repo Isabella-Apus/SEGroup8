@@ -4,9 +4,14 @@ on:
   pull_request:
     paths:
       - "microservices/secondhand-service/**"
+      - "microservices/security-contract/**"
       - "microservices/pom.xml"
       - "frontend/e2e/domain-d/**"
       - "frontend/e2e/microservices/secondhand-service-api.spec.ts"
+      - "frontend/src/**"
+      - "frontend/vite.config.js"
+      - "frontend/docker/nginx.conf"
+      - "compose*.yml"
       - "scripts/e2e/stubs/secondhand-order-contract-stub.mjs"
       - "02_docs/microservices/secondhand-service/**"
       - "03_devops/microservices/secondhand-service/**"
@@ -23,9 +28,14 @@ on:
     branches: [main]
     paths:
       - "microservices/secondhand-service/**"
+      - "microservices/security-contract/**"
       - "microservices/pom.xml"
       - "frontend/e2e/domain-d/**"
       - "frontend/e2e/microservices/secondhand-service-api.spec.ts"
+      - "frontend/src/**"
+      - "frontend/vite.config.js"
+      - "frontend/docker/nginx.conf"
+      - "compose*.yml"
       - "scripts/e2e/stubs/secondhand-order-contract-stub.mjs"
       - "02_docs/microservices/secondhand-service/**"
       - "03_devops/microservices/secondhand-service/**"
@@ -346,6 +356,10 @@ jobs:
           grep -q "minReplicas: 1" /tmp/secondhand-hpa.yaml
           grep -q "maxReplicas: 4" /tmp/secondhand-hpa.yaml
           grep -q "averageUtilization: 70" /tmp/secondhand-hpa.yaml
+          grep -q 'runAsUser: 10001' /tmp/secondhand-deployment.yaml
+          grep -q 'runAsGroup: 10001' /tmp/secondhand-deployment.yaml
+          grep -q 'readOnlyRootFilesystem: true' /tmp/secondhand-deployment.yaml
+          grep -q 'mountPath: /tmp' /tmp/secondhand-deployment.yaml
           if grep -q '^  replicas:' /tmp/secondhand-deployment.yaml; then
             echo "secondhand Deployment must not pin replicas while HPA is enabled"
             exit 1
