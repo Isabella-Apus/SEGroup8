@@ -41,7 +41,7 @@ helm --namespace "$k8s_namespace" status segroup8 >/dev/null
 
 build_time="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 helm upgrade --install segroup8 "$chart_dir" \
-  --namespace "$k8s_namespace" --reuse-values --atomic --cleanup-on-fail --wait \
+  --namespace "$k8s_namespace" --reset-then-reuse-values --atomic --cleanup-on-fail --wait \
   --timeout 10m --history-max 5 \
   --set order.enabled=true \
   --set-string "order.image.repository=$registry/$registry_namespace/order" \

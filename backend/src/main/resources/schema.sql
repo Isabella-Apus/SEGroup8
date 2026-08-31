@@ -372,8 +372,25 @@ CREATE TABLE IF NOT EXISTS `secondhand_product` (
   `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idx_secondhand_seller` (`seller_user_id`),
-  KEY `idx_secondhand_category` (`category_id`, `sub_category_id`)
+  KEY `idx_secondhand_category` (`category_id`, `sub_category_id`),
+  KEY `idx_secondhand_status_created` (`status`, `create_time` DESC, `id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+SET @secondhand_status_created_idx_exists = (
+  SELECT COUNT(*)
+  FROM information_schema.STATISTICS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'secondhand_product'
+    AND INDEX_NAME = 'idx_secondhand_status_created'
+);
+SET @secondhand_status_created_idx_add_sql = IF(
+  @secondhand_status_created_idx_exists = 0,
+  'CREATE INDEX `idx_secondhand_status_created` ON `secondhand_product` (`status`, `create_time` DESC, `id`)',
+  'SELECT 1'
+);
+PREPARE stmt_secondhand_status_created_idx_add FROM @secondhand_status_created_idx_add_sql;
+EXECUTE stmt_secondhand_status_created_idx_add;
+DEALLOCATE PREPARE stmt_secondhand_status_created_idx_add;
 
 SET @secondhand_category_id_col_exists = (
   SELECT COUNT(*)

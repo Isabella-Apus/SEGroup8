@@ -1,0 +1,61 @@
+2026-08-31T16:29:04+08:00
+NAME                                READY   UP-TO-DATE   AVAILABLE   AGE     CONTAINERS   IMAGES                                                                                                                      SELECTOR
+deployment.apps/segroup8-backend    2/2     2            2           2d18h   backend      crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323    app.kubernetes.io/component=backend,app.kubernetes.io/instance=segroup8
+deployment.apps/segroup8-frontend   1/1     1            1           2d18h   frontend     crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/frontend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323   app.kubernetes.io/component=frontend,app.kubernetes.io/instance=segroup8
+
+NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE                      NOMINATED NODE   READINESS GATES
+pod/mysql-0                              1/1     Running   0          2d18h   10.42.0.40   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/segroup8-backend-7dc76cb94d-tmnjx    1/1     Running   0          2d      10.42.0.48   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/segroup8-backend-7dc76cb94d-tnmhm    1/1     Running   0          30m     10.42.0.77   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/segroup8-frontend-5bb4b9c7c8-5bcsd   1/1     Running   0          2d      10.42.0.47   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+
+NAME               TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE     SELECTOR
+service/backend    ClusterIP   10.43.58.56    <none>        8080/TCP   2d18h   app.kubernetes.io/component=backend,app.kubernetes.io/instance=segroup8
+service/frontend   ClusterIP   10.43.54.227   <none>        80/TCP     2d18h   app.kubernetes.io/component=frontend,app.kubernetes.io/instance=segroup8
+service/mysql      ClusterIP   None           <none>        3306/TCP   2d18h   app.kubernetes.io/component=database,app.kubernetes.io/instance=segroup8
+
+NAME                                 CLASS     HOSTS   ADDRESS      PORTS   AGE
+ingress.networking.k8s.io/segroup8   traefik   *       172.28.7.2   80      2d18h
+
+NAME                                                   REFERENCE                     TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/segroup8-backend   Deployment/segroup8-backend   cpu: 3%/60%   2         4         2          9m21s
+NAME                                 CPU(cores)   MEMORY(bytes)
+mysql-0                              24m          537Mi
+segroup8-backend-7dc76cb94d-tmnjx    2m           268Mi
+segroup8-backend-7dc76cb94d-tnmhm    16m          267Mi
+segroup8-frontend-5bb4b9c7c8-5bcsd   1m           4Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   186m         4%       3859Mi          53%
+Name:                                                  segroup8-backend
+Namespace:                                             segroup8
+Labels:                                                experiment.segroup8/scope=complete-system
+Annotations:                                           <none>
+CreationTimestamp:                                     Mon, 31 Aug 2026 16:19:45 +0800
+Reference:                                             Deployment/segroup8-backend
+Metrics:                                               ( current / target )
+  resource cpu on pods  (as a percentage of request):  3% (9m) / 60%
+Min replicas:                                          2
+Max replicas:                                          4
+Behavior:
+  Scale Up:
+    Stabilization Window: 0 seconds
+    Select Policy: Max
+    Policies:
+      - Type: Pods  Value: 2  Period: 15 seconds
+  Scale Down:
+    Stabilization Window: 60 seconds
+    Select Policy: Max
+    Policies:
+      - Type: Percent  Value: 50  Period: 15 seconds
+Deployment pods:       2 current / 2 desired
+Conditions:
+  Type            Status  Reason            Message
+  ----            ------  ------            -------
+  AbleToScale     True    ReadyForNewScale  recommended size matches current size
+  ScalingActive   True    ValidMetricFound  the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)
+  ScalingLimited  True    TooFewReplicas    the desired replica count is less than the minimum replica count
+Events:
+  Type    Reason             Age   From                       Message
+  ----    ------             ----  ----                       -------
+  Normal  SuccessfulRescale  9m6s  horizontal-pod-autoscaler  New size: 4; reason: cpu resource utilization (percentage of request) above target
+  Normal  SuccessfulRescale  4m5s  horizontal-pod-autoscaler  New size: 2; reason: All metrics below target

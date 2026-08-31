@@ -2,18 +2,19 @@
 
 ## 1. 结论与验收边界
 
-本次实验在分支 `experiment/cloud-native-performance` 上完成。初始 HPA、性能和故障轮次
-编号为 `20260830-2300-ef71f1fe`，自动恢复修复复验编号为
-`20260831-recovery-d6eee99b`。实验使用一台 4 vCPU、7.1 GiB 内存的 K3s
-v1.36.3 单节点服务器，并在独立命名空间
-`segroup8-cloud-exp-20260830-2300-ef71f1fe` 中运行。原有 `segroup8`
-命名空间未被替换、扩容或写入实验数据。
+本次实验在分支 `experiment/cloud-native-performance` 上完成。性能与依赖故障轮次编号为
+`20260830-2300-ef71f1fe`，自动恢复修复复验编号为
+`20260831-recovery-d6eee99b`；助教确认 HPA 应面向完整系统后，最终 HPA 复验编号为
+`20260831-system-hpa-prewarmed`。实验使用一台 4 vCPU、7.1 GiB 内存的 K3s
+v1.36.3 单节点服务器。性能与依赖故障仍在隔离命名空间中运行；完整系统 HPA 直接复用
+`segroup8` 中已发布的前端、后端、MySQL 镜像和配置。HPA 临时数据已清零，最终保留
+CPU 60%、`minReplicas=2`、`maxReplicas=4` 的后端 HPA。
 
 验收状态：
 
 | 项目 | 状态 | 结论 |
 |---|---|---|
-| HPA 扩缩容 | **通过** | 调优轮次完整观察到 `1→4→2→1`；资源、时间线和请求指标齐全 |
+| 完整系统 HPA 扩缩容 | **通过** | 公开链路完整经过前端、后端和 MySQL；观察到 `2→4（4 Ready）→2`，6 个计量窗口均 0% 错误 |
 | 依赖故障最低课程要求 | **通过** | 停止订单服务后，二手购买返回 HTTP 202/`RETRY`；二手服务存活、就绪和无关查询保持可用 |
 | 依赖恢复增强目标 | **通过** | 保留首次 `RETRY` 失败证据；统一数据库时钟后，订单依赖恢复时后台自动推进 `CREATED`，恰好生成 1 单并保存地址快照 |
 | 改造前后性能 | **完成** | 3 个公开接口、单体/微服务各 3 轮、相同数据和压力脚本；包含吞吐、平均、P95、错误率、CPU、内存 |
@@ -31,8 +32,6 @@ flowchart LR
   S --> SDB[(secondhand_db\n500 条同源数据)]
   S -->|内部 HTTP、超时、重试状态| O[order-service]
   O --> ODB[(order_db)]
-  MS[Metrics Server] --> H[HPA autoscaling/v2\nCPU 60%, 1..4]
-  H --> S
 ```
 
 公平性控制如下：
@@ -62,23 +61,70 @@ JAR 挂载到服务器已缓存且固定摘要的 Java 基础镜像中，并记�
 
 该挂载方式只用于本次隔离实验，不替代三个微服务各自流水线生产的不可变候选镜像。
 
-## 3. HPA 实验
+## 3. 完整系统 HPA 实验
 
-配置为 CPU 平均利用率 60%，最小 1、最大 4；扩容每 15 秒最多增加 2 个
-Pod，缩容稳定窗口 60 秒、每 15 秒最多减少 50%。调优后的正式轮次结果：
+### 3.1 口径与拓扑
 
-| 并发 | 时长 | 初始→峰值→最终 | 吞吐 | 平均 | P95 | 错误率 |
-|---:|---:|---:|---:|---:|---:|---:|
-| 10 | 90 s | `1→4→1` | 2.67 req/s | 3674.80 ms | 4770.67 ms | 2.44% |
+Kubernetes HPA 必须绑定一个可伸缩对象，不能绑定“整个系统”这个抽象概念。本实验让
+所有压力都经过真实公开入口，并把主要无状态计算层作为伸缩目标：
 
-时间线实际呈现 `1→4→2→1`。扩容时有一段只有 1 个新旧 Pod 就绪，负载停止
-后才逐步恢复 4/4；Pod 没有重启。因此机制验证通过，但当前参数仍存在突发流量
-下扩容赶不上请求的风险。建议最终系统把 `minReplicas` 调为 2，并优化列表查询、
-预热 JVM，再用分阶段升压脚本复测。
+```mermaid
+flowchart LR
+  L[加权 HTTP 压测器] --> T[Traefik / 公网入口]
+  T --> F[frontend Nginx]
+  F --> B[segroup8-backend\nHPA 2..4]
+  B --> DB[(MySQL / PVC)]
+  MS[Metrics Server] --> H[HPA autoscaling/v2\nCPU 60%]
+  H --> B
+```
 
-探索性边界实验使用并发 60，共 3 轮，三轮均从 1 扩到 4 并缩回 1；但错误率
-分别为 99.90%、100%、100%。这组只证明扩缩容会触发和系统的过载边界，存放在
-`hpa-overload-60/`，不作为“性能良好”的证据。
+因此它不是“只压一个微服务”：前端路由、完整后端和真实数据库都参与请求；只有不保存
+本地业务状态的后端 Pod 被水平扩缩，MySQL 不做错误的多副本水平扩容。
+
+### 3.2 最终配置与结果
+
+配置为 CPU 平均利用率 60%，最小 2、最大 4；扩容每 15 秒最多增加 2 个 Pod，
+缩容稳定窗口 60 秒、每 15 秒最多减少 50%。脚本先测固定 2 副本基线，再施加 120 秒
+扩容触发负载，等新增 Pod 全部 Ready 后做第二次业务预热，最后用相同接口比例分阶段计量。
+
+| 模式 | 并发 | 吞吐（req/s） | 平均（ms） | P95（ms） | 错误率 |
+|---|---:|---:|---:|---:|---:|
+| 固定 2 副本 | 5 | 28.41 | 175.78 | 428.74 | 0% |
+| 固定 2 副本 | 10 | 30.05 | 329.89 | 873.23 | 0% |
+| 固定 2 副本 | 20 | 30.19 | 655.67 | 1941.81 | 0% |
+| HPA 2..4 | 5 | 13.78 | 362.11 | 1073.75 | 0% |
+| HPA 2..4 | 10 | 18.83 | 527.54 | 1367.20 | 0% |
+| HPA 2..4 | 20 | 21.75 | 908.35 | 2797.84 | 0% |
+
+最终时间线为 `2→4（4 个均 Ready）→2`，所有 Pod 重启数为 0，六个计量窗口全部
+0% 错误。首轮 100 条/页负载虽完成扩缩容，但 `hpa-c5` 错误率 5.1546%，超过 5%
+门禁并返回非零退出码；该失败证据保留在
+`04_tests/cloud-native-experiments/20260831-system-hpa-failed-v1/`。
+
+扩容后业务预热把并发 20 的 HPA 吞吐从未充分预热轮次的 9.26 提升到
+21.75 req/s。最终 HPA 吞吐仍低于固定 2 副本，因为这是 4 vCPU 单节点：增加 Pod
+不会增加物理算力，反而增加 JVM、连接池与 MySQL 的共享资源竞争。因此本轮证明了
+扩缩容机制、Ready 容量和无错误服务，但不声称“单节点副本越多越快”。若课程要求证明
+容量随节点增加，应另在多节点集群复测。
+
+### 3.3 慢查询优化与可复现性
+
+二手公开列表的代表查询在 5,000 条混合状态数据上，优化前为全表扫描加排序，
+`EXPLAIN ANALYZE` 为 2.71 ms。新增
+`idx_secondhand_status_created(status, create_time DESC, id)` 后实际走索引，降到
+0.395 ms，下降 85.4%。脚本用索引 `INVISIBLE/VISIBLE` 重放前后计划；没有观察到
+全表扫描或优化后未使用索引都会失败。
+
+完整证据位于
+`04_tests/cloud-native-experiments/20260831-system-hpa-prewarmed/`。一键复现命令为：
+
+```bash
+bash scripts/experiments/cloud-native/reproduce_system_hpa_demo.sh
+```
+
+脚本复用当前不可变镜像、Secret、PVC、Service 和 Ingress，自动生成并清理保留 ID 段的
+临时数据，记录健康、就绪、版本、日志、事件、资源和副本时间线。成功后保留优化 HPA；
+设置 `KEEP_OPTIMIZED_HPA=false` 可在演示后恢复运行前状态。
 
 ## 4. 依赖故障实验
 
@@ -164,7 +210,9 @@ Pod，缩容稳定窗口 60 秒、每 15 秒最多减少 50%。调优后的正�
 
 初始实验原始证据入口：`04_tests/cloud-native-experiments/20260830-2300-ef71f1fe/`。
 自动恢复修复前后复验证据入口：
-`04_tests/cloud-native-experiments/20260831-recovery-d6eee99b/`。
+`04_tests/cloud-native-experiments/20260831-recovery-d6eee99b/`。完整系统 HPA 最终证据入口：
+`04_tests/cloud-native-experiments/20260831-system-hpa-prewarmed/`；首轮门禁失败保留在
+`04_tests/cloud-native-experiments/20260831-system-hpa-failed-v1/`。
 
 | 目录 | 内容 |
 |---|---|
@@ -172,7 +220,7 @@ Pod，缩容稳定窗口 60 秒、每 15 秒最多减少 50%。调优后的正�
 | `performance/raw/` | 正式 18 份逐请求延迟 JSON 与控制台摘要 |
 | `performance/resources/` | 正式每 2 秒 CPU/内存采样 |
 | `performance-exploratory-overload-20/` | 被明确降级为探索性失败的并发 20 结果 |
-| `hpa/` | 调优正式轮次的时间线、资源、事件、HPA 描述和原始请求数据 |
+| `hpa/` | 历史二手微服务 HPA 调参材料，不再作为完整系统 HPA 验收结论 |
 | `hpa-overload-60/` | 三轮过载边界实验 |
 | `dependency-fault/` | 故障响应、健康检查、数据库状态、恢复时间线、两侧日志与事件 |
 
@@ -184,13 +232,18 @@ Pod，缩容稳定窗口 60 秒、每 15 秒最多减少 50%。调优后的正�
 | `dependency-fault-database-clock-success/` | 数据库时钟修复后正式通过轮次；自动恢复、唯一订单、地址快照和调度日志 |
 | `environment/` | 复验环境、Kubernetes 资源和制品元数据 |
 
-复现脚本位于 `scripts/experiments/cloud-native/`。在 K3s 节点准备好身份治理、订单、二手三个 JAR 并放到
-`$HOST_ROOT/jars/` 后依次执行：
+完整系统 HPA 直接复用当前部署，无需重新上传三个微服务 JAR。答辩现场执行：
+
+```bash
+bash scripts/experiments/cloud-native/reproduce_system_hpa_demo.sh
+```
+
+性能对比和依赖故障仍使用隔离环境；在 K3s 节点准备好身份治理、订单、二手三个 JAR
+并放到 `$HOST_ROOT/jars/` 后依次执行：
 
 ```bash
 GIT_COMMIT=<commit> bash scripts/experiments/cloud-native/prepare_environment.sh <run-id> <host-root>
 CONCURRENCY=5 DURATION=20 WARMUP=3 bash scripts/experiments/cloud-native/run_performance_comparison.sh <host-root>/state.env
-ROUNDS=1 CONCURRENCY=10 DURATION=90 WARMUP=3 bash scripts/experiments/cloud-native/run_hpa_experiment.sh <host-root>/state.env
 bash scripts/experiments/cloud-native/run_dependency_fault_experiment.sh <host-root>/state.env <evidence-name>
 bash scripts/experiments/cloud-native/cleanup_environment.sh <host-root>/state.env
 ```
@@ -201,7 +254,18 @@ bash scripts/experiments/cloud-native/cleanup_environment.sh <host-root>/state.e
 ## 8. 提交前验证
 
 - `bash -n scripts/experiments/cloud-native/*.sh`：通过。
-- `python -m py_compile scripts/experiments/cloud-native/http_benchmark.py`：通过。
+- `python -m py_compile scripts/experiments/cloud-native/http_benchmark.py scripts/experiments/cloud-native/http_mix_benchmark.py`：通过。
+- `helm lint` 以及启用 `backend.autoscaling.enabled=true` 的 `helm template`：服务器通过，
+  渲染值为 CPU 60%、2..4 副本。
+- `mvn -Dtest=SecondhandProductServiceImplTest test`：6 个测试通过；本地全量测试曾因
+  120 秒执行上限被终止，不将该次超时写成全量通过，完整回归由分支 CI 再验证。
+- Windows 受限环境中的 Testcontainers 集成测试因 Docker named pipe `Access is denied` 未实际启动，记为
+  `NOT_RUN`，不归类为代码失败。随后在云服务器创建一次性空数据库并执行完整 `schema.sql`：成功创建
+  33 张表，`idx_secondhand_status_created` 的 3 个索引字段均存在，校验结束后临时库已删除。
+- Helm 接管 dry-run 首先发现旧 release values 缺少后来新增的服务节点；四条发布脚本已统一从纯
+  `--reuse-values` 改为 `--reset-then-reuse-values`，兼顾新 chart 默认值和各服务已发布值。
+- 完整系统 HPA 精简证据 30 个文件的 SHA-256 复核通过；逐请求 raw JSON 留在服务器，
+  不进入 Git。
 - 164 个仓库内证据文件均写入 `sha256-manifest.txt`；所有 JSON 均可解析。
 - `mvn -B --no-transfer-progress -f microservices/pom.xml -pl identity-governance-service,order-service,secondhand-service -am clean test`：
   非沙箱运行 BUILD SUCCESS；当前报告统计 security-contract 5、identity-governance-service 17、

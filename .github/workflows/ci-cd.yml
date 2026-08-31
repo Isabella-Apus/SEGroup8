@@ -258,6 +258,20 @@ jobs:
             --set-string frontend.image.tag=sha-test \
             --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
             >/dev/null
+          hpa_render="$(mktemp)"
+          helm template segroup8 deploy/helm/segroup8 \
+            --namespace segroup8 \
+            --set-string backend.image.repository=registry.example/segroup8/backend \
+            --set-string backend.image.tag=sha-test \
+            --set-string frontend.image.repository=registry.example/segroup8/frontend \
+            --set-string frontend.image.tag=sha-test \
+            --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
+            --set backend.autoscaling.enabled=true > "$hpa_render"
+          grep -q '^kind: HorizontalPodAutoscaler$' "$hpa_render"
+          grep -q '^  name: segroup8-backend$' "$hpa_render"
+          grep -q '^  minReplicas: 2$' "$hpa_render"
+          grep -q '^  maxReplicas: 4$' "$hpa_render"
+          grep -q '^          averageUtilization: 60$' "$hpa_render"
 
   publish-images:
     name: Publish verified images to ACR

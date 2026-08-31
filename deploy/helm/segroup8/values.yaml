@@ -18,6 +18,20 @@ backend:
     limits:
       cpu: "1"
       memory: 1536Mi
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 60
+    behavior:
+      scaleUp:
+        stabilizationWindowSeconds: 0
+        pods: 2
+        periodSeconds: 15
+      scaleDown:
+        stabilizationWindowSeconds: 60
+        percent: 50
+        periodSeconds: 15
 
 frontend:
   replicaCount: 1
