@@ -93,7 +93,7 @@ class ReliableMessagingIntegrationTest {
     }
 
     @Test
-    void allSevenContractsUseOneEnvelopeAndSnapshotWithoutSourceQueries() throws Exception {
+    void allSupportedContractsUseOneEnvelopeAndSnapshotWithoutSourceQueries() throws Exception {
         int index = 0;
         for (String type : EventTypes.ALL) {
             Map<String, Object> payload = new LinkedHashMap<>();
@@ -115,8 +115,9 @@ class ReliableMessagingIntegrationTest {
             index++;
         }
         inboxWorker.runOnce();
-        assertEquals(7, count("inbox_event", "status='PROCESSED'"));
-        assertEquals(6, count("notification", "content like 'Source service is unavailable%'"));
+        assertEquals(EventTypes.ALL.size(), count("inbox_event", "status='PROCESSED'"));
+        assertEquals(EventTypes.ALL.size()-1,
+                count("notification", "content like 'Source service is unavailable%'"));
         assertEquals("ACTIVE", jdbc.queryForObject(
                 "select access_status from user_access_projection where user_id=900", String.class));
     }
