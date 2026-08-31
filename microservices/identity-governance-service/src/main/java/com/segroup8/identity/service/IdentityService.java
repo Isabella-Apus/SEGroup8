@@ -119,9 +119,16 @@ public class IdentityService {
     }
 
     public Map<String, Object> addressSnapshot(long userId, long addressId) {
+        return addressSnapshot("WHERE id=? AND user_id=?", addressId, userId);
+    }
+
+    public Map<String, Object> shippingAddress(long userId) {
+        return addressSnapshot("WHERE user_id=? ORDER BY is_default DESC,id LIMIT 1", userId);
+    }
+
+    private Map<String, Object> addressSnapshot(String suffix, Object... arguments) {
         List<Map<String, Object>> matches = jdbc.query(
-                "SELECT id,user_id,receiver_name,receiver_phone,province,city,detail_address "
-                        + "FROM address WHERE id=? AND user_id=?",
+                "SELECT id,user_id,receiver_name,receiver_phone,province,city,detail_address FROM address " + suffix,
                 (rs, row) -> {
                     Map<String, Object> snapshot = new LinkedHashMap<>();
                     snapshot.put("addressId", rs.getLong("id"));
@@ -132,7 +139,7 @@ public class IdentityService {
                     snapshot.put("city", rs.getString("city"));
                     snapshot.put("detailAddress", rs.getString("detail_address"));
                     return snapshot;
-                }, addressId, userId);
+                }, arguments);
         if (matches.isEmpty()) throw new ApiException(404, "address not found");
         return matches.get(0);
     }

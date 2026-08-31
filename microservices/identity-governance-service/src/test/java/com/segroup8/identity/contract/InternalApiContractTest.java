@@ -48,6 +48,11 @@ class InternalApiContractTest extends IdentityTestSupport {
                 .andExpect(jsonPath("$.code").value(0))
                 .andExpect(jsonPath("$.data.receiverName").value("Receiver"))
                 .andExpect(jsonPath("$.data.detailAddress").value("Nanshan Road"));
+        mvc.perform(get("/internal/users/{userId}/shipping-address", user.userId())
+                        .header("X-Internal-Service-Token", "test-internal-service-token")
+                        .header("X-Request-Id", "contract-address-default"))
+                .andExpect(jsonPath("$.code").value(0))
+                .andExpect(jsonPath("$.data.addressId").value(addressId));
 
         mvc.perform(post("/internal/auth/introspect")
                         .header("X-Internal-Service-Token", "test-internal-service-token")
