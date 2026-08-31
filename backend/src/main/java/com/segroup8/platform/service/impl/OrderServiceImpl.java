@@ -1644,10 +1644,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void runAfterCommitBestEffort(String actionName, Runnable action) {
-        if (actionName != null && actionName.startsWith("notify")) {
-            action.run();
-            return;
-        }
         Runnable guardedAction = () -> {
             try {
                 action.run();
