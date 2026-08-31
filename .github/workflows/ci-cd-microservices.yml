@@ -69,10 +69,18 @@ jobs:
       - name: Build the tested candidate image
         shell: bash
         run: |
+          set -Eeuo pipefail
+          mkdir -p release-candidate
           jar_sha="$(sha256sum microservices/catalog-shop-service/target/catalog-shop-service-1.0.0.jar | cut -d' ' -f1)"
           docker build --build-arg GIT_SHA="$GITHUB_SHA" --build-arg JAR_SHA256="$jar_sha" --tag "$CANDIDATE_IMAGE" microservices/catalog-shop-service
           test "$(docker image inspect "$CANDIDATE_IMAGE" --format '{{.Config.User}}')" = '10001:10001'
           test "$(docker image inspect "$CANDIDATE_IMAGE" --format '{{index .Config.Labels "org.opencontainers.image.revision"}}')" = "$GITHUB_SHA"
+          test "$(docker image inspect "$CANDIDATE_IMAGE" --format '{{index .Config.Labels "com.segroup8.catalog-shop.jar-sha256"}}')" = "$jar_sha"
+          image_id="$(docker image inspect "$CANDIDATE_IMAGE" --format '{{.Id}}')"
+          printf '%s  %s\n' "$jar_sha" catalog-shop-service-1.0.0.jar > release-candidate/catalog-shop-jar.sha256
+          jq -n --arg gitSha "$GITHUB_SHA" --arg jarSha256 "$jar_sha" --arg candidateImage "$CANDIDATE_IMAGE" --arg candidateImageId "$image_id" \
+            '{gitSha:$gitSha,jarSha256:$jarSha256,candidateImage:$candidateImage,candidateImageId:$candidateImageId}' \
+            > release-candidate/release-metadata.json
       - name: Build frontend acceptance image and install browser
         shell: bash
         run: |
@@ -118,14 +126,22 @@ jobs:
         run: |
           helm_args=(--set catalogShop.enabled=true --set-string backend.image.repository=test/backend --set-string backend.image.tag=test --set-string frontend.image.repository=test/frontend --set-string frontend.image.tag=test --set-string catalogShop.image.repository=test/catalog-shop --set-string catalogShop.image.tag="$IMAGE_TAG" --set-file mysql.initSchema=backend/src/main/resources/schema.sql)
           helm lint deploy/helm/segroup8 "${helm_args[@]}"
-          helm template segroup8 deploy/helm/segroup8 "${helm_args[@]}" >/dev/null
+          render="$(mktemp)"
+          helm template segroup8 deploy/helm/segroup8 --show-only templates/catalog-shop-deployment.yaml "${helm_args[@]}" >"$render"
+          grep -q 'runAsUser: 10001' "$render"
+          grep -q 'runAsGroup: 10001' "$render"
+          grep -q 'readOnlyRootFilesystem: true' "$render"
+          grep -q 'mountPath: /tmp' "$render"
+          jq -n --arg revision "$GITHUB_SHA" \
+            '{revision:$revision,maven:"PASS",mysqlIntegration:"PASS",publicApiCoverage:"PASS",independentServiceE2E:"PASS",fullSystemUseCaseE2E:"REQUIRED_SHARED_CHECK",candidateImage:"PASS",helmStatic:"PASS",registryDigest:"PENDING_MAIN",kubernetesRollout:"NOT_RUN_ON_PULL_REQUEST"}' \
+            > release-candidate/acceptance-summary.json
       - name: Save the exact candidate image
-        run: docker save "$CANDIDATE_IMAGE" | gzip > /tmp/catalog-shop-candidate.tar.gz
+        run: docker save "$CANDIDATE_IMAGE" | gzip -1 > release-candidate/catalog-shop-image.tar.gz
       - uses: actions/upload-artifact@v4
         if: always()
         with: {name: catalog-shop-test-reports, path: 'microservices/catalog-shop-service/target/surefire-reports/**', if-no-files-found: error}
       - uses: actions/upload-artifact@v4
-        with: {name: catalog-shop-candidate-image, path: /tmp/catalog-shop-candidate.tar.gz, if-no-files-found: error, retention-days: 3}
+        with: {name: catalog-shop-candidate-image, path: 'release-candidate/**', if-no-files-found: error, retention-days: 7}
 
   publish:
     name: Publish immutable tested image
@@ -135,16 +151,37 @@ jobs:
     environment: production
     steps:
       - uses: actions/download-artifact@v4
-        with: {name: catalog-shop-candidate-image, path: /tmp}
-      - run: gunzip -c /tmp/catalog-shop-candidate.tar.gz | docker load
+        with: {name: catalog-shop-candidate-image, path: release-candidate}
+      - name: Load and verify the E2E-tested candidate
+        run: |
+          gunzip -c release-candidate/catalog-shop-image.tar.gz | docker load
+          test "$(docker image inspect "$CANDIDATE_IMAGE" --format '{{.Id}}')" = "$(jq -r '.candidateImageId' release-candidate/release-metadata.json)"
+          test "$(docker image inspect "$CANDIDATE_IMAGE" --format '{{index .Config.Labels "com.segroup8.catalog-shop.jar-sha256"}}')" = "$(jq -r '.jarSha256' release-candidate/release-metadata.json)"
       - uses: docker/login-action@v3
         with: {registry: '${{ vars.ACR_REGISTRY }}', username: '${{ secrets.ACR_USERNAME }}', password: '${{ secrets.ACR_PASSWORD }}'}
       - name: Push the exact verified candidate
         env: {REGISTRY: '${{ vars.ACR_REGISTRY }}', REGISTRY_NAMESPACE: '${{ vars.ACR_NAMESPACE }}'}
         run: |
+          set -Eeuo pipefail
           target="$REGISTRY/$REGISTRY_NAMESPACE/catalog-shop:$IMAGE_TAG"
           docker tag "$CANDIDATE_IMAGE" "$target"
-          docker push "$target"
+          docker push "$target" | tee catalog-shop-image-push.log
+          digest="$(docker image inspect "$target" --format '{{join .RepoDigests "\n"}}' | head -n 1)"
+          test -n "$digest"
+          printf '%s\n' "$digest" > catalog-shop-image-digest.txt
+          jq --arg publishedImage "$target" --arg repositoryDigest "$digest" \
+            '. + {publishedImage:$publishedImage,repositoryDigest:$repositoryDigest}' \
+            release-candidate/release-metadata.json > catalog-shop-release-metadata.json
+      - name: Upload registry digest and release metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-shop-image-digest-${{ github.sha }}
+          path: |
+            catalog-shop-image-digest.txt
+            catalog-shop-release-metadata.json
+            catalog-shop-image-push.log
+          if-no-files-found: error
+          retention-days: 30
 
   deploy:
     name: Atomic K3s deployment and smoke

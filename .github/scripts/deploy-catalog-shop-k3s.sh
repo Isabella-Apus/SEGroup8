@@ -40,13 +40,14 @@ kubectl --namespace "$k8s_namespace" get secret segroup8-catalog-shop-secret >/d
 helm --namespace "$k8s_namespace" status segroup8 >/dev/null
 
 helm upgrade --install segroup8 "$chart_dir" \
-  --namespace "$k8s_namespace" --reuse-values --atomic --cleanup-on-fail --wait \
+  --namespace "$k8s_namespace" --reset-then-reuse-values --atomic --cleanup-on-fail --wait \
   --timeout 10m --history-max 5 \
   --set catalogShop.enabled=true \
   --set-string "catalogShop.image.repository=$registry/$registry_namespace/catalog-shop" \
   --set-string "catalogShop.image.tag=$image_tag" \
-  --set-string "deployment.version=$image_tag" \
-  --set-string "deployment.commit=$release_id"
+  --set-string "catalogShop.deployment.version=$image_tag" \
+  --set-string "catalogShop.deployment.commit=$release_id" \
+  --set-string "catalogShop.deployment.buildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-catalog-shop --timeout=5m
 service_info="$(kubectl --namespace "$k8s_namespace" exec deployment/segroup8-catalog-shop -- curl --fail --silent --show-error http://127.0.0.1:8080/actuator/info)"

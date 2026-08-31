@@ -74,9 +74,13 @@ catalogShop:
     tag: ""
     pullPolicy: IfNotPresent
   secretName: segroup8-catalog-shop-secret
-  identityStatusCheckUrl: http://segroup8-identity-governance:8091/internal/auth/introspect
-  messagingEventUrl: http://segroup8-messaging:8084
-  orderEventUrl: ""
+  identityStatusCheckUrl: http://identity-governance-service:8091/internal/auth/introspect
+  messagingEventUrl: http://messaging:8084
+  orderEventUrl: http://segroup8-order:8085
+  deployment:
+    version: ""
+    commit: ""
+    buildTime: ""
   resources:
     requests: {cpu: 200m, memory: 256Mi}
     limits: {cpu: "1", memory: 768Mi}
