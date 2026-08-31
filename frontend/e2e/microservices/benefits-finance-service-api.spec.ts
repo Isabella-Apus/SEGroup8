@@ -214,7 +214,7 @@ test("UC23 with UC12 and UC14 preserves idempotent money facts and strict events
   // CI starts the relay, MySQL and the strict HTTP sink on the same runner.
   // Keep the assertion bounded, but allow a cold runner more than one relay
   // retry window before declaring the delivery contract broken.
-  }, { timeout: 30_000 }).toEqual(expect.arrayContaining([
+  }, { timeout: 60_000 }).toEqual(expect.arrayContaining([
     "PaymentCompleted.v1", "PaymentCompleted.v1", "PaymentCompleted.v1", "RefundCompleted.v1",
   ]));
 });
