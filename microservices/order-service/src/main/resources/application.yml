@@ -19,6 +19,7 @@ downstream:
   catalog-url: ${CATALOG_SERVICE_URL:http://segroup8-catalog-shop:8080}
   finance-url: ${BENEFITS_FINANCE_SERVICE_URL:http://benefits-finance:8085}
   messaging-url: ${MESSAGING_SERVICE_URL:http://messaging:8084}
+  secondhand-url: ${SECONDHAND_SERVICE_URL:http://secondhand-service:8080}
   connect-timeout: 1s
   read-timeout: 2s
 outbox:

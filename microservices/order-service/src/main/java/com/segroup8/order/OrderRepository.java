@@ -361,6 +361,12 @@ class OrderRepository {
                 (rs,n)->rs.getLong(1),orderId);
     }
 
+    String secondhandBusinessKey(String aggregateId) {
+        List<String> keys=db.query("select business_key from order_info where id=? and business_key like 'SECONDHAND:%'",
+                (rs,n)->rs.getString(1),Long.parseLong(aggregateId));
+        return keys.isEmpty()?null:keys.get(0);
+    }
+
     record OutboxMessage(String eventId,String eventType,String aggregateType,String aggregateId,
             String payload,Instant createdAt) {}
     private static PageView<ReviewView> pageReviews(List<ReviewView> all,long page,long size) {

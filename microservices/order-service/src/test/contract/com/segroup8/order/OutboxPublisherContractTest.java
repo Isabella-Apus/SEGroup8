@@ -39,10 +39,35 @@ class OutboxPublisherContractTest {
                 .andExpect(jsonPath("$.payload.dedupeKey").value("event-1"))
                 .andRespond(withSuccess());
 
-        new OutboxPublisher(repository, builder, new ObjectMapper(), "http://messaging.test", "internal-token")
+        new OutboxPublisher(repository, builder, new ObjectMapper(), "http://messaging.test",
+                "http://secondhand.test", "internal-token")
                 .publish();
 
         server.verify();
         verify(repository).markPublished("event-1");
+    }
+
+    @Test
+    void alsoProjectsSecondhandOrderStatusWithTheConsumerDto() {
+        OrderRepository repository = mock(OrderRepository.class);
+        var event = new OrderRepository.OutboxMessage("event-2", "OrderStatusChanged.v1", "ORDER", "43",
+                "{\"orderId\":43,\"status\":\"PAID\"}", Instant.parse("2026-08-31T12:00:00Z"));
+        when(repository.pendingOutbox()).thenReturn(List.of(event));
+        when(repository.notificationRecipients("43", "OrderStatusChanged.v1")).thenReturn(List.of(20L));
+        when(repository.secondhandBusinessKey("43")).thenReturn("SECONDHAND:BARGAIN:88");
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        server.expect(once(), requestTo("http://messaging.test/internal/events")).andRespond(withSuccess());
+        server.expect(once(), requestTo("http://secondhand.test/internal/events/order-status-changed"))
+                .andExpect(jsonPath("$.eventId").value("event-2"))
+                .andExpect(jsonPath("$.orderBusinessKey").value("SECONDHAND:BARGAIN:88"))
+                .andExpect(jsonPath("$.orderId").value(43))
+                .andExpect(jsonPath("$.newStatus").value("PAID"))
+                .andRespond(withSuccess());
+
+        new OutboxPublisher(repository, builder, new ObjectMapper(), "http://messaging.test",
+                "http://secondhand.test", "internal-token").publish();
+        server.verify();
+        verify(repository).markPublished("event-2");
     }
 }

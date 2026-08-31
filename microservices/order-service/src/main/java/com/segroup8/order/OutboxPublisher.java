@@ -15,13 +15,16 @@ import org.springframework.web.client.RestClient;
 class OutboxPublisher {
     private final OrderRepository repository;
     private final RestClient messaging;
+    private final RestClient secondhand;
     private final String internalToken;
     private final ObjectMapper json;
 
     OutboxPublisher(OrderRepository repository,RestClient.Builder builder,ObjectMapper json,
             @Value("${downstream.messaging-url}") String messagingUrl,
+            @Value("${downstream.secondhand-url}") String secondhandUrl,
             @Value("${security.internal-service-token}") String internalToken) {
-        this.repository=repository;this.messaging=builder.baseUrl(messagingUrl).build();
+        this.repository=repository;this.messaging=builder.clone().baseUrl(messagingUrl).build();
+        this.secondhand=builder.clone().baseUrl(secondhandUrl).build();
         this.internalToken=internalToken;this.json=json;
     }
 
@@ -49,11 +52,25 @@ class OutboxPublisher {
                                 "aggregateId",event.aggregateId(),"occurredAt",event.createdAt(),
                                 "traceId",event.eventId(),"payload",payload))
                         .retrieve().toBodilessEntity();
+                publishSecondhandStatus(event,payload);
                 repository.markPublished(event.eventId());
             } catch (Exception ex) {
                 repository.markOutboxRetry(event.eventId());
             }
         }
+    }
+
+    private void publishSecondhandStatus(OrderRepository.OutboxMessage event,Map<String,Object> payload) {
+        if(!"OrderStatusChanged.v1".equals(event.eventType())) return;
+        String businessKey=repository.secondhandBusinessKey(event.aggregateId());
+        if(businessKey==null) return;
+        secondhand.post().uri("/internal/events/order-status-changed")
+                .header("X-Internal-Service-Token",internalToken)
+                .header("X-Request-Id",event.eventId())
+                .header("X-Idempotency-Key",event.eventId())
+                .body(Map.of("eventId",event.eventId(),"orderBusinessKey",businessKey,
+                        "orderId",Long.parseLong(event.aggregateId()),"newStatus",String.valueOf(payload.get("status"))))
+                .retrieve().toBodilessEntity();
     }
 
     private String title(String eventType) {
