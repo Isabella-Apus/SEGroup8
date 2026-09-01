@@ -19,6 +19,7 @@ on:
       - "deploy/helm/segroup8/templates/ingress.yaml"
       - "deploy/helm/segroup8/values.yaml"
       - ".github/scripts/deploy-identity-governance-k3s.sh"
+      - ".github/scripts/sync-acr-pull-secret.sh"
       - ".github/workflows/identity-governance-ci-cd.yml"
   push:
     branches: [main]
@@ -39,6 +40,7 @@ on:
       - "deploy/helm/segroup8/templates/ingress.yaml"
       - "deploy/helm/segroup8/values.yaml"
       - ".github/scripts/deploy-identity-governance-k3s.sh"
+      - ".github/scripts/sync-acr-pull-secret.sh"
       - ".github/workflows/identity-governance-ci-cd.yml"
   workflow_dispatch:
 
@@ -377,9 +379,12 @@ jobs:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
           ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+          ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
         run: |
           set -o pipefail
+          .github/scripts/sync-acr-pull-secret.sh
           remote_archive="/tmp/identity-governance-$GITHUB_SHA.tar.gz"
           scp "identity-governance-chart-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$remote_archive"
           ssh \

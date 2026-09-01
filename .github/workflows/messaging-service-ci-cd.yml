@@ -45,6 +45,7 @@ on:
       - "deploy/helm/segroup8/values.yaml"
       - "deploy/helm/segroup8/Chart.yaml"
       - ".github/scripts/deploy-messaging-k3s.sh"
+      - ".github/scripts/sync-acr-pull-secret.sh"
       - ".github/workflows/messaging-service-ci-cd.yml"
   push:
     branches: [main]
@@ -91,6 +92,7 @@ on:
       - "deploy/helm/segroup8/values.yaml"
       - "deploy/helm/segroup8/Chart.yaml"
       - ".github/scripts/deploy-messaging-k3s.sh"
+      - ".github/scripts/sync-acr-pull-secret.sh"
       - ".github/workflows/messaging-service-ci-cd.yml"
   workflow_dispatch:
 
@@ -454,11 +456,14 @@ jobs:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
           ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+          ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
           REALTIME_ALLOWED_ORIGIN_PATTERNS: ${{ vars.REALTIME_ALLOWED_ORIGIN_PATTERNS }}
           IDENTITY_SERVICE_URL: ${{ vars.IDENTITY_SERVICE_URL }}
         run: |
           set -o pipefail
+          .github/scripts/sync-acr-pull-secret.sh
           archive="/tmp/messaging-chart-$GITHUB_SHA.tar.gz"
           scp "messaging-chart-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$archive"
           ssh \

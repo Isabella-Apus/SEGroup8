@@ -19,6 +19,7 @@ on:
       - '05_management/microservices/catalog-shop-service/**'
       - 'deploy/helm/segroup8/**'
       - '.github/scripts/deploy-catalog-shop-k3s.sh'
+      - '.github/scripts/sync-acr-pull-secret.sh'
       - '.github/workflows/ci-cd-microservices.yml'
   push:
     branches: [main]
@@ -200,8 +201,15 @@ jobs:
           chmod 600 "$HOME/.ssh/id_ed25519"
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
       - name: Upload chart and deployment script
-        env: {DEPLOY_HOST: '${{ secrets.DEPLOY_HOST }}', DEPLOY_USER: '${{ secrets.DEPLOY_USER }}'}
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
+          K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
         run: |
+          .github/scripts/sync-acr-pull-secret.sh
           tar -czf "/tmp/catalog-shop-chart-${GITHUB_SHA}.tgz" deploy/helm/segroup8
           scp "/tmp/catalog-shop-chart-${GITHUB_SHA}.tgz" "$DEPLOY_USER@$DEPLOY_HOST:/tmp/catalog-shop-chart-${GITHUB_SHA}.tgz"
           scp .github/scripts/deploy-catalog-shop-k3s.sh "$DEPLOY_USER@$DEPLOY_HOST:/tmp/deploy-catalog-shop-${GITHUB_SHA}.sh"
