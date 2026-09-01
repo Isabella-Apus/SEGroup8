@@ -1,0 +1,51 @@
+name: segroup8-benefits-finance-acceptance
+
+services:
+  database:
+    image: mysql:8.4.6
+    environment:
+      MYSQL_DATABASE: benefits_finance_db
+      MYSQL_USER: benefits_finance_app
+      MYSQL_PASSWORD: benefits_finance_app_password
+      MYSQL_ROOT_PASSWORD: benefits_finance_root_password
+      TZ: Asia/Shanghai
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_general_ci"]
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+    volumes:
+      - benefits_finance_acceptance_db:/var/lib/mysql
+
+  benefits-finance:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${FINANCE_ACCEPTANCE_IMAGE:-segroup8/benefits-finance:acceptance}
+    environment:
+      DB_URL: jdbc:mysql://database:3306/benefits_finance_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+      DB_USERNAME: benefits_finance_app
+      DB_PASSWORD: benefits_finance_app_password
+      FLYWAY_DB_USERNAME: root
+      FLYWAY_DB_PASSWORD: benefits_finance_root_password
+      JWT_SECRET: benefits-finance-acceptance-jwt-secret-at-least-32-bytes
+      INTERNAL_SERVICE_TOKEN: benefits-finance-acceptance-internal-token
+      OUTBOX_EVENT_SINK_URL: http://host.docker.internal:18087/internal/events
+      OUTBOX_POLL_MS: "250"
+      OUTBOX_MAX_ATTEMPTS: "3"
+      APP_VERSION: acceptance
+      APP_COMMIT: ${APP_COMMIT:-acceptance}
+      APP_BUILD_TIME: ${APP_BUILD_TIME:-acceptance}
+      TZ: Asia/Shanghai
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    ports:
+      - "${FINANCE_ACCEPTANCE_PORT:-18085}:8085"
+    depends_on:
+      database:
+        condition: service_healthy
+
+volumes:
+  benefits_finance_acceptance_db:

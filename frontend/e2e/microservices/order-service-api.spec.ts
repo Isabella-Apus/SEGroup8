@@ -39,7 +39,8 @@ test("UC11-UC15 independent order-service acceptance flow", async ({ request }) 
     (count: number, pathItem: any) => count + Object.keys(pathItem).filter((key) => methods.has(key)).length,
     0,
   );
-  expect(operationCount).toBe(36);
+  expect(operationCount).toBe(37);
+  expect(runtimeDocument.paths["/internal/events"]?.post).toBeTruthy();
   expect(runtimeDocument.paths["/internal/orders/secondhand"]?.post).toBeTruthy();
   expect(runtimeDocument.paths["/api/admin/orders/{id}"]?.get).toBeTruthy();
 
@@ -88,7 +89,7 @@ test("UC11-UC15 independent order-service acceptance flow", async ({ request }) 
 
 test("UC20 secondhand order uses the same independently deployed fulfillment state machine", async ({ request }) => {
   const createdResponse = await request.post("/internal/orders/secondhand", {
-    headers: internal,
+    headers: { ...internal, "Idempotency-Key": "SECONDHAND:DIRECT:acceptance-uc20" },
     data: {
       tradeType: "DIRECT",
       tradeId: "acceptance-uc20",
@@ -109,7 +110,7 @@ test("UC20 secondhand order uses the same independently deployed fulfillment sta
   const orderId = Number((await createdResponse.json()).data.orderId);
 
   const replay = await request.post("/internal/orders/secondhand", {
-    headers: internal,
+    headers: { ...internal, "Idempotency-Key": "SECONDHAND:DIRECT:acceptance-uc20" },
     data: {
       tradeType: "DIRECT",
       tradeId: "acceptance-uc20",

@@ -22,23 +22,29 @@ const server = createServer(async (request, response) => {
         return;
     }
 
-    const addressLookup = new URL(request.url || "/", "http://stub")
+    const parsedUrl = new URL(request.url || "/", "http://stub");
+    const addressLookup = parsedUrl
         .pathname.match(/^\/internal\/users\/(\d+)\/address-snapshot$/);
-    if (request.method === "GET" && addressLookup) {
-        const userId = Number(addressLookup[1]);
-        const addressId = Number(new URL(request.url, "http://stub").searchParams.get("addressId") || 1);
+    const address = parsedUrl.pathname.match(/^\/internal\/users\/(\d+)\/addresses\/(\d+)$/);
+    const shipping = parsedUrl.pathname.match(/^\/internal\/users\/(\d+)\/shipping-address$/);
+    if (request.method === "GET" && (addressLookup || address || shipping)) {
+        const userId = Number((addressLookup || address || shipping)[1]);
+        const addressId = addressLookup
+            ? Number(parsedUrl.searchParams.get("addressId") || 1)
+            : (address ? Number(address[2]) : 100);
         send(response, 200, { code: 0, message: "success", data: {
-            id: addressId, userId, receiverName: "Acceptance Buyer", receiverPhone: "13800008000",
-            province: "Zhejiang", city: "Hangzhou", detailAddress: "Acceptance Road 1"
+            id: addressId, addressId, userId, receiverName: "Acceptance Buyer",
+            receiverPhone: "13800138000", province: "Guangdong", city: "Shenzhen",
+            detailAddress: "Nanshan Acceptance Road"
         }});
         return;
     }
 
     if (request.method === "POST" && request.url === "/internal/orders/secondhand") {
         const body = await readJson(request);
-        const key = String(request.headers["x-idempotency-key"] || body.orderBusinessKey || "");
+        const key = String(request.headers["idempotency-key"] || body.orderBusinessKey || "");
         if (!key) {
-            send(response, 400, { code: 400, message: "missing idempotency key", data: null });
+            send(response, 400, { error: "missing idempotency key" });
             return;
         }
         if (!orders.has(key)) {
@@ -53,8 +59,7 @@ const server = createServer(async (request, response) => {
     if (request.method === "GET" && lookup) {
         const order = orders.get(decodeURIComponent(lookup[1]));
         send(response, order ? 200 : 404,
-            order ? { code: 0, message: "success", data: order }
-                : { code: 404, message: "not found", data: null });
+            order ? { code: 0, message: "success", data: order } : { code: 404, message: "not found", data: null });
         return;
     }
 

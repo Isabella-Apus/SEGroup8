@@ -1,0 +1,33 @@
+{
+  "id": "sha256:2a60df31818f68f28b40471b9f69d55fa1d2537dbf5cbcab879df8a2516b1e9c",
+  "repoTags": [
+    "segroup8/benefits-finance:e2e"
+  ],
+  "repoDigests": [
+    "segroup8/benefits-finance@sha256:2a60df31818f68f28b40471b9f69d55fa1d2537dbf5cbcab879df8a2516b1e9c"
+  ],
+  "created": "2026-08-31T08:17:21.13551482Z",
+  "architecture": "amd64",
+  "os": "linux",
+  "size": 125009746,
+  "user": "10001:10001",
+  "healthcheck": {
+    "Test": [
+      "CMD",
+      "bash",
+      "-c",
+      "exec 3<>/dev/tcp/127.0.0.1/8085; printf 'GET /actuator/health/liveness HTTP/1.0\\r\\nHost: localhost\\r\\n\\r\\n' >&3; grep -q '\"status\":\"UP\"' <&3"
+    ],
+    "Interval": 15000000000,
+    "Timeout": 5000000000,
+    "StartPeriod": 30000000000,
+    "Retries": 6
+  },
+  "labels": {
+    "title": "benefits-finance-service",
+    "source": "https://github.com/Isabella-Apus/SEGroup8",
+    "revision": "cbc1ab300d0bf3c78669d1c0ac9f72fd5a390e3a",
+    "created": "2026-08-31T08:17:17Z",
+    "jarSha256": "c8dc7f93525fb8778adfa7b46d9adb55d08cd62caf488339b8a9842d362c957d"
+  }
+}

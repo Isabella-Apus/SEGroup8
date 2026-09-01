@@ -12,7 +12,10 @@ k8s_namespace="${6:-segroup8}"
 command -v helm >/dev/null
 command -v kubectl >/dev/null
 command -v curl >/dev/null
-export KUBECONFIG="${KUBECONFIG:-$HOME/.kube/config}"
+command -v flock >/dev/null
+export KUBECONFIG="$HOME/.kube/config"
+exec 9>"$HOME/.segroup8-helm.lock"
+flock -w 3300 9 || { echo "Timed out waiting for the shared Helm deployment lock" >&2; exit 1; }
 work_dir="$(mktemp -d)"
 
 cleanup() { rm -rf -- "$work_dir"; rm -f -- "$archive"; }
@@ -34,7 +37,6 @@ trap on_exit EXIT
 tar -xzf "$archive" -C "$work_dir"
 chart_dir="$work_dir/deploy/helm/segroup8"
 test -f "$chart_dir/Chart.yaml"
-kubectl get namespace "$k8s_namespace" >/dev/null
 kubectl --namespace "$k8s_namespace" get secret acr-pull-secret >/dev/null
 kubectl --namespace "$k8s_namespace" get secret segroup8-order-secret >/dev/null
 helm --namespace "$k8s_namespace" status segroup8 >/dev/null
@@ -44,6 +46,11 @@ helm upgrade --install segroup8 "$chart_dir" \
   --namespace "$k8s_namespace" --reset-then-reuse-values --atomic --cleanup-on-fail --wait \
   --timeout 10m --history-max 5 \
   --set order.enabled=true \
+  --set catalogShop.replicaCount=1 \
+  --set catalogShop.hpa.enabled=false \
+  --set benefitsFinance.replicas=1 \
+  --set identityGovernance.autoscaling.enabled=false \
+  --set secondhand.autoscaling.enabled=false \
   --set-string "order.image.repository=$registry/$registry_namespace/order" \
   --set-string "order.image.tag=$image_tag" \
   --set-string "order.deployment.version=$image_tag" \
@@ -51,11 +58,14 @@ helm upgrade --install segroup8 "$chart_dir" \
   --set-string "order.deployment.buildTime=$build_time"
 
 kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-order --timeout=5m
-order_info="$(kubectl --namespace "$k8s_namespace" exec deployment/segroup8-order -- curl --fail --silent --show-error http://127.0.0.1:8085/actuator/info)"
+service_ip="$(kubectl --namespace "$k8s_namespace" get service segroup8-order -o jsonpath='{.spec.clusterIP}')"
+[[ -n "$service_ip" && "$service_ip" != "None" ]]
+service_url="http://${service_ip}:8085"
+order_info="$(curl --fail --silent --show-error "$service_url/actuator/info")"
 grep -F '"version":"'"$image_tag"'"' <<<"$order_info" >/dev/null
 grep -F '"commit":"'"$release_id"'"' <<<"$order_info" >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/segroup8-order -- curl --fail --silent --show-error http://127.0.0.1:8085/actuator/health/liveness >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/segroup8-order -- curl --fail --silent --show-error http://127.0.0.1:8085/actuator/health/readiness >/dev/null
-status="$(kubectl --namespace "$k8s_namespace" exec deployment/segroup8-order -- curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8085/api/order/list)"
+curl --fail --silent --show-error "$service_url/actuator/health/liveness" >/dev/null
+curl --fail --silent --show-error "$service_url/actuator/health/readiness" >/dev/null
+status="$(curl --silent --output /dev/null --write-out '%{http_code}' "$service_url/api/order/list")"
 [[ "$status" == "401" ]]
 echo "order-service deployed successfully as $image_tag"

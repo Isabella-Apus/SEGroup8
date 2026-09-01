@@ -3,6 +3,7 @@ package com.segroup8.order;
 import com.segroup8.order.ApiModels.CreateOrderItem;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
@@ -30,7 +31,9 @@ class HttpDownstreamGateway implements DownstreamGateway {
         try {
             Reservation response = catalog.post().uri("/internal/inventory/reservations")
                     .header("X-Internal-Service-Token", internalToken)
+                    .header("X-Request-Id", reservationId)
                     .header("Idempotency-Key", reservationId)
+                    .header("X-Idempotency-Key", reservationId)
                     .body(Map.of("reservationId", reservationId, "buyerUserId", buyerUserId, "items", items))
                     .retrieve().onStatus(HttpStatusCode::isError, (req, res) -> {
                         throw new OrderException("INVENTORY_RESERVATION_FAILED", "Inventory could not be reserved", 409);
@@ -50,53 +53,67 @@ class HttpDownstreamGateway implements DownstreamGateway {
     @Override public void releaseReservation(String key) { inventoryCommand(key, "release"); }
 
     private void inventoryCommand(String key, String action) {
+        String operationKey = key + ":" + action;
         catalog.post().uri("/internal/inventory/reservations/{id}/" + action, key)
-                .header("X-Internal-Service-Token", internalToken).header("Idempotency-Key", key + ":" + action)
+                .header("X-Internal-Service-Token", internalToken)
+                .header("X-Request-Id", operationKey)
+                .header("Idempotency-Key", operationKey)
+                .header("X-Idempotency-Key", operationKey)
                 .retrieve().toBodilessEntity();
     }
 
     @Override
     public Quote quote(String key, long buyerUserId, BigDecimal totalAmount, Long voucherId) {
         try {
-            Quote result = finance.post().uri("/internal/finance/quotes")
-                    .header("X-Internal-Service-Token", internalToken).header("Idempotency-Key", key)
-                    .body(Map.of("quoteRequestId", key, "buyerUserId", buyerUserId,
-                            "totalAmount", totalAmount, "voucherId", voucherId == null ? "" : voucherId))
-                    .retrieve().body(Quote.class);
-            return result == null ? new Quote(totalAmount, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO) : result;
+            Map<String,Object> body = new LinkedHashMap<>();
+            body.put("orderRequestId", key); body.put("userId", buyerUserId);
+            body.put("amount", totalAmount); if (voucherId != null) body.put("voucherId", voucherId);
+            FinanceQuote result = finance.post().uri("/internal/checkout/quote")
+                    .header("X-Internal-Service-Token", internalToken)
+                    .header("X-Request-Id", key)
+                    .header("Idempotency-Key", key)
+                    .header("X-Idempotency-Key", key)
+                    .body(body).retrieve().body(FinanceQuote.class);
+            return result == null ? new Quote(totalAmount, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO)
+                    : new Quote(result.payableAmount(), result.discountAmount(), BigDecimal.ZERO,
+                            result.discountAmount());
         } catch (RestClientException ex) {
             throw new OrderException("FINANCE_QUOTE_UNAVAILABLE", "Finance quote is temporarily unavailable", 503);
         }
     }
 
-    @Override public RemoteResult debit(String key, long user, BigDecimal amount, String mode, String channel) {
-        return financeWrite("/internal/finance/debits", key,
-                Map.of("paymentRequestId", key, "userId", user, "amount", amount,
+    @Override public RemoteResult debit(String key, long orderId, long user, BigDecimal amount, String mode, String channel) {
+        return financeWrite("/internal/payments/debit", key,
+                Map.of("paymentRequestId", key, "orderId", orderId, "userId", user, "amount", amount,
                         "payMode", mode == null ? "COIN" : mode, "payChannel", channel == null ? "" : channel));
     }
-    @Override public RemoteResult paymentResult(String key) { return financeQuery("/internal/finance/debits/{id}", key); }
-    @Override public RemoteResult refund(String key, long orderId, long user, BigDecimal amount) {
-        return financeWrite("/internal/finance/refunds", key,
-                Map.of("refundRequestId", key, "orderId", orderId, "userId", user, "amount", amount));
+    @Override public RemoteResult paymentResult(String key) { return financeQuery("/internal/payments/{id}", key); }
+    @Override public RemoteResult refund(String key, String paymentRequestId, long orderId, long user, BigDecimal amount) {
+        return financeWrite("/internal/payments/refund", key,
+                Map.of("refundRequestId", key, "paymentRequestId", paymentRequestId,
+                        "orderId", orderId, "userId", user, "amount", amount));
     }
-    @Override public RemoteResult refundResult(String key) { return financeQuery("/internal/finance/refunds/{id}", key); }
+    @Override public RemoteResult refundResult(String key) { return financeQuery("/internal/payments/{id}", key); }
     @Override public RemoteResult settle(String key, long orderId, long sellerUserId, BigDecimal amount) {
-        return financeWrite("/internal/finance/settlements", key,
-                Map.of("settlementRequestId", key, "orderId", orderId, "sellerUserId", sellerUserId, "amount", amount));
+        return financeWrite("/internal/settlements", key,
+                Map.of("orderId", orderId, "sellerId", sellerUserId, "amount", amount));
     }
     @Override public RemoteResult settlementResult(String key) {
-        return financeQuery("/internal/finance/settlements/{id}", key);
+        return financeQuery("/internal/payments/{id}", key);
     }
-    @Override public void releaseVoucher(String key, Long voucherId, long user) {
+    @Override public void releaseVoucher(String key, long orderId, Long voucherId, long user) {
         if (voucherId == null) return;
-        financeWrite("/internal/finance/vouchers/releases", key,
-                Map.of("releaseRequestId", key, "voucherId", voucherId, "userId", user));
+        financeWrite("/internal/vouchers/release", key,
+                Map.of("orderRequestId", key, "orderId", orderId, "voucherId", voucherId, "userId", user));
     }
 
     private RemoteResult financeWrite(String uri, String key, Object body) {
         try {
             Map<?, ?> response = finance.post().uri(uri).header("X-Internal-Service-Token", internalToken)
-                    .header("Idempotency-Key", key).body(body).retrieve().body(Map.class);
+                    .header("X-Request-Id", key)
+                    .header("Idempotency-Key", key)
+                    .header("X-Idempotency-Key", key)
+                    .body(body).retrieve().body(Map.class);
             return parse(response);
         } catch (RestClientException ex) {
             return RemoteResult.UNKNOWN;
@@ -106,6 +123,7 @@ class HttpDownstreamGateway implements DownstreamGateway {
     private RemoteResult financeQuery(String uri, String key) {
         try {
             return parse(finance.get().uri(uri, key).header("X-Internal-Service-Token", internalToken)
+                    .header("X-Request-Id", key)
                     .retrieve().body(Map.class));
         } catch (RestClientException ex) {
             return RemoteResult.UNKNOWN;
@@ -119,4 +137,6 @@ class HttpDownstreamGateway implements DownstreamGateway {
         if ("FAILED".equalsIgnoreCase(status)) return RemoteResult.FAILED;
         return RemoteResult.UNKNOWN;
     }
+
+    private record FinanceQuote(BigDecimal payableAmount, BigDecimal discountAmount) {}
 }

@@ -16,6 +16,8 @@ import com.segroup8.platform.entity.OrderItem;
 import com.segroup8.platform.entity.ProductAuction;
 import com.segroup8.platform.entity.ProductNegotiation;
 import com.segroup8.platform.entity.SecondhandProduct;
+import com.segroup8.platform.event.EventTypes;
+import com.segroup8.platform.event.ProducerOutboxService;
 import com.segroup8.platform.entity.User;
 import com.segroup8.platform.mapper.AuctionLogMapper;
 import com.segroup8.platform.mapper.OrderInfoMapper;
@@ -37,6 +39,7 @@ import com.segroup8.platform.vo.ProductAuctionVO;
 import com.segroup8.platform.vo.ProductNegotiationVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -81,7 +84,16 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
     private final ChatService chatService;
     private final RealtimePushService realtimePushService;
     private final NotificationService notificationService;
+    private final ProducerOutboxService outbox;
     private final EscrowSettlementService escrowSettlementService;
+
+    /**
+     * The event path is the production default.  The false value is retained
+     * only for the monolith rollback/test profile; it is deliberately wrapped
+     * best-effort so a legacy notification failure cannot roll back a decision.
+     */
+    @Value("${app.messaging.event-notifications-enabled:true}")
+    private boolean eventNotificationsEnabled = false;
 
     public SecondhandTradeServiceImpl(ProductNegotiationMapper productNegotiationMapper,
             ProductAuctionMapper productAuctionMapper,
@@ -93,7 +105,8 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
             ChatService chatService,
             RealtimePushService realtimePushService,
             NotificationService notificationService,
-            EscrowSettlementService escrowSettlementService) {
+            EscrowSettlementService escrowSettlementService,
+            ProducerOutboxService outbox) {
         this.productNegotiationMapper = productNegotiationMapper;
         this.productAuctionMapper = productAuctionMapper;
         this.auctionLogMapper = auctionLogMapper;
@@ -104,6 +117,7 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         this.chatService = chatService;
         this.realtimePushService = realtimePushService;
         this.notificationService = notificationService;
+        this.outbox = outbox;
         this.escrowSettlementService = escrowSettlementService;
     }
 
@@ -155,6 +169,11 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         negotiation.setProposedPrice(request.getProposedPrice());
         negotiation.setStatus(NEGOTIATION_APPLIED);
         productNegotiationMapper.insert(negotiation);
+        notifyRecipient("bargain application", negotiation.getSellerUserId(),
+                "收到新的议价申请",
+                "商品“" + product.getName() + "”收到议价 " + negotiation.getProposedPrice(),
+                "/merchant/messages", "BARGAIN", "SECONDHAND",
+                "secondhand-bargain-apply:" + negotiation.getId());
         runAfterCommit(() -> publishBargainApply(negotiation, product));
 
         return toNegotiationVO(negotiation);
@@ -214,6 +233,14 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
             productNegotiationMapper.updateById(negotiation);
         }
 
+        String bargainTarget = negotiation.getUsedOrderId() == null
+                ? "/secondhand/" + negotiation.getProductId()
+                : "/secondhand/orders/" + negotiation.getUsedOrderId();
+        notifyRecipient("bargain confirmation", negotiation.getBuyerUserId(),
+                "卖家已确认议价",
+                "商品“" + product.getName() + "”议价已确认，成交价 " + negotiation.getConfirmedPrice(),
+                bargainTarget, "BARGAIN", "SECONDHAND",
+                "secondhand-bargain-confirm:" + negotiation.getId() + ":" + negotiation.getConfirmedPrice());
         runAfterCommit(() -> publishBargainConfirmation(negotiation, product, sellerUserId));
 
         return toNegotiationVO(negotiation);
@@ -248,6 +275,11 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         negotiation.setStatus(NEGOTIATION_REJECTED);
 
         SecondhandProduct product = secondhandProductMapper.selectById(negotiation.getProductId());
+        notifyRecipient("bargain rejection", negotiation.getBuyerUserId(),
+                "议价申请未通过",
+                product == null ? "卖家未接受本次议价" : "卖家未接受商品“" + product.getName() + "”的本次议价",
+                "/secondhand/" + negotiation.getProductId(), "BARGAIN", "SECONDHAND",
+                "secondhand-bargain-reject:" + negotiation.getId());
         runAfterCommit(() -> publishBargainRejection(negotiation, product, sellerUserId));
 
         return toNegotiationVO(negotiation);
@@ -531,11 +563,11 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                         "productId", auction.getProductId(),
                         "bidderUserId", bidderUserId,
                         "bidAmount", request.getBidAmount()));
-        notificationService.createNotification(
-                auction.getSellerUserId(),
+        notifyRecipient("auction bid", auction.getSellerUserId(),
                 "竞拍收到新出价",
                 "您的竞拍商品收到新出价 " + request.getBidAmount(),
-                "/secondhand/" + auction.getProductId());
+                "/secondhand/" + auction.getProductId(), "AUCTION_BID", "SECONDHAND",
+                "secondhand-auction-bid:" + auction.getId() + ":" + request.getBidAmount());
         if (oldBidderUserId != null && !Objects.equals(oldBidderUserId, bidderUserId)) {
             realtimePushService.pushToUser(oldBidderUserId,
                     RealtimeEventTypes.MSG_TYPE_AUCTION_OUTBID,
@@ -544,11 +576,11 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                             "productId", auction.getProductId(),
                             "oldBidAmount", oldBidAmount,
                             "newBidAmount", request.getBidAmount()));
-            notificationService.createNotification(
-                    oldBidderUserId,
+            notifyRecipient("auction outbid", oldBidderUserId,
                     "您的竞拍出价已被超过",
                     "当前最高出价为 " + request.getBidAmount(),
-                    "/secondhand/" + auction.getProductId());
+                    "/secondhand/" + auction.getProductId(), "AUCTION_OUTBID", "SECONDHAND",
+                    "secondhand-auction-outbid:" + auction.getId() + ":" + oldBidderUserId + ":" + request.getBidAmount());
         }
         return getAuctionByProductId(auction.getProductId());
     }
@@ -661,6 +693,22 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
             throw new BusinessException(409, "拍卖结算状态冲突，请稍后重试");
         }
 
+        outbox.publish(EventTypes.SECONDHAND_TRADE_SETTLED, "secondhand-monolith", "SECONDHAND_TRADE",
+                auction.getId(), Map.ofEntries(
+                        Map.entry("recipientUserIds", List.of(auction.getSellerUserId(), auction.getCurrentBidderUserId())),
+                        Map.entry("tradeType", "AUCTION"),
+                        Map.entry("tradeId", auction.getId()),
+                        Map.entry("productId", product.getId()),
+                        Map.entry("buyerId", auction.getCurrentBidderUserId()),
+                        Map.entry("sellerId", auction.getSellerUserId()),
+                        Map.entry("price", auction.getCurrentPrice()),
+                        Map.entry("businessId", String.valueOf(order.getId())),
+                        Map.entry("businessType", "SECONDHAND_TRADE"),
+                        Map.entry("displayTitle", "Secondhand trade settled"),
+                        Map.entry("displayText", "Trade for " + (product.getName() == null ? "[Unavailable item]" : product.getName()) + " was settled"),
+                        Map.entry("targetPath", "/secondhand/orders/" + order.getId()),
+                        Map.entry("dedupeKey", "secondhand-settled:" + auction.getId())));
+
         realtimePushService.pushToUsers(
                 List.of(auction.getSellerUserId(), auction.getCurrentBidderUserId()),
                 RealtimeEventTypes.MSG_TYPE_AUCTION_SETTLED,
@@ -671,16 +719,6 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                         "winnerUserId", auction.getCurrentBidderUserId(),
                         "amount", auction.getCurrentPrice(),
                         "settleResult", AUCTION_FINISHED));
-        notificationService.createNotification(
-                auction.getCurrentBidderUserId(),
-                "竞拍成功",
-                "您已竞得商品“" + product.getName() + "”，请查看订单并等待卖家发货",
-                "/secondhand/orders/" + order.getId());
-        notificationService.createNotification(
-                auction.getSellerUserId(),
-                "竞拍商品已成交",
-                "商品“" + product.getName() + "”已成交，请及时发货",
-                "/secondhand/orders/" + order.getId());
     }
 
     private ProductNegotiation findEffectiveNegotiation(Long productId, Long buyerUserId) {
@@ -777,11 +815,6 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                         "productId", negotiation.getProductId(),
                         "buyerUserId", negotiation.getBuyerUserId(),
                         "proposedPrice", negotiation.getProposedPrice())));
-        runBestEffort("notify bargain application", () -> notificationService.createNotification(
-                negotiation.getSellerUserId(),
-                "收到新的议价申请",
-                "买家对商品“" + product.getName() + "”提出价格 " + negotiation.getProposedPrice(),
-                "/merchant/messages"));
     }
 
     private void publishBargainConfirmation(ProductNegotiation negotiation, SecondhandProduct product,
@@ -799,14 +832,6 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                         "confirmedPrice", negotiation.getConfirmedPrice(),
                         "effectiveUntil", negotiation.getEffectiveUntil(),
                         "orderId", negotiation.getUsedOrderId() == null ? 0L : negotiation.getUsedOrderId())));
-        String targetPath = negotiation.getUsedOrderId() == null
-                ? "/secondhand/" + negotiation.getProductId()
-                : "/secondhand/orders/" + negotiation.getUsedOrderId();
-        runBestEffort("notify bargain confirmation", () -> notificationService.createNotification(
-                negotiation.getBuyerUserId(),
-                "卖家已确认议价",
-                "商品“" + product.getName() + "”的议价已确认，成交价为 " + negotiation.getConfirmedPrice(),
-                targetPath));
     }
 
     private void publishBargainRejection(ProductNegotiation negotiation, SecondhandProduct product,
@@ -822,11 +847,6 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
                         "productId", negotiation.getProductId(),
                         "sellerUserId", sellerUserId,
                         "status", NEGOTIATION_REJECTED)));
-        runBestEffort("notify bargain rejection", () -> notificationService.createNotification(
-                negotiation.getBuyerUserId(),
-                "议价申请未通过",
-                product == null ? "卖家未接受本次议价" : "卖家未接受商品“" + product.getName() + "”的本次议价",
-                "/secondhand/" + negotiation.getProductId()));
     }
 
     private void runAfterCommit(Runnable action) {
@@ -849,6 +869,33 @@ public class SecondhandTradeServiceImpl implements SecondhandTradeService {
         } catch (RuntimeException exception) {
             log.warn("UC18 side effect failed after core decision: {}", actionName, exception);
         }
+    }
+
+    /**
+     * Production notifications are recorded in the producer outbox in the
+     * same transaction as the second-hand decision.  The direct service call
+     * is retained only for the monolith rollback/test profile and is
+     * deliberately best-effort so a legacy messaging outage cannot roll back
+     * the core decision.
+     */
+    private void notifyRecipient(String action, Long recipientUserId, String title, String content,
+            String targetPath, String notificationType, String businessType, String dedupeKey) {
+        if (recipientUserId == null) {
+            return;
+        }
+        if (eventNotificationsEnabled && outbox != null) {
+            outbox.notification("secondhand-monolith", "SECONDHAND", dedupeKey,
+                    List.of(recipientUserId), title, content, targetPath,
+                    notificationType, businessType, dedupeKey);
+            return;
+        }
+        Runnable legacyNotification = () -> runBestEffort("legacy " + action,
+                () -> notificationService.createNotification(recipientUserId, title, content, targetPath));
+        // A proxied @Transactional legacy service can mark the surrounding
+        // transaction rollback-only before its exception reaches our catch.
+        // Defer it until after commit in the rollback profile so the business
+        // decision remains durable even when the legacy path fails.
+        runAfterCommit(legacyNotification);
     }
 
     private ProductAuctionVO toAuctionVO(ProductAuction auction) {

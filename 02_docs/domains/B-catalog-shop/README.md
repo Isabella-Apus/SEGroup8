@@ -1,6 +1,6 @@
 # Domain B - 商品、店铺、风险与行为
 
-当前实现：`catalog-service`、`shop-service`、`risk-service`、`behavior-service` 四个可独立构建/测试的原型模块。目标 `catalog-shop-service` 尚未作为单一独立部署单元完成。
+当前实现：`microservices/catalog-shop-service` 是 UC06-UC10 唯一可构建、镜像化和部署的服务。其源码内按 catalog、shop、risk、behavior 划分模块；旧的四个重复原型目录已移除，避免被 Maven 或部署工具误识别为运行时服务。
 
 | 用例 | 单 UC 文档 | 浏览器测试 | 当前证据 |
 |---|---|---|---|

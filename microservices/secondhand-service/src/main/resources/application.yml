@@ -26,15 +26,18 @@ security:
   internal-token: ${INTERNAL_SERVICE_TOKEN:local-internal-service-token}
 
 clients:
-  order:
-    base-url: ${ORDER_SERVICE_URL:http://order-service:8080}
-    connect-timeout: ${ORDER_CONNECT_TIMEOUT:1s}
-    read-timeout: ${ORDER_READ_TIMEOUT:2s}
-    max-attempts: ${ORDER_MAX_ATTEMPTS:20}
+  messaging:
+    base-url: ${MESSAGING_SERVICE_URL:http://messaging:8084}
+    publish-delay-ms: ${OUTBOX_PUBLISH_DELAY_MS:2000}
   identity:
     base-url: ${IDENTITY_SERVICE_URL:http://identity-governance-service:8091}
     connect-timeout: ${IDENTITY_CONNECT_TIMEOUT:1s}
-    read-timeout: ${IDENTITY_READ_TIMEOUT:3s}
+    read-timeout: ${IDENTITY_READ_TIMEOUT:2s}
+  order:
+    base-url: ${ORDER_SERVICE_URL:http://segroup8-order:8085}
+    connect-timeout: ${ORDER_CONNECT_TIMEOUT:1s}
+    read-timeout: ${ORDER_READ_TIMEOUT:2s}
+    max-attempts: ${ORDER_MAX_ATTEMPTS:20}
 
 secondhand:
   recovery:

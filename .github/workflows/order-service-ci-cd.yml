@@ -10,14 +10,20 @@ on:
       - "frontend/e2e/domain-d/uc20-fulfillment.spec.ts"
       - "frontend/e2e/microservices/order-service-api.spec.ts"
       - "frontend/playwright.config.ts"
+      - "frontend/src/**"
+      - "frontend/vite.config.js"
+      - "frontend/docker/nginx.conf"
+      - "compose*.yml"
       - "scripts/e2e/stubs/order-downstream-contract-stub.mjs"
       - "02_docs/microservices/order-service/**"
       - "03_devops/microservices/order-service/**"
       - "04_tests/microservices/order-service/**"
       - "05_management/microservices/order-service/**"
       - "deploy/helm/segroup8/templates/order-*.yaml"
+      - "deploy/helm/segroup8/templates/ingress.yaml"
       - "deploy/helm/segroup8/values.yaml"
       - ".github/scripts/deploy-order-k3s.sh"
+      - ".github/scripts/sync-acr-pull-secret.sh"
       - ".github/scripts/collect-order-k3s-diagnostics.sh"
       - ".github/workflows/order-service-ci-cd.yml"
   push:
@@ -30,14 +36,20 @@ on:
       - "frontend/e2e/domain-d/uc20-fulfillment.spec.ts"
       - "frontend/e2e/microservices/order-service-api.spec.ts"
       - "frontend/playwright.config.ts"
+      - "frontend/src/**"
+      - "frontend/vite.config.js"
+      - "frontend/docker/nginx.conf"
+      - "compose*.yml"
       - "scripts/e2e/stubs/order-downstream-contract-stub.mjs"
       - "02_docs/microservices/order-service/**"
       - "03_devops/microservices/order-service/**"
       - "04_tests/microservices/order-service/**"
       - "05_management/microservices/order-service/**"
       - "deploy/helm/segroup8/templates/order-*.yaml"
+      - "deploy/helm/segroup8/templates/ingress.yaml"
       - "deploy/helm/segroup8/values.yaml"
       - ".github/scripts/deploy-order-k3s.sh"
+      - ".github/scripts/sync-acr-pull-secret.sh"
       - ".github/scripts/collect-order-k3s-diagnostics.sh"
       - ".github/workflows/order-service-ci-cd.yml"
   workflow_dispatch:
@@ -280,7 +292,12 @@ jobs:
       - name: Lint and render order-service
         run: |
           helm lint deploy/helm/segroup8 --set order.enabled=true --set-string order.image.repository=registry.example/segroup8/order --set-string order.image.tag=sha-test --set-string backend.image.repository=registry.example/segroup8/backend --set-string backend.image.tag=sha-test --set-string frontend.image.repository=registry.example/segroup8/frontend --set-string frontend.image.tag=sha-test --set-file mysql.initSchema=backend/src/main/resources/schema.sql
-          helm template segroup8 deploy/helm/segroup8 --namespace segroup8 --set order.enabled=true --set-string order.image.repository=registry.example/segroup8/order --set-string order.image.tag=sha-test --set-string backend.image.repository=registry.example/segroup8/backend --set-string backend.image.tag=sha-test --set-string frontend.image.repository=registry.example/segroup8/frontend --set-string frontend.image.tag=sha-test --set-file mysql.initSchema=backend/src/main/resources/schema.sql >/dev/null
+          render="$(mktemp)"
+          helm template segroup8 deploy/helm/segroup8 --namespace segroup8 --show-only templates/order-deployment.yaml --set order.enabled=true --set-string order.image.repository=registry.example/segroup8/order --set-string order.image.tag=sha-test --set-string backend.image.repository=registry.example/segroup8/backend --set-string backend.image.tag=sha-test --set-string frontend.image.repository=registry.example/segroup8/frontend --set-string frontend.image.tag=sha-test --set-file mysql.initSchema=backend/src/main/resources/schema.sql >"$render"
+          grep -q 'runAsUser: 10001' "$render"
+          grep -q 'runAsGroup: 10001' "$render"
+          grep -q 'readOnlyRootFilesystem: true' "$render"
+          grep -q 'mountPath: /tmp' "$render"
 
   publish-order-image:
     name: Publish immutable order-service image
@@ -349,9 +366,8 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ENABLE_PRODUCTION_DEPLOY == 'true'
     needs: publish-order-image
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 70
     environment: production
-    concurrency: {group: segroup8-production-helm, cancel-in-progress: false}
     steps:
       - uses: actions/checkout@v4
       - name: Package Helm chart
@@ -370,9 +386,12 @@ jobs:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
           ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+          ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
         run: |
           set -o pipefail
+          .github/scripts/sync-acr-pull-secret.sh
           archive="/tmp/order-chart-$GITHUB_SHA.tar.gz"
           scp "order-chart-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$archive"
           ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=10 "$DEPLOY_USER@$DEPLOY_HOST" "bash -s -- '$GITHUB_SHA' '$archive' '$ACR_REGISTRY' '$ACR_NAMESPACE' 'sha-$GITHUB_SHA' '$K8S_NAMESPACE'" < .github/scripts/deploy-order-k3s.sh | tee order-deployment.log

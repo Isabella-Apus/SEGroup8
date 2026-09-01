@@ -108,7 +108,7 @@ class UserControllerWebMvcTest {
         mockMvc.perform(post("/api/user/addresses")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"receiverName\":\"Test User\",\"receiverPhone\":\"123\",\"province\":\"Beijing\",\"city\":\"Beijing\",\"detailAddress\":\"No.1 Test Road\",\"isDefault\":0}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400));
 
         verify(userService, never()).createAddress(any());

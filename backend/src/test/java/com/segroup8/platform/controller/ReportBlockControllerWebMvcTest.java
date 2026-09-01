@@ -89,7 +89,7 @@ class ReportBlockControllerWebMvcTest {
         mockMvc.perform(post("/api/report-block/block")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400));
     }
 

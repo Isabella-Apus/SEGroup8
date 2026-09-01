@@ -9,13 +9,13 @@ interface DownstreamGateway {
     void confirmReservation(String reservationId);
     void releaseReservation(String reservationId);
     Quote quote(String quoteRequestId, long buyerUserId, BigDecimal totalAmount, Long voucherId);
-    RemoteResult debit(String paymentRequestId, long buyerUserId, BigDecimal amount, String payMode, String payChannel);
+    RemoteResult debit(String paymentRequestId, long orderId, long buyerUserId, BigDecimal amount, String payMode, String payChannel);
     RemoteResult paymentResult(String paymentRequestId);
-    RemoteResult refund(String refundRequestId, long orderId, long buyerUserId, BigDecimal amount);
+    RemoteResult refund(String refundRequestId, String paymentRequestId, long orderId, long buyerUserId, BigDecimal amount);
     RemoteResult refundResult(String refundRequestId);
     RemoteResult settle(String settlementRequestId, long orderId, long sellerUserId, BigDecimal amount);
     RemoteResult settlementResult(String settlementRequestId);
-    void releaseVoucher(String releaseRequestId, Long voucherId, long buyerUserId);
+    void releaseVoucher(String releaseRequestId, long orderId, Long voucherId, long buyerUserId);
 
     record ProductSnapshot(long productId, String productName, BigDecimal price, int quantity,
             long sellerUserId, Long shopId) {}

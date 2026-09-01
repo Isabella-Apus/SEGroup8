@@ -1,0 +1,15 @@
+# API 测试报告
+
+执行日期：2026-08-31
+
+本机已验证：
+
+- Bearer JWT 缺失返回 401；普通用户访问管理员/经营接口返回 403。
+- 浏览器 JWT 不能替代内部服务令牌；内部 token 缺失返回 403。
+- 卖家/管理员券创建、列表、更新、关闭/删除与归属隔离。
+- 用户领券、重复领取、报价、预占、重复核销、释放补偿。
+- 充值幂等、钱包余额和私有流水。
+- 内部扣款、结果查询、退款与结算重复请求返回原结果。
+- Outbox 首次投递失败后保留事件并退避重试，后续成功时标记为已发布。
+
+原始结果以 `evidence/raw-reports/` 的 Surefire XML/TXT 为准。运行时与仓库 OpenAPI 共 25 个操作（17 个公开操作、8 个内部操作），方法+规范化路径精确相等；公开操作成功路径以及 401/403/400/404/幂等边界均有自动化覆盖。写接口支持 `Idempotency-Key`：同键同请求重放同一响应，同键不同请求返回 `409 IDEMPOTENCY_KEY_REUSED`。MySQL Testcontainers 使用独立 Flyway migrator 和运行 DML 用户，覆盖运行账号不能 DDL/跨 schema 写入的负向断言。tested revision `cbc1ab300d0bf3c78669d1c0ac9f72fd5a390e3a` 的 `clean verify`：服务 26/26、安全契约 5/5、MySQL 4/4，均为 0 失败、0 错误、0 跳过；完整计数、镜像和耗时以 `result-summary.json` 为准。

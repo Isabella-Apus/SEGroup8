@@ -41,15 +41,16 @@ class OrderApiTest {
     @MockBean DownstreamGateway downstream;
 
     @BeforeEach void clean() {
-        for (String table : List.of("outbox_event","order_saga","idempotency_record","logistics_trace","review",
+        for (String table : List.of("inbox_event","outbox_event","order_saga","idempotency_record","logistics_trace","review",
                 "order_after_sale_log","order_item","order_info")) db.update("delete from " + table);
         when(downstream.reserve(anyString(),anyLong(),anyList())).thenAnswer(inv -> new Reservation(inv.getArgument(0),
                 List.of(new ProductSnapshot(10,"Snapshot phone",new BigDecimal("100.00"),1,2,20L))));
         when(downstream.quote(anyString(),anyLong(),any(),any())).thenReturn(new Quote(new BigDecimal("90.00"),
                 new BigDecimal("10.00"),new BigDecimal("5.00"),new BigDecimal("5.00")));
-        when(downstream.debit(anyString(),anyLong(),any(),any(),any())).thenReturn(RemoteResult.SUCCEEDED);
+        when(downstream.debit(anyString(),anyLong(),anyLong(),any(),any(),any())).thenReturn(RemoteResult.SUCCEEDED);
         when(downstream.paymentResult(anyString())).thenReturn(RemoteResult.SUCCEEDED);
-        when(downstream.refund(anyString(),anyLong(),anyLong(),any())).thenReturn(RemoteResult.SUCCEEDED);
+        when(downstream.refund(anyString(),nullable(String.class),anyLong(),anyLong(),any()))
+                .thenReturn(RemoteResult.SUCCEEDED);
         when(downstream.refundResult(anyString())).thenReturn(RemoteResult.SUCCEEDED);
         when(downstream.settle(anyString(),anyLong(),anyLong(),any())).thenReturn(RemoteResult.SUCCEEDED);
         when(downstream.settlementResult(anyString())).thenReturn(RemoteResult.UNKNOWN);
@@ -108,12 +109,17 @@ class OrderApiTest {
     }
 
     @Test void refundAdminAndInternalApisAreProtectedAndIdempotent() throws Exception {
-        String first=mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token")
+        String first=mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token").header("Idempotency-Key","SECONDHAND:DIRECT:t-1")
                 .contentType("application/json").content(secondhandBody())).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         long id=json.readTree(first).path("data").path("orderId").asLong();
-        mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token")
+        mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token").header("Idempotency-Key","SECONDHAND:DIRECT:t-1")
                 .contentType("application/json").content(secondhandBody())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.orderId").value(id));
+        mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token")
+                .contentType("application/json").content(secondhandBody())).andExpect(status().isBadRequest());
+        mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token").header("Idempotency-Key","SECONDHAND:DIRECT:wrong")
+                .contentType("application/json").content(secondhandBody())).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("IDEMPOTENCY_KEY_MISMATCH"));
         mvc.perform(get("/internal/orders/by-business-key/SECONDHAND:DIRECT:t-1")).andExpect(status().isUnauthorized());
         mvc.perform(get("/internal/orders/by-business-key/SECONDHAND:DIRECT:t-1").header("X-Internal-Service-Token","test-internal-token"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.data.orderId").value(id));
@@ -127,6 +133,24 @@ class OrderApiTest {
                 .andExpect(status().isForbidden());
         mvc.perform(post("/api/admin/orders/{id}/refund/approve",id).headers(admin()).header("Idempotency-Key","refund-decision-1"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.data.refundStatus").value(2));
+    }
+
+    @Test void catalogReservationExpiryClosesPendingOrderExactlyOnce() throws Exception {
+        String created=mvc.perform(post("/api/order/create").headers(user(1)).header("Idempotency-Key","expiry-order")
+                .contentType("application/json").content(createBody())).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        long id=json.readTree(created).path("data").path("id").asLong();
+        String event="{\"eventId\":\"inventory-expired-1\",\"eventType\":\"InventoryReservationExpired.v1\","
+                + "\"producer\":\"catalog-shop-service\",\"payload\":{\"orderId\":\"reservation:expiry-order\","
+                + "\"reservationId\":1,\"status\":\"EXPIRED\"}}";
+        mvc.perform(post("/internal/events").header("X-Internal-Service-Token","test-internal-token")
+                .contentType("application/json").content(event)).andExpect(status().isNoContent());
+        mvc.perform(post("/internal/events").header("X-Internal-Service-Token","test-internal-token")
+                .contentType("application/json").content(event)).andExpect(status().isNoContent());
+        mvc.perform(get("/api/order/detail/{id}",id).headers(user(1)))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.orderStatusKey").value("CANCELLED"));
+        assertThat(db.queryForObject("select count(*) from inbox_event where event_id='inventory-expired-1'",Integer.class))
+                .isEqualTo(1);
     }
 
     @Test void remainingPublicWriteEndpointsEnforceRolesAndState() throws Exception {
@@ -271,7 +295,7 @@ class OrderApiTest {
     private org.springframework.http.HttpHeaders user(long id){var h=new org.springframework.http.HttpHeaders();h.set("X-User-Id",String.valueOf(id));h.set("X-User-Role","USER");return h;}
     private org.springframework.http.HttpHeaders admin(){var h=user(99);h.set("X-User-Role","ADMIN");return h;}
     private String createBody(){return "{\"items\":[{\"productId\":10,\"quantity\":1}],\"receiverName\":\"Buyer\",\"receiverPhone\":\"13800008000\",\"receiverProvince\":\"Zhejiang\",\"receiverCity\":\"Hangzhou\",\"receiverDetailAddress\":\"masked at rest boundary\",\"voucherId\":3}";}
-    private long createSecondhand(String tradeId) throws Exception {String response=mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token").contentType("application/json").content(secondhandBody(tradeId))).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();return json.readTree(response).path("data").path("orderId").asLong();}
+    private long createSecondhand(String tradeId) throws Exception {String response=mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token").header("Idempotency-Key","SECONDHAND:DIRECT:"+tradeId).contentType("application/json").content(secondhandBody(tradeId))).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();return json.readTree(response).path("data").path("orderId").asLong();}
     private String secondhandBody(){return secondhandBody("t-1");}
     private String secondhandBody(String tradeId){return "{\"tradeType\":\"DIRECT\",\"tradeId\":\""+tradeId+"\",\"orderBusinessKey\":\"SECONDHAND:DIRECT:"+tradeId+"\",\"buyerUserId\":1,\"sellerUserId\":2,\"productId\":88,\"productName\":\"Used book\",\"price\":50,\"receiverName\":\"Buyer\",\"receiverPhone\":\"13800008000\",\"receiverProvince\":\"Zhejiang\",\"receiverCity\":\"Hangzhou\",\"receiverDetailAddress\":\"detail\"}";}
 }

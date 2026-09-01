@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
+export KUBECONFIG="$HOME/.kube/config"
 
 k8s_namespace="${1:-segroup8}"
 helm_release="${2:-segroup8}"

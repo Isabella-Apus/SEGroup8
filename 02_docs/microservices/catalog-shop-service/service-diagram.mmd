@@ -1,0 +1,14 @@
+flowchart LR
+  Gateway --> CatalogShop[catalog-shop-service]
+  subgraph CatalogShop
+    Catalog[catalog + inventory]
+    Shop[shop]
+    Risk[risk]
+    Behavior[behavior]
+  end
+  CatalogShop --> DB[(catalog_shop_db)]
+  Identity[identity-governance-service] -->|MerchantApproved.v1| Shop
+  Order[order-service] -->|reservation API| Catalog
+  Secondhand[secondhand-service] -->|ProductSubmitted.v1| Risk
+  Catalog -->|InventoryReservationExpired.v1| Order
+  Risk -->|NotificationRequested.v1| Messaging[messaging-service]

@@ -37,6 +37,12 @@ spec:
         - name: secondhand-service
           image: "{{ required "secondhand.image.repository is required when enabled" .Values.secondhand.image.repository }}:{{ required "secondhand.image.tag is required when enabled" .Values.secondhand.image.tag }}"
           imagePullPolicy: {{ .Values.secondhand.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           ports:
             - name: http
               containerPort: 8080
@@ -60,7 +66,7 @@ spec:
               port: http
             periodSeconds: 5
             timeoutSeconds: 3
-            failureThreshold: 24
+            failureThreshold: 60
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
@@ -77,4 +83,10 @@ spec:
             failureThreshold: 3
           resources:
             {{- toYaml .Values.secondhand.resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
 {{- end }}

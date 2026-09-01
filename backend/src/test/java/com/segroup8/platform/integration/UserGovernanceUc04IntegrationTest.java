@@ -2,6 +2,7 @@ package com.segroup8.platform.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.segroup8.platform.utils.JwtUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
@@ -24,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @Tag("DOMAIN_A")
 @Tag("UC04")
 class UserGovernanceUc04IntegrationTest {
@@ -39,6 +42,14 @@ class UserGovernanceUc04IntegrationTest {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @BeforeEach
+    void resetGlobalState() {
+        jdbcTemplate.update("delete from admin_audit_log");
+        jdbcTemplate.update("delete from user where id != 2");
+        jdbcTemplate.update("update user set username = 'admin1', password = 'x', nickname = '管理员1', role = 'ADMIN', status = 'NORMAL' where id = 2");
+        jdbcTemplate.update("ALTER TABLE user ALTER COLUMN id RESTART WITH 3");
+    }
 
     @Test
     void banLoginFailureUnbanRecoveryPermissionAndAuditMustBeConsistent() throws Exception {

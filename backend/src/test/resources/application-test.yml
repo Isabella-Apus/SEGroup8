@@ -23,4 +23,12 @@ app:
     expire-hours: 24
   upload:
     dir: uploads
-
+  internal-service:
+    token: test-internal-service-token
+  messaging:
+    event-notifications-enabled: false
+  outbox:
+    relay-delay-ms: 3600000
+  risk-audit:
+    llm:
+      enabled: false

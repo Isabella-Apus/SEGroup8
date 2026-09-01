@@ -13,9 +13,6 @@
     "raw-reports/TEST-com.segroup8.platform.integration.ChatFlowUc24IntegrationTest.xml",
     "raw-reports/TEST-com.segroup8.platform.service.impl.ChatServiceImplTest.xml",
     "raw-reports/TEST-com.segroup8.platform.service.impl.UC24ChatAuthorizationTest.xml",
-    "raw-reports/playwright/playwright-results.json",
-    "raw-reports/playwright/playwright-results.xml",
-    "raw-reports/playwright/playwright-report/index.html",
     "screenshots/uc24-chat-history-and-block.png",
     "logs/runtime-health.txt",
     "../../../02_docs/UC24/test-report.md"

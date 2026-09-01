@@ -1,0 +1,3 @@
+ALTER TABLE product ADD COLUMN cover VARCHAR(500) NOT NULL DEFAULT '';
+ALTER TABLE product ADD COLUMN images TEXT NULL;
+UPDATE product SET images = '[]' WHERE images IS NULL;

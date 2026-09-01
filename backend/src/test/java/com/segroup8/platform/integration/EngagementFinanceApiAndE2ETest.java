@@ -284,7 +284,7 @@ class EngagementFinanceApiAndE2ETest {
                         .header("Authorization", bearer(buyerToken))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"amount\":0,\"channel\":\"WECHAT\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400));
         assertEquals(new BigDecimal("150.00"), db.queryForObject(
                 "select personal_balance from balance where user_id = 1", BigDecimal.class));

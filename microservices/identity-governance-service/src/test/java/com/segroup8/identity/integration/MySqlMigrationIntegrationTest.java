@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.dao.DataAccessException;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,6 +19,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -48,10 +50,19 @@ class MySqlMigrationIntegrationTest {
     @Test
     void realMySqlRunsFlywayAndOwnsAllIdentityTables() {
         Long tables = db.queryForObject("SELECT COUNT(*) FROM information_schema.tables "
-                + "WHERE table_schema=DATABASE() AND table_name IN ('user','address','merchant_application',"
+                + "WHERE table_schema=DATABASE() AND table_name IN ('user','address','merchant_application','report',"
                 + "'user_report','user_block','credit_score_log','admin_audit_log','idempotency_record','outbox_event')",
                 Long.class);
-        assertThat(tables).isEqualTo(9);
+        assertThat(tables).isEqualTo(10);
+    }
+
+    @Test
+    void identityAccountCannotReadOrderSchema() throws Exception {
+        var result = MYSQL.execInContainer("mysql", "-uroot", "-p" + MYSQL.getPassword(), "-e",
+                "create database if not exists order_db; create table if not exists order_db.order_info(id bigint primary key);");
+        assertThat(result.getExitCode()).isZero();
+        assertThatThrownBy(() -> db.queryForObject("select count(*) from order_db.order_info", Long.class))
+                .isInstanceOf(DataAccessException.class);
     }
 
     @Test

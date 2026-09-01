@@ -134,6 +134,29 @@ paths:
         '200':
           description: Compatibility envelope containing an ownership-validated receiver snapshot
           content: {application/json: {schema: {$ref: '#/components/schemas/AddressSnapshotEnvelope'}}}
+  /internal/users/{userId}/addresses/{addressId}:
+    get:
+      tags: [Internal]
+      security: [{serviceToken: []}]
+      parameters:
+        - {$ref: '#/components/parameters/UserId'}
+        - {$ref: '#/components/parameters/AddressId'}
+        - {$ref: '#/components/parameters/RequestId'}
+      responses:
+        '200':
+          description: Ownership-validated receiver snapshot
+          content: {application/json: {schema: {$ref: '#/components/schemas/AddressSnapshotEnvelope'}}}
+  /internal/users/{userId}/shipping-address:
+    get:
+      tags: [Internal]
+      security: [{serviceToken: []}]
+      parameters:
+        - {$ref: '#/components/parameters/UserId'}
+        - {$ref: '#/components/parameters/RequestId'}
+      responses:
+        '200':
+          description: Default-first receiver snapshot
+          content: {application/json: {schema: {$ref: '#/components/schemas/AddressSnapshotEnvelope'}}}
   /internal/blocks/check:
     post:
       tags: [Internal]
@@ -168,9 +191,10 @@ components:
         message: {type: string, example: success}
         data:
           type: object
-          required: [id, userId, receiverName, receiverPhone, province, city, detailAddress]
+          required: [id, addressId, userId, receiverName, receiverPhone, province, city, detailAddress]
           properties:
             id: {type: integer, format: int64}
+            addressId: {type: integer, format: int64}
             userId: {type: integer, format: int64}
             receiverName: {type: string}
             receiverPhone: {type: string}

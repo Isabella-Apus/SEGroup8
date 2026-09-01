@@ -175,10 +175,28 @@ paths:
       operationId: rejectAdminRefund
       parameters: [{$ref: '#/components/parameters/OrderId'}, {$ref: '#/components/parameters/IdempotencyKey'}]
       responses: {'200': {$ref: '#/components/responses/OrderResponse'}}
+  /internal/events:
+    post:
+      operationId: receiveCatalogInventoryEvent
+      security: [{internalToken: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [eventId, eventType, producer, payload]
+              properties:
+                eventId: {type: string}
+                eventType: {type: string, enum: [InventoryReservationExpired.v1, InventoryReservationReleased.v1]}
+                producer: {type: string, enum: [catalog-shop-service]}
+                payload: {type: object}
+      responses: {'204': {description: Accepted once; duplicate eventId is an idempotent no-op}}
   /internal/orders/secondhand:
     post:
       operationId: createSecondhandOrder
       security: [{internalToken: []}]
+      parameters: [{$ref: '#/components/parameters/IdempotencyKey'}]
       requestBody:
         required: true
         content: {application/json: {schema: {$ref: '#/components/schemas/SecondhandOrderRequest'}}}

@@ -26,10 +26,13 @@ class HttpOrderGatewayContractTest {
     void sendsIdempotentBusinessContractAndParsesPendingPaymentOrder() {
         RestClient.Builder builder = RestClient.builder().baseUrl("http://order.test");
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        HttpOrderGateway gateway = new HttpOrderGateway(builder.build(), "internal-test-token");
+        HttpOrderGateway gateway = new HttpOrderGateway(builder.build(), "internal-test-token",
+                (userId, addressId, requestId) -> { throw new AssertionError("persisted snapshot must be reused"); });
         server.expect(once(), requestTo("http://order.test/internal/orders/secondhand"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header("X-Internal-Service-Token", "internal-test-token"))
+                .andExpect(header("X-Request-Id", "SECONDHAND:BARGAIN:88"))
+                .andExpect(header("Idempotency-Key", "SECONDHAND:BARGAIN:88"))
                 .andExpect(header("X-Idempotency-Key", "SECONDHAND:BARGAIN:88"))
                 .andExpect(jsonPath("$.tradeType").value("BARGAIN"))
                 .andExpect(jsonPath("$.tradeId").value("88"))
@@ -37,7 +40,11 @@ class HttpOrderGatewayContractTest {
                 .andExpect(jsonPath("$.buyerUserId").value(20))
                 .andExpect(jsonPath("$.sellerUserId").value(10))
                 .andExpect(jsonPath("$.productName").value("Used book"))
+                .andExpect(jsonPath("$.receiverName").value("Buyer"))
                 .andExpect(jsonPath("$.receiverPhone").value("13800008000"))
+                .andExpect(jsonPath("$.receiverProvince").value("Zhejiang"))
+                .andExpect(jsonPath("$.receiverCity").value("Hangzhou"))
+                .andExpect(jsonPath("$.receiverDetailAddress").value("West Lake Road 1"))
                 .andRespond(withSuccess("{\"code\":0,\"message\":\"success\",\"data\":{"
                         + "\"orderId\":901,\"orderNo\":\"ORD901\",\"status\":\"PENDING_PAY\"}}",
                         MediaType.APPLICATION_JSON));
@@ -52,13 +59,15 @@ class HttpOrderGatewayContractTest {
     void looksUpUncertainOrderByBusinessKeyWithInternalAuthentication() {
         RestClient.Builder builder = RestClient.builder().baseUrl("http://order.test");
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
-        HttpOrderGateway gateway = new HttpOrderGateway(builder.build(), "internal-test-token");
+        HttpOrderGateway gateway = new HttpOrderGateway(builder.build(), "internal-test-token",
+                (userId, addressId, requestId) -> { throw new AssertionError("address lookup not expected"); });
         server.expect(once(), requestTo(
                         "http://order.test/internal/orders/by-business-key/SECONDHAND%3ABARGAIN%3A88"))
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header("X-Internal-Service-Token", "internal-test-token"))
+                .andExpect(header("X-Request-Id", "SECONDHAND:BARGAIN:88"))
                 .andRespond(withSuccess("{\"code\":0,\"message\":\"success\",\"data\":{"
-                        + "\"orderId\":901,\"orderNo\":\"ORD901\",\"status\":\"PENDING_PAY\"}}",
+                                + "\"orderId\":901,\"orderNo\":\"ORD901\",\"status\":\"PENDING_PAY\"}}",
                         MediaType.APPLICATION_JSON));
 
         var receipt = gateway.findByBusinessKey("SECONDHAND:BARGAIN:88");

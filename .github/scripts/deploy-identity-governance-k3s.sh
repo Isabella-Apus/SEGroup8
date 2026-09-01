@@ -16,8 +16,11 @@ fi
 command -v helm >/dev/null
 command -v kubectl >/dev/null
 command -v curl >/dev/null
+command -v flock >/dev/null
 
-export KUBECONFIG="${KUBECONFIG:-$HOME/.kube/config}"
+export KUBECONFIG="$HOME/.kube/config"
+exec 9>"$HOME/.segroup8-helm.lock"
+flock -w 3300 9 || { echo "Timed out waiting for the shared Helm deployment lock" >&2; exit 1; }
 work_dir="$(mktemp -d)"
 
 cleanup() {
@@ -51,7 +54,6 @@ tar -xzf "$archive" -C "$work_dir"
 chart_dir="$work_dir/deploy/helm/segroup8"
 test -f "$chart_dir/Chart.yaml"
 
-kubectl get namespace "$k8s_namespace" >/dev/null
 kubectl --namespace "$k8s_namespace" get secret acr-pull-secret >/dev/null
 kubectl --namespace "$k8s_namespace" get secret identity-governance-secret >/dev/null
 
@@ -68,6 +70,11 @@ helm upgrade --install segroup8 "$chart_dir" \
   --timeout 10m \
   --history-max 5 \
   --set identityGovernance.enabled=true \
+  --set identityGovernance.autoscaling.enabled=false \
+  --set catalogShop.replicaCount=1 \
+  --set catalogShop.hpa.enabled=false \
+  --set benefitsFinance.replicas=1 \
+  --set secondhand.autoscaling.enabled=false \
   --set-string "identityGovernance.image.repository=$registry/$registry_namespace/identity-governance" \
   --set-string "identityGovernance.image.tag=$image_tag" \
   --set-string "identityGovernance.deployment.version=$image_tag" \
@@ -75,18 +82,17 @@ helm upgrade --install segroup8 "$chart_dir" \
   --set-string "identityGovernance.deployment.buildTime=$build_time"
 
 kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-identity-governance --timeout=5m
-identity_info="$(kubectl --namespace "$k8s_namespace" exec deployment/segroup8-identity-governance -- \
-  curl --fail --silent --show-error http://127.0.0.1:8091/actuator/info)"
+service_ip="$(kubectl --namespace "$k8s_namespace" get service identity-governance-service -o jsonpath='{.spec.clusterIP}')"
+[[ -n "$service_ip" && "$service_ip" != "None" ]]
+service_url="http://${service_ip}:8091"
+identity_info="$(curl --fail --silent --show-error "$service_url/actuator/info")"
 grep -F '"version":"'"$image_tag"'"' <<<"$identity_info" >/dev/null
 grep -F '"commit":"'"$release_id"'"' <<<"$identity_info" >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/segroup8-identity-governance -- \
-  curl --fail --silent --show-error http://127.0.0.1:8091/actuator/health/liveness >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/segroup8-identity-governance -- \
-  curl --fail --silent --show-error http://127.0.0.1:8091/actuator/health/readiness >/dev/null
-identity_smoke="$(kubectl --namespace "$k8s_namespace" exec deployment/segroup8-identity-governance -- \
-  curl --fail --silent --show-error -H 'Content-Type: application/json' \
+curl --fail --silent --show-error "$service_url/actuator/health/liveness" >/dev/null
+curl --fail --silent --show-error "$service_url/actuator/health/readiness" >/dev/null
+identity_smoke="$(curl --fail --silent --show-error -H 'Content-Type: application/json' \
   -d '{"username":"__deployment_smoke__","password":"invalid"}' \
-  http://127.0.0.1:8091/api/auth/login)"
+  "$service_url/api/auth/login")"
 grep -F '"code":401' <<<"$identity_smoke" >/dev/null
 
 echo "identity-governance-service deployed successfully as $image_tag"

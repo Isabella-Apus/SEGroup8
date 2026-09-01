@@ -1,0 +1,22 @@
+{{- if .Values.benefitsFinance.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: benefits-finance-config
+  labels: { app.kubernetes.io/name: benefits-finance }
+data:
+  APP_VERSION: {{ .Values.benefitsFinance.image.tag | quote }}
+  APP_COMMIT: {{ .Values.benefitsFinance.image.commit | quote }}
+  APP_BUILD_TIME: {{ .Values.benefitsFinance.image.buildTime | quote }}
+  JAVA_TOOL_OPTIONS: {{ .Values.benefitsFinance.config.javaToolOptions | quote }}
+  CURRENCY: {{ .Values.benefitsFinance.config.currency | quote }}
+  ORDER_SERVICE_URL: {{ .Values.benefitsFinance.config.orderServiceUrl | quote }}
+  QUOTE_TTL_SECONDS: {{ .Values.benefitsFinance.config.quoteTtlSeconds | quote }}
+  RESERVATION_TTL_SECONDS: {{ .Values.benefitsFinance.config.reservationTtlSeconds | quote }}
+  OUTBOX_EVENT_SINK_URL: {{ .Values.benefitsFinance.config.outboxEventSinkUrl | quote }}
+  OUTBOX_POLL_MS: {{ .Values.benefitsFinance.config.outboxPollMs | quote }}
+  OUTBOX_BATCH_SIZE: {{ .Values.benefitsFinance.config.outboxBatchSize | quote }}
+  OUTBOX_MAX_ATTEMPTS: {{ .Values.benefitsFinance.config.outboxMaxAttempts | quote }}
+  HTTP_CONNECT_TIMEOUT_MS: {{ .Values.benefitsFinance.config.httpConnectTimeoutMs | quote }}
+  HTTP_READ_TIMEOUT_MS: {{ .Values.benefitsFinance.config.httpReadTimeoutMs | quote }}
+{{- end }}

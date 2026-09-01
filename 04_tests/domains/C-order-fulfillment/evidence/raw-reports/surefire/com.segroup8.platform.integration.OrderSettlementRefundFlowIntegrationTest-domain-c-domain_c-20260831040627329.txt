@@ -1,0 +1,30 @@
+-------------------------------------------------------------------------------
+Test set: com.segroup8.platform.integration.OrderSettlementRefundFlowIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 2, Failures: 2, Errors: 0, Skipped: 0, Time elapsed: 2.397 s <<< FAILURE! -- in com.segroup8.platform.integration.OrderSettlementRefundFlowIntegrationTest
+com.segroup8.platform.integration.OrderSettlementRefundFlowIntegrationTest.deliveredToAutoConfirmShouldSettleAndKeepAccountIsolation -- Time elapsed: 0.082 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <2> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:182)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:177)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:538)
+	at com.segroup8.platform.integration.OrderSettlementRefundFlowIntegrationTest.deliveredToAutoConfirmShouldSettleAndKeepAccountIsolation(OrderSettlementRefundFlowIntegrationTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+com.segroup8.platform.integration.OrderSettlementRefundFlowIntegrationTest.refundSplitShouldHandleOnlyRefundAndTimeoutAutoRefund -- Time elapsed: 0.087 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:31)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:183)
+	at com.segroup8.platform.integration.OrderSettlementRefundFlowIntegrationTest.refundSplitShouldHandleOnlyRefundAndTimeoutAutoRefund(OrderSettlementRefundFlowIntegrationTest.java:128)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+

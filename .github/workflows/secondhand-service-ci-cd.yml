@@ -4,9 +4,14 @@ on:
   pull_request:
     paths:
       - "microservices/secondhand-service/**"
+      - "microservices/security-contract/**"
       - "microservices/pom.xml"
       - "frontend/e2e/domain-d/**"
       - "frontend/e2e/microservices/secondhand-service-api.spec.ts"
+      - "frontend/src/**"
+      - "frontend/vite.config.js"
+      - "frontend/docker/nginx.conf"
+      - "compose*.yml"
       - "scripts/e2e/stubs/secondhand-order-contract-stub.mjs"
       - "02_docs/microservices/secondhand-service/**"
       - "03_devops/microservices/secondhand-service/**"
@@ -16,16 +21,23 @@ on:
       - "04_tests/performance/HPA实验记录表.md"
       - "05_management/microservices/secondhand-service/**"
       - "deploy/helm/segroup8/templates/secondhand-*.yaml"
+      - "deploy/helm/segroup8/templates/ingress.yaml"
       - "deploy/helm/segroup8/values.yaml"
       - ".github/scripts/deploy-secondhand-k3s.sh"
+      - ".github/scripts/sync-acr-pull-secret.sh"
       - ".github/workflows/secondhand-service-ci-cd.yml"
   push:
     branches: [main]
     paths:
       - "microservices/secondhand-service/**"
+      - "microservices/security-contract/**"
       - "microservices/pom.xml"
       - "frontend/e2e/domain-d/**"
       - "frontend/e2e/microservices/secondhand-service-api.spec.ts"
+      - "frontend/src/**"
+      - "frontend/vite.config.js"
+      - "frontend/docker/nginx.conf"
+      - "compose*.yml"
       - "scripts/e2e/stubs/secondhand-order-contract-stub.mjs"
       - "02_docs/microservices/secondhand-service/**"
       - "03_devops/microservices/secondhand-service/**"
@@ -35,8 +47,10 @@ on:
       - "04_tests/performance/HPA实验记录表.md"
       - "05_management/microservices/secondhand-service/**"
       - "deploy/helm/segroup8/templates/secondhand-*.yaml"
+      - "deploy/helm/segroup8/templates/ingress.yaml"
       - "deploy/helm/segroup8/values.yaml"
       - ".github/scripts/deploy-secondhand-k3s.sh"
+      - ".github/scripts/sync-acr-pull-secret.sh"
       - ".github/workflows/secondhand-service-ci-cd.yml"
   workflow_dispatch:
 
@@ -346,6 +360,10 @@ jobs:
           grep -q "minReplicas: 1" /tmp/secondhand-hpa.yaml
           grep -q "maxReplicas: 4" /tmp/secondhand-hpa.yaml
           grep -q "averageUtilization: 70" /tmp/secondhand-hpa.yaml
+          grep -q 'runAsUser: 10001' /tmp/secondhand-deployment.yaml
+          grep -q 'runAsGroup: 10001' /tmp/secondhand-deployment.yaml
+          grep -q 'readOnlyRootFilesystem: true' /tmp/secondhand-deployment.yaml
+          grep -q 'mountPath: /tmp' /tmp/secondhand-deployment.yaml
           if grep -q '^  replicas:' /tmp/secondhand-deployment.yaml; then
             echo "secondhand Deployment must not pin replicas while HPA is enabled"
             exit 1
@@ -424,11 +442,8 @@ jobs:
       vars.ENABLE_PRODUCTION_DEPLOY == 'true'
     needs: publish-secondhand-image
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 70
     environment: production
-    concurrency:
-      group: segroup8-production-helm
-      cancel-in-progress: false
     steps:
       - name: Check out deployment files
         uses: actions/checkout@v4
@@ -450,9 +465,12 @@ jobs:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
           ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+          ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
         run: |
           set -o pipefail
+          .github/scripts/sync-acr-pull-secret.sh
           archive="/tmp/secondhand-chart-$GITHUB_SHA.tar.gz"
           scp "secondhand-chart-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$archive"
           ssh \

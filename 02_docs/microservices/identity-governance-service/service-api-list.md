@@ -50,7 +50,9 @@
 |---|---|---|---|
 | POST | `/internal/auth/introspect` | Gateway/高风险服务 | 服务 Token、Request ID、幂等键 |
 | GET | `/internal/users/{userId}/summary` | 业务服务 | 服务 Token、Request ID、最小字段 |
-| GET | `/internal/users/{userId}/address-snapshot?addressId={id}` | order/secondhand | 服务 Token、Request ID、地址所有权；省略 addressId 时返回默认/首个地址 |
+| GET | `/internal/users/{userId}/address-snapshot?addressId={id}` | 已发布的 secondhand 消费者 | 服务 Token、Request ID、地址所有权；省略 addressId 时返回默认/首个地址 |
+| GET | `/internal/users/{userId}/addresses/{addressId}` | 二手服务 | 服务 Token、Request ID、校验用户与地址归属、返回不可变建单快照 |
+| GET | `/internal/users/{userId}/shipping-address` | 二手服务 | 服务 Token、Request ID、默认地址优先的不可变建单快照 |
 | POST | `/internal/blocks/check` | messaging | 服务 Token、Request ID、幂等键、批量输入 |
 
 机器可读契约仍以 `openapi.yaml` 为准；本文件用于课程检查和 PR 人工评审。

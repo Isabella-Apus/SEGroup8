@@ -16,15 +16,16 @@ security:
     secret: ${JWT_SECRET:change-this-development-secret-at-least-32-bytes}
   internal-service-token: ${INTERNAL_SERVICE_TOKEN:change-this-internal-token}
 downstream:
-  catalog-url: ${CATALOG_SERVICE_URL:http://catalog-shop-service:8080}
-  finance-url: ${BENEFITS_FINANCE_SERVICE_URL:http://benefits-finance-service:8080}
-  messaging-url: ${MESSAGING_SERVICE_URL:http://messaging-service:8080}
+  catalog-url: ${CATALOG_SERVICE_URL:http://segroup8-catalog-shop:8080}
+  finance-url: ${BENEFITS_FINANCE_SERVICE_URL:http://benefits-finance:8085}
+  messaging-url: ${MESSAGING_SERVICE_URL:http://messaging:8084}
+  secondhand-url: ${SECONDHAND_SERVICE_URL:http://secondhand-service:8080}
   connect-timeout: 1s
   read-timeout: 2s
 outbox:
   publisher:
     enabled: ${OUTBOX_PUBLISHER_ENABLED:true}
-    fixed-delay: 2s
+    fixed-delay: ${OUTBOX_PUBLISHER_FIXED_DELAY_MS:2000}
 management:
   prometheus:
     metrics:

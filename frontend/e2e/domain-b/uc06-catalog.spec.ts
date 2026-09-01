@@ -26,7 +26,7 @@ test.describe("@DOMAIN_B @UC06 real catalog search flow", () => {
     await expect(page.getByText("暂无商品")).toBeVisible();
 
     const invalid = await request.get("/api/product/list?pageNum=0&pageSize=101");
-    expect(invalid.ok()).toBeTruthy();
+    expect(invalid.status()).toBe(400);
     expect((await invalid.json()).code).not.toBe(0);
   });
 });

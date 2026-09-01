@@ -66,12 +66,7 @@ public class TradeOrderCoordinator {
         } catch (RuntimeException createFailure) {
             log.warn("order create failed productId={} tradeType={} tradeId={} orderBusinessKey={}",
                     request.productId(), request.tradeType(), request.tradeId(), request.orderBusinessKey(), createFailure);
-            Optional<OrderReceipt> recovered = lookupAfterUncertainFailure(request);
-            if (recovered.isPresent()) {
-                complete(request, recovered.get());
-            } else {
-                failOrRetry(request, rootMessage(createFailure));
-            }
+            reconcileAfterUncertainFailure(request, createFailure);
         }
         return requests.findById(requestId).orElseThrow();
     }
@@ -111,13 +106,24 @@ public class TradeOrderCoordinator {
                 request.orderStatus(), message);
     }
 
-    private Optional<OrderReceipt> lookupAfterUncertainFailure(TradeOrderRequest request) {
+    private void reconcileAfterUncertainFailure(TradeOrderRequest request, RuntimeException createFailure) {
         try {
-            return orderGateway.findByBusinessKey(request.orderBusinessKey());
+            Optional<OrderReceipt> recovered = orderGateway.findByBusinessKey(request.orderBusinessKey());
+            if (recovered.isPresent()) {
+                complete(request, recovered.get());
+            } else {
+                // A successful 404-style lookup proves that no order exists, so a
+                // bounded retry may eventually release the local trade lock safely.
+                failOrRetry(request, rootMessage(createFailure));
+            }
         } catch (RuntimeException lookupFailure) {
             log.warn("order lookup failed productId={} tradeType={} tradeId={} orderBusinessKey={}",
                     request.productId(), request.tradeType(), request.tradeId(), request.orderBusinessKey(), lookupFailure);
-            return Optional.empty();
+            // The create request may have committed even though its response was
+            // lost. If the status lookup is also unavailable, never convert that
+            // uncertainty into a definitive failure and never unfreeze the item.
+            requests.markRetry(request.id(), "create outcome uncertain; status lookup failed: "
+                    + rootMessage(lookupFailure), 10L);
         }
     }
 

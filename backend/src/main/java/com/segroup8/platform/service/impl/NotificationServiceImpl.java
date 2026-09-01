@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.segroup8.platform.common.BusinessException;
 import com.segroup8.platform.entity.Notification;
+import com.segroup8.platform.event.ProducerOutboxService;
+import com.segroup8.platform.event.TraceContext;
 import com.segroup8.platform.mapper.NotificationMapper;
 import com.segroup8.platform.realtime.RealtimePushService;
 import com.segroup8.platform.service.NotificationService;
@@ -11,6 +13,9 @@ import com.segroup8.platform.vo.NotificationVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -24,10 +29,24 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationMapper notificationMapper;
     private final RealtimePushService realtimePushService;
+    private final ProducerOutboxService producerOutboxService;
+    private final boolean eventNotificationsEnabled;
 
     public NotificationServiceImpl(NotificationMapper notificationMapper, RealtimePushService realtimePushService) {
         this.notificationMapper = notificationMapper;
         this.realtimePushService = realtimePushService;
+        this.producerOutboxService = null;
+        this.eventNotificationsEnabled = false;
+    }
+
+    @Autowired
+    public NotificationServiceImpl(NotificationMapper notificationMapper, RealtimePushService realtimePushService,
+            ProducerOutboxService producerOutboxService,
+            @Value("${app.messaging.event-notifications-enabled:true}") boolean eventNotificationsEnabled) {
+        this.notificationMapper = notificationMapper;
+        this.realtimePushService = realtimePushService;
+        this.producerOutboxService = producerOutboxService;
+        this.eventNotificationsEnabled = eventNotificationsEnabled;
     }
 
     @Override
@@ -95,6 +114,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public NotificationVO createNotification(Long userId, String title, String content, String targetPath) {
         requireUserId(userId);
         if (!StringUtils.hasText(title) || !StringUtils.hasText(content)) {
@@ -109,6 +129,16 @@ public class NotificationServiceImpl implements NotificationService {
         }
         notification.setIsRead(0);
         notification.setCreateTime(java.time.LocalDateTime.now());
+        if (eventNotificationsEnabled) {
+            String scope = inferScope(notification);
+            String traceId = TraceContext.currentTraceId();
+            String dedupeKey = "legacy-notification:" + traceId + ":" + userId + ":" +
+                    Integer.toHexString((title + "|" + content + "|" + targetPath).hashCode());
+            producerOutboxService.notification("backend-monolith", "NOTIFICATION", dedupeKey,
+                    List.of(userId), title.trim(), content.trim(), notification.getTargetPath(),
+                    "GENERIC", scope.toUpperCase(), dedupeKey);
+            return toVO(notification);
+        }
         notificationMapper.insert(notification);
         NotificationVO vo = toVO(notification);
         Map<String, Object> payload = new LinkedHashMap<>();

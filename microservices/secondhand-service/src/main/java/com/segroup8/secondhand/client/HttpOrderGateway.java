@@ -13,11 +13,13 @@ import org.springframework.web.client.RestClientException;
 public class HttpOrderGateway implements OrderGateway {
     private final RestClient client;
     private final String internalToken;
+    private final AddressGateway addresses;
 
     public HttpOrderGateway(@Qualifier("orderRestClient") RestClient client,
-            @Value("${security.internal-token}") String internalToken) {
+            @Value("${security.internal-token}") String internalToken, AddressGateway addresses) {
         this.client = client;
         this.internalToken = internalToken;
+        this.addresses = addresses;
     }
 
     @Override
@@ -25,6 +27,8 @@ public class HttpOrderGateway implements OrderGateway {
         try {
             OrderEnvelope envelope = client.post().uri("/internal/orders/secondhand")
                     .header("X-Internal-Service-Token", internalToken)
+                    .header("X-Request-Id", request.orderBusinessKey())
+                    .header("Idempotency-Key", request.orderBusinessKey())
                     .header("X-Idempotency-Key", request.orderBusinessKey())
                     .body(new CreateOrderCommand(request.tradeType(), request.tradeId(), request.orderBusinessKey(),
                             request.buyerUserId(), request.sellerUserId(), request.productId(), request.productName(),
@@ -56,6 +60,7 @@ public class HttpOrderGateway implements OrderGateway {
             OrderEnvelope envelope = client.get()
                     .uri(uriBuilder -> uriBuilder.path("/internal/orders/by-business-key/{key}").build(businessKey))
                     .header("X-Internal-Service-Token", internalToken)
+                    .header("X-Request-Id", businessKey)
                     .retrieve()
                     .onStatus(status -> status.value() == 404, (request, response) -> {
                         throw new OrderNotFoundException();

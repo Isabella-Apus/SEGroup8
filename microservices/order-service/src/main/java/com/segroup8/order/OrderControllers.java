@@ -282,7 +282,13 @@ class InternalOrderController {
     }
 
     @PostMapping("/secondhand")
-    ApiResponse<SecondhandOrderReceipt> secondhand(@Valid @RequestBody SecondhandOrderRequest request) {
+    ApiResponse<SecondhandOrderReceipt> secondhand(@RequestHeader("Idempotency-Key") String idempotencyKey,
+            @Valid @RequestBody SecondhandOrderRequest request) {
+        String expectedKey = "SECONDHAND:" + request.tradeType() + ":" + request.tradeId();
+        if (!expectedKey.equals(request.orderBusinessKey()) || !expectedKey.equals(idempotencyKey)) {
+            throw new OrderException("IDEMPOTENCY_KEY_MISMATCH",
+                    "Idempotency-Key and orderBusinessKey must identify the requested trade", 400);
+        }
         return ApiResponse.success(ApiModels.secondhandReceipt(service.createSecondhand(request)));
     }
 

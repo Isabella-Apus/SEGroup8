@@ -5,18 +5,18 @@
 当前 A-E 划分适合五人 Epic、需求追踪和测试统计，但不适合简单地做成五个运行时微服务：
 
 - Domain A 的登录是多数受保护用例的**业务前置条件**，但其他服务不应在每次请求时同步调用 Domain A；
-- Domain B 已经实际拆成 `catalog-service`、`shop-service`、`risk-service`、`behavior-service`，说明一个交付域可以包含多个微服务；
+- Domain B 在一个可独立部署的 `catalog-shop-service` 内按 catalog、shop、risk、behavior 划分模块，说明交付域与运行时 Deployment 可以一一对应；
 - Domain E 同时包含优惠券、钱包、聊天、通知，把它们部署为一个服务会混合资金强一致逻辑与消息最终一致逻辑；
 - Domain D 的二手商品/议价/拍卖是一个内聚边界，但成交后的订单、支付、物流仍应由订单服务拥有。
 
-因此冻结为“5 个交付域、6 个目标业务微服务、1 个入口与 1 个支撑组件”。Domain B 现有四个 Spring Boot 模块保留为内部模块和迁移原型，但课程目标架构只把它们作为一个 `catalog-shop-service` 部署单元，避免为了形式上的细粒度拆分承担过高运维成本。
+因此冻结为“5 个交付域、6 个目标业务微服务、1 个入口与 1 个支撑组件”。Domain B 只以 `catalog-shop-service` 作为部署单元，避免为了形式上的细粒度拆分承担过高运维成本。
 
 ## 2. 当前实现与目标边界
 
 | 目标服务 | 主要 UC | 唯一职责 | 当前源码位置 | 当前状态 |
 |---|---|---|---|---|
 | `identity-governance-service` | UC01-UC05 | 注册登录、JWT、账号/资料/地址/商家申请、举报拉黑、信用和管理审计 | 单体 Domain A 控制器 | `TARGET` |
-| `catalog-shop-service` | UC06-UC10 | 分类、商品、库存、店铺、商品风险审核、浏览/搜索行为 | `microservices/catalog-service`、`shop-service`、`risk-service`、`behavior-service` 与单体对应控制器 | 四个可独立测试的迁移原型已实现；统一部署单元为 `TARGET` |
+| `catalog-shop-service` | UC06-UC10 | 分类、商品、库存、店铺、商品风险审核、浏览/搜索行为 | `microservices/catalog-shop-service` | `CURRENT`：唯一 Boot 入口、独立镜像、Helm、MySQL/API/契约/E2E 门禁 |
 | `order-service` | UC11-UC15、UC20 | 下单、支付状态、退款、履约、物流、评价；拥有所有订单 | 单体订单、物流、评价控制器 | `TARGET` |
 | `secondhand-service` | UC16-UC19 | 二手商品、直接购买意向、议价、拍卖；不拥有订单履约 | 单体二手商品与交易控制器 | `TARGET` |
 | `benefits-finance-service` | UC21-UC23 | 优惠券、领券核销、余额和资金流水 | 单体优惠券与财务控制器 | `TARGET` |
@@ -48,7 +48,7 @@
 | benefits-finance | `microservices/benefits-finance-service` | `segroup8/benefits-finance:<sha>` | `benefits_finance_db` |
 | messaging | `microservices/messaging-service` | `segroup8/messaging:<sha>` | `messaging_db` |
 
-Domain B 现有四个 module 目前各自可构建，但不等于目标 `catalog-shop-service` 已完成。合并时可保留四个内部 Maven library module，另加一个唯一的 boot application 作为部署入口；CI 对这个部署入口执行独立构建、测试和镜像发布。
+Domain B 的唯一 Maven module 是 `catalog-shop-service`；CI 对该部署入口执行独立构建、测试、镜像、Compose 和 Helm 验证。
 
 ## 3. 交付域与运行时服务对应
 
@@ -152,10 +152,9 @@ sequenceDiagram
 ## 7. 迁移顺序
 
 1. 冻结当前单体 tag 和 API 回归测试，Gateway 保持原 `/api/**` 路径。
-2. 将现有 catalog/shop/risk/behavior 作为 `catalog-shop-service` 的四个内部模块，统一 JWT 校验、配置、数据库和容器入口，停止信任客户端直接传入的 `X-User-Id` 等头。
+2. 在 `catalog-shop-service` 内完成 catalog/shop/risk/behavior 模块的统一 JWT 校验、配置、数据库和容器入口，停止信任客户端直接传入的身份头。
 3. 抽取 identity-governance-service；先迁移登录签发，再迁移资料、地址、账号状态、商家申请和用户治理。
 4. 抽取 order-service，并通过库存/资金适配器替换跨表访问。
 5. 抽取 secondhand-service，使用幂等订单创建契约恢复 UC17-UC20。
 6. 抽取 benefits-finance 与 messaging，恢复 UC21-UC25。
 7. 对每次迁移执行契约测试、服务 API 测试、Compose E2E、故障注入和性能对比；没有运行证据时标记 `NOT_RUN`。
-

@@ -336,8 +336,11 @@ class OrderRepository {
     }
 
     List<OutboxMessage> pendingOutbox() {
-        return db.query("select event_id,event_type,payload from outbox_event where status='PENDING' and available_at<=current_timestamp order by id limit 50",
-                (rs,n)->new OutboxMessage(rs.getString(1),rs.getString(2),rs.getString(3)));
+        return db.query("select event_id,event_type,aggregate_type,aggregate_id,payload,create_time "
+                        + "from outbox_event where status='PENDING' and available_at<=current_timestamp order by id limit 50",
+                (rs,n)->new OutboxMessage(rs.getString("event_id"),rs.getString("event_type"),
+                        rs.getString("aggregate_type"),rs.getString("aggregate_id"),rs.getString("payload"),
+                        rs.getTimestamp("create_time").toInstant()));
     }
 
     void markPublished(String eventId) {
@@ -349,7 +352,23 @@ class OrderRepository {
                 Timestamp.from(Instant.now().plusSeconds(30)),eventId);
     }
 
-    record OutboxMessage(String eventId,String eventType,String payload) {}
+    List<Long> notificationRecipients(String aggregateId,String eventType) {
+        long orderId=Long.parseLong(aggregateId);
+        if ("OrderStatusChanged.v1".equals(eventType)||"OrderRefundStatusChanged.v1".equals(eventType)) {
+            return List.of(db.queryForObject("select buyer_user_id from order_info where id=?",Long.class,orderId));
+        }
+        return db.query("select distinct seller_user_id from order_item where order_id=? and seller_user_id is not null",
+                (rs,n)->rs.getLong(1),orderId);
+    }
+
+    String secondhandBusinessKey(String aggregateId) {
+        List<String> keys=db.query("select business_key from order_info where id=? and business_key like 'SECONDHAND:%'",
+                (rs,n)->rs.getString(1),Long.parseLong(aggregateId));
+        return keys.isEmpty()?null:keys.get(0);
+    }
+
+    record OutboxMessage(String eventId,String eventType,String aggregateType,String aggregateId,
+            String payload,Instant createdAt) {}
     private static PageView<ReviewView> pageReviews(List<ReviewView> all,long page,long size) {
         int from=(int)Math.min(all.size(),(page-1)*size), to=(int)Math.min(all.size(),from+size);
         return new PageView<>(all.size(),page,size,all.subList(from,to));

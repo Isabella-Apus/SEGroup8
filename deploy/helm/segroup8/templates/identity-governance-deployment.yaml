@@ -35,6 +35,12 @@ spec:
         - name: identity-governance
           image: "{{ required "identityGovernance.image.repository is required" .Values.identityGovernance.image.repository }}:{{ required "identityGovernance.image.tag is required" .Values.identityGovernance.image.tag }}"
           imagePullPolicy: {{ .Values.identityGovernance.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
           ports:
             - name: http
               containerPort: 8091
@@ -48,6 +54,10 @@ spec:
               value: {{ .Values.identityGovernance.deployment.commit | quote }}
             - name: APP_BUILD_TIME
               value: {{ .Values.identityGovernance.deployment.buildTime | quote }}
+            - name: CATALOG_SHOP_SERVICE_URL
+              value: "http://segroup8-catalog-shop:8080"
+            - name: MESSAGING_SERVICE_URL
+              value: "http://messaging:8084"
             - name: TZ
               value: Asia/Shanghai
           startupProbe:
@@ -56,7 +66,7 @@ spec:
               port: http
             periodSeconds: 5
             timeoutSeconds: 3
-            failureThreshold: 24
+            failureThreshold: 60
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
@@ -73,4 +83,10 @@ spec:
             failureThreshold: 3
           resources:
             {{- toYaml .Values.identityGovernance.resources | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
 {{- end }}

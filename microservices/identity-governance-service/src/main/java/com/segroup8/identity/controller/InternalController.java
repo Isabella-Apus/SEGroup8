@@ -33,9 +33,20 @@ public class InternalController {
     }
 
     @GetMapping("/users/{id}/address-snapshot")
-    public ApiResult<Map<String, Object>> addressSnapshot(@PathVariable long id,
+    public ApiResult<Map<String, Object>> legacyAddressSnapshot(@PathVariable long id,
             @RequestParam(required = false) Long addressId) {
         return ApiResult.success(service.addressSnapshot(id, addressId));
+    }
+
+    @GetMapping("/users/{userId}/addresses/{addressId}")
+    public ApiResult<Map<String, Object>> addressSnapshot(@PathVariable long userId,
+            @PathVariable long addressId) {
+        return ApiResult.success(service.addressSnapshot(userId, addressId));
+    }
+
+    @GetMapping("/users/{userId}/shipping-address")
+    public ApiResult<Map<String, Object>> shippingAddress(@PathVariable long userId) {
+        return ApiResult.success(service.shippingAddress(userId));
     }
 
     @SuppressWarnings("unchecked")

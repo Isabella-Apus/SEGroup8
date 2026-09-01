@@ -1,0 +1,10 @@
+**/.git
+**/.idea
+**/.vscode
+src
+*.log
+*.md
+target/*.jar.original
+target/surefire-reports
+target/test-classes
+target/classes

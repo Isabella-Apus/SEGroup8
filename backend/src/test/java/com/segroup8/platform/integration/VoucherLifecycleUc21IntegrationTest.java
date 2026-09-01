@@ -123,7 +123,7 @@ class VoucherLifecycleUc21IntegrationTest extends DomainEIntegrationTestBase {
 
         ObjectNode invalidTotal = voucherJson("UC21非法数量");
         invalidTotal.put("totalCount", 0);
-        assertInvalid(invalidTotal);
+        assertValidationInvalid(invalidTotal);
 
         assertEquals(0, db.queryForObject("select count(*) from voucher", Integer.class));
     }
@@ -155,6 +155,15 @@ class VoucherLifecycleUc21IntegrationTest extends DomainEIntegrationTestBase {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(body)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value(400));
+    }
+
+    private void assertValidationInvalid(ObjectNode body) throws Exception {
+        mvc.perform(post("/api/voucher/seller")
+                        .header("Authorization", bearer(sellerToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(body)))
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400));
     }
 }

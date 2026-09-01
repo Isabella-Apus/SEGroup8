@@ -50,7 +50,27 @@ jobs:
           "-Dgroups=DOMAIN_A" clean test
       - name: Run Domain B (UC06-UC10) microservice tests
         if: inputs.domain == 'B'
-        run: mvn -B --no-transfer-progress -f microservices/pom.xml -Pdomain-b clean test
+        run: mvn -B --no-transfer-progress -f microservices/pom.xml -Pdomain-b clean verify
+      - name: Require Domain B MySQL integration test to execute
+        if: inputs.domain == 'B'
+        shell: bash
+        run: |
+          report=microservices/catalog-shop-service/target/surefire-reports/TEST-com.segroup8.catalogshop.MySqlSchemaOwnershipIntegrationTest.xml
+          test -f "$report"
+          python - "$report" <<'PY'
+          import sys, xml.etree.ElementTree as ET
+          suite = ET.parse(sys.argv[1]).getroot()
+          if int(suite.attrib.get("tests", "0")) < 1 or int(suite.attrib.get("skipped", "0")) != 0:
+              raise SystemExit("required MySQL integration test was skipped")
+          PY
+      - name: Upload tested catalog-shop JAR for full-system E2E
+        if: inputs.domain == 'B'
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalog-shop-e2e-jar
+          path: microservices/catalog-shop-service/target/catalog-shop-service-1.0.0.jar
+          if-no-files-found: error
+          retention-days: 3
       - name: Run Domain C (UC11-UC15) tests and collect evidence
         if: inputs.domain == 'C'
         run: node 04_tests/domains/C-order-fulfillment/run-domain-c-tests.mjs --suite DOMAIN_C --goal verify

@@ -33,6 +33,40 @@ backend:
         percent: 50
         periodSeconds: 15
 
+messaging:
+  # The messaging service is delivered by its own pipeline. Keep the shared
+  # platform release installable without a messaging image or secret.
+  enabled: false
+  replicaCount: 1
+  image:
+    repository: ""
+    # CI supplies an immutable sha-<git-sha> tag; no latest fallback is allowed.
+    tag: ""
+    pullPolicy: IfNotPresent
+  secretName: segroup8-messaging-secret
+  deployment:
+    version: ""
+    commit: ""
+    buildTime: ""
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 768Mi
+  config:
+    identityServiceUrl: http://identity-governance-service:8091
+    realtimeAllowedOriginPatterns: ""
+    identityConnectTimeoutMs: "2000"
+    identityReadTimeoutMs: "3000"
+    identityMaxAttempts: "3"
+    identityRetryBackoffMs: "100"
+    inboxPollDelayMs: "1000"
+    inboxMaxRetries: "5"
+    deliveryPollDelayMs: "1000"
+    deliveryMaxRetries: "5"
+
 frontend:
   replicaCount: 1
   image:
@@ -46,54 +80,6 @@ frontend:
     limits:
       cpu: 250m
       memory: 256Mi
-
-secondhand:
-  enabled: false
-  replicaCount: 1
-  image:
-    repository: ""
-    tag: ""
-    pullPolicy: IfNotPresent
-  secretName: segroup8-secondhand-secret
-  service:
-    port: 8080
-  deployment:
-    version: ""
-    commit: ""
-    buildTime: ""
-  orderServiceUrl: http://segroup8-order:8085
-  identityServiceUrl: http://identity-governance-service:8091
-  catalogShopServiceUrl: http://catalog-shop-service:8080
-  orderConnectTimeout: 1s
-  orderReadTimeout: 3s
-  orderMaxAttempts: 20
-  identityConnectTimeout: 1s
-  identityReadTimeout: 3s
-  tradeRecoveryDelayMs: 5000
-  tradeRecoveryBatchSize: 20
-  schedulingPoolSize: 2
-  auctionSettlementDelayMs: 5000
-  resources:
-    requests:
-      cpu: 100m
-      memory: 256Mi
-    limits:
-      cpu: 500m
-      memory: 768Mi
-  autoscaling:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 4
-    targetCPUUtilizationPercentage: 70
-    behavior:
-      scaleUp:
-        stabilizationWindowSeconds: 0
-        pods: 2
-        periodSeconds: 15
-      scaleDown:
-        stabilizationWindowSeconds: 60
-        percent: 50
-        periodSeconds: 15
 
 identityGovernance:
   # The component is enabled by its own service pipeline after the shared
@@ -141,9 +127,10 @@ order:
   service:
     port: 8085
   downstream:
-    catalogUrl: http://catalog-shop-service:8080
-    financeUrl: http://benefits-finance-service:8080
-    messagingUrl: http://messaging-service:8080
+    catalogUrl: http://segroup8-catalog-shop:8080
+    financeUrl: http://benefits-finance:8085
+    messagingUrl: http://messaging:8084
+    secondhandUrl: http://secondhand-service:8080
   resources:
     requests:
       cpu: 100m
@@ -152,6 +139,54 @@ order:
       cpu: 500m
       memory: 768Mi
 
+secondhand:
+  enabled: false
+  replicaCount: 1
+  image:
+    repository: ""
+    tag: ""
+    pullPolicy: IfNotPresent
+  secretName: segroup8-secondhand-secret
+  service:
+    port: 8080
+  deployment:
+    version: ""
+    commit: ""
+    buildTime: ""
+  orderServiceUrl: http://segroup8-order:8085
+  identityServiceUrl: http://identity-governance-service:8091
+  messagingServiceUrl: http://messaging:8084
+  catalogShopServiceUrl: http://segroup8-catalog-shop:8080
+  orderConnectTimeout: 1s
+  orderReadTimeout: 2s
+  orderMaxAttempts: 3
+  identityConnectTimeout: 1s
+  identityReadTimeout: 3s
+  tradeRecoveryDelayMs: 5000
+  tradeRecoveryBatchSize: 20
+  schedulingPoolSize: 2
+  auctionSettlementDelayMs: 5000
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 768Mi
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 70
+    behavior:
+      scaleUp:
+        stabilizationWindowSeconds: 0
+        pods: 2
+        periodSeconds: 15
+      scaleDown:
+        stabilizationWindowSeconds: 60
+        percent: 50
+        periodSeconds: 15
 mysql:
   image:
     repository: mysql
@@ -182,3 +217,57 @@ deployment:
   version: ""
   commit: ""
   buildTime: ""
+
+catalogShop:
+  # Enabled explicitly by the catalog-shop release workflow so the existing
+  # monolith release is not changed before its database Secret is provisioned.
+  enabled: false
+  replicaCount: 1
+  image:
+    repository: ""
+    tag: ""
+    pullPolicy: IfNotPresent
+  secretName: segroup8-catalog-shop-secret
+  identityStatusCheckUrl: http://identity-governance-service:8091/internal/auth/introspect
+  messagingEventUrl: http://messaging:8084
+  orderEventUrl: http://segroup8-order:8085
+  deployment:
+    version: ""
+    commit: ""
+    buildTime: ""
+  resources:
+    requests: {cpu: 200m, memory: 256Mi}
+    limits: {cpu: "1", memory: 768Mi}
+  hpa:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 65
+
+benefitsFinance:
+  enabled: false
+  replicas: 1
+  image:
+    repository: segroup8/benefits-finance
+    tag: dev
+    commit: unknown
+    buildTime: unknown
+    pullPolicy: IfNotPresent
+  service:
+    port: 8085
+  secretName: benefits-finance-secrets
+  config:
+    currency: CNY
+    orderServiceUrl: http://segroup8-order:8085
+    quoteTtlSeconds: "300"
+    reservationTtlSeconds: "900"
+    outboxEventSinkUrl: http://messaging:8084/internal/events
+    outboxPollMs: "5000"
+    outboxBatchSize: "50"
+    outboxMaxAttempts: "8"
+    httpConnectTimeoutMs: "1000"
+    httpReadTimeoutMs: "3000"
+    javaToolOptions: "-Djava.io.tmpdir=/tmp"
+  resources:
+    requests: { cpu: 100m, memory: 256Mi }
+    limits: { cpu: 500m, memory: 512Mi }

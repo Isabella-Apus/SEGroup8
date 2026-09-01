@@ -1,0 +1,13 @@
+{{- if .Values.benefitsFinance.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: benefits-finance
+  labels: { app.kubernetes.io/name: benefits-finance }
+spec:
+  selector: { app.kubernetes.io/name: benefits-finance }
+  ports:
+    - name: http
+      port: {{ .Values.benefitsFinance.service.port }}
+      targetPort: http
+{{- end }}

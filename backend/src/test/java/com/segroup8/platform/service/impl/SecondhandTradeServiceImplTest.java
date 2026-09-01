@@ -24,6 +24,7 @@ import com.segroup8.platform.realtime.RealtimePushService;
 import com.segroup8.platform.service.ChatService;
 import com.segroup8.platform.service.NotificationService;
 import com.segroup8.platform.service.settlement.EscrowSettlementService;
+import com.segroup8.platform.event.ProducerOutboxService;
 import com.segroup8.platform.vo.ProductNegotiationVO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,6 +86,8 @@ class SecondhandTradeServiceImplTest {
 
     @Mock
     private EscrowSettlementService escrowSettlementService;
+    @Mock
+    private ProducerOutboxService outbox;
 
     private SecondhandTradeServiceImpl secondhandTradeService;
 
@@ -92,7 +95,7 @@ class SecondhandTradeServiceImplTest {
     void setUp() {
         secondhandTradeService = new SecondhandTradeServiceImpl(productNegotiationMapper, productAuctionMapper,
                 auctionLogMapper, secondhandProductMapper, userMapper, orderInfoMapper, orderItemMapper,
-                chatService, realtimePushService, notificationService, escrowSettlementService);
+                chatService, realtimePushService, notificationService, escrowSettlementService, outbox);
     }
 
     @AfterEach
@@ -225,6 +228,9 @@ class SecondhandTradeServiceImplTest {
 
         verify(orderInfoMapper).insert(any(OrderInfo.class));
         verify(orderItemMapper).insert(any(OrderItem.class));
+        verify(outbox).publish(org.mockito.ArgumentMatchers.eq("SecondhandTradeSettled.v1"),
+                org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.eq("SECONDHAND_TRADE"),
+                org.mockito.ArgumentMatchers.eq(11L), org.mockito.ArgumentMatchers.any());
     }
 
     private ProductNegotiation negotiation(String status) {

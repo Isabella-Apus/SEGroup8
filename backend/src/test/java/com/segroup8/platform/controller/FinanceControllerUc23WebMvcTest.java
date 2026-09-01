@@ -113,7 +113,7 @@ class FinanceControllerUc23WebMvcTest {
         mockMvc.perform(post("/api/finance/recharge")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"amount\":0,\"channel\":\"WECHAT\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400));
 
         verifyNoInteractions(escrowSettlementService);

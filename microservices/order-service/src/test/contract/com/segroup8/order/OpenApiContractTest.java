@@ -44,7 +44,7 @@ class OpenApiContractTest {
             "GET /api/admin/orders", "GET /api/admin/orders/list", "GET /api/admin/orders/{id}",
             "GET /api/admin/orders/detail/{id}", "GET /api/admin/orders/{id}/after-sale-logs",
             "POST /api/admin/orders/batch-close", "POST /api/admin/orders/{id}/refund/approve",
-            "POST /api/admin/orders/{id}/refund/reject", "POST /internal/orders/secondhand",
+            "POST /api/admin/orders/{id}/refund/reject", "POST /internal/events", "POST /internal/orders/secondhand",
             "GET /internal/orders/by-business-key/{key}", "GET /internal/orders/{id}/snapshot");
 
     @Autowired @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping mappings;
@@ -64,7 +64,7 @@ class OpenApiContractTest {
                     .forEach(method -> actual.add(method.name() + " " + path)));
         });
         assertThat(actual).containsExactlyInAnyOrderElementsOf(RUNTIME_OPERATIONS);
-        assertThat(actual).hasSize(36);
+        assertThat(actual).hasSize(37);
     }
 
     @Test
@@ -79,7 +79,7 @@ class OpenApiContractTest {
         assertThat(document.get("openapi")).isEqualTo("3.0.3");
         Map<String,Object> paths = (Map<String,Object>) document.get("paths");
         assertThat(paths).containsKeys("/api/order/create", "/api/review/followup",
-                "/api/logistics/order/{orderId}/trace", "/internal/orders/secondhand");
+                "/api/logistics/order/{orderId}/trace", "/internal/events", "/internal/orders/secondhand");
 
         for (var pathEntry : paths.entrySet()) {
             var matcher = TEMPLATE.matcher(pathEntry.getKey());
@@ -113,7 +113,7 @@ class OpenApiContractTest {
 
         Set<String> reviewedOperations = operations(reviewed);
         Set<String> generatedOperations = operations(generated);
-        assertThat(reviewedOperations).hasSize(36);
+        assertThat(reviewedOperations).hasSize(37);
         assertThat(generatedOperations)
                 .as("Springdoc runtime operations must match the reviewed OpenAPI YAML")
                 .containsExactlyInAnyOrderElementsOf(reviewedOperations);

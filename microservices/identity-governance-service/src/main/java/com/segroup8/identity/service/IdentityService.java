@@ -119,13 +119,32 @@ public class IdentityService {
     }
 
     public Map<String, Object> addressSnapshot(long userId, Long addressId) {
-        String columns = "SELECT id,user_id,receiver_name,receiver_phone,province,city,detail_address "
-                + "FROM address WHERE user_id=? ";
-        Optional<Map<String, Object>> address = addressId == null
-                ? one(columns + "ORDER BY is_default DESC,id LIMIT 1", userId)
-                : one(columns + "AND id=? LIMIT 1", userId, addressId);
-        return address.orElseThrow(() -> new ApiException(404,
-                addressId == null ? "用户没有可用收货地址" : "收货地址不存在或不属于该用户"));
+        return addressId == null
+                ? addressSnapshot("WHERE user_id=? ORDER BY is_default DESC,id LIMIT 1", userId)
+                : addressSnapshot("WHERE id=? AND user_id=?", addressId, userId);
+    }
+
+    public Map<String, Object> shippingAddress(long userId) {
+        return addressSnapshot("WHERE user_id=? ORDER BY is_default DESC,id LIMIT 1", userId);
+    }
+
+    private Map<String, Object> addressSnapshot(String suffix, Object... arguments) {
+        List<Map<String, Object>> matches = jdbc.query(
+                "SELECT id,user_id,receiver_name,receiver_phone,province,city,detail_address FROM address " + suffix,
+                (rs, row) -> {
+                    Map<String, Object> snapshot = new LinkedHashMap<>();
+                    snapshot.put("id", rs.getLong("id"));
+                    snapshot.put("addressId", rs.getLong("id"));
+                    snapshot.put("userId", rs.getLong("user_id"));
+                    snapshot.put("receiverName", rs.getString("receiver_name"));
+                    snapshot.put("receiverPhone", rs.getString("receiver_phone"));
+                    snapshot.put("province", rs.getString("province"));
+                    snapshot.put("city", rs.getString("city"));
+                    snapshot.put("detailAddress", rs.getString("detail_address"));
+                    return snapshot;
+                }, arguments);
+        if (matches.isEmpty()) throw new ApiException(404, "收货地址不存在或不属于该用户");
+        return matches.get(0);
     }
 
     @Transactional
@@ -237,8 +256,11 @@ public class IdentityService {
             throw new ApiException(404, "用户不存在");
         }
         String action = banned ? "BAN_USER" : "UNBAN_USER";
+        UserAccount changed = findUser(userId).orElseThrow(() -> new ApiException(404, "用户不存在"));
         outbox("UserAccessChanged.v1", "user", userId,
-                Map.of("userId", userId, "status", banned ? "BANNED" : "NORMAL"));
+                Map.of("userId", userId, "status", banned ? "BANNED" : "NORMAL",
+                        "version", changed.accessVersion(), "role", changed.role(),
+                        "displayName", safe(changed.nickname()), "avatarUrl", safe(changed.avatar())));
         audit(action, "USER", userId, banned ? "管理员封禁用户" : "管理员解禁用户");
     }
 

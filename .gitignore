@@ -18,6 +18,7 @@ frontend/blob-report/
 04_tests/**/evidence/**/*.webm
 .ci/
 05_management/archive/test-assets/runtime-reports/
+.ms06-v1-checkpoint/
 
 # backend
 backend/target/

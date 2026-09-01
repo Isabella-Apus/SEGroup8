@@ -16,8 +16,11 @@ fi
 command -v helm >/dev/null
 command -v kubectl >/dev/null
 command -v curl >/dev/null
+command -v flock >/dev/null
 
-export KUBECONFIG="${KUBECONFIG:-$HOME/.kube/config}"
+export KUBECONFIG="$HOME/.kube/config"
+exec 9>"$HOME/.segroup8-helm.lock"
+flock -w 3300 9 || { echo "Timed out waiting for the shared Helm deployment lock" >&2; exit 1; }
 work_dir="$(mktemp -d)"
 
 cleanup() {
@@ -51,7 +54,6 @@ tar -xzf "$archive" -C "$work_dir"
 chart_dir="$work_dir/deploy/helm/segroup8"
 test -f "$chart_dir/Chart.yaml"
 
-kubectl get namespace "$k8s_namespace" >/dev/null
 kubectl --namespace "$k8s_namespace" get secret acr-pull-secret >/dev/null
 kubectl --namespace "$k8s_namespace" get secret segroup8-secondhand-secret >/dev/null
 helm --namespace "$k8s_namespace" status segroup8 >/dev/null
@@ -66,7 +68,11 @@ helm upgrade --install segroup8 "$chart_dir" \
   --timeout 10m \
   --history-max 5 \
   --set secondhand.enabled=true \
-  --set secondhand.autoscaling.enabled=true \
+  --set secondhand.autoscaling.enabled=false \
+  --set catalogShop.replicaCount=1 \
+  --set catalogShop.hpa.enabled=false \
+  --set benefitsFinance.replicas=1 \
+  --set identityGovernance.autoscaling.enabled=false \
   --set-string "secondhand.image.repository=$registry/$registry_namespace/secondhand" \
   --set-string "secondhand.image.tag=$image_tag" \
   --set-string "secondhand.deployment.version=$image_tag" \
@@ -74,16 +80,15 @@ helm upgrade --install segroup8 "$chart_dir" \
   --set-string "secondhand.deployment.buildTime=$build_time"
 
 kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-secondhand --timeout=5m
-secondhand_info="$(kubectl --namespace "$k8s_namespace" exec deployment/segroup8-secondhand -- \
-  curl --fail --silent --show-error http://127.0.0.1:8080/actuator/info)"
+service_ip="$(kubectl --namespace "$k8s_namespace" get service secondhand-service -o jsonpath='{.spec.clusterIP}')"
+[[ -n "$service_ip" && "$service_ip" != "None" ]]
+service_url="http://${service_ip}:8080"
+secondhand_info="$(curl --fail --silent --show-error "$service_url/actuator/info")"
 grep -F '"version":"'"$image_tag"'"' <<<"$secondhand_info" >/dev/null
 grep -F '"commit":"'"$release_id"'"' <<<"$secondhand_info" >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/segroup8-secondhand -- \
-  curl --fail --silent --show-error http://127.0.0.1:8080/actuator/health/liveness >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/segroup8-secondhand -- \
-  curl --fail --silent --show-error http://127.0.0.1:8080/actuator/health/readiness >/dev/null
-secondhand_smoke="$(kubectl --namespace "$k8s_namespace" exec deployment/segroup8-secondhand -- \
-  curl --fail --silent --show-error http://127.0.0.1:8080/api/secondhand/list)"
+curl --fail --silent --show-error "$service_url/actuator/health/liveness" >/dev/null
+curl --fail --silent --show-error "$service_url/actuator/health/readiness" >/dev/null
+secondhand_smoke="$(curl --fail --silent --show-error "$service_url/api/secondhand/list")"
 grep -F '"code":0' <<<"$secondhand_smoke" >/dev/null
 
 echo "secondhand-service deployed successfully as $image_tag"

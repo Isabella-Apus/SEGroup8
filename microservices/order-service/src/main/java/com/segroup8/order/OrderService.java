@@ -118,7 +118,7 @@ class OrderService {
         if (order.orderStatus()==OrderState.PENDING_PAY) {
             transactions.executeWithoutResult(s->repository.transition(orderId,order.version(),OrderState.PENDING_PAY,
                     OrderState.PAYMENT_PENDING,"payment_request_id=?",paymentId));
-            result=downstream.debit(paymentId,buyerId,order.payableAmount(),pay.payMode(),pay.payChannel());
+            result=downstream.debit(paymentId,orderId,buyerId,order.payableAmount(),pay.payMode(),pay.payChannel());
             if(result==RemoteResult.UNKNOWN) result=downstream.paymentResult(paymentId);
         } else if (order.orderStatus()==OrderState.PAYMENT_PENDING && paymentId.equals(repository.paymentRequestId(orderId))) {
             result=downstream.paymentResult(paymentId);
@@ -161,7 +161,7 @@ class OrderService {
         try{
             String reservationId = repository.reservationId(orderId);
             if (reservationId != null) downstream.releaseReservation(reservationId);
-            downstream.releaseVoucher("voucher-release:"+key,repository.voucherId(orderId),buyerId);
+            downstream.releaseVoucher("voucher-release:"+key,orderId,repository.voucherId(orderId),buyerId);
         }catch(RuntimeException ex){
             transactions.executeWithoutResult(s->repository.saga("cancel:"+key,orderId,"CANCEL","COMPENSATION_PENDING","RELEASE",ex.getMessage()));
             throw new OrderException("CANCELLATION_PENDING","Cancellation compensation will be retried",503);
@@ -202,7 +202,7 @@ class OrderService {
         order.items().stream().filter(i->i.sellerUserId()!=null).forEach(i->sellerAmounts.merge(i.sellerUserId(),
                 i.price().multiply(BigDecimal.valueOf(i.quantity())),BigDecimal::add));
         for(var settlement:sellerAmounts.entrySet()){
-            String settlementId="settlement:"+key+":"+settlement.getKey();
+            String settlementId="settlement:"+orderId+":"+settlement.getKey();
             RemoteResult result=downstream.settlementResult(settlementId);
             if(result==null)result=RemoteResult.UNKNOWN;
             if(result==RemoteResult.UNKNOWN)result=downstream.settle(settlementId,orderId,settlement.getKey(),settlement.getValue());
@@ -251,7 +251,8 @@ class OrderService {
         RemoteResult result;
         if("REQUESTED".equals(order.refundStatus())){
             transactions.executeWithoutResult(s->repository.refundStatus(orderId,"REFUND_PENDING",null,refundId));
-            result=downstream.refund(refundId,orderId,order.buyerUserId(),order.payableAmount());
+            result=downstream.refund(refundId,repository.paymentRequestId(orderId),orderId,
+                    order.buyerUserId(),order.payableAmount());
             if(result==RemoteResult.UNKNOWN)result=downstream.refundResult(refundId);
         }else if(refundId.equals(repository.refundRequestId(orderId))){result=downstream.refundResult(refundId);}
         else throw new OrderException("REFUND_ALREADY_IN_PROGRESS","Refund is in progress under another request",409);

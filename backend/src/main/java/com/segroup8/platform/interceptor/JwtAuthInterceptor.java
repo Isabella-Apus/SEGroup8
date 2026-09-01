@@ -21,6 +21,7 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        UserContext.clear();
         if (CorsUtils.isPreFlightRequest(request)) {
             response.setStatus(HttpServletResponse.SC_OK);
             return true;
@@ -32,10 +33,15 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
         }
 
         String token = auth.substring(7);
-        Claims claims = jwtUtils.parseToken(token);
-        Object uidObj = claims.get("uid");
-        Long uid = uidObj instanceof Number ? ((Number) uidObj).longValue() : Long.valueOf(uidObj.toString());
-        UserContext.setUserId(uid);
+        try {
+            Claims claims = jwtUtils.parseToken(token);
+            Object uidObj = claims.get("uid");
+            Long uid = uidObj instanceof Number ? ((Number) uidObj).longValue() : Long.valueOf(uidObj.toString());
+            UserContext.setUserId(uid);
+        } catch (Exception ex) {
+            UserContext.clear();
+            throw new BusinessException(401, "无效或过期的登录令牌");
+        }
         return true;
     }
 

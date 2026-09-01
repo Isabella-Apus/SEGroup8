@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS `outbox_event`;
 DROP TABLE IF EXISTS `idempotency_record`;
 DROP TABLE IF EXISTS `address`;
 DROP TABLE IF EXISTS `chat_message`;
@@ -452,4 +453,20 @@ CREATE TABLE `idempotency_record` (
   `create_time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   `update_time` TIMESTAMP,
   UNIQUE (`user_id`, `request_method`, `request_path`, `idempotency_key`)
+);
+
+CREATE TABLE `outbox_event` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `event_id` VARCHAR(64) NOT NULL UNIQUE,
+  `event_type` VARCHAR(64) NOT NULL,
+  `aggregate_type` VARCHAR(64) NOT NULL,
+  `aggregate_id` VARCHAR(128) NOT NULL,
+  `payload` CLOB NOT NULL,
+  `trace_id` VARCHAR(128) NOT NULL,
+  `status` VARCHAR(16) NOT NULL DEFAULT 'PENDING',
+  `retry_count` INT NOT NULL DEFAULT 0,
+  `next_attempt_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `published_at` TIMESTAMP,
+  `last_error` VARCHAR(500)
 );

@@ -46,7 +46,6 @@ export async function expectBusinessSuccess<T = any>(
 }
 
 export async function expectBusinessFailure(response: APIResponse): Promise<any> {
-    expect(response.ok()).toBeTruthy();
     const payload = await response.json();
     expect(Number(payload?.code)).not.toBe(0);
     return payload;

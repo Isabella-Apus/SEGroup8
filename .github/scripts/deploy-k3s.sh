@@ -31,8 +31,11 @@ fi
 command -v helm >/dev/null
 command -v kubectl >/dev/null
 command -v curl >/dev/null
+command -v flock >/dev/null
 
-export KUBECONFIG="${KUBECONFIG:-$HOME/.kube/config}"
+export KUBECONFIG="$HOME/.kube/config"
+exec 9>"$HOME/.segroup8-helm.lock"
+flock -w 3300 9 || { echo "Timed out waiting for the shared Helm deployment lock" >&2; exit 1; }
 work_dir="$(mktemp -d)"
 
 cleanup() {
@@ -67,7 +70,6 @@ schema_file="$work_dir/backend/src/main/resources/schema.sql"
 test -f "$chart_dir/Chart.yaml"
 test -s "$schema_file"
 
-kubectl get namespace "$k8s_namespace" >/dev/null
 for secret_name in acr-pull-secret segroup8-backend-secret segroup8-mysql-secret; do
   kubectl --namespace "$k8s_namespace" get secret "$secret_name" >/dev/null
 done
@@ -90,6 +92,11 @@ helm upgrade --install segroup8 "$chart_dir" \
   --set-string "deployment.version=$image_tag" \
   --set-string "deployment.commit=$release_id" \
   --set-string "deployment.buildTime=$build_time" \
+  --set catalogShop.replicaCount=1 \
+  --set catalogShop.hpa.enabled=false \
+  --set benefitsFinance.replicas=1 \
+  --set identityGovernance.autoscaling.enabled=false \
+  --set secondhand.autoscaling.enabled=false \
   --set-file "mysql.initSchema=$schema_file"
 
 kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-backend --timeout=5m
