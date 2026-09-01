@@ -23,6 +23,7 @@ on:
       - "deploy/helm/segroup8/templates/benefits-finance-*.yaml"
       - "deploy/helm/segroup8/templates/ingress.yaml"
       - "deploy/helm/segroup8/values.yaml"
+      - ".github/scripts/sync-acr-pull-secret.sh"
       - ".github/workflows/benefits-finance-service-ci-cd.yml"
   push:
     branches: [main]
@@ -47,6 +48,7 @@ on:
       - "deploy/helm/segroup8/templates/benefits-finance-*.yaml"
       - "deploy/helm/segroup8/templates/ingress.yaml"
       - "deploy/helm/segroup8/values.yaml"
+      - ".github/scripts/sync-acr-pull-secret.sh"
       - ".github/workflows/benefits-finance-service-ci-cd.yml"
   workflow_dispatch:
 
@@ -427,11 +429,15 @@ jobs:
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
+          ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
           IMAGE: ${{ needs.publish-benefits-finance-image.outputs.image }}
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
         shell: bash
         run: |
           set -Eeuo pipefail
+          .github/scripts/sync-acr-pull-secret.sh
           archive="/tmp/benefits-finance-$GITHUB_SHA.tgz"
           scp "benefits-finance-chart-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$archive"
           repository="${IMAGE%:*}"; tag="${IMAGE##*:}"

@@ -34,6 +34,10 @@ spec:
               valueFrom: {secretKeyRef: {name: {{ .Values.catalogShop.secretName }}, key: DB_USERNAME}}
             - name: DB_PASSWORD
               valueFrom: {secretKeyRef: {name: {{ .Values.catalogShop.secretName }}, key: DB_PASSWORD}}
+            - name: SPRING_FLYWAY_USER
+              valueFrom: {secretKeyRef: {name: {{ .Values.catalogShop.secretName }}, key: FLYWAY_DB_USERNAME}}
+            - name: SPRING_FLYWAY_PASSWORD
+              valueFrom: {secretKeyRef: {name: {{ .Values.catalogShop.secretName }}, key: FLYWAY_DB_PASSWORD}}
             - name: INTERNAL_SERVICE_TOKEN
               valueFrom: {secretKeyRef: {name: {{ .Values.catalogShop.secretName }}, key: INTERNAL_SERVICE_TOKEN}}
             - name: JWT_SECRET

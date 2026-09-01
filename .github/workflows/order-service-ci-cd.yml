@@ -23,6 +23,7 @@ on:
       - "deploy/helm/segroup8/templates/ingress.yaml"
       - "deploy/helm/segroup8/values.yaml"
       - ".github/scripts/deploy-order-k3s.sh"
+      - ".github/scripts/sync-acr-pull-secret.sh"
       - ".github/scripts/collect-order-k3s-diagnostics.sh"
       - ".github/workflows/order-service-ci-cd.yml"
   push:
@@ -48,6 +49,7 @@ on:
       - "deploy/helm/segroup8/templates/ingress.yaml"
       - "deploy/helm/segroup8/values.yaml"
       - ".github/scripts/deploy-order-k3s.sh"
+      - ".github/scripts/sync-acr-pull-secret.sh"
       - ".github/scripts/collect-order-k3s-diagnostics.sh"
       - ".github/workflows/order-service-ci-cd.yml"
   workflow_dispatch:
@@ -385,9 +387,12 @@ jobs:
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           ACR_REGISTRY: ${{ vars.ACR_REGISTRY }}
           ACR_NAMESPACE: ${{ vars.ACR_NAMESPACE }}
+          ACR_USERNAME: ${{ secrets.ACR_USERNAME }}
+          ACR_PASSWORD: ${{ secrets.ACR_PASSWORD }}
           K8S_NAMESPACE: ${{ vars.K8S_NAMESPACE || 'segroup8' }}
         run: |
           set -o pipefail
+          .github/scripts/sync-acr-pull-secret.sh
           archive="/tmp/order-chart-$GITHUB_SHA.tar.gz"
           scp "order-chart-$GITHUB_SHA.tar.gz" "$DEPLOY_USER@$DEPLOY_HOST:$archive"
           ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=10 "$DEPLOY_USER@$DEPLOY_HOST" "bash -s -- '$GITHUB_SHA' '$archive' '$ACR_REGISTRY' '$ACR_NAMESPACE' 'sha-$GITHUB_SHA' '$K8S_NAMESPACE'" < .github/scripts/deploy-order-k3s.sh | tee order-deployment.log
