@@ -51,7 +51,6 @@ tar -xzf "$archive" -C "$work_dir"
 chart_dir="$work_dir/deploy/helm/segroup8"
 test -f "$chart_dir/Chart.yaml"
 
-kubectl get namespace "$k8s_namespace" >/dev/null
 kubectl --namespace "$k8s_namespace" get secret acr-pull-secret >/dev/null
 kubectl --namespace "$k8s_namespace" get secret identity-governance-secret >/dev/null
 

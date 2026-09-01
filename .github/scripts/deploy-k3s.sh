@@ -67,7 +67,6 @@ schema_file="$work_dir/backend/src/main/resources/schema.sql"
 test -f "$chart_dir/Chart.yaml"
 test -s "$schema_file"
 
-kubectl get namespace "$k8s_namespace" >/dev/null
 for secret_name in acr-pull-secret segroup8-backend-secret segroup8-mysql-secret; do
   kubectl --namespace "$k8s_namespace" get secret "$secret_name" >/dev/null
 done
