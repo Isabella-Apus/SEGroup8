@@ -35,7 +35,7 @@ cat <<EOF | ssh \
   -o ServerAliveInterval=30 \
   -o ServerAliveCountMax=5 \
   "$DEPLOY_USER@$DEPLOY_HOST" \
-  "kubectl --namespace '$K8S_NAMESPACE' apply -f - >/dev/null"
+  "export KUBECONFIG=\"\$HOME/.kube/config\"; kubectl --namespace '$K8S_NAMESPACE' apply -f - >/dev/null"
 apiVersion: v1
 kind: Secret
 metadata:
@@ -50,6 +50,6 @@ ssh \
   -o ServerAliveInterval=30 \
   -o ServerAliveCountMax=5 \
   "$DEPLOY_USER@$DEPLOY_HOST" \
-  "kubectl --namespace '$K8S_NAMESPACE' get secret acr-pull-secret -o jsonpath='{.data.\\.dockerconfigjson}' | base64 -d | grep -Fq '\"$ACR_REGISTRY\"'"
+  "export KUBECONFIG=\"\$HOME/.kube/config\"; kubectl --namespace '$K8S_NAMESPACE' get secret acr-pull-secret -o jsonpath='{.data.\\.dockerconfigjson}' | base64 -d | grep -Fq '\"$ACR_REGISTRY\"'"
 
 echo "acr-pull-secret synchronized for $ACR_REGISTRY"

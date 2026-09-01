@@ -24,7 +24,7 @@ command -v helm >/dev/null
 command -v kubectl >/dev/null
 command -v wget >/dev/null
 
-export KUBECONFIG="${KUBECONFIG:-$HOME/.kube/config}"
+export KUBECONFIG="$HOME/.kube/config"
 work_dir="$(mktemp -d)"
 
 cleanup() {

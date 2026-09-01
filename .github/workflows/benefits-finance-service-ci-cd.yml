@@ -444,6 +444,7 @@ jobs:
           ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=10 "$DEPLOY_USER@$DEPLOY_HOST" bash -s -- \
             "$archive" "$K8S_NAMESPACE" "$repository" "$tag" "$GITHUB_SHA" <<'REMOTE' | tee benefits-finance-deployment.log
           set -Eeuo pipefail
+          export KUBECONFIG="$HOME/.kube/config"
           archive=$1; namespace=$2; repository=$3; tag=$4; git_sha=$5
           trap 'rm -f -- "$archive"' EXIT
           kubectl -n "$namespace" get secret benefits-finance-secrets >/dev/null
@@ -478,6 +479,7 @@ jobs:
           if test -f "$HOME/.ssh/id_ed25519"; then
             ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=3 "$DEPLOY_USER@$DEPLOY_HOST" bash -s -- \
               "$K8S_NAMESPACE" > benefits-finance-diagnostics.log 2>&1 <<'REMOTE' || true
+          export KUBECONFIG="$HOME/.kube/config"
           namespace=$1
           helm -n "$namespace" status segroup8 || true
           helm -n "$namespace" history segroup8 || true
