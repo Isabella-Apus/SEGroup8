@@ -337,7 +337,10 @@ jobs:
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
   deploy-production:
     name: Deploy images to production K3s
-    if: vars.ENABLE_PRODUCTION_DEPLOY == 'true'
+    if: >-
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      vars.ENABLE_PRODUCTION_DEPLOY == 'true'
     needs: publish-images
     runs-on: ubuntu-latest
     timeout-minutes: 45
