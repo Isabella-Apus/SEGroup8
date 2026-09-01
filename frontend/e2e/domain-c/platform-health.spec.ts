@@ -10,12 +10,21 @@ test.describe("@DOMAIN_C order fulfillment shared infrastructure", () => {
     }, testInfo) => {
         await login(page, testAccount);
 
+        const token = await page.evaluate(() =>
+            window.localStorage.getItem("segroup8_token"),
+        );
+        expect(token).toBeTruthy();
+        const contractResponse = await page.context().request.get(
+            "/api/order/list",
+            { headers: { Authorization: `Bearer ${token}` } },
+        );
+        expect(contractResponse.status()).toBe(200);
+        expect((await contractResponse.json())?.code).toBe(0);
+
         const orderResponsePromise = waitForApiResponse(page, "/api/order/list");
         await page.goto("/order");
         const orderResponse = await orderResponsePromise;
-        const payload = await orderResponse.json();
-
-        expect(payload?.code).toBe(0);
+        expect(orderResponse.status()).toBe(200);
         await expect(page).toHaveURL(/\/order$/);
         await expect(
             page.getByRole("heading", { name: "我的订单" }),

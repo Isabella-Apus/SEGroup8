@@ -77,9 +77,9 @@ helm upgrade --install segroup8 "$chart_dir" \
   --set-string "messaging.image.tag=$image_tag" \
   --set-string "messaging.config.realtimeAllowedOriginPatterns=$realtime_allowed_origins" \
   --set-string "messaging.config.identityServiceUrl=$identity_service_url" \
-  --set-string "deployment.version=$image_tag" \
-  --set-string "deployment.commit=$release_id" \
-  --set-string "deployment.buildTime=$build_time"
+  --set-string "messaging.deployment.version=$image_tag" \
+  --set-string "messaging.deployment.commit=$release_id" \
+  --set-string "messaging.deployment.buildTime=$build_time"
 
 kubectl --namespace "$k8s_namespace" rollout status deployment/messaging --timeout=5m
 messaging_info="$(kubectl --namespace "$k8s_namespace" exec deployment/messaging -- \

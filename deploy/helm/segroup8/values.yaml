@@ -30,6 +30,10 @@ messaging:
     tag: ""
     pullPolicy: IfNotPresent
   secretName: segroup8-messaging-secret
+  deployment:
+    version: ""
+    commit: ""
+    buildTime: ""
   resources:
     requests:
       cpu: 100m

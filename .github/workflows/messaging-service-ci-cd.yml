@@ -313,6 +313,9 @@ jobs:
             --set messaging.enabled=true \
             --set-string messaging.image.repository=registry.example/segroup8/messaging \
             --set-string messaging.image.tag=sha-test \
+            --set-string messaging.deployment.version=sha-test \
+            --set-string messaging.deployment.commit=0123456789012345678901234567890123456789 \
+            --set-string messaging.deployment.buildTime=2026-09-01T00:00:00Z \
             --set-string backend.image.repository=registry.example/segroup8/backend \
             --set-string backend.image.tag=sha-test \
             --set-string frontend.image.repository=registry.example/segroup8/frontend \
@@ -323,6 +326,9 @@ jobs:
             --set messaging.enabled=true \
             --set-string messaging.image.repository=registry.example/segroup8/messaging \
             --set-string messaging.image.tag=sha-test \
+            --set-string messaging.deployment.version=sha-test \
+            --set-string messaging.deployment.commit=0123456789012345678901234567890123456789 \
+            --set-string messaging.deployment.buildTime=2026-09-01T00:00:00Z \
             --set-string backend.image.repository=registry.example/segroup8/backend \
             --set-string backend.image.tag=sha-test \
             --set-string frontend.image.repository=registry.example/segroup8/frontend \
@@ -334,6 +340,8 @@ jobs:
           grep -q 'runAsGroup: 10001' messaging-rendered.yaml
           grep -q 'readOnlyRootFilesystem: true' messaging-rendered.yaml
           grep -q 'mountPath: /tmp' messaging-rendered.yaml
+          grep -A1 'name: APP_VERSION' messaging-rendered.yaml | grep -q 'value: "sha-test"'
+          grep -A1 'name: APP_COMMIT' messaging-rendered.yaml | grep -q 'value: "0123456789012345678901234567890123456789"'
 
   acceptance-summary:
     name: Current revision acceptance summary
