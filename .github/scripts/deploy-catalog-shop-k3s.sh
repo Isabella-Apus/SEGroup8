@@ -52,10 +52,13 @@ helm upgrade --install segroup8 "$chart_dir" \
   --set-string "catalogShop.deployment.buildTime=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-catalog-shop --timeout=5m
-service_info="$(kubectl --namespace "$k8s_namespace" exec deployment/segroup8-catalog-shop -- curl --fail --silent --show-error http://127.0.0.1:8080/actuator/info)"
+service_ip="$(kubectl --namespace "$k8s_namespace" get service segroup8-catalog-shop -o jsonpath='{.spec.clusterIP}')"
+[[ -n "$service_ip" && "$service_ip" != "None" ]]
+service_url="http://${service_ip}:8080"
+service_info="$(curl --fail --silent --show-error "$service_url/actuator/info")"
 grep -F '"version":"'"$image_tag"'"' <<<"$service_info" >/dev/null
 grep -F '"commit":"'"$release_id"'"' <<<"$service_info" >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/segroup8-catalog-shop -- curl --fail --silent --show-error http://127.0.0.1:8080/actuator/health/liveness >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/segroup8-catalog-shop -- curl --fail --silent --show-error http://127.0.0.1:8080/actuator/health/readiness >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/segroup8-catalog-shop -- curl --fail --silent --show-error http://127.0.0.1:8080/api/category/tree >/dev/null
+curl --fail --silent --show-error "$service_url/actuator/health/liveness" >/dev/null
+curl --fail --silent --show-error "$service_url/actuator/health/readiness" >/dev/null
+curl --fail --silent --show-error "$service_url/api/category/tree" >/dev/null
 echo "catalog-shop-service deployed successfully as $image_tag"

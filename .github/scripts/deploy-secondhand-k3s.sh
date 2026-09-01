@@ -76,16 +76,15 @@ helm upgrade --install segroup8 "$chart_dir" \
   --set-string "secondhand.deployment.buildTime=$build_time"
 
 kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-secondhand --timeout=5m
-secondhand_info="$(kubectl --namespace "$k8s_namespace" exec deployment/segroup8-secondhand -- \
-  curl --fail --silent --show-error http://127.0.0.1:8080/actuator/info)"
+service_ip="$(kubectl --namespace "$k8s_namespace" get service secondhand-service -o jsonpath='{.spec.clusterIP}')"
+[[ -n "$service_ip" && "$service_ip" != "None" ]]
+service_url="http://${service_ip}:8080"
+secondhand_info="$(curl --fail --silent --show-error "$service_url/actuator/info")"
 grep -F '"version":"'"$image_tag"'"' <<<"$secondhand_info" >/dev/null
 grep -F '"commit":"'"$release_id"'"' <<<"$secondhand_info" >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/segroup8-secondhand -- \
-  curl --fail --silent --show-error http://127.0.0.1:8080/actuator/health/liveness >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/segroup8-secondhand -- \
-  curl --fail --silent --show-error http://127.0.0.1:8080/actuator/health/readiness >/dev/null
-secondhand_smoke="$(kubectl --namespace "$k8s_namespace" exec deployment/segroup8-secondhand -- \
-  curl --fail --silent --show-error http://127.0.0.1:8080/api/secondhand/list)"
+curl --fail --silent --show-error "$service_url/actuator/health/liveness" >/dev/null
+curl --fail --silent --show-error "$service_url/actuator/health/readiness" >/dev/null
+secondhand_smoke="$(curl --fail --silent --show-error "$service_url/api/secondhand/list")"
 grep -F '"code":0' <<<"$secondhand_smoke" >/dev/null
 
 echo "secondhand-service deployed successfully as $image_tag"

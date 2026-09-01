@@ -22,7 +22,7 @@ fi
 
 command -v helm >/dev/null
 command -v kubectl >/dev/null
-command -v wget >/dev/null
+command -v curl >/dev/null
 command -v flock >/dev/null
 
 export KUBECONFIG="$HOME/.kube/config"
@@ -84,13 +84,13 @@ helm upgrade --install segroup8 "$chart_dir" \
   --set-string "messaging.deployment.buildTime=$build_time"
 
 kubectl --namespace "$k8s_namespace" rollout status deployment/messaging --timeout=5m
-messaging_info="$(kubectl --namespace "$k8s_namespace" exec deployment/messaging -- \
-  wget -qO- http://127.0.0.1:8084/actuator/info)"
+service_ip="$(kubectl --namespace "$k8s_namespace" get service messaging -o jsonpath='{.spec.clusterIP}')"
+[[ -n "$service_ip" && "$service_ip" != "None" ]]
+service_url="http://${service_ip}:8084"
+messaging_info="$(curl --fail --silent --show-error "$service_url/actuator/info")"
 grep -F '"version":"'"$image_tag"'"' <<<"$messaging_info" >/dev/null
 grep -F '"commit":"'"$release_id"'"' <<<"$messaging_info" >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/messaging -- \
-  wget -qO- http://127.0.0.1:8084/actuator/health/liveness >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/messaging -- \
-  wget -qO- http://127.0.0.1:8084/actuator/health/readiness >/dev/null
+curl --fail --silent --show-error "$service_url/actuator/health/liveness" >/dev/null
+curl --fail --silent --show-error "$service_url/actuator/health/readiness" >/dev/null
 
 echo "messaging-service deployed successfully as $image_tag"

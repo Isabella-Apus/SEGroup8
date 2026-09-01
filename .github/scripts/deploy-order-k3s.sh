@@ -53,11 +53,14 @@ helm upgrade --install segroup8 "$chart_dir" \
   --set-string "order.deployment.buildTime=$build_time"
 
 kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-order --timeout=5m
-order_info="$(kubectl --namespace "$k8s_namespace" exec deployment/segroup8-order -- curl --fail --silent --show-error http://127.0.0.1:8085/actuator/info)"
+service_ip="$(kubectl --namespace "$k8s_namespace" get service segroup8-order -o jsonpath='{.spec.clusterIP}')"
+[[ -n "$service_ip" && "$service_ip" != "None" ]]
+service_url="http://${service_ip}:8085"
+order_info="$(curl --fail --silent --show-error "$service_url/actuator/info")"
 grep -F '"version":"'"$image_tag"'"' <<<"$order_info" >/dev/null
 grep -F '"commit":"'"$release_id"'"' <<<"$order_info" >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/segroup8-order -- curl --fail --silent --show-error http://127.0.0.1:8085/actuator/health/liveness >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/segroup8-order -- curl --fail --silent --show-error http://127.0.0.1:8085/actuator/health/readiness >/dev/null
-status="$(kubectl --namespace "$k8s_namespace" exec deployment/segroup8-order -- curl --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8085/api/order/list)"
+curl --fail --silent --show-error "$service_url/actuator/health/liveness" >/dev/null
+curl --fail --silent --show-error "$service_url/actuator/health/readiness" >/dev/null
+status="$(curl --silent --output /dev/null --write-out '%{http_code}' "$service_url/api/order/list")"
 [[ "$status" == "401" ]]
 echo "order-service deployed successfully as $image_tag"

@@ -77,18 +77,17 @@ helm upgrade --install segroup8 "$chart_dir" \
   --set-string "identityGovernance.deployment.buildTime=$build_time"
 
 kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-identity-governance --timeout=5m
-identity_info="$(kubectl --namespace "$k8s_namespace" exec deployment/segroup8-identity-governance -- \
-  curl --fail --silent --show-error http://127.0.0.1:8091/actuator/info)"
+service_ip="$(kubectl --namespace "$k8s_namespace" get service identity-governance-service -o jsonpath='{.spec.clusterIP}')"
+[[ -n "$service_ip" && "$service_ip" != "None" ]]
+service_url="http://${service_ip}:8091"
+identity_info="$(curl --fail --silent --show-error "$service_url/actuator/info")"
 grep -F '"version":"'"$image_tag"'"' <<<"$identity_info" >/dev/null
 grep -F '"commit":"'"$release_id"'"' <<<"$identity_info" >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/segroup8-identity-governance -- \
-  curl --fail --silent --show-error http://127.0.0.1:8091/actuator/health/liveness >/dev/null
-kubectl --namespace "$k8s_namespace" exec deployment/segroup8-identity-governance -- \
-  curl --fail --silent --show-error http://127.0.0.1:8091/actuator/health/readiness >/dev/null
-identity_smoke="$(kubectl --namespace "$k8s_namespace" exec deployment/segroup8-identity-governance -- \
-  curl --fail --silent --show-error -H 'Content-Type: application/json' \
+curl --fail --silent --show-error "$service_url/actuator/health/liveness" >/dev/null
+curl --fail --silent --show-error "$service_url/actuator/health/readiness" >/dev/null
+identity_smoke="$(curl --fail --silent --show-error -H 'Content-Type: application/json' \
   -d '{"username":"__deployment_smoke__","password":"invalid"}' \
-  http://127.0.0.1:8091/api/auth/login)"
+  "$service_url/api/auth/login")"
 grep -F '"code":401' <<<"$identity_smoke" >/dev/null
 
 echo "identity-governance-service deployed successfully as $image_tag"

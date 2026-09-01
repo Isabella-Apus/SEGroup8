@@ -457,13 +457,16 @@ jobs:
             --set-string benefitsFinance.image.commit="$git_sha" \
             --set-string benefitsFinance.image.buildTime="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
           kubectl -n "$namespace" rollout status deployment/benefits-finance --timeout=180s
+          service_ip="$(kubectl -n "$namespace" get service benefits-finance -o jsonpath='{.spec.clusterIP}')"
+          test -n "$service_ip" && test "$service_ip" != "None"
+          service_url="http://${service_ip}:8085"
           for endpoint in liveness readiness; do
-            kubectl get --raw "/api/v1/namespaces/${namespace}/services/http:benefits-finance:8085/proxy/actuator/health/${endpoint}" \
+            curl --fail --silent --show-error "$service_url/actuator/health/${endpoint}" \
               | grep -q '"status":"UP"'
           done
-          kubectl get --raw "/api/v1/namespaces/${namespace}/services/http:benefits-finance:8085/proxy/actuator/info" \
+          curl --fail --silent --show-error "$service_url/actuator/info" \
             | grep -Fq "\"commit\":\"$git_sha\""
-          kubectl get --raw "/api/v1/namespaces/${namespace}/services/http:benefits-finance:8085/proxy/api/finance/dashboard" \
+          curl --silent --show-error "$service_url/api/finance/dashboard" \
             2>/dev/null | grep -q 'AUTH_REQUIRED'
           helm -n "$namespace" status segroup8
           helm -n "$namespace" history segroup8
