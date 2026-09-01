@@ -28,7 +28,7 @@ class OutboxPublisher {
         this.internalToken=internalToken;this.json=json;
     }
 
-    @Scheduled(fixedDelayString="${outbox.publisher.fixed-delay:2s}")
+    @Scheduled(fixedDelayString="${outbox.publisher.fixed-delay:2000}")
     void publish() {
         for (var event:repository.pendingOutbox()) {
             try {
