@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 
-@SpringBootTest(properties = "outbox.publisher.enabled=true")
+@SpringBootTest(properties = {
+        "outbox.publisher.enabled=true",
+        "downstream.secondhand-url=http://127.0.0.1:1"
+})
 @Tag("CONTRACT")
 class ProductionSchedulingConfigurationTest {
     @Autowired ApplicationContext context;
