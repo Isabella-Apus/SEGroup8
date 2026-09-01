@@ -126,14 +126,14 @@ class ChatControllerUc24WebMvcTest {
         mockMvc.perform(post("/api/chat/conversations/24/messages")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"content\":\"   \"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400));
 
         String oversized = "x".repeat(1001);
         mockMvc.perform(post("/api/chat/conversations/24/messages")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"content\":\"" + oversized + "\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400));
 
         verify(chatService, never()).sendMessage(any(), any(), any());

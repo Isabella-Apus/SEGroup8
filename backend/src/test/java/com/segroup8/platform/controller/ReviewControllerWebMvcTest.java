@@ -91,7 +91,7 @@ class ReviewControllerWebMvcTest {
         UserContext.setUserId(1502L);
         mockMvc.perform(post("/api/review/1/reply").contentType("application/json")
                         .content("{\"reply\":\"\"}"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.code").value(400));
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value(400));
     }
 
     @Test

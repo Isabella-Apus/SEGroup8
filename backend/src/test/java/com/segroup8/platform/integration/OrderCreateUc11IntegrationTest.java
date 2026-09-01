@@ -126,8 +126,8 @@ class OrderCreateUc11IntegrationTest {
 
     @Test
     void rejectsInvalidRequestParameters_beforeWritingBusinessData() throws Exception {
-        assertRejected("{\"addressId\":1101,\"items\":[]}", "uc11-empty", 400);
-        assertRejected(orderRequest(PRODUCT_ID, 0, ADDRESS_ID, null), "uc11-zero-quantity", 400);
+        assertValidationRejected("{\"addressId\":1101,\"items\":[]}", "uc11-empty");
+        assertValidationRejected(orderRequest(PRODUCT_ID, 0, ADDRESS_ID, null), "uc11-zero-quantity");
 
         assertNoCreatedOrder();
         assertThat(number("SELECT stock FROM product WHERE id = ?", PRODUCT_ID)).isEqualTo(10);
@@ -232,6 +232,13 @@ class OrderCreateUc11IntegrationTest {
         createOrder(request, idempotencyKey)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(expectedCode))
+                .andExpect(jsonPath("$.data").doesNotExist());
+    }
+
+    private void assertValidationRejected(String request, String idempotencyKey) throws Exception {
+        createOrder(request, idempotencyKey)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.data").doesNotExist());
     }
 

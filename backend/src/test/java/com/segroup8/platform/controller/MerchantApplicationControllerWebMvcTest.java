@@ -107,7 +107,7 @@ class MerchantApplicationControllerWebMvcTest {
         mockMvc.perform(post("/api/admin/merchant-applications/8/reject")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"rejectReason\":\"\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400));
 
         verify(merchantApplicationService, never()).reject(any(), any());

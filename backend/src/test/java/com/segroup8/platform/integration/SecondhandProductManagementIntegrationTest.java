@@ -214,21 +214,33 @@ class SecondhandProductManagementIntegrationTest {
     @Test
     void invalidNameImagesCategoryConditionNegotiableAndPrices_doNotWriteProducts() throws Exception {
         long before = count("SELECT COUNT(*) FROM secondhand_product WHERE seller_user_id = ?", SELLER_ID);
-        List<ObjectNode> invalidPayloads = List.of(
+        List<ObjectNode> validationInvalidPayloads = List.of(
                 validPayload(" "),
                 validPayload("UC16 No Images").set("images", objectMapper.createArrayNode()),
                 withTenImages(validPayload("UC16 Too Many Images")),
                 validPayload("UC16 No Condition").put("conditionLevel", " "),
                 validPayload("UC16 No Origin").putNull("originPrice"),
                 validPayload("UC16 Zero Sale").put("salePrice", 0),
-                validPayload("UC16 Reversed Price").put("originPrice", 50).put("salePrice", 80),
-                validPayload("UC16 Invalid Main").put("categoryId", 9999),
-                validPayload("UC16 Invalid Child").put("subCategoryId", 9999),
                 validPayload("UC16 Invalid Negotiable").put("isNegotiable", 2),
                 validPayload("UC16 Price Overflow").put("salePrice", "123456789.01")
         );
 
-        for (ObjectNode payload : invalidPayloads) {
+        for (ObjectNode payload : validationInvalidPayloads) {
+            mockMvc.perform(post("/api/secondhand/seller")
+                            .header("Authorization", bearer(sellerToken))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(payload.toString()))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value(400));
+        }
+
+        List<ObjectNode> businessInvalidPayloads = List.of(
+                validPayload("UC16 Reversed Price").put("originPrice", 50).put("salePrice", 80),
+                validPayload("UC16 Invalid Main").put("categoryId", 9999),
+                validPayload("UC16 Invalid Child").put("subCategoryId", 9999)
+        );
+
+        for (ObjectNode payload : businessInvalidPayloads) {
             mockMvc.perform(post("/api/secondhand/seller")
                             .header("Authorization", bearer(sellerToken))
                             .contentType(MediaType.APPLICATION_JSON)

@@ -88,7 +88,7 @@ class AdminOrderControllerWebMvcTest {
         mockMvc.perform(post("/api/admin/orders/1/refund/approve")
                 .contentType("application/json")
                 .content("{\"remark\":\"" + tooLong + "\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400))
                 .andExpect(jsonPath("$.message").value("审核意见最多255字"));
 

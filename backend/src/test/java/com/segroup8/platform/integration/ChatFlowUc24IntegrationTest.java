@@ -144,8 +144,8 @@ class ChatFlowUc24IntegrationTest {
     void invalidContentAndEitherDirectionBlockLeaveNoMessage() throws Exception {
         long conversationId = createProductConversation(buyerToken, 2402L);
 
-        rejectMessage(conversationId, buyerToken, "   ", 400);
-        rejectMessage(conversationId, buyerToken, "x".repeat(1001), 400);
+        rejectValidationMessage(conversationId, buyerToken, "   ");
+        rejectValidationMessage(conversationId, buyerToken, "x".repeat(1001));
 
         db.update("insert into user_block(blocker_id, blocked_id, create_time) values(2401, 2402, current_timestamp)");
         rejectMessage(conversationId, sellerToken, "blocked by buyer", 403);
@@ -209,6 +209,16 @@ class ChatFlowUc24IntegrationTest {
                         .content(body))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(code));
+    }
+
+    private void rejectValidationMessage(long conversationId, String token, String content) throws Exception {
+        String body = objectMapper.writeValueAsString(java.util.Map.of("content", content));
+        mvc.perform(post("/api/chat/conversations/{id}/messages", conversationId)
+                        .header("Authorization", bearer(token))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(400));
     }
 
     private int count(String sql, Object... args) {
