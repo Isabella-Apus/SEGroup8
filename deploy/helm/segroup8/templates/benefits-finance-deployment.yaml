@@ -57,7 +57,7 @@ spec:
             httpGet: { path: /actuator/health/liveness, port: http }
             periodSeconds: 2
             timeoutSeconds: 2
-            failureThreshold: 45
+            failureThreshold: 150
           livenessProbe:
             httpGet: { path: /actuator/health/liveness, port: http }
             periodSeconds: 10

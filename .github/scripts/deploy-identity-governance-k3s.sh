@@ -70,6 +70,11 @@ helm upgrade --install segroup8 "$chart_dir" \
   --timeout 10m \
   --history-max 5 \
   --set identityGovernance.enabled=true \
+  --set identityGovernance.autoscaling.enabled=false \
+  --set catalogShop.replicaCount=1 \
+  --set catalogShop.hpa.enabled=false \
+  --set benefitsFinance.replicas=1 \
+  --set secondhand.autoscaling.enabled=false \
   --set-string "identityGovernance.image.repository=$registry/$registry_namespace/identity-governance" \
   --set-string "identityGovernance.image.tag=$image_tag" \
   --set-string "identityGovernance.deployment.version=$image_tag" \

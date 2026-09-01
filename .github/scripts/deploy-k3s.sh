@@ -92,6 +92,11 @@ helm upgrade --install segroup8 "$chart_dir" \
   --set-string "deployment.version=$image_tag" \
   --set-string "deployment.commit=$release_id" \
   --set-string "deployment.buildTime=$build_time" \
+  --set catalogShop.replicaCount=1 \
+  --set catalogShop.hpa.enabled=false \
+  --set benefitsFinance.replicas=1 \
+  --set identityGovernance.autoscaling.enabled=false \
+  --set secondhand.autoscaling.enabled=false \
   --set-file "mysql.initSchema=$schema_file"
 
 kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-backend --timeout=5m

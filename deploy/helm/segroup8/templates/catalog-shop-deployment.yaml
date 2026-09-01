@@ -51,7 +51,7 @@ spec:
             - {name: APP_VERSION, value: {{ .Values.catalogShop.deployment.version | quote }}}
             - {name: GIT_COMMIT, value: {{ .Values.catalogShop.deployment.commit | quote }}}
             - {name: APP_BUILD_TIME, value: {{ .Values.catalogShop.deployment.buildTime | quote }}}
-          startupProbe: {httpGet: {path: /actuator/health/liveness, port: http}, failureThreshold: 30, periodSeconds: 5}
+          startupProbe: {httpGet: {path: /actuator/health/liveness, port: http}, failureThreshold: 60, periodSeconds: 5}
           livenessProbe: {httpGet: {path: /actuator/health/liveness, port: http}, periodSeconds: 10, failureThreshold: 3}
           readinessProbe: {httpGet: {path: /actuator/health/readiness, port: http}, periodSeconds: 5, failureThreshold: 3}
           resources: {{- toYaml .Values.catalogShop.resources | nindent 12 }}

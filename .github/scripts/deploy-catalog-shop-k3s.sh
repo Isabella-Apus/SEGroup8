@@ -45,6 +45,11 @@ helm upgrade --install segroup8 "$chart_dir" \
   --namespace "$k8s_namespace" --reset-then-reuse-values --atomic --cleanup-on-fail --wait \
   --timeout 10m --history-max 5 \
   --set catalogShop.enabled=true \
+  --set catalogShop.replicaCount=1 \
+  --set catalogShop.hpa.enabled=false \
+  --set benefitsFinance.replicas=1 \
+  --set identityGovernance.autoscaling.enabled=false \
+  --set secondhand.autoscaling.enabled=false \
   --set-string "catalogShop.image.repository=$registry/$registry_namespace/catalog-shop" \
   --set-string "catalogShop.image.tag=$image_tag" \
   --set-string "catalogShop.deployment.version=$image_tag" \

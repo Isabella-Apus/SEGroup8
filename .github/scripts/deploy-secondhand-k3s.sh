@@ -68,7 +68,11 @@ helm upgrade --install segroup8 "$chart_dir" \
   --timeout 10m \
   --history-max 5 \
   --set secondhand.enabled=true \
-  --set secondhand.autoscaling.enabled=true \
+  --set secondhand.autoscaling.enabled=false \
+  --set catalogShop.replicaCount=1 \
+  --set catalogShop.hpa.enabled=false \
+  --set benefitsFinance.replicas=1 \
+  --set identityGovernance.autoscaling.enabled=false \
   --set-string "secondhand.image.repository=$registry/$registry_namespace/secondhand" \
   --set-string "secondhand.image.tag=$image_tag" \
   --set-string "secondhand.deployment.version=$image_tag" \

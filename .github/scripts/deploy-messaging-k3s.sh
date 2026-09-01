@@ -75,6 +75,11 @@ helm upgrade --install segroup8 "$chart_dir" \
   --timeout 10m \
   --history-max 5 \
   --set messaging.enabled=true \
+  --set catalogShop.replicaCount=1 \
+  --set catalogShop.hpa.enabled=false \
+  --set benefitsFinance.replicas=1 \
+  --set identityGovernance.autoscaling.enabled=false \
+  --set secondhand.autoscaling.enabled=false \
   --set-string "messaging.image.repository=$registry/$registry_namespace/messaging" \
   --set-string "messaging.image.tag=$image_tag" \
   --set-string "messaging.config.realtimeAllowedOriginPatterns=$realtime_allowed_origins" \

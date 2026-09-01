@@ -446,12 +446,21 @@ jobs:
           exec 9>"$HOME/.segroup8-helm.lock"
           flock -w 3300 9 || { echo "Timed out waiting for the shared Helm deployment lock" >&2; exit 1; }
           archive=$1; namespace=$2; repository=$3; tag=$4; git_sha=$5
-          trap 'rm -f -- "$archive"' EXIT
+          work_dir="$(mktemp -d)"
+          trap 'rm -rf -- "$work_dir"; rm -f -- "$archive"' EXIT
+          tar -xzf "$archive" -C "$work_dir"
+          chart_dir="$work_dir/deploy/helm/segroup8"
+          test -f "$chart_dir/Chart.yaml"
           kubectl -n "$namespace" get secret benefits-finance-secrets >/dev/null
           helm -n "$namespace" status segroup8 >/dev/null
-          helm upgrade --install segroup8 "$archive" --namespace "$namespace" --reset-then-reuse-values \
+          helm upgrade --install segroup8 "$chart_dir" --namespace "$namespace" --reset-then-reuse-values \
             --atomic --cleanup-on-fail --wait --timeout 5m --history-max 10 \
             --set benefitsFinance.enabled=true \
+            --set benefitsFinance.replicas=1 \
+            --set catalogShop.replicaCount=1 \
+            --set catalogShop.hpa.enabled=false \
+            --set identityGovernance.autoscaling.enabled=false \
+            --set secondhand.autoscaling.enabled=false \
             --set-string benefitsFinance.image.repository="$repository" \
             --set-string benefitsFinance.image.tag="$tag" \
             --set-string benefitsFinance.image.commit="$git_sha" \

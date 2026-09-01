@@ -60,7 +60,7 @@ spec:
           startupProbe:
             httpGet: {path: /actuator/health/liveness, port: http}
             periodSeconds: 5
-            failureThreshold: 30
+            failureThreshold: 60
           resources: {{- toYaml .Values.order.resources | nindent 12 }}
           securityContext:
             allowPrivilegeEscalation: false
