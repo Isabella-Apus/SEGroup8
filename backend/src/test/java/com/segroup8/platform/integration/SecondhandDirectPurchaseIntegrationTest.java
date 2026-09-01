@@ -127,7 +127,7 @@ class SecondhandDirectPurchaseIntegrationTest {
                         .header("Authorization", "Bearer " + buyerAToken)
                         .contentType("application/json")
                         .content("{}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(400));
         buy(17101, buyerAToken, 17203).andExpect(jsonPath("$.code").value(400));
         buy(17101, buyerAToken, 999999).andExpect(jsonPath("$.code").value(400));
