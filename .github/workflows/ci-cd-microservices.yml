@@ -189,8 +189,8 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ENABLE_PRODUCTION_DEPLOY == 'true'
     needs: publish
     runs-on: ubuntu-latest
+    timeout-minutes: 70
     environment: production
-    concurrency: {group: segroup8-production-helm, cancel-in-progress: false}
     steps:
       - uses: actions/checkout@v4
       - name: Configure SSH

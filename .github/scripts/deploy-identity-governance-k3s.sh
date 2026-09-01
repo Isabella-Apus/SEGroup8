@@ -16,8 +16,11 @@ fi
 command -v helm >/dev/null
 command -v kubectl >/dev/null
 command -v curl >/dev/null
+command -v flock >/dev/null
 
 export KUBECONFIG="$HOME/.kube/config"
+exec 9>"$HOME/.segroup8-helm.lock"
+flock -w 3300 9 || { echo "Timed out waiting for the shared Helm deployment lock" >&2; exit 1; }
 work_dir="$(mktemp -d)"
 
 cleanup() {

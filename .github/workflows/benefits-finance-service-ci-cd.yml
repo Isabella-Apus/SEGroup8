@@ -406,11 +406,8 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.ENABLE_PRODUCTION_DEPLOY == 'true'
     needs: publish-benefits-finance-image
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 70
     environment: production
-    concurrency:
-      group: segroup8-production-helm
-      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
       - name: Package Helm chart
@@ -445,6 +442,9 @@ jobs:
             "$archive" "$K8S_NAMESPACE" "$repository" "$tag" "$GITHUB_SHA" <<'REMOTE' | tee benefits-finance-deployment.log
           set -Eeuo pipefail
           export KUBECONFIG="$HOME/.kube/config"
+          command -v flock >/dev/null
+          exec 9>"$HOME/.segroup8-helm.lock"
+          flock -w 3300 9 || { echo "Timed out waiting for the shared Helm deployment lock" >&2; exit 1; }
           archive=$1; namespace=$2; repository=$3; tag=$4; git_sha=$5
           trap 'rm -f -- "$archive"' EXIT
           kubectl -n "$namespace" get secret benefits-finance-secrets >/dev/null

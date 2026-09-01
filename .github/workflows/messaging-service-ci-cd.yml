@@ -431,11 +431,8 @@ jobs:
       vars.ENABLE_PRODUCTION_DEPLOY == 'true'
     needs: publish-messaging-image
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 70
     environment: production
-    concurrency:
-      group: segroup8-production-helm
-      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
       - name: Package Helm chart

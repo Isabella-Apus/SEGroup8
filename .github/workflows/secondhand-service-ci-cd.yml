@@ -442,11 +442,8 @@ jobs:
       vars.ENABLE_PRODUCTION_DEPLOY == 'true'
     needs: publish-secondhand-image
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 70
     environment: production
-    concurrency:
-      group: segroup8-production-helm
-      cancel-in-progress: false
     steps:
       - name: Check out deployment files
         uses: actions/checkout@v4

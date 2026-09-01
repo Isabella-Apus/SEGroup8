@@ -343,11 +343,8 @@ jobs:
       vars.ENABLE_PRODUCTION_DEPLOY == 'true'
     needs: publish-images
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 70
     environment: production
-    concurrency:
-      group: segroup8-production-helm
-      cancel-in-progress: false
     steps:
       - name: Check out deployment configuration
         uses: actions/checkout@v4
