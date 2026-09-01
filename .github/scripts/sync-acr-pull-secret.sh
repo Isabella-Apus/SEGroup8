@@ -8,6 +8,13 @@ set -Eeuo pipefail
 : "${ACR_PASSWORD:?ACR_PASSWORD is required}"
 : "${K8S_NAMESPACE:?K8S_NAMESPACE is required}"
 
+auth_b64=""
+docker_config_b64=""
+cleanup() {
+  unset auth_b64 docker_config_b64 ACR_PASSWORD
+}
+trap cleanup EXIT
+
 if [[ ! "$ACR_REGISTRY" =~ ^[a-zA-Z0-9.-]+(:[0-9]+)?$ ]]; then
   echo "ACR_REGISTRY must be a hostname with an optional port" >&2
   exit 2
@@ -45,5 +52,4 @@ ssh \
   "$DEPLOY_USER@$DEPLOY_HOST" \
   "kubectl --namespace '$K8S_NAMESPACE' get secret acr-pull-secret -o jsonpath='{.data.\\.dockerconfigjson}' | base64 -d | grep -Fq '\"$ACR_REGISTRY\"'"
 
-unset auth_b64 docker_config_b64 ACR_PASSWORD
 echo "acr-pull-secret synchronized for $ACR_REGISTRY"
