@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "name": "list-monolith-run2",
+  "url": "http://10.43.120.41:8080/api/secondhand/list?pageNum=1&pageSize=50",
+  "concurrency": 5,
+  "configuredDurationSeconds": 20.0,
+  "warmupSeconds": 3.0,
+  "timeoutSeconds": 5.0,
+  "startedAt": "2026-08-30T15:32:20.345461+00:00",
+  "finishedAt": "2026-08-30T15:32:40.382974+00:00",
+  "measuredDurationSeconds": 20.03748866802198,
+  "requests": 20,
+  "successfulRequests": 0,
+  "failedRequests": 20,
+  "throughputRequestsPerSecond": 0.998129073525975,
+  "errorRate": 1.0,
+  "latencyMs": {
+    "average": null,
+    "p50": null,
+    "p95": null,
+    "p99": null,
+    "minimum": null,
+    "maximum": null
+  },
+  "statuses": {
+    "0": 20
+  },
+  "errors": {
+    "TimeoutError:timed out": 20
+  },
+  "rawLatencyMs": [
+    5012.5837,
+    5008.5383,
+    5003.4649,
+    5005.8558,
+    5014.9139,
+    5006.5194,
+    5005.9952,
+    5005.7671,
+    5012.9152,
+    5008.3247,
+    5005.302,
+    5006.142,
+    5007.967,
+    5006.779,
+    5006.0171,
+    5005.1861,
+    5014.3717,
+    5005.4095,
+    5006.5931,
+    5005.4627
+  ]
+}

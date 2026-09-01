@@ -19,6 +19,7 @@ class TradeOrderCoordinatorViewUnitTest {
         LocalDateTime now = LocalDateTime.now();
         TradeOrderRequest request = new TradeOrderRequest(1, "DIRECT_BUY", "1-v1",
                 "SECONDHAND:DIRECT_BUY:1-v1", 1, 20, 10, new BigDecimal("50.00"), 3L,
+                "Used book", "Buyer", "13800008000", "Zhejiang", "Hangzhou", "West Lake Road 1",
                 null, "RETRY", null, null, null, 1, "timeout", now, 1, now, now);
 
         assertThat(coordinator.toView(request).message()).contains("处理中");

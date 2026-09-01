@@ -196,16 +196,17 @@ paths:
     post:
       operationId: createSecondhandOrder
       security: [{internalToken: []}]
+      parameters: [{$ref: '#/components/parameters/IdempotencyKey'}]
       requestBody:
         required: true
         content: {application/json: {schema: {$ref: '#/components/schemas/SecondhandOrderRequest'}}}
-      responses: {'200': {description: Raw internal order snapshot, content: {application/json: {schema: {$ref: '#/components/schemas/InternalOrder'}}}}}
+      responses: {'200': {description: Idempotent secondhand order receipt envelope, content: {application/json: {schema: {$ref: '#/components/schemas/SecondhandOrderReceiptEnvelope'}}}}, '400': {$ref: '#/components/responses/ErrorResponse'}}
   /internal/orders/by-business-key/{key}:
     get:
       operationId: getOrderByBusinessKey
       security: [{internalToken: []}]
       parameters: [{$ref: '#/components/parameters/BusinessKey'}]
-      responses: {'200': {description: Raw internal order snapshot, content: {application/json: {schema: {$ref: '#/components/schemas/InternalOrder'}}}}}
+      responses: {'200': {description: Secondhand order receipt envelope, content: {application/json: {schema: {$ref: '#/components/schemas/SecondhandOrderReceiptEnvelope'}}}}, '404': {$ref: '#/components/responses/ErrorResponse'}}
   /internal/orders/{orderId}/snapshot:
     get:
       operationId: getInternalOrderSnapshot
@@ -263,6 +264,20 @@ components:
             pageNum: {type: integer, format: int64}
             pageSize: {type: integer, format: int64}
             records: {type: array, items: {$ref: '#/components/schemas/PublicOrder'}}
+    SecondhandOrderReceiptEnvelope:
+      type: object
+      required: [code, message, data]
+      properties:
+        code: {type: integer, enum: [0]}
+        message: {type: string}
+        data: {$ref: '#/components/schemas/SecondhandOrderReceipt'}
+    SecondhandOrderReceipt:
+      type: object
+      required: [orderId, orderNo, status]
+      properties:
+        orderId: {type: integer, format: int64}
+        orderNo: {type: string}
+        status: {type: string, example: PENDING_PAY}
     PublicOrder:
       type: object
       required: [id, orderNo, payStatus, orderStatus, orderStatusKey, refundStatus, items]
@@ -298,12 +313,19 @@ components:
       properties: {productId: {type: integer, format: int64}, quantity: {type: integer, minimum: 1}}
     SecondhandOrderRequest:
       type: object
-      required: [tradeType, tradeId, buyerUserId, sellerUserId, productId, productName, price, receiverName, receiverPhone, receiverProvince, receiverCity, receiverDetailAddress]
+      required: [tradeType, tradeId, orderBusinessKey, buyerUserId, sellerUserId, productId, productName, price, receiverName, receiverPhone, receiverProvince, receiverCity, receiverDetailAddress]
       properties:
         tradeType: {type: string}
         tradeId: {type: string}
+        orderBusinessKey: {type: string, example: 'SECONDHAND:DIRECT_BUY:900500-v1'}
         buyerUserId: {type: integer, format: int64}
         sellerUserId: {type: integer, format: int64}
         productId: {type: integer, format: int64}
         productName: {type: string}
         price: {type: number}
+        receiverName: {type: string}
+        receiverPhone: {type: string}
+        receiverProvince: {type: string}
+        receiverCity: {type: string}
+        receiverDetailAddress: {type: string}
+        remark: {type: string, maxLength: 255}

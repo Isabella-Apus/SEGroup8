@@ -118,8 +118,10 @@ public class IdentityService {
                 + "FROM address WHERE user_id=? ORDER BY is_default DESC,id", CurrentUser.require().userId());
     }
 
-    public Map<String, Object> addressSnapshot(long userId, long addressId) {
-        return addressSnapshot("WHERE id=? AND user_id=?", addressId, userId);
+    public Map<String, Object> addressSnapshot(long userId, Long addressId) {
+        return addressId == null
+                ? addressSnapshot("WHERE user_id=? ORDER BY is_default DESC,id LIMIT 1", userId)
+                : addressSnapshot("WHERE id=? AND user_id=?", addressId, userId);
     }
 
     public Map<String, Object> shippingAddress(long userId) {
@@ -131,6 +133,7 @@ public class IdentityService {
                 "SELECT id,user_id,receiver_name,receiver_phone,province,city,detail_address FROM address " + suffix,
                 (rs, row) -> {
                     Map<String, Object> snapshot = new LinkedHashMap<>();
+                    snapshot.put("id", rs.getLong("id"));
                     snapshot.put("addressId", rs.getLong("id"));
                     snapshot.put("userId", rs.getLong("user_id"));
                     snapshot.put("receiverName", rs.getString("receiver_name"));
@@ -140,7 +143,7 @@ public class IdentityService {
                     snapshot.put("detailAddress", rs.getString("detail_address"));
                     return snapshot;
                 }, arguments);
-        if (matches.isEmpty()) throw new ApiException(404, "address not found");
+        if (matches.isEmpty()) throw new ApiException(404, "收货地址不存在或不属于该用户");
         return matches.get(0);
     }
 

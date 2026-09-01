@@ -1,0 +1,22 @@
+2026-08-31T00:16:36+08:00
+NAME              STATUS   AGE
+default           Active   2d13h
+kube-node-lease   Active   2d13h
+kube-public       Active   2d13h
+kube-system       Active   2d13h
+segroup8          Active   2d12h
+NAME                                READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/segroup8-backend    1/1     1            1           2d2h
+deployment.apps/segroup8-frontend   1/1     1            1           2d2h
+
+NAME                                     READY   STATUS    RESTARTS   AGE
+pod/mysql-0                              1/1     Running   0          2d2h
+pod/segroup8-backend-7dc76cb94d-tmnjx    1/1     Running   0          32h
+pod/segroup8-frontend-5bb4b9c7c8-5bcsd   1/1     Running   0          32h
+
+NAME               TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+service/backend    ClusterIP   10.43.58.56    <none>        8080/TCP   2d2h
+service/frontend   ClusterIP   10.43.54.227   <none>        80/TCP     2d2h
+service/mysql      ClusterIP   None           <none>        3306/TCP   2d2h
+existing-system-root-http=200
+existing-system-secondhand-http=200

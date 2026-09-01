@@ -1,0 +1,171 @@
+LAST SEEN   TYPE      REASON                         OBJECT                                       MESSAGE
+19m         Normal    Scheduled                      pod/secondhand-service-75df9ff569-c82fm      Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/secondhand-service-75df9ff569-c82fm to izbp1fcr5ltsng9ra8gt84z
+3m57s       Normal    Scheduled                      pod/secondhand-service-75df9ff569-n98wj      Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/secondhand-service-75df9ff569-n98wj to izbp1fcr5ltsng9ra8gt84z
+19m         Normal    Scheduled                      pod/secondhand-service-75df9ff569-pqs7f      Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/secondhand-service-75df9ff569-pqs7f to izbp1fcr5ltsng9ra8gt84z
+59m         Normal    Scheduled                      pod/secondhand-service-75df9ff569-fkxxm      Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/secondhand-service-75df9ff569-fkxxm to izbp1fcr5ltsng9ra8gt84z
+9m57s       Normal    Scheduled                      pod/secondhand-service-75df9ff569-892m2      Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/secondhand-service-75df9ff569-892m2 to izbp1fcr5ltsng9ra8gt84z
+14m         Normal    Scheduled                      pod/secondhand-service-75df9ff569-kjktw      Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/secondhand-service-75df9ff569-kjktw to izbp1fcr5ltsng9ra8gt84z
+4m11s       Normal    Scheduled                      pod/secondhand-service-75df9ff569-whrsb      Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/secondhand-service-75df9ff569-whrsb to izbp1fcr5ltsng9ra8gt84z
+10m         Normal    Scheduled                      pod/secondhand-service-75df9ff569-t7bw7      Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/secondhand-service-75df9ff569-t7bw7 to izbp1fcr5ltsng9ra8gt84z
+10m         Normal    Scheduled                      pod/secondhand-service-75df9ff569-l84gg      Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/secondhand-service-75df9ff569-l84gg to izbp1fcr5ltsng9ra8gt84z
+4m11s       Normal    Scheduled                      pod/secondhand-service-75df9ff569-k4ckb      Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/secondhand-service-75df9ff569-k4ckb to izbp1fcr5ltsng9ra8gt84z
+19m         Normal    Scheduled                      pod/secondhand-service-75df9ff569-dj7l9      Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/secondhand-service-75df9ff569-dj7l9 to izbp1fcr5ltsng9ra8gt84z
+59m         Normal    Scheduled                      pod/mysql-797646cfd5-bjhpl                   Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/mysql-797646cfd5-bjhpl to izbp1fcr5ltsng9ra8gt84z
+59m         Normal    Scheduled                      pod/monolith-86f5d4c556-dn9lt                Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/monolith-86f5d4c556-dn9lt to izbp1fcr5ltsng9ra8gt84z
+14m         Normal    Scheduled                      pod/secondhand-service-75df9ff569-lf9vx      Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/secondhand-service-75df9ff569-lf9vx to izbp1fcr5ltsng9ra8gt84z
+14m         Normal    Scheduled                      pod/secondhand-service-75df9ff569-m8bt8      Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/secondhand-service-75df9ff569-m8bt8 to izbp1fcr5ltsng9ra8gt84z
+59m         Normal    Scheduled                      pod/order-service-b486d7b94-79c64            Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/order-service-b486d7b94-79c64 to izbp1fcr5ltsng9ra8gt84z
+59m         Normal    ScalingReplicaSet              deployment/order-service                     Scaled up replica set order-service-b486d7b94 from 0 to 1
+59m         Normal    SuccessfulCreate               replicaset/mysql-797646cfd5                  Created pod: mysql-797646cfd5-bjhpl
+59m         Normal    SuccessfulCreate               replicaset/secondhand-service-75df9ff569     Created pod: secondhand-service-75df9ff569-fkxxm
+59m         Normal    ScalingReplicaSet              deployment/mysql                             Scaled up replica set mysql-797646cfd5 from 0 to 1
+59m         Normal    ScalingReplicaSet              deployment/monolith                          Scaled up replica set monolith-86f5d4c556 from 0 to 1
+59m         Normal    SuccessfulCreate               replicaset/monolith-86f5d4c556               Created pod: monolith-86f5d4c556-dn9lt
+59m         Normal    ScalingReplicaSet              deployment/secondhand-service                Scaled up replica set secondhand-service-75df9ff569 from 0 to 1
+59m         Normal    SuccessfulCreate               replicaset/order-service-b486d7b94           Created pod: order-service-b486d7b94-79c64
+59m         Normal    Pulled                         pod/mysql-797646cfd5-bjhpl                   Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/mysql:8.4.6" already present on machine and can be accessed by the pod
+59m         Normal    Pulled                         pod/order-service-b486d7b94-79c64            Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+59m         Normal    Created                        pod/mysql-797646cfd5-bjhpl                   Container created
+59m         Normal    Started                        pod/mysql-797646cfd5-bjhpl                   Container started
+59m         Normal    Started                        pod/order-service-b486d7b94-79c64            Container started
+59m         Normal    Created                        pod/order-service-b486d7b94-79c64            Container created
+59m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/secondhand-service   invalid metrics (1 invalid out of 1), first error is: failed to get cpu resource metric value: failed to get cpu utilization: unable to get metrics for resource cpu: no metrics returned from resource metrics API
+59m         Warning   FailedGetResourceMetric        horizontalpodautoscaler/secondhand-service   failed to get cpu utilization: unable to get metrics for resource cpu: no metrics returned from resource metrics API
+59m         Warning   Unhealthy                      pod/mysql-797646cfd5-bjhpl                   Readiness probe failed: mysqladmin: [Warning] Using a password on the command line interface can be insecure.
+58m         Warning   Unhealthy                      pod/order-service-b486d7b94-79c64            Startup probe failed: Get "http://10.42.0.50:8085/actuator/health/liveness": dial tcp 10.42.0.50:8085: connect: connection refused
+58m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-fkxxm      Startup probe failed: Get "http://10.42.0.52:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+58m         Warning   Unhealthy                      pod/order-service-b486d7b94-79c64            Startup probe failed: Get "http://10.42.0.50:8085/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+57m         Warning   Unhealthy                      pod/monolith-86f5d4c556-dn9lt                Startup probe failed: Get "http://10.42.0.51:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+57m         Warning   FailedGetResourceMetric        horizontalpodautoscaler/secondhand-service   failed to get cpu utilization: did not receive metrics for targeted pods (pods might be unready)
+57m         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/secondhand-service   invalid metrics (1 invalid out of 1), first error is: failed to get cpu resource metric value: failed to get cpu utilization: did not receive metrics for targeted pods (pods might be unready)
+49m         Warning   Unhealthy                      pod/monolith-86f5d4c556-dn9lt                Readiness probe failed: Get "http://10.42.0.51:8080/actuator/health/readiness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+45m         Normal    Killing                        pod/monolith-86f5d4c556-dn9lt                Container monolith failed liveness probe, will be restarted
+45m         Normal    Started                        pod/monolith-86f5d4c556-dn9lt                Container started
+45m         Normal    Created                        pod/monolith-86f5d4c556-dn9lt                Container created
+45m         Normal    Pulled                         pod/monolith-86f5d4c556-dn9lt                Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+44m         Warning   Unhealthy                      pod/monolith-86f5d4c556-dn9lt                Startup probe failed: Get "http://10.42.0.51:8080/actuator/health/liveness": dial tcp 10.42.0.51:8080: connect: connection refused
+19m         Normal    SuccessfulCreate               replicaset/secondhand-service-75df9ff569     Created pod: secondhand-service-75df9ff569-pqs7f
+19m         Normal    SuccessfulCreate               replicaset/secondhand-service-75df9ff569     Created pod: secondhand-service-75df9ff569-dj7l9
+19m         Normal    Started                        pod/secondhand-service-75df9ff569-dj7l9      Container started
+19m         Normal    Created                        pod/secondhand-service-75df9ff569-dj7l9      Container created
+19m         Normal    Pulled                         pod/secondhand-service-75df9ff569-dj7l9      Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+19m         Normal    Created                        pod/secondhand-service-75df9ff569-pqs7f      Container created
+19m         Normal    Started                        pod/secondhand-service-75df9ff569-pqs7f      Container started
+19m         Normal    Pulled                         pod/secondhand-service-75df9ff569-pqs7f      Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+19m         Normal    SuccessfulCreate               replicaset/secondhand-service-75df9ff569     Created pod: secondhand-service-75df9ff569-c82fm
+19m         Normal    Killing                        pod/secondhand-service-75df9ff569-fkxxm      Container secondhand-service failed liveness probe, will be restarted
+19m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-fkxxm      Liveness probe failed: Get "http://10.42.0.52:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+19m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-fkxxm      Readiness probe failed: Get "http://10.42.0.52:8080/actuator/health/readiness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+18m         Normal    Started                        pod/secondhand-service-75df9ff569-fkxxm      Container started
+18m         Normal    Pulled                         pod/secondhand-service-75df9ff569-fkxxm      Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+18m         Normal    Created                        pod/secondhand-service-75df9ff569-fkxxm      Container created
+18m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-fkxxm      Readiness probe failed: Get "http://10.42.0.52:8080/actuator/health/readiness": dial tcp 10.42.0.52:8080: connect: connection refused
+18m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-fkxxm      Startup probe failed: Get "http://10.42.0.52:8080/actuator/health/liveness": dial tcp 10.42.0.52:8080: connect: connection refused
+18m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-pqs7f      Startup probe failed: Get "http://10.42.0.54:8080/actuator/health/liveness": dial tcp 10.42.0.54:8080: connect: connection refused
+18m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-dj7l9      Startup probe failed: Get "http://10.42.0.53:8080/actuator/health/liveness": dial tcp 10.42.0.53:8080: connect: connection refused
+18m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-pqs7f      Startup probe failed: Get "http://10.42.0.54:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+18m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-dj7l9      Startup probe failed: Get "http://10.42.0.53:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+17m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-c82fm      Startup probe failed: Get "http://10.42.0.55:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+16m         Normal    Killing                        pod/secondhand-service-75df9ff569-dj7l9      Stopping container secondhand-service
+16m         Normal    Killing                        pod/secondhand-service-75df9ff569-fkxxm      Stopping container secondhand-service
+16m         Normal    SuccessfulDelete               replicaset/secondhand-service-75df9ff569     Deleted pod: secondhand-service-75df9ff569-dj7l9
+16m         Normal    SuccessfulDelete               replicaset/secondhand-service-75df9ff569     Deleted pod: secondhand-service-75df9ff569-fkxxm
+15m         Normal    Killing                        pod/secondhand-service-75df9ff569-pqs7f      Stopping container secondhand-service
+15m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-pqs7f      Readiness probe failed: Get "http://10.42.0.54:8080/actuator/health/readiness": dial tcp 10.42.0.54:8080: connect: connection refused
+15m         Normal    SuccessfulDelete               replicaset/secondhand-service-75df9ff569     Deleted pod: secondhand-service-75df9ff569-pqs7f
+14m         Normal    ScalingReplicaSet              deployment/secondhand-service                Scaled up replica set secondhand-service-75df9ff569 from 1 to 2
+14m         Normal    SuccessfulRescale              horizontalpodautoscaler/secondhand-service   New size: 2; reason: cpu resource utilization (percentage of request) above target
+14m         Normal    SuccessfulCreate               replicaset/secondhand-service-75df9ff569     Created pod: secondhand-service-75df9ff569-m8bt8
+14m         Normal    Created                        pod/secondhand-service-75df9ff569-m8bt8      Container created
+14m         Normal    Pulled                         pod/secondhand-service-75df9ff569-m8bt8      Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+14m         Normal    Started                        pod/secondhand-service-75df9ff569-m8bt8      Container started
+14m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-c82fm      Liveness probe failed: Get "http://10.42.0.55:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+14m         Normal    ScalingReplicaSet              deployment/secondhand-service                Scaled up replica set secondhand-service-75df9ff569 from 2 to 4
+14m         Normal    SuccessfulCreate               replicaset/secondhand-service-75df9ff569     Created pod: secondhand-service-75df9ff569-kjktw
+14m         Normal    SuccessfulCreate               replicaset/secondhand-service-75df9ff569     Created pod: secondhand-service-75df9ff569-lf9vx
+14m         Normal    Created                        pod/secondhand-service-75df9ff569-kjktw      Container created
+14m         Normal    Started                        pod/secondhand-service-75df9ff569-kjktw      Container started
+14m         Normal    Pulled                         pod/secondhand-service-75df9ff569-lf9vx      Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+14m         Normal    Created                        pod/secondhand-service-75df9ff569-lf9vx      Container created
+14m         Normal    Started                        pod/secondhand-service-75df9ff569-lf9vx      Container started
+14m         Normal    Pulled                         pod/secondhand-service-75df9ff569-kjktw      Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+14m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-c82fm      Readiness probe failed: Get "http://10.42.0.55:8080/actuator/health/readiness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+13m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-m8bt8      Startup probe failed: Get "http://10.42.0.56:8080/actuator/health/liveness": dial tcp 10.42.0.56:8080: connect: connection refused
+13m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-m8bt8      Startup probe failed: Get "http://10.42.0.56:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+13m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-kjktw      Startup probe failed: Get "http://10.42.0.57:8080/actuator/health/liveness": dial tcp 10.42.0.57:8080: connect: connection refused
+13m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-lf9vx      Startup probe failed: Get "http://10.42.0.58:8080/actuator/health/liveness": dial tcp 10.42.0.58:8080: connect: connection refused
+12m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-lf9vx      Startup probe failed: Get "http://10.42.0.58:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+12m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-kjktw      Startup probe failed: Get "http://10.42.0.57:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+11m         Normal    Killing                        pod/secondhand-service-75df9ff569-kjktw      Stopping container secondhand-service
+11m         Normal    Killing                        pod/secondhand-service-75df9ff569-lf9vx      Stopping container secondhand-service
+11m         Normal    SuccessfulDelete               replicaset/secondhand-service-75df9ff569     Deleted pod: secondhand-service-75df9ff569-lf9vx
+11m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-lf9vx      Readiness probe failed: Get "http://10.42.0.58:8080/actuator/health/readiness": EOF
+11m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-kjktw      Readiness probe failed: HTTP probe failed with statuscode: 503
+11m         Normal    SuccessfulDelete               replicaset/secondhand-service-75df9ff569     Deleted pod: secondhand-service-75df9ff569-kjktw
+10m         Normal    Killing                        pod/secondhand-service-75df9ff569-m8bt8      Stopping container secondhand-service
+10m         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-m8bt8      Readiness probe failed: Get "http://10.42.0.56:8080/actuator/health/readiness": dial tcp 10.42.0.56:8080: connect: connection refused
+10m         Normal    SuccessfulDelete               replicaset/secondhand-service-75df9ff569     Deleted pod: secondhand-service-75df9ff569-m8bt8
+10m         Normal    SuccessfulCreate               replicaset/secondhand-service-75df9ff569     Created pod: secondhand-service-75df9ff569-t7bw7
+10m         Normal    Pulled                         pod/secondhand-service-75df9ff569-l84gg      Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+10m         Normal    SuccessfulCreate               replicaset/secondhand-service-75df9ff569     Created pod: secondhand-service-75df9ff569-l84gg
+10m         Normal    Created                        pod/secondhand-service-75df9ff569-l84gg      Container created
+10m         Normal    Created                        pod/secondhand-service-75df9ff569-t7bw7      Container created
+10m         Normal    Pulled                         pod/secondhand-service-75df9ff569-t7bw7      Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+10m         Normal    Started                        pod/secondhand-service-75df9ff569-t7bw7      Container started
+10m         Normal    Started                        pod/secondhand-service-75df9ff569-l84gg      Container started
+9m58s       Normal    SuccessfulCreate               replicaset/secondhand-service-75df9ff569     Created pod: secondhand-service-75df9ff569-892m2
+9m57s       Normal    Pulled                         pod/secondhand-service-75df9ff569-892m2      Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+9m57s       Normal    Created                        pod/secondhand-service-75df9ff569-892m2      Container created
+9m57s       Normal    Killing                        pod/secondhand-service-75df9ff569-c82fm      Container secondhand-service failed liveness probe, will be restarted
+9m57s       Normal    Started                        pod/secondhand-service-75df9ff569-892m2      Container started
+9m27s       Normal    Started                        pod/secondhand-service-75df9ff569-c82fm      Container started
+9m27s       Normal    Pulled                         pod/secondhand-service-75df9ff569-c82fm      Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+9m27s       Normal    Created                        pod/secondhand-service-75df9ff569-c82fm      Container created
+9m19s       Warning   Unhealthy                      pod/secondhand-service-75df9ff569-c82fm      Startup probe failed: Get "http://10.42.0.55:8080/actuator/health/liveness": dial tcp 10.42.0.55:8080: connect: connection refused
+9m13s       Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/secondhand-service   invalid metrics (1 invalid out of 1), first error is: failed to get cpu resource metric value: failed to get cpu utilization: did not receive metrics for targeted pods (pods might be unready)
+9m13s       Warning   FailedGetResourceMetric        horizontalpodautoscaler/secondhand-service   failed to get cpu utilization: did not receive metrics for targeted pods (pods might be unready)
+8m52s       Warning   Unhealthy                      pod/secondhand-service-75df9ff569-l84gg      Startup probe failed: Get "http://10.42.0.59:8080/actuator/health/liveness": dial tcp 10.42.0.59:8080: connect: connection refused
+8m46s       Warning   Unhealthy                      pod/secondhand-service-75df9ff569-l84gg      Startup probe failed: Get "http://10.42.0.59:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+8m42s       Warning   Unhealthy                      pod/secondhand-service-75df9ff569-t7bw7      Startup probe failed: Get "http://10.42.0.60:8080/actuator/health/liveness": dial tcp 10.42.0.60:8080: connect: connection refused
+8m38s       Warning   Unhealthy                      pod/secondhand-service-75df9ff569-892m2      Startup probe failed: Get "http://10.42.0.61:8080/actuator/health/liveness": dial tcp 10.42.0.61:8080: connect: connection refused
+8m36s       Warning   Unhealthy                      pod/secondhand-service-75df9ff569-t7bw7      Startup probe failed: Get "http://10.42.0.60:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+8m32s       Warning   Unhealthy                      pod/secondhand-service-75df9ff569-892m2      Startup probe failed: Get "http://10.42.0.61:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+6m43s       Normal    Killing                        pod/secondhand-service-75df9ff569-l84gg      Stopping container secondhand-service
+6m43s       Normal    SuccessfulDelete               replicaset/secondhand-service-75df9ff569     Deleted pod: secondhand-service-75df9ff569-892m2
+6m43s       Normal    Killing                        pod/secondhand-service-75df9ff569-892m2      Stopping container secondhand-service
+6m43s       Warning   Unhealthy                      pod/secondhand-service-75df9ff569-892m2      Readiness probe failed: Get "http://10.42.0.61:8080/actuator/health/readiness": dial tcp 10.42.0.61:8080: connect: connection refused
+6m43s       Normal    SuccessfulDelete               replicaset/secondhand-service-75df9ff569     Deleted pod: secondhand-service-75df9ff569-l84gg
+6m42s       Warning   Unhealthy                      pod/secondhand-service-75df9ff569-l84gg      Readiness probe failed: Get "http://10.42.0.59:8080/actuator/health/readiness": dial tcp 10.42.0.59:8080: connect: connection refused
+6m13s       Normal    Killing                        pod/secondhand-service-75df9ff569-c82fm      Stopping container secondhand-service
+6m13s       Normal    SuccessfulDelete               replicaset/secondhand-service-75df9ff569     Deleted pod: secondhand-service-75df9ff569-c82fm
+4m13s       Normal    ScalingReplicaSet              deployment/secondhand-service                Scaled up replica set secondhand-service-75df9ff569 from 1 to 3
+4m13s       Normal    SuccessfulRescale              horizontalpodautoscaler/secondhand-service   New size: 3; reason: cpu resource utilization (percentage of request) above target
+4m11s       Normal    Created                        pod/secondhand-service-75df9ff569-k4ckb      Container created
+4m11s       Normal    Pulled                         pod/secondhand-service-75df9ff569-k4ckb      Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+4m11s       Normal    Started                        pod/secondhand-service-75df9ff569-k4ckb      Container started
+4m11s       Normal    Pulled                         pod/secondhand-service-75df9ff569-whrsb      Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+4m11s       Normal    Created                        pod/secondhand-service-75df9ff569-whrsb      Container created
+4m11s       Normal    Started                        pod/secondhand-service-75df9ff569-whrsb      Container started
+3m58s       Normal    SuccessfulRescale              horizontalpodautoscaler/secondhand-service   New size: 4; reason: cpu resource utilization (percentage of request) above target
+3m58s       Normal    ScalingReplicaSet              deployment/secondhand-service                Scaled up replica set secondhand-service-75df9ff569 from 3 to 4
+3m58s       Normal    SuccessfulCreate               replicaset/secondhand-service-75df9ff569     (combined from similar events): Created pod: secondhand-service-75df9ff569-n98wj
+3m57s       Normal    Created                        pod/secondhand-service-75df9ff569-n98wj      Container created
+3m57s       Normal    Pulled                         pod/secondhand-service-75df9ff569-n98wj      Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+3m56s       Normal    Started                        pod/secondhand-service-75df9ff569-n98wj      Container started
+2m47s       Warning   Unhealthy                      pod/secondhand-service-75df9ff569-whrsb      Startup probe failed: Get "http://10.42.0.62:8080/actuator/health/liveness": dial tcp 10.42.0.62:8080: connect: connection refused
+2m47s       Warning   Unhealthy                      pod/secondhand-service-75df9ff569-k4ckb      Startup probe failed: Get "http://10.42.0.63:8080/actuator/health/liveness": dial tcp 10.42.0.63:8080: connect: connection refused
+2m41s       Warning   Unhealthy                      pod/secondhand-service-75df9ff569-whrsb      Startup probe failed: Get "http://10.42.0.62:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2m41s       Warning   Unhealthy                      pod/secondhand-service-75df9ff569-k4ckb      Startup probe failed: Get "http://10.42.0.63:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+2m37s       Warning   Unhealthy                      pod/secondhand-service-75df9ff569-n98wj      Startup probe failed: Get "http://10.42.0.64:8080/actuator/health/liveness": dial tcp 10.42.0.64:8080: connect: connection refused
+2m31s       Warning   Unhealthy                      pod/secondhand-service-75df9ff569-n98wj      Startup probe failed: Get "http://10.42.0.64:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+87s         Normal    Killing                        pod/secondhand-service-75df9ff569-k4ckb      Stopping container secondhand-service
+87s         Normal    Killing                        pod/secondhand-service-75df9ff569-n98wj      Stopping container secondhand-service
+87s         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-n98wj      Readiness probe failed: Get "http://10.42.0.64:8080/actuator/health/readiness": dial tcp 10.42.0.64:8080: connect: connection refused
+87s         Normal    SuccessfulRescale              horizontalpodautoscaler/secondhand-service   New size: 2; reason: All metrics below target
+87s         Normal    ScalingReplicaSet              deployment/secondhand-service                Scaled down replica set secondhand-service-75df9ff569 from 4 to 2
+87s         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-k4ckb      Readiness probe failed: Get "http://10.42.0.63:8080/actuator/health/readiness": dial tcp 10.42.0.63:8080: connect: connection refused
+27s         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-whrsb      Readiness probe failed: Get "http://10.42.0.62:8080/actuator/health/readiness": dial tcp 10.42.0.62:8080: connect: connection refused
+27s         Normal    SuccessfulRescale              horizontalpodautoscaler/secondhand-service   New size: 1; reason: All metrics below target
+27s         Normal    ScalingReplicaSet              deployment/secondhand-service                Scaled down replica set secondhand-service-75df9ff569 from 2 to 1
+27s         Normal    SuccessfulDelete               replicaset/secondhand-service-75df9ff569     (combined from similar events): Deleted pod: secondhand-service-75df9ff569-whrsb
+27s         Normal    Killing                        pod/secondhand-service-75df9ff569-whrsb      Stopping container secondhand-service

@@ -1,0 +1,5 @@
+NAME                                  READY   STATUS    RESTARTS      AGE   IP           NODE                      NOMINATED NODE   READINESS GATES
+monolith-86f5d4c556-dn9lt             1/1     Running   3 (19m ago)   33m   10.42.0.51   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+mysql-797646cfd5-bjhpl                1/1     Running   0             33m   10.42.0.49   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+order-service-b486d7b94-79c64         1/1     Running   0             33m   10.42.0.50   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+secondhand-service-75df9ff569-fkxxm   1/1     Running   0             33m   10.42.0.52   izbp1fcr5ltsng9ra8gt84z   <none>           <none>

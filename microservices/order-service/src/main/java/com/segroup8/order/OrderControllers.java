@@ -282,20 +282,21 @@ class InternalOrderController {
     }
 
     @PostMapping("/secondhand")
-    OrderView secondhand(@RequestHeader("Idempotency-Key") String idempotencyKey,
+    ApiResponse<SecondhandOrderReceipt> secondhand(@RequestHeader("Idempotency-Key") String idempotencyKey,
             @Valid @RequestBody SecondhandOrderRequest request) {
-        String expectedKey = request.tradeType() + ":" + request.tradeId();
-        if (!expectedKey.equals(idempotencyKey)) {
+        String expectedKey = "SECONDHAND:" + request.tradeType() + ":" + request.tradeId();
+        if (!expectedKey.equals(request.orderBusinessKey()) || !expectedKey.equals(idempotencyKey)) {
             throw new OrderException("IDEMPOTENCY_KEY_MISMATCH",
-                    "Idempotency-Key must equal tradeType:tradeId", 400);
+                    "Idempotency-Key and orderBusinessKey must identify the requested trade", 400);
         }
-        return service.createSecondhand(request);
+        return ApiResponse.success(ApiModels.secondhandReceipt(service.createSecondhand(request)));
     }
 
     @GetMapping("/by-business-key/{key}")
-    OrderView byKey(@PathVariable String key) {
-        return repository.byBusinessKey(key)
+    ApiResponse<SecondhandOrderReceipt> byKey(@PathVariable String key) {
+        OrderView order = repository.byBusinessKey(key)
                 .orElseThrow(() -> new OrderException("ORDER_NOT_FOUND", "Order does not exist", 404));
+        return ApiResponse.success(ApiModels.secondhandReceipt(order));
     }
 
     @GetMapping("/{id}/snapshot")

@@ -89,10 +89,11 @@ test("UC11-UC15 independent order-service acceptance flow", async ({ request }) 
 
 test("UC20 secondhand order uses the same independently deployed fulfillment state machine", async ({ request }) => {
   const createdResponse = await request.post("/internal/orders/secondhand", {
-    headers: { ...internal, "Idempotency-Key": "DIRECT:acceptance-uc20" },
+    headers: { ...internal, "Idempotency-Key": "SECONDHAND:DIRECT:acceptance-uc20" },
     data: {
       tradeType: "DIRECT",
       tradeId: "acceptance-uc20",
+      orderBusinessKey: "SECONDHAND:DIRECT:acceptance-uc20",
       buyerUserId: 1,
       sellerUserId: 2,
       productId: 88,
@@ -106,13 +107,14 @@ test("UC20 secondhand order uses the same independently deployed fulfillment sta
     },
   });
   expect(createdResponse.status()).toBe(200);
-  const orderId = Number((await createdResponse.json()).id);
+  const orderId = Number((await createdResponse.json()).data.orderId);
 
   const replay = await request.post("/internal/orders/secondhand", {
-    headers: { ...internal, "Idempotency-Key": "DIRECT:acceptance-uc20" },
+    headers: { ...internal, "Idempotency-Key": "SECONDHAND:DIRECT:acceptance-uc20" },
     data: {
       tradeType: "DIRECT",
       tradeId: "acceptance-uc20",
+      orderBusinessKey: "SECONDHAND:DIRECT:acceptance-uc20",
       buyerUserId: 1,
       sellerUserId: 2,
       productId: 88,
@@ -125,7 +127,8 @@ test("UC20 secondhand order uses the same independently deployed fulfillment sta
       receiverDetailAddress: "Acceptance address",
     },
   });
-  expect(Number((await replay.json()).id)).toBe(orderId);
+  expect(replay.status()).toBe(200);
+  expect(Number((await replay.json()).data.orderId)).toBe(orderId);
 
   expect((await request.post(`/api/order/${orderId}/pay`, {
     headers: { ...user, "Idempotency-Key": "uc20-pay" }, data: { payMode: "COIN" },

@@ -1,0 +1,6 @@
+# weight path
+# All requests enter through Traefik and frontend Nginx before reaching backend/MySQL.
+5 /api/secondhand/list?pageNum=1&pageSize=20
+2 /api/product/list?pageNum=1&pageSize=20
+2 /api/category/tree
+1 /api/search/hot

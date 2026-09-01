@@ -1,0 +1,252 @@
+{
+  "runs": [
+    {
+      "endpoint": "detail",
+      "system": "microservice",
+      "run": 1,
+      "throughput": 191.10916786473703,
+      "averageMs": 26.137151171105813,
+      "p95Ms": 79.473301548569,
+      "errorRate": 0.0,
+      "requests": 3832
+    },
+    {
+      "endpoint": "detail",
+      "system": "microservice",
+      "run": 2,
+      "throughput": 206.74762369747376,
+      "averageMs": 24.129267252912328,
+      "p95Ms": 76.52885616553249,
+      "errorRate": 0.0,
+      "requests": 4154
+    },
+    {
+      "endpoint": "detail",
+      "system": "microservice",
+      "run": 3,
+      "throughput": 205.79353438122817,
+      "averageMs": 24.272805431053865,
+      "p95Ms": 77.20427000458585,
+      "errorRate": 0.0,
+      "requests": 4124
+    },
+    {
+      "endpoint": "detail",
+      "system": "monolith",
+      "run": 1,
+      "throughput": 17.379176308265865,
+      "averageMs": 286.4961045732167,
+      "p95Ms": 410.6788119970588,
+      "errorRate": 0.0,
+      "requests": 351
+    },
+    {
+      "endpoint": "detail",
+      "system": "monolith",
+      "run": 2,
+      "throughput": 27.28561706870631,
+      "averageMs": 183.07548260204078,
+      "p95Ms": 301.27638299600227,
+      "errorRate": 0.0,
+      "requests": 549
+    },
+    {
+      "endpoint": "detail",
+      "system": "monolith",
+      "run": 3,
+      "throughput": 36.15080276663324,
+      "averageMs": 138.19284000951365,
+      "p95Ms": 211.53050909342707,
+      "errorRate": 0.0,
+      "requests": 727
+    },
+    {
+      "endpoint": "keyword",
+      "system": "microservice",
+      "run": 1,
+      "throughput": 37.561574908645014,
+      "averageMs": 133.03045953774998,
+      "p95Ms": 211.7657108232379,
+      "errorRate": 0.0,
+      "requests": 753
+    },
+    {
+      "endpoint": "keyword",
+      "system": "microservice",
+      "run": 2,
+      "throughput": 47.63966755423318,
+      "averageMs": 104.86427344862099,
+      "p95Ms": 185.20633680454918,
+      "errorRate": 0.0,
+      "requests": 955
+    },
+    {
+      "endpoint": "keyword",
+      "system": "microservice",
+      "run": 3,
+      "throughput": 48.590595233068804,
+      "averageMs": 102.84121900613303,
+      "p95Ms": 179.10746272973472,
+      "errorRate": 0.0,
+      "requests": 974
+    },
+    {
+      "endpoint": "keyword",
+      "system": "monolith",
+      "run": 1,
+      "throughput": 1.4826230670592462,
+      "averageMs": 3260.2296725954147,
+      "p95Ms": 3743.395500407496,
+      "errorRate": 0.0,
+      "requests": 32
+    },
+    {
+      "endpoint": "keyword",
+      "system": "monolith",
+      "run": 2,
+      "throughput": 2.0946884870850284,
+      "averageMs": 2355.7980600671726,
+      "p95Ms": 2884.426601183077,
+      "errorRate": 0.0,
+      "requests": 44
+    },
+    {
+      "endpoint": "keyword",
+      "system": "monolith",
+      "run": 3,
+      "throughput": 4.4296796329423564,
+      "averageMs": 1124.7933876671595,
+      "p95Ms": 1642.6614304538814,
+      "errorRate": 0.0,
+      "requests": 90
+    },
+    {
+      "endpoint": "list",
+      "system": "microservice",
+      "run": 1,
+      "throughput": 15.279580179836618,
+      "averageMs": 325.5020775578751,
+      "p95Ms": 504.6670638053911,
+      "errorRate": 0.0,
+      "requests": 310
+    },
+    {
+      "endpoint": "list",
+      "system": "microservice",
+      "run": 2,
+      "throughput": 25.237767767390324,
+      "averageMs": 197.82036893691009,
+      "p95Ms": 283.88780995301204,
+      "errorRate": 0.0,
+      "requests": 508
+    },
+    {
+      "endpoint": "list",
+      "system": "microservice",
+      "run": 3,
+      "throughput": 23.688189946990992,
+      "averageMs": 210.63184853433535,
+      "p95Ms": 302.73024278576486,
+      "errorRate": 0.0,
+      "requests": 477
+    },
+    {
+      "endpoint": "list",
+      "system": "monolith",
+      "run": 1,
+      "throughput": 0.9189157830290775,
+      "averageMs": null,
+      "p95Ms": null,
+      "errorRate": 1.0,
+      "requests": 23
+    },
+    {
+      "endpoint": "list",
+      "system": "monolith",
+      "run": 2,
+      "throughput": 0.998129073525975,
+      "averageMs": null,
+      "p95Ms": null,
+      "errorRate": 1.0,
+      "requests": 20
+    },
+    {
+      "endpoint": "list",
+      "system": "monolith",
+      "run": 3,
+      "throughput": 1.6591345515686342,
+      "averageMs": 2971.3039816307305,
+      "p95Ms": 4263.6441778042345,
+      "errorRate": 0.0,
+      "requests": 35
+    }
+  ],
+  "aggregates": [
+    {
+      "endpoint": "detail",
+      "system": "microservice",
+      "runs": 3,
+      "runsWithSuccessfulLatency": 3,
+      "medianThroughput": 205.79353438122817,
+      "medianAverageMs": 24.272805431053865,
+      "medianP95Ms": 77.20427000458585,
+      "totalRequests": 12110,
+      "weightedErrorRate": 0.0
+    },
+    {
+      "endpoint": "detail",
+      "system": "monolith",
+      "runs": 3,
+      "runsWithSuccessfulLatency": 3,
+      "medianThroughput": 27.28561706870631,
+      "medianAverageMs": 183.07548260204078,
+      "medianP95Ms": 301.27638299600227,
+      "totalRequests": 1627,
+      "weightedErrorRate": 0.0
+    },
+    {
+      "endpoint": "keyword",
+      "system": "microservice",
+      "runs": 3,
+      "runsWithSuccessfulLatency": 3,
+      "medianThroughput": 47.63966755423318,
+      "medianAverageMs": 104.86427344862099,
+      "medianP95Ms": 185.20633680454918,
+      "totalRequests": 2682,
+      "weightedErrorRate": 0.0
+    },
+    {
+      "endpoint": "keyword",
+      "system": "monolith",
+      "runs": 3,
+      "runsWithSuccessfulLatency": 3,
+      "medianThroughput": 2.0946884870850284,
+      "medianAverageMs": 2355.7980600671726,
+      "medianP95Ms": 2884.426601183077,
+      "totalRequests": 166,
+      "weightedErrorRate": 0.0
+    },
+    {
+      "endpoint": "list",
+      "system": "microservice",
+      "runs": 3,
+      "runsWithSuccessfulLatency": 3,
+      "medianThroughput": 23.688189946990992,
+      "medianAverageMs": 210.63184853433535,
+      "medianP95Ms": 302.73024278576486,
+      "totalRequests": 1295,
+      "weightedErrorRate": 0.0
+    },
+    {
+      "endpoint": "list",
+      "system": "monolith",
+      "runs": 3,
+      "runsWithSuccessfulLatency": 1,
+      "medianThroughput": 0.998129073525975,
+      "medianAverageMs": 2971.3039816307305,
+      "medianP95Ms": 4263.6441778042345,
+      "totalRequests": 78,
+      "weightedErrorRate": 0.5512820512820513
+    }
+  ]
+}

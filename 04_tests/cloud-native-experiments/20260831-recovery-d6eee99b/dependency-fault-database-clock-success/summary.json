@@ -1,0 +1,17 @@
+{
+  "dependency": "secondhand-service -> order-service",
+  "fault": "order-service replicas scaled from 1 to 0",
+  "faultResponseHttpStatus": 202,
+  "faultResponseRequestStatus": "RETRY",
+  "controlledResponseObserved": true,
+  "livenessDuringFault": "UP",
+  "readinessDuringFault": "UP",
+  "recoveredRequestStatus": "CREATED",
+  "repeatHttpStatus": 200,
+  "matchingOrdersAfterRepeat": 1,
+  "noDuplicateOrder": true,
+  "identityAddressPrecheckHttpStatus": 200,
+  "addressSnapshotStored": true,
+  "courseFaultHandlingRequirementPassed": true,
+  "automaticRecoveryPassed": true
+}

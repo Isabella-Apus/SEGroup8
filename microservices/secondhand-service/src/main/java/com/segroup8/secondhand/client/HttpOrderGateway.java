@@ -25,26 +25,29 @@ public class HttpOrderGateway implements OrderGateway {
     @Override
     public OrderReceipt createSecondhandOrder(TradeOrderRequest request) {
         try {
-            AddressGateway.AddressSnapshot address = request.addressId() == null
-                    ? addresses.requireDefaultAddress(request.buyerUserId(), request.orderBusinessKey())
-                    : addresses.requireOwnedAddress(request.buyerUserId(), request.addressId(),
-                            request.orderBusinessKey());
-            OrderData order = client.post().uri("/internal/orders/secondhand")
+            OrderEnvelope envelope = client.post().uri("/internal/orders/secondhand")
                     .header("X-Internal-Service-Token", internalToken)
                     .header("X-Request-Id", request.orderBusinessKey())
                     .header("Idempotency-Key", request.orderBusinessKey())
                     .header("X-Idempotency-Key", request.orderBusinessKey())
-                    .body(CreateOrderCommand.from(request, address))
+                    .body(new CreateOrderCommand(request.tradeType(), request.tradeId(), request.orderBusinessKey(),
+                            request.buyerUserId(), request.sellerUserId(), request.productId(), request.productName(),
+                            request.price(), request.receiverName(), request.receiverPhone(), request.receiverProvince(),
+                            request.receiverCity(), request.receiverDetailAddress(), request.remark()))
                     .retrieve()
-                    .onStatus(HttpStatusCode::isError, (httpRequest, response) -> {
+                    .onStatus(HttpStatusCode::is4xxClientError, (httpRequest, response) -> {
+                        throw new OrderContractException("order-service rejected secondhand contract with HTTP "
+                                + response.getStatusCode());
+                    })
+                    .onStatus(HttpStatusCode::is5xxServerError, (httpRequest, response) -> {
                         throw new OrderServiceUnavailableException("order-service returned HTTP " + response.getStatusCode());
                     })
-                    .body(OrderData.class);
-            if (order == null || order.id() == null) {
+                    .body(OrderEnvelope.class);
+            if (envelope == null || envelope.data() == null || envelope.data().orderId() == null) {
                 throw new OrderServiceUnavailableException("order-service returned an incomplete response");
             }
-            return order.toReceipt();
-        } catch (OrderServiceUnavailableException exception) {
+            return envelope.data().toReceipt();
+        } catch (OrderContractException | OrderServiceUnavailableException exception) {
             throw exception;
         } catch (RestClientException exception) {
             throw new OrderServiceUnavailableException("order-service create request failed", exception);
@@ -54,7 +57,7 @@ public class HttpOrderGateway implements OrderGateway {
     @Override
     public Optional<OrderReceipt> findByBusinessKey(String businessKey) {
         try {
-            OrderData order = client.get()
+            OrderEnvelope envelope = client.get()
                     .uri(uriBuilder -> uriBuilder.path("/internal/orders/by-business-key/{key}").build(businessKey))
                     .header("X-Internal-Service-Token", internalToken)
                     .header("X-Request-Id", businessKey)
@@ -65,8 +68,9 @@ public class HttpOrderGateway implements OrderGateway {
                     .onStatus(HttpStatusCode::isError, (request, response) -> {
                         throw new OrderServiceUnavailableException("order-service lookup returned HTTP " + response.getStatusCode());
                     })
-                    .body(OrderData.class);
-            return order == null || order.id() == null ? Optional.empty() : Optional.of(order.toReceipt());
+                    .body(OrderEnvelope.class);
+            return envelope == null || envelope.data() == null || envelope.data().orderId() == null
+                    ? Optional.empty() : Optional.of(envelope.data().toReceipt());
         } catch (OrderNotFoundException notFound) {
             return Optional.empty();
         } catch (OrderServiceUnavailableException exception) {
@@ -76,22 +80,18 @@ public class HttpOrderGateway implements OrderGateway {
         }
     }
 
-    record CreateOrderCommand(String tradeType, String tradeId, long buyerUserId, long sellerUserId,
-            long productId, String productName, java.math.BigDecimal price, String receiverName,
-            String receiverPhone, String receiverProvince, String receiverCity,
-            String receiverDetailAddress, String remark) {
-        static CreateOrderCommand from(TradeOrderRequest request, AddressGateway.AddressSnapshot address) {
-            return new CreateOrderCommand(request.tradeType(), request.tradeId(), request.buyerUserId(),
-                    request.sellerUserId(), request.productId(), "Secondhand product #" + request.productId(),
-                    request.price(), address.receiverName(), address.receiverPhone(), address.province(),
-                    address.city(), address.detailAddress(),
-                    request.remark());
-        }
+    record CreateOrderCommand(String tradeType, String tradeId, String orderBusinessKey,
+            long buyerUserId, long sellerUserId, long productId, String productName,
+            java.math.BigDecimal price, String receiverName, String receiverPhone,
+            String receiverProvince, String receiverCity, String receiverDetailAddress, String remark) {
     }
 
-    record OrderData(Long id, String orderNo, String orderStatus) {
+    record OrderEnvelope(Integer code, String message, OrderData data) {
+    }
+
+    record OrderData(Long orderId, String orderNo, String status) {
         OrderReceipt toReceipt() {
-            return new OrderReceipt(id, orderNo, orderStatus == null ? "PENDING_PAY" : orderStatus);
+            return new OrderReceipt(orderId, orderNo, status == null ? "PENDING_PAY" : status);
         }
     }
 

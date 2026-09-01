@@ -1,0 +1,249 @@
+apiVersion: v1
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "4"
+      meta.helm.sh/release-name: segroup8
+      meta.helm.sh/release-namespace: segroup8
+    creationTimestamp: "2026-08-28T14:13:00Z"
+    generation: 13
+    labels:
+      app.kubernetes.io/component: backend
+      app.kubernetes.io/instance: segroup8
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: segroup8
+      helm.sh/chart: segroup8-0.1.0
+    name: segroup8-backend
+    namespace: segroup8
+    resourceVersion: "119585"
+    uid: 0f5dad3f-6e40-4a8d-bd06-08fce9056757
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 2
+    revisionHistoryLimit: 3
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: backend
+        app.kubernetes.io/instance: segroup8
+    strategy:
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 0
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app.kubernetes.io/component: backend
+          app.kubernetes.io/instance: segroup8
+      spec:
+        containers:
+        - env:
+          - name: APP_VERSION
+            value: sha-bb72290cff96c78ab189468b82db1f8ba3cd9323
+          - name: APP_COMMIT
+            value: bb72290cff96c78ab189468b82db1f8ba3cd9323
+          - name: APP_BUILD_TIME
+            value: "2026-08-29T07:57:34Z"
+          - name: APP_RISK_AUDIT_LLM_ENABLED
+            value: "false"
+          - name: TZ
+            value: Asia/Shanghai
+          envFrom:
+          - secretRef:
+              name: segroup8-backend-secret
+          image: crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 3
+          name: backend
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1536Mi
+            requests:
+              cpu: 250m
+              memory: 512Mi
+          startupProbe:
+            failureThreshold: 24
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /app/uploads
+            name: uploads
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: acr-pull-secret
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext:
+          fsGroup: 10001
+          fsGroupChangePolicy: OnRootMismatch
+          runAsGroup: 10001
+          runAsNonRoot: true
+          runAsUser: 10001
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: uploads
+          persistentVolumeClaim:
+            claimName: segroup8-uploads
+  status:
+    availableReplicas: 2
+    conditions:
+    - lastTransitionTime: "2026-08-28T14:13:00Z"
+      lastUpdateTime: "2026-08-29T07:58:22Z"
+      message: ReplicaSet "segroup8-backend-7dc76cb94d" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    - lastTransitionTime: "2026-08-31T08:12:53Z"
+      lastUpdateTime: "2026-08-31T08:12:53Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    observedGeneration: 13
+    readyReplicas: 2
+    replicas: 2
+    terminatingReplicas: 0
+    updatedReplicas: 2
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    annotations:
+      deployment.kubernetes.io/revision: "4"
+      meta.helm.sh/release-name: segroup8
+      meta.helm.sh/release-namespace: segroup8
+    creationTimestamp: "2026-08-28T14:13:00Z"
+    generation: 4
+    labels:
+      app.kubernetes.io/component: frontend
+      app.kubernetes.io/instance: segroup8
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: segroup8
+      helm.sh/chart: segroup8-0.1.0
+    name: segroup8-frontend
+    namespace: segroup8
+    resourceVersion: "46879"
+    uid: b0bede9f-9d02-4326-9dd0-c77eb6ee4f2e
+  spec:
+    progressDeadlineSeconds: 600
+    replicas: 1
+    revisionHistoryLimit: 3
+    selector:
+      matchLabels:
+        app.kubernetes.io/component: frontend
+        app.kubernetes.io/instance: segroup8
+    strategy:
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 0
+      type: RollingUpdate
+    template:
+      metadata:
+        labels:
+          app.kubernetes.io/component: frontend
+          app.kubernetes.io/instance: segroup8
+      spec:
+        containers:
+        - image: crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/frontend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 2
+          name: frontend
+          ports:
+          - containerPort: 80
+            name: http
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 2
+          resources:
+            limits:
+              cpu: 250m
+              memory: 256Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          startupProbe:
+            failureThreshold: 20
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            periodSeconds: 3
+            successThreshold: 1
+            timeoutSeconds: 1
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        imagePullSecrets:
+        - name: acr-pull-secret
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    availableReplicas: 1
+    conditions:
+    - lastTransitionTime: "2026-08-28T14:13:04Z"
+      lastUpdateTime: "2026-08-28T14:13:04Z"
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: "True"
+      type: Available
+    - lastTransitionTime: "2026-08-28T14:13:00Z"
+      lastUpdateTime: "2026-08-29T07:57:40Z"
+      message: ReplicaSet "segroup8-frontend-5bb4b9c7c8" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: "True"
+      type: Progressing
+    observedGeneration: 4
+    readyReplicas: 1
+    replicas: 1
+    terminatingReplicas: 0
+    updatedReplicas: 1
+kind: List
+metadata:
+  resourceVersion: ""

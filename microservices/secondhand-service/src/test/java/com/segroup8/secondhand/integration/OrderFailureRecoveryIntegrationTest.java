@@ -35,6 +35,11 @@ class OrderFailureRecoveryIntegrationTest extends SecondhandIntegrationSupport {
         assertThat(db.queryForObject("select status from secondhand_product where id=?", Integer.class, productId))
                 .isEqualTo(4);
         String businessKey = processing.orderBusinessKey();
+        long retryDelaySeconds = db.queryForObject(
+                "select TIMESTAMPDIFF(SECOND,CURRENT_TIMESTAMP,next_retry_at) "
+                        + "from trade_order_request where order_business_key=?",
+                Long.class, businessKey);
+        assertThat(retryDelaySeconds).isBetween(0L, 2L);
 
         doReturn(new OrderReceipt(9001, "ORD9001", "PENDING_PAY"))
                 .when(orderGateway).createSecondhandOrder(any());

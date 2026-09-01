@@ -18,6 +18,20 @@ backend:
     limits:
       cpu: "1"
       memory: 1536Mi
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 4
+    targetCPUUtilizationPercentage: 60
+    behavior:
+      scaleUp:
+        stabilizationWindowSeconds: 0
+        pods: 2
+        periodSeconds: 15
+      scaleDown:
+        stabilizationWindowSeconds: 60
+        percent: 50
+        periodSeconds: 15
 
 messaging:
   # The messaging service is delivered by its own pipeline. Keep the shared
@@ -146,8 +160,11 @@ secondhand:
   orderConnectTimeout: 1s
   orderReadTimeout: 2s
   orderMaxAttempts: 3
+  identityConnectTimeout: 1s
+  identityReadTimeout: 3s
   tradeRecoveryDelayMs: 5000
   tradeRecoveryBatchSize: 20
+  schedulingPoolSize: 2
   auctionSettlementDelayMs: 5000
   resources:
     requests:
@@ -170,7 +187,6 @@ secondhand:
         stabilizationWindowSeconds: 60
         percent: 50
         periodSeconds: 15
-
 mysql:
   image:
     repository: mysql

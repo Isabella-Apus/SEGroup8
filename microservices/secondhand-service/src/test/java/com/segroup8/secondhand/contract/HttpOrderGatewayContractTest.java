@@ -27,8 +27,7 @@ class HttpOrderGatewayContractTest {
         RestClient.Builder builder = RestClient.builder().baseUrl("http://order.test");
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
         HttpOrderGateway gateway = new HttpOrderGateway(builder.build(), "internal-test-token",
-                (userId, addressId, requestId) -> new com.segroup8.secondhand.client.AddressGateway.AddressSnapshot(
-                        "Receiver", "13800138000", "Guangdong", "Shenzhen", "Nanshan Road"));
+                (userId, addressId, requestId) -> { throw new AssertionError("persisted snapshot must be reused"); });
         server.expect(once(), requestTo("http://order.test/internal/orders/secondhand"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header("X-Internal-Service-Token", "internal-test-token"))
@@ -37,14 +36,17 @@ class HttpOrderGatewayContractTest {
                 .andExpect(header("X-Idempotency-Key", "SECONDHAND:BARGAIN:88"))
                 .andExpect(jsonPath("$.tradeType").value("BARGAIN"))
                 .andExpect(jsonPath("$.tradeId").value("88"))
+                .andExpect(jsonPath("$.orderBusinessKey").value("SECONDHAND:BARGAIN:88"))
                 .andExpect(jsonPath("$.buyerUserId").value(20))
                 .andExpect(jsonPath("$.sellerUserId").value(10))
-                .andExpect(jsonPath("$.receiverName").value("Receiver"))
-                .andExpect(jsonPath("$.receiverPhone").value("13800138000"))
-                .andExpect(jsonPath("$.receiverProvince").value("Guangdong"))
-                .andExpect(jsonPath("$.receiverCity").value("Shenzhen"))
-                .andExpect(jsonPath("$.receiverDetailAddress").value("Nanshan Road"))
-                .andRespond(withSuccess("{\"id\":901,\"orderNo\":\"ORD901\",\"orderStatus\":\"PENDING_PAY\"}",
+                .andExpect(jsonPath("$.productName").value("Used book"))
+                .andExpect(jsonPath("$.receiverName").value("Buyer"))
+                .andExpect(jsonPath("$.receiverPhone").value("13800008000"))
+                .andExpect(jsonPath("$.receiverProvince").value("Zhejiang"))
+                .andExpect(jsonPath("$.receiverCity").value("Hangzhou"))
+                .andExpect(jsonPath("$.receiverDetailAddress").value("West Lake Road 1"))
+                .andRespond(withSuccess("{\"code\":0,\"message\":\"success\",\"data\":{"
+                        + "\"orderId\":901,\"orderNo\":\"ORD901\",\"status\":\"PENDING_PAY\"}}",
                         MediaType.APPLICATION_JSON));
 
         var receipt = gateway.createSecondhandOrder(request());
@@ -64,7 +66,8 @@ class HttpOrderGatewayContractTest {
                 .andExpect(method(HttpMethod.GET))
                 .andExpect(header("X-Internal-Service-Token", "internal-test-token"))
                 .andExpect(header("X-Request-Id", "SECONDHAND:BARGAIN:88"))
-                .andRespond(withSuccess("{\"id\":901,\"orderNo\":\"ORD901\",\"orderStatus\":\"PENDING_PAY\"}",
+                .andRespond(withSuccess("{\"code\":0,\"message\":\"success\",\"data\":{"
+                                + "\"orderId\":901,\"orderNo\":\"ORD901\",\"status\":\"PENDING_PAY\"}}",
                         MediaType.APPLICATION_JSON));
 
         var receipt = gateway.findByBusinessKey("SECONDHAND:BARGAIN:88");
@@ -76,7 +79,8 @@ class HttpOrderGatewayContractTest {
     private TradeOrderRequest request() {
         LocalDateTime now = LocalDateTime.now();
         return new TradeOrderRequest(1, "BARGAIN", "88", "SECONDHAND:BARGAIN:88", 7, 20, 10,
-                new BigDecimal("75.00"), 100L, "议价订单", "PENDING", null, null, null,
+                new BigDecimal("75.00"), 3L, "Used book", "Buyer", "13800008000", "Zhejiang",
+                "Hangzhou", "West Lake Road 1", "议价订单", "PENDING", null, null, null,
                 0, null, now, 0, now, now);
     }
 }

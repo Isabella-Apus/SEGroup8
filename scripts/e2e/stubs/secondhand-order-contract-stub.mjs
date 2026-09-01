@@ -22,12 +22,18 @@ const server = createServer(async (request, response) => {
         return;
     }
 
-    const address = request.url?.match(/^\/internal\/users\/(\d+)\/addresses\/(\d+)$/);
-    const shipping = request.url?.match(/^\/internal\/users\/(\d+)\/shipping-address$/);
-    if (request.method === "GET" && (address || shipping)) {
-        const userId = Number((address || shipping)[1]);
+    const parsedUrl = new URL(request.url || "/", "http://stub");
+    const addressLookup = parsedUrl
+        .pathname.match(/^\/internal\/users\/(\d+)\/address-snapshot$/);
+    const address = parsedUrl.pathname.match(/^\/internal\/users\/(\d+)\/addresses\/(\d+)$/);
+    const shipping = parsedUrl.pathname.match(/^\/internal\/users\/(\d+)\/shipping-address$/);
+    if (request.method === "GET" && (addressLookup || address || shipping)) {
+        const userId = Number((addressLookup || address || shipping)[1]);
+        const addressId = addressLookup
+            ? Number(parsedUrl.searchParams.get("addressId") || 1)
+            : (address ? Number(address[2]) : 100);
         send(response, 200, { code: 0, message: "success", data: {
-            addressId: address ? Number(address[2]) : 100, userId, receiverName: "Acceptance Buyer",
+            id: addressId, addressId, userId, receiverName: "Acceptance Buyer",
             receiverPhone: "13800138000", province: "Guangdong", city: "Shenzhen",
             detailAddress: "Nanshan Acceptance Road"
         }});
@@ -36,23 +42,24 @@ const server = createServer(async (request, response) => {
 
     if (request.method === "POST" && request.url === "/internal/orders/secondhand") {
         const body = await readJson(request);
-        const key = String(request.headers["idempotency-key"] || body.tradeId || "");
+        const key = String(request.headers["idempotency-key"] || body.orderBusinessKey || "");
         if (!key) {
             send(response, 400, { error: "missing idempotency key" });
             return;
         }
         if (!orders.has(key)) {
             sequence += 1;
-            orders.set(key, { id: sequence, orderNo: `E2E${sequence}`, orderStatus: "PENDING_PAY" });
+            orders.set(key, { orderId: sequence, orderNo: `E2E${sequence}`, status: "PENDING_PAY" });
         }
-        send(response, 200, orders.get(key));
+        send(response, 200, { code: 0, message: "success", data: orders.get(key) });
         return;
     }
 
     const lookup = request.url?.match(/^\/internal\/orders\/by-business-key\/(.+)$/);
     if (request.method === "GET" && lookup) {
         const order = orders.get(decodeURIComponent(lookup[1]));
-        send(response, order ? 200 : 404, order || { error: "not found" });
+        send(response, order ? 200 : 404,
+            order ? { code: 0, message: "success", data: order } : { code: 404, message: "not found", data: null });
         return;
     }
 

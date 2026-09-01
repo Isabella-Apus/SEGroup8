@@ -20,15 +20,4 @@ public class OrderClientConfiguration {
         factory.setReadTimeout(readTimeout);
         return builder.baseUrl(baseUrl).requestFactory(factory).build();
     }
-
-    @Bean("identityRestClient")
-    RestClient identityRestClient(RestClient.Builder builder,
-            @Value("${clients.identity.base-url}") String baseUrl,
-            @Value("${clients.identity.connect-timeout}") Duration connectTimeout,
-            @Value("${clients.identity.read-timeout}") Duration readTimeout) {
-        HttpClient httpClient = HttpClient.newBuilder().connectTimeout(connectTimeout).build();
-        JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(httpClient);
-        factory.setReadTimeout(readTimeout);
-        return builder.baseUrl(baseUrl).requestFactory(factory).build();
-    }
 }

@@ -1,0 +1,43 @@
+2026-08-31T00:12:24+08:00
+NAME                                        STATUS   AGE
+default                                     Active   2d13h
+kube-node-lease                             Active   2d13h
+kube-public                                 Active   2d13h
+kube-system                                 Active   2d13h
+segroup8                                    Active   2d12h
+segroup8-cloud-exp-20260830-2300-ef71f1fe   Active   68m
+NAME                                READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/segroup8-backend    1/1     1            1           2d1h
+deployment.apps/segroup8-frontend   1/1     1            1           2d1h
+
+NAME                                     READY   STATUS    RESTARTS   AGE
+pod/mysql-0                              1/1     Running   0          2d1h
+pod/segroup8-backend-7dc76cb94d-tmnjx    1/1     Running   0          32h
+pod/segroup8-frontend-5bb4b9c7c8-5bcsd   1/1     Running   0          32h
+
+NAME               TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)    AGE
+service/backend    ClusterIP   10.43.58.56    <none>        8080/TCP   2d1h
+service/frontend   ClusterIP   10.43.54.227   <none>        80/TCP     2d1h
+service/mysql      ClusterIP   None           <none>        3306/TCP   2d1h
+NAME                                 READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/monolith             1/1     1            1           68m
+deployment.apps/mysql                1/1     1            1           68m
+deployment.apps/order-service        1/1     1            1           68m
+deployment.apps/secondhand-service   1/1     1            1           68m
+
+NAME                                      READY   STATUS    RESTARTS      AGE
+pod/monolith-86f5d4c556-dn9lt             1/1     Running   3 (53m ago)   68m
+pod/mysql-797646cfd5-bjhpl                1/1     Running   0             68m
+pod/order-service-b486d7b94-nkn98         1/1     Running   0             7m5s
+pod/secondhand-service-75df9ff569-t7bw7   1/1     Running   0             18m
+
+NAME                         TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+service/monolith             ClusterIP   10.43.120.41    <none>        8080/TCP   68m
+service/mysql                ClusterIP   10.43.134.57    <none>        3306/TCP   68m
+service/order-service        ClusterIP   10.43.176.32    <none>        8085/TCP   68m
+service/secondhand-service   ClusterIP   10.43.213.198   <none>        8080/TCP   68m
+NAME                                  CPU(cores)   MEMORY(bytes)   
+monolith-86f5d4c556-dn9lt             3m           252Mi           
+mysql-797646cfd5-bjhpl                15m          550Mi           
+order-service-b486d7b94-nkn98         9m           194Mi           
+secondhand-service-75df9ff569-t7bw7   8m           224Mi           

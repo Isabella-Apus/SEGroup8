@@ -1,0 +1,70 @@
+{
+  "scope": "complete-system",
+  "trafficPath": "Traefik -> frontend Nginx -> backend -> MySQL",
+  "runs": [
+    {
+      "name": "fixed-c10",
+      "concurrency": 10,
+      "throughput": 30.04829139339587,
+      "averageMs": 329.8858359308217,
+      "p95Ms": 873.2337937544798,
+      "errorRate": 0.0,
+      "requests": 926
+    },
+    {
+      "name": "fixed-c20",
+      "concurrency": 20,
+      "throughput": 30.192886618088146,
+      "averageMs": 655.6697259410943,
+      "p95Ms": 1941.8093377957111,
+      "errorRate": 0.0,
+      "requests": 927
+    },
+    {
+      "name": "fixed-c5",
+      "concurrency": 5,
+      "throughput": 28.408526336396807,
+      "averageMs": 175.77518708514327,
+      "p95Ms": 428.74454050615896,
+      "errorRate": 0.0,
+      "requests": 856
+    },
+    {
+      "name": "hpa-c10",
+      "concurrency": 10,
+      "throughput": 18.82880896118145,
+      "averageMs": 527.5434845201138,
+      "p95Ms": 1367.1984920219984,
+      "errorRate": 0.0,
+      "requests": 576
+    },
+    {
+      "name": "hpa-c20",
+      "concurrency": 20,
+      "throughput": 21.749328155252684,
+      "averageMs": 908.3507316693916,
+      "p95Ms": 2797.836225960052,
+      "errorRate": 0.0,
+      "requests": 672
+    },
+    {
+      "name": "hpa-c5",
+      "concurrency": 5,
+      "throughput": 13.780116391064917,
+      "averageMs": 362.10594159591164,
+      "p95Ms": 1073.7532699829899,
+      "errorRate": 0.0,
+      "requests": 417
+    }
+  ],
+  "hpa": {
+    "minimumReplicas": 2,
+    "peakReplicas": 4,
+    "peakReadyReplicas": 4,
+    "finalReplicas": 2,
+    "scaleOutObserved": true,
+    "usableScaleOutObserved": true,
+    "scaleInObserved": true
+  },
+  "maximumErrorRate": 0.0
+}

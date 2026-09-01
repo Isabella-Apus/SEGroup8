@@ -256,6 +256,8 @@ jobs:
           exit 1
       - name: Run UC01-UC05 against the independent service
         working-directory: frontend
+        env:
+          E2E_OUTPUT_DIR: ${{ runner.temp }}/identity-domain-a-e2e
         run: npx playwright test e2e/domain-a --workers=1
       - name: Collect independent stack diagnostics
         if: always()

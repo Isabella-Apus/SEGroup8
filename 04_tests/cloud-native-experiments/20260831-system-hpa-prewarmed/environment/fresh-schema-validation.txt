@@ -1,0 +1,9 @@
+Validation target: one-time empty database on the experiment K3s MySQL instance
+Schema source: backend/src/main/resources/schema.sql
+Result: PASS
+Tables created: 33
+idx_secondhand_status_created index columns: 3
+Cleanup: temporary validation database dropped automatically
+
+Command result:
+FRESH_SCHEMA_OK tables=33 index_columns=3

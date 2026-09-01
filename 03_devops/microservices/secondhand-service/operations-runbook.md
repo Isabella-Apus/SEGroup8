@@ -110,5 +110,19 @@ kubectl -n segroup8 exec deployment/segroup8-secondhand -- curl -fsS http://127.
 订单依赖不可用时，二手服务 readiness 应保持 `UP`；查看 `trade_order_request` 的 `PENDING/RETRY`、尝试次数和
 business key。恢复订单服务后，先按 business key 查询再重试，验证没有重复订单。
 
+若依赖已恢复但请求长期停在 `RETRY`，同时查询数据库时钟与到期时间：
+
+```sql
+SELECT id, request_status, attempts, next_retry_at, CURRENT_TIMESTAMP,
+       TIMESTAMPDIFF(SECOND, CURRENT_TIMESTAMP, next_retry_at)
+FROM trade_order_request
+WHERE request_status = 'RETRY';
+```
+
+正式实现使用数据库单一时钟写入和筛选 `next_retry_at`。禁止改回 `LocalDateTime.now()` 后再用
+数据库 `CURRENT_TIMESTAMP` 筛选；容器与 MySQL 时区不一致时会形成约 8 小时的隐性恢复延迟。
+真实 K3s 修复前后证据见
+`04_tests/cloud-native-experiments/20260831-recovery-d6eee99b/`。
+
 暂停恢复任务时应先缩容服务或统一调整调度间隔，处理完成后再恢复副本，并检查 `trade_order_request` 与
 `outbox_event` 积压。共享 relay/CDC 接入前，`event_status=NEW` 表示待集成，不得冒充已送达或手工删除。

@@ -1,0 +1,36 @@
+LAST SEEN   TYPE      REASON                         OBJECT                                       MESSAGE
+105s        Normal    Scheduled                      pod/secondhand-service-75df9ff569-fkxxm      Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/secondhand-service-75df9ff569-fkxxm to izbp1fcr5ltsng9ra8gt84z
+105s        Normal    Scheduled                      pod/mysql-797646cfd5-bjhpl                   Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/mysql-797646cfd5-bjhpl to izbp1fcr5ltsng9ra8gt84z
+105s        Normal    Scheduled                      pod/monolith-86f5d4c556-dn9lt                Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/monolith-86f5d4c556-dn9lt to izbp1fcr5ltsng9ra8gt84z
+105s        Normal    Scheduled                      pod/order-service-b486d7b94-79c64            Successfully assigned segroup8-cloud-exp-20260830-2300-ef71f1fe/order-service-b486d7b94-79c64 to izbp1fcr5ltsng9ra8gt84z
+105s        Normal    SuccessfulCreate               replicaset/mysql-797646cfd5                  Created pod: mysql-797646cfd5-bjhpl
+105s        Normal    ScalingReplicaSet              deployment/secondhand-service                Scaled up replica set secondhand-service-75df9ff569 from 0 to 1
+105s        Normal    SuccessfulCreate               replicaset/secondhand-service-75df9ff569     Created pod: secondhand-service-75df9ff569-fkxxm
+105s        Normal    ScalingReplicaSet              deployment/order-service                     Scaled up replica set order-service-b486d7b94 from 0 to 1
+105s        Normal    SuccessfulCreate               replicaset/order-service-b486d7b94           Created pod: order-service-b486d7b94-79c64
+105s        Normal    SuccessfulCreate               replicaset/monolith-86f5d4c556               Created pod: monolith-86f5d4c556-dn9lt
+105s        Normal    ScalingReplicaSet              deployment/monolith                          Scaled up replica set monolith-86f5d4c556 from 0 to 1
+105s        Normal    ScalingReplicaSet              deployment/mysql                             Scaled up replica set mysql-797646cfd5 from 0 to 1
+104s        Normal    Pulled                         pod/order-service-b486d7b94-79c64            Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+104s        Normal    Started                        pod/monolith-86f5d4c556-dn9lt                Container started
+104s        Normal    Started                        pod/mysql-797646cfd5-bjhpl                   Container started
+104s        Normal    Created                        pod/mysql-797646cfd5-bjhpl                   Container created
+104s        Normal    Pulled                         pod/mysql-797646cfd5-bjhpl                   Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/mysql:8.4.6" already present on machine and can be accessed by the pod
+104s        Normal    Created                        pod/order-service-b486d7b94-79c64            Container created
+104s        Normal    Started                        pod/order-service-b486d7b94-79c64            Container started
+104s        Normal    Pulled                         pod/monolith-86f5d4c556-dn9lt                Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+104s        Normal    Created                        pod/monolith-86f5d4c556-dn9lt                Container created
+104s        Normal    Started                        pod/secondhand-service-75df9ff569-fkxxm      Container started
+104s        Normal    Created                        pod/secondhand-service-75df9ff569-fkxxm      Container created
+104s        Normal    Pulled                         pod/secondhand-service-75df9ff569-fkxxm      Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-bb72290cff96c78ab189468b82db1f8ba3cd9323" already present on machine and can be accessed by the pod
+90s         Warning   FailedGetResourceMetric        horizontalpodautoscaler/secondhand-service   failed to get cpu utilization: unable to get metrics for resource cpu: no metrics returned from resource metrics API
+90s         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/secondhand-service   invalid metrics (1 invalid out of 1), first error is: failed to get cpu resource metric value: failed to get cpu utilization: unable to get metrics for resource cpu: no metrics returned from resource metrics API
+79s         Warning   Unhealthy                      pod/mysql-797646cfd5-bjhpl                   Readiness probe failed: mysqladmin: [Warning] Using a password on the command line interface can be insecure.
+25s         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-fkxxm      Startup probe failed: Get "http://10.42.0.52:8080/actuator/health/liveness": dial tcp 10.42.0.52:8080: connect: connection refused
+25s         Warning   Unhealthy                      pod/order-service-b486d7b94-79c64            Startup probe failed: Get "http://10.42.0.50:8085/actuator/health/liveness": dial tcp 10.42.0.50:8085: connect: connection refused
+19s         Warning   Unhealthy                      pod/secondhand-service-75df9ff569-fkxxm      Startup probe failed: Get "http://10.42.0.52:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+19s         Warning   Unhealthy                      pod/order-service-b486d7b94-79c64            Startup probe failed: Get "http://10.42.0.50:8085/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+15s         Warning   Unhealthy                      pod/monolith-86f5d4c556-dn9lt                Startup probe failed: Get "http://10.42.0.51:8080/actuator/health/liveness": dial tcp 10.42.0.51:8080: connect: connection refused
+15s         Warning   FailedGetResourceMetric        horizontalpodautoscaler/secondhand-service   failed to get cpu utilization: did not receive metrics for targeted pods (pods might be unready)
+15s         Warning   FailedComputeMetricsReplicas   horizontalpodautoscaler/secondhand-service   invalid metrics (1 invalid out of 1), first error is: failed to get cpu resource metric value: failed to get cpu utilization: did not receive metrics for targeted pods (pods might be unready)
+9s          Warning   Unhealthy                      pod/monolith-86f5d4c556-dn9lt                Startup probe failed: Get "http://10.42.0.51:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)

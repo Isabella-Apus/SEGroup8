@@ -3,6 +3,7 @@ package com.segroup8.secondhand.service;
 import com.segroup8.secondhand.api.TradeOrderView;
 import com.segroup8.secondhand.client.OrderGateway;
 import com.segroup8.secondhand.client.OrderGateway.OrderReceipt;
+import com.segroup8.secondhand.client.OrderContractException;
 import com.segroup8.secondhand.domain.SecondhandProduct;
 import com.segroup8.secondhand.domain.TradeOrderRequest;
 import com.segroup8.secondhand.repository.AuctionRepository;
@@ -11,7 +12,6 @@ import com.segroup8.secondhand.repository.NegotiationRepository;
 import com.segroup8.secondhand.repository.OutboxRepository;
 import com.segroup8.secondhand.repository.ProductRepository;
 import com.segroup8.secondhand.repository.TradeOrderRequestRepository;
-import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -58,6 +58,11 @@ public class TradeOrderCoordinator {
         try {
             OrderReceipt receipt = orderGateway.createSecondhandOrder(request);
             complete(request, receipt);
+        } catch (OrderContractException contractFailure) {
+            log.error("order contract rejected productId={} tradeType={} tradeId={} orderBusinessKey={}",
+                    request.productId(), request.tradeType(), request.tradeId(), request.orderBusinessKey(),
+                    contractFailure);
+            fail(request, rootMessage(contractFailure));
         } catch (RuntimeException createFailure) {
             log.warn("order create failed productId={} tradeType={} tradeId={} orderBusinessKey={}",
                     request.productId(), request.tradeType(), request.tradeId(), request.orderBusinessKey(), createFailure);
@@ -66,15 +71,27 @@ public class TradeOrderCoordinator {
         return requests.findById(requestId).orElseThrow();
     }
 
-    public void recoverPending(int limit) {
-        for (TradeOrderRequest request : requests.findRetryable(limit)) {
+    public RecoverySummary recoverPending(int limit) {
+        var due = requests.findRetryable(limit);
+        int created = 0;
+        int retrying = 0;
+        int failed = 0;
+        for (TradeOrderRequest request : due) {
             try {
-                dispatch(request.id());
+                TradeOrderRequest result = dispatch(request.id());
+                if ("CREATED".equals(result.requestStatus())) created++;
+                else if ("FAILED".equals(result.requestStatus())) failed++;
+                else retrying++;
             } catch (RuntimeException exception) {
+                retrying++;
                 log.error("trade recovery failed productId={} tradeType={} tradeId={} orderBusinessKey={}",
                         request.productId(), request.tradeType(), request.tradeId(), request.orderBusinessKey(), exception);
             }
         }
+        return new RecoverySummary(due.size(), created, retrying, failed);
+    }
+
+    public record RecoverySummary(int scanned, int created, int retrying, int failed) {
     }
 
     public TradeOrderView toView(TradeOrderRequest request) {
@@ -106,7 +123,7 @@ public class TradeOrderCoordinator {
             // lost. If the status lookup is also unavailable, never convert that
             // uncertainty into a definitive failure and never unfreeze the item.
             requests.markRetry(request.id(), "create outcome uncertain; status lookup failed: "
-                    + rootMessage(lookupFailure), LocalDateTime.now().plusSeconds(10));
+                    + rootMessage(lookupFailure), 10L);
         }
     }
 
@@ -143,9 +160,13 @@ public class TradeOrderCoordinator {
     private void failOrRetry(TradeOrderRequest request, String error) {
         int nextAttempt = request.attempts() + 1;
         if (nextAttempt < maxAttempts) {
-            requests.markRetry(request.id(), error, LocalDateTime.now().plusSeconds(nextAttempt * 2L));
+            requests.markRetry(request.id(), error, nextAttempt * 2L);
             return;
         }
+        fail(request, error);
+    }
+
+    private void fail(TradeOrderRequest request, String error) {
         transactions.executeWithoutResult(status -> {
             if (requests.markFailed(request.id(), error) == 0) {
                 return;

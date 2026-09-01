@@ -1,0 +1,15 @@
+{
+  "dependency": "secondhand-service -> order-service",
+  "fault": "order-service replicas scaled from 1 to 0",
+  "faultResponseHttpStatus": 202,
+  "faultResponseRequestStatus": "RETRY",
+  "controlledResponseObserved": true,
+  "livenessDuringFault": "UP",
+  "readinessDuringFault": "UP",
+  "recoveredRequestStatus": "RETRY",
+  "repeatHttpStatus": 202,
+  "matchingOrdersAfterRepeat": 0,
+  "noDuplicateOrder": false,
+  "courseFaultHandlingRequirementPassed": true,
+  "automaticRecoveryPassed": false
+}

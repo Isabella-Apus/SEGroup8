@@ -109,19 +109,20 @@ class OrderApiTest {
     }
 
     @Test void refundAdminAndInternalApisAreProtectedAndIdempotent() throws Exception {
-        String first=mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token").header("Idempotency-Key","DIRECT:t-1")
+        String first=mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token").header("Idempotency-Key","SECONDHAND:DIRECT:t-1")
                 .contentType("application/json").content(secondhandBody())).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        long id=json.readTree(first).get("id").asLong();
-        mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token").header("Idempotency-Key","DIRECT:t-1")
-                .contentType("application/json").content(secondhandBody())).andExpect(status().isOk()).andExpect(jsonPath("$.id").value(id));
+        long id=json.readTree(first).path("data").path("orderId").asLong();
+        mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token").header("Idempotency-Key","SECONDHAND:DIRECT:t-1")
+                .contentType("application/json").content(secondhandBody())).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.orderId").value(id));
         mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token")
                 .contentType("application/json").content(secondhandBody())).andExpect(status().isBadRequest());
-        mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token").header("Idempotency-Key","DIRECT:wrong")
+        mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token").header("Idempotency-Key","SECONDHAND:DIRECT:wrong")
                 .contentType("application/json").content(secondhandBody())).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("IDEMPOTENCY_KEY_MISMATCH"));
-        mvc.perform(get("/internal/orders/by-business-key/DIRECT:t-1")).andExpect(status().isUnauthorized());
-        mvc.perform(get("/internal/orders/by-business-key/DIRECT:t-1").header("X-Internal-Service-Token","test-internal-token"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(id));
+        mvc.perform(get("/internal/orders/by-business-key/SECONDHAND:DIRECT:t-1")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/internal/orders/by-business-key/SECONDHAND:DIRECT:t-1").header("X-Internal-Service-Token","test-internal-token"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.data.orderId").value(id));
         mvc.perform(get("/internal/orders/{id}/snapshot",id).header("X-Internal-Service-Token","test-internal-token"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.items[0].productType").value("SECONDHAND"));
         db.update("update order_info set order_status='PENDING_SHIP',pay_status='PAID' where id=?",id);
@@ -294,7 +295,7 @@ class OrderApiTest {
     private org.springframework.http.HttpHeaders user(long id){var h=new org.springframework.http.HttpHeaders();h.set("X-User-Id",String.valueOf(id));h.set("X-User-Role","USER");return h;}
     private org.springframework.http.HttpHeaders admin(){var h=user(99);h.set("X-User-Role","ADMIN");return h;}
     private String createBody(){return "{\"items\":[{\"productId\":10,\"quantity\":1}],\"receiverName\":\"Buyer\",\"receiverPhone\":\"13800008000\",\"receiverProvince\":\"Zhejiang\",\"receiverCity\":\"Hangzhou\",\"receiverDetailAddress\":\"masked at rest boundary\",\"voucherId\":3}";}
-    private long createSecondhand(String tradeId) throws Exception {String response=mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token").header("Idempotency-Key","DIRECT:"+tradeId).contentType("application/json").content(secondhandBody(tradeId))).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();return json.readTree(response).get("id").asLong();}
+    private long createSecondhand(String tradeId) throws Exception {String response=mvc.perform(post("/internal/orders/secondhand").header("X-Internal-Service-Token","test-internal-token").header("Idempotency-Key","SECONDHAND:DIRECT:"+tradeId).contentType("application/json").content(secondhandBody(tradeId))).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();return json.readTree(response).path("data").path("orderId").asLong();}
     private String secondhandBody(){return secondhandBody("t-1");}
-    private String secondhandBody(String tradeId){return "{\"tradeType\":\"DIRECT\",\"tradeId\":\""+tradeId+"\",\"buyerUserId\":1,\"sellerUserId\":2,\"productId\":88,\"productName\":\"Used book\",\"price\":50,\"receiverName\":\"Buyer\",\"receiverPhone\":\"13800008000\",\"receiverProvince\":\"Zhejiang\",\"receiverCity\":\"Hangzhou\",\"receiverDetailAddress\":\"detail\"}";}
+    private String secondhandBody(String tradeId){return "{\"tradeType\":\"DIRECT\",\"tradeId\":\""+tradeId+"\",\"orderBusinessKey\":\"SECONDHAND:DIRECT:"+tradeId+"\",\"buyerUserId\":1,\"sellerUserId\":2,\"productId\":88,\"productName\":\"Used book\",\"price\":50,\"receiverName\":\"Buyer\",\"receiverPhone\":\"13800008000\",\"receiverProvince\":\"Zhejiang\",\"receiverCity\":\"Hangzhou\",\"receiverDetailAddress\":\"detail\"}";}
 }

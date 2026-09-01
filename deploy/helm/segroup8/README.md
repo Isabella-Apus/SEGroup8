@@ -77,17 +77,23 @@ The demo seed file is intentionally excluded from production.
 
 ## Deployment behavior
 
-The platform workflow installs the base `segroup8` release. The identity
-and individual service pipelines then use
+The platform workflow installs the base `segroup8` release. The identity and
+individual service pipelines then use
 `helm upgrade --install --reset-then-reuse-values --atomic --wait`.
 This loads keys newly introduced by the current chart, then preserves explicit
 values owned by the existing release and upgrades only the selected component.
+It avoids the missing-value template failures caused by plain `--reuse-values`.
 All service deployment jobs must share the
 `segroup8-production-helm` concurrency group. A failed upgrade is rolled back
 automatically.
 Images use `sha-<full Git SHA>` tags so every release is traceable and
 rollback-safe.
 
-The identity HPA template is present but disabled by default. Enabling it and
-recording scale-out/scale-in metrics belongs to the later autoscaling
-experiment; the normal Kubernetes deployment does not claim that experiment.
+The backend HPA template represents the complete-system autoscaling experiment:
+traffic enters through Traefik and frontend Nginx, while the HPA scales the
+main stateless compute tier. It defaults to CPU 60%, `minReplicas=2` and
+`maxReplicas=4`, but remains disabled unless the operator deliberately sets
+`backend.autoscaling.enabled=true`. The identity HPA is also optional and is
+not evidence of the complete-system experiment. Recorded scale-out/scale-in
+timelines and request results, not a rendered manifest alone, are the acceptance
+evidence.

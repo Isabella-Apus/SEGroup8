@@ -6,7 +6,9 @@ metadata:
     {{- include "segroup8.labels" . | nindent 4 }}
     app.kubernetes.io/component: backend
 spec:
+  {{- if not .Values.backend.autoscaling.enabled }}
   replicas: {{ .Values.backend.replicaCount }}
+  {{- end }}
   revisionHistoryLimit: 3
   strategy:
     type: RollingUpdate

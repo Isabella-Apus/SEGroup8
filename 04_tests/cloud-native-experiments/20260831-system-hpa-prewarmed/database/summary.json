@@ -1,0 +1,13 @@
+{
+  "query": "secondhand public list: status=1 ORDER BY create_time DESC LIMIT 100",
+  "temporaryRows": 5000,
+  "before": {
+    "executionMs": 2.71,
+    "plan": "table-scan-and-sort"
+  },
+  "after": {
+    "executionMs": 0.395,
+    "plan": "idx_secondhand_status_created"
+  },
+  "executionTimeReductionPercent": 85.42435424354244
+}

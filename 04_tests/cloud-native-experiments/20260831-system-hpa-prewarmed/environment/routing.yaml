@@ -1,0 +1,149 @@
+apiVersion: v1
+items:
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: segroup8
+      meta.helm.sh/release-namespace: segroup8
+    creationTimestamp: "2026-08-28T14:13:00Z"
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: segroup8
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: segroup8
+      helm.sh/chart: segroup8-0.1.0
+    name: segroup8
+    namespace: segroup8
+    resourceVersion: "20587"
+    uid: 0686a7ec-238d-4d7e-aabf-b6965bc9f2d2
+  spec:
+    ingressClassName: traefik
+    rules:
+    - http:
+        paths:
+        - backend:
+            service:
+              name: frontend
+              port:
+                name: http
+          path: /
+          pathType: Prefix
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.28.7.2
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: segroup8
+      meta.helm.sh/release-namespace: segroup8
+    creationTimestamp: "2026-08-28T14:13:00Z"
+    labels:
+      app.kubernetes.io/component: backend
+      app.kubernetes.io/instance: segroup8
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: segroup8
+      helm.sh/chart: segroup8-0.1.0
+    name: backend
+    namespace: segroup8
+    resourceVersion: "20569"
+    uid: f20ef1f4-55cb-4727-8f50-4e787fdd8387
+  spec:
+    clusterIP: 10.43.58.56
+    clusterIPs:
+    - 10.43.58.56
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: http
+    selector:
+      app.kubernetes.io/component: backend
+      app.kubernetes.io/instance: segroup8
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: segroup8
+      meta.helm.sh/release-namespace: segroup8
+    creationTimestamp: "2026-08-28T14:13:00Z"
+    labels:
+      app.kubernetes.io/component: frontend
+      app.kubernetes.io/instance: segroup8
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: segroup8
+      helm.sh/chart: segroup8-0.1.0
+    name: frontend
+    namespace: segroup8
+    resourceVersion: "20567"
+    uid: 8f5c845d-fcf1-4a64-a7e8-983b78706014
+  spec:
+    clusterIP: 10.43.54.227
+    clusterIPs:
+    - 10.43.54.227
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+    selector:
+      app.kubernetes.io/component: frontend
+      app.kubernetes.io/instance: segroup8
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: segroup8
+      meta.helm.sh/release-namespace: segroup8
+    creationTimestamp: "2026-08-28T14:13:00Z"
+    labels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: segroup8
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: segroup8
+      helm.sh/chart: segroup8-0.1.0
+    name: mysql
+    namespace: segroup8
+    resourceVersion: "20563"
+    uid: 6507480d-979c-44d6-bbc1-b9a119e1ca4f
+  spec:
+    clusterIP: None
+    clusterIPs:
+    - None
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: mysql
+      port: 3306
+      protocol: TCP
+      targetPort: mysql
+    selector:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: segroup8
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:
+  resourceVersion: ""

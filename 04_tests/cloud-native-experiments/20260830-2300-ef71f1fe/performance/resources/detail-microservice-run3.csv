@@ -1,0 +1,12 @@
+timestamp,pod,cpu,memory
+2026-08-30T23:37:18+08:00,secondhand-service-75df9ff569-fkxxm,3m,233Mi
+2026-08-30T23:37:21+08:00,secondhand-service-75df9ff569-fkxxm,3m,233Mi
+2026-08-30T23:37:23+08:00,secondhand-service-75df9ff569-fkxxm,3m,233Mi
+2026-08-30T23:37:25+08:00,secondhand-service-75df9ff569-fkxxm,3m,233Mi
+2026-08-30T23:37:27+08:00,secondhand-service-75df9ff569-fkxxm,3m,233Mi
+2026-08-30T23:37:29+08:00,secondhand-service-75df9ff569-fkxxm,3m,233Mi
+2026-08-30T23:37:32+08:00,secondhand-service-75df9ff569-fkxxm,56m,234Mi
+2026-08-30T23:37:34+08:00,secondhand-service-75df9ff569-fkxxm,56m,234Mi
+2026-08-30T23:37:36+08:00,secondhand-service-75df9ff569-fkxxm,56m,234Mi
+2026-08-30T23:37:38+08:00,secondhand-service-75df9ff569-fkxxm,56m,234Mi
+2026-08-30T23:37:41+08:00,secondhand-service-75df9ff569-fkxxm,56m,234Mi

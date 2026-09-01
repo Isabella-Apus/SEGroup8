@@ -6,6 +6,7 @@
 | 封禁/解禁 | `UserAccessChanged.v1` | 用户状态、`access_version` 和 outbox 同事务 | 消费者幂等更新权限缓存；高风险写在版本未知时失败关闭 |
 | 通知 | 后续由 messaging 消费治理事件 | 治理结果先提交 | 通知失败不回滚治理结果，保留 outbox 重试 |
 | 用户摘要 | `GET /internal/users/{id}/summary` | 只读最小投影 | 调用者优先本地投影；失败使用旧快照，禁止跨库查询 |
+| 兼容地址快照 | `GET /internal/users/{id}/address-snapshot?addressId={addressId}` | 校验地址属于用户后只读返回；省略地址 ID 时返回默认或首个地址 | 保留给已发布的 secondhand 消费者，禁止跨库读取地址表 |
 | 地址快照 | `GET /internal/users/{userId}/addresses/{addressId}` | 校验地址属于买家后返回收件人、电话、省市和详细地址 | 二手服务创建订单前调用并冻结快照；不可用时拒绝建单，不使用占位地址 |
 | 默认配送地址 | `GET /internal/users/{userId}/shipping-address` | 返回默认优先、否则最早创建的配送地址 | 议价确认和定时拍卖结算没有地址参数时使用；无地址则失败并进入二手恢复流程 |
 | 拉黑校验 | `POST /internal/blocks/check` | 本地批量只读 | messaging 无缓存且调用失败时拒绝建会话 |
