@@ -27,7 +27,7 @@ SEGroup8/
 3. `.github/workflows/`、`.github/scripts/`；
 4. 所有 `compose*.yml`；
 5. `.env.docker.example`、`.gitattributes`、`.gitignore`；
-6. `README.md`、`DOCKER.md`、`DEPLOY_ALIYUN.md`、`SECURITY.md`、`AGENTS.md`。
+6. `README.md`、`DOCKER.md`、`DEPLOY_ALIYUN.md`、`SECURITY.md`。
 
 不要包含 `.git/`、`node_modules/`、`target/`、`dist/`、上传文件、运行日志、私有环境配置、密码/Secret 或完整 Playwright HTML/trace/video。当前不移动源码，避免破坏 Maven、Compose、Helm 和 CI 的相对路径。
 

@@ -9,4 +9,4 @@
 | Playwright real-mode | 是 | 是 | 必须连接真实后端并刷新或重新查询验证持久化 |
 | 文档计划 | 否 | 否 | 只有实际执行报告可以标记 PASS |
 
-UC11-UC15 的数量以各自 `04_tests/UCxx/evidence/result-summary.json` 和 Playwright 报告为准，不以测试方法数或 PR 数量衡量完成度。
+UC11-UC15 的数量以各自 `04_tests/UCxx/evidence/result-summary.json` 和 Playwright 报告为准，不以测试方法数衡量完成度。
