@@ -1,5 +1,5 @@
 {
-  "dependency": "secondhand-service -> order-service",
+  "dependency": "Order outage across all six microservices; direct Secondhand and asynchronous Catalog dependencies",
   "fault": "order-service replicas scaled from 1 to 0",
   "faultResponseHttpStatus": 202,
   "faultResponseRequestStatus": "RETRY",
@@ -12,6 +12,23 @@
   "noDuplicateOrder": true,
   "identityAddressPrecheckHttpStatus": 200,
   "addressSnapshotStored": true,
+  "nonOrderServicesDuringFault": {
+    "identity-governance": { "livenessHttpStatus": 200, "liveness": "UP", "readinessHttpStatus": 200, "readiness": "UP", "businessHttpStatus": 200, "businessResponseValid": true, "passed": true },
+    "catalog-shop": { "livenessHttpStatus": 200, "liveness": "UP", "readinessHttpStatus": 200, "readiness": "UP", "businessHttpStatus": 200, "businessResponseValid": true, "passed": true },
+    "benefits-finance": { "livenessHttpStatus": 200, "liveness": "UP", "readinessHttpStatus": 200, "readiness": "UP", "businessHttpStatus": 200, "businessResponseValid": true, "passed": true },
+    "messaging": { "livenessHttpStatus": 200, "liveness": "UP", "readinessHttpStatus": 200, "readiness": "UP", "businessHttpStatus": 200, "businessResponseValid": true, "passed": true },
+    "secondhand": { "livenessHttpStatus": 200, "liveness": "UP", "readinessHttpStatus": 200, "readiness": "UP", "businessHttpStatus": 200, "businessResponseValid": true, "passed": true }
+  },
+  "allNonOrderServicesOperationalDuringFault": true,
+  "catalogOutboxStatusDuringFault": "PENDING",
+  "catalogOutboxAttemptsDuringFault": 1,
+  "catalogOutboxRetainedDuringFault": true,
+  "catalogOutboxStatusAfterRecovery": "SENT",
+  "catalogEventInboxCountAfterRecovery": 1,
+  "catalogAutomaticRecoveryPassed": true,
+  "orderRolloutSeconds": 71,
+  "recoveryPollingSeconds": 54,
+  "dependencyRecoveryStepSeconds": 125,
   "courseFaultHandlingRequirementPassed": true,
   "automaticRecoveryPassed": true
 }

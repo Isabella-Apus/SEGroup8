@@ -36,12 +36,14 @@ bash scripts/experiments/cloud-native/reproduce_system_hpa_demo.sh
 故障实验只允许创建或操作 `segroup8-cloud-exp-*` 命名空间：
 
 1. `prepare_environment.sh` 创建隔离 MySQL、单体和全部六个微服务；
-2. `run_dependency_fault_experiment.sh` 将隔离 Order 缩为 0；
-3. 验证 Identity、Catalog、Finance、Messaging、Secondhand 的 liveness、readiness 和代表业务接口在故障窗口全部正常；
-4. 验证二手购买返回 HTTP 202/`RETRY`，恢复后自动进入 `CREATED`、只生成一单并保存地址快照；
-5. 验证 Catalog 发往 Order 的事件在 Outbox 中保留，Order 恢复后自动发送且 Order Inbox 恰好接收一次；
-6. 同时观测生产命名空间全部服务与生产 Order endpoints，证明命名空间隔离；
-7. `cleanup_environment.sh` 删除隔离命名空间并保留证据。
+2. `run_dependency_fault_experiment.sh` 先在终端展示六个微服务，再仅将隔离 Order 缩为 0；Order 行仍保留并显示 `Ready 0/0`；
+3. 验证二手购买返回 HTTP 202/`RETRY`，故障请求已被可靠保存；
+4. 验证 Identity、Catalog、Finance、Messaging、Secondhand 的 liveness、readiness 和代表业务接口在故障窗口全部正常，同时验证 Catalog 发往 Order 的事件保留在 Outbox；
+5. 恢复 Order，验证二手请求自动进入 `CREATED`，Catalog 事件自动变为 `SENT`，且 Order Inbox 恰好接收一次；
+6. 重复二手购买请求，验证最终只生成一单并保存地址快照；
+7. 汇总 `summary.json` 和分步演示状态；`cleanup_environment.sh` 可在演示结束后删除隔离命名空间并保留证据。
+
+故障只注入 `segroup8-cloud-exp-*` 隔离命名空间。脚本不再读取或展示完整生产命名空间，因为隔离环境的 Order 缩容不会修改生产 Deployment、Service 或 Endpoint。第五步会分别记录 `orderRolloutSeconds`、`recoveryPollingSeconds` 和 `dependencyRecoveryStepSeconds`：前者通常占主要时间，是 JVM/Spring Boot 启动和探针确认耗时；后者才是 Order Ready 后的业务自动补偿等待。
 
 ```bash
 GIT_COMMIT=<commit> \
@@ -49,6 +51,11 @@ bash scripts/experiments/cloud-native/prepare_environment.sh <run-id> <host-root
 
 bash scripts/experiments/cloud-native/run_dependency_fault_experiment.sh \
   <host-root>/state.env dependency-fault-order
+
+# 另开终端显示同一隔离命名空间中的六服务状态和当前实验步骤
+source <host-root>/state.env
+watch -n 1 -c env NAMESPACE="$NAMESPACE" HOST_ROOT="$HOST_ROOT" \
+  bash scripts/experiments/cloud-native/show_dependency_fault_dashboard.sh
 
 bash scripts/experiments/cloud-native/cleanup_environment.sh \
   <host-root>/state.env

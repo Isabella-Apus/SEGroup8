@@ -2,53 +2,59 @@
 
 ## 1. 实验目标与隔离方式
 
-本实验选择 `secondhand-service -> order-service` 作为典型依赖链路，主动将隔离命名空间中的 Order 从 1 个副本缩为 0，验证受影响请求得到设计好的可恢复结果、二手服务不随依赖一起崩溃，并在 Order 恢复后自动补建且不产生重复订单。
+本实验在独立命名空间 `segroup8-cloud-exp-defense-ready` 中部署六个微服务，仅将隔离环境的 `order-service` 从 1 个副本缩为 0。上方状态表展示同一隔离环境中的六个微服务；下方继续展示 `secondhand-service -> order-service` 同步故障链路和 `catalog-shop-service -> order-service` 异步事件链路。
 
-实验提交为 `b622e6bbb0447d6823b50e7789e4777f7131eb9b`。故障命名空间是 `segroup8-cloud-exp-20260902-fault-b622e6bb`；生产命名空间 `segroup8` 只接受健康观测，没有停止或修改生产 Order。
+实验不读取、不停止也不修改正式系统命名空间。故障发生时，上方 Order 状态随实际 Deployment 变为“故障已注入”，其余五个微服务继续显示实际探针与副本状态。
 
-## 2. 故障期与恢复结果
+## 2. 最终实验结果
+
+最终证据目录：`dependency-fault-six-services-final-20260902-213617`，脚本退出码为 0。
 
 | 检查项 | 结果 |
 |---|---|
 | 故障注入 | 隔离 Order `1 -> 0` |
+| 隔离环境六服务展示 | 6/6，故障期仅 Order 的期望副本为 0 |
+| 其余五服务连续性检查 | 15/15 通过：每个服务的 liveness、readiness、业务接口均成功 |
 | 二手购买响应 | HTTP 202，`requestStatus=RETRY` |
-| 二手 liveness/readiness | `UP` / `UP` |
-| 无关二手列表 | 正常返回 |
-| Order 恢复 | 后台任务自动重试 |
-| 最终请求状态 | `CREATED` |
-| 重复请求 | HTTP 200，复用原结果 |
-| 匹配订单数量 | 1 |
-| 地址快照 | Identity 预检 HTTP 200，Order 已保存完整快照 |
+| Catalog 异步事件 | 故障期保留为 `PENDING`，恢复后变为 `SENT` |
+| Order 恢复 | Deployment 恢复为 1 个副本，两个依赖链路自动补偿 |
+| 最终二手请求状态 | `CREATED` |
+| Order 对 Catalog 事件的消费 | Inbox 记录恰好 1 条 |
+| 重复二手购买请求 | HTTP 200，匹配订单数仍为 1 |
+| 地址快照 | Identity 预检 HTTP 200，Order 保存完整快照 |
+| 课程故障处理要求 | 通过 |
+| 自动恢复增强目标 | 通过 |
 
-故障期的“查询失败”被视为结果不确定，二手服务保持商品冻结和 `RETRY`，不会把网络失败误判为业务失败；恢复任务复用 `tradeType:tradeId` 业务键查询或创建，因此重复提交后仍恰好一单。
+## 3. Order 停机对六个微服务的影响
 
-## 3. Order 停机对其他服务的影响
+“服务仍然运行”不等于“所有涉及 Order 的业务都不受影响”。本次实测结论如下：
 
-“服务正常”与“所有业务正常”必须分开判断：
-
-| 服务 | 进程/探针 | Order 停机后的业务影响 |
+| 服务 | 故障期状态 | 业务影响 |
 |---|---|---|
-| identity-governance | 正常 | 无直接依赖，身份、用户、地址和治理能力正常 |
-| catalog-shop | 正常 | 商品、店铺、分类和搜索正常；完整新建单无法完成，发往 Order 的库存事件等待重试 |
-| benefits-finance | 正常 | 钱包、优惠券和已接收请求可处理；不再收到 Order 发起的新支付、退款和结算请求 |
-| messaging | 正常 | 聊天、已有通知和 WebSocket 正常；不会产生新的 Order 状态事件通知 |
-| secondhand | 正常但部分降级 | 浏览、发布和议价正常；直购与拍卖结算进入 `RETRY`，恢复后补建单 |
-| frontend | 可访问 | 非订单页面可用，订单相关路由和业务请求失败或等待恢复 |
+| identity-governance | 正常 | 身份、用户和地址能力正常，无直接 Order 依赖 |
+| catalog-shop | 正常、异步降级 | 分类等业务正常；发往 Order 的事件可靠保存在 Outbox，恢复后自动投递 |
+| benefits-finance | 正常 | 钱包/财务查询正常；不会收到停机期间尚未由 Order 发出的新请求 |
+| messaging | 正常 | 通知查询等能力正常；不会收到停机期间尚未由 Order 发出的新状态事件 |
+| secondhand | 正常、同步降级 | 浏览能力正常；购买请求进入 `RETRY`，Order 恢复后自动补建订单 |
+| order | 故障已注入 | 副本数为 0、接口不可用；恢复后消费待处理请求和事件 |
 
-本次正式实验只暂停隔离 Order。故障窗口观测到生产 backend、catalog-shop、identity、order、secondhand、messaging、finance 和 frontend 健康入口全部返回 HTTP 200，生产 Order endpoints 仍存在。
+## 4. 第五步耗时说明
 
-## 4. 原始证据
+本次第五步总计 125 秒，其中 Order Deployment 冷启动与就绪用了 71 秒，两个依赖链路的自动恢复轮询用了 54 秒。此前看到约 80 秒并不是脚本卡死：这台服务器上 Order 的 Spring Boot 冷启动本身约需一分钟，随后重试任务还要等待下一次退避窗口。
 
-- `summary.json`：故障响应、探针、恢复、幂等和地址快照结论；
-- `00-run-metadata.env`：实验提交及三个候选 JAR 的 SHA-256；
-- `01-fault-injection.txt`、`08-recovery.txt`：Order 缩容和恢复；
-- `02-*`、`06-*`、`09-*`、`10-*`、`11-*`、`12-*`、`13-*`：故障响应、状态时间线、恢复数据和重复请求；
-- `03-*`、`04-*`、`05-*`：故障期间二手服务的探针和无关能力；
-- `01a-production-namespace-isolation.txt`、`01a-*-health.txt`：生产命名空间隔离证明；
-- `07-*`、`14-*`、`15-*`、`17-events.txt`：脱敏日志和 Kubernetes 事件；
-- `environment/`：实验镜像、资源清单与候选制品元数据。
+脚本现在分别输出 `orderRolloutSeconds`、`recoveryPollingSeconds` 和 `dependencyRecoveryStepSeconds`，现场可以直接判断时间花在启动还是业务补偿。实验不会人为修改重试时间来制造快速通过。
 
-## 5. 复现
+## 5. 核心证据
+
+- `summary.json`：全部断言和三个分段耗时；
+- `00-six-microservices-before-fault.txt`：故障前六服务均为 1/1；
+- `01-six-microservices-during-fault.txt`：故障期 Order 为 0，其余五服务为 1/1；
+- `service-continuity/results.tsv`：其余五服务的 15 项连续性检查；
+- `09-recovery-timeline.txt`：Secondhand、Catalog、Order Inbox 的自动恢复时间线；
+- `11b-catalog-outbox-after-recovery.tsv`、`11c-order-catalog-inbox-after-recovery.tsv`：异步事件投递与恰好一次消费证据；
+- 其余响应、数据库状态、脱敏日志和 Kubernetes 事件文件用于追溯细节。
+
+## 6. 复现与现场展示
 
 ```bash
 GIT_COMMIT=<commit> \
@@ -57,8 +63,9 @@ bash scripts/experiments/cloud-native/prepare_environment.sh <run-id> <host-root
 bash scripts/experiments/cloud-native/run_dependency_fault_experiment.sh \
   <host-root>/state.env dependency-fault-order
 
-bash scripts/experiments/cloud-native/cleanup_environment.sh \
-  <host-root>/state.env
+source <host-root>/state.env
+watch -n 1 -c env NAMESPACE="$NAMESPACE" HOST_ROOT="$HOST_ROOT" \
+  bash scripts/experiments/cloud-native/show_dependency_fault_dashboard.sh
 ```
 
-现场应展示 HTTP 202/`RETRY`、探针保持 `UP`、Order 恢复后的 `CREATED`，以及重复调用后订单数量仍为 1。
+展示时，上方六服务表应随隔离 Order 的 `1 -> 0 -> 1` 实时变化；下方链路应显示 Secondhand `RETRY -> CREATED`、Catalog `PENDING -> SENT` 和 Order Inbox `0 -> 1`。

@@ -1,0 +1,8 @@
+隔离命名空间：segroup8-cloud-exp-defense-ready
+SERVICE                         READY  DESIRED  AVAILABLE
+identity-governance-service     1      1        1
+catalog-shop-service            1      1        1
+order-service                   1      1        1
+secondhand-service              1      1        1
+benefits-finance-service        1      1        1
+messaging-service               1      1        1
