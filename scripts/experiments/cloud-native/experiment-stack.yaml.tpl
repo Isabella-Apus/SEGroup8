@@ -349,3 +349,226 @@ spec:
   selector: { app: secondhand-service }
   ports:
     - { name: http, port: 8080, targetPort: http }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-shop-service
+  namespace: __NAMESPACE__
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: catalog-shop-service }
+  template:
+    metadata:
+      labels: { app: catalog-shop-service }
+    spec:
+      securityContext: { runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, fsGroup: 10001 }
+      containers:
+        - name: catalog-shop-service
+          image: __BASE_IMAGE__
+          imagePullPolicy: IfNotPresent
+          command: ["java", "-XX:MaxRAMPercentage=75", "-jar", "/app/app.jar"]
+          ports:
+            - { name: http, containerPort: 8080 }
+          env:
+            - { name: SERVER_PORT, value: "8080" }
+            - { name: DB_URL, value: "jdbc:mysql://mysql:3306/catalog_shop_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai" }
+            - { name: DB_USERNAME, value: catalog_shop_app }
+            - name: DB_PASSWORD
+              valueFrom: { secretKeyRef: { name: experiment-secrets, key: DB_PASSWORD } }
+            - name: JWT_SECRET
+              valueFrom: { secretKeyRef: { name: experiment-secrets, key: JWT_SECRET } }
+            - name: INTERNAL_SERVICE_TOKEN
+              valueFrom: { secretKeyRef: { name: experiment-secrets, key: INTERNAL_SERVICE_TOKEN } }
+            - { name: IDENTITY_STATUS_CHECK_URL, value: "http://identity-governance-service:8091/internal/auth/introspect" }
+            - { name: IDENTITY_STATUS_CHECK_MODE, value: introspect }
+            - { name: MESSAGING_EVENT_URL, value: "http://messaging:8084" }
+            - { name: ORDER_EVENT_URL, value: "http://order-service:8085" }
+            - { name: OUTBOX_PUBLISH_MS, value: "2000" }
+            - { name: HTTP_CONNECT_TIMEOUT_MS, value: "500" }
+            - { name: HTTP_READ_TIMEOUT_MS, value: "1500" }
+            - { name: APP_VERSION, value: "experiment-__RUN_ID__" }
+            - { name: GIT_COMMIT, value: "__GIT_COMMIT__" }
+            - { name: TZ, value: Asia/Shanghai }
+          startupProbe:
+            httpGet: { path: /actuator/health/liveness, port: http }
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet: { path: /actuator/health/readiness, port: http }
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /actuator/health/liveness, port: http }
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { cpu: 500m, memory: 768Mi }
+          securityContext: { allowPrivilegeEscalation: false, readOnlyRootFilesystem: true }
+          volumeMounts:
+            - { name: catalog-jar, mountPath: /app/app.jar, readOnly: true }
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: catalog-jar
+          hostPath:
+            path: __HOST_ROOT__/jars/catalog-shop-service-1.0.0.jar
+            type: File
+        - { name: tmp, emptyDir: {} }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: segroup8-catalog-shop
+  namespace: __NAMESPACE__
+spec:
+  selector: { app: catalog-shop-service }
+  ports:
+    - { name: http, port: 8080, targetPort: http }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: benefits-finance-service
+  namespace: __NAMESPACE__
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: benefits-finance-service }
+  template:
+    metadata:
+      labels: { app: benefits-finance-service }
+    spec:
+      securityContext: { runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, fsGroup: 10001 }
+      terminationGracePeriodSeconds: 35
+      containers:
+        - name: benefits-finance-service
+          image: __BASE_IMAGE__
+          imagePullPolicy: IfNotPresent
+          command: ["java", "-XX:MaxRAMPercentage=75", "-jar", "/app/app.jar"]
+          ports:
+            - { name: http, containerPort: 8085 }
+          env:
+            - { name: SERVER_PORT, value: "8085" }
+            - { name: DB_URL, value: "jdbc:mysql://mysql:3306/benefits_finance_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai" }
+            - { name: DB_USERNAME, value: benefits_finance_app }
+            - name: DB_PASSWORD
+              valueFrom: { secretKeyRef: { name: experiment-secrets, key: DB_PASSWORD } }
+            - name: JWT_SECRET
+              valueFrom: { secretKeyRef: { name: experiment-secrets, key: JWT_SECRET } }
+            - name: INTERNAL_SERVICE_TOKEN
+              valueFrom: { secretKeyRef: { name: experiment-secrets, key: INTERNAL_SERVICE_TOKEN } }
+            - { name: OUTBOX_EVENT_SINK_URL, value: "http://messaging:8084/internal/events" }
+            - { name: HTTP_CONNECT_TIMEOUT_MS, value: "500" }
+            - { name: HTTP_READ_TIMEOUT_MS, value: "1500" }
+            - { name: APP_VERSION, value: "experiment-__RUN_ID__" }
+            - { name: APP_COMMIT, value: "__GIT_COMMIT__" }
+            - { name: APP_BUILD_TIME, value: experiment }
+            - { name: TZ, value: Asia/Shanghai }
+          startupProbe:
+            httpGet: { path: /actuator/health/liveness, port: http }
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet: { path: /actuator/health/readiness, port: http }
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /actuator/health/liveness, port: http }
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { cpu: 500m, memory: 768Mi }
+          securityContext: { allowPrivilegeEscalation: false, readOnlyRootFilesystem: true }
+          volumeMounts:
+            - { name: finance-jar, mountPath: /app/app.jar, readOnly: true }
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: finance-jar
+          hostPath:
+            path: __HOST_ROOT__/jars/benefits-finance-service-1.0.0.jar
+            type: File
+        - { name: tmp, emptyDir: {} }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: benefits-finance
+  namespace: __NAMESPACE__
+spec:
+  selector: { app: benefits-finance-service }
+  ports:
+    - { name: http, port: 8085, targetPort: http }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: messaging-service
+  namespace: __NAMESPACE__
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: messaging-service }
+  template:
+    metadata:
+      labels: { app: messaging-service }
+    spec:
+      securityContext: { runAsNonRoot: true, runAsUser: 10001, runAsGroup: 10001, fsGroup: 10001 }
+      containers:
+        - name: messaging-service
+          image: __BASE_IMAGE__
+          imagePullPolicy: IfNotPresent
+          command: ["java", "-XX:MaxRAMPercentage=75", "-jar", "/app/app.jar"]
+          ports:
+            - { name: http, containerPort: 8084 }
+          env:
+            - { name: SERVER_PORT, value: "8084" }
+            - { name: DB_URL, value: "jdbc:mysql://mysql:3306/messaging_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai" }
+            - { name: DB_USERNAME, value: messaging_app }
+            - name: DB_PASSWORD
+              valueFrom: { secretKeyRef: { name: experiment-secrets, key: DB_PASSWORD } }
+            - name: JWT_SECRET
+              valueFrom: { secretKeyRef: { name: experiment-secrets, key: JWT_SECRET } }
+            - name: INTERNAL_SERVICE_TOKEN
+              valueFrom: { secretKeyRef: { name: experiment-secrets, key: INTERNAL_SERVICE_TOKEN } }
+            - name: INTERNAL_OPERATIONS_TOKEN
+              valueFrom: { secretKeyRef: { name: experiment-secrets, key: INTERNAL_SERVICE_TOKEN } }
+            - { name: IDENTITY_SERVICE_URL, value: "http://identity-governance-service:8091" }
+            - name: IDENTITY_SERVICE_TOKEN
+              valueFrom: { secretKeyRef: { name: experiment-secrets, key: INTERNAL_SERVICE_TOKEN } }
+            - { name: REALTIME_ALLOWED_ORIGIN_PATTERNS, value: "http://localhost:5174" }
+            - { name: APP_VERSION, value: "experiment-__RUN_ID__" }
+            - { name: APP_COMMIT, value: "__GIT_COMMIT__" }
+            - { name: APP_BUILD_TIME, value: experiment }
+            - { name: TZ, value: Asia/Shanghai }
+          startupProbe:
+            httpGet: { path: /actuator/health/liveness, port: http }
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet: { path: /actuator/health/readiness, port: http }
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: { path: /actuator/health/liveness, port: http }
+            periodSeconds: 10
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits: { cpu: 500m, memory: 768Mi }
+          securityContext: { allowPrivilegeEscalation: false, readOnlyRootFilesystem: true }
+          volumeMounts:
+            - { name: messaging-jar, mountPath: /app/app.jar, readOnly: true }
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: messaging-jar
+          hostPath:
+            path: __HOST_ROOT__/jars/messaging-service-1.0.0.jar
+            type: File
+        - { name: tmp, emptyDir: {} }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: messaging
+  namespace: __NAMESPACE__
+spec:
+  selector: { app: messaging-service }
+  ports:
+    - { name: http, port: 8084, targetPort: http }

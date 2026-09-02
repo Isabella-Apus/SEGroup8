@@ -35,12 +35,13 @@ bash scripts/experiments/cloud-native/reproduce_system_hpa_demo.sh
 
 故障实验只允许创建或操作 `segroup8-cloud-exp-*` 命名空间：
 
-1. `prepare_environment.sh` 创建隔离 MySQL、单体、身份、Order 和二手服务；
+1. `prepare_environment.sh` 创建隔离 MySQL、单体和全部六个微服务；
 2. `run_dependency_fault_experiment.sh` 将隔离 Order 缩为 0；
-3. 验证二手购买返回 HTTP 202/`RETRY`，探针和无关列表正常；
-4. 同时观测生产命名空间全部服务与生产 Order endpoints，证明命名空间隔离；
-5. 恢复隔离 Order，验证请求自动进入 `CREATED`、只生成一单并保存地址快照；
-6. `cleanup_environment.sh` 删除隔离命名空间并保留证据。
+3. 验证 Identity、Catalog、Finance、Messaging、Secondhand 的 liveness、readiness 和代表业务接口在故障窗口全部正常；
+4. 验证二手购买返回 HTTP 202/`RETRY`，恢复后自动进入 `CREATED`、只生成一单并保存地址快照；
+5. 验证 Catalog 发往 Order 的事件在 Outbox 中保留，Order 恢复后自动发送且 Order Inbox 恰好接收一次；
+6. 同时观测生产命名空间全部服务与生产 Order endpoints，证明命名空间隔离；
+7. `cleanup_environment.sh` 删除隔离命名空间并保留证据。
 
 ```bash
 GIT_COMMIT=<commit> \
@@ -53,4 +54,6 @@ bash scripts/experiments/cloud-native/cleanup_environment.sh \
   <host-root>/state.env
 ```
 
-三个实验 JAR 放在 `<host-root>/jars/`。生成的 Secret、JWT、数据库密码和渲染清单不得提交；可提交 `summary.json`、探针响应、资源清单、事件、脱敏日志和数据库验证结果。
+六个实验 JAR 放在 `<host-root>/jars/`：`identity-governance-service-1.0.0.jar`、`catalog-shop-service-1.0.0.jar`、`order-service-1.0.0.jar`、`secondhand-service-1.0.0.jar`、`benefits-finance-service-1.0.0.jar`、`messaging-service-1.0.0.jar`。生成的 Secret、JWT、数据库密码和渲染清单不得提交；可提交 `summary.json`、探针响应、资源清单、事件、脱敏日志和数据库验证结果。
+
+三类依赖采用不同断言：Secondhand 对 Order 是同步建单依赖，验证受控降级、自动恢复和重复请求不产生重复订单；Catalog 对 Order 是异步事件依赖，验证 Outbox 保留与恢复投递；Finance 和 Messaging 的调用方向均为 Order 指向它们，所以 Order 停止时验证其自身业务接口继续返回成功，不伪造不存在的补偿流程。

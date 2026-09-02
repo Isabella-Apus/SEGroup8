@@ -18,7 +18,10 @@ fi
 for artifact in \
   "$HOST_ROOT/jars/identity-governance-service-1.0.0.jar" \
   "$HOST_ROOT/jars/secondhand-service-1.0.0.jar" \
-  "$HOST_ROOT/jars/order-service-1.0.0.jar"; do
+  "$HOST_ROOT/jars/order-service-1.0.0.jar" \
+  "$HOST_ROOT/jars/catalog-shop-service-1.0.0.jar" \
+  "$HOST_ROOT/jars/benefits-finance-service-1.0.0.jar" \
+  "$HOST_ROOT/jars/messaging-service-1.0.0.jar"; do
   test -f "$artifact" || { echo "Missing artifact: $artifact" >&2; exit 3; }
 done
 if kubectl get namespace "$NAMESPACE" >/dev/null 2>&1; then
@@ -75,12 +78,17 @@ kubectl -n "$NAMESPACE" rollout status deployment/monolith --timeout=300s
 kubectl -n "$NAMESPACE" rollout status deployment/identity-governance-service --timeout=300s
 kubectl -n "$NAMESPACE" rollout status deployment/order-service --timeout=300s
 kubectl -n "$NAMESPACE" rollout status deployment/secondhand-service --timeout=300s
+kubectl -n "$NAMESPACE" rollout status deployment/catalog-shop-service --timeout=300s
+kubectl -n "$NAMESPACE" rollout status deployment/benefits-finance-service --timeout=300s
+kubectl -n "$NAMESPACE" rollout status deployment/messaging-service --timeout=300s
 
 MYSQL_POD="$(kubectl -n "$NAMESPACE" get pod -l app=mysql -o jsonpath='{.items[0].metadata.name}')"
 kubectl -n "$NAMESPACE" exec -i "$MYSQL_POD" -- \
   mysql -uroot -p"$MYSQL_ROOT_PASSWORD" < "$SCRIPT_DIR/sql/04-seed-secondhand-performance.sql"
 kubectl -n "$NAMESPACE" exec -i "$MYSQL_POD" -- \
   mysql -uroot -p"$MYSQL_ROOT_PASSWORD" < "$SCRIPT_DIR/sql/05-seed-identity-fault.sql"
+kubectl -n "$NAMESPACE" exec "$MYSQL_POD" -- mysql -uroot -p"$MYSQL_ROOT_PASSWORD" messaging_db -e \
+  "INSERT INTO user_access_projection(user_id,access_status,role,display_name,source_version) VALUES(3,'ACTIVE','USER','Experiment Buyer',1) ON DUPLICATE KEY UPDATE access_status='ACTIVE',role='USER',display_name='Experiment Buyer',source_version=GREATEST(source_version,1);"
 
 cat > "$HOST_ROOT/state.env" <<STATE
 RUN_ID=$RUN_ID
@@ -92,6 +100,9 @@ GIT_COMMIT=$GIT_COMMIT
 SECONDHAND_JAR_SHA256=$SECONDHAND_SHA
 ORDER_JAR_SHA256=$ORDER_SHA
 IDENTITY_JAR_SHA256=$IDENTITY_SHA
+CATALOG_JAR_FILE=catalog-shop-service-1.0.0.jar
+FINANCE_JAR_FILE=benefits-finance-service-1.0.0.jar
+MESSAGING_JAR_FILE=messaging-service-1.0.0.jar
 MONOLITH_IMAGE_DIGEST=$MONOLITH_DIGEST
 STATE
 
