@@ -1,70 +1,56 @@
-# Cloud-native experiment runners
+# 云原生实验脚本
 
-本目录包含两类用途不同的脚本。
+课程最终只保留两个正式实验入口：完整系统 HPA，以及隔离环境中的 Order 依赖故障。历史二手微服务 HPA 已移出项目，不再提供脚本、Helm 模板或流水线门禁。
 
-## 完整系统 HPA 实验（当前验收口径）
+## 完整系统 HPA
 
-助教确认 HPA 实验面向完整系统。脚本复用已部署的镜像、Secret、PVC、Service、Ingress
-和 MySQL，不重建平行应用。压测流量始终经过真实公开链路：
+`run_system_hpa_experiment.sh` 将 HPA 绑定共享系统后端 `deployment/segroup8-backend`，不绑定 `secondhand-service`。Kubernetes HPA 必须指向一个具体可伸缩工作负载，因此“完整系统”在这里表示：
 
-`Traefik -> frontend Nginx -> segroup8-backend -> MySQL`
+- 从 frontend Service/Nginx 进入共享兼容后端和 MySQL；
+- 使用首页、商品、分类、搜索、二手列表组成的混合负载；
+- 同时记录公开入口、前端、后端、数据库、节点资源与 HPA 时间线；
+- 固定 2 副本与 HPA 2..4 使用相同负载，扩出的 Pod 必须全部 Ready；
+- 只有扩容、缩回 2 和错误率不高于 5% 同时成立才返回 0。
 
-HPA 只能绑定一个 Kubernetes 可伸缩对象，不能直接绑定“整套系统”。因此它绑定主要无状态
-计算层 `deployment/segroup8-backend`；前端和数据库仍参与每一次请求，但数据库不做水平扩容。
-
-正式复测（固定 2 副本与 HPA 2..4 使用相同分阶段负载）：
+正式复现：
 
 ```bash
 RUN_ID=formal-$(date +%Y%m%d-%H%M%S) \
-CONCURRENCIES='2 5 10' STAGE_DURATION=45 WARMUP_DURATION=30 \
+KEEP_OPTIMIZED_HPA=false \
+CONCURRENCIES='5 10 20' STAGE_DURATION=30 WARMUP_DURATION=20 \
+SCALE_TRIGGER_DURATION=120 \
 bash scripts/experiments/cloud-native/run_system_hpa_experiment.sh
 ```
 
-答辩现场一键演示（较短，仍保留预热、固定基线、扩容、缩容和证据）：
+答辩短演示：
 
 ```bash
+KEEP_OPTIMIZED_HPA=false \
 bash scripts/experiments/cloud-native/reproduce_system_hpa_demo.sh
 ```
 
-两个脚本默认：
+默认最小 2 副本是最终可用性配置，不要求扩容必须逐级经过 1、2、4。设置 `KEEP_OPTIMIZED_HPA=false` 会在实验结束后恢复原副本数和原 HPA 状态。
 
-- 使用 `segroup8` 命名空间和 `http://127.0.0.1` 公开入口；
-- 生成 5,000 条保留 ID 段的临时只读压测数据，结束时删除；
-- 用索引 `INVISIBLE/VISIBLE` 重放同一条 SQL 的 `EXPLAIN ANALYZE`，索引本身保留；
-- 先将后端固定为 2 副本并预热，再应用 CPU 60%、`minReplicas=2`、`maxReplicas=4` 的 HPA；
-- 持续加载直到扩出的 Pod 全部就绪，再做一次业务预热后才开始计量，避免把 JVM 冷启动
-  误判为 HPA 性能；
-- 记录镜像、路由、请求、逐接口延迟、Pod/节点资源、HPA 时间线、事件和三层日志；
-- 使用真实页面常用的 20 条/页负载和显式 15 秒超时；只有观测到扩容、回落到 2
-  且最大错误率不超过 5% 才返回 0；
-- 生成的 HPA 带有当前 Helm release 的归属元数据（默认 release 为 `segroup8`），后续启用
-  chart 中的 `backend.autoscaling.enabled` 时可由同一个 Helm release 平滑接管；
-- 成功后保留优化后的 HPA；设置 `KEEP_OPTIMIZED_HPA=false` 可恢复运行前状态；失败时总会恢复。
+## Order 依赖故障
 
-证据默认位于 `/root/segroup8-experiments/system-hpa-<RUN_ID>/`。答辩时重点展示
-`summary.json`、`replica-timeline.csv`、`database/explain-before.txt`、
-`database/explain-after.txt`、`resource-snapshots.log` 和 `hpa-describe.txt`。
+故障实验只允许创建或操作 `segroup8-cloud-exp-*` 命名空间：
 
-## 隔离的微服务/依赖故障/性能实验（历史与其他课程实验）
-
-以下脚本只创建名称匹配 `segroup8-cloud-exp-*` 的隔离命名空间：
-
-1. `prepare_environment.sh`
-2. `run_performance_comparison.sh`
-3. `run_hpa_experiment.sh`（历史二手微服务 HPA，不再作为完整系统 HPA 结论）
-4. `run_dependency_fault_experiment.sh`
-5. `cleanup_environment.sh`
-
-隔离运行器需要 Bash、Python 3、kubectl、Metrics API、缓存的 Java/MySQL 镜像，以及
-`<host-root>/jars/` 下的身份治理、订单和二手服务 JAR。生成的凭据只保存在 Kubernetes
-Secret 和服务器端渲染清单中，不应提交到 Git。
-
-依赖故障实验不会覆盖既有证据：
+1. `prepare_environment.sh` 创建隔离 MySQL、单体、身份、Order 和二手服务；
+2. `run_dependency_fault_experiment.sh` 将隔离 Order 缩为 0；
+3. 验证二手购买返回 HTTP 202/`RETRY`，探针和无关列表正常；
+4. 同时观测生产命名空间全部服务与生产 Order endpoints，证明命名空间隔离；
+5. 恢复隔离 Order，验证请求自动进入 `CREATED`、只生成一单并保存地址快照；
+6. `cleanup_environment.sh` 删除隔离命名空间并保留证据。
 
 ```bash
+GIT_COMMIT=<commit> \
+bash scripts/experiments/cloud-native/prepare_environment.sh <run-id> <host-root>
+
 bash scripts/experiments/cloud-native/run_dependency_fault_experiment.sh \
-  <host-root>/state.env dependency-fault-<candidate>
+  <host-root>/state.env dependency-fault-order
+
+bash scripts/experiments/cloud-native/cleanup_environment.sh \
+  <host-root>/state.env
 ```
 
-它只有在受控故障、自动恢复、无重复订单和收件地址快照全部通过时才返回 0；失败时仍保留
-`summary.json` 和诊断材料。
+三个实验 JAR 放在 `<host-root>/jars/`。生成的 Secret、JWT、数据库密码和渲染清单不得提交；可提交 `summary.json`、探针响应、资源清单、事件、脱敏日志和数据库验证结果。

@@ -2,7 +2,7 @@
 
 | 需求 / 用例 | 六类图模型 | 主要代码模块 | 测试编号与现有测试 | 结果 / 证据 |
 |---|---|---|---|---|
-| REQ10 / UC10 浏览搜索热词 | SYS-BEH10 / CONCEPT-CLASS10 / COMP-STRUCT10 / COMP-SEQ10 / DESIGN-CLASS10 / OBJ-SEQ10 | `BrowseHistoryView.vue`；`SearchBehaviorServiceImpl`、`BrowseHistoryServiceImpl` | E2E-TC10-001~04 `BehaviorApiAndE2ETest`；E2E-TC10-001 `frontend/e2e/domain-b/uc10-behavior.spec.ts` | **CI_E2E_PASS / LOCAL_ARTIFACT_MISSING**：服务/API 原始结果已归档；最新 main 的全 UC Playwright Job 通过（https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611），但仓库未保存本用例独立 Playwright JSON。 |
+| REQ10 / UC10 浏览搜索热词 | SYS-BEH10 / CONCEPT-CLASS10 / COMP-STRUCT10 / COMP-SEQ10 / DESIGN-CLASS10 / OBJ-SEQ10 | `BrowseHistoryView.vue`；`SearchBehaviorServiceImpl`、`BrowseHistoryServiceImpl` | E2E-TC10-001~04 `BehaviorApiAndE2ETest`；E2E-TC10-001 `frontend/e2e/domain-b/uc10-behavior.spec.ts` | **CI_E2E_PASS / ACTIONS_ARTIFACT**：服务/API 原始结果已归档；最新 main 的全 UC Playwright Job 通过（https://github.com/Isabella-Apus/SEGroup8/actions/runs/33526387696），完整 Playwright 报告由 Actions artifact 保存，Git 仅保留结构化摘要和关键证据。 |
 
 ## 权威材料
 

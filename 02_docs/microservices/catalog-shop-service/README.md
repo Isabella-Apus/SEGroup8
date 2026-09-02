@@ -4,11 +4,8 @@
 
 - 服务边界与兼容策略：`service-boundary.md`
 - 图源与渲染件：`service-diagram.mmd`、`service-diagram.svg`
-- 六服务共同验收清单：`../service-acceptance-checklist.md`
 - 改造前后代码差异：`before-after-code-diff.md`
 - 契约：`openapi.yaml`
 - 数据归属：`database-ownership.md`
 - 跨服务失败语义：`cross-service-calls.md`
-- 迁移核对：`migration-version-report.md`
 - UC 追溯：`traceability.md`
-- 完整交付索引：`delivery-manifest.md`

@@ -1,0 +1,2 @@
+EXPLAIN
+-> Limit: 100 row(s)  (cost=125 rows=100) (actual time=0.317..0.464 rows=100 loops=1)\n    -> Index lookup on secondhand_product using idx_secondhand_status_created (status=1)  (cost=125 rows=1002) (actual time=0.316..0.458 rows=100 loops=1)\n

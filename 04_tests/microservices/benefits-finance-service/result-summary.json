@@ -1,51 +1,17 @@
 {
   "service": "benefits-finance-service",
-  "generatedAt": "2026-08-31T08:18:00Z",
-  "testedRevision": "historical-cbc1ab300d0bf3c78669d1c0ac9f72fd5a390e3a",
-  "authoritativeCurrentHeadEvidence": "Benefits Finance Service CI/CD benefits-finance-acceptance-summary artifact at the same GitHub SHA",
-  "baselineRevision": "bb72290cff96c78ab189468b82db1f8ba3cd9323",
-  "command": "mvn -B --no-transfer-progress -f microservices/pom.xml -pl benefits-finance-service -am clean verify",
-  "status": "HISTORICAL_PARTIAL_NOT_CURRENT_HEAD_EVIDENCE",
-  "blockers": [
-    "Current root Compose has only the legacy backend; order-service and messaging-service are not in this PR runtime stack.",
-    "Finance-routed browser E2E, registry digest, and Kubernetes rollout are NOT_RUN."
-  ],
-  "maven": "PASS",
-  "mysqlIntegration": "PASS",
-  "publicApiCoverage": { "covered": 17, "total": 17 },
-  "tests": { "run": 26, "failures": 0, "errors": 0, "skipped": 0 },
-  "securityContractTests": { "run": 5, "failures": 0, "errors": 0, "skipped": 0 },
-  "independentServiceE2E": "PASS",
-  "fullSystemUseCaseE2E": "NOT_RUN",
-  "platformUiCompatibilityRegression": "PASS",
-  "e2e": {
-    "independentCandidate": { "run": 3, "passed": 3, "failed": 0, "skipped": 0, "duration": "1.8s" },
-    "platformCompatibility": { "run": 3, "passed": 3, "failed": 0, "skipped": 0, "duration": "15.3s" },
-    "benefitsFinanceServiceRouted": false
+  "testedRevision": "b622e6bbb0447d6823b50e7789e4777f7131eb9b",
+  "status": "MAIN_CI_AND_K3S_DEPLOYMENT_PASSED",
+  "workflowRun": "https://github.com/Isabella-Apus/SEGroup8/actions/runs/33526387386",
+  "openApiOperations": { "public": 17, "internal": 8 },
+  "checks": {
+    "apiContractAndRealMySql": "PASS",
+    "independentCandidateE2E": "PASS",
+    "platformAuthComposeRegression": "PASS",
+    "fullSystemE2E": "PASS_RUN_33526387696",
+    "immutableImagePublish": "PASS",
+    "helmAtomicDeploy": "PASS",
+    "livenessReadinessInfo": "PASS"
   },
-  "executions": [
-    { "kind": "mavenCleanVerify", "completedAt": "2026-08-31T08:17:01Z", "result": "PASS",
-      "tests": { "run": 26, "failures": 0, "errors": 0, "skipped": 0 } },
-    { "kind": "mysqlTestcontainersWithSeparateMigrator", "completedAt": "2026-08-31T08:17:01Z", "result": "PASS",
-      "image": "mysql:8.4.6", "tests": { "run": 4, "failures": 0, "errors": 0, "skipped": 0 } },
-    { "kind": "independentCandidateServiceE2E", "completedAt": "2026-08-31T08:17:45Z", "result": "PASS",
-      "tests": { "run": 3, "failures": 0, "errors": 0, "skipped": 0 } },
-    { "kind": "legacyPlatformDomainECompatibility", "completedAt": "2026-08-31T08:18:27Z", "result": "PASS",
-      "tests": { "run": 3, "failures": 0, "errors": 0, "skipped": 0 } },
-    { "kind": "financeRoutedBrowserE2E", "result": "NOT_RUN", "reason": "order and messaging services are not present in the current Compose stack" }
-  ],
-  "candidateImage": "PASS",
-  "candidateImageId": "sha256:2a60df31818f68f28b40471b9f69d55fa1d2537dbf5cbcab879df8a2516b1e9c",
-  "jarSha256": "c8dc7f93525fb8778adfa7b46d9adb55d08cd62caf488339b8a9842d362c957d",
-  "helmStatic": "PASS",
-  "registryDigest": "PENDING",
-  "kubernetesRollout": "NOT_RUN",
-  "faultInjectionOnKubernetes": "NOT_RUN",
-  "environments": {
-    "mysqlTestcontainers": "PASS_MYSQL_8_4_6_SEPARATE_MIGRATOR_AND_DML_USER",
-    "independentServiceE2E": "PASS",
-    "legacyPlatformCompatibility": "PASS",
-    "microserviceRoutedBrowserE2E": "NOT_RUN",
-    "kubernetes": "NOT_RUN"
-  }
+  "evidenceBoundary": "Current generated reports are stored in the same-SHA Actions artifacts; Git retains summaries and structured evidence only."
 }

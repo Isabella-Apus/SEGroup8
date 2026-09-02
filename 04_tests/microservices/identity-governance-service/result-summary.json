@@ -1,42 +1,16 @@
 {
   "service": "identity-governance-service",
-  "generatedAt": "2026-08-30T18:09:01+08:00",
-  "branch": "feature/ms-identity-governance",
-  "implementationCommit": "cdb09c19",
-  "auditCommit": "ea1f1854dbd32cf39291be3204b328f31b96c4e3",
-  "maven": {
-    "status": "PASS",
-    "securityContract": {"tests": 5, "passed": 5, "failed": 0, "errors": 0, "skipped": 0},
-    "service": {"tests": 16, "passed": 16, "failed": 0, "errors": 0, "skipped": 0},
-    "mysql": {"tests": 2, "passed": 2, "skipped": 0, "fullApiPath": "PASS"}
+  "testedRevision": "b622e6bbb0447d6823b50e7789e4777f7131eb9b",
+  "status": "MAIN_CI_AND_K3S_DEPLOYMENT_PASSED",
+  "workflowRun": "https://github.com/Isabella-Apus/SEGroup8/actions/runs/33526387419",
+  "openApiOperations": { "public": 31, "internal": 6 },
+  "checks": {
+    "apiContractAndRealMySql": "PASS",
+    "independentE2E": "PASS",
+    "fullSystemE2E": "PASS_RUN_33526387696",
+    "immutableImagePublish": "PASS",
+    "helmAtomicDeploy": "PASS",
+    "livenessReadinessInfo": "PASS"
   },
-  "apiCoverage": {
-    "openApiRuntimeParity": {"status": "PASS", "manualOperations": 34, "runtimeOperations": 34, "missing": 0, "extra": 0},
-    "publicOperations": 31,
-    "successCovered": 31,
-    "protectedAnonymousRejected": 29,
-    "protectedDeletedAccountRejected": 29,
-    "adminOrdinaryUserRejected": 10
-  },
-  "compose": "PASS",
-  "containerHealth": {"liveness": "UP", "readiness": "UP", "version": "local-validation"},
-  "containerSmoke": {"register": "PASS", "login": "PASS", "role": "USER"},
-  "databaseIsolation": {"status": "PASS", "crossSchemaError": "MySQL 1142 SELECT command denied"},
-  "domainAE2E": {
-    "monolithStart": {"status": "PASS", "tests": 5, "passed": 5, "failed": 0, "durationSeconds": 9.9},
-    "microservice": {"status": "PASS", "tests": 5, "passed": 5, "failed": 0, "durationSeconds": 20.1, "failedFirstRunPreserved": true}
-  },
-  "deploymentFailureDrill": {"localContainer": "PASS", "k3sAtomicRollback": "NOT_RUN"},
-  "kubernetes": {
-    "manifests": "CONFIGURED",
-    "pipeline": "CONFIGURED",
-    "prVerification": {
-      "serviceRun": {"id": 33297661588, "status": "PASS"},
-      "fullSystemRun": {"id": 33297661706, "status": "PASS"}
-    },
-    "currentBranchPipeline": "PENDING_CURRENT_PUSH",
-    "registryPublish": "NOT_RUN_ON_PULL_REQUEST",
-    "clusterRollout": "NOT_RUN_ON_PULL_REQUEST"
-  },
-  "cloudNativeExperiments": {"hpaAutoscaling": "NOT_RUN", "dependencyFailureHandling": "NOT_RUN"}
+  "evidenceBoundary": "Current generated reports are stored in the same-SHA Actions artifacts; Git retains summaries and key evidence only."
 }

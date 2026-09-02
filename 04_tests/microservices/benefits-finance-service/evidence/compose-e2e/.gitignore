@@ -1,9 +1,0 @@
-# Keep compact JSON/XML/log evidence, but never commit bulky Playwright artifacts.
-playwright-report/
-test-results/
-**/traces/
-**/trace.zip
-**/videos/
-**/*.webm
-**/screenshots/
-**/*.png

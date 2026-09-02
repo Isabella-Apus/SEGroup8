@@ -1,2 +1,0 @@
-EXPLAIN
--> Limit: 100 row(s)  (cost=309 rows=100) (actual time=2.7..2.71 rows=100 loops=1)\n    -> Sort: secondhand_product.create_time DESC, limit input to 100 row(s) per chunk  (cost=309 rows=3004) (actual time=2.7..2.71 rows=100 loops=1)\n        -> Filter: (secondhand_product.`status` = 1)  (cost=309 rows=3004) (actual time=0.0799..2.43 rows=1002 loops=1)\n            -> Table scan on secondhand_product  (cost=309 rows=3004) (actual time=0.0776..2.17 rows=5002 loops=1)\n

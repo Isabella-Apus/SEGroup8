@@ -3,7 +3,7 @@
 ## 对比基线
 
 - 改造前：`origin/main@bb72290cff96c78ab189468b82db1f8ba3cd9323`，订单能力位于单体 `backend`。
-- 改造后：当前 `feature/ms-order` HEAD；验收时以 PR #210 的 GitHub HEAD SHA 为准。
+- 改造后：功能已合入 `main`，当前验收基线为 `b622e6bbb0447d6823b50e7789e4777f7131eb9b`。
 - 可复现命令：
 
 ```bash

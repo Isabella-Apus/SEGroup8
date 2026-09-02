@@ -1,11 +1,9 @@
-# 测试计划
+# catalog-shop-service 最终测试计划
 
-| 层级 | 范围 | 通过标准 |
-|---|---|---|
-| unit/API | UC06-UC10、校验、所有权、无 LLM key | Maven tests 0 failure |
-| migration | H2 空 Schema；MySQL 8 clean/legacy import；跨库拒绝 | Flyway 成功，拒绝身份库 |
-| concurrency/contract | 多商品原子预留、幂等 confirm/release、过期 | 不超卖，重复结果一致 |
-| E2E | 复用 `frontend/e2e/domain-b/uc06` 至 `uc10` | 5 个 spec 全通过 |
-| deployment/HPA | Helm atomic、探针、版本、回滚、搜索负载 | 无错误发布；指标和证据齐全 |
+覆盖 UC06-UC10、30 个公开 OpenAPI 操作、6 个内部操作、库存并发/幂等、Flyway、真实 MySQL、跨库拒绝、独立服务 smoke、完整浏览器 E2E、候选镜像和 Helm 部署。标准入口：
 
-本地已执行 Maven API/迁移测试。MySQL Compose、浏览器、K3s 与 HPA 必须在对应环境执行并保存原始证据。
+```bash
+mvn -B --no-transfer-progress -f microservices/pom.xml -pl catalog-shop-service -am clean verify
+```
+
+独立流水线验证服务边界和候选镜像；共享流水线执行 UC06-UC10 及完整 UC01-UC25 回归。

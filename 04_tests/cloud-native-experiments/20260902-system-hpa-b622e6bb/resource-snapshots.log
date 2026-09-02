@@ -1,0 +1,536 @@
+[2026-09-02T10:38:27+08:00] mode=fixed stage=warmup
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   1002m        183Mi
+segroup8-backend-54498dc59-tf5lj   12m          257Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   1353m        33%      5734Mi          78%
+[2026-09-02T10:38:34+08:00] mode=fixed stage=warmup
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   1002m        183Mi
+segroup8-backend-54498dc59-tf5lj   12m          257Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   1353m        33%      5734Mi          78%
+[2026-09-02T10:38:41+08:00] mode=fixed stage=warmup
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   1002m        183Mi
+segroup8-backend-54498dc59-tf5lj   12m          257Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   1353m        33%      5734Mi          78%
+[2026-09-02T10:38:48+08:00] mode=fixed stage=warmup-post
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   715m         220Mi
+segroup8-backend-54498dc59-tf5lj   712m         259Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   2917m        72%      5768Mi          79%
+[2026-09-02T10:38:49+08:00] mode=fixed stage=c5
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   715m         220Mi
+segroup8-backend-54498dc59-tf5lj   712m         259Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   2917m        72%      5768Mi          79%
+[2026-09-02T10:38:56+08:00] mode=fixed stage=c5
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   715m         220Mi
+segroup8-backend-54498dc59-tf5lj   712m         259Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   2769m        69%      5750Mi          79%
+[2026-09-02T10:39:03+08:00] mode=fixed stage=c5
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   906m         235Mi
+segroup8-backend-54498dc59-tf5lj   694m         264Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   2769m        69%      5750Mi          79%
+[2026-09-02T10:39:11+08:00] mode=fixed stage=c5
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   906m         235Mi
+segroup8-backend-54498dc59-tf5lj   888m         272Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3522m        88%      5757Mi          79%
+[2026-09-02T10:39:19+08:00] mode=fixed stage=c5
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   906m         235Mi
+segroup8-backend-54498dc59-tf5lj   888m         272Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3522m        88%      5757Mi          79%
+[2026-09-02T10:39:26+08:00] mode=fixed stage=c5-post
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   906m         235Mi
+segroup8-backend-54498dc59-tf5lj   888m         272Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3522m        88%      5757Mi          79%
+[2026-09-02T10:39:27+08:00] mode=fixed stage=c10
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   960m         246Mi
+segroup8-backend-54498dc59-tf5lj   733m         273Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   2385m        59%      5769Mi          79%
+[2026-09-02T10:39:35+08:00] mode=fixed stage=c10
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   960m         246Mi
+segroup8-backend-54498dc59-tf5lj   733m         273Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   2385m        59%      5769Mi          79%
+[2026-09-02T10:39:43+08:00] mode=fixed stage=c10
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   723m         250Mi
+segroup8-backend-54498dc59-tf5lj   343m         264Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3447m        86%      5768Mi          79%
+[2026-09-02T10:39:50+08:00] mode=fixed stage=c10
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   723m         250Mi
+segroup8-backend-54498dc59-tf5lj   343m         264Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3447m        86%      5768Mi          79%
+[2026-09-02T10:39:58+08:00] mode=fixed stage=c10-post
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   968m         252Mi
+segroup8-backend-54498dc59-tf5lj   837m         276Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3441m        86%      5755Mi          79%
+[2026-09-02T10:39:59+08:00] mode=fixed stage=c20
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   968m         252Mi
+segroup8-backend-54498dc59-tf5lj   837m         276Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3441m        86%      5755Mi          79%
+[2026-09-02T10:40:07+08:00] mode=fixed stage=c20
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   968m         252Mi
+segroup8-backend-54498dc59-tf5lj   837m         276Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3441m        86%      5755Mi          79%
+[2026-09-02T10:40:15+08:00] mode=fixed stage=c20
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   873m         253Mi
+segroup8-backend-54498dc59-tf5lj   718m         266Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3482m        87%      5746Mi          79%
+[2026-09-02T10:40:23+08:00] mode=fixed stage=c20
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   873m         253Mi
+segroup8-backend-54498dc59-tf5lj   718m         266Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3482m        87%      5746Mi          79%
+[2026-09-02T10:40:31+08:00] mode=fixed stage=c20-post
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   927m         256Mi
+segroup8-backend-54498dc59-tf5lj   827m         270Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3648m        91%      5749Mi          79%
+[2026-09-02T10:40:32+08:00] mode=hpa stage=scale-trigger
+NAME               REFERENCE                     TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: <unknown>/60%   2         4         0          2s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   927m         256Mi
+segroup8-backend-54498dc59-tf5lj   827m         270Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3648m        91%      5749Mi          79%
+[2026-09-02T10:40:41+08:00] mode=hpa stage=scale-trigger
+NAME               REFERENCE                     TARGETS              MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: <unknown>/60%   2         4         0          12s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   795m         257Mi
+segroup8-backend-54498dc59-tf5lj   507m         274Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   2811m        70%      5742Mi          79%
+[2026-09-02T10:40:50+08:00] mode=hpa stage=scale-trigger
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 260%/60%   2         4         2          21s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   795m         257Mi
+segroup8-backend-54498dc59-tf5lj   507m         274Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   2811m        70%      5742Mi          79%
+[2026-09-02T10:40:59+08:00] mode=hpa stage=scale-trigger
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 268%/60%   2         4         4          31s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   833m         258Mi
+segroup8-backend-54498dc59-tf5lj   507m         274Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3640m        91%      5800Mi          79%
+[2026-09-02T10:41:10+08:00] mode=hpa stage=scale-trigger
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 268%/60%   2         4         4          40s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   833m         258Mi
+segroup8-backend-54498dc59-tf5lj   507m         274Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3997m        99%      5876Mi          80%
+[2026-09-02T10:41:19+08:00] mode=hpa stage=scale-trigger
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 155%/60%   2         4         4          50s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   466m         259Mi
+segroup8-backend-54498dc59-tf5lj   310m         274Mi
+segroup8-backend-54498dc59-tqm89   566m         79Mi
+segroup8-backend-54498dc59-wnkqz   504m         70Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3997m        99%      5876Mi          80%
+[2026-09-02T10:41:29+08:00] mode=hpa stage=scale-trigger
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 173%/60%   2         4         4          60s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   475m         259Mi
+segroup8-backend-54498dc59-tf5lj   393m         274Mi
+segroup8-backend-54498dc59-tqm89   682m         95Mi
+segroup8-backend-54498dc59-wnkqz   673m         90Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3972m        99%      5870Mi          80%
+[2026-09-02T10:41:39+08:00] mode=hpa stage=scale-trigger
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 173%/60%   2         4         4          71s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   475m         259Mi
+segroup8-backend-54498dc59-tf5lj   277m         274Mi
+segroup8-backend-54498dc59-tqm89   630m         120Mi
+segroup8-backend-54498dc59-wnkqz   596m         118Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3978m        99%      5908Mi          81%
+[2026-09-02T10:41:49+08:00] mode=hpa stage=scale-trigger
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 150%/60%   2         4         4          81s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   475m         259Mi
+segroup8-backend-54498dc59-tf5lj   277m         274Mi
+segroup8-backend-54498dc59-tqm89   630m         120Mi
+segroup8-backend-54498dc59-wnkqz   596m         118Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3978m        99%      5908Mi          81%
+[2026-09-02T10:41:59+08:00] mode=hpa stage=scale-trigger
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 150%/60%   2         4         4          90s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   434m         259Mi
+segroup8-backend-54498dc59-tf5lj   313m         274Mi
+segroup8-backend-54498dc59-tqm89   638m         148Mi
+segroup8-backend-54498dc59-wnkqz   577m         137Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3976m        99%      5805Mi          79%
+[2026-09-02T10:42:09+08:00] mode=hpa stage=scale-trigger
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 149%/60%   2         4         4          100s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   434m         259Mi
+segroup8-backend-54498dc59-tf5lj   313m         274Mi
+segroup8-backend-54498dc59-tqm89   638m         148Mi
+segroup8-backend-54498dc59-wnkqz   577m         137Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3959m        98%      5862Mi          80%
+[2026-09-02T10:42:19+08:00] mode=hpa stage=scale-trigger
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 141%/60%   2         4         4          110s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   394m         260Mi
+segroup8-backend-54498dc59-tf5lj   313m         274Mi
+segroup8-backend-54498dc59-tqm89   640m         172Mi
+segroup8-backend-54498dc59-wnkqz   624m         158Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3959m        98%      5862Mi          80%
+[2026-09-02T10:42:29+08:00] mode=hpa stage=scale-trigger
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 141%/60%   2         4         4          119s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   306m         260Mi
+segroup8-backend-54498dc59-tf5lj   362m         274Mi
+segroup8-backend-54498dc59-tqm89   651m         206Mi
+segroup8-backend-54498dc59-wnkqz   657m         187Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3982m        99%      5912Mi          81%
+[2026-09-02T10:42:37+08:00] mode=hpa stage=scale-trigger-post
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 133%/60%   2         4         4          2m6s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   306m         260Mi
+segroup8-backend-54498dc59-tf5lj   362m         274Mi
+segroup8-backend-54498dc59-tqm89   651m         206Mi
+segroup8-backend-54498dc59-wnkqz   657m         187Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3982m        99%      5912Mi          81%
+[2026-09-02T10:42:38+08:00] mode=hpa stage=scale-ready
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 133%/60%   2         4         4          2m7s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   306m         260Mi
+segroup8-backend-54498dc59-tf5lj   362m         274Mi
+segroup8-backend-54498dc59-tqm89   651m         206Mi
+segroup8-backend-54498dc59-wnkqz   657m         187Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3982m        99%      5912Mi          81%
+[2026-09-02T10:42:40+08:00] mode=hpa stage=post-scale-warmup
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 133%/60%   2         4         4          2m12s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   104m         260Mi
+segroup8-backend-54498dc59-tf5lj   171m         274Mi
+segroup8-backend-54498dc59-tqm89   631m         223Mi
+segroup8-backend-54498dc59-wnkqz   822m         222Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   2938m        73%      5888Mi          81%
+[2026-09-02T10:42:50+08:00] mode=hpa stage=post-scale-warmup
+NAME               REFERENCE                     TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 55%/60%   2         4         4          2m21s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   104m         260Mi
+segroup8-backend-54498dc59-tf5lj   171m         274Mi
+segroup8-backend-54498dc59-tqm89   631m         223Mi
+segroup8-backend-54498dc59-wnkqz   822m         222Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   2938m        73%      5888Mi          81%
+[2026-09-02T10:43:00+08:00] mode=hpa stage=post-scale-warmup
+NAME               REFERENCE                     TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 55%/60%   2         4         4          2m30s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   121m         260Mi
+segroup8-backend-54498dc59-tf5lj   94m          274Mi
+segroup8-backend-54498dc59-tqm89   459m         227Mi
+segroup8-backend-54498dc59-wnkqz   584m         223Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3599m        89%      5888Mi          81%
+[2026-09-02T10:43:08+08:00] mode=hpa stage=post-scale-warmup-post
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 125%/60%   2         4         4          2m37s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   121m         260Mi
+segroup8-backend-54498dc59-tf5lj   94m          274Mi
+segroup8-backend-54498dc59-tqm89   459m         227Mi
+segroup8-backend-54498dc59-wnkqz   584m         223Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3599m        89%      5888Mi          81%
+[2026-09-02T10:43:09+08:00] mode=hpa stage=c5
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 125%/60%   2         4         4          2m40s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   121m         260Mi
+segroup8-backend-54498dc59-tf5lj   94m          274Mi
+segroup8-backend-54498dc59-tqm89   459m         227Mi
+segroup8-backend-54498dc59-wnkqz   584m         223Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3599m        89%      5888Mi          81%
+[2026-09-02T10:43:18+08:00] mode=hpa stage=c5
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 153%/60%   2         4         4          2m49s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   107m         260Mi
+segroup8-backend-54498dc59-tf5lj   84m          274Mi
+segroup8-backend-54498dc59-tqm89   781m         231Mi
+segroup8-backend-54498dc59-wnkqz   560m         229Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   2831m        70%      5909Mi          81%
+[2026-09-02T10:43:28+08:00] mode=hpa stage=c5
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 153%/60%   2         4         4          2m59s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   184m         260Mi
+segroup8-backend-54498dc59-tf5lj   89m          274Mi
+segroup8-backend-54498dc59-tqm89   334m         232Mi
+segroup8-backend-54498dc59-wnkqz   735m         234Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3802m        95%      5933Mi          81%
+[2026-09-02T10:43:37+08:00] mode=hpa stage=c5
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 134%/60%   2         4         4          3m8s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   184m         260Mi
+segroup8-backend-54498dc59-tf5lj   89m          274Mi
+segroup8-backend-54498dc59-tqm89   334m         232Mi
+segroup8-backend-54498dc59-wnkqz   735m         234Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3802m        95%      5933Mi          81%
+[2026-09-02T10:43:46+08:00] mode=hpa stage=c5-post
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 134%/60%   2         4         4          3m15s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   198m         260Mi
+segroup8-backend-54498dc59-tf5lj   205m         274Mi
+segroup8-backend-54498dc59-tqm89   635m         234Mi
+segroup8-backend-54498dc59-wnkqz   663m         241Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3869m        96%      5921Mi          81%
+[2026-09-02T10:43:47+08:00] mode=hpa stage=c10
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 170%/60%   2         4         4          3m19s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   198m         260Mi
+segroup8-backend-54498dc59-tf5lj   205m         274Mi
+segroup8-backend-54498dc59-tqm89   635m         234Mi
+segroup8-backend-54498dc59-wnkqz   663m         241Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3869m        96%      5921Mi          81%
+[2026-09-02T10:43:57+08:00] mode=hpa stage=c10
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 170%/60%   2         4         4          3m28s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   96m          260Mi
+segroup8-backend-54498dc59-tf5lj   83m          274Mi
+segroup8-backend-54498dc59-tqm89   427m         232Mi
+segroup8-backend-54498dc59-wnkqz   447m         244Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   2126m        53%      5904Mi          81%
+[2026-09-02T10:44:07+08:00] mode=hpa stage=c10
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 105%/60%   2         4         4          3m38s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   96m          260Mi
+segroup8-backend-54498dc59-tf5lj   83m          274Mi
+segroup8-backend-54498dc59-tqm89   427m         232Mi
+segroup8-backend-54498dc59-wnkqz   447m         244Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   2126m        53%      5904Mi          81%
+[2026-09-02T10:44:17+08:00] mode=hpa stage=c10
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 167%/60%   2         4         4          3m47s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   225m         261Mi
+segroup8-backend-54498dc59-tf5lj   190m         274Mi
+segroup8-backend-54498dc59-tqm89   623m         247Mi
+segroup8-backend-54498dc59-wnkqz   632m         246Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3930m        98%      5935Mi          81%
+[2026-09-02T10:44:24+08:00] mode=hpa stage=c10-post
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 167%/60%   2         4         4          3m53s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   225m         261Mi
+segroup8-backend-54498dc59-tf5lj   190m         274Mi
+segroup8-backend-54498dc59-tqm89   623m         247Mi
+segroup8-backend-54498dc59-wnkqz   632m         246Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3930m        98%      5935Mi          81%
+[2026-09-02T10:44:26+08:00] mode=hpa stage=c20
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 167%/60%   2         4         4          3m57s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   150m         261Mi
+segroup8-backend-54498dc59-tf5lj   180m         274Mi
+segroup8-backend-54498dc59-tqm89   632m         241Mi
+segroup8-backend-54498dc59-wnkqz   364m         246Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3330m        83%      5899Mi          81%
+[2026-09-02T10:44:36+08:00] mode=hpa stage=c20
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 132%/60%   2         4         4          4m8s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   150m         261Mi
+segroup8-backend-54498dc59-tf5lj   180m         274Mi
+segroup8-backend-54498dc59-tqm89   632m         241Mi
+segroup8-backend-54498dc59-wnkqz   364m         246Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3330m        83%      5899Mi          81%
+[2026-09-02T10:44:46+08:00] mode=hpa stage=c20
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 123%/60%   2         4         4          4m18s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   229m         261Mi
+segroup8-backend-54498dc59-tf5lj   215m         274Mi
+segroup8-backend-54498dc59-tqm89   332m         242Mi
+segroup8-backend-54498dc59-wnkqz   458m         247Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3269m        81%      5933Mi          81%
+[2026-09-02T10:44:56+08:00] mode=hpa stage=c20
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 123%/60%   2         4         4          4m26s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   280m         261Mi
+segroup8-backend-54498dc59-tf5lj   195m         274Mi
+segroup8-backend-54498dc59-tqm89   559m         244Mi
+segroup8-backend-54498dc59-wnkqz   597m         251Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3983m        99%      5920Mi          81%
+[2026-09-02T10:45:04+08:00] mode=hpa stage=c20-post
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 163%/60%   2         4         4          4m33s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   280m         261Mi
+segroup8-backend-54498dc59-tf5lj   195m         274Mi
+segroup8-backend-54498dc59-tqm89   559m         244Mi
+segroup8-backend-54498dc59-wnkqz   597m         251Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3983m        99%      5920Mi          81%
+[2026-09-02T10:45:05+08:00] mode=hpa stage=scale-down
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 163%/60%   2         4         4          4m34s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   280m         261Mi
+segroup8-backend-54498dc59-tf5lj   195m         274Mi
+segroup8-backend-54498dc59-tqm89   559m         244Mi
+segroup8-backend-54498dc59-wnkqz   597m         251Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   3983m        99%      5920Mi          81%
+[2026-09-02T10:45:17+08:00] mode=hpa stage=scale-down
+NAME               REFERENCE                     TARGETS         MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 163%/60%   2         4         4          4m46s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   48m          262Mi
+segroup8-backend-54498dc59-tf5lj   80m          274Mi
+segroup8-backend-54498dc59-tqm89   263m         245Mi
+segroup8-backend-54498dc59-wnkqz   597m         251Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   2013m        50%      5913Mi          81%
+[2026-09-02T10:45:29+08:00] mode=hpa stage=scale-down
+NAME               REFERENCE                     TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 98%/60%   2         4         4          4m58s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   9m           262Mi
+segroup8-backend-54498dc59-tf5lj   4m           274Mi
+segroup8-backend-54498dc59-tqm89   25m          245Mi
+segroup8-backend-54498dc59-wnkqz   82m          251Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   1000m        25%      5918Mi          81%
+[2026-09-02T10:45:41+08:00] mode=hpa stage=scale-down
+NAME               REFERENCE                     TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 12%/60%   2         4         4          5m10s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   9m           262Mi
+segroup8-backend-54498dc59-tf5lj   4m           274Mi
+segroup8-backend-54498dc59-tqm89   25m          245Mi
+segroup8-backend-54498dc59-wnkqz   82m          251Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   1000m        25%      5918Mi          81%
+[2026-09-02T10:45:53+08:00] mode=hpa stage=scale-down
+NAME               REFERENCE                     TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 4%/60%   2         4         4          5m22s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   8m           262Mi
+segroup8-backend-54498dc59-tf5lj   4m           274Mi
+segroup8-backend-54498dc59-tqm89   12m          245Mi
+segroup8-backend-54498dc59-wnkqz   18m          251Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   844m         21%      5953Mi          81%
+[2026-09-02T10:46:05+08:00] mode=hpa stage=scale-down
+NAME               REFERENCE                     TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 3%/60%   2         4         4          5m34s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   6m           262Mi
+segroup8-backend-54498dc59-tf5lj   4m           274Mi
+segroup8-backend-54498dc59-tqm89   11m          245Mi
+segroup8-backend-54498dc59-wnkqz   18m          251Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   828m         20%      5899Mi          81%
+[2026-09-02T10:46:17+08:00] mode=hpa stage=scale-down
+NAME               REFERENCE                     TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 3%/60%   2         4         4          5m46s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   10m          261Mi
+segroup8-backend-54498dc59-tf5lj   4m           274Mi
+segroup8-backend-54498dc59-tqm89   19m          245Mi
+segroup8-backend-54498dc59-wnkqz   19m          251Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   957m         23%      5900Mi          81%
+[2026-09-02T10:46:29+08:00] mode=hpa stage=scale-down
+NAME               REFERENCE                     TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 5%/60%   2         4         4          5m58s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   6m           261Mi
+segroup8-backend-54498dc59-tf5lj   4m           274Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   1366m        34%      5412Mi          74%
+[2026-09-02T10:46:41+08:00] mode=hpa stage=scale-down
+NAME               REFERENCE                     TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+segroup8-backend   Deployment/segroup8-backend   cpu: 2%/60%   2         4         2          6m10s
+NAME                               CPU(cores)   MEMORY(bytes)
+segroup8-backend-54498dc59-8jm9s   6m           261Mi
+segroup8-backend-54498dc59-tf5lj   4m           274Mi
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   1366m        34%      5412Mi          74%

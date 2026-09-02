@@ -9,6 +9,7 @@ HELM_RELEASE="${HELM_RELEASE:-segroup8}"
 DEPLOYMENT="${DEPLOYMENT:-segroup8-backend}"
 HPA_NAME="${HPA_NAME:-segroup8-backend}"
 PUBLIC_BASE_URL="${PUBLIC_BASE_URL:-http://127.0.0.1}"
+LOAD_BASE_URL="${LOAD_BASE_URL:-}"
 MIN_REPLICAS="${MIN_REPLICAS:-2}"
 MAX_REPLICAS="${MAX_REPLICAS:-4}"
 TARGET_CPU="${TARGET_CPU:-60}"
@@ -30,6 +31,10 @@ esac
 case "$DEPLOYMENT" in
   ''|*[!a-zA-Z0-9-]*) echo "Unsafe deployment: $DEPLOYMENT" >&2; exit 2 ;;
 esac
+if [[ "$DEPLOYMENT" == *secondhand* || "$HPA_NAME" == *secondhand* ]]; then
+  echo "The course HPA experiment must target the complete-system backend, not secondhand-service" >&2
+  exit 2
+fi
 case "$HELM_RELEASE" in
   ''|*[!a-zA-Z0-9-]*) echo "Unsafe Helm release: $HELM_RELEASE" >&2; exit 2 ;;
 esac
@@ -146,7 +151,7 @@ snapshot() {
 run_benchmark() {
   local mode="$1" concurrency="$2" stage="c$concurrency"
   python3 "$SCRIPT_DIR/http_mix_benchmark.py" \
-    --name "$mode-$stage" --base-url "$PUBLIC_BASE_URL" --endpoint-file "$ENDPOINT_FILE" \
+    --name "$mode-$stage" --base-url "$LOAD_BASE_URL" --endpoint-file "$ENDPOINT_FILE" \
     --concurrency "$concurrency" --duration "$STAGE_DURATION" --timeout "$REQUEST_TIMEOUT" \
     --output "$OUT/raw/$mode-$stage.json" > "$OUT/raw/$mode-$stage.console.log" 2>&1 &
   local pid=$!
@@ -161,7 +166,7 @@ run_benchmark() {
 warm_up() {
   local mode="$1" label="${2:-warmup}" duration="${3:-$WARMUP_DURATION}"
   python3 "$SCRIPT_DIR/http_mix_benchmark.py" \
-    --name "$mode-$label" --base-url "$PUBLIC_BASE_URL" --endpoint-file "$ENDPOINT_FILE" \
+    --name "$mode-$label" --base-url "$LOAD_BASE_URL" --endpoint-file "$ENDPOINT_FILE" \
     --concurrency 4 --duration "$duration" --timeout "$REQUEST_TIMEOUT" \
     --output "$OUT/raw/$mode-$label.json" > "$OUT/raw/$mode-$label.console.log" 2>&1 &
   local pid=$!
@@ -191,9 +196,13 @@ kubectl get --raw /apis/metrics.k8s.io/v1beta1/nodes >/dev/null
 kubectl -n "$NAMESPACE" get deployment "$DEPLOYMENT" >/dev/null
 kubectl -n "$NAMESPACE" get statefulset "$MYSQL_STATEFULSET" >/dev/null
 curl --fail --silent --show-error "$PUBLIC_BASE_URL/health" >/dev/null
+if [[ -z "$LOAD_BASE_URL" ]]; then
+  FRONTEND_SERVICE_IP="$(kubectl -n "$NAMESPACE" get service frontend -o jsonpath='{.spec.clusterIP}')"
+  LOAD_BASE_URL="http://$FRONTEND_SERVICE_IP"
+fi
 while read -r weight endpoint; do
   [[ -z "${weight:-}" || "$weight" == \#* ]] && continue
-  curl --fail --silent --show-error "$PUBLIC_BASE_URL$endpoint" >/dev/null
+  curl --fail --silent --show-error "$LOAD_BASE_URL$endpoint" >/dev/null
 done < "$ENDPOINT_FILE"
 
 {
@@ -205,7 +214,10 @@ done < "$ENDPOINT_FILE"
   kubectl -n "$NAMESPACE" get deployment,pod,service,ingress,hpa -o wide
   kubectl -n "$NAMESPACE" top pods
   echo "publicBaseUrl=$PUBLIC_BASE_URL"
-  echo "loadPath=Traefik -> frontend Nginx -> backend -> MySQL"
+  echo "loadBaseUrl=$LOAD_BASE_URL"
+  echo "loadPath=frontend Service/Nginx -> shared compatibility backend -> MySQL"
+  echo "autoscalingTarget=deployment/$DEPLOYMENT"
+  echo "excludedAutoscalingTarget=secondhand-service"
   echo "originalBackendReplicas=$ORIGINAL_REPLICAS"
   echo "backendImage=$(kubectl -n "$NAMESPACE" get deployment "$DEPLOYMENT" -o jsonpath='{.spec.template.spec.containers[0].image}')"
   echo "frontendImage=$(kubectl -n "$NAMESPACE" get deployment segroup8-frontend -o jsonpath='{.spec.template.spec.containers[0].image}')"
@@ -324,7 +336,8 @@ peak_ready = max((int(point["readyReplicas"]) for point in hpa_points), default=
 final = int(hpa_points[-1]["currentReplicas"]) if hpa_points else 0
 summary = {
     "scope": "complete-system",
-    "trafficPath": "Traefik -> frontend Nginx -> backend -> MySQL",
+    "trafficPath": "frontend Service/Nginx -> shared compatibility backend -> MySQL",
+    "autoscalingTarget": "shared compatibility backend (never secondhand-service)",
     "runs": runs,
     "hpa": {
         "minimumReplicas": minimum,
@@ -357,4 +370,8 @@ PY
 
 SUCCESS=true
 echo "Complete-system HPA experiment passed: $OUT"
-echo "Optimized HPA remains enabled with minReplicas=$MIN_REPLICAS (set KEEP_OPTIMIZED_HPA=false to restore the original state)."
+if [[ "$KEEP_OPTIMIZED_HPA" == true ]]; then
+  echo "Optimized HPA remains enabled with minReplicas=$MIN_REPLICAS."
+else
+  echo "The pre-experiment replica/HPA state will be restored by the exit handler."
+fi

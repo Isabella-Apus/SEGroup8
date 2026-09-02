@@ -39,11 +39,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File 04_tests/domains/B-catalog-s
 
 该命令会执行 `frontend/e2e/domain-b/uc06-catalog.spec.ts`，并把 Playwright JUnit、JSON、HTML 报告和失败诊断材料写入 `04_tests/domains/B-catalog-shop/evidence/`；CI 将这些结果作为 artifact 保存。
 
+当前 `main@b622e6bb` 已由 Catalog-Shop 流水线 33526387391 和完整系统流水线 33526387696 在合并后的微服务与真实浏览器环境复验通过。
+
 ## 原始证据
 
 - [测试代码](../../microservices/catalog-service/src/test/java/com/segroup8/catalog/CatalogApiIntegrationTest.java)
 - [测试配置](../../microservices/catalog-service/src/test/resources/application.yml)
-- [完整 Maven 日志](../../04_tests/UC06/evidence/logs/maven-clean-test.log)
 - [Surefire XML 原始报告](../../04_tests/UC06/evidence/raw-reports/TEST-com.segroup8.catalog.CatalogApiAndE2ETest.xml)
-- [Surefire 文本报告](../../04_tests/UC06/evidence/raw-reports/com.segroup8.catalog.CatalogApiAndE2ETest.txt)
 - [UC06 运行结果截图](../../04_tests/UC06/evidence/screenshots/UC06-test-result.png)

@@ -1,47 +1,30 @@
 # 自动化测试与交付流水线
 
-流水线定义位于 `.github/workflows/ci-cd.yml`。A-E 五域后端/API 测试通过
-`_domain-tests.yml` 复用同一结构；浏览器层在启动 Compose 前先执行
-UC01-UC25 覆盖清单门禁，不为每个 UC 分别创建 workflow。
+完整系统流水线位于 `.github/workflows/ci-cd.yml`，六个微服务各有独立流水线。共享测试模板 `_domain-tests.yml` 复用 A-E 领域测试结构；浏览器层在启动 Compose 后执行 UC01-UC25 覆盖检查和真实 Playwright 测试。
 
-CI 链接：
-`https://github.com/Isabella-Apus/SEGroup8/actions/workflows/ci-cd.yml`
+Actions 入口：<https://github.com/Isabella-Apus/SEGroup8/actions>
 
-## 触发阶段
+## 触发方式
 
-- Pull Request：执行前端生产构建、后端平台测试、A-E 五域测试、Helm 校验、
-  UC01-UC25 覆盖清单、真实 Compose 冒烟和全量 Playwright，并上传证据。
-- `main`：重复执行质量检查；全部门禁通过后，将已验证的前后端制品封装为
-  Docker 镜像、推送至阿里云 ACR，并通过 Helm 部署到单节点 K3s。
-- `v*` 标签：执行质量检查并创建带前后端发布包的 GitHub Release。
-- 手动运行：在 Actions 页面按需执行构建和测试，不触发生产部署。
+- Pull Request：执行受影响范围的构建、单元/集成/API/E2E 与 Helm 静态验证，不部署生产环境。
+- 推送 `main`：各服务流水线在测试通过后发布同一候选镜像，并在部署开关及生产凭据可用时原子部署到 K3s；完整系统流水线验证前端、兼容后端、五域和 UC01-UC25。
+- 手动运行：执行构建与测试；生产部署仍受 workflow 中的 `main` 分支和部署配置约束。
+- 项目不创建 GitHub Release；制品、测试报告和部署日志由 Actions artifact 保存。
 
-## GitHub 配置
+## 必要配置
 
-建议至少将 `1 / Frontend common tests`、`1 / Backend platform tests and JAR`、
-五个 Domain job、`2 / UC01-UC25 browser coverage manifest`、
-`3 / Playwright full-stack smoke` 和 `4 / All UC E2E tests` 设置为 `main`
-分支必需检查。
+`production` Environment 需要：
 
-覆盖门禁执行：
+- Variables：`ACR_REGISTRY`、`ACR_NAMESPACE`、`K8S_NAMESPACE`；
+- Secrets：`ACR_USERNAME`、`ACR_PASSWORD`、`DEPLOY_HOST`、`DEPLOY_USER`、`DEPLOY_SSH_KEY`、`DEPLOY_KNOWN_HOSTS`；
+- 集群中预先创建数据库、服务身份和镜像拉取所需 Secret。
+
+生产镜像使用 `sha-<Git SHA>` 标签。Helm 使用 `--atomic --wait`，探针或 rollout 失败时自动回滚。完整初始化和排查方式见 `deploy/helm/segroup8/README.md` 与 `03_devops/microservices/*/operations-runbook.md`。
+
+UC 覆盖检查：
 
 ```bash
 node scripts/ci/verify-uc-e2e-coverage.mjs
 ```
 
-它要求 UC01-UC25 分别在约定的 `frontend/e2e/domain-*/` 下至少有一个
-`ucXX-*.spec.ts`，并拒绝放错 Domain 或超出 UC01-UC25 的文件。平台 smoke/health
-spec 不计作业务 UC。报告同时写入 Actions Step Summary，并作为
-`uc01-uc25-e2e-coverage` artifact 上传。当前 UC01-UC25 均已有规范位置的 spec，门禁结果为 25/25；未来任一用例入口缺失或放错 Domain 时，该门禁会按设计失败并阻断流水线。
-
-创建 `production` Environment 并配置：
-
-- Repository/Environment variables：`ACR_REGISTRY`、`ACR_NAMESPACE`
-- Environment secrets：`ACR_USERNAME`、`ACR_PASSWORD`、`DEPLOY_HOST`、
-  `DEPLOY_USER`、`DEPLOY_SSH_KEY`、`DEPLOY_KNOWN_HOSTS`
-- 可选 variables：`K8S_NAMESPACE`（默认 `segroup8`）、`PRODUCTION_URL`
-
-集群中需预先创建 `acr-pull-secret`、`segroup8-backend-secret` 和
-`segroup8-mysql-secret`。流水线使用不可变的 `sha-<Git SHA>` 标签发布镜像；
-Helm 通过 `--atomic --wait` 等待健康探针，升级失败时自动回滚。
-具体初始化和持久化说明见 `deploy/helm/segroup8/README.md`。
+它只检查 UC01-UC25 是否各有对应浏览器测试入口；真正的验收结论仍以 Maven、真实 MySQL、Compose/Playwright 和部署执行结果为准，文档存在性与文件 hash 不作为普通测试门禁。

@@ -1,160 +1,88 @@
 # 微服务划分与依赖设计
 
-## 1. 结论
+## 1. 最终划分
 
-当前 A-E 划分适合五人 Epic、需求追踪和测试统计，但不适合简单地做成五个运行时微服务：
+系统使用 5 个需求交付域、6 个业务微服务、1 个统一入口和 1 个媒体支撑能力。Domain E 拆成资金与消息两个服务，避免把资金强一致和实时消息混成一个事务边界；Domain B 合并为一个 catalog-shop 部署单元，避免无业务收益的过细拆分。
 
-- Domain A 的登录是多数受保护用例的**业务前置条件**，但其他服务不应在每次请求时同步调用 Domain A；
-- Domain B 在一个可独立部署的 `catalog-shop-service` 内按 catalog、shop、risk、behavior 划分模块，说明交付域与运行时 Deployment 可以一一对应；
-- Domain E 同时包含优惠券、钱包、聊天、通知，把它们部署为一个服务会混合资金强一致逻辑与消息最终一致逻辑；
-- Domain D 的二手商品/议价/拍卖是一个内聚边界，但成交后的订单、支付、物流仍应由订单服务拥有。
+| 服务 | UC | 唯一职责 | 源码 | 数据库 | 状态 |
+|---|---|---|---|---|---|
+| identity-governance-service | UC01–UC05 | 登录、用户、地址、商家审核、举报拉黑、信用、审计 | `microservices/identity-governance-service` | `identity_governance_db` | 已实现/已部署 |
+| catalog-shop-service | UC06–UC10 | 分类、商品、店铺、搜索、库存、风险与行为 | `microservices/catalog-shop-service` | `catalog_shop_db` | 已实现/已部署 |
+| order-service | UC11–UC15、UC20 | 订单、支付状态、履约、售后、物流、评价 | `microservices/order-service` | `order_db` | 已实现/已部署 |
+| secondhand-service | UC16–UC19 | 二手发布、直购、议价、拍卖与建单补偿 | `microservices/secondhand-service` | `secondhand_db` | 已实现/已部署 |
+| benefits-finance-service | UC21–UC23 | 优惠券、钱包、资金流水、支付退款结算 | `microservices/benefits-finance-service` | `benefits_finance_db` | 已实现/已部署 |
+| messaging-service | UC24–UC25 | 会话、通知、WebSocket、事件 Inbox/Outbox | `microservices/messaging-service` | `messaging_db` | 已实现/已部署 |
 
-因此冻结为“5 个交付域、6 个目标业务微服务、1 个入口与 1 个支撑组件”。Domain B 只以 `catalog-shop-service` 作为部署单元，避免为了形式上的细粒度拆分承担过高运维成本。
+兼容后端继续承载未彻底移除的回退实现，用于改造前后比较和迁移安全，不拥有已经切到微服务的新增写入规则。
 
-## 2. 当前实现与目标边界
-
-| 目标服务 | 主要 UC | 唯一职责 | 当前源码位置 | 当前状态 |
-|---|---|---|---|---|
-| `identity-governance-service` | UC01-UC05 | 注册登录、JWT、账号/资料/地址/商家申请、举报拉黑、信用和管理审计 | 单体 Domain A 控制器 | `TARGET` |
-| `catalog-shop-service` | UC06-UC10 | 分类、商品、库存、店铺、商品风险审核、浏览/搜索行为 | `microservices/catalog-shop-service` | `CURRENT`：唯一 Boot 入口、独立镜像、Helm、MySQL/API/契约/E2E 门禁 |
-| `order-service` | UC11-UC15、UC20 | 下单、支付状态、退款、履约、物流、评价；拥有所有订单 | 单体订单、物流、评价控制器 | `TARGET` |
-| `secondhand-service` | UC16-UC19 | 二手商品、直接购买意向、议价、拍卖；不拥有订单履约 | 单体二手商品与交易控制器 | `TARGET` |
-| `benefits-finance-service` | UC21-UC23 | 优惠券、领券核销、余额和资金流水 | 单体优惠券与财务控制器 | `TARGET` |
-| `messaging-service` | UC24-UC25 | 会话、消息、持久通知、WebSocket 推送 | 单体聊天、通知和 realtime 包 | `TARGET` |
-| API Gateway / Nginx | 全局 | TLS、路由、限流、统一认证入口、请求 ID；不持有业务表 | 当前 Nginx/Compose 入口 | `CURRENT`，能力待增强 |
-| Media adapter | 全局 | 图片/媒体上传；只返回不可变资源地址 | 单体 `UploadController` | `CURRENT` 支撑组件，不计业务微服务 |
-
-`microservices/security-contract` 是共享认证契约库，不是可部署业务服务，也不计入“至少三个业务微服务”。
-
-### 每个微服务的验收定义
-
-本设计中的 6 个服务都是独立部署单元，不是仅靠 Java package 命名进行逻辑分组。每个服务必须同时满足：
-
-1. 有独立 Maven module 和可执行 Spring Boot JAR，可用 `mvn -pl <service> -am clean verify` 单独构建测试；
-2. 有独立 Dockerfile、镜像名、配置、健康检查和端口；
-3. 有独立 Helm Deployment/Service，可单独升级、回滚和扩缩容；
-4. 有独立 schema migration、数据库账号和最小权限；
-5. 只读写本服务归属表，不能注入另一服务的 Mapper/Repository；
-6. 有公开/内部 API 契约测试、MySQL 集成测试和至少一个跨服务失败恢复测试。
-
-目标目录约定如下；目录和命令是迁移验收目标，当前不存在的模块必须标记 `NOT_IMPLEMENTED`：
-
-| 服务 | 目标 Maven module | 镜像 | Schema |
-|---|---|---|---|
-| identity-governance | `microservices/identity-governance-service` | `segroup8/identity-governance:<sha>` | `identity_governance_db` |
-| catalog-shop | `microservices/catalog-shop-service` | `segroup8/catalog-shop:<sha>` | `catalog_shop_db` |
-| order | `microservices/order-service` | `segroup8/order:<sha>` | `order_db` |
-| secondhand | `microservices/secondhand-service` | `segroup8/secondhand:<sha>` | `secondhand_db` |
-| benefits-finance | `microservices/benefits-finance-service` | `segroup8/benefits-finance:<sha>` | `benefits_finance_db` |
-| messaging | `microservices/messaging-service` | `segroup8/messaging:<sha>` | `messaging_db` |
-
-Domain B 的唯一 Maven module 是 `catalog-shop-service`；CI 对该部署入口执行独立构建、测试、镜像、Compose 和 Helm 验证。
-
-## 3. 交付域与运行时服务对应
-
-| 交付域 | 主要协作服务 | 说明 |
-|---|---|---|
-| A：UC01-UC05 | identity-governance、messaging | A 的核心数据在同一服务；审核结果通知由 messaging 异步投递 |
-| B：UC06-UC10 | catalog-shop | catalog/shop/risk/behavior 是同一部署服务内的模块，不跨库协作 |
-| C：UC11-UC15 | order、catalog-shop、benefits-finance、messaging | order 编排库存、资金和通知，但不读取其他服务数据库 |
-| D：UC16-UC20 | secondhand、order、messaging | secondhand 决定成交上下文；order 创建并履约订单 |
-| E：UC21-UC25 | benefits-finance、messaging | 资金强一致边界和消息最终一致边界分开部署 |
-
-## 4. 目标关系图
+## 2. 服务关系图
 
 ```mermaid
 flowchart LR
-    Client[Web / Admin / Seller] --> Gateway[API Gateway / Nginx]
+    Client[Web / Admin / Seller] --> Gateway[Ingress / Frontend]
+    Gateway --> Identity[identity-governance]
+    Gateway --> Catalog[catalog-shop]
+    Gateway --> Order[order]
+    Gateway --> Secondhand[secondhand]
+    Gateway --> Finance[benefits-finance]
+    Gateway --> Messaging[messaging]
 
-    Gateway --> Identity[identity-governance-service]
-    Gateway --> Catalog[catalog-shop-service]
-    Gateway --> Order[order-service]
-    Gateway --> Secondhand[secondhand-service]
-    Gateway --> Benefits[benefits-finance-service]
-    Gateway --> Messaging[messaging-service]
+    SharedJWT[security-contract 本地验 JWT]
+    SharedJWT -.嵌入.-> Catalog & Order & Secondhand & Finance & Messaging
 
-    Identity -->|签发 JWT| Client
-    Client -->|Bearer JWT| Gateway
-    SharedVerifier[本地 JWT verifier / security-contract]
-    SharedVerifier -.嵌入.-> Catalog & Order & Secondhand & Benefits & Messaging
+    Order -->|库存预留/释放| Catalog
+    Order -->|支付/退款/结算请求| Finance
+    Secondhand -->|幂等创建二手订单| Order
+    Secondhand -->|地址快照| Identity
+    Catalog -->|库存事件| Order
 
-    Order -->|库存预留/释放 API| Catalog
-    Order -->|优惠试算、核销、支付/退款 API| Benefits
-    Secondhand -->|幂等创建订单 API| Order
-    Secondhand -->|二手商品风险审核事件| Catalog
-    Identity -->|UserAccessChanged event| EventBus[(Event / Outbox)]
-    Order -->|OrderStatusChanged event| EventBus
-    Secondhand -->|TradeStatusChanged event| EventBus
-    EventBus --> Identity & Messaging & Order & Secondhand
+    Identity -->|用户与治理事件| Bus[(HTTP 事件入口 / Outbox)]
+    Order -->|订单事件| Bus
+    Catalog -->|库存事件| Bus
+    Finance -->|资金事件| Bus
+    Bus --> Messaging
 ```
 
-每个业务服务只连接自己的 schema。图中的调用箭头代表版本化 API 或事件，不代表跨库查询。
+箭头代表版本化 HTTP API 或事件，不代表跨库查询。每个服务只连接自己的 schema。
 
-## 5. Domain A 到底是不是其他服务的前置条件
+## 3. 调用方式与一致性
 
-
-1. **业务上是前置条件**：游客可以浏览公开商品；创建订单、发布商品、聊天、领券等受保护操作需要先通过 UC01 登录并取得 JWT。
-2. **运行时不应成为逐请求同步前置服务**：登录成功后，业务服务应本地校验 JWT 的签名、有效期和角色，不应每次请求都调用 `identity-governance-service` 查询“这个 token 是否有效”。否则身份服务故障会扩散为全站故障。
-
-当前代码已经具备这一方向的基础：单体使用 JWT，`microservices/security-contract` 能独立校验 `uid`、`username`、`role`。但当前仍使用共享对称密钥，默认 token 有效期为 24 小时；这是当前事实，不是最终安全设计。
-
-### 认证流程
-
-```mermaid
-sequenceDiagram
-    participant U as 用户
-    participant G as Gateway
-    participant I as identity-governance-service
-    participant O as 任一业务服务
-
-    U->>G: POST /api/auth/login
-    G->>I: 转发登录
-    I-->>U: 短期 Access JWT + Refresh Token
-    U->>G: 业务请求 + Bearer JWT
-    G->>G: 校验签名/过期/基础角色
-    G->>O: 转发可信身份上下文 + 原始 JWT
-    O->>O: 本地校验并执行资源所有权规则
-    O-->>U: 业务结果
-```
-
-### 封禁、解禁和角色变化
-
-纯离线 JWT 会遇到“用户被封禁但旧 token 尚未过期”的窗口。迁移阶段采用：
-
-- Access Token 缩短到 15-30 分钟，Refresh Token 只由 identity-governance-service 处理；
-- `UserAccessChanged(userId, status, roles, version, occurredAt)` 通过 outbox 发布；
-- Gateway 和业务服务维护本地 denylist/权限版本缓存；
-- 高风险操作可以在缓存缺失时调用一次 introspection，但不能让所有请求都依赖它；
-- 消费失败重试，按 `eventId` 幂等，缓存不可用时高风险写操作应失败关闭，公开只读接口不受影响。
-
-### identity-governance 调用失败怎么处理
-
-| 场景 | 是否同步依赖身份服务 | 失败策略 |
+| 链路 | 方式 | 失败策略 |
 |---|---|---|
-| 普通受保护请求验 JWT | 否 | Gateway 和业务服务本地验签；身份服务暂时不可用不影响未过期 token 的普通请求 |
-| 用户被封禁/角色改变 | 事件传播 | identity 在本地事务同时写用户状态和 outbox；消费者按 eventId 重试，进入 DLQ 后告警和人工/定时重放；高风险接口在权限版本不确定时失败关闭 |
-| 查询用户昵称/头像 | 可避免同步 | 消费 `UserProfileChanged` 建本服务最小只读投影；投影滞后时展示旧资料，不读取 `user` 表 |
-| 创建会话前检查拉黑 | 批量内部 API或本地投影 | 优先本地 block 投影；无缓存且治理接口不可用时拒绝创建会话，不能绕过拉黑规则 |
-| 商家审核后创建店铺 | 事件 | 审核事务写 `MerchantApproved` outbox；catalog-shop 幂等创建店铺；失败重试并显示 `APPROVED_PENDING_PROVISION`，不得让两个服务双写对方表 |
-| 其他服务写管理审计 | 事件 | 源服务在自身事务写本地 outbox；identity-governance 消费后写 `admin_audit_log`；核心业务不跨库回滚，积压必须告警和补偿 |
+| 客户端 → identity | 同步 HTTP | 登录失败明确返回；已签发 JWT 由业务服务本地验证 |
+| order → catalog-shop | 同步库存 API + 幂等键 | 超时不直接重试未知写入；按请求键查询/释放 |
+| order → finance | 同步资金请求 + 请求 ID | 资金结果按业务请求幂等；未知结果先查询 |
+| secondhand → order | 同步建单 + 本地补偿任务 | 失败进入 `RETRY`，恢复后用同一 business key 自动补建 |
+| secondhand → identity | 同步地址快照 | 不可用时建单等待，不写占位地址 |
+| 业务服务 → messaging | Outbox/事件入口 | 核心事务不因通知失败回滚；重试、Inbox 去重和 DLQ |
+| catalog-shop → order | Outbox 库存事件 | Order 不可用时积压并按退避重试 |
 
-因此 identity-governance 是登录和用户事实的 owner，但不是全站同步单点。真正需要同步身份事实且无法安全降级的高风险操作才失败关闭。
+共同规则：
 
-## 6. 跨服务一致性规则
+- 订单保存商品、成交价和收件地址快照，历史查询不回查其他服务数据库；
+- 所有跨服务写请求使用业务幂等键，HTTP 超时不能等同于业务失败；
+- 资金变更与流水在 Finance 自身事务完成，Order 只保存结果和外部交易号；
+- 通知失败不能回滚已完成的订单、审核或拍卖；
+- 只有不可逆、跨系统、安全或正式发布边界设置阻断门禁，普通前置检查不得替代真实代码、模拟和测量。
 
-- 订单服务保存商品名、成交价、收货地址等快照，不回查 catalog/identity 表生成历史订单。
-- catalog 的库存预留和释放使用幂等键；订单创建失败必须释放预留。
-- secondhand 先冻结成交资格，再幂等请求 order 创建订单；超时通过查询幂等结果恢复，不能直接写 `order_info`。
-- benefits-finance 在自己的事务内写余额与资金流水；order 只保存支付结果和外部交易号。
-- messaging 订阅业务事件生成通知；通知失败不能回滚已经完成的订单、审核或拍卖事务。
-- 任何服务不得连接或读取另一服务 schema；跨服务只传稳定 ID、快照、API DTO 或事件。
+## 4. 身份服务是否是同步单点
 
-## 7. 迁移顺序
+登录是受保护业务的前置条件，但普通业务请求不逐次同步调用身份服务。登录后，Gateway 和业务服务用共享验证库本地校验 JWT；地址快照、封禁状态和高风险权限等确实需要最新身份事实的操作，才调用内部 API或消费治理事件。
 
-1. 冻结当前单体 tag 和 API 回归测试，Gateway 保持原 `/api/**` 路径。
-2. 在 `catalog-shop-service` 内完成 catalog/shop/risk/behavior 模块的统一 JWT 校验、配置、数据库和容器入口，停止信任客户端直接传入的身份头。
-3. 抽取 identity-governance-service；先迁移登录签发，再迁移资料、地址、账号状态、商家申请和用户治理。
-4. 抽取 order-service，并通过库存/资金适配器替换跨表访问。
-5. 抽取 secondhand-service，使用幂等订单创建契约恢复 UC17-UC20。
-6. 抽取 benefits-finance 与 messaging，恢复 UC21-UC25。
-7. 对每次迁移执行契约测试、服务 API 测试、Compose E2E、故障注入和性能对比；没有运行证据时标记 `NOT_RUN`。
+因此 identity-governance 暂时不可用时：公开浏览和未过期 JWT 的普通低风险请求仍可继续；登录、地址快照和无法安全降级的高风险写操作明确失败或等待，不能绕过权限。
+
+## 5. Order 停机影响
+
+| 服务 | 进程/探针 | 业务影响 |
+|---|---|---|
+| identity-governance | 正常 | 无直接依赖 |
+| catalog-shop | 正常 | 浏览搜索正常；新建单无法完成，发往 Order 的库存事件等待重试 |
+| benefits-finance | 正常 | 自身接口可用；没有新的 Order 支付、退款、结算请求 |
+| messaging | 正常 | 聊天和已有通知可用；不产生新的订单事件通知 |
+| secondhand | 正常 | 浏览发布可用；直购/拍卖结算进入 `RETRY`，Order 恢复后补建单 |
+
+正式故障实验只暂停隔离命名空间中的 Order；生产 Order 和其他生产服务全部保持 1/1 Ready，详见 `04_tests/cloud-native-experiments/20260902-order-fault-b622e6bb/`。
+
+## 6. 验收定义
+
+每个业务服务必须具备：独立可执行 JAR、Dockerfile、镜像、配置、Service/Deployment、Flyway 与数据库账号；只访问本服务表；公开 API 测试、真实 MySQL 测试、独立 E2E、完整系统路由 E2E；日志、liveness、readiness、version；流水线发布不可变 `sha-<commit>` 镜像并用 Helm 原子部署。当前六个服务均按此结构实现，实际运行结论见 `02_docs/test-summary.md`。

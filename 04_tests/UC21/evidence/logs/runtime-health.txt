@@ -1,7 +1,0 @@
-executedAt=2026-08-28T16:39:00+08:00
-frontend.url=http://127.0.0.1:8088/health
-frontend.body=ok
-backend.url=http://127.0.0.1:8089/actuator/health
-backend.status=UP
-backend.db.status=UP
-backend.db.database=MySQL

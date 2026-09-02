@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.segroup8.platform.integration.SecondhandDirectPurchaseIntegrationTest
--------------------------------------------------------------------------------
-Tests run: 7, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 89.11 s -- in com.segroup8.platform.integration.SecondhandDirectPurchaseIntegrationTest

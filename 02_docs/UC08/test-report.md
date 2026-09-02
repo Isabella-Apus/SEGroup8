@@ -45,12 +45,11 @@ powershell -NoProfile -ExecutionPolicy Bypass -File 04_tests/domains/B-catalog-s
 
 UC08 的需求、设计、实现、测试和运行证据已建立完整追溯；四个 UC08 场景均可重复运行，本次全部通过，且现有 UC06 测试未发生回归。
 
+当前 `main@b622e6bb` 已由 Catalog-Shop 流水线 33526387391 和完整系统流水线 33526387696 在合并后的微服务与真实浏览器环境复验通过。
+
 ## 原始证据
 
 - [UC08 API 集成测试代码](../../microservices/shop-service/src/test/java/com/segroup8/shop/ShopApiIntegrationTest.java)
 - [测试配置](../../microservices/shop-service/src/test/resources/application.yml)
-- [UC08 完整 Maven 日志](../../04_tests/UC08/evidence/logs/uc08-maven-clean-test.log)
-- [UC06+UC08 回归日志](../../04_tests/UC08/evidence/logs/microservices-regression-test.log)
 - [Surefire XML 原始报告](../../04_tests/UC08/evidence/raw-reports/TEST-com.segroup8.shop.ShopApiAndE2ETest.xml)
-- [Surefire 文本报告](../../04_tests/UC08/evidence/raw-reports/com.segroup8.shop.ShopApiAndE2ETest.txt)
 - [UC08 运行结果截图](../../04_tests/UC08/evidence/screenshots/UC08-test-result.png)

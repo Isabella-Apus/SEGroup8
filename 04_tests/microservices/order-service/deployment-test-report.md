@@ -1,3 +1,3 @@
-# 部署测试报告
+# order-service 部署测试报告
 
-状态：本次未连接生产 K3s，因此未产生 Helm revision、pod readiness 或公网 smoke 证据。已交付原子部署工作流、三个 order Helm 模板、订单域 Ingress 路由及探针配置；工作流会先检查三个下游 Service，再校验 rollout、readiness、`/actuator/info` commit 和订单查询未认证安全响应。CI 运行后仍需回填镜像 digest、revision 和原始输出。
+同一 run 的 Helm lint、不可变镜像发布和 `Helm atomic deploy order-service` jobs 均成功。服务器实测镜像为 `order:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b`，Deployment 1/1 Ready；liveness、readiness、`/actuator/info` 和公开健康检查返回 200。Order 依赖故障正式结果见 `04_tests/cloud-native-experiments/20260902-order-fault-b622e6bb/`。

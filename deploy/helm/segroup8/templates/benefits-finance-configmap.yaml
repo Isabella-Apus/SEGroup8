@@ -10,7 +10,6 @@ data:
   APP_BUILD_TIME: {{ .Values.benefitsFinance.image.buildTime | quote }}
   JAVA_TOOL_OPTIONS: {{ .Values.benefitsFinance.config.javaToolOptions | quote }}
   CURRENCY: {{ .Values.benefitsFinance.config.currency | quote }}
-  ORDER_SERVICE_URL: {{ .Values.benefitsFinance.config.orderServiceUrl | quote }}
   QUOTE_TTL_SECONDS: {{ .Values.benefitsFinance.config.quoteTtlSeconds | quote }}
   RESERVATION_TTL_SECONDS: {{ .Values.benefitsFinance.config.reservationTtlSeconds | quote }}
   OUTBOX_EVENT_SINK_URL: {{ .Values.benefitsFinance.config.outboxEventSinkUrl | quote }}

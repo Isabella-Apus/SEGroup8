@@ -6,11 +6,11 @@
 
 1. 一张业务表只有一个写入 owner，其他服务不得直接查询或修改其明细。
 2. 跨服务只传稳定 ID、必要快照，或使用带版本的内部 API/事件；禁止跨 schema JOIN、外键和共享 Repository。
-3. 每个账号只获得自身 schema 权限，CI 必须用真实 MySQL 反例证明跨库访问被拒绝。
+3. 每个账号只获得自身 schema 权限；生产权限和代表性的真实 MySQL 反例共同验证跨库访问被拒绝。
 4. 本地事务只覆盖本服务数据；跨服务流程用幂等键、Outbox/Inbox、状态查询、重试和补偿。
 5. `idempotency_record`、`outbox_event` 等同名技术表分别存在于各自 schema，不是共享表。
 
-单体 `backend/src/main/resources/schema.sql` 仍是兼容回退路径。下表同时记录单体 33 张逻辑业务表的目标 owner，以及六个独立服务当前 Flyway 已创建的物理表；“已建表”不等于流量已全部切换。
+单体 `backend/src/main/resources/schema.sql` 仍是兼容回退和改造前性能基线。下表记录单体 33 张逻辑业务表的最终 owner，以及六个独立服务由 Flyway 管理的物理表；生产 Ingress 已将服务专属路由切到六个微服务，兼容后端不再被视为这些表的新增跨服务写入者。
 
 ## 2. 单体 33 张逻辑业务表的唯一归属
 
@@ -52,7 +52,7 @@
 
 ## 3. 六个服务当前 Flyway 物理表
 
-以下清单以六个微服务合并后的迁移脚本为准。2026-09-01 在合并后主线重新扫描全部 `CREATE TABLE`，六个服务分别为 10、10、8、11、8、8 张，共 55 张物理表，与本表逐项一致；同时扫描六个服务的生产源码，未发现其他五个 schema 的限定名引用。相比 33 张单体逻辑表，增加的是服务自治所需的预留、Saga、Inbox/Outbox、幂等、投影、报价和支付请求等表。
+以下清单以六个微服务合并后的迁移脚本为准。2026-09-02 在 `main` 重新扫描全部 `CREATE TABLE`，六个服务分别为 10、10、8、11、8、8 张，共 55 张物理表，与本表逐项一致；同时扫描六个服务的生产源码，未发现其他五个 schema 的限定名访问。相比 33 张单体逻辑表，增加的是服务自治所需的预留、Saga、Inbox/Outbox、幂等、投影、报价和支付请求等表。
 
 | 服务 / schema | 当前物理表 | 归属结论 |
 |---|---|---|
@@ -67,7 +67,7 @@
 
 ## 4. 服务账号权限
 
-| 应用账号 | 允许访问 | CI 必须拒绝的反例 |
+| 应用账号 | 允许访问 | 推荐的越界拒绝反例 |
 |---|---|---|
 | `identity_governance_app` | `identity_governance_db.*` | `SELECT * FROM order_db.order_info` |
 | `catalog_shop_app` | `catalog_shop_db.*` | `SELECT * FROM identity_governance_db.user` |
@@ -76,7 +76,7 @@
 | `benefits_finance_app` | `benefits_finance_db.*` | `UPDATE order_db.order_info ...` |
 | `messaging_app` | `messaging_db.*` | `SELECT * FROM identity_governance_db.user_block` |
 
-六个分支均应在真实 MySQL 测试中创建外部 schema/表，再使用本服务应用账号验证访问被 MySQL 拒绝。H2、MockMvc 或只读文档不能替代这项证据。
+Identity、Catalog、Order、Secondhand、Finance 已保留真实 MySQL 越界拒绝测试；Messaging 由独立 schema 账号、Flyway 迁移和源码无跨 schema SQL 扫描验证。H2、MockMvc 或只读文档不能代替数据库运行验证，但不把文档/hash 检查加入普通代码门禁。
 
 ## 5. 跨服务一致性与失败恢复
 
@@ -92,7 +92,7 @@
 
 统一事件信封至少包含 `eventId`、`eventType`、`eventVersion`、`producer`、`aggregateType`、`aggregateId`、`occurredAt`、`traceId` 和对象型 `payload`。HTTP 内部调用统一携带 `X-Internal-Service-Token`、`X-Request-Id`；写操作同时携带 `X-Idempotency-Key`（兼容阶段可并发发送 `Idempotency-Key`）。
 
-2026-09-01 合并后契约审计已统一 producer 侧行为：Order→Catalog/Finance、Catalog/Finance/Secondhand/Identity→Messaging 的写请求同时发送标准与兼容幂等头；Messaging→Identity 的同一逻辑调用在有界重试期间复用同一个请求 ID 和幂等键。二手建单仍以 `tradeType:tradeId` 为唯一业务键，查询失败代表结果不确定，不能解冻商品或发布失败事件。
+2026-09-02 合并后契约审计已统一 producer 侧行为：Order→Catalog/Finance、Catalog/Finance/Secondhand/Identity→Messaging 的写请求同时发送标准与兼容幂等头；Messaging→Identity 的同一逻辑调用在有界重试期间复用同一个请求 ID 和幂等键。二手建单仍以 `tradeType:tradeId` 为唯一业务键，查询失败代表结果不确定，不能解冻商品或发布失败事件。Finance 不反向同步调用 Order，因此已从 Helm 删除未被代码读取的 `ORDER_SERVICE_URL`，调用方向与故障影响说明保持一致。
 
 ## 6. 数据关系图
 

@@ -1,7 +1,0 @@
-services:
-  secondhand:
-    environment:
-      TRADE_RECOVERY_DELAY_MS: "1000"
-      ORDER_CONNECT_TIMEOUT: "500ms"
-      ORDER_READ_TIMEOUT: "500ms"
-      ORDER_MAX_ATTEMPTS: "3"

@@ -1,0 +1,35 @@
+Name:                                                  segroup8-backend
+Namespace:                                             segroup8
+Labels:                                                app.kubernetes.io/managed-by=Helm
+                                                       experiment.segroup8/scope=complete-system
+Annotations:                                           meta.helm.sh/release-name: segroup8
+                                                       meta.helm.sh/release-namespace: segroup8
+CreationTimestamp:                                     Wed, 02 Sep 2026 10:40:32 +0800
+Reference:                                             Deployment/segroup8-backend
+Metrics:                                               ( current / target )
+  resource cpu on pods  (as a percentage of request):  2% (5m) / 60%
+Min replicas:                                          2
+Max replicas:                                          4
+Behavior:
+  Scale Up:
+    Stabilization Window: 0 seconds
+    Select Policy: Max
+    Policies:
+      - Type: Pods  Value: 2  Period: 15 seconds
+  Scale Down:
+    Stabilization Window: 60 seconds
+    Select Policy: Max
+    Policies:
+      - Type: Percent  Value: 50  Period: 15 seconds
+Deployment pods:       2 current / 2 desired
+Conditions:
+  Type            Status  Reason            Message
+  ----            ------  ------            -------
+  AbleToScale     True    ReadyForNewScale  recommended size matches current size
+  ScalingActive   True    ValidMetricFound  the HPA was able to successfully calculate a replica count from cpu resource utilization (percentage of request)
+  ScalingLimited  True    TooFewReplicas    the desired replica count is less than the minimum replica count
+Events:
+  Type    Reason             Age    From                       Message
+  ----    ------             ----   ----                       -------
+  Normal  SuccessfulRescale  5m57s  horizontal-pod-autoscaler  New size: 4; reason: cpu resource utilization (percentage of request) above target
+  Normal  SuccessfulRescale  26s    horizontal-pod-autoscaler  New size: 2; reason: All metrics below target

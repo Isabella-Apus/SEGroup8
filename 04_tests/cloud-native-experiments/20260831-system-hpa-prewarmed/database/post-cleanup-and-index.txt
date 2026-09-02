@@ -1,4 +1,0 @@
-temporary_rows=0
-secondhand_product	1	idx_secondhand_status_created	1	status	A	1	NULL	NULL		BTREE			YES	NULL
-secondhand_product	1	idx_secondhand_status_created	2	create_time	D	4936	NULL	NULL		BTREE			YES	NULL
-secondhand_product	1	idx_secondhand_status_created	3	id	A	4936	NULL	NULL		BTREE			YES	NULL

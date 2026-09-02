@@ -25,8 +25,8 @@ node 04_tests/domains/C-order-fulfillment/run-domain-c-tests.mjs --suite UC12 --
 
 后端定向测试使用 Testcontainers MySQL 8.4.6 和生产 `schema.sql`，不是 H2。实际结果：8 tests passed，0 failures，0 errors。
 
-浏览器测试使用专用 Compose MySQL、后端服务和 Vite 前端。原始 Surefire、Playwright、日志、截图和汇总分别位于 `evidence/raw-reports/`、`evidence/logs/`、`evidence/screenshots/` 和 `evidence/result-summary.json`。
+浏览器测试使用专用 Compose MySQL、后端服务和 Vite 前端。Git 保留结构化结果和关键截图，完整 Playwright 报告与服务日志由 Actions artifact 保存。
 
 ## 回归状态
 
-UC12 定向 MySQL Integration 已通过。全后端 `clean verify`、前端 `build:real`、CI 和非作者 Review 应在 PR 合并前记录到 PR 正文，不以本地定向结果代替。
+UC12 定向 MySQL Integration、完整后端、前端构建和浏览器 E2E 已由 `main@b622e6bb` 的 Order 流水线 33526387441 与完整系统流水线 33526387696 复验通过。

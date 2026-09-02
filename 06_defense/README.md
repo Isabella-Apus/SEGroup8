@@ -1,11 +1,3 @@
-# 06_defense - 答辩与演示材料
+# 06_defense 答辩材料
 
-中期阶段先保留交付清单，最终答辩前补齐：
-
-- PPT；
-- 技术总结与 AI 使用说明；
-- 代表性用例演示脚本；
-- CI 失败阻断、Kubernetes 部署、扩缩容、故障处理和性能对比演示证据；
-- 5–8 分钟备用录屏。
-
-当前状态：`PLANNED`，不计为已完成。
+最终答辩前放入 PPT、讲稿、演示步骤、AI 使用说明和必要的备用录屏。当前代码仓库只保留该目录入口；云原生实验的可复现脚本与最终数据分别位于 `scripts/experiments/cloud-native/` 和 `04_tests/cloud-native-experiments/`。

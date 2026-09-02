@@ -22,7 +22,7 @@ mvn -B -f microservices/pom.xml -pl benefits-finance-service -am clean verify
 
 运行时数据库、JWT 和内部令牌来自 Kubernetes Secret；TTL、币种、Outbox 目标、HTTP 超时和版本来自 ConfigMap。生产迁移应使用 `FLYWAY_DB_USERNAME`/`FLYWAY_DB_PASSWORD` 与运行时 DML 账号分离。当前 JWT 实现使用 `JWT_SECRET`，未实现 `JWT_PUBLIC_KEY` 模式。
 
-服务暴露 `/actuator/health/liveness`、`/actuator/health/readiness` 和 `/actuator/info`。readiness 包含数据库、成功迁移/核心表只读以及密钥格式检查；日志包含关联 ID，并仅记录掩码后的用户 ID。配置矩阵和字段级说明见 [跨服务调用](cross-service-calls.md)。这些是交付契约，不代表尚未执行的 Kubernetes 故障演练、Helm 发布或回滚已完成。
+服务暴露 `/actuator/health/liveness`、`/actuator/health/readiness` 和 `/actuator/info`。readiness 包含数据库、成功迁移/核心表只读以及密钥格式检查；日志包含关联 ID，并仅记录掩码后的用户 ID。配置矩阵和字段级说明见 [跨服务调用](cross-service-calls.md)。`main@b622e6bb` 已完成 Finance 独立流水线、镜像发布与 K3s 原子部署，运行 33526387386。
 
 相关材料：
 
@@ -31,4 +31,4 @@ mvn -B -f microservices/pom.xml -pl benefits-finance-service -am clean verify
 - [跨服务调用、事件和错误码](cross-service-calls.md)
 - [OpenAPI 完整契约](openapi.yaml)
 - [追溯矩阵](traceability.md)
-- [交付清单](delivery-manifest.md)
+- [改造前后代码差异](before-after-code-diff.md)

@@ -55,4 +55,4 @@
 | GET | `/internal/users/{userId}/shipping-address` | 二手服务 | 服务 Token、Request ID、默认地址优先的不可变建单快照 |
 | POST | `/internal/blocks/check` | messaging | 服务 Token、Request ID、幂等键、批量输入 |
 
-机器可读契约仍以 `openapi.yaml` 为准；本文件用于课程检查和 PR 人工评审。
+机器可读契约仍以 `openapi.yaml` 为准；本文件用于课程检查和人工验收。

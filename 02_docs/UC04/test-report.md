@@ -27,17 +27,7 @@ Compose project afterward. H2 evidence remains reported separately.
 - 已完成：在真实 Docker Compose frontend/backend/MySQL 上执行浏览器 spec，并提交
   Playwright raw report、logs 和 screenshots 目录（本次通过无失败截图）。
 
-## PR 所需信息
 
-- CI：`https://github.com/Isabella-Apus/SEGroup8/actions/workflows/ci-cd.yml`
-- 修改文件：`backend/src/test/java/com/segroup8/platform/controller/AdminUserControllerWebMvcTest.java`、
-  `backend/src/test/java/com/segroup8/platform/service/impl/AdminUserServiceImplTest.java`、
-  `backend/src/test/java/com/segroup8/platform/integration/UserGovernanceUc04IntegrationTest.java`、
-  `frontend/e2e/domain-a/uc04-ban-unban.spec.ts`、`02_docs/UC04/test-plan.md`、
-  `02_docs/UC04/test-report.md`、`04_tests/UC04/evidence/result-summary.json`、
-  `02_docs/UC04/traceability.md`。
-- Evidence：`04_tests/UC04/evidence/`；`raw-reports/` 已提交本次 9 个后端测试的
-  Surefire XML/TXT，`logs/`、`playwright-report/`、`playwright-results.json` 和
-  `test-results/.last-run.json` 已提交真实 Compose 浏览器运行产物。
-- 风险：本地 Docker 使用了缓存镜像别名以绕过 Docker Hub 证书问题；CI 仍需能够拉取
-  workflow 中声明的上游镜像。旧 Token 在封禁后的资源访问策略仍需跨服务回归。
+## 当前 CI 证据
+
+main@b622e6bb 的 Identity Governance 流水线 33526387419 和完整系统流水线 33526387696 已复验相关 API、真实数据库、Compose/Playwright 与生产部署。完整 HTML、trace、video 和流水线日志由 Actions artifact 保存。

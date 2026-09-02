@@ -2,7 +2,7 @@
 
 | 需求 / 用例 | 六类图模型 | 主要代码模块 | 测试编号与现有测试 | 结果 / 证据 |
 |---|---|---|---|---|
-| REQ23 / UC23 钱包账户结算 | SYS-BEH23 / CONCEPT-CLASS23 / COMP-STRUCT23 / COMP-SEQ23 / DESIGN-CLASS23 / OBJ-SEQ23 | `MerchantFinanceView.vue`；`FinanceController`、`EscrowSettlementService` | E2E-TC23-001 `uc23RechargeWalletBusinessAccountAndRecords`；UNIT-TC23-001~02 结算策略；E2E-TC23-001 `frontend/e2e/domain-e/uc23-wallet-settlement.spec.ts` | **LOCAL_E2E_PASS**：已归档 Playwright JSON，1/1 通过、unexpected 0；路径 `../../04_tests/UC23/evidence/raw-reports/playwright/playwright-results.json`。最新 main 全量 E2E CI 同时通过：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611 |
+| REQ23 / UC23 钱包账户结算 | SYS-BEH23 / CONCEPT-CLASS23 / COMP-STRUCT23 / COMP-SEQ23 / DESIGN-CLASS23 / OBJ-SEQ23 | `MerchantFinanceView.vue`；`FinanceController`、`EscrowSettlementService` | E2E-TC23-001 `uc23RechargeWalletBusinessAccountAndRecords`；UNIT-TC23-001~02 结算策略；E2E-TC23-001 `frontend/e2e/domain-e/uc23-wallet-settlement.spec.ts` | **MAIN_CI_E2E_PASS**：保留结构化结果，并由当前 main 完整系统流水线复验，1/1 通过、unexpected 0；路径 `Actions run 33526387696 artifact`。最新 main 全量 E2E CI 同时通过：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33526387696 |
 
 ## 权威材料
 

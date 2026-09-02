@@ -22,6 +22,4 @@ Playwright 访问 Nginx 前端 `http://127.0.0.1:8088`。卖家通过真实接�
 
 JUnit 验证了重复领取拒绝、不可领取状态、领完拒绝、店铺门槛、失败不占用、取消释放与支付核销。完整 Domain-E 回归同时覆盖 UC21 与 UC23–UC25 的共享服务测试。
 
-整体状态：`PASS`。原始 Surefire XML/TXT、Playwright JSON/XML/HTML、页面截图和运行环境快照位于 `04_tests/UC22/evidence/`。
-
-全队覆盖清单已识别 UC22 为 `COVERED`。清单仍因 UC20、UC23、UC24、UC25 缺少独立 spec 返回退出码 1，这些用例由后续独立 PR 补齐。
+整体状态：`PASS`。Git 保留 Surefire XML、结构化结果和关键截图；完整 Playwright HTML、trace、video 由 Actions artifact 保存。当前 `main@b622e6bb` 的完整系统流水线 33526387696 已确认 UC01-UC25 全部具备独立 spec 并执行通过。

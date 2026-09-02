@@ -5,7 +5,7 @@
 | 版本 | Git 证据 | 运行入口 | UC01-UC05 同断言结果 |
 |---|---|---|---|
 | 改造前单体 | `monolith-start` / `2d39751cbda8d4e6d6b4a10565a9f9f9e266f119` | 根目录 `compose.yml` | 2026-08-30 复跑，5/5 PASS，9.9 秒 |
-| 改造后微服务 | `feature/ms-identity-governance` / PR HEAD | `microservices/identity-governance-service/compose.local.yml` | 2026-08-29 复跑，5/5 PASS，33.0 秒 |
+| 改造后微服务 | `main@b622e6bb` | `microservices/identity-governance-service/compose.local.yml` | 独立流水线与完整系统流水线通过 |
 
 两次运行都使用当前仓库 `frontend/e2e/domain-a/uc01-uc05*.spec.ts`，没有复制或改写断言。单体基线使用临时 worktree、独立端口、独立网络和全新 MySQL 卷；发现旧 Compose 写死全局卷名后先停止实例，只在临时 worktree 改名再重跑，`monolith-start` tag 本身没有移动或覆盖。
 
@@ -32,6 +32,4 @@ npx playwright test e2e/domain-a
 | 可观测性 | 单体健康检查 | JSON 日志、liveness、readiness、info 版本与 request/trace ID |
 | 交付 | 单体 Docker/Helm | 独立 JAR、镜像、Deployment、Service、可关闭 HPA、独立回滚 |
 
-PR 的代码差异应以 `origin/main` 的起点 `bb72290cff96c78ab189468b82db1f8ba3cd9323` 到 PR HEAD 为准；不要用 `monolith-start...HEAD` 的全仓库差异冒充本 PR 改动，因为该 tag 之后还包含其他团队工作。
-
-`microservices-v1` 只能在全组服务完成、同数据性能对比和最终验收后统一创建，本 PR 不提前打该 tag。
+改造差异以起点 `bb72290cff96c78ab189468b82db1f8ba3cd9323` 到当前 `main` 中身份治理目录及其路由、部署配置的变化为准；全仓库其他团队改动不计入本服务差异。

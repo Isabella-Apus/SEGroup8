@@ -1,52 +1,24 @@
-# 02_docs - 中期文档索引
+# 02_docs 最终文档索引
 
-## 中期检查单一入口
+本目录仅保留课程最终验收需要的需求、设计、模型、测试说明和微服务改造材料。Issue/PR 描述、阶段审计、迁移过程稿、中期稿和重复证据已移到仓库外 `selfwork/SEGroup8-final-prune-20260902/`。
 
-- [Kinda Goods 中期检查总报告](specifications/midterm-inspection-report.md)
-
-## 四份权威总文档
+## 系统级文档
 
 - [软件需求说明书](specifications/software-requirements.md)
 - [软件概要设计说明书](specifications/software-architecture-design.md)
 - [软件详细设计说明书](specifications/software-detailed-design.md)
 - [需求追溯矩阵](specifications/requirements-traceability-matrix.md)
+- [UC01-UC25 总清单](use-case-catalog.md)
+- [最终测试汇总](test-summary.md)
 
-## 单用例唯一事实来源
+## 微服务改造必交材料
 
-- [UC01](UC01/README.md)
-- [UC02](UC02/README.md)
-- [UC03](UC03/README.md)
-- [UC04](UC04/README.md)
-- [UC05](UC05/README.md)
-- [UC06](UC06/README.md)
-- [UC07](UC07/README.md)
-- [UC08](UC08/README.md)
-- [UC09](UC09/README.md)
-- [UC10](UC10/README.md)
-- [UC11](UC11/README.md)
-- [UC12](UC12/README.md)
-- [UC13](UC13/README.md)
-- [UC14](UC14/README.md)
-- [UC15](UC15/README.md)
-- [UC16](UC16/README.md)
-- [UC17](UC17/README.md)
-- [UC18](UC18/README.md)
-- [UC19](UC19/README.md)
-- [UC20](UC20/README.md)
-- [UC21](UC21/README.md)
-- [UC22](UC22/README.md)
-- [UC23](UC23/README.md)
-- [UC24](UC24/README.md)
-- [UC25](UC25/README.md)
+- [服务划分与调用关系图](architecture/microservice-boundaries.md)
+- [服务接口清单](architecture/service-api-catalog.md)
+- [数据表归属表](architecture/database-ownership.md)
+- [跨服务调用规则](architecture/README.md)
+- `microservices/<service>/`：六个服务各自的边界、图、OpenAPI、表归属、跨服务调用、改造前后差异与追溯。
 
-## 跨用例材料
+## 用例文档
 
-- [Domain A–E](domains/)
-- [微服务架构、接口与数据归属](architecture/README.md)
-- [用例总清单](use-case-catalog.md)
-- [测试汇总](test-summary.md)
-- [编号规则](traceability-conventions.md)
-- [图模型规范](diagram-conventions.md)
-- [历史归档](../05_management/archive/README.md)
-
-旧材料只用于追溯，不再维护当前状态。测试源码保留在框架默认目录，原始证据位于 `../04_tests/`。
+`UC01/` 至 `UC25/` 各保留需求、六类模型源文件、测试计划、测试报告和追溯。原始结构化测试结果与关键截图位于 `../04_tests/`；完整 HTML、trace、video 由 Actions artifact 保存。

@@ -2,7 +2,7 @@
 
 | 需求 / 用例 | 六类图模型 | 主要代码模块 | 测试编号与现有测试 | 结果 / 证据 |
 |---|---|---|---|---|
-| REQ06 / UC06 搜索筛选详情 | SYS-BEH06 / CONCEPT-CLASS06 / COMP-STRUCT06 / COMP-SEQ06 / DESIGN-CLASS06 / OBJ-SEQ06 | `ProductListView.vue`、`ProductDetailView.vue`；`CatalogController`、`CatalogService` | E2E-TC06-001 `t0601_combinedSearchAndPublicDetail`；E2E-TC06-002 `t0602_filtersSortsEmptyAndExceptionPaths`；E2E-TC06-001 `frontend/e2e/domain-b/uc06-catalog.spec.ts` | **CI_E2E_PASS / LOCAL_ARTIFACT_MISSING**：服务/API 原始结果已归档；最新 main 的全 UC Playwright Job 通过（https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611），但仓库未保存本用例独立 Playwright JSON。 |
+| REQ06 / UC06 搜索筛选详情 | SYS-BEH06 / CONCEPT-CLASS06 / COMP-STRUCT06 / COMP-SEQ06 / DESIGN-CLASS06 / OBJ-SEQ06 | `ProductListView.vue`、`ProductDetailView.vue`；`CatalogController`、`CatalogService` | E2E-TC06-001 `t0601_combinedSearchAndPublicDetail`；E2E-TC06-002 `t0602_filtersSortsEmptyAndExceptionPaths`；E2E-TC06-001 `frontend/e2e/domain-b/uc06-catalog.spec.ts` | **CI_E2E_PASS / ACTIONS_ARTIFACT**：服务/API 原始结果已归档；最新 main 的全 UC Playwright Job 通过（https://github.com/Isabella-Apus/SEGroup8/actions/runs/33526387696），完整 Playwright 报告由 Actions artifact 保存，Git 仅保留结构化摘要和关键证据。 |
 
 ## 权威材料
 

@@ -460,7 +460,6 @@ jobs:
             --set catalogShop.replicaCount=1 \
             --set catalogShop.hpa.enabled=false \
             --set identityGovernance.autoscaling.enabled=false \
-            --set secondhand.autoscaling.enabled=false \
             --set-string benefitsFinance.image.repository="$repository" \
             --set-string benefitsFinance.image.tag="$tag" \
             --set-string benefitsFinance.image.commit="$git_sha" \

@@ -1,19 +1,17 @@
 {
   "service": "messaging-service",
-  "source": "historical-local-snapshot",
-  "authoritativeCurrentHeadEvidence": "Messaging Service CI/CD messaging-acceptance-summary artifact at the same GitHub SHA",
-  "historical": {
-    "maven": "PASS",
-    "mysqlIntegration": "PASS",
-    "publicApiCovered": 12,
-    "publicApiTotal": 12,
-    "candidateImage": "PASS",
-    "helmStatic": "PASS"
+  "testedRevision": "b622e6bbb0447d6823b50e7789e4777f7131eb9b",
+  "status": "MAIN_CI_AND_K3S_DEPLOYMENT_PASSED",
+  "workflowRun": "https://github.com/Isabella-Apus/SEGroup8/actions/runs/33526387412",
+  "openApiOperations": { "public": 8, "internal": 4 },
+  "checks": {
+    "apiContract": "PASS",
+    "realMySqlMigration": "PASS",
+    "independentApiAndWebSocketE2E": "PASS",
+    "uc24Uc25FullSystemE2E": "PASS",
+    "fullSystemE2E": "PASS_RUN_33526387696",
+    "immutableImagePublish": "PASS",
+    "helmAtomicDeploy": "PASS"
   },
-  "requiredCurrentChecks": {
-    "independentServiceE2E": "PR_CI",
-    "fullSystemUseCaseE2E": "PR_CI",
-    "registryDigest": "MAIN_ONLY",
-    "kubernetesRollout": "MAIN_ONLY_WHEN_ENABLED"
-  }
+  "evidenceBoundary": "Current generated reports are stored in the same-SHA Actions artifacts; Git retains summaries and structured evidence only."
 }

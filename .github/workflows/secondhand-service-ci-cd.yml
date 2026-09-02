@@ -16,9 +16,6 @@ on:
       - "02_docs/microservices/secondhand-service/**"
       - "03_devops/microservices/secondhand-service/**"
       - "04_tests/microservices/secondhand-service/**"
-      - "04_tests/performance/k6/common.js"
-      - "04_tests/performance/k6/secondhand-hpa.k6.js"
-      - "04_tests/performance/HPA实验记录表.md"
       - "05_management/microservices/secondhand-service/**"
       - "deploy/helm/segroup8/templates/secondhand-*.yaml"
       - "deploy/helm/segroup8/templates/ingress.yaml"
@@ -42,9 +39,6 @@ on:
       - "02_docs/microservices/secondhand-service/**"
       - "03_devops/microservices/secondhand-service/**"
       - "04_tests/microservices/secondhand-service/**"
-      - "04_tests/performance/k6/common.js"
-      - "04_tests/performance/k6/secondhand-hpa.k6.js"
-      - "04_tests/performance/HPA实验记录表.md"
       - "05_management/microservices/secondhand-service/**"
       - "deploy/helm/segroup8/templates/secondhand-*.yaml"
       - "deploy/helm/segroup8/templates/ingress.yaml"
@@ -314,7 +308,6 @@ jobs:
             --set-string frontend.image.repository=registry.example/segroup8/frontend \
             --set-string frontend.image.tag=sha-test \
             --set secondhand.enabled=true \
-            --set secondhand.autoscaling.enabled=true \
             --set-string secondhand.image.repository=registry.example/segroup8/secondhand \
             --set-string secondhand.image.tag=sha-test \
             --set-file mysql.initSchema=backend/src/main/resources/schema.sql
@@ -325,24 +318,10 @@ jobs:
             --set-string frontend.image.repository=registry.example/segroup8/frontend \
             --set-string frontend.image.tag=sha-test \
             --set secondhand.enabled=true \
-            --set secondhand.autoscaling.enabled=true \
             --set-string secondhand.image.repository=registry.example/segroup8/secondhand \
             --set-string secondhand.image.tag=sha-test \
             --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
             >/dev/null
-          helm template segroup8 deploy/helm/segroup8 \
-            --namespace segroup8 \
-            --show-only templates/secondhand-hpa.yaml \
-            --set-string backend.image.repository=registry.example/segroup8/backend \
-            --set-string backend.image.tag=sha-test \
-            --set-string frontend.image.repository=registry.example/segroup8/frontend \
-            --set-string frontend.image.tag=sha-test \
-            --set secondhand.enabled=true \
-            --set secondhand.autoscaling.enabled=true \
-            --set-string secondhand.image.repository=registry.example/segroup8/secondhand \
-            --set-string secondhand.image.tag=sha-test \
-            --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
-            > /tmp/secondhand-hpa.yaml
           helm template segroup8 deploy/helm/segroup8 \
             --namespace segroup8 \
             --show-only templates/secondhand-deployment.yaml \
@@ -351,23 +330,15 @@ jobs:
             --set-string frontend.image.repository=registry.example/segroup8/frontend \
             --set-string frontend.image.tag=sha-test \
             --set secondhand.enabled=true \
-            --set secondhand.autoscaling.enabled=true \
             --set-string secondhand.image.repository=registry.example/segroup8/secondhand \
             --set-string secondhand.image.tag=sha-test \
             --set-file mysql.initSchema=backend/src/main/resources/schema.sql \
             > /tmp/secondhand-deployment.yaml
-          grep -q "kind: HorizontalPodAutoscaler" /tmp/secondhand-hpa.yaml
-          grep -q "minReplicas: 1" /tmp/secondhand-hpa.yaml
-          grep -q "maxReplicas: 4" /tmp/secondhand-hpa.yaml
-          grep -q "averageUtilization: 70" /tmp/secondhand-hpa.yaml
           grep -q 'runAsUser: 10001' /tmp/secondhand-deployment.yaml
           grep -q 'runAsGroup: 10001' /tmp/secondhand-deployment.yaml
           grep -q 'readOnlyRootFilesystem: true' /tmp/secondhand-deployment.yaml
           grep -q 'mountPath: /tmp' /tmp/secondhand-deployment.yaml
-          if grep -q '^  replicas:' /tmp/secondhand-deployment.yaml; then
-            echo "secondhand Deployment must not pin replicas while HPA is enabled"
-            exit 1
-          fi
+          grep -q '^  replicas: 1$' /tmp/secondhand-deployment.yaml
 
   publish-secondhand-image:
     name: Publish immutable secondhand-service image

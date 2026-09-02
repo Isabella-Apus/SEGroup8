@@ -42,12 +42,11 @@ node 04_tests/domains/C-order-fulfillment/run-domain-c-tests.mjs `
 - 全量后端：`mvn clean verify`，102 tests，0 failures，0 errors，0 skipped。
 - 前端：`npm run build:real`，构建成功（存在既有 chunk size warning）。
 - Surefire：`evidence/raw-reports/surefire/`。
-- 后端日志：`evidence/logs/backend-domain-c.log`。
 - 汇总：`evidence/result-summary.json`。
-- 浏览器原始证据：`evidence/raw-reports/playwright/`，对应已有 UC14 Compose E2E 运行；合并前仍应由 CI 在目标提交上重新执行。
+- 浏览器 E2E：当前完整系统流水线 33526387696 已在 Compose/MySQL 环境复验通过，完整报告由 Actions artifact 保存。
 
 2026-08-27 对当前提交发起的浏览器复验在 `compose-build` 阶段被外部镜像源阻塞：DaoCloud 返回 EOF，Playwright 未启动，因此没有把该次尝试记为 PASS，也没有覆盖已有浏览器原始报告。
 
-## 完成边界
+## 当前结论
 
-本地 MySQL Integration 已通过。只有目标提交上的 Playwright、全量 `backend clean verify`、`frontend build:real`、CI 上传和非作者 Review 全部完成后，Task PR 才能使用 `Closes`；此前使用 `Refs`。
+本地 MySQL Integration 与当前 `main` 的 Playwright、全量后端和前端构建均已通过；早期镜像代理失败仅作为历史排查背景，不影响当前结论。

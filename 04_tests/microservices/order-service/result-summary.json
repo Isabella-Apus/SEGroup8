@@ -1,12 +1,17 @@
 {
-  "taskId": "MS-03",
   "service": "order-service",
-  "generatedAt": "2026-08-30T11:02:03+08:00",
-  "sourceRevision": "366c26b1",
-  "maven": {"passed": 9, "failed": 0, "skipped": 1, "securityContractPassed": 5, "status": "passed_with_mysql_test_skipped"},
-  "e2e": {"status": "not_run", "requiredUseCases": ["UC11", "UC12", "UC13", "UC14", "UC15", "UC20"]},
-  "deployment": {"status": "not_run"},
-  "contracts": {"catalog": "passed", "finance": "passed", "secondhand": "passed", "openapi": "passed"},
-  "faultInjection": {"paymentUnknownContractTest": "passed", "kubernetesDrill": "not_run"},
-  "performance": {"status": "not_run", "requiredRunsPerVersion": 3}
+  "testedRevision": "b622e6bbb0447d6823b50e7789e4777f7131eb9b",
+  "status": "MAIN_CI_AND_K3S_DEPLOYMENT_PASSED",
+  "workflowRun": "https://github.com/Isabella-Apus/SEGroup8/actions/runs/33526387441",
+  "openApiOperations": { "public": 33, "internal": 4 },
+  "checks": {
+    "apiContractAndRealMySql": "PASS",
+    "independentCandidateE2E": "PASS",
+    "domainE2E": "PASS",
+    "fullSystemE2E": "PASS_RUN_33526387696",
+    "immutableImagePublish": "PASS",
+    "helmAtomicDeploy": "PASS",
+    "orderDependencyRecoveryExperiment": "PASS"
+  },
+  "evidenceBoundary": "Current generated reports are stored in the same-SHA Actions artifacts; cloud fault evidence is retained under 04_tests/cloud-native-experiments."
 }

@@ -1,0 +1,71 @@
+{
+  "scope": "complete-system",
+  "trafficPath": "frontend Service/Nginx -> shared compatibility backend -> MySQL",
+  "autoscalingTarget": "shared compatibility backend (never secondhand-service)",
+  "runs": [
+    {
+      "name": "fixed-c10",
+      "concurrency": 10,
+      "throughput": 28.018612887744265,
+      "averageMs": 354.04335996730384,
+      "p95Ms": 2093.66303400202,
+      "errorRate": 0.0,
+      "requests": 856
+    },
+    {
+      "name": "fixed-c20",
+      "concurrency": 20,
+      "throughput": 37.89873385901891,
+      "averageMs": 520.1165360212635,
+      "p95Ms": 3543.8595511004664,
+      "errorRate": 0.0,
+      "requests": 1175
+    },
+    {
+      "name": "fixed-c5",
+      "concurrency": 5,
+      "throughput": 19.301574314130832,
+      "averageMs": 256.6590991011149,
+      "p95Ms": 1205.1420926014544,
+      "errorRate": 0.0,
+      "requests": 594
+    },
+    {
+      "name": "hpa-c10",
+      "concurrency": 10,
+      "throughput": 29.265253419437713,
+      "averageMs": 338.38887978466965,
+      "p95Ms": 1859.6896609960822,
+      "errorRate": 0.0,
+      "requests": 896
+    },
+    {
+      "name": "hpa-c20",
+      "concurrency": 20,
+      "throughput": 33.32866407270786,
+      "averageMs": 584.8405023408773,
+      "p95Ms": 3235.6127524999465,
+      "errorRate": 0.0,
+      "requests": 1056
+    },
+    {
+      "name": "hpa-c5",
+      "concurrency": 5,
+      "throughput": 24.40674686638144,
+      "averageMs": 202.23962440658966,
+      "p95Ms": 1089.196407100826,
+      "errorRate": 0.0,
+      "requests": 748
+    }
+  ],
+  "hpa": {
+    "minimumReplicas": 2,
+    "peakReplicas": 4,
+    "peakReadyReplicas": 4,
+    "finalReplicas": 2,
+    "scaleOutObserved": true,
+    "usableScaleOutObserved": true,
+    "scaleInObserved": true
+  },
+  "maximumErrorRate": 0.0
+}

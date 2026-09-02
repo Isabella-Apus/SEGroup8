@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.segroup8.secondhand.api.SecondhandProductApiTest
--------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 15.36 s -- in com.segroup8.secondhand.api.SecondhandProductApiTest

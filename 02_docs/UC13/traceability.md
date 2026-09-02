@@ -2,7 +2,7 @@
 
 | 需求 / 用例 | 六类图模型 | 主要代码模块 | 测试编号与现有测试 | 结果 / 证据 |
 |---|---|---|---|---|
-| REQ13 / UC13 发货物流收货 | SYS-BEH13 / CONCEPT-CLASS13 / COMP-STRUCT13 / COMP-SEQ13 / DESIGN-CLASS13 / OBJ-SEQ13 | `MerchantOrdersView.vue`、`OrderDetailView.vue`；`LogisticsServiceImpl`、`OrderServiceImpl` | UNIT-TC13-001 `shipSellerOrder_shouldPersistNotificationForBuyer`；INT-TC13-001 `deliveredToAutoConfirmShouldSettle...`；E2E-TC13-001 `frontend/e2e/domain-c/uc13-fulfillment.spec.ts` | **LOCAL_E2E_PASS**：已归档 Playwright JSON，1/1 通过、unexpected 0；路径 `../../04_tests/UC13/evidence/raw-reports/playwright/playwright-results.json`。最新 main 全量 E2E CI 同时通过：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611 |
+| REQ13 / UC13 发货物流收货 | SYS-BEH13 / CONCEPT-CLASS13 / COMP-STRUCT13 / COMP-SEQ13 / DESIGN-CLASS13 / OBJ-SEQ13 | `MerchantOrdersView.vue`、`OrderDetailView.vue`；`LogisticsServiceImpl`、`OrderServiceImpl` | UNIT-TC13-001 `shipSellerOrder_shouldPersistNotificationForBuyer`；INT-TC13-001 `deliveredToAutoConfirmShouldSettle...`；E2E-TC13-001 `frontend/e2e/domain-c/uc13-fulfillment.spec.ts` | **MAIN_CI_E2E_PASS**：保留结构化结果，并由当前 main 完整系统流水线复验，1/1 通过、unexpected 0；路径 `Actions run 33526387696 artifact`。最新 main 全量 E2E CI 同时通过：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33526387696 |
 
 ## 权威材料
 

@@ -1,0 +1,13 @@
+NAME                                          READY   UP-TO-DATE   AVAILABLE   AGE     CONTAINERS                    IMAGES                                                                                                                     SELECTOR
+deployment.apps/identity-governance-service   1/1     1            1           7m10s   identity-governance-service   crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b   app=identity-governance-service
+deployment.apps/monolith                      1/1     1            1           7m10s   monolith                      crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b   app=monolith
+deployment.apps/mysql                         1/1     1            1           7m10s   mysql                         crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/mysql:8.4.6                                            app=mysql
+deployment.apps/order-service                 1/1     1            1           7m10s   order-service                 crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b   app=order-service
+deployment.apps/secondhand-service            1/1     1            1           7m10s   secondhand-service            crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b   app=secondhand-service
+
+NAME                                              READY   STATUS    RESTARTS   AGE     IP            NODE                      NOMINATED NODE   READINESS GATES
+pod/identity-governance-service-7579fcfd4-pllhl   1/1     Running   0          7m10s   10.42.0.240   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/monolith-795445b986-6755k                     1/1     Running   0          7m10s   10.42.0.241   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/mysql-9bd4b798d-bqsk9                         1/1     Running   0          7m10s   10.42.0.239   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/order-service-79d55f66b7-vpth6                1/1     Running   0          83s     10.42.0.245   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/secondhand-service-786bf554f6-h2grj           1/1     Running   0          7m10s   10.42.0.242   izbp1fcr5ltsng9ra8gt84z   <none>           <none>

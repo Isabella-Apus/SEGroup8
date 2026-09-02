@@ -1,101 +1,18 @@
 {
-  "taskId": "MS-04",
   "service": "secondhand-service",
-  "monolithBaseline": {
-    "tag": "monolith-start",
-    "commit": "2d39751cbda8d4e6d6b4a10565a9f9f9e266f119"
+  "testedRevision": "b622e6bbb0447d6823b50e7789e4777f7131eb9b",
+  "status": "MAIN_CI_AND_K3S_DEPLOYMENT_PASSED",
+  "workflowRun": "https://github.com/Isabella-Apus/SEGroup8/actions/runs/33526387403",
+  "openApiOperations": { "public": 21, "internal": 2 },
+  "checks": {
+    "apiContractAndRealMySql": "PASS",
+    "independentE2E": "PASS",
+    "domainE2E": "PASS",
+    "fullSystemE2E": "PASS_RUN_33526387696",
+    "immutableImagePublish": "PASS",
+    "helmAtomicDeploy": "PASS",
+    "orderDependencyRecoveryExperiment": "PASS",
+    "serviceSpecificHpa": "REMOVED_COMPLETE_SYSTEM_HPA_USED"
   },
-  "implementationBaseCommit": "bb72290cff96c78ab189468b82db1f8ba3cd9323",
-  "validationCommit": "137f2293edd24eb07ad6a7ec229082b1f4940d0d",
-  "executedAt": "2026-08-31T01:33:24+08:00",
-  "status": "LOCAL_INDEPENDENT_ACCEPTANCE_PASSED_SHARED_DELIVERY_PENDING",
-  "maven": {
-    "securityContract": { "tests": 5, "failures": 0, "errors": 0, "skipped": 0 },
-    "secondhandService": { "tests": 21, "failures": 0, "errors": 0, "skipped": 0 },
-    "total": { "tests": 26, "failures": 0, "errors": 0, "skipped": 0 },
-    "mysql84OwnershipAndMigration": "PASSED"
-  },
-  "openapi": {
-    "publicBusinessOperations": 21,
-    "internalEventOperations": 2,
-    "runtimeOperations": 23,
-    "completenessGate": "PASSED"
-  },
-  "playwright": {
-    "domain": "D",
-    "tests": 5,
-    "passed": 5,
-    "failed": 0,
-    "durationMs": 89059.846,
-    "result": "evidence/playwright-final/playwright-results.json"
-  },
-  "independentServiceE2E": {
-    "useCases": ["UC16", "UC17", "UC18", "UC19"],
-    "tests": 4,
-    "passed": 4,
-    "failed": 0,
-    "durationSeconds": 6.3,
-    "runtime": "real image / MySQL 8.4.6 / process-level order contract stub",
-    "result": "evidence/playwright-independent/playwright-results.json"
-  },
-  "delivery": {
-    "dockerBuild": "PASSED",
-    "containerUid": 10001,
-    "helmLint": "PASSED",
-    "helmTemplate": "PASSED",
-    "localKubernetesRollbackDrill": "PASSED",
-    "rollbackEvidence": "evidence/deployment-drill/20260830-233919-summary.json",
-    "githubActions": "PENDING_CURRENT_PUSH",
-    "registryDigest": "PENDING_MAIN_RELEASE",
-    "productionKubernetesRollout": "PENDING_SHARED_CLUSTER"
-  },
-  "hpaFormal": {
-    "status": "PASSED_WITH_PEAK_READY_3_OF_4",
-    "environment": "docker-desktop / Kubernetes v1.34.3 / metrics-server v0.9.0",
-    "image": "segroup8/secondhand:hpa-20260830-234945",
-    "imageImportedToNode": true,
-    "configuration": {
-      "minReplicas": 1,
-      "maxReplicas": 4,
-      "targetCpuUtilizationPercentage": 70,
-      "vus": 15,
-      "duration": "150s"
-    },
-    "replicas": { "initial": 1, "peak": 4, "peakReady": 3, "final": 1, "finalReady": 1 },
-    "http": {
-      "requests": 10692,
-      "requestsPerSecond": 71.564,
-      "averageDurationMs": 208.57,
-      "p95DurationMs": 413.30,
-      "failedRate": 0,
-      "businessSuccessRate": 1,
-      "serverErrorRate": 0
-    },
-    "evidence": "evidence/hpa/20260830-234945-formal-summary.json"
-  },
-  "formalAuctionComparison": {
-    "status": "PASSED",
-    "roundsPerVersion": 3,
-    "vus": 10,
-    "durationPerRound": "30s",
-    "monolithAverage": { "requestsPerSecond": 32.40, "averageDurationMs": 108.88, "p95DurationMs": 194.91 },
-    "microserviceAverage": { "requestsPerSecond": 39.58, "averageDurationMs": 50.38, "p95DurationMs": 101.46 },
-    "allRoundsHttpFailureRate": 0,
-    "allRoundsBusinessSuccessRate": 1,
-    "report": "../../performance/secondhand-auction-formal-comparison.md"
-  },
-  "orderDependencyDrill": {
-    "status": "PASSED",
-    "readinessWhileDependencyDown": "UP",
-    "recovery": "RETRY_TO_CREATED_WITH_SAME_BUSINESS_KEY",
-    "retryExhaustion": "FAILED_AND_PRODUCT_RESTORED_TO_ON_SHELF",
-    "evidence": "evidence/fault-drill/20260830-230030-summary.json"
-  },
-  "sharedPending": [
-    "product-search and new-order monolith/microservice three-round comparison",
-    "real team order-service outage drill",
-    "main ACR digest and production rollout",
-    "microservices-v1 team tag",
-    "non-author review"
-  ]
+  "evidenceBoundary": "Current generated reports are stored in the same-SHA Actions artifacts; final cloud experiment evidence is retained under 04_tests/cloud-native-experiments."
 }

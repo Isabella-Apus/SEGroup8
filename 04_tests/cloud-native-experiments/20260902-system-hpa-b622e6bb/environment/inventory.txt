@@ -1,0 +1,63 @@
+2026-09-02T10:37:20+08:00
+Linux iZbp1fcr5ltsng9ra8gt84Z 5.15.0-187-generic #197-Ubuntu SMP Fri Jul 17 19:17:01 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+Client Version: v1.36.3+k3s1
+Kustomize Version: v5.8.1
+Server Version: v1.36.3+k3s1
+NAME                      STATUS   ROLES           AGE     VERSION        INTERNAL-IP   EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION               CONTAINER-RUNTIME
+izbp1fcr5ltsng9ra8gt84z   Ready    control-plane   4d23h   v1.36.3+k3s1   172.28.7.2    <none>        Ubuntu 22.04.5 LTS   5.15.0-187-generic (amd64)   containerd://2.3.2-k3s2
+NAME                      CPU(cores)   CPU(%)   MEMORY(bytes)   MEMORY(%)
+izbp1fcr5ltsng9ra8gt84z   280m         7%       5538Mi          76%
+NAME                                           READY   UP-TO-DATE   AVAILABLE   AGE     CONTAINERS            IMAGES                                                                                                                                 SELECTOR
+deployment.apps/benefits-finance               1/1     1            1           13h     benefits-finance      crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/benefits-finance:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b      app.kubernetes.io/name=benefits-finance
+deployment.apps/messaging                      1/1     1            1           17h     messaging             crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/messaging:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b             app.kubernetes.io/component=messaging,app.kubernetes.io/instance=segroup8
+deployment.apps/segroup8-backend               1/1     1            1           4d12h   backend               crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b               app.kubernetes.io/component=backend,app.kubernetes.io/instance=segroup8
+deployment.apps/segroup8-catalog-shop          1/1     1            1           18h     catalog-shop          crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/catalog-shop:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b          app.kubernetes.io/component=catalog-shop,app.kubernetes.io/instance=segroup8
+deployment.apps/segroup8-frontend              1/1     1            1           4d12h   frontend              crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/frontend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b              app.kubernetes.io/component=frontend,app.kubernetes.io/instance=segroup8
+deployment.apps/segroup8-identity-governance   1/1     1            1           18h     identity-governance   crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/identity-governance:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b   app.kubernetes.io/component=identity-governance,app.kubernetes.io/instance=segroup8
+deployment.apps/segroup8-order                 1/1     1            1           12h     order-service         crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/order:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b                 app.kubernetes.io/component=order-service,app.kubernetes.io/instance=segroup8
+deployment.apps/segroup8-secondhand            1/1     1            1           17h     secondhand-service    crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/secondhand:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b            app.kubernetes.io/component=secondhand-service,app.kubernetes.io/instance=segroup8
+
+NAME                                               READY   STATUS    RESTARTS      AGE     IP            NODE                      NOMINATED NODE   READINESS GATES
+pod/benefits-finance-7b9b6c548-lpcbj               1/1     Running   0             10h     10.42.0.231   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/messaging-84c874768f-gdm6l                     1/1     Running   0             10h     10.42.0.232   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/mysql-0                                        1/1     Running   7 (13h ago)   4d12h   10.42.0.189   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/segroup8-backend-54498dc59-tf5lj               1/1     Running   0             10h     10.42.0.233   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/segroup8-catalog-shop-c644d85bd-2rrsx          1/1     Running   0             10h     10.42.0.227   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/segroup8-frontend-f85ff46cb-6flhj              1/1     Running   0             10h     10.42.0.234   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/segroup8-identity-governance-b56cfc7d5-5xs42   1/1     Running   0             10h     10.42.0.229   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/segroup8-order-586764f645-ksb9m                1/1     Running   0             10h     10.42.0.230   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/segroup8-secondhand-557d6d96bd-f7twf           1/1     Running   0             10h     10.42.0.228   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+
+NAME                                  TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE     SELECTOR
+service/backend                       ClusterIP   10.43.58.56     <none>        8080/TCP   4d12h   app.kubernetes.io/component=backend,app.kubernetes.io/instance=segroup8
+service/benefits-finance              ClusterIP   10.43.240.237   <none>        8085/TCP   13h     app.kubernetes.io/name=benefits-finance
+service/frontend                      ClusterIP   10.43.54.227    <none>        80/TCP     4d12h   app.kubernetes.io/component=frontend,app.kubernetes.io/instance=segroup8
+service/identity-governance-service   ClusterIP   10.43.104.61    <none>        8091/TCP   18h     app.kubernetes.io/component=identity-governance,app.kubernetes.io/instance=segroup8
+service/messaging                     ClusterIP   10.43.162.6     <none>        8084/TCP   17h     app.kubernetes.io/component=messaging,app.kubernetes.io/instance=segroup8
+service/mysql                         ClusterIP   None            <none>        3306/TCP   4d12h   app.kubernetes.io/component=database,app.kubernetes.io/instance=segroup8
+service/secondhand-service            ClusterIP   10.43.98.54     <none>        8080/TCP   17h     app.kubernetes.io/component=secondhand-service,app.kubernetes.io/instance=segroup8
+service/segroup8-catalog-shop         ClusterIP   10.43.197.158   <none>        8080/TCP   18h     app.kubernetes.io/component=catalog-shop,app.kubernetes.io/instance=segroup8
+service/segroup8-order                ClusterIP   10.43.205.82    <none>        8085/TCP   12h     app.kubernetes.io/component=order-service,app.kubernetes.io/instance=segroup8
+
+NAME                                 CLASS     HOSTS   ADDRESS      PORTS   AGE
+ingress.networking.k8s.io/segroup8   traefik   *       172.28.7.2   80      4d12h
+NAME                                           CPU(cores)   MEMORY(bytes)
+benefits-finance-7b9b6c548-lpcbj               2m           203Mi
+messaging-84c874768f-gdm6l                     3m           189Mi
+mysql-0                                        25m          578Mi
+segroup8-backend-54498dc59-tf5lj               4m           250Mi
+segroup8-catalog-shop-c644d85bd-2rrsx          2m           184Mi
+segroup8-frontend-f85ff46cb-6flhj              1m           9Mi
+segroup8-identity-governance-b56cfc7d5-5xs42   2m           212Mi
+segroup8-order-586764f645-ksb9m                2m           213Mi
+segroup8-secondhand-557d6d96bd-f7twf           2m           217Mi
+publicBaseUrl=http://127.0.0.1
+loadBaseUrl=http://10.43.54.227
+loadPath=frontend Service/Nginx -> shared compatibility backend -> MySQL
+autoscalingTarget=deployment/segroup8-backend
+excludedAutoscalingTarget=secondhand-service
+originalBackendReplicas=1
+backendImage=crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b
+frontendImage=crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/frontend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b
+backendRequests={"cpu":"250m","memory":"512Mi"}
+backendLimits={"cpu":"1","memory":"1536Mi"}

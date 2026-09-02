@@ -2,7 +2,7 @@
 
 | 需求 / 用例 | 六类图模型 | 主要代码模块 | 测试编号与现有测试 | 结果 / 证据 |
 |---|---|---|---|---|
-| REQ11 / UC11 购物车结算拆单 | SYS-BEH11 / CONCEPT-CLASS11 / COMP-STRUCT11 / COMP-SEQ11 / DESIGN-CLASS11 / OBJ-SEQ11 | `CartView.vue`；`OrderController`、`OrderServiceImpl` | UNIT-TC11-001 `payMyOrder_shouldSplitCartItemsIntoIndependentPaidOrders`；E2E-TC11-001 `frontend/e2e/domain-c/uc11-checkout-order.spec.ts` | **LOCAL_E2E_PASS**：已归档 Playwright JSON，1/1 通过、unexpected 0；路径 `../../04_tests/UC11/evidence/raw-reports/playwright/playwright-results.json`。最新 main 全量 E2E CI 同时通过：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611 |
+| REQ11 / UC11 购物车结算拆单 | SYS-BEH11 / CONCEPT-CLASS11 / COMP-STRUCT11 / COMP-SEQ11 / DESIGN-CLASS11 / OBJ-SEQ11 | `CartView.vue`；`OrderController`、`OrderServiceImpl` | UNIT-TC11-001 `payMyOrder_shouldSplitCartItemsIntoIndependentPaidOrders`；E2E-TC11-001 `frontend/e2e/domain-c/uc11-checkout-order.spec.ts` | **MAIN_CI_E2E_PASS**：保留结构化结果，并由当前 main 完整系统流水线复验，1/1 通过、unexpected 0；路径 `Actions run 33526387696 artifact`。最新 main 全量 E2E CI 同时通过：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33526387696 |
 
 ## 权威材料
 

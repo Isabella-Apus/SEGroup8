@@ -1,0 +1,29 @@
+LAST SEEN   TYPE      REASON              OBJECT                                     MESSAGE
+5m56s       Normal    Scheduled           pod/segroup8-backend-54498dc59-wnkqz       Successfully assigned segroup8/segroup8-backend-54498dc59-wnkqz to izbp1fcr5ltsng9ra8gt84z
+5m56s       Normal    Scheduled           pod/segroup8-backend-54498dc59-tqm89       Successfully assigned segroup8/segroup8-backend-54498dc59-tqm89 to izbp1fcr5ltsng9ra8gt84z
+8m59s       Normal    Scheduled           pod/segroup8-backend-54498dc59-8jm9s       Successfully assigned segroup8/segroup8-backend-54498dc59-8jm9s to izbp1fcr5ltsng9ra8gt84z
+9m          Normal    SuccessfulCreate    replicaset/segroup8-backend-54498dc59      Created pod: segroup8-backend-54498dc59-8jm9s
+9m          Normal    ScalingReplicaSet   deployment/segroup8-backend                Scaled up replica set segroup8-backend-54498dc59 from 1 to 2
+8m59s       Normal    Pulled              pod/segroup8-backend-54498dc59-8jm9s       Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b" already present on machine and can be accessed by the pod
+8m59s       Normal    Created             pod/segroup8-backend-54498dc59-8jm9s       Container created
+8m59s       Normal    Started             pod/segroup8-backend-54498dc59-8jm9s       Container started
+8m29s       Warning   Unhealthy           pod/segroup8-backend-54498dc59-8jm9s       Startup probe failed: Get "http://10.42.0.236:8080/actuator/health/liveness": dial tcp 10.42.0.236:8080: connect: connection refused
+5m57s       Normal    ScalingReplicaSet   deployment/segroup8-backend                Scaled up replica set segroup8-backend-54498dc59 from 2 to 4
+5m57s       Normal    SuccessfulCreate    replicaset/segroup8-backend-54498dc59      Created pod: segroup8-backend-54498dc59-wnkqz
+5m57s       Normal    SuccessfulCreate    replicaset/segroup8-backend-54498dc59      Created pod: segroup8-backend-54498dc59-tqm89
+5m57s       Normal    SuccessfulRescale   horizontalpodautoscaler/segroup8-backend   New size: 4; reason: cpu resource utilization (percentage of request) above target
+5m56s       Normal    Pulled              pod/segroup8-backend-54498dc59-wnkqz       Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b" already present on machine and can be accessed by the pod
+5m55s       Normal    Started             pod/segroup8-backend-54498dc59-wnkqz       Container started
+5m55s       Normal    Created             pod/segroup8-backend-54498dc59-tqm89       Container created
+5m55s       Normal    Pulled              pod/segroup8-backend-54498dc59-tqm89       Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b" already present on machine and can be accessed by the pod
+5m55s       Normal    Started             pod/segroup8-backend-54498dc59-tqm89       Container started
+5m55s       Normal    Created             pod/segroup8-backend-54498dc59-wnkqz       Container created
+4m31s       Warning   Unhealthy           pod/segroup8-backend-54498dc59-tqm89       Startup probe failed: Get "http://10.42.0.237:8080/actuator/health/liveness": dial tcp 10.42.0.237:8080: connect: connection refused
+4m31s       Warning   Unhealthy           pod/segroup8-backend-54498dc59-wnkqz       Startup probe failed: Get "http://10.42.0.238:8080/actuator/health/liveness": dial tcp 10.42.0.238:8080: connect: connection refused
+4m23s       Warning   Unhealthy           pod/segroup8-backend-54498dc59-wnkqz       Startup probe failed: Get "http://10.42.0.238:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+26s         Normal    Killing             pod/segroup8-backend-54498dc59-tqm89       Stopping container backend
+26s         Normal    SuccessfulDelete    replicaset/segroup8-backend-54498dc59      Deleted pod: segroup8-backend-54498dc59-wnkqz
+26s         Normal    SuccessfulDelete    replicaset/segroup8-backend-54498dc59      Deleted pod: segroup8-backend-54498dc59-tqm89
+26s         Normal    Killing             pod/segroup8-backend-54498dc59-wnkqz       Stopping container backend
+26s         Normal    SuccessfulRescale   horizontalpodautoscaler/segroup8-backend   New size: 2; reason: All metrics below target
+26s         Normal    ScalingReplicaSet   deployment/segroup8-backend                Scaled down replica set segroup8-backend-54498dc59 from 4 to 2

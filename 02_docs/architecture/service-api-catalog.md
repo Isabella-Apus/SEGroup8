@@ -2,7 +2,7 @@
 
 ## 1. 清单口径
 
-本清单根据当前 `backend/.../controller`、`microservices/*Controller.java` 和 WebSocket 配置盘点。表中“目标服务”表示迁移后的唯一接口所有者；当前绝大多数路由仍由单体提供，不能据此宣称微服务已经部署。
+本清单根据当前 `backend/.../controller`、六个微服务 Controller、Ingress 和 WebSocket 配置盘点。表中服务是当前唯一接口所有者；兼容后端保留旧实现用于回退和改造前后比较，生产具体路由优先进入对应微服务。
 
 统一约束：
 
@@ -12,7 +12,7 @@
 - Gateway 可以注入可信身份上下文，但业务服务仍须验证签名和资源所有权；客户端提交的 `X-User-Id`、`X-Seller-Id`、`X-Admin-Id` 不可信；
 - 写接口返回前必须完成本服务事务；异步副作用通过 outbox/event 处理。
 
-## 2. 当前公开 API 的唯一目标归属
+## 2. 当前公开 API 的唯一归属
 
 ### identity-governance-service：身份模块（UC01-UC04）
 
@@ -180,11 +180,11 @@ UC20 的支付、发货、收货和完成接口归 order-service；secondhand-se
 | POST | `/api/upload/image` | 图片上传 |
 | POST | `/api/upload/media` | 媒体上传 |
 
-## 3. 目标内部同步契约
+## 3. 当前内部同步契约
 
-下列路径是迁移目标，不是当前已实现接口：
+下列路径已由相应提供方实现，并通过调用方/提供方契约测试：
 
-| 调用方 → 提供方 | 方法与目标路径 | 核心约束 |
+| 调用方 → 提供方 | 方法与路径 | 核心约束 |
 |---|---|---|
 | Gateway/高风险服务 → identity-governance | `POST /internal/auth/introspect` | 仅缓存缺失的高风险操作使用；禁止逐请求调用 |
 | 业务服务 → identity-governance | `GET /internal/users/{userId}/summary` | 只取必要公开摘要；历史业务优先保存快照 |
@@ -195,7 +195,7 @@ UC20 的支付、发货、收货和完成接口归 order-service；secondhand-se
 | secondhand → order | `POST /internal/orders/secondhand` | 以 `tradeType + tradeId` 唯一，重复请求返回同一订单 |
 | 业务服务 → messaging | `POST /internal/notifications` | 非核心同步兼容入口；优先消费事件 |
 
-## 4. 目标事件契约
+## 4. 当前事件契约
 
 | 事件 | 发布者 | 主要消费者 | 最小字段 |
 |---|---|---|---|

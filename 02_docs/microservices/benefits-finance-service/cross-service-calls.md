@@ -89,7 +89,6 @@ JSON 请求体，不使用“任意请求都返回 200”的宽松 stub。
 | `CURRENCY` | ConfigMap | `CNY` | 金额币种 |
 | `QUOTE_TTL_SECONDS` | ConfigMap | `300` | 报价有效期 |
 | `RESERVATION_TTL_SECONDS` | ConfigMap | `900` | 券预占有效期 |
-| `ORDER_SERVICE_URL` | ConfigMap | `http://segroup8-order:8085` | 订单服务 Kubernetes DNS；当前 finance 仅保留调用契约，未在本 PR 中部署 order 服务 |
 | `OUTBOX_EVENT_SINK_URL` | ConfigMap | `http://messaging:8084/internal/events` | messaging Kubernetes DNS；空值会暂停发布但保留 Outbox |
 | `OUTBOX_POLL_MS`、`OUTBOX_BATCH_SIZE` | ConfigMap | `5000`、`50` | Relay 扫描周期和批量 |
 | `HTTP_CONNECT_TIMEOUT_MS`、`HTTP_READ_TIMEOUT_MS` | ConfigMap | `1000`、`3000` | Outbox HTTP 连接/读取超时 |
@@ -102,4 +101,4 @@ JSON 请求体，不使用“任意请求都返回 200”的宽松 stub。
 - version：`/actuator/info` 的 `app.name` 与 `app.version`。
 - 基础日志 pattern 固定包含 `traceId`、`requestId` 和掩码后的 `userId`；报价日志补充 `quoteId`，资金完成日志按类型补充 `orderId`、`paymentRequestId` 或 `refundRequestId`、`transactionId`、两位小数金额和币种，Outbox 日志补充 `eventId/eventType`。
 
-上述内容是接口与部署契约说明，不代表 Kubernetes 故障演练已经执行。真实 Pod events、探针失败、Helm revision/回滚及恢复后重复请求证据仍以测试与运维目录中的状态为准。
+Finance 不同步调用 Order；调用方向是 Order → Finance。Order 停止时 Finance 自身的公开接口、钱包和券数据仍可用，只是不再收到新的支付、退款和结算请求。最终部署、探针与恢复证据见 `03_devops/cloud-native-experiments/README.md`。

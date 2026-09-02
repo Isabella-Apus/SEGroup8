@@ -1,0 +1,1368 @@
+{
+  "schemaVersion": 1,
+  "name": "fixed-warmup",
+  "baseUrl": "http://10.43.54.227",
+  "endpoints": [
+    {
+      "path": "/",
+      "url": "http://10.43.54.227/",
+      "weight": 2
+    },
+    {
+      "path": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "url": "http://10.43.54.227/api/secondhand/list?pageNum=1&pageSize=20",
+      "weight": 2
+    },
+    {
+      "path": "/api/product/list?pageNum=1&pageSize=20",
+      "url": "http://10.43.54.227/api/product/list?pageNum=1&pageSize=20",
+      "weight": 2
+    },
+    {
+      "path": "/api/category/tree",
+      "url": "http://10.43.54.227/api/category/tree",
+      "weight": 2
+    },
+    {
+      "path": "/api/search/hot",
+      "url": "http://10.43.54.227/api/search/hot",
+      "weight": 2
+    }
+  ],
+  "concurrency": 4,
+  "configuredDurationSeconds": 20.0,
+  "warmupSeconds": 0.0,
+  "timeoutSeconds": 15.0,
+  "startedAt": "2026-09-02T02:38:27.362872+00:00",
+  "finishedAt": "2026-09-02T02:38:48.009354+00:00",
+  "measuredDurationSeconds": 20.646446792998177,
+  "throughputRequestsPerSecond": 9.832200282948605,
+  "requests": 203,
+  "successfulRequests": 203,
+  "failedRequests": 0,
+  "errorRate": 0.0,
+  "latencyMs": {
+    "average": 404.01197381306434,
+    "p50": 44.97170200193068,
+    "p95": 2096.96147739814,
+    "p99": 3105.38237315879,
+    "minimum": 1.2854509986937046,
+    "maximum": 3539.7929289974854
+  },
+  "statuses": {
+    "200": 203
+  },
+  "errors": {},
+  "perEndpoint": {
+    "/api/product/list?pageNum=1&pageSize=20": {
+      "requests": 40,
+      "successfulRequests": 40,
+      "failedRequests": 0,
+      "errorRate": 0.0,
+      "latencyMs": {
+        "average": 415.65688712507836,
+        "p50": 339.6513839979889,
+        "p95": 831.4815546513265,
+        "p99": 1595.3412943305734,
+        "minimum": 81.92886499455199,
+        "maximum": 1906.1116840020986
+      },
+      "statuses": {
+        "200": 40
+      },
+      "errors": {}
+    },
+    "/api/category/tree": {
+      "requests": 40,
+      "successfulRequests": 40,
+      "failedRequests": 0,
+      "errorRate": 0.0,
+      "latencyMs": {
+        "average": 29.497433850156085,
+        "p50": 22.885040496475995,
+        "p95": 70.21422795041869,
+        "p99": 91.93128327256998,
+        "minimum": 4.775086003064644,
+        "maximum": 98.31921300065005
+      },
+      "statuses": {
+        "200": 40
+      },
+      "errors": {}
+    },
+    "/api/search/hot": {
+      "requests": 40,
+      "successfulRequests": 40,
+      "failedRequests": 0,
+      "errorRate": 0.0,
+      "latencyMs": {
+        "average": 36.34517932550807,
+        "p50": 26.34946649777703,
+        "p95": 105.62587815038567,
+        "p99": 122.95352350040046,
+        "minimum": 4.323165005189367,
+        "maximum": 130.78435300121782
+      },
+      "statuses": {
+        "200": 40
+      },
+      "errors": {}
+    },
+    "/": {
+      "requests": 42,
+      "successfulRequests": 42,
+      "failedRequests": 0,
+      "errorRate": 0.0,
+      "latencyMs": {
+        "average": 4.528869024181317,
+        "p50": 3.6054270021850243,
+        "p95": 8.945496553133124,
+        "p99": 11.713083378854193,
+        "minimum": 1.2854509986937046,
+        "maximum": 13.381365999521222
+      },
+      "statuses": {
+        "200": 42
+      },
+      "errors": {}
+    },
+    "/api/secondhand/list?pageNum=1&pageSize=20": {
+      "requests": 41,
+      "successfulRequests": 41,
+      "failedRequests": 0,
+      "errorRate": 0.0,
+      "latencyMs": {
+        "average": 1525.9570286099206,
+        "p50": 1263.392192995525,
+        "p95": 3107.4934159987606,
+        "p99": 3498.8434101993334,
+        "minimum": 385.3031619946705,
+        "maximum": 3539.7929289974854
+      },
+      "statuses": {
+        "200": 41
+      },
+      "errors": {}
+    }
+  },
+  "raw": [
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 359.4558,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 30.6017,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 13.9047,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 130.7844,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 54.0114,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 4.2025,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 7.4681,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1297.2559,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 491.2259,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 419.7069,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 35.7552,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 49.2303,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 981.8161,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 12.1728,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 2.2529,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 3.3915,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 947.5315,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 39.6761,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 17.1878,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 12.8189,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 21.0181,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 806.6412,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 3.0063,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 8.9741,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 3539.7929,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 197.2726,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 44.7428,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 3.9741,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 2376.4582,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 2124.9369,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1761.0071,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1614.4972,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 16.6314,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 45.4668,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 44.9717,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 728.3463,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 275.6672,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 20.7333,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 29.3765,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 21.7164,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 29.4221,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 3.7394,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 2.7213,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1261.4763,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 325.5189,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 2.4461,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1517.4419,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1001.2964,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 291.9989,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 14.3738,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 22.2168,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 2.5744,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 2.3786,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 2803.9741,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 58.0162,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 33.727,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 3437.4191,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 150.6962,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 49.4253,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 38.205,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 110.7053,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 4.7098,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 2577.9072,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 154.4963,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 16.3605,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 26.7745,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 18.7133,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 49.8529,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 2118.167,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 415.4135,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 566.5415,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 118.6975,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 10.2181,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 28.1964,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 15.495,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 38.2185,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 3.7398,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 7.4424,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1511.4357,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 273.1673,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 13.4815,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 8.2882,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 5.4254,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 923.4682,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 207.4331,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1141.7371,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 113.8724,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 8.128,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 25.2961,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 37.4126,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 19.853,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 3.1257,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 4.3132,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 526.2965,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 6.137,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1672.9758,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 353.7838,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 7.6342,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1379.4908,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 362.6079,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 14.022,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 81.9399,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 23.2768,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1092.7011,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 595.7817,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1109.2645,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 17.125,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 8.842,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 60.9448,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 6.3633,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 7.3534,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 3001.9413,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 582.4028,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 2234.4138,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 671.8894,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 323.4703,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 4.9497,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 69.5971,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 15.2026,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 9.2456,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 1.5998,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 1.2855,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 385.3032,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 518.3039,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 10.1284,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 13.3814,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1672.3472,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 508.0183,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 770.7713,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 407.5109,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 44.2079,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 3.4558,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 3.4715,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1254.4379,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 280.444,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 16.4309,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 10.5312,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1023.1392,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1906.1117,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 12.5603,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 52.6815,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 13.3073,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 37.1893,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 8.4019,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1263.3922,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 639.7551,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 603.9909,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 380.5078,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 3.1716,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 2.6141,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 753.4974,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 25.0368,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 46.0883,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 118.0302,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 816.8614,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 98.3192,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 3107.4934,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 194.7702,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 11.9171,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 27.489,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 15.1034,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 42.3292,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 4.4201,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 9.3124,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 636.0902,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 187.9774,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 562.6325,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 10.4884,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 15.4866,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 4.3232,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 61.5723,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 3.053,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 2.2056,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 455.1789,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 203.7238,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 1.9987,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 1.5704,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 2160.4977,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 19.9621,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 43.2458,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 54.9978,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 5.245,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1843.101,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 81.9289,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 4.7751,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 20.1776,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 18.9229,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 78.3578,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 3.2622,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 5.0826,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 646.2489,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 279.6655,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 316.4202,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 46.4726,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 49.8245,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 105.3585,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1182.4927,
+      "error": null
+    },
+    {
+      "endpoint": "/api/product/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 259.2584,
+      "error": null
+    },
+    {
+      "endpoint": "/api/category/tree",
+      "status": 200,
+      "latencyMs": 13.0689,
+      "error": null
+    },
+    {
+      "endpoint": "/api/search/hot",
+      "status": 200,
+      "latencyMs": 13.3132,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 2.0334,
+      "error": null
+    },
+    {
+      "endpoint": "/",
+      "status": 200,
+      "latencyMs": 2.9857,
+      "error": null
+    },
+    {
+      "endpoint": "/api/secondhand/list?pageNum=1&pageSize=20",
+      "status": 200,
+      "latencyMs": 1029.8217,
+      "error": null
+    }
+  ]
+}

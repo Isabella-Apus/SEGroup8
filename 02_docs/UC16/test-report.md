@@ -5,8 +5,8 @@
 | 验证项 | 当前结果 | 原始证据 |
 |---|---|---|
 | H2 Integration | PASS：5/5，失败 0，错误 0，跳过 0，23.57 秒 | `evidence/raw-reports/surefire/` |
-| MySQL 8 Integration | PASS：5/5，失败 0，错误 0，跳过 0，22.873 秒 | `evidence/raw-reports/mysql/`、`evidence/logs/backend-mysql-integration.log` |
-| Compose + Playwright | PASS：1/1，失败 0，跳过 0，47.718 秒 | `evidence/raw-reports/playwright/`、`evidence/logs/`、`evidence/screenshots/` |
+| MySQL 8 Integration | PASS：5/5，失败 0，错误 0，跳过 0，22.873 秒 | `../../04_tests/UC16/evidence/raw-reports/mysql/` |
+| Compose + Playwright | PASS：1/1，失败 0，跳过 0，47.718 秒 | 当前 Actions artifact、关键截图 |
 
 ## 已验证结论
 
@@ -18,10 +18,10 @@ Integration 已在 H2 和 Compose MySQL 上分别通过，覆盖真实分类、�
 
 | 回归项 | 结果 | 日志 |
 |---|---|---|
-| Domain-D 定向测试 | PASS：25/25，失败 0，错误 0，跳过 0 | `evidence/logs/domain-d-targeted.log` |
-| 后端全量 `clean verify` | PASS：100/100，失败 0，错误 0，跳过 0 | `evidence/logs/backend-clean-verify.log` |
-| 前端 `build:real` | PASS：2421 modules transformed | `evidence/logs/frontend-build-real.log` |
-| Domain-D Evidence manifest | 历史 UC16 清单本身为 PASS；UC17–UC20 的当前结果以各自 `test-report.md` 和最新全 UC CI 为准，不再沿用旧的 `E2E_PENDING` 聚合结论 | `../domains/D-secondhand/evidence-manifest.json` |
+| Domain-D 定向测试 | PASS：25/25，失败 0，错误 0，跳过 0 | Actions artifact |
+| 后端全量 `clean verify` | PASS：100/100，失败 0，错误 0，跳过 0 | Actions artifact |
+| 前端 `build:real` | PASS：2421 modules transformed | Actions artifact |
+| 当前完整系统与服务 E2E | PASS：UC16–UC20 均通过 | Secondhand 流水线 33526387403、完整系统流水线 33526387696 |
 
 ## 执行命令
 
@@ -41,7 +41,6 @@ $env:E2E_EVIDENCE_ROOT = '04_tests/UC16/evidence'
 $env:E2E_OUTPUT_DIR = '04_tests/UC16/evidence/raw-reports/playwright'
 .\scripts\e2e\run-compose-e2e.ps1 -ResetDatabase -- e2e/domain-d/uc16-product-management.spec.ts --workers=1
 
-node 04_tests/domains/D-secondhand/verify-evidence-manifest.mjs
 ```
 
-最终状态以 Surefire XML、Playwright JSON/JUnit 和 `evidence/result-summary.json` 为准。CI 与非作者 Review 完成前不关闭 UC16 父 Issue `#55`；本 PR 只关闭 UC16 的本阶段 Task Issue `#148`。
+最终状态以保留的 Surefire XML、结构化 Playwright 结果和当前 Actions 运行一致结论为准。

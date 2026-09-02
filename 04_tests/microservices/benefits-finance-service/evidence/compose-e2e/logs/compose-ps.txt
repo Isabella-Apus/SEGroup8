@@ -1,4 +1,0 @@
-NAME                           IMAGE                     COMMAND                  SERVICE    CREATED              STATUS                        PORTS
-segroup8-platform-backend-1    segroup8/backend:1.0.0    "java -XX:MaxRAMPerc…"   backend    About a minute ago   Up About a minute (healthy)   0.0.0.0:8089->8080/tcp, [::]:8089->8080/tcp
-segroup8-platform-database-1   mysql:8.4.6               "docker-entrypoint.s…"   database   About an hour ago    Up About an hour (healthy)    0.0.0.0:3307->3306/tcp, [::]:3307->3306/tcp
-segroup8-platform-frontend-1   segroup8/frontend:1.0.0   "/docker-entrypoint.…"   frontend   About a minute ago   Up About a minute (healthy)   0.0.0.0:8088->80/tcp, [::]:8088->80/tcp

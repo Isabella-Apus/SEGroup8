@@ -1,6 +1,6 @@
 # UC16 二手商品发布和管理
 
-状态：**LOCAL_E2E_PASS**。
+状态：**MAIN_CI_E2E_PASS**。
 
 本目录是 UC16 需求、六类图模型、追溯和测试文档的唯一事实来源。
 
@@ -12,7 +12,7 @@
 - 原始证据：`../../04_tests/UC16/evidence/`
 - Domain：`D-secondhand`
 
-最新 main 全 UC Playwright Job：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611
+最新 main 全 UC Playwright Job：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33526387696
 
 ## 图模型（按参考文档分层）
 

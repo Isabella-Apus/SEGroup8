@@ -1,6 +1,6 @@
 # UC08 店铺查看、设置和装修
 
-状态：**CI_E2E_PASS / LOCAL_ARTIFACT_MISSING**。
+状态：**CI_E2E_PASS / ACTIONS_ARTIFACT**。
 
 本目录是 UC08 需求、六类图模型、追溯和测试文档的唯一事实来源。
 
@@ -12,7 +12,7 @@
 - 原始证据：`../../04_tests/UC08/evidence/`
 - Domain：`B-catalog-shop`
 
-最新 main 全 UC Playwright Job：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611
+最新 main 全 UC Playwright Job：https://github.com/Isabella-Apus/SEGroup8/actions/runs/33526387696
 
 ## 图模型（按参考文档分层）
 

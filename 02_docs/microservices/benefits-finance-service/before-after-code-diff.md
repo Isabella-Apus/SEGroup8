@@ -2,8 +2,8 @@
 
 ## 可复现基线
 
-- 改造前基线：`bb72290cff96c78ab189468b82db1f8ba3cd9323`（PR 目标 `main`）
-- 改造后：运行 `git rev-parse HEAD` 获取当前 PR 提交；提交后重新运行验收并在 `result-summary.json` 记录 tested revision。
+- 改造前基线：`bb72290cff96c78ab189468b82db1f8ba3cd9323`
+- 改造后基线：`main@b622e6bbb0447d6823b50e7789e4777f7131eb9b`，独立和完整系统流水线均通过。
 
 可复现命令：
 
@@ -23,7 +23,7 @@ git diff -- microservices/benefits-finance-service deploy/helm/segroup8 .github/
 
 ## 路由和兼容阶段
 
-finance 的目标 Service DNS 是 `benefits-finance:8085`；订单和消息下游目标分别为 `segroup8-order:8085`、`messaging:8084`。当前 `main` 的根 Compose 仍仅含旧单体 backend，订单/messaging 微服务尚未合入本 PR 的运行栈。因此本次保留旧单体兼容路由，归属 UC 的浏览器微服务切流明确为 `NOT_RUN`，不得把旧平台 UI 回归记为 finance 路由 E2E。
+Finance 的 Service DNS 是 `benefits-finance:8085`；订单和消息服务分别为 `segroup8-order:8085`、`messaging:8084`。当前生产 Ingress 已把 `/api/finance`、`/api/voucher` 切到 Finance，Order/Messaging 也已部署；独立 Finance E2E、Domain E 浏览器 E2E 和生产 rollout 均由当前服务流水线验证。兼容后端保留旧路由只用于回退与改造前比较。
 
 ## 代码层差异重点
 

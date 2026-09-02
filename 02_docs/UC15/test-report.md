@@ -31,17 +31,14 @@ node 04_tests/domains/C-order-fulfillment/run-domain-c-tests.mjs --suite UC15 --
 - Maven 退出码：0。
 - Surefire 后缀：`domain-c-uc15-20260827135302750`。
 - 汇总：`evidence/result-summary.json`。
-- 原始 JUnit XML/TXT：`evidence/raw-reports/surefire/`。
-- 后端日志：`evidence/logs/backend-domain-c.log`。
+- 原始 JUnit XML：`../../04_tests/UC15/evidence/raw-reports/surefire/`。
 
 ## 浏览器证据
 
-`frontend/e2e/domain-c/uc15-review.spec.ts` 已有一次真实浏览器 PASS 原始报告，覆盖买家首评、卖家回复、买家追评以及刷新后的持久化验证。报告、JUnit XML、截图位于 `evidence/raw-reports/playwright/` 和 `evidence/screenshots/`。
-
-该 Playwright 结果为分支已有历史证据；它与本次 2026-08-27 MySQL/JUnit 定向执行分别记录，不将历史浏览器结果标记为本轮重新运行。本轮 Compose 重试在 Playwright 启动前因 DaoCloud Docker 镜像代理返回 `EOF` 而退出，未产生新的浏览器测试结论。
+`frontend/e2e/domain-c/uc15-review.spec.ts` 覆盖买家首评、卖家回复、买家追评以及刷新后的持久化验证。当前 `main` 完整系统流水线 33526387696 已复验通过，完整浏览器报告由 Actions artifact 保存。
 
 ## 回归结果
 
 - Backend `mvn clean verify`：104 tests passed，0 failures，0 errors，0 skipped。
 - Frontend `npm run build:real`：构建成功；仅保留已有的大分块体积告警。
-- Compose Playwright 重试：基础镜像下载阶段失败，未执行到 UC15 spec。
+- Compose Playwright：当前完整系统流水线通过。

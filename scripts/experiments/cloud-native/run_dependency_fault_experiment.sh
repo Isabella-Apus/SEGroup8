@@ -26,6 +26,7 @@ INTERNAL_SERVICE_TOKEN="$(kubectl -n "$NAMESPACE" get secret experiment-secrets 
 SECONDHAND_IP="$(kubectl -n "$NAMESPACE" get service secondhand-service -o jsonpath='{.spec.clusterIP}')"
 IDENTITY_IP="$(kubectl -n "$NAMESPACE" get service identity-governance-service -o jsonpath='{.spec.clusterIP}')"
 BASE_URL="http://$SECONDHAND_IP:8080"
+PRODUCTION_NAMESPACE="${PRODUCTION_NAMESPACE:-segroup8}"
 
 # Reset only the dedicated fault specimen. The 499 remaining performance rows
 # stay unchanged, so this drill cannot invalidate the comparison dataset.
@@ -44,7 +45,6 @@ print(f"{head}.{body}.{sig}")
 PY
 )"
 
-kubectl -n "$NAMESPACE" delete hpa secondhand-service --ignore-not-found >/dev/null
 kubectl -n "$NAMESPACE" scale deployment secondhand-service --replicas=1 >/dev/null
 kubectl -n "$NAMESPACE" rollout status deployment/secondhand-service --timeout=180s >/dev/null
 kubectl -n "$NAMESPACE" get deployment,pod -o wide > "$OUT/00-before-fault.txt"
@@ -58,6 +58,40 @@ FAULT_START="$(date --iso-8601=seconds)"
 kubectl -n "$NAMESPACE" scale deployment order-service --replicas=0 > "$OUT/01-fault-injection.txt"
 kubectl -n "$NAMESPACE" wait --for=delete pod -l app=order-service --timeout=120s >> "$OUT/01-fault-injection.txt" 2>&1 || true
 kubectl -n "$NAMESPACE" get deployment,pod -o wide >> "$OUT/01-fault-injection.txt"
+
+# Observe namespace isolation while the experiment Order deployment is down.
+# These observations are evidence, not an extra pass/fail gate: a developer
+# cluster may legitimately have no production namespace.
+if kubectl get namespace "$PRODUCTION_NAMESPACE" >/dev/null 2>&1; then
+  {
+    echo "observed_at=$(date --iso-8601=seconds)"
+    echo "fault_namespace=$NAMESPACE"
+    echo "production_namespace=$PRODUCTION_NAMESPACE"
+    echo "production_order_endpoints=$(kubectl -n "$PRODUCTION_NAMESPACE" get endpoints segroup8-order -o jsonpath='{.subsets[*].addresses[*].ip}' 2>/dev/null || true)"
+    kubectl -n "$PRODUCTION_NAMESPACE" get deployment,pod -o wide
+    while read -r label service port path; do
+      service_ip="$(kubectl -n "$PRODUCTION_NAMESPACE" get service "$service" -o jsonpath='{.spec.clusterIP}' 2>/dev/null || true)"
+      if [[ -z "$service_ip" ]]; then
+        echo "$label=NOT_DEPLOYED"
+        continue
+      fi
+      status="$(curl -sS -o "$OUT/01a-$label-health.json" -w '%{http_code}' "http://$service_ip:$port$path" || true)"
+      echo "$label=$status"
+    done <<'SERVICES'
+backend backend 8080 /actuator/health/readiness
+catalog_shop segroup8-catalog-shop 8080 /actuator/health/readiness
+identity identity-governance-service 8091 /actuator/health/readiness
+order segroup8-order 8085 /actuator/health/readiness
+secondhand secondhand-service 8080 /actuator/health/readiness
+messaging messaging 8084 /actuator/health/readiness
+finance benefits-finance 8085 /actuator/health/readiness
+frontend frontend 80 /health
+SERVICES
+  } > "$OUT/01a-production-namespace-isolation.txt" 2>&1
+else
+  echo "production namespace $PRODUCTION_NAMESPACE is not present; production impact observation NOT_RUN" \
+    > "$OUT/01a-production-namespace-isolation.txt"
+fi
 
 HTTP_CODE="$(curl -sS -o "$OUT/02-buy-during-outage-response.json" -w '%{http_code}' \
   -X POST "$BASE_URL/api/secondhand/900500/buy" \

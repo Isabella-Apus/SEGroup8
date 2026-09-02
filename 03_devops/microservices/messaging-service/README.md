@@ -1,18 +1,6 @@
-# Messaging service operations
+# messaging-service 运维入口
 
-Build and verify from the repository root:
+- 构建：`mvn -B -f microservices/pom.xml -pl messaging-service -am clean verify`
+- 日常部署、探针、日志、Inbox/DLQ 处理和回滚：[operations-runbook.md](operations-runbook.md)
 
-```powershell
-$env:JAVA_HOME='D:\java\IntelliJ IDEA 2025.2.1\jbr'
-$env:Path="$env:JAVA_HOME\bin;$env:Path"
-mvn -B -f microservices/pom.xml -pl messaging-service -am clean verify
-```
-
-The runtime requires Secret-injected `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`,
-`JWT_SECRET`, `INTERNAL_SERVICE_TOKEN`, and (for replay)
-`INTERNAL_OPERATIONS_TOKEN`. `REALTIME_ALLOWED_ORIGIN_PATTERNS` must be an
-explicit allow-list.
-
-Do not use `latest` for the messaging release. Use
-`segroup8/messaging:sha-<full-git-sha>` and deploy through the existing
-`deploy/helm/segroup8` chart.
+运行时 Secret 包含数据库、JWT、内部服务令牌和独立 operations token；`REALTIME_ALLOWED_ORIGIN_PATTERNS` 必须显式配置。生产镜像只使用 `messaging:sha-<完整提交号>`，由独立流水线验证后原样推送并通过共享 Helm release 原子部署。

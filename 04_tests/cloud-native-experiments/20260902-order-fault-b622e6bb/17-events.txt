@@ -1,0 +1,65 @@
+LAST SEEN   TYPE      REASON                  OBJECT                                             MESSAGE
+7m10s       Warning   ClusterIPNotAllocated   service/identity-governance-service                Cluster IP [IPv4]: 10.43.207.173 is not allocated; repairing
+83s         Normal    Scheduled               pod/order-service-79d55f66b7-vpth6                 Successfully assigned segroup8-cloud-exp-20260902-fault-b622e6bb/order-service-79d55f66b7-vpth6 to izbp1fcr5ltsng9ra8gt84z
+7m10s       Normal    Scheduled               pod/secondhand-service-786bf554f6-h2grj            Successfully assigned segroup8-cloud-exp-20260902-fault-b622e6bb/secondhand-service-786bf554f6-h2grj to izbp1fcr5ltsng9ra8gt84z
+4m53s       Normal    Scheduled               pod/order-service-79d55f66b7-mgbvl                 Successfully assigned segroup8-cloud-exp-20260902-fault-b622e6bb/order-service-79d55f66b7-mgbvl to izbp1fcr5ltsng9ra8gt84z
+7m10s       Normal    Scheduled               pod/identity-governance-service-7579fcfd4-pllhl    Successfully assigned segroup8-cloud-exp-20260902-fault-b622e6bb/identity-governance-service-7579fcfd4-pllhl to izbp1fcr5ltsng9ra8gt84z
+7m10s       Normal    Scheduled               pod/order-service-79d55f66b7-ldbjn                 Successfully assigned segroup8-cloud-exp-20260902-fault-b622e6bb/order-service-79d55f66b7-ldbjn to izbp1fcr5ltsng9ra8gt84z
+7m10s       Normal    Scheduled               pod/mysql-9bd4b798d-bqsk9                          Successfully assigned segroup8-cloud-exp-20260902-fault-b622e6bb/mysql-9bd4b798d-bqsk9 to izbp1fcr5ltsng9ra8gt84z
+7m10s       Normal    Scheduled               pod/monolith-795445b986-6755k                      Successfully assigned segroup8-cloud-exp-20260902-fault-b622e6bb/monolith-795445b986-6755k to izbp1fcr5ltsng9ra8gt84z
+7m11s       Normal    ScalingReplicaSet       deployment/identity-governance-service             Scaled up replica set identity-governance-service-7579fcfd4 from 0 to 1
+7m11s       Normal    SuccessfulCreate        replicaset/monolith-795445b986                     Created pod: monolith-795445b986-6755k
+7m11s       Normal    SuccessfulCreate        replicaset/identity-governance-service-7579fcfd4   Created pod: identity-governance-service-7579fcfd4-pllhl
+7m11s       Normal    SuccessfulCreate        replicaset/mysql-9bd4b798d                         Created pod: mysql-9bd4b798d-bqsk9
+7m11s       Normal    SuccessfulCreate        replicaset/order-service-79d55f66b7                Created pod: order-service-79d55f66b7-ldbjn
+7m11s       Normal    ScalingReplicaSet       deployment/mysql                                   Scaled up replica set mysql-9bd4b798d from 0 to 1
+7m11s       Normal    ScalingReplicaSet       deployment/monolith                                Scaled up replica set monolith-795445b986 from 0 to 1
+7m11s       Normal    SuccessfulCreate        replicaset/secondhand-service-786bf554f6           Created pod: secondhand-service-786bf554f6-h2grj
+7m11s       Normal    ScalingReplicaSet       deployment/secondhand-service                      Scaled up replica set secondhand-service-786bf554f6 from 0 to 1
+7m10s       Normal    Pulled                  pod/mysql-9bd4b798d-bqsk9                          Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/mysql:8.4.6" already present on machine and can be accessed by the pod
+7m10s       Normal    Pulling                 pod/secondhand-service-786bf554f6-h2grj            Pulling image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b"
+7m10s       Normal    Pulling                 pod/monolith-795445b986-6755k                      Pulling image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b"
+7m10s       Normal    Pulling                 pod/identity-governance-service-7579fcfd4-pllhl    Pulling image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b"
+7m10s       Normal    Created                 pod/mysql-9bd4b798d-bqsk9                          Container created
+7m10s       Normal    Started                 pod/mysql-9bd4b798d-bqsk9                          Container started
+7m9s        Normal    Pulled                  pod/monolith-795445b986-6755k                      Successfully pulled image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b" in 488ms (488ms including waiting). Image size: 166995279 bytes.
+7m9s        Normal    Created                 pod/monolith-795445b986-6755k                      Container created
+7m9s        Normal    Pulled                  pod/identity-governance-service-7579fcfd4-pllhl    Successfully pulled image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b" in 437ms (437ms including waiting). Image size: 166995279 bytes.
+7m9s        Normal    Started                 pod/secondhand-service-786bf554f6-h2grj            Container started
+7m9s        Normal    Pulling                 pod/order-service-79d55f66b7-ldbjn                 Pulling image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b"
+7m9s        Normal    Pulled                  pod/order-service-79d55f66b7-ldbjn                 Successfully pulled image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b" in 533ms (534ms including waiting). Image size: 166995279 bytes.
+7m9s        Normal    Created                 pod/order-service-79d55f66b7-ldbjn                 Container created
+7m9s        Normal    Started                 pod/monolith-795445b986-6755k                      Container started
+7m9s        Normal    Pulled                  pod/secondhand-service-786bf554f6-h2grj            Successfully pulled image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b" in 466ms (466ms including waiting). Image size: 166995279 bytes.
+7m9s        Normal    Created                 pod/secondhand-service-786bf554f6-h2grj            Container created
+7m9s        Normal    Started                 pod/identity-governance-service-7579fcfd4-pllhl    Container started
+7m9s        Normal    Created                 pod/identity-governance-service-7579fcfd4-pllhl    Container created
+7m8s        Normal    Started                 pod/order-service-79d55f66b7-ldbjn                 Container started
+6m33s       Warning   Unhealthy               pod/mysql-9bd4b798d-bqsk9                          Readiness probe failed: mysqladmin: [Warning] Using a password on the command line interface can be insecure.
+5m46s       Warning   Unhealthy               pod/identity-governance-service-7579fcfd4-pllhl    Startup probe failed: Get "http://10.42.0.240:8091/actuator/health/liveness": dial tcp 10.42.0.240:8091: connect: connection refused
+5m40s       Warning   Unhealthy               pod/secondhand-service-786bf554f6-h2grj            Startup probe failed: Get "http://10.42.0.242:8080/actuator/health/liveness": dial tcp 10.42.0.242:8080: connect: connection refused
+5m40s       Warning   Unhealthy               pod/order-service-79d55f66b7-ldbjn                 Startup probe failed: Get "http://10.42.0.243:8085/actuator/health/liveness": dial tcp 10.42.0.243:8085: connect: connection refused
+5m40s       Warning   Unhealthy               pod/identity-governance-service-7579fcfd4-pllhl    Startup probe failed: Get "http://10.42.0.240:8091/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+5m34s       Warning   Unhealthy               pod/secondhand-service-786bf554f6-h2grj            Startup probe failed: Get "http://10.42.0.242:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+5m34s       Warning   Unhealthy               pod/order-service-79d55f66b7-ldbjn                 Startup probe failed: Get "http://10.42.0.243:8085/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+5m31s       Warning   Unhealthy               pod/monolith-795445b986-6755k                      Startup probe failed: Get "http://10.42.0.241:8080/actuator/health/liveness": dial tcp 10.42.0.241:8080: connect: connection refused
+5m25s       Warning   Unhealthy               pod/monolith-795445b986-6755k                      Startup probe failed: Get "http://10.42.0.241:8080/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+5m2s        Normal    SuccessfulDelete        replicaset/order-service-79d55f66b7                Deleted pod: order-service-79d55f66b7-ldbjn
+5m2s        Normal    Killing                 pod/order-service-79d55f66b7-ldbjn                 Stopping container order-service
+4m54s       Normal    Started                 pod/order-service-79d55f66b7-mgbvl                 Container started
+4m54s       Normal    Pulled                  pod/order-service-79d55f66b7-mgbvl                 Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b" already present on machine and can be accessed by the pod
+4m54s       Normal    SuccessfulCreate        replicaset/order-service-79d55f66b7                Created pod: order-service-79d55f66b7-mgbvl
+4m54s       Normal    Created                 pod/order-service-79d55f66b7-mgbvl                 Container created
+3m54s       Warning   Unhealthy               pod/order-service-79d55f66b7-mgbvl                 Startup probe failed: Get "http://10.42.0.244:8085/actuator/health/liveness": dial tcp 10.42.0.244:8085: connect: connection refused
+3m48s       Warning   Unhealthy               pod/order-service-79d55f66b7-mgbvl                 Startup probe failed: Get "http://10.42.0.244:8085/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)
+90s         Normal    Killing                 pod/order-service-79d55f66b7-mgbvl                 Stopping container order-service
+90s         Normal    ScalingReplicaSet       deployment/order-service                           Scaled down replica set order-service-79d55f66b7 from 1 to 0
+90s         Normal    SuccessfulDelete        replicaset/order-service-79d55f66b7                Deleted pod: order-service-79d55f66b7-mgbvl
+89s         Warning   Unhealthy               pod/order-service-79d55f66b7-mgbvl                 Readiness probe failed: Get "http://10.42.0.244:8085/actuator/health/readiness": dial tcp 10.42.0.244:8085: connect: connection refused
+85s         Normal    ScalingReplicaSet       deployment/order-service                           Scaled up replica set order-service-79d55f66b7 from 0 to 1
+84s         Normal    Pulled                  pod/order-service-79d55f66b7-vpth6                 Container image "crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b" already present on machine and can be accessed by the pod
+84s         Normal    SuccessfulCreate        replicaset/order-service-79d55f66b7                Created pod: order-service-79d55f66b7-vpth6
+84s         Normal    Created                 pod/order-service-79d55f66b7-vpth6                 Container created
+84s         Normal    Started                 pod/order-service-79d55f66b7-vpth6                 Container started
+24s         Warning   Unhealthy               pod/order-service-79d55f66b7-vpth6                 Startup probe failed: Get "http://10.42.0.245:8085/actuator/health/liveness": dial tcp 10.42.0.245:8085: connect: connection refused
+18s         Warning   Unhealthy               pod/order-service-79d55f66b7-vpth6                 Startup probe failed: Get "http://10.42.0.245:8085/actuator/health/liveness": context deadline exceeded (Client.Timeout exceeded while awaiting headers)

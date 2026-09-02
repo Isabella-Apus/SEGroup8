@@ -1,0 +1,32 @@
+observed_at=2026-09-02T10:56:23+08:00
+fault_namespace=segroup8-cloud-exp-20260902-fault-b622e6bb
+production_namespace=segroup8
+production_order_endpoints=10.42.0.230
+NAME                                           READY   UP-TO-DATE   AVAILABLE   AGE     CONTAINERS            IMAGES                                                                                                                                 SELECTOR
+deployment.apps/benefits-finance               1/1     1            1           13h     benefits-finance      crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/benefits-finance:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b      app.kubernetes.io/name=benefits-finance
+deployment.apps/messaging                      1/1     1            1           18h     messaging             crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/messaging:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b             app.kubernetes.io/component=messaging,app.kubernetes.io/instance=segroup8
+deployment.apps/segroup8-backend               1/1     1            1           4d12h   backend               crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/backend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b               app.kubernetes.io/component=backend,app.kubernetes.io/instance=segroup8
+deployment.apps/segroup8-catalog-shop          1/1     1            1           18h     catalog-shop          crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/catalog-shop:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b          app.kubernetes.io/component=catalog-shop,app.kubernetes.io/instance=segroup8
+deployment.apps/segroup8-frontend              1/1     1            1           4d12h   frontend              crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/frontend:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b              app.kubernetes.io/component=frontend,app.kubernetes.io/instance=segroup8
+deployment.apps/segroup8-identity-governance   1/1     1            1           18h     identity-governance   crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/identity-governance:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b   app.kubernetes.io/component=identity-governance,app.kubernetes.io/instance=segroup8
+deployment.apps/segroup8-order                 1/1     1            1           12h     order-service         crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/order:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b                 app.kubernetes.io/component=order-service,app.kubernetes.io/instance=segroup8
+deployment.apps/segroup8-secondhand            1/1     1            1           18h     secondhand-service    crpi-oyyvfqoq4lnnoc8v.cn-hangzhou.personal.cr.aliyuncs.com/segroup8/secondhand:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b            app.kubernetes.io/component=secondhand-service,app.kubernetes.io/instance=segroup8
+
+NAME                                               READY   STATUS    RESTARTS      AGE     IP            NODE                      NOMINATED NODE   READINESS GATES
+pod/benefits-finance-7b9b6c548-lpcbj               1/1     Running   0             11h     10.42.0.231   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/messaging-84c874768f-gdm6l                     1/1     Running   0             11h     10.42.0.232   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/mysql-0                                        1/1     Running   7 (13h ago)   4d12h   10.42.0.189   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/segroup8-backend-54498dc59-tf5lj               1/1     Running   0             11h     10.42.0.233   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/segroup8-catalog-shop-c644d85bd-2rrsx          1/1     Running   0             11h     10.42.0.227   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/segroup8-frontend-f85ff46cb-6flhj              1/1     Running   0             11h     10.42.0.234   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/segroup8-identity-governance-b56cfc7d5-5xs42   1/1     Running   0             11h     10.42.0.229   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/segroup8-order-586764f645-ksb9m                1/1     Running   0             11h     10.42.0.230   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+pod/segroup8-secondhand-557d6d96bd-f7twf           1/1     Running   0             11h     10.42.0.228   izbp1fcr5ltsng9ra8gt84z   <none>           <none>
+backend=200
+catalog_shop=200
+identity=200
+order=200
+secondhand=200
+messaging=200
+finance=200
+frontend=200

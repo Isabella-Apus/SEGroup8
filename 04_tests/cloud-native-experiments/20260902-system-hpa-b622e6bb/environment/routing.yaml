@@ -1,0 +1,533 @@
+apiVersion: v1
+items:
+- apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: segroup8
+      meta.helm.sh/release-namespace: segroup8
+    creationTimestamp: "2026-08-28T14:13:00Z"
+    generation: 15
+    labels:
+      app.kubernetes.io/instance: segroup8
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: segroup8
+      helm.sh/chart: segroup8-0.1.0
+    name: segroup8
+    namespace: segroup8
+    resourceVersion: "173924"
+    uid: 0686a7ec-238d-4d7e-aabf-b6965bc9f2d2
+  spec:
+    ingressClassName: traefik
+    rules:
+    - http:
+        paths:
+        - backend:
+            service:
+              name: segroup8-catalog-shop
+              port:
+                name: http
+          path: /api/user/browse-history
+          pathType: Prefix
+        - backend:
+            service:
+              name: segroup8-catalog-shop
+              port:
+                name: http
+          path: /api/admin/product-risk-audits
+          pathType: Prefix
+        - backend:
+            service:
+              name: segroup8-catalog-shop
+              port:
+                name: http
+          path: /api/category
+          pathType: Prefix
+        - backend:
+            service:
+              name: segroup8-catalog-shop
+              port:
+                name: http
+          path: /api/product
+          pathType: Prefix
+        - backend:
+            service:
+              name: segroup8-catalog-shop
+              port:
+                name: http
+          path: /api/shop
+          pathType: Prefix
+        - backend:
+            service:
+              name: segroup8-catalog-shop
+              port:
+                name: http
+          path: /api/search
+          pathType: Prefix
+        - backend:
+            service:
+              name: identity-governance-service
+              port:
+                name: http
+          path: /api/admin/merchant-applications
+          pathType: Prefix
+        - backend:
+            service:
+              name: identity-governance-service
+              port:
+                name: http
+          path: /api/admin/audit-logs
+          pathType: Prefix
+        - backend:
+            service:
+              name: identity-governance-service
+              port:
+                name: http
+          path: /api/admin/reports
+          pathType: Prefix
+        - backend:
+            service:
+              name: identity-governance-service
+              port:
+                name: http
+          path: /api/admin/users
+          pathType: Prefix
+        - backend:
+            service:
+              name: identity-governance-service
+              port:
+                name: http
+          path: /api/auth
+          pathType: Prefix
+        - backend:
+            service:
+              name: identity-governance-service
+              port:
+                name: http
+          path: /api/report-block
+          pathType: Prefix
+        - backend:
+            service:
+              name: identity-governance-service
+              port:
+                name: http
+          path: /api/credit
+          pathType: Prefix
+        - backend:
+            service:
+              name: identity-governance-service
+              port:
+                name: http
+          path: /api/user
+          pathType: Prefix
+        - backend:
+            service:
+              name: segroup8-order
+              port:
+                name: http
+          path: /api/order
+          pathType: Prefix
+        - backend:
+            service:
+              name: segroup8-order
+              port:
+                name: http
+          path: /api/review
+          pathType: Prefix
+        - backend:
+            service:
+              name: segroup8-order
+              port:
+                name: http
+          path: /api/logistics
+          pathType: Prefix
+        - backend:
+            service:
+              name: segroup8-order
+              port:
+                name: http
+          path: /api/admin/orders
+          pathType: Prefix
+        - backend:
+            service:
+              name: secondhand-service
+              port:
+                name: http
+          path: /api/secondhand
+          pathType: Prefix
+        - backend:
+            service:
+              name: messaging
+              port:
+                name: http
+          path: /api/chat
+          pathType: Prefix
+        - backend:
+            service:
+              name: messaging
+              port:
+                name: http
+          path: /api/notifications
+          pathType: Prefix
+        - backend:
+            service:
+              name: messaging
+              port:
+                name: http
+          path: /ws/realtime
+          pathType: Prefix
+        - backend:
+            service:
+              name: benefits-finance
+              port:
+                name: http
+          path: /api/finance
+          pathType: Prefix
+        - backend:
+            service:
+              name: benefits-finance
+              port:
+                name: http
+          path: /api/voucher
+          pathType: Prefix
+        - backend:
+            service:
+              name: frontend
+              port:
+                name: http
+          path: /
+          pathType: Prefix
+  status:
+    loadBalancer:
+      ingress:
+      - ip: 172.28.7.2
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: segroup8
+      meta.helm.sh/release-namespace: segroup8
+    creationTimestamp: "2026-08-28T14:13:00Z"
+    labels:
+      app.kubernetes.io/component: backend
+      app.kubernetes.io/instance: segroup8
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: segroup8
+      helm.sh/chart: segroup8-0.1.0
+    name: backend
+    namespace: segroup8
+    resourceVersion: "20569"
+    uid: f20ef1f4-55cb-4727-8f50-4e787fdd8387
+  spec:
+    clusterIP: 10.43.58.56
+    clusterIPs:
+    - 10.43.58.56
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: http
+    selector:
+      app.kubernetes.io/component: backend
+      app.kubernetes.io/instance: segroup8
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: segroup8
+      meta.helm.sh/release-namespace: segroup8
+    creationTimestamp: "2026-09-01T13:27:15Z"
+    labels:
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: benefits-finance
+    name: benefits-finance
+    namespace: segroup8
+    resourceVersion: "172719"
+    uid: 990774af-7a1c-47b8-ad7c-8dc6ff296152
+  spec:
+    clusterIP: 10.43.240.237
+    clusterIPs:
+    - 10.43.240.237
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8085
+      protocol: TCP
+      targetPort: http
+    selector:
+      app.kubernetes.io/name: benefits-finance
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: segroup8
+      meta.helm.sh/release-namespace: segroup8
+    creationTimestamp: "2026-08-28T14:13:00Z"
+    labels:
+      app.kubernetes.io/component: frontend
+      app.kubernetes.io/instance: segroup8
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: segroup8
+      helm.sh/chart: segroup8-0.1.0
+    name: frontend
+    namespace: segroup8
+    resourceVersion: "20567"
+    uid: 8f5c845d-fcf1-4a64-a7e8-983b78706014
+  spec:
+    clusterIP: 10.43.54.227
+    clusterIPs:
+    - 10.43.54.227
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+    selector:
+      app.kubernetes.io/component: frontend
+      app.kubernetes.io/instance: segroup8
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: segroup8
+      meta.helm.sh/release-namespace: segroup8
+    creationTimestamp: "2026-09-01T08:00:13Z"
+    labels:
+      app.kubernetes.io/component: identity-governance
+      app.kubernetes.io/instance: segroup8
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: segroup8
+      helm.sh/chart: segroup8-0.1.0
+    name: identity-governance-service
+    namespace: segroup8
+    resourceVersion: "158664"
+    uid: 17039d9c-12c8-4193-903b-eaf4eeedd58c
+  spec:
+    clusterIP: 10.43.104.61
+    clusterIPs:
+    - 10.43.104.61
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8091
+      protocol: TCP
+      targetPort: http
+    selector:
+      app.kubernetes.io/component: identity-governance
+      app.kubernetes.io/instance: segroup8
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: segroup8
+      meta.helm.sh/release-namespace: segroup8
+    creationTimestamp: "2026-09-01T08:54:53Z"
+    labels:
+      app.kubernetes.io/component: messaging
+      app.kubernetes.io/instance: segroup8
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: segroup8
+      helm.sh/chart: segroup8-0.1.0
+    name: messaging
+    namespace: segroup8
+    resourceVersion: "163998"
+    uid: d4e034ad-f1c9-4444-9825-722af8f4841f
+  spec:
+    clusterIP: 10.43.162.6
+    clusterIPs:
+    - 10.43.162.6
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8084
+      protocol: TCP
+      targetPort: http
+    selector:
+      app.kubernetes.io/component: messaging
+      app.kubernetes.io/instance: segroup8
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: segroup8
+      meta.helm.sh/release-namespace: segroup8
+    creationTimestamp: "2026-08-28T14:13:00Z"
+    labels:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: segroup8
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: segroup8
+      helm.sh/chart: segroup8-0.1.0
+    name: mysql
+    namespace: segroup8
+    resourceVersion: "20563"
+    uid: 6507480d-979c-44d6-bbc1-b9a119e1ca4f
+  spec:
+    clusterIP: None
+    clusterIPs:
+    - None
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: mysql
+      port: 3306
+      protocol: TCP
+      targetPort: mysql
+    selector:
+      app.kubernetes.io/component: database
+      app.kubernetes.io/instance: segroup8
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: segroup8
+      meta.helm.sh/release-namespace: segroup8
+    creationTimestamp: "2026-09-01T08:48:41Z"
+    labels:
+      app.kubernetes.io/component: secondhand-service
+      app.kubernetes.io/instance: segroup8
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: segroup8
+      helm.sh/chart: segroup8-0.1.0
+    name: secondhand-service
+    namespace: segroup8
+    resourceVersion: "163144"
+    uid: 8ca2276f-d029-4e72-8b30-9e43ebfbebff
+  spec:
+    clusterIP: 10.43.98.54
+    clusterIPs:
+    - 10.43.98.54
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: http
+    selector:
+      app.kubernetes.io/component: secondhand-service
+      app.kubernetes.io/instance: segroup8
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: segroup8
+      meta.helm.sh/release-namespace: segroup8
+    creationTimestamp: "2026-09-01T07:57:59Z"
+    labels:
+      app.kubernetes.io/component: catalog-shop
+      app.kubernetes.io/instance: segroup8
+      app.kubernetes.io/managed-by: Helm
+    name: segroup8-catalog-shop
+    namespace: segroup8
+    resourceVersion: "158386"
+    uid: 1657747f-36a5-4d00-86ba-88066f76d170
+  spec:
+    clusterIP: 10.43.197.158
+    clusterIPs:
+    - 10.43.197.158
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: http
+    selector:
+      app.kubernetes.io/component: catalog-shop
+      app.kubernetes.io/instance: segroup8
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      meta.helm.sh/release-name: segroup8
+      meta.helm.sh/release-namespace: segroup8
+    creationTimestamp: "2026-09-01T13:57:32Z"
+    labels:
+      app.kubernetes.io/component: order-service
+      app.kubernetes.io/instance: segroup8
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: segroup8
+      helm.sh/chart: segroup8-0.1.0
+    name: segroup8-order
+    namespace: segroup8
+    resourceVersion: "173916"
+    uid: d23d8197-ff49-495f-a2a4-26185e65523a
+  spec:
+    clusterIP: 10.43.205.82
+    clusterIPs:
+    - 10.43.205.82
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8085
+      protocol: TCP
+      targetPort: http
+    selector:
+      app.kubernetes.io/component: order-service
+      app.kubernetes.io/instance: segroup8
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:
+  resourceVersion: ""

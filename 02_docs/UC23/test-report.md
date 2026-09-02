@@ -16,6 +16,4 @@
 - 退款从经营账户扣回并写回个人账户，两条退款流水金额和为 0；
 - 买家在页面充值，刷新后余额和个人流水保持；卖家财务看板刷新后仍显示本次订单结算。
 
-整体状态：`PASS`。Surefire XML、Playwright JSON/XML/HTML、运行状态和截图保存在 `04_tests/UC23/evidence/`。
-
-静态覆盖清单已识别 `frontend/e2e/domain-e/uc23-wallet-settlement.spec.ts` 为 UC23 的唯一规范路径。全仓覆盖脚本仍会因 `origin/main` 尚缺 UC20、UC22、UC24、UC25 而返回非零；这些用例不属于本 PR 的范围，其中 UC22 正在独立 PR 中等待合并。
+整体状态：`PASS`。Git 保留 Surefire XML、结构化结果和关键截图；完整 Playwright HTML、trace、video 由 Actions artifact 保存。当前 `main@b622e6bb` 的完整系统流水线 33526387696 已确认 UC01-UC25 全部具备独立 spec 并执行通过。

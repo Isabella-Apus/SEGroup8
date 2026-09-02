@@ -1,3 +1,3 @@
-# 部署测试报告
+# catalog-shop-service 部署测试报告
 
-Helm 模板、原子发布步骤、readiness/liveness/info 与失败演练已交付。当前本地环境没有目标 K3s 发布上下文，未伪造集群结果。发布负责人须记录 release/revision、镜像 digest、rollout、三个 actuator smoke、失败 revision 的自动回滚和修复 revision。
+同一 run 的 `Publish immutable tested image` 与 `Atomic K3s deployment and smoke` jobs 成功。服务器实测镜像为 `catalog-shop:sha-b622e6bbb0447d6823b50e7789e4777f7131eb9b`，Deployment 1/1 Ready；探针、版本和公开健康检查返回 200。Helm 使用实际 Service DNS `segroup8-catalog-shop:8080`，部署失败由原子升级回滚。

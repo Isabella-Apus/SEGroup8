@@ -1,12 +1,9 @@
-# MS-06 V3 test plan
+# messaging-service 最终测试计划
 
-| Area | Evidence command or artifact | Required outcome |
-|---|---|---|
-| Build | Maven reactor verify | messaging and security tests pass |
-| Backend regression | `mvn -B -f backend/pom.xml test` | no code failures; Docker errors isolated |
-| Runtime | live health/info/metrics probes | liveness/readiness/info and five metrics |
-| Failure isolation | `evidence/raw-reports/scenario-c-live.md` | stop/restart preserves event and creates one notification |
-| Container | Docker build with SHA tag | image builds without secrets |
-| Helm | `helm lint` and `helm template` | chart renders with messaging values |
-| Drill | deployment-failure-drill.md | failed readiness blocks and rollback recovers |
-| Source boundary | `node scripts/ci/verify-messaging-boundary.mjs` | no foreign mapper/entity/schema access |
+覆盖 UC24-UC25、8 个公开 OpenAPI 操作、4 个内部操作、WebSocket、JWT/内部鉴权、Inbox/Outbox、重试/DLQ、Flyway、真实 MySQL、候选镜像 E2E、完整系统 E2E 和 Helm 部署。标准入口：
+
+```bash
+mvn -B --no-transfer-progress -f microservices/pom.xml -pl messaging-service -am clean verify
+```
+
+公开 HTTP 路由、WebSocket 路由和前端代理由 CI 审计；通知投递失败不能回滚已完成的订单或治理事务。

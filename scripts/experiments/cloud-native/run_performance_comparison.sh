@@ -7,9 +7,8 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 OUT="$HOST_ROOT/evidence/performance"
 mkdir -p "$OUT/raw" "$OUT/resources"
 
-# Keep the comparison one replica versus one replica. HPA is enabled again by
-# run_hpa_experiment.sh, where scaling is the variable under test.
-kubectl -n "$NAMESPACE" delete hpa secondhand-service --ignore-not-found
+# Keep the comparison one replica versus one replica. Autoscaling is tested
+# separately by the complete-system runner, never by this service comparison.
 kubectl -n "$NAMESPACE" scale deployment/monolith deployment/secondhand-service --replicas=1
 kubectl -n "$NAMESPACE" rollout status deployment/monolith --timeout=180s
 kubectl -n "$NAMESPACE" rollout status deployment/secondhand-service --timeout=180s

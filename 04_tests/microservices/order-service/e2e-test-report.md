@@ -1,3 +1,3 @@
-# E2E 测试报告
+# order-service E2E 测试报告
 
-状态：本次未运行。现有 UC11-UC15 与 UC20 Playwright spec 保持原位置并复用，没有复制到服务目录。开发代理与 Helm Ingress 已把 `/api/order`、`/api/review`、`/api/logistics`、`/api/admin/orders` 路由到 order-service；仍需在 catalog-shop、benefits-finance、messaging、secondhand 调用方全部部署后运行并回填浏览器版本、commit、6 条用例结果和截图路径。
+同一 run 的 `UC11-UC15 and UC20 candidate image API E2E` 以及 `UC11-UC15 and UC20 Compose Playwright regression` jobs 成功。共享 [Kinda Goods CI/CD](https://github.com/Isabella-Apus/SEGroup8/actions/runs/33526387696) 同 SHA 的完整 UC01-UC25 回归也成功。E2E 使用已测试候选镜像，发布阶段不重新构建。

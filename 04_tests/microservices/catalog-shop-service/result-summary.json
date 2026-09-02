@@ -1,23 +1,16 @@
 {
   "service": "catalog-shop-service",
-  "generatedAt": "2026-08-31T16:05:47+08:00",
-  "sourceCommit": "historical-local-snapshot-before-current-pr-head",
-  "authoritativeCurrentHeadEvidence": "Catalog Shop Service CI/CD acceptance-summary.json artifact plus Kinda Goods CI/CD checks at the same GitHub SHA",
-  "automated": {
-    "command": "mvn -B -f microservices/pom.xml -pl catalog-shop-service -am clean verify",
-    "tests": 14,
-    "passed": 13,
-    "failures": 0,
-    "errors": 0,
-    "skipped": 1,
-    "status": "LOCAL_PARTIAL_HISTORICAL",
-    "note": "The historical local run skipped the Docker-backed MySQL test. The current PR workflow rejects a missing or skipped MySQL ownership test."
+  "testedRevision": "b622e6bbb0447d6823b50e7789e4777f7131eb9b",
+  "status": "MAIN_CI_AND_K3S_DEPLOYMENT_PASSED",
+  "workflowRun": "https://github.com/Isabella-Apus/SEGroup8/actions/runs/33526387391",
+  "openApiOperations": { "public": 30, "internal": 6 },
+  "checks": {
+    "apiContractAndRealMySql": "PASS",
+    "independentSmoke": "PASS",
+    "fullSystemE2E": "PASS_RUN_33526387696",
+    "immutableImagePublish": "PASS",
+    "helmAtomicDeploy": "PASS",
+    "livenessReadinessInfo": "PASS"
   },
-  "requiredCurrentChecks": {
-    "mysql8": "PR_CI",
-    "independentComposeBrowserE2e": "PR_CI",
-    "fullSystemE2e": "SHARED_PR_CI",
-    "deployment": "MAIN_ONLY",
-    "hpa": "OUT_OF_CURRENT_ACCEPTANCE_SCOPE"
-  }
+  "evidenceBoundary": "Current generated reports are stored in the same-SHA Actions artifacts; Git retains summaries and key evidence only."
 }

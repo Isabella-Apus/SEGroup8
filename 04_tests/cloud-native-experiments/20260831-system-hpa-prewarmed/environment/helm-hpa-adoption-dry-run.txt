@@ -1,9 +1,0 @@
-Validation target: existing segroup8 Helm release and script-created backend HPA
-Helm version: v3.21.4
-Mode: server-side dry-run; no cluster workload was changed
-Values merge: --reset-then-reuse-values
-Expected HPA: minReplicas=2, maxReplicas=4, averageUtilization=60
-Result: PASS
-
-Command result:
-HELM_HPA_ADOPTION_DRY_RUN_OK

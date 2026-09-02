@@ -2,7 +2,7 @@
 
 | 需求 / 用例 | 六类图模型 | 主要代码模块 | 测试编号与现有测试 | 结果 / 证据 |
 |---|---|---|---|---|
-| REQ09 / UC09 商品风险审核 | SYS-BEH09 / CONCEPT-CLASS09 / COMP-STRUCT09 / COMP-SEQ09 / DESIGN-CLASS09 / OBJ-SEQ09 | `AdminProductRiskAuditView.vue`；`ProductRiskAuditServiceImpl` | E2E-TC09-001~03 `RiskApiAndE2ETest`；E2E-TC09-001 `frontend/e2e/domain-b/uc09-risk-audit.spec.ts` | **CI_E2E_PASS / LOCAL_ARTIFACT_MISSING**：服务/API 原始结果已归档；最新 main 的全 UC Playwright Job 通过（https://github.com/Isabella-Apus/SEGroup8/actions/runs/33185345952/job/98897601611），但仓库未保存本用例独立 Playwright JSON。 |
+| REQ09 / UC09 商品风险审核 | SYS-BEH09 / CONCEPT-CLASS09 / COMP-STRUCT09 / COMP-SEQ09 / DESIGN-CLASS09 / OBJ-SEQ09 | `AdminProductRiskAuditView.vue`；`ProductRiskAuditServiceImpl` | E2E-TC09-001~03 `RiskApiAndE2ETest`；E2E-TC09-001 `frontend/e2e/domain-b/uc09-risk-audit.spec.ts` | **CI_E2E_PASS / ACTIONS_ARTIFACT**：服务/API 原始结果已归档；最新 main 的全 UC Playwright Job 通过（https://github.com/Isabella-Apus/SEGroup8/actions/runs/33526387696），完整 Playwright 报告由 Actions artifact 保存，Git 仅保留结构化摘要和关键证据。 |
 
 ## 权威材料
 
