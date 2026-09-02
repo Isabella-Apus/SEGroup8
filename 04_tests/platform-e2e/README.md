@@ -7,7 +7,7 @@ shared `frontend/playwright.config.ts`, fixtures, and helpers.
 The CI lifecycle starts MySQL, backend, and frontend once, runs the smoke gate
 first, and then runs every Domain A-E Playwright suite against the same stack.
 `container-acceptance/` retains the independently reproducible Compose
-acceptance checks that were originally tracked as Issue #65.
+acceptance checks used by the final delivery.
 
 ## Local run
 
