@@ -82,12 +82,15 @@ kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-secondha
 service_ip="$(kubectl --namespace "$k8s_namespace" get service secondhand-service -o jsonpath='{.spec.clusterIP}')"
 [[ -n "$service_ip" && "$service_ip" != "None" ]]
 service_url="http://${service_ip}:8080"
-secondhand_info="$(curl --fail --silent --show-error "$service_url/actuator/info")"
+curl_service() {
+  curl --connect-timeout 5 --max-time 15 --retry 12 --retry-all-errors --retry-delay 5 "$@"
+}
+secondhand_info="$(curl_service --fail --silent --show-error "$service_url/actuator/info")"
 grep -F '"version":"'"$image_tag"'"' <<<"$secondhand_info" >/dev/null
 grep -F '"commit":"'"$release_id"'"' <<<"$secondhand_info" >/dev/null
-curl --fail --silent --show-error "$service_url/actuator/health/liveness" >/dev/null
-curl --fail --silent --show-error "$service_url/actuator/health/readiness" >/dev/null
-secondhand_smoke="$(curl --fail --silent --show-error "$service_url/api/secondhand/list")"
+curl_service --fail --silent --show-error "$service_url/actuator/health/liveness" >/dev/null
+curl_service --fail --silent --show-error "$service_url/actuator/health/readiness" >/dev/null
+secondhand_smoke="$(curl_service --fail --silent --show-error "$service_url/api/secondhand/list")"
 grep -F '"code":0' <<<"$secondhand_smoke" >/dev/null
 
 echo "secondhand-service deployed successfully as $image_tag"

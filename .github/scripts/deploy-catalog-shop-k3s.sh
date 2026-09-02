@@ -59,10 +59,13 @@ kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-catalog-
 service_ip="$(kubectl --namespace "$k8s_namespace" get service segroup8-catalog-shop -o jsonpath='{.spec.clusterIP}')"
 [[ -n "$service_ip" && "$service_ip" != "None" ]]
 service_url="http://${service_ip}:8080"
-service_info="$(curl --fail --silent --show-error "$service_url/actuator/info")"
+curl_service() {
+  curl --connect-timeout 5 --max-time 15 --retry 12 --retry-all-errors --retry-delay 5 "$@"
+}
+service_info="$(curl_service --fail --silent --show-error "$service_url/actuator/info")"
 grep -F '"version":"'"$image_tag"'"' <<<"$service_info" >/dev/null
 grep -F '"commit":"'"$release_id"'"' <<<"$service_info" >/dev/null
-curl --fail --silent --show-error "$service_url/actuator/health/liveness" >/dev/null
-curl --fail --silent --show-error "$service_url/actuator/health/readiness" >/dev/null
-curl --fail --silent --show-error "$service_url/api/category/tree" >/dev/null
+curl_service --fail --silent --show-error "$service_url/actuator/health/liveness" >/dev/null
+curl_service --fail --silent --show-error "$service_url/actuator/health/readiness" >/dev/null
+curl_service --fail --silent --show-error "$service_url/api/category/tree" >/dev/null
 echo "catalog-shop-service deployed successfully as $image_tag"

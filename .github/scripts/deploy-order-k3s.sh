@@ -60,11 +60,14 @@ kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-order --
 service_ip="$(kubectl --namespace "$k8s_namespace" get service segroup8-order -o jsonpath='{.spec.clusterIP}')"
 [[ -n "$service_ip" && "$service_ip" != "None" ]]
 service_url="http://${service_ip}:8085"
-order_info="$(curl --fail --silent --show-error "$service_url/actuator/info")"
+curl_service() {
+  curl --connect-timeout 5 --max-time 15 --retry 12 --retry-all-errors --retry-delay 5 "$@"
+}
+order_info="$(curl_service --fail --silent --show-error "$service_url/actuator/info")"
 grep -F '"version":"'"$image_tag"'"' <<<"$order_info" >/dev/null
 grep -F '"commit":"'"$release_id"'"' <<<"$order_info" >/dev/null
-curl --fail --silent --show-error "$service_url/actuator/health/liveness" >/dev/null
-curl --fail --silent --show-error "$service_url/actuator/health/readiness" >/dev/null
-status="$(curl --silent --output /dev/null --write-out '%{http_code}' "$service_url/api/order/list")"
+curl_service --fail --silent --show-error "$service_url/actuator/health/liveness" >/dev/null
+curl_service --fail --silent --show-error "$service_url/actuator/health/readiness" >/dev/null
+status="$(curl_service --silent --output /dev/null --write-out '%{http_code}' "$service_url/api/order/list")"
 [[ "$status" == "401" ]]
 echo "order-service deployed successfully as $image_tag"

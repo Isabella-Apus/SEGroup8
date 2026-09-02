@@ -84,12 +84,15 @@ kubectl --namespace "$k8s_namespace" rollout status deployment/segroup8-identity
 service_ip="$(kubectl --namespace "$k8s_namespace" get service identity-governance-service -o jsonpath='{.spec.clusterIP}')"
 [[ -n "$service_ip" && "$service_ip" != "None" ]]
 service_url="http://${service_ip}:8091"
-identity_info="$(curl --fail --silent --show-error "$service_url/actuator/info")"
+curl_service() {
+  curl --connect-timeout 5 --max-time 15 --retry 12 --retry-all-errors --retry-delay 5 "$@"
+}
+identity_info="$(curl_service --fail --silent --show-error "$service_url/actuator/info")"
 grep -F '"version":"'"$image_tag"'"' <<<"$identity_info" >/dev/null
 grep -F '"commit":"'"$release_id"'"' <<<"$identity_info" >/dev/null
-curl --fail --silent --show-error "$service_url/actuator/health/liveness" >/dev/null
-curl --fail --silent --show-error "$service_url/actuator/health/readiness" >/dev/null
-identity_smoke="$(curl --fail --silent --show-error -H 'Content-Type: application/json' \
+curl_service --fail --silent --show-error "$service_url/actuator/health/liveness" >/dev/null
+curl_service --fail --silent --show-error "$service_url/actuator/health/readiness" >/dev/null
+identity_smoke="$(curl_service --fail --silent --show-error -H 'Content-Type: application/json' \
   -d '{"username":"__deployment_smoke__","password":"invalid"}' \
   "$service_url/api/auth/login")"
 grep -F '"code":401' <<<"$identity_smoke" >/dev/null

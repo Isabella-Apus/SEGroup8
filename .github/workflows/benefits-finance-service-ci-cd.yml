@@ -468,13 +468,16 @@ jobs:
           service_ip="$(kubectl -n "$namespace" get service benefits-finance -o jsonpath='{.spec.clusterIP}')"
           test -n "$service_ip" && test "$service_ip" != "None"
           service_url="http://${service_ip}:8085"
+          curl_service() {
+            curl --connect-timeout 5 --max-time 15 --retry 12 --retry-all-errors --retry-delay 5 "$@"
+          }
           for endpoint in liveness readiness; do
-            curl --fail --silent --show-error "$service_url/actuator/health/${endpoint}" \
+            curl_service --fail --silent --show-error "$service_url/actuator/health/${endpoint}" \
               | grep -q '"status":"UP"'
           done
-          curl --fail --silent --show-error "$service_url/actuator/info" \
+          curl_service --fail --silent --show-error "$service_url/actuator/info" \
             | grep -Fq "\"commit\":\"$git_sha\""
-          curl --silent --show-error "$service_url/api/finance/dashboard" \
+          curl_service --silent --show-error "$service_url/api/finance/dashboard" \
             2>/dev/null | grep -q 'AUTH_REQUIRED'
           helm -n "$namespace" status segroup8
           helm -n "$namespace" history segroup8
