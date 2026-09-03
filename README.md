@@ -18,6 +18,16 @@
 
 期中报告、旧分支验收稿、重复交付清单、旧单服务 HPA 和完整 Playwright HTML/trace/video 已移至仓库外 `selfwork/SEGroup8-final-prune-20260902/`，不作为最终提交事实来源。
 
+## 版本与 Git 追溯
+
+- 代码仓库：<https://github.com/Isabella-Apus/SEGroup8>
+- 改造前原系统标签：`monolith-start`，对应提交 `2d39751cbda8d4e6d6b4a10565a9f9f9e266f119`。
+- 改造后六微服务 Maven 版本：`1.0.0`；容器发布版本使用不可变的 `sha-<完整 Git SHA>`，不使用 `latest` 作为验收依据。
+- 六服务生产部署、完整系统 HPA、Order 故障恢复和性能实验的共同运行证据基线：`b622e6bbb0447d6823b50e7789e4777f7131eb9b`。该 SHA 是实验基线，不表示此后文档和测试修复停止提交。
+- 完整提交记录：<https://github.com/Isabella-Apus/SEGroup8/commits/main/>；本地可执行 `git log --date=iso --pretty=fuller --decorate` 查看作者、提交者、时间、标签和合并记录。
+
+六份服务级改造前后代码差异位于 `02_docs/microservices/<service>/before-after-code-diff.md`。最终打包若不包含 `.git/`，仍应同时提交本 README、Git 仓库地址和课程平台要求的仓库访问权限，避免丢失完整提交记录。
+
 ## 系统组成
 
 | 组件 | 目录 | 责任 |
